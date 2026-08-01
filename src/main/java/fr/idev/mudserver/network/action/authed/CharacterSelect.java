@@ -13,6 +13,7 @@ import fr.idev.mudserver.game.PlayerInstance;
 import fr.idev.mudserver.network.ActionHandler;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.Session;
+import fr.idev.mudserver.network.action.ingame.Look;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.authed.NoCharacterNamed;
 import fr.idev.mudserver.network.message.authed.NowPlaying;
@@ -27,19 +28,22 @@ public class CharacterSelect implements ActionHandler {
     private final AuthWorld authWorld;
     private final GameWorld gameWorld;
     private final CharacterList characterListAction;
+    private final Look lookAction;
 
     public CharacterSelect(
             CharacterDao characterDao,
             AccountDao accountDao,
             AuthWorld authWorld,
             GameWorld gameWorld,
-            CharacterList characterListAction
+            CharacterList characterListAction,
+            Look lookAction
     ) {
         this.characterDao = characterDao;
         this.accountDao = accountDao;
         this.authWorld = authWorld;
         this.gameWorld = gameWorld;
         this.characterListAction = characterListAction;
+        this.lookAction = lookAction;
     }
 
     @Override
@@ -81,6 +85,6 @@ public class CharacterSelect implements ActionHandler {
         gameWorld.enterWorld(player);
 
         session.send(new NowPlaying(character.get().name()));
-        // TODO(phase 5) : déléguer à Look.onReceive(session, ""), comme côté PHP.
+        lookAction.onReceive(session, "");
     }
 }
