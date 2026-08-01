@@ -1,0 +1,114 @@
+package fr.idev.mudserver.game;
+
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import fr.idev.mudserver.AbstractIntegrationTest;
+import fr.idev.mudserver.domain.Account;
+import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.Item;
+import fr.idev.mudserver.domain.ItemTemplate;
+import fr.idev.mudserver.domain.ItemType;
+import fr.idev.mudserver.domain.Race;
+import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.persistence.AccountDao;
+import fr.idev.mudserver.persistence.CharacterDao;
+import fr.idev.mudserver.persistence.ItemDao;
+import fr.idev.mudserver.persistence.ItemTemplateDao;
+import fr.idev.mudserver.persistence.RoomDao;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * Contrairement au test PHP équivalent ({@code ItemRaceConditionTest}, deux appels
+ * {@code dispatch()} séquentiels sur le même thread — pas une vraie race), ce test induit une
+ * concurrence réelle : deux virtual threads, synchronisés par un {@link CyclicBarrier} pour
+ * arriver au plus près l'un de l'autre, appellent {@link ItemService#addItemToInventory} sur le
+ * même item. Volontairement pas {@code @Transactional} : chaque appel doit ouvrir sa PROPRE
+ * transaction/connexion (le verrou pessimiste n'a de sens qu'entre deux transactions
+ * distinctes) — un {@code @Transactional} au niveau du test partagerait la connexion du thread
+ * de test, pas celle des deux virtual threads qui font le vrai travail.
+ */
+class ItemRaceConditionTest extends AbstractIntegrationTest {
+
+    private static final int ITERATIONS = 50;
+
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private ItemDao itemDao;
+
+    @Autowired
+    private RoomDao roomDao;
+
+    @Autowired
+    private AccountDao accountDao;
+
+    @Autowired
+    private CharacterDao characterDao;
+
+    @Autowired
+    private ItemTemplateDao itemTemplateDao;
+
+    @Test
+    void exactlyOneCharacterWinsTheRace() throws Exception {
+        Room room = new Room(UUID.randomUUID(), "Race test room", "...", null);
+        roomDao.insert(room);
+
+        Character alice = seedCharacter(room, "race-alice-" + UUID.randomUUID());
+        Character bob = seedCharacter(room, "race-bob-" + UUID.randomUUID());
+
+        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "race-item-" + UUID.randomUUID(), null, ItemType.MISC, 1);
+        itemTemplateDao.insert(template);
+
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            for (int i = 0; i < ITERATIONS; i++) {
+                Item item = new Item(UUID.randomUUID(), template.id(), room.id(), null, null);
+                itemDao.insert(item);
+
+                CyclicBarrier barrier = new CyclicBarrier(2);
+                Callable<Boolean> aliceAttempt = () -> {
+                    barrier.await();
+                    return itemService.addItemToInventory(item, alice);
+                };
+                Callable<Boolean> bobAttempt = () -> {
+                    barrier.await();
+                    return itemService.addItemToInventory(item, bob);
+                };
+
+                Future<Boolean> aliceResult = executor.submit(aliceAttempt);
+                Future<Boolean> bobResult = executor.submit(bobAttempt);
+
+                boolean aliceWon = aliceResult.get();
+                boolean bobWon = bobResult.get();
+
+                assertThat(aliceWon ^ bobWon)
+                        .as("exactement un gagnant à l'itération %d (alice=%s, bob=%s)", i, aliceWon, bobWon)
+                        .isTrue();
+
+                Item afterRace = itemDao.findById(item.id()).orElseThrow();
+                UUID winnerId = aliceWon ? alice.id() : bob.id();
+                assertThat(afterRace.characterId()).isEqualTo(winnerId);
+            }
+        }
+    }
+
+    private Character seedCharacter(Room room, String login) {
+        Account account = new Account(UUID.randomUUID(), login, "hashed-password", null);
+        accountDao.insert(account);
+        Character character = new Character(
+                UUID.randomUUID(), account.id(), login, room.id(), Race.HUMAN,
+                10, 10, 10, 10, 10, 10, 10, 10, 10, 10
+        );
+        characterDao.insert(character);
+        return character;
+    }
+}
