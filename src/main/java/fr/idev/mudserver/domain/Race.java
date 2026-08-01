@@ -1,5 +1,6 @@
 package fr.idev.mudserver.domain;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static fr.idev.mudserver.domain.Ability.CHARISMA;
@@ -24,14 +25,38 @@ public enum Race {
         };
     }
 
+    /**
+     * {@code LinkedHashMap} plutôt que {@code Map.of(...)} : l'ordre d'insertion doit rester
+     * stable (affiché tel quel par {@code ChooseRace}), ce que {@code Map.of(...)} ne garantit
+     * pas (ordre d'itération volontairement randomisé par la JVM).
+     */
     public Map<Ability, Integer> abilityScoreBonuses() {
-        return switch (this) {
-            case DWARF -> Map.of(STRENGTH, 2, CONSTITUTION, 2);
-            case HUMAN -> Map.of(
-                    STRENGTH, 1, DEXTERITY, 1, CONSTITUTION, 1,
-                    INTELLIGENCE, 1, WISDOM, 1, CHARISMA, 1);
-            case HIGH_ELF -> Map.of(DEXTERITY, 2, INTELLIGENCE, 2, WISDOM, 1, CHARISMA, 1);
-            case ORC -> Map.of(STRENGTH, 2, DEXTERITY, 1, WISDOM, 1);
-        };
+        Map<Ability, Integer> bonuses = new LinkedHashMap<>();
+        switch (this) {
+            case DWARF -> {
+                bonuses.put(STRENGTH, 2);
+                bonuses.put(CONSTITUTION, 2);
+            }
+            case HUMAN -> {
+                bonuses.put(STRENGTH, 1);
+                bonuses.put(DEXTERITY, 1);
+                bonuses.put(CONSTITUTION, 1);
+                bonuses.put(INTELLIGENCE, 1);
+                bonuses.put(WISDOM, 1);
+                bonuses.put(CHARISMA, 1);
+            }
+            case HIGH_ELF -> {
+                bonuses.put(DEXTERITY, 2);
+                bonuses.put(INTELLIGENCE, 2);
+                bonuses.put(WISDOM, 1);
+                bonuses.put(CHARISMA, 1);
+            }
+            case ORC -> {
+                bonuses.put(STRENGTH, 2);
+                bonuses.put(DEXTERITY, 1);
+                bonuses.put(WISDOM, 1);
+            }
+        }
+        return bonuses;
     }
 }

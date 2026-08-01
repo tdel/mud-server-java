@@ -1,0 +1,3 @@
+app:
+  telnet:
+    enabled: false

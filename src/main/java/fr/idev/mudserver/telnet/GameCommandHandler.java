@@ -8,6 +8,10 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
 
+import fr.idev.mudserver.game.AuthWorld;
+import fr.idev.mudserver.game.GameWorld;
+import fr.idev.mudserver.network.ActionDispatcher;
+
 /**
  * Frontière Netty <-> logique métier. Chaque connexion obtient exactement un virtual thread,
  * démarré à {@code channelActive} et vivant jusqu'à la déconnexion : c'est lui, et lui seul,
@@ -18,9 +22,8 @@ import io.netty.util.AttributeKey;
  * <p>Point important : {@code channelRead0} ne doit jamais soumettre indépendamment chaque
  * ligne au pool de virtual threads (un {@code executor.execute()} par ligne) — deux lignes
  * reçues dans le même paquet TCP se traiteraient alors sur deux virtual threads distincts,
- * sans garantie d'ordre d'exécution entre eux (seul l'ordre d'appel de {@code channelRead0}
- * sur le thread NIO est garanti, pas l'ordre d'exécution des tâches une fois remises à
- * l'executor). D'où la file : un seul virtual thread consommateur par connexion.
+ * sans garantie d'ordre d'exécution entre eux. D'où la file : un seul virtual thread
+ * consommateur par connexion.
  */
 public class GameCommandHandler extends SimpleChannelInboundHandler<String> {
 
@@ -28,16 +31,24 @@ public class GameCommandHandler extends SimpleChannelInboundHandler<String> {
     private static final AttributeKey<BlockingQueue<String>> INBOX_KEY = AttributeKey.valueOf("telnetInbox");
     private static final String POISON_PILL = new String();
 
-    private final ExecutorService virtualThreadExecutor;
+    private static final String WELCOME =
+            "Welcome to mud-server-java.\nType \"login <name>\" or \"register <name>\" to begin.\n";
 
-    public GameCommandHandler(ExecutorService virtualThreadExecutor) {
+    private final ExecutorService virtualThreadExecutor;
+    private final ActionDispatcher actionDispatcher;
+    private final AuthWorld authWorld;
+    private final GameWorld gameWorld;
+
+    public GameCommandHandler(ExecutorService virtualThreadExecutor, ActionDispatcher actionDispatcher, AuthWorld authWorld, GameWorld gameWorld) {
         this.virtualThreadExecutor = virtualThreadExecutor;
+        this.actionDispatcher = actionDispatcher;
+        this.authWorld = authWorld;
+        this.gameWorld = gameWorld;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        TelnetSession session = new TelnetSession(ctx.channel());
-        session.setLineHandler(line -> handleDemoLine(session, line));
+        TelnetSession session = new TelnetSession(ctx.channel(), actionDispatcher, authWorld, gameWorld);
         BlockingQueue<String> inbox = new LinkedBlockingQueue<>();
         ctx.channel().attr(SESSION_KEY).set(session);
         ctx.channel().attr(INBOX_KEY).set(inbox);
@@ -58,7 +69,7 @@ public class GameCommandHandler extends SimpleChannelInboundHandler<String> {
     }
 
     private void runConnectionLoop(TelnetSession session, BlockingQueue<String> inbox) {
-        session.write("Bienvenue sur mud-server-java (démo écho, tapez \"mask\" pour tester un prompt masqué).\r\n> ");
+        session.write(WELCOME);
         try {
             while (true) {
                 String line = inbox.take();
@@ -66,18 +77,11 @@ public class GameCommandHandler extends SimpleChannelInboundHandler<String> {
                     return;
                 }
                 session.handleLine(line);
-                session.write("> ");
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        }
-    }
-
-    private void handleDemoLine(TelnetSession session, String line) {
-        if ("mask".equalsIgnoreCase(line.trim())) {
-            session.promptMasked("Mot de passe (masqué) : ", typed -> session.write("Tu as tapé : " + typed + "\r\n"));
-        } else {
-            session.write(line + "\r\n");
+        } finally {
+            session.handleClose();
         }
     }
 }

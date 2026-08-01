@@ -10,4 +10,5 @@ spring:
 
 app:
   telnet:
+    enabled: true
     port: 4001

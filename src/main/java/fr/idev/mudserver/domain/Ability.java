@@ -6,5 +6,16 @@ public enum Ability {
     CONSTITUTION,
     INTELLIGENCE,
     WISDOM,
-    CHARISMA
+    CHARISMA;
+
+    public String label() {
+        return switch (this) {
+            case STRENGTH -> "Strength";
+            case DEXTERITY -> "Dexterity";
+            case CONSTITUTION -> "Constitution";
+            case INTELLIGENCE -> "Intelligence";
+            case WISDOM -> "Wisdom";
+            case CHARISMA -> "Charisma";
+        };
+    }
 }

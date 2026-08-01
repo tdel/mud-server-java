@@ -52,10 +52,13 @@ public class AccountDao {
         ).stream().findFirst();
     }
 
+    /** {@code characterId} peut être {@code null} (voir CharacterDelete) — {@link Map#of} refuse les valeurs null. */
     public void updateCurrentCharacter(UUID accountId, UUID characterId) {
         jdbcTemplate.update(
                 "UPDATE account SET current_character_id = :characterId WHERE id = :accountId",
-                Map.of("accountId", accountId, "characterId", characterId)
+                new MapSqlParameterSource()
+                        .addValue("accountId", accountId)
+                        .addValue("characterId", characterId)
         );
     }
 }
