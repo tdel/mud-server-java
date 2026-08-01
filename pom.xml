@@ -94,10 +94,13 @@
             <artifactId>spring-security-crypto</artifactId>
         </dependency>
 
-        <!-- Lecture de data/items.json (fixtures item_template) -->
+        <!-- Lecture de data/items.json (fixtures item_template). spring-boot-starter-json
+             plutôt que jackson-databind seul : depuis Spring Boot 4, l'autoconfiguration
+             Jackson (le bean ObjectMapper) vit dans le module dédié spring-boot-jackson,
+             tiré par ce starter — même pattern que spring-boot-starter-flyway (voir plus haut). -->
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-json</artifactId>
         </dependency>
 
         <!-- Tests -->

@@ -1,0 +1,20 @@
+[
+    {
+        "id": "019fa0a5-80bf-7e84-87bf-5cf699c00315",
+        "name": "Potion de soin",
+        "type": "potion",
+        "weight": 1
+    },
+    {
+        "id": "019fa0a5-80c0-7035-9c2d-113b09a275df",
+        "name": "Epée courte",
+        "type": "weapon",
+        "weight": 1
+    },
+    {
+        "id": "019faec6-116d-723d-b04c-76d51a2a2cb7",
+        "name": "Casque de fer",
+        "type": "helmet",
+        "weight": 2
+    }
+]

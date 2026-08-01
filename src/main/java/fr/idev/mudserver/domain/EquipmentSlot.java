@@ -6,5 +6,9 @@ public enum EquipmentSlot {
     CHEST,
     LEGS,
     FEET,
-    HANDS
+    HANDS;
+
+    public String label() {
+        return name().toLowerCase();
+    }
 }
