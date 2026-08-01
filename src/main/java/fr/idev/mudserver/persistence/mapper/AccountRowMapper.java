@@ -12,11 +12,7 @@ public class AccountRowMapper implements RowMapper<Account> {
 
     @Override
     public Account mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return new Account(
-                rs.getObject("id", UUID.class),
-                rs.getString("login"),
-                rs.getString("password"),
-                rs.getObject("current_character_id", UUID.class)
-        );
+        return new Account(rs.getObject("id", UUID.class), rs.getString("login"), rs.getString("password"),
+                rs.getObject("current_character_id", UUID.class));
     }
 }

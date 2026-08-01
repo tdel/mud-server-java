@@ -15,14 +15,16 @@ import fr.idev.mudserver.network.message.ingame.CharacterLeftRoom;
 import fr.idev.mudserver.persistence.CharacterDao;
 
 /**
- * Les joueurs actuellement présents dans une room, et le point d'entrée pour diffuser un
- * message à tout le monde dedans. Rejoindre/quitter notifie toujours la room, l'appelant n'a
- * jamais besoin d'y penser lui-même.
+ * Les joueurs actuellement présents dans une room, et le point d'entrée pour
+ * diffuser un message à tout le monde dedans. Rejoindre/quitter notifie
+ * toujours la room, l'appelant n'a jamais besoin d'y penser lui-même.
  *
- * <p>{@code ConcurrentHashMap.newKeySet()} remplace le {@code SplObjectStorage} PHP — son
- * itérateur est faiblement cohérent (jamais de {@code ConcurrentModificationException}, tolère
- * un ajout/retrait pendant l'itération), donc {@link #broadcast} n'a pas besoin du snapshot
- * défensif que fait la version PHP avant d'itérer.
+ * <p>
+ * {@code ConcurrentHashMap.newKeySet()} remplace le {@code SplObjectStorage}
+ * PHP — son itérateur est faiblement cohérent (jamais de
+ * {@code ConcurrentModificationException}, tolère un ajout/retrait pendant
+ * l'itération), donc {@link #broadcast} n'a pas besoin du snapshot défensif que
+ * fait la version PHP avant d'itérer.
  */
 public class RoomInstance {
 

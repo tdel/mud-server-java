@@ -14,10 +14,7 @@ public class ActionDispatcher {
     }
 
     public void dispatch(Session session, String actionName, String argument) {
-        registry.find(session.state(), actionName)
-                .ifPresentOrElse(
-                        action -> action.onReceive(session, argument),
-                        () -> session.send(new ActionNotFound())
-                );
+        registry.find(session.state(), actionName).ifPresentOrElse(action -> action.onReceive(session, argument),
+                () -> session.send(new ActionNotFound()));
     }
 }

@@ -13,16 +13,19 @@ import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.ActionDispatcher;
 
 /**
- * Frontière Netty <-> logique métier. Chaque connexion obtient exactement un virtual thread,
- * démarré à {@code channelActive} et vivant jusqu'à la déconnexion : c'est lui, et lui seul,
- * qui exécute {@code session.handleLine(...)}, en dépilant une file FIFO alimentée par
- * {@code channelRead0}. C'est le calque direct du "un coroutine par connexion" de Swoole
- * côté PHP (TelnetConnectionHandler::run()).
+ * Frontière Netty <-> logique métier. Chaque connexion obtient exactement un
+ * virtual thread, démarré à {@code channelActive} et vivant jusqu'à la
+ * déconnexion : c'est lui, et lui seul, qui exécute
+ * {@code session.handleLine(...)}, en dépilant une file FIFO alimentée par
+ * {@code channelRead0}. C'est le calque direct du "un coroutine par connexion"
+ * de Swoole côté PHP (TelnetConnectionHandler::run()).
  *
- * <p>Point important : {@code channelRead0} ne doit jamais soumettre indépendamment chaque
- * ligne au pool de virtual threads (un {@code executor.execute()} par ligne) — deux lignes
- * reçues dans le même paquet TCP se traiteraient alors sur deux virtual threads distincts,
- * sans garantie d'ordre d'exécution entre eux. D'où la file : un seul virtual thread
+ * <p>
+ * Point important : {@code channelRead0} ne doit jamais soumettre
+ * indépendamment chaque ligne au pool de virtual threads (un
+ * {@code executor.execute()} par ligne) — deux lignes reçues dans le même
+ * paquet TCP se traiteraient alors sur deux virtual threads distincts, sans
+ * garantie d'ordre d'exécution entre eux. D'où la file : un seul virtual thread
  * consommateur par connexion.
  */
 public class GameCommandHandler extends SimpleChannelInboundHandler<String> {
@@ -31,15 +34,15 @@ public class GameCommandHandler extends SimpleChannelInboundHandler<String> {
     private static final AttributeKey<BlockingQueue<String>> INBOX_KEY = AttributeKey.valueOf("telnetInbox");
     private static final String POISON_PILL = new String();
 
-    private static final String WELCOME =
-            "Welcome to mud-server-java.\nType \"login <name>\" or \"register <name>\" to begin.\n";
+    private static final String WELCOME = "Welcome to mud-server-java.\nType \"login <name>\" or \"register <name>\" to begin.\n";
 
     private final ExecutorService virtualThreadExecutor;
     private final ActionDispatcher actionDispatcher;
     private final AuthWorld authWorld;
     private final GameWorld gameWorld;
 
-    public GameCommandHandler(ExecutorService virtualThreadExecutor, ActionDispatcher actionDispatcher, AuthWorld authWorld, GameWorld gameWorld) {
+    public GameCommandHandler(ExecutorService virtualThreadExecutor, ActionDispatcher actionDispatcher,
+            AuthWorld authWorld, GameWorld gameWorld) {
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.actionDispatcher = actionDispatcher;
         this.authWorld = authWorld;

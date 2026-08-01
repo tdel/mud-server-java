@@ -24,58 +24,39 @@ public class RoomDao {
     }
 
     public void insert(Room room) {
-        jdbcTemplate.update(
-                """
+        jdbcTemplate.update("""
                 INSERT INTO room (id, name, description, is_starting_room)
                 VALUES (:id, :name, :description, :isStartingRoom)
-                """,
-                new MapSqlParameterSource()
-                        .addValue("id", room.id())
-                        .addValue("name", room.name())
-                        .addValue("description", room.description())
-                        .addValue("isStartingRoom", room.isStartingRoom())
-        );
+                """, new MapSqlParameterSource().addValue("id", room.id()).addValue("name", room.name())
+                .addValue("description", room.description()).addValue("isStartingRoom", room.isStartingRoom()));
     }
 
     public Optional<Room> findById(UUID id) {
-        return jdbcTemplate.query(
-                "SELECT * FROM room WHERE id = :id",
-                Map.of("id", id),
-                MAPPER
-        ).stream().findFirst();
+        return jdbcTemplate.query("SELECT * FROM room WHERE id = :id", Map.of("id", id), MAPPER).stream().findFirst();
     }
 
     public Optional<Room> findByName(String name) {
-        return jdbcTemplate.query(
-                "SELECT * FROM room WHERE name = :name",
-                Map.of("name", name),
-                MAPPER
-        ).stream().findFirst();
+        return jdbcTemplate.query("SELECT * FROM room WHERE name = :name", Map.of("name", name), MAPPER).stream()
+                .findFirst();
     }
 
     public Optional<Room> findStartingRoom() {
-        return jdbcTemplate.query(
-                "SELECT * FROM room WHERE is_starting_room = TRUE",
-                MAPPER
-        ).stream().findFirst();
+        return jdbcTemplate.query("SELECT * FROM room WHERE is_starting_room = TRUE", MAPPER).stream().findFirst();
     }
 
     public List<Room> findAll() {
         return jdbcTemplate.query("SELECT * FROM room", MAPPER);
     }
 
-    /** Ne marque rien de plus ; l'appelant doit avoir appelé {@link #clearStartingRoom()} avant si besoin. */
+    /**
+     * Ne marque rien de plus ; l'appelant doit avoir appelé
+     * {@link #clearStartingRoom()} avant si besoin.
+     */
     public void markAsStartingRoom(UUID roomId) {
-        jdbcTemplate.update(
-                "UPDATE room SET is_starting_room = TRUE WHERE id = :id",
-                Map.of("id", roomId)
-        );
+        jdbcTemplate.update("UPDATE room SET is_starting_room = TRUE WHERE id = :id", Map.of("id", roomId));
     }
 
     public void clearStartingRoom() {
-        jdbcTemplate.update(
-                "UPDATE room SET is_starting_room = NULL WHERE is_starting_room = TRUE",
-                Map.of()
-        );
+        jdbcTemplate.update("UPDATE room SET is_starting_room = NULL WHERE is_starting_room = TRUE", Map.of());
     }
 }

@@ -7,12 +7,12 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
 /**
- * Retire les séquences IAC (subnégociation, négociation d'option) du flux entrant, sans
- * jamais répondre à une négociation côté serveur — seul le toggle ECHO explicite de
- * {@link TelnetSession#promptMasked} émet de l'IAC, en sortie. Port du filtre par regex
- * PHP (IacFilter::strip()) en scan d'octets, nécessaire ici car un decoder Netty ne peut
- * pas travailler sur un buffer déjà entièrement reçu : une séquence IAC peut être coupée
- * entre deux paquets TCP.
+ * Retire les séquences IAC (subnégociation, négociation d'option) du flux
+ * entrant, sans jamais répondre à une négociation côté serveur — seul le toggle
+ * ECHO explicite de {@link TelnetSession#promptMasked} émet de l'IAC, en
+ * sortie. Port du filtre par regex PHP (IacFilter::strip()) en scan d'octets,
+ * nécessaire ici car un decoder Netty ne peut pas travailler sur un buffer déjà
+ * entièrement reçu : une séquence IAC peut être coupée entre deux paquets TCP.
  */
 public class IacFilterDecoder extends ByteToMessageDecoder {
 
@@ -56,7 +56,8 @@ public class IacFilterDecoder extends ByteToMessageDecoder {
                 }
                 in.readUnsignedByte(); // option, ignorée : pas de négociation côté serveur
             }
-            // sinon : autre commande IAC à 2 octets (NOP, AYT, ...), déjà consommée, ignorée
+            // sinon : autre commande IAC à 2 octets (NOP, AYT, ...), déjà consommée,
+            // ignorée
         }
         if (wroteAny) {
             out.add(cleaned);

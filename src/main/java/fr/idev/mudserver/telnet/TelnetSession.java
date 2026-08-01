@@ -19,9 +19,10 @@ import fr.idev.mudserver.network.OutputMessage;
 import fr.idev.mudserver.network.Session;
 
 /**
- * État par connexion, porté par un attribut de {@link Channel}. Netty garantit qu'un seul
- * virtual thread touche une connexion donnée à la fois (voir GameCommandHandler) — aucune
- * synchronisation supplémentaire n'est donc nécessaire sur ces champs mutables.
+ * État par connexion, porté par un attribut de {@link Channel}. Netty garantit
+ * qu'un seul virtual thread touche une connexion donnée à la fois (voir
+ * GameCommandHandler) — aucune synchronisation supplémentaire n'est donc
+ * nécessaire sur ces champs mutables.
  */
 public class TelnetSession implements Session, TelnetOutput {
 
@@ -78,11 +79,12 @@ public class TelnetSession implements Session, TelnetOutput {
     }
 
     /**
-     * Coupe l'echo local du client, écrit {@code prompt}, capture la ligne suivante en clair
-     * pour {@code onLine}. L'echo est toujours rétabli juste avant que {@code onLine} ne
-     * s'exécute. Le client n'ayant jamais renvoyé le retour chariot pendant que l'echo était
-     * coupé, on émet nous-même un saut de ligne pour que ce que {@code onLine} écrit démarre
-     * sur une ligne neuve plutôt qu'accolé au prompt.
+     * Coupe l'echo local du client, écrit {@code prompt}, capture la ligne suivante
+     * en clair pour {@code onLine}. L'echo est toujours rétabli juste avant que
+     * {@code onLine} ne s'exécute. Le client n'ayant jamais renvoyé le retour
+     * chariot pendant que l'echo était coupé, on émet nous-même un saut de ligne
+     * pour que ce que {@code onLine} écrit démarre sur une ligne neuve plutôt
+     * qu'accolé au prompt.
      */
     @Override
     public void promptMasked(String prompt, Consumer<String> onLine) {

@@ -24,8 +24,7 @@ public class CharacterDao {
     }
 
     public void insert(Character character) {
-        jdbcTemplate.update(
-                """
+        jdbcTemplate.update("""
                 INSERT INTO character (
                     id, account_id, name, current_room_id, race,
                     current_health, max_health, current_mana, max_mana,
@@ -36,60 +35,37 @@ public class CharacterDao {
                     :strength, :dexterity, :constitution, :intelligence, :wisdom, :charisma
                 )
                 """,
-                new MapSqlParameterSource()
-                        .addValue("id", character.id())
-                        .addValue("accountId", character.accountId())
-                        .addValue("name", character.name())
-                        .addValue("currentRoomId", character.currentRoomId())
-                        .addValue("race", character.race().name())
-                        .addValue("currentHealth", character.currentHealth())
-                        .addValue("maxHealth", character.maxHealth())
-                        .addValue("currentMana", character.currentMana())
-                        .addValue("maxMana", character.maxMana())
-                        .addValue("strength", character.strength())
-                        .addValue("dexterity", character.dexterity())
-                        .addValue("constitution", character.constitution())
-                        .addValue("intelligence", character.intelligence())
-                        .addValue("wisdom", character.wisdom())
-                        .addValue("charisma", character.charisma())
-        );
+                new MapSqlParameterSource().addValue("id", character.id()).addValue("accountId", character.accountId())
+                        .addValue("name", character.name()).addValue("currentRoomId", character.currentRoomId())
+                        .addValue("race", character.race().name()).addValue("currentHealth", character.currentHealth())
+                        .addValue("maxHealth", character.maxHealth()).addValue("currentMana", character.currentMana())
+                        .addValue("maxMana", character.maxMana()).addValue("strength", character.strength())
+                        .addValue("dexterity", character.dexterity()).addValue("constitution", character.constitution())
+                        .addValue("intelligence", character.intelligence()).addValue("wisdom", character.wisdom())
+                        .addValue("charisma", character.charisma()));
     }
 
     public Optional<Character> findById(UUID id) {
-        return jdbcTemplate.query(
-                "SELECT * FROM character WHERE id = :id",
-                Map.of("id", id),
-                MAPPER
-        ).stream().findFirst();
+        return jdbcTemplate.query("SELECT * FROM character WHERE id = :id", Map.of("id", id), MAPPER).stream()
+                .findFirst();
     }
 
     public List<Character> findByAccountId(UUID accountId) {
-        return jdbcTemplate.query(
-                "SELECT * FROM character WHERE account_id = :accountId",
-                Map.of("accountId", accountId),
-                MAPPER
-        );
+        return jdbcTemplate.query("SELECT * FROM character WHERE account_id = :accountId",
+                Map.of("accountId", accountId), MAPPER);
     }
 
     public Optional<Character> findByAccountIdAndName(UUID accountId, String name) {
-        return jdbcTemplate.query(
-                "SELECT * FROM character WHERE account_id = :accountId AND name = :name",
-                Map.of("accountId", accountId, "name", name),
-                MAPPER
-        ).stream().findFirst();
+        return jdbcTemplate.query("SELECT * FROM character WHERE account_id = :accountId AND name = :name",
+                Map.of("accountId", accountId, "name", name), MAPPER).stream().findFirst();
     }
 
     public void updateCurrentRoom(UUID characterId, UUID roomId) {
-        jdbcTemplate.update(
-                "UPDATE character SET current_room_id = :roomId WHERE id = :characterId",
-                Map.of("characterId", characterId, "roomId", roomId)
-        );
+        jdbcTemplate.update("UPDATE character SET current_room_id = :roomId WHERE id = :characterId",
+                Map.of("characterId", characterId, "roomId", roomId));
     }
 
     public void deleteById(UUID characterId) {
-        jdbcTemplate.update(
-                "DELETE FROM character WHERE id = :characterId",
-                Map.of("characterId", characterId)
-        );
+        jdbcTemplate.update("DELETE FROM character WHERE id = :characterId", Map.of("characterId", characterId));
     }
 }

@@ -1,12 +1,7 @@
 package fr.idev.mudserver.domain;
 
 public enum Ability {
-    STRENGTH,
-    DEXTERITY,
-    CONSTITUTION,
-    INTELLIGENCE,
-    WISDOM,
-    CHARISMA;
+    STRENGTH, DEXTERITY, CONSTITUTION, INTELLIGENCE, WISDOM, CHARISMA;
 
     public String label() {
         return switch (this) {

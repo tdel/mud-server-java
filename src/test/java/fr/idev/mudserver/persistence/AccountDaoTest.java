@@ -43,16 +43,12 @@ class AccountDaoTest extends AbstractIntegrationTest {
 
         Room startingRoom = new Room(UUID.randomUUID(), "Place du village", "...", true);
         roomDao.insert(startingRoom);
-        Character character = new Character(
-                UUID.randomUUID(), account.id(), "Bob le Nain", startingRoom.id(), Race.DWARF,
-                12, 12, 10, 10, 12, 10, 12, 10, 10, 10
-        );
+        Character character = new Character(UUID.randomUUID(), account.id(), "Bob le Nain", startingRoom.id(),
+                Race.DWARF, 12, 12, 10, 10, 12, 10, 12, 10, 10, 10);
         characterDao.insert(character);
 
         accountDao.updateCurrentCharacter(account.id(), character.id());
 
-        assertThat(accountDao.findById(account.id()))
-                .map(Account::currentCharacterId)
-                .contains(character.id());
+        assertThat(accountDao.findById(account.id())).map(Account::currentCharacterId).contains(character.id());
     }
 }

@@ -11,9 +11,10 @@ import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.persistence.CharacterDao;
 
 /**
- * Suit tous les joueurs actuellement dans le monde de jeu, pour toute la durée de vie du
- * process. Agnostique du transport : ne connaît que {@link PlayerInstance} et les identifiants
- * de room, jamais telnet (ni aucun autre transport) directement.
+ * Suit tous les joueurs actuellement dans le monde de jeu, pour toute la durée
+ * de vie du process. Agnostique du transport : ne connaît que
+ * {@link PlayerInstance} et les identifiants de room, jamais telnet (ni aucun
+ * autre transport) directement.
  */
 @Component
 public class GameWorld {
@@ -43,10 +44,11 @@ public class GameWorld {
     }
 
     /**
-     * Appelé une fois au démarrage du serveur, avant qu'aucune connexion ne soit acceptée —
-     * ainsi {@link #roomInstance} n'a jamais besoin d'être thread-safe en écriture concurrente
-     * pour la première visite d'une room (contrairement au PHP, ici {@code computeIfAbsent} le
-     * serait de toute façon, mais le warm-up évite même la question).
+     * Appelé une fois au démarrage du serveur, avant qu'aucune connexion ne soit
+     * acceptée — ainsi {@link #roomInstance} n'a jamais besoin d'être thread-safe
+     * en écriture concurrente pour la première visite d'une room (contrairement au
+     * PHP, ici {@code computeIfAbsent} le serait de toute façon, mais le warm-up
+     * évite même la question).
      */
     public void warmRoomInstances(Iterable<Room> rooms) {
         for (Room room : rooms) {

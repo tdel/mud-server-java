@@ -10,10 +10,11 @@ import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.Session;
 
 /**
- * Suit tous les clients connectés mais pas encore en train de jouer (les états "connected"
- * et "authed" comptent tous les deux). {@code ConcurrentHashMap.newKeySet()} remplace le
- * {@code SplObjectStorage} PHP — son itérateur tolère un ajout/retrait concurrent sans copie
- * défensive préalable, contrairement à l'original.
+ * Suit tous les clients connectés mais pas encore en train de jouer (les états
+ * "connected" et "authed" comptent tous les deux).
+ * {@code ConcurrentHashMap.newKeySet()} remplace le {@code SplObjectStorage}
+ * PHP — son itérateur tolère un ajout/retrait concurrent sans copie défensive
+ * préalable, contrairement à l'original.
  */
 @Component
 public class AuthWorld {
@@ -31,10 +32,11 @@ public class AuthWorld {
     }
 
     /**
-     * Détache la session du suivi "connecté mais pas en jeu" sans repasser par l'état
-     * {@code CONNECTED} — l'appelant (voir {@code CharacterSelect}) enchaîne directement sur
-     * l'état {@code INGAME}. Ne pas remplacer par {@code exitWorld()} + {@code setState()} :
-     * {@code exitWorld()} vide aussi le compte attaché à la session.
+     * Détache la session du suivi "connecté mais pas en jeu" sans repasser par
+     * l'état {@code CONNECTED} — l'appelant (voir {@code CharacterSelect}) enchaîne
+     * directement sur l'état {@code INGAME}. Ne pas remplacer par
+     * {@code exitWorld()} + {@code setState()} : {@code exitWorld()} vide aussi le
+     * compte attaché à la session.
      */
     public void moveToGameWorld(Session session) {
         connectedSessions.remove(session);

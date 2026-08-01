@@ -33,7 +33,8 @@ public class Register implements ActionHandler {
     private final PasswordEncoder passwordEncoder;
     private final CharacterList characterListAction;
 
-    public Register(AccountDao accountDao, AuthWorld authWorld, PasswordEncoder passwordEncoder, CharacterList characterListAction) {
+    public Register(AccountDao accountDao, AuthWorld authWorld, PasswordEncoder passwordEncoder,
+            CharacterList characterListAction) {
         this.accountDao = accountDao;
         this.authWorld = authWorld;
         this.passwordEncoder = passwordEncoder;
@@ -73,7 +74,8 @@ public class Register implements ActionHandler {
             return;
         }
 
-        session.promptMasked("Confirm password: ", confirmation -> onPasswordConfirmed(session, login, password, confirmation));
+        session.promptMasked("Confirm password: ",
+                confirmation -> onPasswordConfirmed(session, login, password, confirmation));
     }
 
     private void onPasswordConfirmed(Session session, String login, String password, String confirmation) {

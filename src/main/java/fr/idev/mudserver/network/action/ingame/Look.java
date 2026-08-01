@@ -31,7 +31,8 @@ public class Look implements ActionHandler {
     private final ItemTemplateDao itemTemplateDao;
     private final GameWorld gameWorld;
 
-    public Look(RoomDao roomDao, RoomExitDao roomExitDao, ItemDao itemDao, ItemTemplateDao itemTemplateDao, GameWorld gameWorld) {
+    public Look(RoomDao roomDao, RoomExitDao roomExitDao, ItemDao itemDao, ItemTemplateDao itemTemplateDao,
+            GameWorld gameWorld) {
         this.roomDao = roomDao;
         this.roomExitDao = roomExitDao;
         this.itemDao = itemDao;
@@ -64,10 +65,8 @@ public class Look implements ActionHandler {
         List<Item> items = itemDao.findByRoomId(roomId);
 
         List<String> exitNames = exits.stream().map(RoomExit::direction).toList();
-        List<String> characterNames = characters.stream()
-                .filter(other -> !other.id().equals(character.id()))
-                .map(Character::name)
-                .toList();
+        List<String> characterNames = characters.stream().filter(other -> !other.id().equals(character.id()))
+                .map(Character::name).toList();
         List<String> itemNames = items.stream()
                 .map(item -> itemTemplateDao.findById(item.templateId()).map(ItemTemplate::name).orElseThrow())
                 .toList();

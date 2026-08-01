@@ -30,14 +30,8 @@ public class CharacterSelect implements ActionHandler {
     private final CharacterList characterListAction;
     private final Look lookAction;
 
-    public CharacterSelect(
-            CharacterDao characterDao,
-            AccountDao accountDao,
-            AuthWorld authWorld,
-            GameWorld gameWorld,
-            CharacterList characterListAction,
-            Look lookAction
-    ) {
+    public CharacterSelect(CharacterDao characterDao, AccountDao accountDao, AuthWorld authWorld, GameWorld gameWorld,
+            CharacterList characterListAction, Look lookAction) {
         this.characterDao = characterDao;
         this.accountDao = accountDao;
         this.authWorld = authWorld;
@@ -77,7 +71,8 @@ public class CharacterSelect implements ActionHandler {
 
         accountDao.updateCurrentCharacter(account.id(), character.get().id());
 
-        // détache de l'AuthWorld, attache la PlayerInstance à la session, fait passer l'état
+        // détache de l'AuthWorld, attache la PlayerInstance à la session, fait passer
+        // l'état
         // à INGAME, puis fait rejoindre GameWorld (broadcast d'arrivée dans la room).
         authWorld.moveToGameWorld(session);
         PlayerInstance player = new PlayerInstance(session, character.get());

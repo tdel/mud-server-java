@@ -22,14 +22,17 @@ import fr.idev.mudserver.network.ActionDispatcher;
 import fr.idev.mudserver.persistence.RoomDao;
 
 /**
- * Démarré sur {@link ApplicationReadyEvent} plutôt qu'en tant que commande séparée — c'est
- * l'équivalent direct de {@code app:telnet:serve} côté PHP, mais ici c'est le point d'entrée
- * principal de l'application, pas une sous-commande. Le listener bloque volontairement sur
- * le thread appelant jusqu'à l'arrêt du serveur (mêmes effets que le {@code Co\run()}
- * bloquant du bootstrap Swoole) — {@code ApplicationReadyEvent} est publié de façon
- * synchrone, donc ce blocage empêche {@code SpringApplication.run()} de jamais retourner.
- * Sans le flag {@code app.telnet.enabled=false} (voir {@code src/test/resources/application.yml}),
- * n'importe quel {@code @SpringBootTest} resterait bloqué indéfiniment au démarrage du contexte.
+ * Démarré sur {@link ApplicationReadyEvent} plutôt qu'en tant que commande
+ * séparée — c'est l'équivalent direct de {@code app:telnet:serve} côté PHP,
+ * mais ici c'est le point d'entrée principal de l'application, pas une
+ * sous-commande. Le listener bloque volontairement sur le thread appelant
+ * jusqu'à l'arrêt du serveur (mêmes effets que le {@code Co\run()} bloquant du
+ * bootstrap Swoole) — {@code ApplicationReadyEvent} est publié de façon
+ * synchrone, donc ce blocage empêche {@code SpringApplication.run()} de jamais
+ * retourner. Sans le flag {@code app.telnet.enabled=false} (voir
+ * {@code src/test/resources/application.yml}), n'importe quel
+ * {@code @SpringBootTest} resterait bloqué indéfiniment au démarrage du
+ * contexte.
  */
 @Component
 @ConditionalOnProperty(prefix = "app.telnet", name = "enabled", havingValue = "true", matchIfMissing = true)
@@ -44,14 +47,8 @@ public class TelnetServer {
     private final RoomDao roomDao;
     private final int port;
 
-    public TelnetServer(
-            ExecutorService virtualThreadExecutor,
-            ActionDispatcher actionDispatcher,
-            AuthWorld authWorld,
-            GameWorld gameWorld,
-            RoomDao roomDao,
-            @Value("${app.telnet.port}") int port
-    ) {
+    public TelnetServer(ExecutorService virtualThreadExecutor, ActionDispatcher actionDispatcher, AuthWorld authWorld,
+            GameWorld gameWorld, RoomDao roomDao, @Value("${app.telnet.port}") int port) {
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.actionDispatcher = actionDispatcher;
         this.authWorld = authWorld;
@@ -67,10 +64,9 @@ public class TelnetServer {
         EventLoopGroup bossGroup = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
         EventLoopGroup workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
         try {
-            ServerBootstrap bootstrap = new ServerBootstrap()
-                    .group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .childHandler(new TelnetServerInitializer(virtualThreadExecutor, actionDispatcher, authWorld, gameWorld));
+            ServerBootstrap bootstrap = new ServerBootstrap().group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class).childHandler(
+                            new TelnetServerInitializer(virtualThreadExecutor, actionDispatcher, authWorld, gameWorld));
 
             Channel channel = bootstrap.bind(port).sync().channel();
             log.info("Serveur telnet démarré sur le port {}", port);

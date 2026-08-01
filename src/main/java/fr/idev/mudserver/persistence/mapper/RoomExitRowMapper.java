@@ -12,11 +12,7 @@ public class RoomExitRowMapper implements RowMapper<RoomExit> {
 
     @Override
     public RoomExit mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return new RoomExit(
-                rs.getObject("id", UUID.class),
-                rs.getString("direction"),
-                rs.getObject("source_room_id", UUID.class),
-                rs.getObject("target_room_id", UUID.class)
-        );
+        return new RoomExit(rs.getObject("id", UUID.class), rs.getString("direction"),
+                rs.getObject("source_room_id", UUID.class), rs.getObject("target_room_id", UUID.class));
     }
 }

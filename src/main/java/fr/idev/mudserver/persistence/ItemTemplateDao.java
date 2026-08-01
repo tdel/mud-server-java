@@ -23,42 +23,28 @@ public class ItemTemplateDao {
     }
 
     public void insert(ItemTemplate template) {
-        jdbcTemplate.update(
-                """
+        jdbcTemplate.update("""
                 INSERT INTO item_template (id, name, description, type, weight)
                 VALUES (:id, :name, :description, :type, :weight)
                 """,
-                new MapSqlParameterSource()
-                        .addValue("id", template.id())
-                        .addValue("name", template.name())
-                        .addValue("description", template.description())
-                        .addValue("type", template.type().name())
-                        .addValue("weight", template.weight())
-        );
+                new MapSqlParameterSource().addValue("id", template.id()).addValue("name", template.name())
+                        .addValue("description", template.description()).addValue("type", template.type().name())
+                        .addValue("weight", template.weight()));
     }
 
     public Optional<ItemTemplate> findById(UUID id) {
-        return jdbcTemplate.query(
-                "SELECT * FROM item_template WHERE id = :id",
-                Map.of("id", id),
-                MAPPER
-        ).stream().findFirst();
+        return jdbcTemplate.query("SELECT * FROM item_template WHERE id = :id", Map.of("id", id), MAPPER).stream()
+                .findFirst();
     }
 
     public Optional<ItemTemplate> findByName(String name) {
-        return jdbcTemplate.query(
-                "SELECT * FROM item_template WHERE name = :name",
-                Map.of("name", name),
-                MAPPER
-        ).stream().findFirst();
+        return jdbcTemplate.query("SELECT * FROM item_template WHERE name = :name", Map.of("name", name), MAPPER)
+                .stream().findFirst();
     }
 
     public boolean existsById(UUID id) {
-        Boolean exists = jdbcTemplate.queryForObject(
-                "SELECT EXISTS(SELECT 1 FROM item_template WHERE id = :id)",
-                Map.of("id", id),
-                Boolean.class
-        );
+        Boolean exists = jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM item_template WHERE id = :id)",
+                Map.of("id", id), Boolean.class);
         return Boolean.TRUE.equals(exists);
     }
 }

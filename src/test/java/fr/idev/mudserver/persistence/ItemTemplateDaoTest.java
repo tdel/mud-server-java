@@ -20,7 +20,8 @@ class ItemTemplateDaoTest extends AbstractIntegrationTest {
 
     @Test
     void insertsAndFindsById() {
-        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Épée courte", "Une épée légère", ItemType.WEAPON, 3);
+        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Épée courte", "Une épée légère", ItemType.WEAPON,
+                3);
 
         itemTemplateDao.insert(template);
 

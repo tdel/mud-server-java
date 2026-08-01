@@ -56,10 +56,8 @@ public class ItemSpawnCommand implements CliCommand {
         Item item = new Item(UUID.randomUUID(), template.get().id(), room.get().id(), null, null);
         itemDao.insert(item);
 
-        System.out.printf(
-                "Spawned \"%s\" (id=%s) in room \"%s\".%n",
-                template.get().name(), item.id(), room.get().name()
-        );
+        System.out.printf("Spawned \"%s\" (id=%s) in room \"%s\".%n", template.get().name(), item.id(),
+                room.get().name());
         return 0;
     }
 }

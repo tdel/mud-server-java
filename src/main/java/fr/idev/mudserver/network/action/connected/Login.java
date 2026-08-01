@@ -29,13 +29,8 @@ public class Login implements ActionHandler {
     private final PasswordEncoder passwordEncoder;
     private final CharacterList characterListAction;
 
-    public Login(
-            AccountDao accountDao,
-            AuthWorld authWorld,
-            GameWorld gameWorld,
-            PasswordEncoder passwordEncoder,
-            CharacterList characterListAction
-    ) {
+    public Login(AccountDao accountDao, AuthWorld authWorld, GameWorld gameWorld, PasswordEncoder passwordEncoder,
+            CharacterList characterListAction) {
         this.accountDao = accountDao;
         this.authWorld = authWorld;
         this.gameWorld = gameWorld;

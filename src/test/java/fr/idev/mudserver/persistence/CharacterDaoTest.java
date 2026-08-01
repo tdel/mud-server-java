@@ -42,10 +42,8 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     @Test
     void insertsAndFindsById() {
         seedAccountAndRooms();
-        Character character = new Character(
-                UUID.randomUUID(), account.id(), "Carol l'Orc", roomA.id(), Race.ORC,
-                14, 14, 10, 10, 14, 11, 12, 10, 11, 10
-        );
+        Character character = new Character(UUID.randomUUID(), account.id(), "Carol l'Orc", roomA.id(), Race.ORC, 14,
+                14, 10, 10, 14, 11, 12, 10, 11, 10);
 
         characterDao.insert(character);
 
@@ -57,26 +55,20 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     @Test
     void updatesCurrentRoom() {
         seedAccountAndRooms();
-        Character character = new Character(
-                UUID.randomUUID(), account.id(), "Carol l'Orc", roomA.id(), Race.ORC,
-                14, 14, 10, 10, 14, 11, 12, 10, 11, 10
-        );
+        Character character = new Character(UUID.randomUUID(), account.id(), "Carol l'Orc", roomA.id(), Race.ORC, 14,
+                14, 10, 10, 14, 11, 12, 10, 11, 10);
         characterDao.insert(character);
 
         characterDao.updateCurrentRoom(character.id(), roomB.id());
 
-        assertThat(characterDao.findById(character.id()))
-                .map(Character::currentRoomId)
-                .contains(roomB.id());
+        assertThat(characterDao.findById(character.id())).map(Character::currentRoomId).contains(roomB.id());
     }
 
     @Test
     void deletesById() {
         seedAccountAndRooms();
-        Character character = new Character(
-                UUID.randomUUID(), account.id(), "Carol l'Orc", roomA.id(), Race.ORC,
-                14, 14, 10, 10, 14, 11, 12, 10, 11, 10
-        );
+        Character character = new Character(UUID.randomUUID(), account.id(), "Carol l'Orc", roomA.id(), Race.ORC, 14,
+                14, 10, 10, 14, 11, 12, 10, 11, 10);
         characterDao.insert(character);
 
         characterDao.deleteById(character.id());

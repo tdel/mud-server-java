@@ -61,10 +61,8 @@ public class ItemTemplateLoadCommand implements CliCommand {
                 continue;
             }
 
-            ItemTemplate template = new ItemTemplate(
-                    id, entry.name(), entry.description(),
-                    ItemType.valueOf(entry.type().toUpperCase(Locale.ROOT)), entry.weight()
-            );
+            ItemTemplate template = new ItemTemplate(id, entry.name(), entry.description(),
+                    ItemType.valueOf(entry.type().toUpperCase(Locale.ROOT)), entry.weight());
             itemTemplateDao.insert(template);
             created++;
         }

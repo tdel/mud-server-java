@@ -24,32 +24,22 @@ public class RoomExitDao {
     }
 
     public void insert(RoomExit exit) {
-        jdbcTemplate.update(
-                """
+        jdbcTemplate.update("""
                 INSERT INTO room_exit (id, direction, source_room_id, target_room_id)
                 VALUES (:id, :direction, :sourceRoomId, :targetRoomId)
-                """,
-                new MapSqlParameterSource()
-                        .addValue("id", exit.id())
-                        .addValue("direction", exit.direction())
-                        .addValue("sourceRoomId", exit.sourceRoomId())
-                        .addValue("targetRoomId", exit.targetRoomId())
-        );
+                """, new MapSqlParameterSource().addValue("id", exit.id()).addValue("direction", exit.direction())
+                .addValue("sourceRoomId", exit.sourceRoomId()).addValue("targetRoomId", exit.targetRoomId()));
     }
 
     public List<RoomExit> findBySourceRoomId(UUID sourceRoomId) {
-        return jdbcTemplate.query(
-                "SELECT * FROM room_exit WHERE source_room_id = :sourceRoomId",
-                Map.of("sourceRoomId", sourceRoomId),
-                MAPPER
-        );
+        return jdbcTemplate.query("SELECT * FROM room_exit WHERE source_room_id = :sourceRoomId",
+                Map.of("sourceRoomId", sourceRoomId), MAPPER);
     }
 
     public Optional<RoomExit> findBySourceRoomIdAndDirection(UUID sourceRoomId, String direction) {
-        return jdbcTemplate.query(
-                "SELECT * FROM room_exit WHERE source_room_id = :sourceRoomId AND direction = :direction",
-                Map.of("sourceRoomId", sourceRoomId, "direction", direction),
-                MAPPER
-        ).stream().findFirst();
+        return jdbcTemplate
+                .query("SELECT * FROM room_exit WHERE source_room_id = :sourceRoomId AND direction = :direction",
+                        Map.of("sourceRoomId", sourceRoomId, "direction", direction), MAPPER)
+                .stream().findFirst();
     }
 }

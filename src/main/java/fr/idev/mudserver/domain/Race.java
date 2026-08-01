@@ -11,10 +11,7 @@ import static fr.idev.mudserver.domain.Ability.STRENGTH;
 import static fr.idev.mudserver.domain.Ability.WISDOM;
 
 public enum Race {
-    DWARF,
-    HUMAN,
-    HIGH_ELF,
-    ORC;
+    DWARF, HUMAN, HIGH_ELF, ORC;
 
     public String label() {
         return switch (this) {
@@ -26,9 +23,10 @@ public enum Race {
     }
 
     /**
-     * {@code LinkedHashMap} plutôt que {@code Map.of(...)} : l'ordre d'insertion doit rester
-     * stable (affiché tel quel par {@code ChooseRace}), ce que {@code Map.of(...)} ne garantit
-     * pas (ordre d'itération volontairement randomisé par la JVM).
+     * {@code LinkedHashMap} plutôt que {@code Map.of(...)} : l'ordre d'insertion
+     * doit rester stable (affiché tel quel par {@code ChooseRace}), ce que
+     * {@code Map.of(...)} ne garantit pas (ordre d'itération volontairement
+     * randomisé par la JVM).
      */
     public Map<Ability, Integer> abilityScoreBonuses() {
         Map<Ability, Integer> bonuses = new LinkedHashMap<>();

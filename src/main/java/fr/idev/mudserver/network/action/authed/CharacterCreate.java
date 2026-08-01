@@ -38,7 +38,8 @@ public class CharacterCreate implements ActionHandler {
     private final CharacterList characterListAction;
     private final DiceRoller diceRoller;
 
-    public CharacterCreate(CharacterDao characterDao, RoomDao roomDao, CharacterList characterListAction, DiceRoller diceRoller) {
+    public CharacterCreate(CharacterDao characterDao, RoomDao roomDao, CharacterList characterListAction,
+            DiceRoller diceRoller) {
         this.characterDao = characterDao;
         this.roomDao = roomDao;
         this.characterListAction = characterListAction;
@@ -114,12 +115,9 @@ public class CharacterCreate implements ActionHandler {
             scores.merge(bonus.getKey(), bonus.getValue(), Integer::sum);
         }
 
-        Character character = new Character(
-                UUID.randomUUID(), account.id(), name, startingRoom.id(), race,
-                100, 100, 10, 10,
-                scores.get(Ability.STRENGTH), scores.get(Ability.DEXTERITY), scores.get(Ability.CONSTITUTION),
-                scores.get(Ability.INTELLIGENCE), scores.get(Ability.WISDOM), scores.get(Ability.CHARISMA)
-        );
+        Character character = new Character(UUID.randomUUID(), account.id(), name, startingRoom.id(), race, 100, 100,
+                10, 10, scores.get(Ability.STRENGTH), scores.get(Ability.DEXTERITY), scores.get(Ability.CONSTITUTION),
+                scores.get(Ability.INTELLIGENCE), scores.get(Ability.WISDOM), scores.get(Ability.CHARISMA));
 
         characterDao.insert(character);
 

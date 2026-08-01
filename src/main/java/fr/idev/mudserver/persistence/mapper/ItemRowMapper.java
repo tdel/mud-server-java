@@ -14,12 +14,8 @@ public class ItemRowMapper implements RowMapper<Item> {
     @Override
     public Item mapRow(ResultSet rs, int rowNum) throws SQLException {
         String slot = rs.getString("slot");
-        return new Item(
-                rs.getObject("id", UUID.class),
-                rs.getObject("template_id", UUID.class),
-                rs.getObject("room_id", UUID.class),
-                rs.getObject("character_id", UUID.class),
-                slot == null ? null : EquipmentSlot.valueOf(slot)
-        );
+        return new Item(rs.getObject("id", UUID.class), rs.getObject("template_id", UUID.class),
+                rs.getObject("room_id", UUID.class), rs.getObject("character_id", UUID.class),
+                slot == null ? null : EquipmentSlot.valueOf(slot));
     }
 }

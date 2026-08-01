@@ -12,11 +12,7 @@ public class RoomRowMapper implements RowMapper<Room> {
 
     @Override
     public Room mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return new Room(
-                rs.getObject("id", UUID.class),
-                rs.getString("name"),
-                rs.getString("description"),
-                (Boolean) rs.getObject("is_starting_room")
-        );
+        return new Room(rs.getObject("id", UUID.class), rs.getString("name"), rs.getString("description"),
+                (Boolean) rs.getObject("is_starting_room"));
     }
 }

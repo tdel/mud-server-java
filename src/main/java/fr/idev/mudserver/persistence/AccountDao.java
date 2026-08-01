@@ -23,42 +23,29 @@ public class AccountDao {
     }
 
     public void insert(Account account) {
-        jdbcTemplate.update(
-                """
+        jdbcTemplate.update("""
                 INSERT INTO account (id, login, password, current_character_id)
                 VALUES (:id, :login, :password, :currentCharacterId)
-                """,
-                new MapSqlParameterSource()
-                        .addValue("id", account.id())
-                        .addValue("login", account.login())
-                        .addValue("password", account.password())
-                        .addValue("currentCharacterId", account.currentCharacterId())
-        );
+                """, new MapSqlParameterSource().addValue("id", account.id()).addValue("login", account.login())
+                .addValue("password", account.password()).addValue("currentCharacterId", account.currentCharacterId()));
     }
 
     public Optional<Account> findById(UUID id) {
-        return jdbcTemplate.query(
-                "SELECT * FROM account WHERE id = :id",
-                Map.of("id", id),
-                MAPPER
-        ).stream().findFirst();
+        return jdbcTemplate.query("SELECT * FROM account WHERE id = :id", Map.of("id", id), MAPPER).stream()
+                .findFirst();
     }
 
     public Optional<Account> findByLogin(String login) {
-        return jdbcTemplate.query(
-                "SELECT * FROM account WHERE login = :login",
-                Map.of("login", login),
-                MAPPER
-        ).stream().findFirst();
+        return jdbcTemplate.query("SELECT * FROM account WHERE login = :login", Map.of("login", login), MAPPER).stream()
+                .findFirst();
     }
 
-    /** {@code characterId} peut être {@code null} (voir CharacterDelete) — {@link Map#of} refuse les valeurs null. */
+    /**
+     * {@code characterId} peut être {@code null} (voir CharacterDelete) —
+     * {@link Map#of} refuse les valeurs null.
+     */
     public void updateCurrentCharacter(UUID accountId, UUID characterId) {
-        jdbcTemplate.update(
-                "UPDATE account SET current_character_id = :characterId WHERE id = :accountId",
-                new MapSqlParameterSource()
-                        .addValue("accountId", accountId)
-                        .addValue("characterId", characterId)
-        );
+        jdbcTemplate.update("UPDATE account SET current_character_id = :characterId WHERE id = :accountId",
+                new MapSqlParameterSource().addValue("accountId", accountId).addValue("characterId", characterId));
     }
 }

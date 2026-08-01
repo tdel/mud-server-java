@@ -24,12 +24,8 @@ public class TelnetServerInitializer extends ChannelInitializer<SocketChannel> {
     private final AuthWorld authWorld;
     private final GameWorld gameWorld;
 
-    public TelnetServerInitializer(
-            ExecutorService virtualThreadExecutor,
-            ActionDispatcher actionDispatcher,
-            AuthWorld authWorld,
-            GameWorld gameWorld
-    ) {
+    public TelnetServerInitializer(ExecutorService virtualThreadExecutor, ActionDispatcher actionDispatcher,
+            AuthWorld authWorld, GameWorld gameWorld) {
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.actionDispatcher = actionDispatcher;
         this.authWorld = authWorld;

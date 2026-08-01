@@ -10,14 +10,16 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 /**
- * Chaque commande CLI (room-create, item-template-create, item-template-load, item-spawn) est
- * un process JVM court invoqué en argument positionnel (ex. {@code java -jar app.jar
- * room-create --name=Foo --description=Bar}), partageant les mêmes DAOs que le serveur telnet
- * sans jamais le démarrer : {@code ApplicationRunner} s'exécute avant la publication
- * d'{@code ApplicationReadyEvent} (qui déclenche {@code TelnetServer.start()}), et
- * {@link System#exit} ici court-circuite le reste du démarrage de {@code SpringApplication}
- * avant que ça n'arrive. Sans argument positionnel reconnu (démarrage normal du serveur), cette
- * méthode ne fait rien et laisse le boot continuer normalement.
+ * Chaque commande CLI (room-create, item-template-create, item-template-load,
+ * item-spawn) est un process JVM court invoqué en argument positionnel (ex.
+ * {@code java -jar app.jar
+ * room-create --name=Foo --description=Bar}), partageant les mêmes DAOs que le
+ * serveur telnet sans jamais le démarrer : {@code ApplicationRunner} s'exécute
+ * avant la publication d'{@code ApplicationReadyEvent} (qui déclenche
+ * {@code TelnetServer.start()}), et {@link System#exit} ici court-circuite le
+ * reste du démarrage de {@code SpringApplication} avant que ça n'arrive. Sans
+ * argument positionnel reconnu (démarrage normal du serveur), cette méthode ne
+ * fait rien et laisse le boot continuer normalement.
  */
 @Component
 public class CliCommandRunner implements ApplicationRunner {

@@ -15,9 +15,10 @@ import fr.idev.mudserver.persistence.ItemDao;
 import fr.idev.mudserver.persistence.ItemTemplateDao;
 
 /**
- * Point d'entrée unique pour lire et muter les items d'un personnage — le sac comme les
- * emplacements équipés. Toute nouvelle mutation d'inventaire (take/drop/equip/unequip, un
- * futur craft/loot/trade) doit passer par ici plutôt que par {@link ItemDao} directement.
+ * Point d'entrée unique pour lire et muter les items d'un personnage — le sac
+ * comme les emplacements équipés. Toute nouvelle mutation d'inventaire
+ * (take/drop/equip/unequip, un futur craft/loot/trade) doit passer par ici
+ * plutôt que par {@link ItemDao} directement.
  */
 @Service
 public class ItemService {
@@ -61,13 +62,14 @@ public class ItemService {
     }
 
     /**
-     * Fait passer {@code item} dans le sac de {@code target}, sauf si un autre joueur l'a déjà
-     * pris entre-temps. Deux joueurs peuvent réellement se disputer un item non possédé sous
-     * les virtual threads — cette méthode relit la ligne sous verrou pessimiste (dans une
-     * transaction) avant de décider si l'item est encore libre. Voir
-     * {@link ItemDao#findByIdForUpdate}.
+     * Fait passer {@code item} dans le sac de {@code target}, sauf si un autre
+     * joueur l'a déjà pris entre-temps. Deux joueurs peuvent réellement se disputer
+     * un item non possédé sous les virtual threads — cette méthode relit la ligne
+     * sous verrou pessimiste (dans une transaction) avant de décider si l'item est
+     * encore libre. Voir {@link ItemDao#findByIdForUpdate}.
      *
-     * @return true si {@code target} porte désormais l'item, false s'il a été pris entre-temps
+     * @return true si {@code target} porte désormais l'item, false s'il a été pris
+     *         entre-temps
      */
     @Transactional
     public boolean addItemToInventory(Item item, Character target) {

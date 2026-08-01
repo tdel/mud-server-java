@@ -14,9 +14,9 @@ import fr.idev.mudserver.network.message.LoggedOut;
 import fr.idev.mudserver.network.message.authed.StoppedPlaying;
 
 /**
- * Utilisable depuis les états "authed" et "ingame". Depuis "ingame", se déloguer ne fait que
- * lâcher le personnage et revenir à la sélection ("authed"). Depuis "authed", se déloguer
- * repasse entièrement à "connected".
+ * Utilisable depuis les états "authed" et "ingame". Depuis "ingame", se
+ * déloguer ne fait que lâcher le personnage et revenir à la sélection
+ * ("authed"). Depuis "authed", se déloguer repasse entièrement à "connected".
  */
 @Component
 public class Logout implements ActionHandler {

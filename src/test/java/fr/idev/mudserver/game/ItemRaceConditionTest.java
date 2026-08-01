@@ -27,14 +27,16 @@ import fr.idev.mudserver.persistence.RoomDao;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Contrairement au test PHP équivalent ({@code ItemRaceConditionTest}, deux appels
- * {@code dispatch()} séquentiels sur le même thread — pas une vraie race), ce test induit une
- * concurrence réelle : deux virtual threads, synchronisés par un {@link CyclicBarrier} pour
- * arriver au plus près l'un de l'autre, appellent {@link ItemService#addItemToInventory} sur le
- * même item. Volontairement pas {@code @Transactional} : chaque appel doit ouvrir sa PROPRE
- * transaction/connexion (le verrou pessimiste n'a de sens qu'entre deux transactions
- * distinctes) — un {@code @Transactional} au niveau du test partagerait la connexion du thread
- * de test, pas celle des deux virtual threads qui font le vrai travail.
+ * Contrairement au test PHP équivalent ({@code ItemRaceConditionTest}, deux
+ * appels {@code dispatch()} séquentiels sur le même thread — pas une vraie
+ * race), ce test induit une concurrence réelle : deux virtual threads,
+ * synchronisés par un {@link CyclicBarrier} pour arriver au plus près l'un de
+ * l'autre, appellent {@link ItemService#addItemToInventory} sur le même item.
+ * Volontairement pas {@code @Transactional} : chaque appel doit ouvrir sa
+ * PROPRE transaction/connexion (le verrou pessimiste n'a de sens qu'entre deux
+ * transactions distinctes) — un {@code @Transactional} au niveau du test
+ * partagerait la connexion du thread de test, pas celle des deux virtual
+ * threads qui font le vrai travail.
  */
 class ItemRaceConditionTest extends AbstractIntegrationTest {
 
@@ -66,7 +68,8 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
         Character alice = seedCharacter(room, "race-alice-" + UUID.randomUUID());
         Character bob = seedCharacter(room, "race-bob-" + UUID.randomUUID());
 
-        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "race-item-" + UUID.randomUUID(), null, ItemType.MISC, 1);
+        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "race-item-" + UUID.randomUUID(), null,
+                ItemType.MISC, 1);
         itemTemplateDao.insert(template);
 
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
@@ -91,8 +94,7 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
                 boolean bobWon = bobResult.get();
 
                 assertThat(aliceWon ^ bobWon)
-                        .as("exactement un gagnant à l'itération %d (alice=%s, bob=%s)", i, aliceWon, bobWon)
-                        .isTrue();
+                        .as("exactement un gagnant à l'itération %d (alice=%s, bob=%s)", i, aliceWon, bobWon).isTrue();
 
                 Item afterRace = itemDao.findById(item.id()).orElseThrow();
                 UUID winnerId = aliceWon ? alice.id() : bob.id();
@@ -104,10 +106,8 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
     private Character seedCharacter(Room room, String login) {
         Account account = new Account(UUID.randomUUID(), login, "hashed-password", null);
         accountDao.insert(account);
-        Character character = new Character(
-                UUID.randomUUID(), account.id(), login, room.id(), Race.HUMAN,
-                10, 10, 10, 10, 10, 10, 10, 10, 10, 10
-        );
+        Character character = new Character(UUID.randomUUID(), account.id(), login, room.id(), Race.HUMAN, 10, 10, 10,
+                10, 10, 10, 10, 10, 10, 10);
         characterDao.insert(character);
         return character;
     }

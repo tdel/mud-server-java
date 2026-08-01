@@ -33,7 +33,8 @@ public class ItemTemplateCreateCommand implements CliCommand {
         String weightOption = CliOptions.first(args, "weight");
 
         if (name == null || description == null || typeOption == null || weightOption == null) {
-            System.err.println("Usage: item-template-create --name=<name> --description=<description> --type=<type> --weight=<weight>");
+            System.err.println(
+                    "Usage: item-template-create --name=<name> --description=<description> --type=<type> --weight=<weight>");
             System.err.println("Valid types: " + Arrays.toString(ItemType.values()));
             return 1;
         }
@@ -47,7 +48,8 @@ public class ItemTemplateCreateCommand implements CliCommand {
         try {
             type = ItemType.valueOf(typeOption.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
-            System.err.println("Unknown type \"" + typeOption + "\". Valid types: " + Arrays.toString(ItemType.values()));
+            System.err
+                    .println("Unknown type \"" + typeOption + "\". Valid types: " + Arrays.toString(ItemType.values()));
             return 1;
         }
 

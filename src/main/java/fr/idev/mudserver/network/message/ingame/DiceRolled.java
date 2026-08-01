@@ -18,13 +18,8 @@ public record DiceRolled(DiceExpression expression, DiceRoll result) implements 
             default -> "";
         };
 
-        String rolls = IntStream.of(result.rolls())
-                .mapToObj(String::valueOf)
-                .collect(Collectors.joining(", "));
+        String rolls = IntStream.of(result.rolls()).mapToObj(String::valueOf).collect(Collectors.joining(", "));
 
-        output.write(String.format(
-                "You roll %s: [%s]%s = %d\n",
-                expression, rolls, modifier, result.total()
-        ));
+        output.write(String.format("You roll %s: [%s]%s = %d\n", expression, rolls, modifier, result.total()));
     }
 }

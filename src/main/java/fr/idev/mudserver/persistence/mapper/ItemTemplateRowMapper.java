@@ -13,12 +13,7 @@ public class ItemTemplateRowMapper implements RowMapper<ItemTemplate> {
 
     @Override
     public ItemTemplate mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return new ItemTemplate(
-                rs.getObject("id", UUID.class),
-                rs.getString("name"),
-                rs.getString("description"),
-                ItemType.valueOf(rs.getString("type")),
-                rs.getInt("weight")
-        );
+        return new ItemTemplate(rs.getObject("id", UUID.class), rs.getString("name"), rs.getString("description"),
+                ItemType.valueOf(rs.getString("type")), rs.getInt("weight"));
     }
 }

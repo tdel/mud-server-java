@@ -132,6 +132,37 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <!-- Formatage/lint Java. Le formatter Eclipse est utilisé plutôt que
+                 google-java-format : ce dernier (ainsi que le pas removeUnusedImports, qui en
+                 dépend) s'appuie sur des API internes de javac cassées par Java 25
+                 (com.sun.tools.javac.util.Log$DeferredDiagnosticHandler#getDiagnostics a changé
+                 de type de retour) - voir https://github.com/diffplug/spotless/issues/2468.
+                 `mvn spotless:check` tourne en phase verify (donc pas pendant `mvn test`) ;
+                 corriger le formatage avec `mvn spotless:apply`. -->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>3.9.0</version>
+                <configuration>
+                    <java>
+                        <eclipse/>
+                        <trimTrailingWhitespace/>
+                        <endWithNewline/>
+                        <indent>
+                            <spaces>true</spaces>
+                            <spacesPerTab>4</spacesPerTab>
+                        </indent>
+                    </java>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <phase>verify</phase>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
