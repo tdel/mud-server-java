@@ -5,3 +5,7 @@ target/
 .vscode/
 .DS_Store
 docker/build/
+.classpath
+.project
+.settings/
+bin/
