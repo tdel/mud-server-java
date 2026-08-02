@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.network.Connection;
-import fr.idev.mudserver.persistence.CharacterDao;
 
 /**
  * Suit tous les joueurs actuellement dans le monde de jeu, pour toute la durée
@@ -22,10 +21,9 @@ public class GameWorld {
 
     private final Map<UUID, RoomInstance> roomInstances = new ConcurrentHashMap<>();
     private final Map<Connection, PlayerInstance> players = new ConcurrentHashMap<>();
-    private final CharacterDao characterDao;
 
-    public GameWorld(CharacterDao characterDao) {
-        this.characterDao = characterDao;
+    public GameWorld() {
+
     }
 
     public void enterWorld(Connection session, PlayerInstance player) {
@@ -46,7 +44,7 @@ public class GameWorld {
     }
 
     public RoomInstance roomInstance(UUID roomId) {
-        return roomInstances.computeIfAbsent(roomId, id -> new RoomInstance(id, characterDao));
+        return roomInstances.computeIfAbsent(roomId, RoomInstance::new);
     }
 
     /**
@@ -58,11 +56,11 @@ public class GameWorld {
      */
     public void warmRoomInstances(Iterable<Room> rooms) {
         for (Room room : rooms) {
-            roomInstance(room.id());
+            roomInstance(room.getId());
         }
     }
 
     public boolean isAlreadyConnected(UUID accountId) {
-        return players.values().stream().anyMatch(player -> player.character().accountId().equals(accountId));
+        return players.values().stream().anyMatch(player -> player.character().getAccountId().equals(accountId));
     }
 }

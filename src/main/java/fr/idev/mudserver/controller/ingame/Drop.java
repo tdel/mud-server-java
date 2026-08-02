@@ -62,7 +62,8 @@ public class Drop implements ControllerHandler {
 
         itemService.removeItemFromInventory(item.get(), character);
 
-        String templateName = itemTemplateDao.findById(item.get().templateId()).map(ItemTemplate::name).orElseThrow();
+        String templateName = itemTemplateDao.findById(item.get().getTemplateId()).map(ItemTemplate::getName)
+                .orElseThrow();
         player.send(new ItemDropped(templateName));
     }
 }

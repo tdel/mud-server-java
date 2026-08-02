@@ -62,7 +62,8 @@ public class Equip implements ControllerHandler {
             return;
         }
 
-        String templateName = itemTemplateDao.findById(item.get().templateId()).map(ItemTemplate::name).orElseThrow();
+        String templateName = itemTemplateDao.findById(item.get().getTemplateId()).map(ItemTemplate::getName)
+                .orElseThrow();
         Optional<EquipmentSlot> slot = itemService.equipItem(item.get(), character);
 
         if (slot.isEmpty()) {

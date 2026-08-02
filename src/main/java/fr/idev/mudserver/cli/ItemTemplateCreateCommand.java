@@ -64,7 +64,7 @@ public class ItemTemplateCreateCommand implements CliCommand {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), name, description, type, weight);
         itemTemplateDao.insert(template);
 
-        System.out.printf("Item template \"%s\" created (id=%s).%n", name, template.id());
+        System.out.printf("Item template \"%s\" created (id=%s).%n", name, template.getId());
         return 0;
     }
 }

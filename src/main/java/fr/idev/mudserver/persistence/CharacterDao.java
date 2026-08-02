@@ -34,15 +34,15 @@ public class CharacterDao {
                     :currentHealth, :maxHealth, :currentMana, :maxMana,
                     :strength, :dexterity, :constitution, :intelligence, :wisdom, :charisma
                 )
-                """,
-                new MapSqlParameterSource().addValue("id", character.id()).addValue("accountId", character.accountId())
-                        .addValue("name", character.name()).addValue("currentRoomId", character.currentRoomId())
-                        .addValue("race", character.race().name()).addValue("currentHealth", character.currentHealth())
-                        .addValue("maxHealth", character.maxHealth()).addValue("currentMana", character.currentMana())
-                        .addValue("maxMana", character.maxMana()).addValue("strength", character.strength())
-                        .addValue("dexterity", character.dexterity()).addValue("constitution", character.constitution())
-                        .addValue("intelligence", character.intelligence()).addValue("wisdom", character.wisdom())
-                        .addValue("charisma", character.charisma()));
+                """, new MapSqlParameterSource().addValue("id", character.getId())
+                .addValue("accountId", character.getAccountId()).addValue("name", character.getName())
+                .addValue("currentRoomId", character.getCurrentRoomId()).addValue("race", character.getRace().name())
+                .addValue("currentHealth", character.getCurrentHealth()).addValue("maxHealth", character.getMaxHealth())
+                .addValue("currentMana", character.getCurrentMana()).addValue("maxMana", character.getMaxMana())
+                .addValue("strength", character.getStrength()).addValue("dexterity", character.getDexterity())
+                .addValue("constitution", character.getConstitution())
+                .addValue("intelligence", character.getIntelligence()).addValue("wisdom", character.getWisdom())
+                .addValue("charisma", character.getCharisma()));
     }
 
     public Optional<Character> findById(UUID id) {

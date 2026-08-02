@@ -62,24 +62,24 @@ public class CharacterSelect implements ControllerHandler {
 
         Account account = authWorld.account(session);
 
-        Optional<Character> character = characterDao.findByAccountIdAndName(account.id(), name);
+        Optional<Character> character = characterDao.findByAccountIdAndName(account.getId(), name);
         if (character.isEmpty()) {
             session.send(new NoCharacterNamed(name));
             characterListAction.onReceive(session, "");
             return;
         }
 
-        accountDao.updateCurrentCharacter(account.id(), character.get().id());
+        accountDao.updateCurrentCharacter(account.getId(), character.get().getId());
 
         // détache de l'AuthWorld, attache la PlayerInstance à la session, fait passer
         // l'état
         // à INGAME, puis fait rejoindre GameWorld (broadcast d'arrivée dans la room).
         authWorld.moveToGameWorld(session);
-        PlayerInstance player = new PlayerInstance(session, character.get());
+        PlayerInstance player = new PlayerInstance(session, character.get(), characterDao);
         session.setState(ConnectionState.INGAME);
         gameWorld.enterWorld(session, player);
 
-        session.send(new NowPlaying(character.get().name()));
+        session.send(new NowPlaying(character.get().getName()));
         lookAction.onReceive(session, "");
     }
 }

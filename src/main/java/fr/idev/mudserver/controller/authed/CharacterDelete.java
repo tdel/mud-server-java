@@ -56,16 +56,16 @@ public class CharacterDelete implements ControllerHandler {
 
         Account account = authWorld.account(session);
 
-        Optional<Character> character = characterDao.findByAccountIdAndName(account.id(), name);
+        Optional<Character> character = characterDao.findByAccountIdAndName(account.getId(), name);
         if (character.isEmpty()) {
             session.send(new NoCharacterNamed(name));
             characterListAction.onReceive(session, "");
             return;
         }
 
-        UUID characterId = character.get().id();
-        if (characterId.equals(account.currentCharacterId())) {
-            accountDao.updateCurrentCharacter(account.id(), null);
+        UUID characterId = character.get().getId();
+        if (characterId.equals(account.getCurrentCharacterId())) {
+            accountDao.updateCurrentCharacter(account.getId(), null);
         }
 
         characterDao.deleteById(characterId);

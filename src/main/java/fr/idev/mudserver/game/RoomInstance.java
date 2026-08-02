@@ -12,7 +12,6 @@ import fr.idev.mudserver.network.OutputMessage;
 import fr.idev.mudserver.network.message.ingame.CharacterDisconnected;
 import fr.idev.mudserver.network.message.ingame.CharacterJoinedRoom;
 import fr.idev.mudserver.network.message.ingame.CharacterLeftRoom;
-import fr.idev.mudserver.persistence.CharacterDao;
 
 /**
  * Les joueurs actuellement présents dans une room, et le point d'entrée pour
@@ -29,33 +28,31 @@ import fr.idev.mudserver.persistence.CharacterDao;
 public class RoomInstance {
 
     private final UUID roomId;
-    private final CharacterDao characterDao;
     private final Set<PlayerInstance> players = ConcurrentHashMap.newKeySet();
 
-    RoomInstance(UUID roomId, CharacterDao characterDao) {
+    RoomInstance(UUID roomId) {
         this.roomId = roomId;
-        this.characterDao = characterDao;
     }
 
     public void join(PlayerInstance player) {
-        player.moveToRoom(roomId, characterDao);
+        player.moveToRoom(roomId);
         players.add(player);
-        broadcast(new CharacterJoinedRoom(player.character().name()), player);
+        broadcast(new CharacterJoinedRoom(player.character().getName()), player);
     }
 
     public void leave(PlayerInstance player, Room destination) {
         players.remove(player);
-        broadcast(new CharacterLeftRoom(player.character().name(), destination.name()), player);
+        broadcast(new CharacterLeftRoom(player.character().getName(), destination.getName()), player);
     }
 
     public void disconnect(PlayerInstance player) {
         players.remove(player);
-        broadcast(new CharacterDisconnected(player.character().name()), player);
+        broadcast(new CharacterDisconnected(player.character().getName()), player);
     }
 
     public Character findCharacterByName(String name) {
         for (PlayerInstance player : players) {
-            if (player.character().name().equalsIgnoreCase(name)) {
+            if (player.character().getName().equalsIgnoreCase(name)) {
                 return player.character();
             }
         }

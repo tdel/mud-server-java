@@ -45,7 +45,7 @@ public class Say implements ControllerHandler {
 
         Character character = player.character();
 
-        gameWorld.roomInstance(character.currentRoomId()).broadcast(new Chat(character.name(), message), player);
+        gameWorld.roomInstance(character.getCurrentRoomId()).broadcast(new Chat(character.getName(), message), player);
 
         player.send(new YouSaid(message));
     }

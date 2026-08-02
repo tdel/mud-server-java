@@ -28,11 +28,11 @@ class RoomExitDaoTest extends AbstractIntegrationTest {
         roomDao.insert(source);
         roomDao.insert(target);
 
-        RoomExit exit = new RoomExit(UUID.randomUUID(), "nord", source.id(), target.id());
+        RoomExit exit = new RoomExit(UUID.randomUUID(), "nord", source.getId(), target.getId());
         roomExitDao.insert(exit);
 
-        assertThat(roomExitDao.findBySourceRoomId(source.id())).containsExactly(exit);
-        assertThat(roomExitDao.findBySourceRoomIdAndDirection(source.id(), "nord")).contains(exit);
-        assertThat(roomExitDao.findBySourceRoomIdAndDirection(source.id(), "sud")).isEmpty();
+        assertThat(roomExitDao.findBySourceRoomId(source.getId())).containsExactly(exit);
+        assertThat(roomExitDao.findBySourceRoomIdAndDirection(source.getId(), "nord")).contains(exit);
+        assertThat(roomExitDao.findBySourceRoomIdAndDirection(source.getId(), "sud")).isEmpty();
     }
 }

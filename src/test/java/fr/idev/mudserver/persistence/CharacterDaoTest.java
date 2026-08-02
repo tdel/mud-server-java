@@ -42,37 +42,37 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     @Test
     void insertsAndFindsById() {
         seedAccountAndRooms();
-        Character character = new Character(UUID.randomUUID(), account.id(), "Carol l'Orc", roomA.id(), Race.ORC, 14,
-                14, 10, 10, 14, 11, 12, 10, 11, 10);
+        Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA.getId(), Race.ORC,
+                14, 14, 10, 10, 14, 11, 12, 10, 11, 10);
 
         characterDao.insert(character);
 
-        assertThat(characterDao.findById(character.id())).contains(character);
-        assertThat(characterDao.findByAccountId(account.id())).containsExactly(character);
-        assertThat(characterDao.findByAccountIdAndName(account.id(), "Carol l'Orc")).contains(character);
+        assertThat(characterDao.findById(character.getId())).contains(character);
+        assertThat(characterDao.findByAccountId(account.getId())).containsExactly(character);
+        assertThat(characterDao.findByAccountIdAndName(account.getId(), "Carol l'Orc")).contains(character);
     }
 
     @Test
     void updatesCurrentRoom() {
         seedAccountAndRooms();
-        Character character = new Character(UUID.randomUUID(), account.id(), "Carol l'Orc", roomA.id(), Race.ORC, 14,
-                14, 10, 10, 14, 11, 12, 10, 11, 10);
+        Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA.getId(), Race.ORC,
+                14, 14, 10, 10, 14, 11, 12, 10, 11, 10);
         characterDao.insert(character);
 
-        characterDao.updateCurrentRoom(character.id(), roomB.id());
+        characterDao.updateCurrentRoom(character.getId(), roomB.getId());
 
-        assertThat(characterDao.findById(character.id())).map(Character::currentRoomId).contains(roomB.id());
+        assertThat(characterDao.findById(character.getId())).map(Character::getCurrentRoomId).contains(roomB.getId());
     }
 
     @Test
     void deletesById() {
         seedAccountAndRooms();
-        Character character = new Character(UUID.randomUUID(), account.id(), "Carol l'Orc", roomA.id(), Race.ORC, 14,
-                14, 10, 10, 14, 11, 12, 10, 11, 10);
+        Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA.getId(), Race.ORC,
+                14, 14, 10, 10, 14, 11, 12, 10, 11, 10);
         characterDao.insert(character);
 
-        characterDao.deleteById(character.id());
+        characterDao.deleteById(character.getId());
 
-        assertThat(characterDao.findById(character.id())).isEmpty();
+        assertThat(characterDao.findById(character.getId())).isEmpty();
     }
 }

@@ -26,8 +26,10 @@ public class AccountDao {
         jdbcTemplate.update("""
                 INSERT INTO account (id, login, password, current_character_id)
                 VALUES (:id, :login, :password, :currentCharacterId)
-                """, new MapSqlParameterSource().addValue("id", account.id()).addValue("login", account.login())
-                .addValue("password", account.password()).addValue("currentCharacterId", account.currentCharacterId()));
+                """,
+                new MapSqlParameterSource().addValue("id", account.getId()).addValue("login", account.getLogin())
+                        .addValue("password", account.getPassword())
+                        .addValue("currentCharacterId", account.getCurrentCharacterId()));
     }
 
     public Optional<Account> findById(UUID id) {

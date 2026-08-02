@@ -61,9 +61,10 @@ public class Unequip implements ControllerHandler {
             return;
         }
 
-        String templateName = itemTemplateDao.findById(item.get().templateId()).map(ItemTemplate::name).orElseThrow();
+        String templateName = itemTemplateDao.findById(item.get().getTemplateId()).map(ItemTemplate::getName)
+                .orElseThrow();
 
-        if (item.get().slot() == null) {
+        if (item.get().getSlot() == null) {
             player.send(new ItemNotEquipped(templateName));
             return;
         }

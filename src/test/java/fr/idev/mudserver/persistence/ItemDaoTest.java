@@ -47,68 +47,68 @@ class ItemDaoTest extends AbstractIntegrationTest {
         roomDao.insert(room);
         Account account = new Account(UUID.randomUUID(), "dave", "hashed-password", null);
         accountDao.insert(account);
-        character = new Character(UUID.randomUUID(), account.id(), "Dave le Nain", room.id(), Race.DWARF, 12, 12, 10,
-                10, 12, 10, 12, 10, 10, 10);
+        character = new Character(UUID.randomUUID(), account.getId(), "Dave le Nain", room.getId(), Race.DWARF, 12, 12,
+                10, 10, 12, 10, 12, 10, 10, 10);
         characterDao.insert(character);
     }
 
     @Test
     void insertsAndFindsById() {
         seedTemplateRoomAndCharacter();
-        Item item = new Item(UUID.randomUUID(), template.id(), room.id(), null, null);
+        Item item = new Item(UUID.randomUUID(), template.getId(), room.getId(), null, null);
 
         itemDao.insert(item);
 
-        assertThat(itemDao.findById(item.id())).contains(item);
-        assertThat(itemDao.findByRoomId(room.id())).containsExactly(item);
+        assertThat(itemDao.findById(item.getId())).contains(item);
+        assertThat(itemDao.findByRoomId(room.getId())).containsExactly(item);
     }
 
     @Test
     void assignToCharacterClearsRoomAndSlot() {
         seedTemplateRoomAndCharacter();
-        Item item = new Item(UUID.randomUUID(), template.id(), room.id(), null, null);
+        Item item = new Item(UUID.randomUUID(), template.getId(), room.getId(), null, null);
         itemDao.insert(item);
 
-        itemDao.assignToCharacter(item.id(), character.id());
+        itemDao.assignToCharacter(item.getId(), character.getId());
 
-        Item updated = itemDao.findById(item.id()).orElseThrow();
-        assertThat(updated.characterId()).isEqualTo(character.id());
-        assertThat(updated.roomId()).isNull();
-        assertThat(itemDao.findByCharacterId(character.id())).containsExactly(updated);
+        Item updated = itemDao.findById(item.getId()).orElseThrow();
+        assertThat(updated.getCharacterId()).isEqualTo(character.getId());
+        assertThat(updated.getRoomId()).isNull();
+        assertThat(itemDao.findByCharacterId(character.getId())).containsExactly(updated);
     }
 
     @Test
     void assignToRoomClearsCharacterAndSlot() {
         seedTemplateRoomAndCharacter();
-        Item item = new Item(UUID.randomUUID(), template.id(), null, character.id(), null);
+        Item item = new Item(UUID.randomUUID(), template.getId(), null, character.getId(), null);
         itemDao.insert(item);
 
-        itemDao.assignToRoom(item.id(), room.id());
+        itemDao.assignToRoom(item.getId(), room.getId());
 
-        Item updated = itemDao.findById(item.id()).orElseThrow();
-        assertThat(updated.roomId()).isEqualTo(room.id());
-        assertThat(updated.characterId()).isNull();
+        Item updated = itemDao.findById(item.getId()).orElseThrow();
+        assertThat(updated.getRoomId()).isEqualTo(room.getId());
+        assertThat(updated.getCharacterId()).isNull();
     }
 
     @Test
     void updatesSlotForEquipAndUnequip() {
         seedTemplateRoomAndCharacter();
-        Item item = new Item(UUID.randomUUID(), template.id(), null, character.id(), null);
+        Item item = new Item(UUID.randomUUID(), template.getId(), null, character.getId(), null);
         itemDao.insert(item);
 
-        itemDao.updateSlot(item.id(), EquipmentSlot.WEAPON);
-        assertThat(itemDao.findById(item.id())).map(Item::slot).contains(EquipmentSlot.WEAPON);
+        itemDao.updateSlot(item.getId(), EquipmentSlot.WEAPON);
+        assertThat(itemDao.findById(item.getId())).map(Item::getSlot).contains(EquipmentSlot.WEAPON);
 
-        itemDao.updateSlot(item.id(), null);
-        assertThat(itemDao.findById(item.id()).orElseThrow().slot()).isNull();
+        itemDao.updateSlot(item.getId(), null);
+        assertThat(itemDao.findById(item.getId()).orElseThrow().getSlot()).isNull();
     }
 
     @Test
     void findByIdForUpdateReadsTheSameRow() {
         seedTemplateRoomAndCharacter();
-        Item item = new Item(UUID.randomUUID(), template.id(), room.id(), null, null);
+        Item item = new Item(UUID.randomUUID(), template.getId(), room.getId(), null, null);
         itemDao.insert(item);
 
-        assertThat(itemDao.findByIdForUpdate(item.id())).contains(item);
+        assertThat(itemDao.findByIdForUpdate(item.getId())).contains(item);
     }
 }

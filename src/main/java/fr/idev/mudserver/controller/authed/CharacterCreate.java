@@ -71,7 +71,7 @@ public class CharacterCreate implements ControllerHandler {
 
         Account account = authWorld.account(session);
 
-        if (characterDao.findByAccountIdAndName(account.id(), name).isPresent()) {
+        if (characterDao.findByAccountIdAndName(account.getId(), name).isPresent()) {
             session.send(new CharacterAlreadyExists(name));
             characterListAction.onReceive(session, "");
             return;
@@ -117,9 +117,10 @@ public class CharacterCreate implements ControllerHandler {
             scores.merge(bonus.getKey(), bonus.getValue(), Integer::sum);
         }
 
-        Character character = new Character(UUID.randomUUID(), account.id(), name, startingRoom.id(), race, 100, 100,
-                10, 10, scores.get(Ability.STRENGTH), scores.get(Ability.DEXTERITY), scores.get(Ability.CONSTITUTION),
-                scores.get(Ability.INTELLIGENCE), scores.get(Ability.WISDOM), scores.get(Ability.CHARISMA));
+        Character character = new Character(UUID.randomUUID(), account.getId(), name, startingRoom.getId(), race, 100,
+                100, 10, 10, scores.get(Ability.STRENGTH), scores.get(Ability.DEXTERITY),
+                scores.get(Ability.CONSTITUTION), scores.get(Ability.INTELLIGENCE), scores.get(Ability.WISDOM),
+                scores.get(Ability.CHARISMA));
 
         characterDao.insert(character);
 

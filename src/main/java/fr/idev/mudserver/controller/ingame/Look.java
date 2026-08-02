@@ -57,20 +57,20 @@ public class Look implements ControllerHandler {
     }
 
     private RoomDescription describeRoom(Character character) {
-        UUID roomId = character.currentRoomId();
+        UUID roomId = character.getCurrentRoomId();
         Room room = roomDao.findById(roomId).orElseThrow();
 
         List<RoomExit> exits = roomExitDao.findBySourceRoomId(roomId);
         List<Character> characters = gameWorld.roomInstance(roomId).characters();
         List<Item> items = itemDao.findByRoomId(roomId);
 
-        List<String> exitNames = exits.stream().map(RoomExit::direction).toList();
-        List<String> characterNames = characters.stream().filter(other -> !other.id().equals(character.id()))
-                .map(Character::name).toList();
+        List<String> exitNames = exits.stream().map(RoomExit::getDirection).toList();
+        List<String> characterNames = characters.stream().filter(other -> !other.getId().equals(character.getId()))
+                .map(Character::getName).toList();
         List<String> itemNames = items.stream()
-                .map(item -> itemTemplateDao.findById(item.templateId()).map(ItemTemplate::name).orElseThrow())
+                .map(item -> itemTemplateDao.findById(item.getTemplateId()).map(ItemTemplate::getName).orElseThrow())
                 .toList();
 
-        return new RoomDescription(room.name(), room.description(), exitNames, characterNames, itemNames);
+        return new RoomDescription(room.getName(), room.getDescription(), exitNames, characterNames, itemNames);
     }
 }

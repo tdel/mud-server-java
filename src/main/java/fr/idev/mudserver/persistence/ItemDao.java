@@ -29,9 +29,9 @@ public class ItemDao {
                 INSERT INTO item (id, template_id, room_id, character_id, slot)
                 VALUES (:id, :templateId, :roomId, :characterId, :slot)
                 """,
-                new MapSqlParameterSource().addValue("id", item.id()).addValue("templateId", item.templateId())
-                        .addValue("roomId", item.roomId()).addValue("characterId", item.characterId())
-                        .addValue("slot", item.slot() == null ? null : item.slot().name()));
+                new MapSqlParameterSource().addValue("id", item.getId()).addValue("templateId", item.getTemplateId())
+                        .addValue("roomId", item.getRoomId()).addValue("characterId", item.getCharacterId())
+                        .addValue("slot", item.getSlot() == null ? null : item.getSlot().name()));
     }
 
     public Optional<Item> findById(UUID id) {

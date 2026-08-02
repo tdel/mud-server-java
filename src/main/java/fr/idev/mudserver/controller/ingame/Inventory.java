@@ -44,7 +44,7 @@ public class Inventory implements ControllerHandler {
 
         List<Item> items = itemService.getInventory(player.character());
         List<String> names = items.stream()
-                .map(item -> itemTemplateDao.findById(item.templateId()).map(ItemTemplate::name).orElseThrow())
+                .map(item -> itemTemplateDao.findById(item.getTemplateId()).map(ItemTemplate::getName).orElseThrow())
                 .toList();
 
         player.send(new fr.idev.mudserver.network.message.ingame.Inventory(names));

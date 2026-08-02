@@ -35,8 +35,8 @@ public class CharacterList implements ControllerHandler {
 
     @Override
     public void onReceive(Connection session, String argument) {
-        List<Character> characters = characterDao.findByAccountId(authWorld.account(session).id());
-        List<String> names = characters.stream().map(Character::name).toList();
+        List<Character> characters = characterDao.findByAccountId(authWorld.account(session).getId());
+        List<String> names = characters.stream().map(Character::getName).toList();
         session.send(new fr.idev.mudserver.network.message.authed.CharacterList(names));
     }
 }

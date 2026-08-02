@@ -11,19 +11,21 @@ import fr.idev.mudserver.persistence.CharacterDao;
  * Une session connectée liée à un {@link Character} pour toute sa durée de vie
  * — changer de personnage signifie se déloguer et en sélectionner un autre, ce
  * qui crée une nouvelle instance. Contrairement au PHP (où {@code character()}
- * relit la relation Doctrine à chaque appel), le record {@link Character} est
- * copié localement et remplacé explicitement à chaque mutation (voir
- * {@link #moveToRoom}) : pas d'identity-map, donc pas de lecture "toujours à
+ * relit la relation Doctrine à chaque appel), la copie locale de
+ * {@link Character} est mutée en place (voir {@link #moveToRoom}) puis
+ * persistée explicitement : pas d'identity-map, donc pas de lecture "toujours à
  * jour" implicite.
  */
 public class PlayerInstance {
 
     private final Connection session;
-    private Character character;
+    private final Character character;
+    private final CharacterDao characterDao;
 
-    public PlayerInstance(Connection session, Character character) {
+    public PlayerInstance(Connection session, Character character, CharacterDao characterDao) {
         this.session = session;
         this.character = character;
+        this.characterDao = characterDao;
     }
 
     public Character character() {
@@ -31,15 +33,12 @@ public class PlayerInstance {
     }
 
     public UUID currentRoomId() {
-        return character.currentRoomId();
+        return character.getCurrentRoomId();
     }
 
-    public void moveToRoom(UUID roomId, CharacterDao characterDao) {
-        characterDao.updateCurrentRoom(character.id(), roomId);
-        character = new Character(character.id(), character.accountId(), character.name(), roomId, character.race(),
-                character.currentHealth(), character.maxHealth(), character.currentMana(), character.maxMana(),
-                character.strength(), character.dexterity(), character.constitution(), character.intelligence(),
-                character.wisdom(), character.charisma());
+    public void moveToRoom(UUID roomId) {
+        character.setCurrentRoomId(roomId);
+        characterDao.updateCurrentRoom(character.getId(), roomId);
     }
 
     public void send(OutputMessage message) {

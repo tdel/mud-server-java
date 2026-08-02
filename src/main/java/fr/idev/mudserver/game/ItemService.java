@@ -32,15 +32,15 @@ public class ItemService {
     }
 
     public List<Item> getInventory(Character character) {
-        return itemDao.findByCharacterId(character.id());
+        return itemDao.findByCharacterId(character.getId());
     }
 
     public List<Item> getCarriedItems(Character character) {
-        return getInventory(character).stream().filter(item -> item.slot() == null).toList();
+        return getInventory(character).stream().filter(item -> item.getSlot() == null).toList();
     }
 
     public List<Item> getEquippedItems(Character character) {
-        return getInventory(character).stream().filter(item -> item.slot() != null).toList();
+        return getInventory(character).stream().filter(item -> item.getSlot() != null).toList();
     }
 
     public Optional<Item> findItemByName(Character character, String name) {
@@ -53,7 +53,8 @@ public class ItemService {
 
     private Optional<Item> findByTemplateName(List<Item> items, String name) {
         for (Item item : items) {
-            String templateName = itemTemplateDao.findById(item.templateId()).map(ItemTemplate::name).orElseThrow();
+            String templateName = itemTemplateDao.findById(item.getTemplateId()).map(ItemTemplate::getName)
+                    .orElseThrow();
             if (templateName.equalsIgnoreCase(name)) {
                 return Optional.of(item);
             }
@@ -73,39 +74,39 @@ public class ItemService {
      */
     @Transactional
     public boolean addItemToInventory(Item item, Character target) {
-        Item locked = itemDao.findByIdForUpdate(item.id()).orElseThrow();
+        Item locked = itemDao.findByIdForUpdate(item.getId()).orElseThrow();
 
-        if (locked.characterId() != null) {
+        if (locked.getCharacterId() != null) {
             return false;
         }
 
-        itemDao.assignToCharacter(item.id(), target.id());
+        itemDao.assignToCharacter(item.getId(), target.getId());
         return true;
     }
 
     public void removeItemFromInventory(Item item, Character target) {
-        itemDao.assignToRoom(item.id(), target.currentRoomId());
+        itemDao.assignToRoom(item.getId(), target.getCurrentRoomId());
     }
 
     public Optional<EquipmentSlot> equipItem(Item item, Character target) {
-        ItemTemplate template = itemTemplateDao.findById(item.templateId()).orElseThrow();
-        Optional<EquipmentSlot> slot = template.type().equipmentSlot();
+        ItemTemplate template = itemTemplateDao.findById(item.getTemplateId()).orElseThrow();
+        Optional<EquipmentSlot> slot = template.getType().equipmentSlot();
 
         if (slot.isEmpty()) {
             return Optional.empty();
         }
 
         for (Item existing : getEquippedItems(target)) {
-            if (!existing.id().equals(item.id()) && existing.slot() == slot.get()) {
-                itemDao.updateSlot(existing.id(), null);
+            if (!existing.getId().equals(item.getId()) && existing.getSlot() == slot.get()) {
+                itemDao.updateSlot(existing.getId(), null);
             }
         }
 
-        itemDao.updateSlot(item.id(), slot.get());
+        itemDao.updateSlot(item.getId(), slot.get());
         return slot;
     }
 
     public void unequipItem(Item item) {
-        itemDao.updateSlot(item.id(), null);
+        itemDao.updateSlot(item.getId(), null);
     }
 }

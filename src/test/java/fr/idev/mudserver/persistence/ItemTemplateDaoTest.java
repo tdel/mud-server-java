@@ -25,7 +25,7 @@ class ItemTemplateDaoTest extends AbstractIntegrationTest {
 
         itemTemplateDao.insert(template);
 
-        assertThat(itemTemplateDao.findById(template.id())).contains(template);
+        assertThat(itemTemplateDao.findById(template.getId())).contains(template);
     }
 
     @Test

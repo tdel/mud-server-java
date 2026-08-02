@@ -43,7 +43,7 @@ public class RoomCreateCommand implements CliCommand {
         Room room = new Room(UUID.randomUUID(), name, description, markStarting ? true : null);
         roomDao.insert(room);
 
-        System.out.printf("Room \"%s\" created (id=%s)%s.%n", name, room.id(),
+        System.out.printf("Room \"%s\" created (id=%s)%s.%n", name, room.getId(),
                 markStarting ? ", marked as the starting room" : "");
         return 0;
     }

@@ -53,10 +53,10 @@ public class Logout implements ControllerHandler {
             Character character = playerInstance.character();
 
             gameWorld.exitWorld(session);
-            Account account = accountDao.findById(character.accountId()).orElseThrow();
+            Account account = accountDao.findById(character.getAccountId()).orElseThrow();
             authWorld.enterWorld(session, account);
 
-            session.send(new StoppedPlaying(character.name()));
+            session.send(new StoppedPlaying(character.getName()));
             characterListAction.onReceive(session, "");
             return;
         }

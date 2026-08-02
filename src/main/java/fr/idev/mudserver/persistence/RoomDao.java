@@ -27,8 +27,8 @@ public class RoomDao {
         jdbcTemplate.update("""
                 INSERT INTO room (id, name, description, is_starting_room)
                 VALUES (:id, :name, :description, :isStartingRoom)
-                """, new MapSqlParameterSource().addValue("id", room.id()).addValue("name", room.name())
-                .addValue("description", room.description()).addValue("isStartingRoom", room.isStartingRoom()));
+                """, new MapSqlParameterSource().addValue("id", room.getId()).addValue("name", room.getName())
+                .addValue("description", room.getDescription()).addValue("isStartingRoom", room.isStartingRoom()));
     }
 
     public Optional<Room> findById(UUID id) {

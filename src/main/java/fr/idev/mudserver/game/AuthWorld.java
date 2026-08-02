@@ -50,6 +50,6 @@ public class AuthWorld {
     }
 
     public boolean isAlreadyConnected(UUID accountId) {
-        return connectedSessions.values().stream().anyMatch(account -> account.id().equals(accountId));
+        return connectedSessions.values().stream().anyMatch(account -> account.getId().equals(accountId));
     }
 }

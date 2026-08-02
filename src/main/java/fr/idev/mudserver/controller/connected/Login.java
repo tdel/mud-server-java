@@ -68,12 +68,12 @@ public class Login implements ControllerHandler {
     }
 
     private void onPasswordEntered(Connection session, Account account, String login, String password) {
-        if (!passwordEncoder.matches(password, account.password())) {
+        if (!passwordEncoder.matches(password, account.getPassword())) {
             session.send(new IncorrectPassword());
             return;
         }
 
-        if (authWorld.isAlreadyConnected(account.id()) || gameWorld.isAlreadyConnected(account.id())) {
+        if (authWorld.isAlreadyConnected(account.getId()) || gameWorld.isAlreadyConnected(account.getId())) {
             session.send(new AccountAlreadyConnected(login));
             return;
         }

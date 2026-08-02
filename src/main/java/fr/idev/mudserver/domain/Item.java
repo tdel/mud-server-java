@@ -1,12 +1,89 @@
 package fr.idev.mudserver.domain;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
  * Appartient à exactement une room OU un character, jamais les deux — invariant
- * appliqué par {@code fr.idev.mudserver.game.ItemService}, pas ici (voir le
- * plan de migration : un record n'a pas sa place pour une méthode qui lève une
- * exception tout en retournant une nouvelle instance immuable).
+ * appliqué par {@code fr.idev.mudserver.game.ItemService}, pas ici.
  */
-public record Item(UUID id, UUID templateId, UUID roomId, UUID characterId, EquipmentSlot slot) {
+public class Item {
+
+    private UUID id;
+    private UUID templateId;
+    private UUID roomId;
+    private UUID characterId;
+    private EquipmentSlot slot;
+
+    public Item(UUID id, UUID templateId, UUID roomId, UUID characterId, EquipmentSlot slot) {
+        this.id = id;
+        this.templateId = templateId;
+        this.roomId = roomId;
+        this.characterId = characterId;
+        this.slot = slot;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public UUID getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(UUID templateId) {
+        this.templateId = templateId;
+    }
+
+    public UUID getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(UUID roomId) {
+        this.roomId = roomId;
+    }
+
+    public UUID getCharacterId() {
+        return characterId;
+    }
+
+    public void setCharacterId(UUID characterId) {
+        this.characterId = characterId;
+    }
+
+    public EquipmentSlot getSlot() {
+        return slot;
+    }
+
+    public void setSlot(EquipmentSlot slot) {
+        this.slot = slot;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Item other)) {
+            return false;
+        }
+        return Objects.equals(id, other.id) && Objects.equals(templateId, other.templateId)
+                && Objects.equals(roomId, other.roomId) && Objects.equals(characterId, other.characterId)
+                && slot == other.slot;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, templateId, roomId, characterId, slot);
+    }
+
+    @Override
+    public String toString() {
+        return "Item[id=" + id + ", templateId=" + templateId + ", roomId=" + roomId + ", characterId=" + characterId
+                + ", slot=" + slot + "]";
+    }
 }

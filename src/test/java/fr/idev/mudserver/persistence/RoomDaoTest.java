@@ -23,7 +23,7 @@ class RoomDaoTest extends AbstractIntegrationTest {
 
         roomDao.insert(room);
 
-        assertThat(roomDao.findById(room.id())).contains(room);
+        assertThat(roomDao.findById(room.getId())).contains(room);
     }
 
     @Test
@@ -33,12 +33,12 @@ class RoomDaoTest extends AbstractIntegrationTest {
         roomDao.insert(first);
         roomDao.insert(second);
 
-        roomDao.markAsStartingRoom(first.id());
-        assertThat(roomDao.findStartingRoom()).map(Room::id).contains(first.id());
+        roomDao.markAsStartingRoom(first.getId());
+        assertThat(roomDao.findStartingRoom()).map(Room::getId).contains(first.getId());
 
         roomDao.clearStartingRoom();
-        roomDao.markAsStartingRoom(second.id());
-        assertThat(roomDao.findStartingRoom()).map(Room::id).contains(second.id());
+        roomDao.markAsStartingRoom(second.getId());
+        assertThat(roomDao.findStartingRoom()).map(Room::getId).contains(second.getId());
     }
 
     @Test

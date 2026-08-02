@@ -27,8 +27,8 @@ public class RoomExitDao {
         jdbcTemplate.update("""
                 INSERT INTO room_exit (id, direction, source_room_id, target_room_id)
                 VALUES (:id, :direction, :sourceRoomId, :targetRoomId)
-                """, new MapSqlParameterSource().addValue("id", exit.id()).addValue("direction", exit.direction())
-                .addValue("sourceRoomId", exit.sourceRoomId()).addValue("targetRoomId", exit.targetRoomId()));
+                """, new MapSqlParameterSource().addValue("id", exit.getId()).addValue("direction", exit.getDirection())
+                .addValue("sourceRoomId", exit.getSourceRoomId()).addValue("targetRoomId", exit.getTargetRoomId()));
     }
 
     public List<RoomExit> findBySourceRoomId(UUID sourceRoomId) {

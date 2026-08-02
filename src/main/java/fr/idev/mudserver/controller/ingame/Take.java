@@ -53,7 +53,7 @@ public class Take implements ControllerHandler {
         }
 
         Character character = player.character();
-        Optional<Item> item = itemService.findItemInRoomByName(character.currentRoomId(), name);
+        Optional<Item> item = itemService.findItemInRoomByName(character.getCurrentRoomId(), name);
 
         if (item.isEmpty()) {
             player.send(new ItemNotFound(name));
@@ -67,7 +67,8 @@ public class Take implements ControllerHandler {
             return;
         }
 
-        String templateName = itemTemplateDao.findById(item.get().templateId()).map(ItemTemplate::name).orElseThrow();
+        String templateName = itemTemplateDao.findById(item.get().getTemplateId()).map(ItemTemplate::getName)
+                .orElseThrow();
         player.send(new ItemTaken(templateName));
     }
 }

@@ -74,7 +74,7 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
 
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             for (int i = 0; i < ITERATIONS; i++) {
-                Item item = new Item(UUID.randomUUID(), template.id(), room.id(), null, null);
+                Item item = new Item(UUID.randomUUID(), template.getId(), room.getId(), null, null);
                 itemDao.insert(item);
 
                 CyclicBarrier barrier = new CyclicBarrier(2);
@@ -96,9 +96,9 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
                 assertThat(aliceWon ^ bobWon)
                         .as("exactement un gagnant à l'itération %d (alice=%s, bob=%s)", i, aliceWon, bobWon).isTrue();
 
-                Item afterRace = itemDao.findById(item.id()).orElseThrow();
-                UUID winnerId = aliceWon ? alice.id() : bob.id();
-                assertThat(afterRace.characterId()).isEqualTo(winnerId);
+                Item afterRace = itemDao.findById(item.getId()).orElseThrow();
+                UUID winnerId = aliceWon ? alice.getId() : bob.getId();
+                assertThat(afterRace.getCharacterId()).isEqualTo(winnerId);
             }
         }
     }
@@ -106,8 +106,8 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
     private Character seedCharacter(Room room, String login) {
         Account account = new Account(UUID.randomUUID(), login, "hashed-password", null);
         accountDao.insert(account);
-        Character character = new Character(UUID.randomUUID(), account.id(), login, room.id(), Race.HUMAN, 10, 10, 10,
-                10, 10, 10, 10, 10, 10, 10);
+        Character character = new Character(UUID.randomUUID(), account.getId(), login, room.getId(), Race.HUMAN, 10, 10,
+                10, 10, 10, 10, 10, 10, 10, 10);
         characterDao.insert(character);
         return character;
     }

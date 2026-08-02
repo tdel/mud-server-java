@@ -27,9 +27,9 @@ public class ItemTemplateDao {
                 INSERT INTO item_template (id, name, description, type, weight)
                 VALUES (:id, :name, :description, :type, :weight)
                 """,
-                new MapSqlParameterSource().addValue("id", template.id()).addValue("name", template.name())
-                        .addValue("description", template.description()).addValue("type", template.type().name())
-                        .addValue("weight", template.weight()));
+                new MapSqlParameterSource().addValue("id", template.getId()).addValue("name", template.getName())
+                        .addValue("description", template.getDescription()).addValue("type", template.getType().name())
+                        .addValue("weight", template.getWeight()));
     }
 
     public Optional<ItemTemplate> findById(UUID id) {

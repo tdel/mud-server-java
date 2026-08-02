@@ -61,7 +61,7 @@ public class Go implements ControllerHandler {
             return;
         }
 
-        UUID newRoomId = exit.get().targetRoomId();
+        UUID newRoomId = exit.get().getTargetRoomId();
         Room newRoom = roomDao.findById(newRoomId).orElseThrow();
 
         gameWorld.roomInstance(oldRoomId).leave(player, newRoom);
