@@ -1,41 +1,36 @@
 package fr.idev.mudserver.persistence;
 
+import static fr.idev.mudserver.persistence.jooq.Tables.ITEM;
+
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
-import fr.idev.mudserver.persistence.mapper.ItemRowMapper;
+import fr.idev.mudserver.persistence.jooq.tables.records.ItemRecord;
 
 @Repository
 public class ItemDao {
 
-    private static final ItemRowMapper MAPPER = new ItemRowMapper();
+    private final DSLContext dsl;
 
-    private final NamedParameterJdbcTemplate jdbcTemplate;
-
-    public ItemDao(NamedParameterJdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public ItemDao(DSLContext dsl) {
+        this.dsl = dsl;
     }
 
     public void insert(Item item) {
-        jdbcTemplate.update("""
-                INSERT INTO item (id, template_id, room_id, character_id, slot)
-                VALUES (:id, :templateId, :roomId, :characterId, :slot)
-                """,
-                new MapSqlParameterSource().addValue("id", item.getId()).addValue("templateId", item.getTemplateId())
-                        .addValue("roomId", item.getRoomId()).addValue("characterId", item.getCharacterId())
-                        .addValue("slot", item.getSlot() == null ? null : item.getSlot().name()));
+        dsl.insertInto(ITEM, ITEM.ID, ITEM.TEMPLATE_ID, ITEM.ROOM_ID, ITEM.CHARACTER_ID, ITEM.SLOT)
+                .values(item.getId(), item.getTemplateId(), item.getRoomId(), item.getCharacterId(),
+                        item.getSlot() == null ? null : item.getSlot().name())
+                .execute();
     }
 
     public Optional<Item> findById(UUID id) {
-        return jdbcTemplate.query("SELECT * FROM item WHERE id = :id", Map.of("id", id), MAPPER).stream().findFirst();
+        return dsl.selectFrom(ITEM).where(ITEM.ID.eq(id)).fetchOptional(ItemDao::toDomain);
     }
 
     /**
@@ -45,32 +40,34 @@ public class ItemDao {
      * commit/rollback.
      */
     public Optional<Item> findByIdForUpdate(UUID id) {
-        return jdbcTemplate.query("SELECT * FROM item WHERE id = :id FOR UPDATE", Map.of("id", id), MAPPER).stream()
-                .findFirst();
+        return dsl.selectFrom(ITEM).where(ITEM.ID.eq(id)).forUpdate().fetchOptional(ItemDao::toDomain);
     }
 
     public List<Item> findByRoomId(UUID roomId) {
-        return jdbcTemplate.query("SELECT * FROM item WHERE room_id = :roomId", Map.of("roomId", roomId), MAPPER);
+        return dsl.selectFrom(ITEM).where(ITEM.ROOM_ID.eq(roomId)).fetch(ItemDao::toDomain);
     }
 
     public List<Item> findByCharacterId(UUID characterId) {
-        return jdbcTemplate.query("SELECT * FROM item WHERE character_id = :characterId",
-                Map.of("characterId", characterId), MAPPER);
+        return dsl.selectFrom(ITEM).where(ITEM.CHARACTER_ID.eq(characterId)).fetch(ItemDao::toDomain);
     }
 
     public void assignToCharacter(UUID itemId, UUID characterId) {
-        jdbcTemplate.update(
-                "UPDATE item SET character_id = :characterId, room_id = NULL, slot = NULL WHERE id = :itemId",
-                Map.of("itemId", itemId, "characterId", characterId));
+        dsl.update(ITEM).set(ITEM.CHARACTER_ID, characterId).setNull(ITEM.ROOM_ID).setNull(ITEM.SLOT)
+                .where(ITEM.ID.eq(itemId)).execute();
     }
 
     public void assignToRoom(UUID itemId, UUID roomId) {
-        jdbcTemplate.update("UPDATE item SET room_id = :roomId, character_id = NULL, slot = NULL WHERE id = :itemId",
-                Map.of("itemId", itemId, "roomId", roomId));
+        dsl.update(ITEM).set(ITEM.ROOM_ID, roomId).setNull(ITEM.CHARACTER_ID).setNull(ITEM.SLOT)
+                .where(ITEM.ID.eq(itemId)).execute();
     }
 
     public void updateSlot(UUID itemId, EquipmentSlot slot) {
-        jdbcTemplate.update("UPDATE item SET slot = :slot WHERE id = :itemId", new MapSqlParameterSource()
-                .addValue("itemId", itemId).addValue("slot", slot == null ? null : slot.name()));
+        dsl.update(ITEM).set(ITEM.SLOT, slot == null ? null : slot.name()).where(ITEM.ID.eq(itemId)).execute();
+    }
+
+    private static Item toDomain(ItemRecord record) {
+        String slot = record.getSlot();
+        return new Item(record.getId(), record.getTemplateId(), record.getRoomId(), record.getCharacterId(),
+                slot == null ? null : EquipmentSlot.valueOf(slot));
     }
 }

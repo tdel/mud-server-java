@@ -88,6 +88,16 @@ public class ItemService {
         itemDao.assignToRoom(item.getId(), target.getCurrentRoomId());
     }
 
+    /**
+     * {@code @Transactional} pour de vrai ici, contrairement à avant : les deux
+     * {@code updateSlot} (déséquiper l'ancien occupant du slot, équiper le nouveau)
+     * doivent partager une transaction pour que la contrainte différée
+     * {@code uniq_character_slot DEFERRABLE INITIALLY DEFERRED} (voir
+     * V1__init_schema.sql) protège réellement le chevauchement transitoire entre
+     * les deux UPDATE — sans transaction commune, chaque UPDATE valide
+     * immédiatement en autocommit et la déférence de la contrainte ne sert à rien.
+     */
+    @Transactional
     public Optional<EquipmentSlot> equipItem(Item item, Character target) {
         ItemTemplate template = itemTemplateDao.findById(item.getTemplateId()).orElseThrow();
         Optional<EquipmentSlot> slot = template.getType().equipmentSlot();
