@@ -1,50 +1,49 @@
 package fr.idev.mudserver.persistence;
 
-import java.util.Map;
+import static fr.idev.mudserver.persistence.jooq.Tables.ITEM_TEMPLATE;
+
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
 import fr.idev.mudserver.domain.ItemTemplate;
-import fr.idev.mudserver.persistence.mapper.ItemTemplateRowMapper;
+import fr.idev.mudserver.domain.ItemType;
+import fr.idev.mudserver.persistence.jooq.tables.records.ItemTemplateRecord;
 
 @Repository
 public class ItemTemplateDao {
 
-    private static final ItemTemplateRowMapper MAPPER = new ItemTemplateRowMapper();
+    private final DSLContext dsl;
 
-    private final NamedParameterJdbcTemplate jdbcTemplate;
-
-    public ItemTemplateDao(NamedParameterJdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public ItemTemplateDao(DSLContext dsl) {
+        this.dsl = dsl;
     }
 
     public void insert(ItemTemplate template) {
-        jdbcTemplate.update("""
-                INSERT INTO item_template (id, name, description, type, weight)
-                VALUES (:id, :name, :description, :type, :weight)
-                """,
-                new MapSqlParameterSource().addValue("id", template.getId()).addValue("name", template.getName())
-                        .addValue("description", template.getDescription()).addValue("type", template.getType().name())
-                        .addValue("weight", template.getWeight()));
+        dsl.insertInto(ITEM_TEMPLATE, ITEM_TEMPLATE.ID, ITEM_TEMPLATE.NAME, ITEM_TEMPLATE.DESCRIPTION,
+                ITEM_TEMPLATE.TYPE, ITEM_TEMPLATE.WEIGHT)
+                .values(template.getId(), template.getName(), template.getDescription(), template.getType().name(),
+                        template.getWeight())
+                .execute();
     }
 
     public Optional<ItemTemplate> findById(UUID id) {
-        return jdbcTemplate.query("SELECT * FROM item_template WHERE id = :id", Map.of("id", id), MAPPER).stream()
-                .findFirst();
+        return dsl.selectFrom(ITEM_TEMPLATE).where(ITEM_TEMPLATE.ID.eq(id)).fetchOptional(ItemTemplateDao::toDomain);
     }
 
     public Optional<ItemTemplate> findByName(String name) {
-        return jdbcTemplate.query("SELECT * FROM item_template WHERE name = :name", Map.of("name", name), MAPPER)
-                .stream().findFirst();
+        return dsl.selectFrom(ITEM_TEMPLATE).where(ITEM_TEMPLATE.NAME.eq(name))
+                .fetchOptional(ItemTemplateDao::toDomain);
     }
 
     public boolean existsById(UUID id) {
-        Boolean exists = jdbcTemplate.queryForObject("SELECT EXISTS(SELECT 1 FROM item_template WHERE id = :id)",
-                Map.of("id", id), Boolean.class);
-        return Boolean.TRUE.equals(exists);
+        return dsl.fetchExists(dsl.selectFrom(ITEM_TEMPLATE).where(ITEM_TEMPLATE.ID.eq(id)));
+    }
+
+    private static ItemTemplate toDomain(ItemTemplateRecord record) {
+        return new ItemTemplate(record.getId(), record.getName(), record.getDescription(),
+                ItemType.valueOf(record.getType()), record.getWeight());
     }
 }
