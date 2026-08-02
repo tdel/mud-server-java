@@ -1,71 +1,65 @@
 package fr.idev.mudserver.persistence;
 
+import static fr.idev.mudserver.persistence.jooq.Tables.CHARACTER;
+
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
 import fr.idev.mudserver.domain.Character;
-import fr.idev.mudserver.persistence.mapper.CharacterRowMapper;
+import fr.idev.mudserver.domain.Race;
+import fr.idev.mudserver.persistence.jooq.tables.records.CharacterRecord;
 
 @Repository
 public class CharacterDao {
 
-    private static final CharacterRowMapper MAPPER = new CharacterRowMapper();
+    private final DSLContext dsl;
 
-    private final NamedParameterJdbcTemplate jdbcTemplate;
-
-    public CharacterDao(NamedParameterJdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public CharacterDao(DSLContext dsl) {
+        this.dsl = dsl;
     }
 
     public void insert(Character character) {
-        jdbcTemplate.update("""
-                INSERT INTO character (
-                    id, account_id, name, current_room_id, race,
-                    current_health, max_health, current_mana, max_mana,
-                    strength, dexterity, constitution, intelligence, wisdom, charisma
-                ) VALUES (
-                    :id, :accountId, :name, :currentRoomId, :race,
-                    :currentHealth, :maxHealth, :currentMana, :maxMana,
-                    :strength, :dexterity, :constitution, :intelligence, :wisdom, :charisma
-                )
-                """, new MapSqlParameterSource().addValue("id", character.getId())
-                .addValue("accountId", character.getAccountId()).addValue("name", character.getName())
-                .addValue("currentRoomId", character.getCurrentRoomId()).addValue("race", character.getRace().name())
-                .addValue("currentHealth", character.getCurrentHealth()).addValue("maxHealth", character.getMaxHealth())
-                .addValue("currentMana", character.getCurrentMana()).addValue("maxMana", character.getMaxMana())
-                .addValue("strength", character.getStrength()).addValue("dexterity", character.getDexterity())
-                .addValue("constitution", character.getConstitution())
-                .addValue("intelligence", character.getIntelligence()).addValue("wisdom", character.getWisdom())
-                .addValue("charisma", character.getCharisma()));
+        dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_ROOM_ID,
+                CHARACTER.RACE, CHARACTER.CURRENT_HEALTH, CHARACTER.MAX_HEALTH, CHARACTER.CURRENT_MANA,
+                CHARACTER.MAX_MANA, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
+                CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA)
+                .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentRoomId(),
+                        character.getRace().name(), character.getCurrentHealth(), character.getMaxHealth(),
+                        character.getCurrentMana(), character.getMaxMana(), character.getStrength(),
+                        character.getDexterity(), character.getConstitution(), character.getIntelligence(),
+                        character.getWisdom(), character.getCharisma())
+                .execute();
     }
 
     public Optional<Character> findById(UUID id) {
-        return jdbcTemplate.query("SELECT * FROM character WHERE id = :id", Map.of("id", id), MAPPER).stream()
-                .findFirst();
+        return dsl.selectFrom(CHARACTER).where(CHARACTER.ID.eq(id)).fetchOptional(CharacterDao::toDomain);
     }
 
     public List<Character> findByAccountId(UUID accountId) {
-        return jdbcTemplate.query("SELECT * FROM character WHERE account_id = :accountId",
-                Map.of("accountId", accountId), MAPPER);
+        return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(accountId)).fetch(CharacterDao::toDomain);
     }
 
     public Optional<Character> findByAccountIdAndName(UUID accountId, String name) {
-        return jdbcTemplate.query("SELECT * FROM character WHERE account_id = :accountId AND name = :name",
-                Map.of("accountId", accountId, "name", name), MAPPER).stream().findFirst();
+        return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(accountId)).and(CHARACTER.NAME.eq(name))
+                .fetchOptional(CharacterDao::toDomain);
     }
 
     public void updateCurrentRoom(UUID characterId, UUID roomId) {
-        jdbcTemplate.update("UPDATE character SET current_room_id = :roomId WHERE id = :characterId",
-                Map.of("characterId", characterId, "roomId", roomId));
+        dsl.update(CHARACTER).set(CHARACTER.CURRENT_ROOM_ID, roomId).where(CHARACTER.ID.eq(characterId)).execute();
     }
 
     public void deleteById(UUID characterId) {
-        jdbcTemplate.update("DELETE FROM character WHERE id = :characterId", Map.of("characterId", characterId));
+        dsl.deleteFrom(CHARACTER).where(CHARACTER.ID.eq(characterId)).execute();
+    }
+
+    private static Character toDomain(CharacterRecord record) {
+        return new Character(record.getId(), record.getAccountId(), record.getName(), record.getCurrentRoomId(),
+                Race.valueOf(record.getRace()), record.getCurrentHealth(), record.getMaxHealth(),
+                record.getCurrentMana(), record.getMaxMana(), record.getStrength(), record.getDexterity(),
+                record.getConstitution(), record.getIntelligence(), record.getWisdom(), record.getCharisma());
     }
 }
