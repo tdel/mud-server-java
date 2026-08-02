@@ -4,12 +4,14 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Room;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Transactional
 class RoomDaoTest extends AbstractIntegrationTest {
@@ -47,5 +49,23 @@ class RoomDaoTest extends AbstractIntegrationTest {
         roomDao.insert(new Room(UUID.randomUUID(), "Salle B", "...", null));
 
         assertThat(roomDao.findAll()).hasSize(2);
+    }
+
+    /**
+     * Non-régression migration jOOQ : uniq_room_starting (index unique sur
+     * is_starting_room, où chaque NULL compte comme distinct) doit toujours
+     * empêcher deux lignes TRUE simultanées - vérifie que le codegen DDLDatabase
+     * n'a pas perdu cette contrainte en generant les classes DSL depuis le SQL
+     * Flyway.
+     */
+    @Test
+    void markingASecondRoomAsStartingWithoutClearingViolatesTheUniqueIndex() {
+        Room first = new Room(UUID.randomUUID(), "Salle A", "...", null);
+        Room second = new Room(UUID.randomUUID(), "Salle B", "...", null);
+        roomDao.insert(first);
+        roomDao.insert(second);
+        roomDao.markAsStartingRoom(first.getId());
+
+        assertThatThrownBy(() -> roomDao.markAsStartingRoom(second.getId())).isInstanceOf(DataAccessException.class);
     }
 }
