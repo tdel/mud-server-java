@@ -15,7 +15,7 @@
     <artifactId>mud-server-java</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <name>mud-server-java</name>
-    <description>Portage Java/Spring Boot du serveur MUD PHP (telnet, Netty, virtual threads, JDBC)</description>
+    <description>Portage Java/Spring Boot du serveur MUD PHP (telnet, Netty, virtual threads, jOOQ)</description>
 
     <properties>
         <java.version>25</java.version>
@@ -51,11 +51,14 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- Persistance : JDBC pur (NamedParameterJdbcTemplate), pas d'Hibernate/JPA.
-             Apporte aussi HikariCP + DataSource autoconfigurée. -->
+        <!-- Persistance : jOOQ (DSLContext) plutôt qu'un ORM classique - pas de
+             persistence-context/lazy-loading à gérer hors transaction (voir les 21 sites
+             d'appel de DAO qui ne tournent jamais dans une transaction). Apporte aussi
+             HikariCP + DataSource autoconfigurée (spring-boot-starter-jooq tire
+             spring-boot-starter-jdbc en transitif). -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <artifactId>spring-boot-starter-jooq</artifactId>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -131,6 +134,55 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <!-- Génère les classes DSL jOOQ (Tables/Records) à partir du SQL Flyway
+                 directement (org.jooq.meta.extensions.ddl.DDLDatabase), sans se connecter à
+                 une vraie base au build : Flyway reste l'unique source de vérité du schéma,
+                 jOOQ ne fait que le refléter. -->
+            <plugin>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen-maven</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-jooq-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jooq</groupId>
+                        <artifactId>jooq-meta-extensions</artifactId>
+                        <version>${jooq.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <generator>
+                        <database>
+                            <name>org.jooq.meta.extensions.ddl.DDLDatabase</name>
+                            <properties>
+                                <property>
+                                    <key>scripts</key>
+                                    <value>src/main/resources/db/migration/V1__init_schema.sql</value>
+                                </property>
+                                <property>
+                                    <key>sort</key>
+                                    <value>semantic</value>
+                                </property>
+                                <property>
+                                    <key>defaultNameCase</key>
+                                    <value>lower</value>
+                                </property>
+                            </properties>
+                        </database>
+                        <target>
+                            <packageName>fr.idev.mudserver.persistence.jooq</packageName>
+                            <directory>target/generated-sources/jooq</directory>
+                        </target>
+                    </generator>
+                </configuration>
             </plugin>
             <!-- Formatage/lint Java. Le formatter Eclipse est utilisé plutôt que
                  google-java-format : ce dernier (ainsi que le pas removeUnusedImports, qui en
