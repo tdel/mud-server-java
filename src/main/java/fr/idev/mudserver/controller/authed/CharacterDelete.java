@@ -1,4 +1,4 @@
-package fr.idev.mudserver.network.action.authed;
+package fr.idev.mudserver.controller.authed;
 
 import java.util.Optional;
 import java.util.Set;
@@ -6,11 +6,11 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
+import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Character;
-import fr.idev.mudserver.network.ActionHandler;
+import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
-import fr.idev.mudserver.network.Session;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.authed.CharacterDeleted;
 import fr.idev.mudserver.network.message.authed.NoCharacterNamed;
@@ -18,7 +18,7 @@ import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 
 @Component
-public class CharacterDelete implements ActionHandler {
+public class CharacterDelete implements ControllerHandler {
 
     private final CharacterDao characterDao;
     private final AccountDao accountDao;
@@ -41,7 +41,7 @@ public class CharacterDelete implements ActionHandler {
     }
 
     @Override
-    public void onReceive(Session session, String argument) {
+    public void onReceive(Connection session, String argument) {
         String name = argument.trim();
 
         if (name.isEmpty()) {

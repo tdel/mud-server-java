@@ -1,4 +1,4 @@
-package fr.idev.mudserver.network.action.authed;
+package fr.idev.mudserver.controller.authed;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
+import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Ability;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Character;
@@ -17,9 +18,8 @@ import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
-import fr.idev.mudserver.network.ActionHandler;
+import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
-import fr.idev.mudserver.network.Session;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.authed.CharacterAlreadyExists;
 import fr.idev.mudserver.network.message.authed.CharacterCreated;
@@ -31,7 +31,7 @@ import fr.idev.mudserver.persistence.CharacterDao;
 import fr.idev.mudserver.persistence.RoomDao;
 
 @Component
-public class CharacterCreate implements ActionHandler {
+public class CharacterCreate implements ControllerHandler {
 
     private final CharacterDao characterDao;
     private final RoomDao roomDao;
@@ -57,7 +57,7 @@ public class CharacterCreate implements ActionHandler {
     }
 
     @Override
-    public void onReceive(Session session, String argument) {
+    public void onReceive(Connection session, String argument) {
         String name = argument.trim();
 
         if (name.isEmpty()) {
@@ -84,9 +84,8 @@ public class CharacterCreate implements ActionHandler {
         promptRace(session, account, startingRoom.get(), name);
     }
 
-    private void promptRace(Session session, Account account, Room startingRoom, String name) {
-        session.send(new ChooseRace());
-        session.awaitLine(line -> {
+    private void promptRace(Connection session, Account account, Room startingRoom, String name) {
+        session.requestBlocking(new ChooseRace(), line -> {
             Race race = parseRace(line);
 
             if (race == null) {
@@ -108,7 +107,7 @@ public class CharacterCreate implements ActionHandler {
         }
     }
 
-    private void createCharacter(Session session, Account account, Room startingRoom, String name, Race race) {
+    private void createCharacter(Connection session, Account account, Room startingRoom, String name, Race race) {
         Map<Ability, Integer> scores = rollAbilityScores();
 
         for (Map.Entry<Ability, Integer> bonus : race.abilityScoreBonuses().entrySet()) {

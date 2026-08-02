@@ -1,4 +1,4 @@
-package fr.idev.mudserver.network.action.connected;
+package fr.idev.mudserver.controller.connected;
 
 import java.util.Optional;
 import java.util.Set;
@@ -6,22 +6,23 @@ import java.util.Set;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import fr.idev.mudserver.controller.ControllerHandler;
+import fr.idev.mudserver.controller.authed.CharacterList;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.network.ActionHandler;
+import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
-import fr.idev.mudserver.network.Session;
-import fr.idev.mudserver.network.action.authed.CharacterList;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.connected.AccountAlreadyConnected;
 import fr.idev.mudserver.network.message.connected.AccountNotFound;
 import fr.idev.mudserver.network.message.connected.IncorrectPassword;
+import fr.idev.mudserver.network.message.connected.RequestPassword;
 import fr.idev.mudserver.network.message.connected.WelcomeBack;
 import fr.idev.mudserver.persistence.AccountDao;
 
 @Component
-public class Login implements ActionHandler {
+public class Login implements ControllerHandler {
 
     private final AccountDao accountDao;
     private final AuthWorld authWorld;
@@ -49,7 +50,7 @@ public class Login implements ActionHandler {
     }
 
     @Override
-    public void onReceive(Session session, String argument) {
+    public void onReceive(Connection session, String argument) {
         String login = argument.trim();
         if (login.isEmpty()) {
             session.send(new Usage("login <name>"));
@@ -62,10 +63,11 @@ public class Login implements ActionHandler {
             return;
         }
 
-        session.promptMasked("Password: ", password -> onPasswordEntered(session, account.get(), login, password));
+        session.promptMasked(new RequestPassword(),
+                password -> onPasswordEntered(session, account.get(), login, password));
     }
 
-    private void onPasswordEntered(Session session, Account account, String login, String password) {
+    private void onPasswordEntered(Connection session, Account account, String login, String password) {
         if (!passwordEncoder.matches(password, account.password())) {
             session.send(new IncorrectPassword());
             return;

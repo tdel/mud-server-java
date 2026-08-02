@@ -1,4 +1,4 @@
-package fr.idev.mudserver.network.action.ingame;
+package fr.idev.mudserver.controller.ingame;
 
 import java.util.List;
 import java.util.Set;
@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
+import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
@@ -13,9 +14,8 @@ import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomExit;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.PlayerInstance;
-import fr.idev.mudserver.network.ActionHandler;
+import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
-import fr.idev.mudserver.network.Session;
 import fr.idev.mudserver.network.message.ingame.RoomDescription;
 import fr.idev.mudserver.persistence.ItemDao;
 import fr.idev.mudserver.persistence.ItemTemplateDao;
@@ -23,7 +23,7 @@ import fr.idev.mudserver.persistence.RoomDao;
 import fr.idev.mudserver.persistence.RoomExitDao;
 
 @Component
-public class Look implements ActionHandler {
+public class Look implements ControllerHandler {
 
     private final RoomDao roomDao;
     private final RoomExitDao roomExitDao;
@@ -51,7 +51,7 @@ public class Look implements ActionHandler {
     }
 
     @Override
-    public void onReceive(Session session, String argument) {
+    public void onReceive(Connection session, String argument) {
         PlayerInstance player = session.player();
         player.send(describeRoom(player.character()));
     }

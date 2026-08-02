@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.network.ConnectionState;
-import fr.idev.mudserver.network.Session;
+import fr.idev.mudserver.network.Connection;
 
 /**
  * Suit tous les clients connectés mais pas encore en train de jouer (les états
@@ -19,14 +19,14 @@ import fr.idev.mudserver.network.Session;
 @Component
 public class AuthWorld {
 
-    private final Set<Session> connectedSessions = ConcurrentHashMap.newKeySet();
+    private final Set<Connection> connectedSessions = ConcurrentHashMap.newKeySet();
 
-    public void enterWorld(Session session) {
+    public void enterWorld(Connection session) {
         connectedSessions.add(session);
         session.setState(ConnectionState.AUTHED);
     }
 
-    public void exitWorld(Session session) {
+    public void exitWorld(Connection session) {
         connectedSessions.remove(session);
         session.setState(ConnectionState.CONNECTED);
     }
@@ -38,12 +38,12 @@ public class AuthWorld {
      * {@code exitWorld()} + {@code setState()} : {@code exitWorld()} vide aussi le
      * compte attaché à la session.
      */
-    public void moveToGameWorld(Session session) {
+    public void moveToGameWorld(Connection session) {
         connectedSessions.remove(session);
     }
 
     public boolean isAlreadyConnected(UUID accountId) {
-        for (Session session : connectedSessions) {
+        for (Connection session : connectedSessions) {
             if (session.account().id().equals(accountId)) {
                 return true;
             }

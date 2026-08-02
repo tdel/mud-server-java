@@ -16,9 +16,9 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.network.ActionDispatcher;
 import fr.idev.mudserver.persistence.RoomDao;
 
 /**
@@ -41,16 +41,16 @@ public class TelnetServer {
     private static final Logger log = LoggerFactory.getLogger(TelnetServer.class);
 
     private final ExecutorService virtualThreadExecutor;
-    private final ActionDispatcher actionDispatcher;
+    private final ControllerDispatcher controllerDispatcher;
     private final AuthWorld authWorld;
     private final GameWorld gameWorld;
     private final RoomDao roomDao;
     private final int port;
 
-    public TelnetServer(ExecutorService virtualThreadExecutor, ActionDispatcher actionDispatcher, AuthWorld authWorld,
-            GameWorld gameWorld, RoomDao roomDao, @Value("${app.telnet.port}") int port) {
+    public TelnetServer(ExecutorService virtualThreadExecutor, ControllerDispatcher controllerDispatcher,
+            AuthWorld authWorld, GameWorld gameWorld, RoomDao roomDao, @Value("${app.telnet.port}") int port) {
         this.virtualThreadExecutor = virtualThreadExecutor;
-        this.actionDispatcher = actionDispatcher;
+        this.controllerDispatcher = controllerDispatcher;
         this.authWorld = authWorld;
         this.gameWorld = gameWorld;
         this.roomDao = roomDao;
@@ -65,8 +65,8 @@ public class TelnetServer {
         EventLoopGroup workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
         try {
             ServerBootstrap bootstrap = new ServerBootstrap().group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class).childHandler(
-                            new TelnetServerInitializer(virtualThreadExecutor, actionDispatcher, authWorld, gameWorld));
+                    .channel(NioServerSocketChannel.class).childHandler(new TelnetServerInitializer(
+                            virtualThreadExecutor, controllerDispatcher, authWorld, gameWorld));
 
             Channel channel = bootstrap.bind(port).sync().channel();
             log.info("Serveur telnet démarré sur le port {}", port);

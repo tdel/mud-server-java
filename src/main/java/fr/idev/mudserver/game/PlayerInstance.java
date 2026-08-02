@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.network.OutputMessage;
-import fr.idev.mudserver.network.Session;
+import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.persistence.CharacterDao;
 
 /**
@@ -18,10 +18,10 @@ import fr.idev.mudserver.persistence.CharacterDao;
  */
 public class PlayerInstance {
 
-    private final Session session;
+    private final Connection session;
     private Character character;
 
-    public PlayerInstance(Session session, Character character) {
+    public PlayerInstance(Connection session, Character character) {
         this.session = session;
         this.character = character;
         session.attachPlayer(this);

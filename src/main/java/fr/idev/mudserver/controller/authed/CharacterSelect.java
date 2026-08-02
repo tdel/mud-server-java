@@ -1,19 +1,19 @@
-package fr.idev.mudserver.network.action.authed;
+package fr.idev.mudserver.controller.authed;
 
 import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import fr.idev.mudserver.controller.ControllerHandler;
+import fr.idev.mudserver.controller.ingame.Look;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.PlayerInstance;
-import fr.idev.mudserver.network.ActionHandler;
+import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
-import fr.idev.mudserver.network.Session;
-import fr.idev.mudserver.network.action.ingame.Look;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.authed.NoCharacterNamed;
 import fr.idev.mudserver.network.message.authed.NowPlaying;
@@ -21,7 +21,7 @@ import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 
 @Component
-public class CharacterSelect implements ActionHandler {
+public class CharacterSelect implements ControllerHandler {
 
     private final CharacterDao characterDao;
     private final AccountDao accountDao;
@@ -51,7 +51,7 @@ public class CharacterSelect implements ActionHandler {
     }
 
     @Override
-    public void onReceive(Session session, String argument) {
+    public void onReceive(Connection session, String argument) {
         String name = argument.trim();
 
         if (name.isEmpty()) {

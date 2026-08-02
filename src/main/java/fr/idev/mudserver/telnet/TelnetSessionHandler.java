@@ -8,9 +8,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
 
+import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.network.ActionDispatcher;
 
 /**
  * Frontière Netty <-> logique métier. Chaque connexion obtient exactement un
@@ -28,30 +28,30 @@ import fr.idev.mudserver.network.ActionDispatcher;
  * garantie d'ordre d'exécution entre eux. D'où la file : un seul virtual thread
  * consommateur par connexion.
  */
-public class GameCommandHandler extends SimpleChannelInboundHandler<String> {
+public class TelnetSessionHandler extends SimpleChannelInboundHandler<String> {
 
-    private static final AttributeKey<TelnetSession> SESSION_KEY = AttributeKey.valueOf("telnetSession");
+    private static final AttributeKey<TelnetConnection> SESSION_KEY = AttributeKey.valueOf("telnetSession");
     private static final AttributeKey<BlockingQueue<String>> INBOX_KEY = AttributeKey.valueOf("telnetInbox");
     private static final String POISON_PILL = new String();
 
     private static final String WELCOME = "Welcome to mud-server-java.\nType \"login <name>\" or \"register <name>\" to begin.\n";
 
     private final ExecutorService virtualThreadExecutor;
-    private final ActionDispatcher actionDispatcher;
+    private final ControllerDispatcher controllerDispatcher;
     private final AuthWorld authWorld;
     private final GameWorld gameWorld;
 
-    public GameCommandHandler(ExecutorService virtualThreadExecutor, ActionDispatcher actionDispatcher,
+    public TelnetSessionHandler(ExecutorService virtualThreadExecutor, ControllerDispatcher controllerDispatcher,
             AuthWorld authWorld, GameWorld gameWorld) {
         this.virtualThreadExecutor = virtualThreadExecutor;
-        this.actionDispatcher = actionDispatcher;
+        this.controllerDispatcher = controllerDispatcher;
         this.authWorld = authWorld;
         this.gameWorld = gameWorld;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        TelnetSession session = new TelnetSession(ctx.channel(), actionDispatcher, authWorld, gameWorld);
+        TelnetConnection session = new TelnetConnection(ctx.channel(), controllerDispatcher, authWorld, gameWorld);
         BlockingQueue<String> inbox = new LinkedBlockingQueue<>();
         ctx.channel().attr(SESSION_KEY).set(session);
         ctx.channel().attr(INBOX_KEY).set(inbox);
@@ -71,7 +71,7 @@ public class GameCommandHandler extends SimpleChannelInboundHandler<String> {
         }
     }
 
-    private void runConnectionLoop(TelnetSession session, BlockingQueue<String> inbox) {
+    private void runConnectionLoop(TelnetConnection session, BlockingQueue<String> inbox) {
         session.write(WELCOME);
         try {
             while (true) {

@@ -9,14 +9,14 @@ import org.slf4j.LoggerFactory;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 
+import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.PlayerInstance;
-import fr.idev.mudserver.network.ActionDispatcher;
+import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.OutputMessage;
-import fr.idev.mudserver.network.Session;
 
 /**
  * État par connexion, porté par un attribut de {@link Channel}. Netty garantit
@@ -24,12 +24,12 @@ import fr.idev.mudserver.network.Session;
  * GameCommandHandler) — aucune synchronisation supplémentaire n'est donc
  * nécessaire sur ces champs mutables.
  */
-public class TelnetSession implements Session, TelnetOutput {
+public class TelnetConnection implements Connection, TelnetOutput {
 
-    private static final Logger log = LoggerFactory.getLogger(TelnetSession.class);
+    private static final Logger log = LoggerFactory.getLogger(TelnetConnection.class);
 
     private final Channel channel;
-    private final ActionDispatcher actionDispatcher;
+    private final ControllerDispatcher controllerDispatcher;
     private final AuthWorld authWorld;
     private final GameWorld gameWorld;
 
@@ -38,9 +38,10 @@ public class TelnetSession implements Session, TelnetOutput {
     private PlayerInstance player;
     private Consumer<String> pendingLine;
 
-    public TelnetSession(Channel channel, ActionDispatcher actionDispatcher, AuthWorld authWorld, GameWorld gameWorld) {
+    public TelnetConnection(Channel channel, ControllerDispatcher controllerDispatcher, AuthWorld authWorld,
+            GameWorld gameWorld) {
         this.channel = channel;
-        this.actionDispatcher = actionDispatcher;
+        this.controllerDispatcher = controllerDispatcher;
         this.authWorld = authWorld;
         this.gameWorld = gameWorld;
     }
@@ -59,7 +60,7 @@ public class TelnetSession implements Session, TelnetOutput {
             String name = spaceIdx == -1 ? line : line.substring(0, spaceIdx);
             String argument = spaceIdx == -1 ? "" : line.substring(spaceIdx + 1);
 
-            actionDispatcher.dispatch(this, name.toLowerCase(), argument);
+            controllerDispatcher.dispatch(this, name.toLowerCase(), argument);
         } catch (Exception e) {
             log.error("telnet.command.failed line={}", rawLine, e);
             write("Something went wrong processing that command. Please try again.\n");
@@ -74,7 +75,8 @@ public class TelnetSession implements Session, TelnetOutput {
     }
 
     @Override
-    public void awaitLine(Consumer<String> handler) {
+    public void requestBlocking(OutputMessage message, Consumer<String> handler) {
+        this.send(message);
         this.pendingLine = handler;
     }
 
@@ -87,10 +89,9 @@ public class TelnetSession implements Session, TelnetOutput {
      * qu'accolé au prompt.
      */
     @Override
-    public void promptMasked(String prompt, Consumer<String> onLine) {
+    public void promptMasked(OutputMessage message, Consumer<String> onLine) {
         writeRaw(TelnetEcho.OFF);
-        write(prompt);
-        awaitLine(line -> {
+        requestBlocking(message, line -> {
             writeRaw(TelnetEcho.ON);
             write("\n");
             onLine.accept(line);

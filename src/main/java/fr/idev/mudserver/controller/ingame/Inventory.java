@@ -1,21 +1,21 @@
-package fr.idev.mudserver.network.action.ingame;
+package fr.idev.mudserver.controller.ingame;
 
 import java.util.List;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.game.PlayerInstance;
-import fr.idev.mudserver.network.ActionHandler;
+import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
-import fr.idev.mudserver.network.Session;
 import fr.idev.mudserver.persistence.ItemTemplateDao;
 
 @Component
-public class Inventory implements ActionHandler {
+public class Inventory implements ControllerHandler {
 
     private final ItemService itemService;
     private final ItemTemplateDao itemTemplateDao;
@@ -36,7 +36,7 @@ public class Inventory implements ActionHandler {
     }
 
     @Override
-    public void onReceive(Session session, String argument) {
+    public void onReceive(Connection session, String argument) {
         PlayerInstance player = session.player();
 
         List<Item> items = itemService.getInventory(player.character());

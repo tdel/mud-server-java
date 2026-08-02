@@ -1,16 +1,16 @@
-package fr.idev.mudserver.network.action.connected;
+package fr.idev.mudserver.controller.connected;
 
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import fr.idev.mudserver.network.ActionHandler;
+import fr.idev.mudserver.controller.ControllerHandler;
+import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
-import fr.idev.mudserver.network.Session;
 import fr.idev.mudserver.network.message.connected.Goodbye;
 
 @Component
-public class Quit implements ActionHandler {
+public class Quit implements ControllerHandler {
 
     @Override
     public String name() {
@@ -23,7 +23,7 @@ public class Quit implements ActionHandler {
     }
 
     @Override
-    public void onReceive(Session session, String argument) {
+    public void onReceive(Connection session, String argument) {
         session.send(new Goodbye());
         session.close();
     }

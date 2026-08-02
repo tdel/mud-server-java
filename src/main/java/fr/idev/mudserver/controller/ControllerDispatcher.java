@@ -1,19 +1,20 @@
-package fr.idev.mudserver.network;
+package fr.idev.mudserver.controller;
 
 import org.springframework.stereotype.Component;
 
+import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.message.ActionNotFound;
 
 @Component
-public class ActionDispatcher {
+public class ControllerDispatcher {
 
-    private final ActionRegistry registry;
+    private final ControllerRegistry registry;
 
-    public ActionDispatcher(ActionRegistry registry) {
+    public ControllerDispatcher(ControllerRegistry registry) {
         this.registry = registry;
     }
 
-    public void dispatch(Session session, String actionName, String argument) {
+    public void dispatch(Connection session, String actionName, String argument) {
         registry.find(session.state(), actionName).ifPresentOrElse(action -> action.onReceive(session, argument),
                 () -> session.send(new ActionNotFound()));
     }

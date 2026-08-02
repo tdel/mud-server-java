@@ -1,39 +1,37 @@
-package fr.idev.mudserver.network.action.ingame;
+package fr.idev.mudserver.controller.ingame;
 
 import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Character;
-import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.game.PlayerInstance;
-import fr.idev.mudserver.network.ActionHandler;
+import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
-import fr.idev.mudserver.network.Session;
 import fr.idev.mudserver.network.message.Usage;
-import fr.idev.mudserver.network.message.ingame.ItemEquipped;
-import fr.idev.mudserver.network.message.ingame.ItemNotCarried;
-import fr.idev.mudserver.network.message.ingame.ItemNotEquippable;
+import fr.idev.mudserver.network.message.ingame.ItemNotFound;
+import fr.idev.mudserver.network.message.ingame.ItemTaken;
 import fr.idev.mudserver.persistence.ItemTemplateDao;
 
 @Component
-public class Equip implements ActionHandler {
+public class Take implements ControllerHandler {
 
     private final ItemService itemService;
     private final ItemTemplateDao itemTemplateDao;
 
-    public Equip(ItemService itemService, ItemTemplateDao itemTemplateDao) {
+    public Take(ItemService itemService, ItemTemplateDao itemTemplateDao) {
         this.itemService = itemService;
         this.itemTemplateDao = itemTemplateDao;
     }
 
     @Override
     public String name() {
-        return "equip";
+        return "take";
     }
 
     @Override
@@ -42,31 +40,31 @@ public class Equip implements ActionHandler {
     }
 
     @Override
-    public void onReceive(Session session, String argument) {
+    public void onReceive(Connection session, String argument) {
         PlayerInstance player = session.player();
         String name = argument.trim();
 
         if (name.isEmpty()) {
-            player.send(new Usage("equip <name>"));
+            player.send(new Usage("take <name>"));
             return;
         }
 
         Character character = player.character();
-        Optional<Item> item = itemService.findItemByName(character, name);
+        Optional<Item> item = itemService.findItemInRoomByName(character.currentRoomId(), name);
 
         if (item.isEmpty()) {
-            player.send(new ItemNotCarried(name));
+            player.send(new ItemNotFound(name));
+            return;
+        }
+
+        if (!itemService.addItemToInventory(item.get(), character)) {
+            // Quelqu'un d'autre l'a pris entre-temps — du point de vue de ce joueur,
+            // indiscernable du fait qu'il n'était jamais là.
+            player.send(new ItemNotFound(name));
             return;
         }
 
         String templateName = itemTemplateDao.findById(item.get().templateId()).map(ItemTemplate::name).orElseThrow();
-        Optional<EquipmentSlot> slot = itemService.equipItem(item.get(), character);
-
-        if (slot.isEmpty()) {
-            player.send(new ItemNotEquippable(templateName));
-            return;
-        }
-
-        player.send(new ItemEquipped(templateName, slot.get()));
+        player.send(new ItemTaken(templateName));
     }
 }

@@ -1,4 +1,4 @@
-package fr.idev.mudserver.network.action.connected;
+package fr.idev.mudserver.controller.connected;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,21 +9,23 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import fr.idev.mudserver.controller.ControllerHandler;
+import fr.idev.mudserver.controller.authed.CharacterList;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.network.ActionHandler;
+import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
-import fr.idev.mudserver.network.Session;
-import fr.idev.mudserver.network.action.authed.CharacterList;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.connected.AccountCreated;
+import fr.idev.mudserver.network.message.connected.ConfirmPassword;
 import fr.idev.mudserver.network.message.connected.InvalidPassword;
 import fr.idev.mudserver.network.message.connected.LoginAlreadyTaken;
 import fr.idev.mudserver.network.message.connected.PasswordMismatch;
+import fr.idev.mudserver.network.message.connected.RequestPassword;
 import fr.idev.mudserver.persistence.AccountDao;
 
 @Component
-public class Register implements ActionHandler {
+public class Register implements ControllerHandler {
 
     private static final int MIN_PASSWORD_LENGTH = 8;
     private static final int MAX_PASSWORD_LENGTH = 128;
@@ -52,7 +54,7 @@ public class Register implements ActionHandler {
     }
 
     @Override
-    public void onReceive(Session session, String argument) {
+    public void onReceive(Connection session, String argument) {
         String login = argument.trim();
         if (login.isEmpty()) {
             session.send(new Usage("register <name>"));
@@ -64,21 +66,21 @@ public class Register implements ActionHandler {
             return;
         }
 
-        session.promptMasked("Password: ", password -> onPasswordEntered(session, login, password));
+        session.promptMasked(new RequestPassword(), password -> onPasswordEntered(session, login, password));
     }
 
-    private void onPasswordEntered(Session session, String login, String password) {
+    private void onPasswordEntered(Connection session, String login, String password) {
         List<String> reasons = validatePassword(password);
         if (!reasons.isEmpty()) {
             session.send(new InvalidPassword(reasons));
             return;
         }
 
-        session.promptMasked("Confirm password: ",
+        session.promptMasked(new ConfirmPassword(),
                 confirmation -> onPasswordConfirmed(session, login, password, confirmation));
     }
 
-    private void onPasswordConfirmed(Session session, String login, String password, String confirmation) {
+    private void onPasswordConfirmed(Connection session, String login, String password, String confirmation) {
         if (!password.equals(confirmation)) {
             session.send(new PasswordMismatch());
             return;

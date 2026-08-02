@@ -5,9 +5,9 @@ import java.util.function.Consumer;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.game.PlayerInstance;
 
-public interface Session {
+public interface Connection {
 
-    void awaitLine(Consumer<String> handler);
+    void requestBlocking(OutputMessage message, Consumer<String> handler);
 
     Account account();
 
@@ -23,7 +23,7 @@ public interface Session {
 
     void send(OutputMessage message);
 
-    void promptMasked(String prompt, Consumer<String> onLine);
+    void promptMasked(OutputMessage message, Consumer<String> onLine);
 
     void close();
 }

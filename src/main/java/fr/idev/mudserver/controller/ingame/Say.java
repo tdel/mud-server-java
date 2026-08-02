@@ -1,21 +1,21 @@
-package fr.idev.mudserver.network.action.ingame;
+package fr.idev.mudserver.controller.ingame;
 
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.PlayerInstance;
-import fr.idev.mudserver.network.ActionHandler;
+import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
-import fr.idev.mudserver.network.Session;
 import fr.idev.mudserver.network.message.ingame.Chat;
 import fr.idev.mudserver.network.message.ingame.SayNothing;
 import fr.idev.mudserver.network.message.ingame.YouSaid;
 
 @Component
-public class Say implements ActionHandler {
+public class Say implements ControllerHandler {
 
     private final GameWorld gameWorld;
 
@@ -34,7 +34,7 @@ public class Say implements ActionHandler {
     }
 
     @Override
-    public void onReceive(Session session, String argument) {
+    public void onReceive(Connection session, String argument) {
         PlayerInstance player = session.player();
         String message = argument.trim();
 
