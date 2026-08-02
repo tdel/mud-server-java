@@ -1,45 +1,41 @@
 package fr.idev.mudserver.persistence;
 
+import static fr.idev.mudserver.persistence.jooq.Tables.ROOM_EXIT;
+
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
 import fr.idev.mudserver.domain.RoomExit;
-import fr.idev.mudserver.persistence.mapper.RoomExitRowMapper;
+import fr.idev.mudserver.persistence.jooq.tables.records.RoomExitRecord;
 
 @Repository
 public class RoomExitDao {
 
-    private static final RoomExitRowMapper MAPPER = new RoomExitRowMapper();
+    private final DSLContext dsl;
 
-    private final NamedParameterJdbcTemplate jdbcTemplate;
-
-    public RoomExitDao(NamedParameterJdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public RoomExitDao(DSLContext dsl) {
+        this.dsl = dsl;
     }
 
     public void insert(RoomExit exit) {
-        jdbcTemplate.update("""
-                INSERT INTO room_exit (id, direction, source_room_id, target_room_id)
-                VALUES (:id, :direction, :sourceRoomId, :targetRoomId)
-                """, new MapSqlParameterSource().addValue("id", exit.getId()).addValue("direction", exit.getDirection())
-                .addValue("sourceRoomId", exit.getSourceRoomId()).addValue("targetRoomId", exit.getTargetRoomId()));
+        dsl.insertInto(ROOM_EXIT, ROOM_EXIT.ID, ROOM_EXIT.DIRECTION, ROOM_EXIT.SOURCE_ROOM_ID, ROOM_EXIT.TARGET_ROOM_ID)
+                .values(exit.getId(), exit.getDirection(), exit.getSourceRoomId(), exit.getTargetRoomId()).execute();
     }
 
     public List<RoomExit> findBySourceRoomId(UUID sourceRoomId) {
-        return jdbcTemplate.query("SELECT * FROM room_exit WHERE source_room_id = :sourceRoomId",
-                Map.of("sourceRoomId", sourceRoomId), MAPPER);
+        return dsl.selectFrom(ROOM_EXIT).where(ROOM_EXIT.SOURCE_ROOM_ID.eq(sourceRoomId)).fetch(RoomExitDao::toDomain);
     }
 
     public Optional<RoomExit> findBySourceRoomIdAndDirection(UUID sourceRoomId, String direction) {
-        return jdbcTemplate
-                .query("SELECT * FROM room_exit WHERE source_room_id = :sourceRoomId AND direction = :direction",
-                        Map.of("sourceRoomId", sourceRoomId, "direction", direction), MAPPER)
-                .stream().findFirst();
+        return dsl.selectFrom(ROOM_EXIT).where(ROOM_EXIT.SOURCE_ROOM_ID.eq(sourceRoomId))
+                .and(ROOM_EXIT.DIRECTION.eq(direction)).fetchOptional(RoomExitDao::toDomain);
+    }
+
+    private static RoomExit toDomain(RoomExitRecord record) {
+        return new RoomExit(record.getId(), record.getDirection(), record.getSourceRoomId(), record.getTargetRoomId());
     }
 }
