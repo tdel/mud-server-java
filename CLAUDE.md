@@ -23,7 +23,9 @@ CLI seed commands run through the same jar via positional args, e.g. `room-creat
 
 ## Stack specifics
 
-- Java 25, Spring Boot 4.1.0. Plain JDBC via `NamedParameterJdbcTemplate` — **no JPA/Hibernate**.
+- Java 25, Spring Boot 4.1.0. Persistence is jOOQ (`DSLContext`, `spring-boot-starter-jooq`) — a type-safe SQL builder, not an ORM: no persistence-context, no lazy loading, no dirty-checking. Chosen over JPA/Hibernate specifically because DAO call sites never run inside a transaction except `ItemService` (see below), which would fight an ORM's session/entity-lifecycle assumptions.
+- The DSL classes (`persistence.jooq.tables.*`, `persistence.jooq.tables.records.*`) are generated at build time (`generate-sources` phase, `jooq-codegen-maven`) directly from `V1__init_schema.sql` via `org.jooq.meta.extensions.ddl.DDLDatabase` — **no live database connection is needed for codegen**, it parses the Flyway SQL file itself. Flyway stays the single source of truth for the schema; jOOQ only reflects it. If a second migration file is ever added, extend the plugin's `scripts` property (currently pinned to `V1__init_schema.sql`) to include it.
+- DAOs (`persistence/*Dao`) keep a stable public API (`insert`/`findById`/etc.) regardless of the underlying query engine — internals use `dsl.selectFrom(TABLE)...fetch(RowMapperEquivalent)` with a small `private static toDomain(...)` mapper per DAO, replacing the old hand-written `RowMapper` classes.
 - Boot 4 split several things out of core that older Boot versions bundled: Flyway needs the dedicated `spring-boot-starter-flyway` (plain `flyway-core` isn't enough) plus `flyway-database-postgresql`; Jackson's `ObjectMapper` bean comes from `spring-boot-starter-json`.
 - `spring-security-crypto` is used only for BCrypt — not the full Spring Security starter.
 - Tests use AssertJ (`assertThat`), not Mockito — the test suite is integration-style against a real Postgres container rather than mocked.
@@ -32,7 +34,7 @@ CLI seed commands run through the same jar via positional args, e.g. `room-creat
 
 - `config/VirtualThreadExecutorConfig` exposes one shared `Executors.newVirtualThreadPerTaskExecutor()` bean. Never block JDBC or other blocking logic on Netty's NIO threads.
 - `telnet/GameCommandHandler` spawns **exactly one virtual thread per connection**, which loops `inbox.take()`-ing from a `LinkedBlockingQueue<String>` fed by `channelRead0`. Do **not** submit each incoming line independently to the executor — two lines arriving in the same TCP packet could then run on different virtual threads with no ordering guarantee. The single-consumer queue is what preserves per-connection command ordering.
-- `game/ItemService.addItemToInventory` is the concurrency-critical path for item pickup races: `@Transactional` + `ItemDao.findByIdForUpdate` (`SELECT ... FOR UPDATE`) pessimistic lock. `game/ItemRaceConditionTest` proves exactly-one-winner semantics using real concurrent virtual threads + a `CyclicBarrier`, and is deliberately **not** `@Transactional` at the test level (that would pin both virtual threads to the test thread's single connection and defeat the point of the test).
+- `game/ItemService.addItemToInventory` is the concurrency-critical path for item pickup races: `@Transactional` + `ItemDao.findByIdForUpdate` (jOOQ `.forUpdate()`, i.e. `SELECT ... FOR UPDATE`) pessimistic lock. `game/ItemRaceConditionTest` proves exactly-one-winner semantics using real concurrent virtual threads + a `CyclicBarrier`, and is deliberately **not** `@Transactional` at the test level (that would pin both virtual threads to the test thread's single connection and defeat the point of the test). `game/ItemService.equipItem` is also `@Transactional`, so its two `updateSlot` calls (unequip old occupant, equip new item) share a transaction — matches the deferred `uniq_character_slot` constraint in `V1__init_schema.sql`.
 
 ## Test context gotcha
 
