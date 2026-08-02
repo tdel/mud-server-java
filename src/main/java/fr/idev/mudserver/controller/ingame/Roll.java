@@ -5,6 +5,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
+import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.PlayerInstance;
 import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoller;
@@ -17,9 +18,11 @@ import fr.idev.mudserver.network.message.ingame.DiceRolled;
 public class Roll implements ControllerHandler {
 
     private final DiceRoller diceRoller;
+    private final GameWorld gameWorld;
 
-    public Roll(DiceRoller diceRoller) {
+    public Roll(DiceRoller diceRoller, GameWorld gameWorld) {
         this.diceRoller = diceRoller;
+        this.gameWorld = gameWorld;
     }
 
     @Override
@@ -34,7 +37,7 @@ public class Roll implements ControllerHandler {
 
     @Override
     public void onReceive(Connection session, String argument) {
-        PlayerInstance player = session.player();
+        PlayerInstance player = gameWorld.player(session);
         String notation = argument.trim();
 
         if (notation.isEmpty()) {

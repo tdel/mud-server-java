@@ -9,6 +9,7 @@ import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
+import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.game.PlayerInstance;
 import fr.idev.mudserver.network.Connection;
@@ -24,10 +25,12 @@ public class Unequip implements ControllerHandler {
 
     private final ItemService itemService;
     private final ItemTemplateDao itemTemplateDao;
+    private final GameWorld gameWorld;
 
-    public Unequip(ItemService itemService, ItemTemplateDao itemTemplateDao) {
+    public Unequip(ItemService itemService, ItemTemplateDao itemTemplateDao, GameWorld gameWorld) {
         this.itemService = itemService;
         this.itemTemplateDao = itemTemplateDao;
+        this.gameWorld = gameWorld;
     }
 
     @Override
@@ -42,7 +45,7 @@ public class Unequip implements ControllerHandler {
 
     @Override
     public void onReceive(Connection session, String argument) {
-        PlayerInstance player = session.player();
+        PlayerInstance player = gameWorld.player(session);
         String name = argument.trim();
 
         if (name.isEmpty()) {

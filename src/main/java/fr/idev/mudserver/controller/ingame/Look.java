@@ -52,7 +52,7 @@ public class Look implements ControllerHandler {
 
     @Override
     public void onReceive(Connection session, String argument) {
-        PlayerInstance player = session.player();
+        PlayerInstance player = gameWorld.player(session);
         player.send(describeRoom(player.character()));
     }
 

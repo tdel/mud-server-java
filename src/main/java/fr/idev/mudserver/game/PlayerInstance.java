@@ -24,7 +24,6 @@ public class PlayerInstance {
     public PlayerInstance(Connection session, Character character) {
         this.session = session;
         this.character = character;
-        session.attachPlayer(this);
     }
 
     public Character character() {

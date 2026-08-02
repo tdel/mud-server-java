@@ -12,7 +12,6 @@ import io.netty.channel.Channel;
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.PlayerInstance;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.OutputMessage;
@@ -34,7 +33,6 @@ public class TelnetConnection implements Connection, TelnetOutput {
     private final GameWorld gameWorld;
 
     private ConnectionState state = ConnectionState.CONNECTED;
-    private PlayerInstance player;
     private Consumer<String> pendingLine;
 
     public TelnetConnection(Channel channel, ControllerDispatcher controllerDispatcher, AuthWorld authWorld,
@@ -67,9 +65,7 @@ public class TelnetConnection implements Connection, TelnetOutput {
     }
 
     public void handleClose() {
-        if (player != null) {
-            gameWorld.exitWorld(player);
-        }
+        gameWorld.exitWorld(this);
         authWorld.exitWorld(this);
     }
 
@@ -127,20 +123,5 @@ public class TelnetConnection implements Connection, TelnetOutput {
     @Override
     public void setState(ConnectionState state) {
         this.state = state;
-        switch (state) {
-            case CONNECTED, AUTHED -> player = null;
-            case INGAME -> {
-            }
-        }
-    }
-
-    @Override
-    public PlayerInstance player() {
-        return player;
-    }
-
-    @Override
-    public void attachPlayer(PlayerInstance player) {
-        this.player = player;
     }
 }

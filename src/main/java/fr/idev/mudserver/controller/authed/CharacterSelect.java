@@ -77,7 +77,7 @@ public class CharacterSelect implements ControllerHandler {
         authWorld.moveToGameWorld(session);
         PlayerInstance player = new PlayerInstance(session, character.get());
         session.setState(ConnectionState.INGAME);
-        gameWorld.enterWorld(player);
+        gameWorld.enterWorld(session, player);
 
         session.send(new NowPlaying(character.get().name()));
         lookAction.onReceive(session, "");

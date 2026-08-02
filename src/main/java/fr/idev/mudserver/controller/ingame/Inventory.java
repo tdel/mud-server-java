@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
+import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.game.PlayerInstance;
 import fr.idev.mudserver.network.Connection;
@@ -19,10 +20,12 @@ public class Inventory implements ControllerHandler {
 
     private final ItemService itemService;
     private final ItemTemplateDao itemTemplateDao;
+    private final GameWorld gameWorld;
 
-    public Inventory(ItemService itemService, ItemTemplateDao itemTemplateDao) {
+    public Inventory(ItemService itemService, ItemTemplateDao itemTemplateDao, GameWorld gameWorld) {
         this.itemService = itemService;
         this.itemTemplateDao = itemTemplateDao;
+        this.gameWorld = gameWorld;
     }
 
     @Override
@@ -37,7 +40,7 @@ public class Inventory implements ControllerHandler {
 
     @Override
     public void onReceive(Connection session, String argument) {
-        PlayerInstance player = session.player();
+        PlayerInstance player = gameWorld.player(session);
 
         List<Item> items = itemService.getInventory(player.character());
         List<String> names = items.stream()

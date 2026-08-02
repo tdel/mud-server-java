@@ -35,7 +35,7 @@ public class Say implements ControllerHandler {
 
     @Override
     public void onReceive(Connection session, String argument) {
-        PlayerInstance player = session.player();
+        PlayerInstance player = gameWorld.player(session);
         String message = argument.trim();
 
         if (message.isEmpty()) {

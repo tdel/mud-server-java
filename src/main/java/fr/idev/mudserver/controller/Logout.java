@@ -9,6 +9,7 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.GameWorld;
+import fr.idev.mudserver.game.PlayerInstance;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.LoggedOut;
@@ -48,9 +49,10 @@ public class Logout implements ControllerHandler {
     @Override
     public void onReceive(Connection session, String argument) {
         if (session.state() == ConnectionState.INGAME) {
-            Character character = session.player().character();
+            PlayerInstance playerInstance = gameWorld.player(session);
+            Character character = playerInstance.character();
 
-            gameWorld.exitWorld(session.player());
+            gameWorld.exitWorld(session);
             Account account = accountDao.findById(character.accountId()).orElseThrow();
             authWorld.enterWorld(session, account);
 

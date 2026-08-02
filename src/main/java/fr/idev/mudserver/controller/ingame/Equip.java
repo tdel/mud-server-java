@@ -10,6 +10,7 @@ import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
+import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.game.PlayerInstance;
 import fr.idev.mudserver.network.Connection;
@@ -25,10 +26,12 @@ public class Equip implements ControllerHandler {
 
     private final ItemService itemService;
     private final ItemTemplateDao itemTemplateDao;
+    private final GameWorld gameWorld;
 
-    public Equip(ItemService itemService, ItemTemplateDao itemTemplateDao) {
+    public Equip(ItemService itemService, ItemTemplateDao itemTemplateDao, GameWorld gameWorld) {
         this.itemService = itemService;
         this.itemTemplateDao = itemTemplateDao;
+        this.gameWorld = gameWorld;
     }
 
     @Override
@@ -43,7 +46,7 @@ public class Equip implements ControllerHandler {
 
     @Override
     public void onReceive(Connection session, String argument) {
-        PlayerInstance player = session.player();
+        PlayerInstance player = gameWorld.player(session);
         String name = argument.trim();
 
         if (name.isEmpty()) {
