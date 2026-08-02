@@ -16,6 +16,7 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.Connection;
@@ -37,13 +38,15 @@ public class CharacterCreate implements ControllerHandler {
     private final RoomDao roomDao;
     private final CharacterList characterListAction;
     private final DiceRoller diceRoller;
+    private final AuthWorld authWorld;
 
     public CharacterCreate(CharacterDao characterDao, RoomDao roomDao, CharacterList characterListAction,
-            DiceRoller diceRoller) {
+            DiceRoller diceRoller, AuthWorld authWorld) {
         this.characterDao = characterDao;
         this.roomDao = roomDao;
         this.characterListAction = characterListAction;
         this.diceRoller = diceRoller;
+        this.authWorld = authWorld;
     }
 
     @Override
@@ -66,7 +69,7 @@ public class CharacterCreate implements ControllerHandler {
             return;
         }
 
-        Account account = session.account();
+        Account account = authWorld.account(session);
 
         if (characterDao.findByAccountIdAndName(account.id(), name).isPresent()) {
             session.send(new CharacterAlreadyExists(name));

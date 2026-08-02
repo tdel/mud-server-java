@@ -9,7 +9,7 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 /**
  * Retire les séquences IAC (subnégociation, négociation d'option) du flux
  * entrant, sans jamais répondre à une négociation côté serveur — seul le toggle
- * ECHO explicite de {@link TelnetConnection#promptMasked} émet de l'IAC, en
+ * ECHO explicite de {@link TelnetConnection#requestBlocking} émet de l'IAC, en
  * sortie. Port du filtre par regex PHP (IacFilter::strip()) en scan d'octets,
  * nécessaire ici car un decoder Netty ne peut pas travailler sur un buffer déjà
  * entièrement reçu : une séquence IAC peut être coupée entre deux paquets TCP.

@@ -1,28 +1,31 @@
 package fr.idev.mudserver.game;
 
-import java.util.Set;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
 
+import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.Connection;
 
 /**
- * Suit tous les clients connectés mais pas encore en train de jouer (les états
- * "connected" et "authed" comptent tous les deux).
- * {@code ConcurrentHashMap.newKeySet()} remplace le {@code SplObjectStorage}
- * PHP — son itérateur tolère un ajout/retrait concurrent sans copie défensive
- * préalable, contrairement à l'original.
+ * Suit tous les clients authentifiés mais pas encore en train de jouer, et le
+ * compte associé à chacun — remplace le {@code SplObjectStorage} PHP par un
+ * {@link ConcurrentHashMap}, dont l'itérateur (voir
+ * {@link #isAlreadyConnected}) tolère un ajout/retrait concurrent sans copie
+ * défensive préalable, contrairement à l'original. Le compte vit ici plutôt que
+ * sur la session elle-même : {@code Connection} n'a donc pas besoin d'exposer
+ * d'accesseur de compte.
  */
 @Component
 public class AuthWorld {
 
-    private final Set<Connection> connectedSessions = ConcurrentHashMap.newKeySet();
+    private final Map<Connection, Account> connectedSessions = new ConcurrentHashMap<>();
 
-    public void enterWorld(Connection session) {
-        connectedSessions.add(session);
+    public void enterWorld(Connection session, Account account) {
+        connectedSessions.put(session, account);
         session.setState(ConnectionState.AUTHED);
     }
 
@@ -42,12 +45,11 @@ public class AuthWorld {
         connectedSessions.remove(session);
     }
 
+    public Account account(Connection session) {
+        return connectedSessions.get(session);
+    }
+
     public boolean isAlreadyConnected(UUID accountId) {
-        for (Connection session : connectedSessions) {
-            if (session.account().id().equals(accountId)) {
-                return true;
-            }
-        }
-        return false;
+        return connectedSessions.values().stream().anyMatch(account -> account.id().equals(accountId));
     }
 }

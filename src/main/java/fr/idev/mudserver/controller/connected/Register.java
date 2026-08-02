@@ -66,7 +66,7 @@ public class Register implements ControllerHandler {
             return;
         }
 
-        session.promptMasked(new RequestPassword(), password -> onPasswordEntered(session, login, password));
+        session.requestBlocking(new RequestPassword(), password -> onPasswordEntered(session, login, password));
     }
 
     private void onPasswordEntered(Connection session, String login, String password) {
@@ -76,7 +76,7 @@ public class Register implements ControllerHandler {
             return;
         }
 
-        session.promptMasked(new ConfirmPassword(),
+        session.requestBlocking(new ConfirmPassword(),
                 confirmation -> onPasswordConfirmed(session, login, password, confirmation));
     }
 
@@ -94,8 +94,7 @@ public class Register implements ControllerHandler {
             return;
         }
 
-        session.attachAccount(account);
-        authWorld.enterWorld(session);
+        authWorld.enterWorld(session, account);
 
         session.send(new AccountCreated(login));
         characterListAction.onReceive(session, "");

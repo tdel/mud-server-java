@@ -63,7 +63,7 @@ public class Login implements ControllerHandler {
             return;
         }
 
-        session.promptMasked(new RequestPassword(),
+        session.requestBlocking(new RequestPassword(),
                 password -> onPasswordEntered(session, account.get(), login, password));
     }
 
@@ -78,8 +78,7 @@ public class Login implements ControllerHandler {
             return;
         }
 
-        session.attachAccount(account);
-        authWorld.enterWorld(session);
+        authWorld.enterWorld(session, account);
 
         session.send(new WelcomeBack(login));
         characterListAction.onReceive(session, "");

@@ -60,7 +60,7 @@ public class CharacterSelect implements ControllerHandler {
             return;
         }
 
-        Account account = session.account();
+        Account account = authWorld.account(session);
 
         Optional<Character> character = characterDao.findByAccountIdAndName(account.id(), name);
         if (character.isEmpty()) {

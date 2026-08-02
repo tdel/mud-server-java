@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -23,11 +24,14 @@ public class CharacterDelete implements ControllerHandler {
     private final CharacterDao characterDao;
     private final AccountDao accountDao;
     private final CharacterList characterListAction;
+    private final AuthWorld authWorld;
 
-    public CharacterDelete(CharacterDao characterDao, AccountDao accountDao, CharacterList characterListAction) {
+    public CharacterDelete(CharacterDao characterDao, AccountDao accountDao, CharacterList characterListAction,
+            AuthWorld authWorld) {
         this.characterDao = characterDao;
         this.accountDao = accountDao;
         this.characterListAction = characterListAction;
+        this.authWorld = authWorld;
     }
 
     @Override
@@ -50,7 +54,7 @@ public class CharacterDelete implements ControllerHandler {
             return;
         }
 
-        Account account = session.account();
+        Account account = authWorld.account(session);
 
         Optional<Character> character = characterDao.findByAccountIdAndName(account.id(), name);
         if (character.isEmpty()) {

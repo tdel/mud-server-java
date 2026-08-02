@@ -10,13 +10,13 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 
 import fr.idev.mudserver.controller.ControllerDispatcher;
-import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.PlayerInstance;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.OutputMessage;
+import fr.idev.mudserver.network.SecureOutputMessage;
 
 /**
  * État par connexion, porté par un attribut de {@link Channel}. Netty garantit
@@ -34,7 +34,6 @@ public class TelnetConnection implements Connection, TelnetOutput {
     private final GameWorld gameWorld;
 
     private ConnectionState state = ConnectionState.CONNECTED;
-    private Account account;
     private PlayerInstance player;
     private Consumer<String> pendingLine;
 
@@ -74,28 +73,27 @@ public class TelnetConnection implements Connection, TelnetOutput {
         authWorld.exitWorld(this);
     }
 
+    /**
+     * Si {@code message} est un {@link SecureOutputMessage}, coupe l'echo local du
+     * client avant l'envoi et capture la ligne suivante en clair : l'echo est
+     * toujours rétabli juste avant que {@code handler} ne s'exécute. Le client
+     * n'ayant jamais renvoyé le retour chariot pendant que l'echo était coupé, on
+     * émet nous-même un saut de ligne pour que ce que {@code handler} écrit démarre
+     * sur une ligne neuve plutôt qu'accolé au prompt.
+     */
     @Override
     public void requestBlocking(OutputMessage message, Consumer<String> handler) {
         this.send(message);
-        this.pendingLine = handler;
-    }
-
-    /**
-     * Coupe l'echo local du client, écrit {@code prompt}, capture la ligne suivante
-     * en clair pour {@code onLine}. L'echo est toujours rétabli juste avant que
-     * {@code onLine} ne s'exécute. Le client n'ayant jamais renvoyé le retour
-     * chariot pendant que l'echo était coupé, on émet nous-même un saut de ligne
-     * pour que ce que {@code onLine} écrit démarre sur une ligne neuve plutôt
-     * qu'accolé au prompt.
-     */
-    @Override
-    public void promptMasked(OutputMessage message, Consumer<String> onLine) {
-        writeRaw(TelnetEcho.OFF);
-        requestBlocking(message, line -> {
-            writeRaw(TelnetEcho.ON);
-            write("\n");
-            onLine.accept(line);
-        });
+        if (message instanceof SecureOutputMessage) {
+            writeRaw(TelnetEcho.OFF);
+            this.pendingLine = line -> {
+                writeRaw(TelnetEcho.ON);
+                write("\n");
+                handler.accept(line);
+            };
+        } else {
+            this.pendingLine = handler;
+        }
     }
 
     @Override
@@ -130,24 +128,10 @@ public class TelnetConnection implements Connection, TelnetOutput {
     public void setState(ConnectionState state) {
         this.state = state;
         switch (state) {
-            case CONNECTED -> {
-                account = null;
-                player = null;
-            }
-            case AUTHED -> player = null;
+            case CONNECTED, AUTHED -> player = null;
             case INGAME -> {
             }
         }
-    }
-
-    @Override
-    public Account account() {
-        return account;
-    }
-
-    @Override
-    public void attachAccount(Account account) {
-        this.account = account;
     }
 
     @Override
