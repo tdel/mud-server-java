@@ -52,4 +52,21 @@ class AccountDaoTest extends AbstractIntegrationTest {
         assertThat(accountDao.findById(account.getId())).map(Account::getCurrentCharacterId)
                 .contains(character.getId());
     }
+
+    @Test
+    void clearsCurrentCharacterBackToNull() {
+        Account account = new Account(UUID.randomUUID(), "carol", "hashed-password", null);
+        accountDao.insert(account);
+
+        Room startingRoom = new Room(UUID.randomUUID(), "Place du village", "...", true);
+        roomDao.insert(startingRoom);
+        Character character = new Character(UUID.randomUUID(), account.getId(), "Carol", startingRoom.getId(),
+                Race.DWARF, 12, 12, 10, 10, 12, 10, 12, 10, 10, 10);
+        characterDao.insert(character);
+        accountDao.updateCurrentCharacter(account.getId(), character.getId());
+
+        accountDao.updateCurrentCharacter(account.getId(), null);
+
+        assertThat(accountDao.findById(account.getId())).map(Account::getCurrentCharacterId).isEmpty();
+    }
 }
