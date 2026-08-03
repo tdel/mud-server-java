@@ -65,6 +65,21 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void updatesProgress() {
+        seedAccountAndRooms();
+        Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA.getId(), Race.ORC,
+                14, 14, 10, 10, 14, 11, 12, 10, 11, 10);
+        characterDao.insert(character);
+
+        character.setCurrentRoomId(roomB.getId());
+        character.setCurrentHealth(7);
+        character.setCurrentMana(3);
+        characterDao.update(character);
+
+        assertThat(characterDao.findById(character.getId())).contains(character);
+    }
+
+    @Test
     void deletesById() {
         seedAccountAndRooms();
         Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA.getId(), Race.ORC,

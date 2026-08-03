@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.OutputMessage;
 import fr.idev.mudserver.network.message.ingame.CharacterDisconnected;
 import fr.idev.mudserver.network.message.ingame.CharacterJoinedRoom;
@@ -27,7 +26,8 @@ import fr.idev.mudserver.network.message.ingame.CharacterLeftRoom;
  * l'itération), donc {@link #broadcast} n'a pas besoin du snapshot défensif que
  * fait la version PHP avant d'itérer. Ce champ n'est jamais persisté ni pris en
  * compte par {@link #equals}/{@link #hashCode} : il ne représente rien en base,
- * uniquement l'état vivant du process.
+ * uniquement l'état vivant du process. Clé sur l'id du personnage plutôt que sa
+ * connexion : {@link Character} porte désormais sa propre connexion.
  */
 public class Room {
 
@@ -36,7 +36,7 @@ public class Room {
     private String description;
     private Boolean isStartingRoom;
 
-    private final Map<Connection, Character> clients = new ConcurrentHashMap<>();
+    private final Map<UUID, Character> clients = new ConcurrentHashMap<>();
 
     public Room(UUID id, String name, String description, Boolean isStartingRoom) {
         this.id = id;
@@ -77,20 +77,20 @@ public class Room {
         this.isStartingRoom = startingRoom;
     }
 
-    public void join(Connection connection, Character character) {
+    public void join(Character character) {
         character.setCurrentRoomId(id);
-        clients.put(connection, character);
-        broadcast(new CharacterJoinedRoom(character.getName()), connection);
+        clients.put(character.getId(), character);
+        broadcast(new CharacterJoinedRoom(character.getName()), character);
     }
 
-    public void leave(Connection connection, Character character, Room destination) {
-        clients.remove(connection);
-        broadcast(new CharacterLeftRoom(character.getName(), destination.getName()), connection);
+    public void leave(Character character, Room destination) {
+        clients.remove(character.getId());
+        broadcast(new CharacterLeftRoom(character.getName(), destination.getName()), character);
     }
 
-    public void disconnect(Connection connection, Character character) {
-        clients.remove(connection);
-        broadcast(new CharacterDisconnected(character.getName()), connection);
+    public void disconnect(Character character) {
+        clients.remove(character.getId());
+        broadcast(new CharacterDisconnected(character.getName()), character);
     }
 
     public Character findCharacterByName(String name) {
@@ -106,12 +106,12 @@ public class Room {
         return new ArrayList<>(clients.values());
     }
 
-    public void broadcast(OutputMessage message, Connection exclude) {
-        for (Map.Entry<Connection, Character> entry : clients.entrySet()) {
-            if (entry.getKey() == exclude) {
+    public void broadcast(OutputMessage message, Character exclude) {
+        for (Character character : clients.values()) {
+            if (character == exclude) {
                 continue;
             }
-            entry.getKey().send(message);
+            character.getConnection().send(message);
         }
     }
 

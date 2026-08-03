@@ -52,6 +52,18 @@ public class CharacterDao {
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_ROOM_ID, roomId).where(CHARACTER.ID.eq(characterId)).execute();
     }
 
+    /**
+     * Ne persiste que les champs qui évoluent réellement en jeu (position, santé,
+     * mana) ; race/stats/nom restent figés à la création, pas besoin de les
+     * réécrire.
+     */
+    public void update(Character character) {
+        dsl.update(CHARACTER).set(CHARACTER.CURRENT_ROOM_ID, character.getCurrentRoomId())
+                .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth())
+                .set(CHARACTER.CURRENT_MANA, character.getCurrentMana()).where(CHARACTER.ID.eq(character.getId()))
+                .execute();
+    }
+
     public void deleteById(UUID characterId) {
         dsl.deleteFrom(CHARACTER).where(CHARACTER.ID.eq(characterId)).execute();
     }

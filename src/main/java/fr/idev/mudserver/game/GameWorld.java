@@ -34,6 +34,7 @@ public class GameWorld {
     }
 
     public void enterWorld(Connection connection, Character character) {
+        character.setConnection(connection);
         characters.put(connection, character);
         moveCharacter(connection, character.getCurrentRoomId());
     }
@@ -42,8 +43,8 @@ public class GameWorld {
         Character character = characters.get(connection);
         Room newRoom = room(roomId);
 
-        room(character.getCurrentRoomId()).leave(connection, character, newRoom);
-        newRoom.join(connection, character);
+        room(character.getCurrentRoomId()).leave(character, newRoom);
+        newRoom.join(character);
         characterDao.updateCurrentRoom(character.getId(), roomId);
     }
 
@@ -53,11 +54,16 @@ public class GameWorld {
             return;
         }
 
-        room(character.getCurrentRoomId()).disconnect(connection, character);
+        characterDao.update(character);
+        room(character.getCurrentRoomId()).disconnect(character);
     }
 
     public Character character(Connection connection) {
         return characters.get(connection);
+    }
+
+    public boolean isCharacterInGame(UUID characterId) {
+        return characters.values().stream().anyMatch(character -> character.getId().equals(characterId));
     }
 
     public Room room(UUID roomId) {

@@ -10,9 +10,11 @@ import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.game.AuthWorld;
+import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
+import fr.idev.mudserver.network.message.authed.CharacterCurrentlyInGame;
 import fr.idev.mudserver.network.message.authed.CharacterDeleted;
 import fr.idev.mudserver.network.message.authed.NoCharacterNamed;
 import fr.idev.mudserver.persistence.AccountDao;
@@ -25,13 +27,15 @@ public class CharacterDelete implements ControllerHandler {
     private final AccountDao accountDao;
     private final CharacterList characterListAction;
     private final AuthWorld authWorld;
+    private final GameWorld gameWorld;
 
     public CharacterDelete(CharacterDao characterDao, AccountDao accountDao, CharacterList characterListAction,
-            AuthWorld authWorld) {
+            AuthWorld authWorld, GameWorld gameWorld) {
         this.characterDao = characterDao;
         this.accountDao = accountDao;
         this.characterListAction = characterListAction;
         this.authWorld = authWorld;
+        this.gameWorld = gameWorld;
     }
 
     @Override
@@ -64,6 +68,13 @@ public class CharacterDelete implements ControllerHandler {
         }
 
         UUID characterId = character.get().getId();
+
+        if (gameWorld.isCharacterInGame(characterId)) {
+            connection.send(new CharacterCurrentlyInGame(name));
+            characterListAction.onReceive(connection, "");
+            return;
+        }
+
         if (characterId.equals(account.getCurrentCharacterId())) {
             accountDao.updateCurrentCharacter(account.getId(), null);
         }

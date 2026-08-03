@@ -42,7 +42,7 @@ public class Say implements ControllerHandler {
             return;
         }
 
-        gameWorld.room(character.getCurrentRoomId()).broadcast(new Chat(character.getName(), message), connection);
+        gameWorld.room(character.getCurrentRoomId()).broadcast(new Chat(character.getName(), message), character);
 
         connection.send(new YouSaid(message));
     }

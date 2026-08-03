@@ -3,6 +3,16 @@ package fr.idev.mudserver.domain;
 import java.util.Objects;
 import java.util.UUID;
 
+import fr.idev.mudserver.network.Connection;
+
+/**
+ * {@code connection} n'est jamais persisté ni pris en compte par
+ * {@link #equals}/{@link #hashCode} : il ne représente rien en base, seulement
+ * la session réseau qui porte ce personnage tant qu'il est en jeu (voir
+ * {@code GameWorld.enterWorld}). Un personnage fraîchement chargé depuis
+ * {@code CharacterDao} n'a pas encore de connexion tant qu'il n'a pas rejoint
+ * le monde.
+ */
 public class Character {
 
     private UUID id;
@@ -20,6 +30,8 @@ public class Character {
     private int intelligence;
     private int wisdom;
     private int charisma;
+
+    private Connection connection;
 
     public Character(UUID id, UUID accountId, String name, UUID currentRoomId, Race race, int currentHealth,
             int maxHealth, int currentMana, int maxMana, int strength, int dexterity, int constitution,
@@ -159,6 +171,14 @@ public class Character {
 
     public void setCharisma(int charisma) {
         this.charisma = charisma;
+    }
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
     }
 
     @Override
