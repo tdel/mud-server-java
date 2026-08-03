@@ -1,6 +1,6 @@
 package fr.idev.mudserver.domain;
 
-public enum Ability {
+public enum Attribute {
     STRENGTH, DEXTERITY, CONSTITUTION, INTELLIGENCE, WISDOM, CHARISMA;
 
     public String label() {

@@ -11,7 +11,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.Ability;
+import fr.idev.mudserver.domain.Attribute;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Race;
@@ -111,16 +111,16 @@ public class CharacterCreate implements ControllerHandler {
     }
 
     private void createCharacter(Connection connection, Account account, Room startingRoom, String name, Race race) {
-        Map<Ability, Integer> scores = rollAbilityScores();
+        Map<Attribute, Integer> scores = rollAttributeScores();
 
-        for (Map.Entry<Ability, Integer> bonus : race.abilityScoreBonuses().entrySet()) {
+        for (Map.Entry<Attribute, Integer> bonus : race.attributeScoreBonuses().entrySet()) {
             scores.merge(bonus.getKey(), bonus.getValue(), Integer::sum);
         }
 
         Character character = new Character(UUID.randomUUID(), account.getId(), name, startingRoom.getId(), race, 100,
-                100, 10, 10, scores.get(Ability.STRENGTH), scores.get(Ability.DEXTERITY),
-                scores.get(Ability.CONSTITUTION), scores.get(Ability.INTELLIGENCE), scores.get(Ability.WISDOM),
-                scores.get(Ability.CHARISMA));
+                100, scores.get(Attribute.STRENGTH), scores.get(Attribute.DEXTERITY),
+                scores.get(Attribute.CONSTITUTION), scores.get(Attribute.INTELLIGENCE), scores.get(Attribute.WISDOM),
+                scores.get(Attribute.CHARISMA));
 
         characterDao.insert(character);
         character.spawnToRoom(startingRoom);
@@ -130,15 +130,15 @@ public class CharacterCreate implements ControllerHandler {
         characterListAction.onReceive(connection, "");
     }
 
-    private Map<Ability, Integer> rollAbilityScores() {
-        Map<Ability, Integer> scores = new LinkedHashMap<>();
-        for (Ability ability : Ability.values()) {
-            scores.put(ability, rollAbilityScore());
+    private Map<Attribute, Integer> rollAttributeScores() {
+        Map<Attribute, Integer> scores = new LinkedHashMap<>();
+        for (Attribute attribute : Attribute.values()) {
+            scores.put(attribute, rollAttributeScore());
         }
         return scores;
     }
 
-    private int rollAbilityScore() {
+    private int rollAttributeScore() {
         // Official 5e method: roll 4d6, drop the lowest single die, sum the rest.
         DiceRoll roll = diceRoller.roll("4d6");
         int[] dice = roll.rolls().clone();

@@ -2,7 +2,7 @@ package fr.idev.mudserver.network.message.authed;
 
 import java.util.Map;
 
-import fr.idev.mudserver.domain.Ability;
+import fr.idev.mudserver.domain.Attribute;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
@@ -20,15 +20,15 @@ public record ChooseRace() implements OutputTelnetMessage {
     }
 
     private String describeBonuses(Race race) {
-        Map<Ability, Integer> bonuses = race.abilityScoreBonuses();
+        Map<Attribute, Integer> bonuses = race.attributeScoreBonuses();
 
         if (bonuses.size() == 6) {
             int bonus = bonuses.values().iterator().next();
-            return "+" + bonus + " to all six abilities";
+            return "+" + bonus + " to all six attributes";
         }
 
         StringBuilder parts = new StringBuilder();
-        for (Map.Entry<Ability, Integer> entry : bonuses.entrySet()) {
+        for (Map.Entry<Attribute, Integer> entry : bonuses.entrySet()) {
             if (!parts.isEmpty()) {
                 parts.append(", ");
             }

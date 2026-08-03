@@ -10,9 +10,8 @@ public record CharacterStats(Character character) implements OutputTelnetMessage
     public void toTelnet(TelnetOutput output) {
         Character c = character;
         output.write(String.format(
-                "== %s ==\nHealth: %d/%d  Mana: %d/%d\nStrength: %d  Dexterity: %d  Constitution: %d\nIntelligence: %d  Wisdom: %d  Charisma: %d\n",
-                c.getName(), c.getCurrentHealth(), c.getMaxHealth(), c.getCurrentMana(), c.getMaxMana(),
-                c.getStrength(), c.getDexterity(), c.getConstitution(), c.getIntelligence(), c.getWisdom(),
-                c.getCharisma()));
+                "== %s ==\nHealth: %d/%d\nStrength: %d  Dexterity: %d  Constitution: %d\nIntelligence: %d  Wisdom: %d  Charisma: %d\n",
+                c.getName(), c.getCurrentHealth(), c.getMaxHealth(), c.getStrength(), c.getDexterity(),
+                c.getConstitution(), c.getIntelligence(), c.getWisdom(), c.getCharisma()));
     }
 }

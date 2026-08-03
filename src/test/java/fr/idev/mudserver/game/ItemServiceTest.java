@@ -66,7 +66,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "erin", "hashed-password", null);
         accountDao.insert(account);
         Character character = new Character(UUID.randomUUID(), account.getId(), "Erin", room.getId(), Race.HUMAN, 10,
-                10, 10, 10, 10, 10, 10, 10, 10, 10);
+                10, 10, 10, 10, 10, 10, 10);
         characterDao.insert(character);
 
         Item firstSword = new Item(UUID.randomUUID(), weaponTemplate.getId(), null, character.getId(), null);
@@ -97,7 +97,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "gwen", "hashed-password", null);
         accountDao.insert(account);
         Character character = new Character(UUID.randomUUID(), account.getId(), "Gwen", room.getId(), Race.HUMAN, 10,
-                10, 10, 10, 10, 10, 10, 10, 10, 10);
+                10, 10, 10, 10, 10, 10, 10);
         characterDao.insert(character);
 
         Item sword = new Item(UUID.randomUUID(), weaponTemplate.getId(), null, character.getId(), null);
@@ -126,7 +126,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "fay", "hashed-password", null);
         accountDao.insert(account);
         Character character = new Character(UUID.randomUUID(), account.getId(), "Fay", room.getId(), Race.HUMAN, 10, 10,
-                10, 10, 10, 10, 10, 10, 10, 10);
+                10, 10, 10, 10, 10, 10);
         characterDao.insert(character);
 
         Item potion = new Item(UUID.randomUUID(), potionTemplate.getId(), null, character.getId(), null);
@@ -151,7 +151,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "gus", "hashed-password", null);
         accountDao.insert(account);
         Character character = new Character(UUID.randomUUID(), account.getId(), "Gus", room.getId(), Race.HUMAN, 10, 10,
-                10, 10, 10, 10, 10, 10, 10, 10);
+                10, 10, 10, 10, 10, 10);
         characterDao.insert(character);
         warmedRoom.join(character);
 

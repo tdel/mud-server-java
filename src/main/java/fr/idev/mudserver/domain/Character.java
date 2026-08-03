@@ -15,6 +15,7 @@ import fr.idev.mudserver.domain.event.CharacterUnequippedItem;
 import fr.idev.mudserver.domain.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.event.ItemPickedUp;
 import fr.idev.mudserver.network.Connection;
+import fr.idev.mudserver.network.OutputMessage;
 
 /**
  * {@code connection}, {@code currentRoom} ne sont jamais persistés ni pris en
@@ -33,8 +34,6 @@ public class Character {
     private Race race;
     private int currentHealth;
     private int maxHealth;
-    private int currentMana;
-    private int maxMana;
     private int strength;
     private int dexterity;
     private int constitution;
@@ -47,8 +46,7 @@ public class Character {
     private final List<Item> inventory = new CopyOnWriteArrayList<>();
 
     public Character(UUID id, UUID accountId, String name, UUID currentRoomId, Race race, int currentHealth,
-            int maxHealth, int currentMana, int maxMana, int strength, int dexterity, int constitution,
-            int intelligence, int wisdom, int charisma) {
+            int maxHealth, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma) {
         this.id = id;
         this.accountId = accountId;
         this.name = name;
@@ -56,8 +54,6 @@ public class Character {
         this.race = race;
         this.currentHealth = currentHealth;
         this.maxHealth = maxHealth;
-        this.currentMana = currentMana;
-        this.maxMana = maxMana;
         this.strength = strength;
         this.dexterity = dexterity;
         this.constitution = constitution;
@@ -120,22 +116,6 @@ public class Character {
 
     public void setMaxHealth(int maxHealth) {
         this.maxHealth = maxHealth;
-    }
-
-    public int getCurrentMana() {
-        return currentMana;
-    }
-
-    public void setCurrentMana(int currentMana) {
-        this.currentMana = currentMana;
-    }
-
-    public int getMaxMana() {
-        return maxMana;
-    }
-
-    public void setMaxMana(int maxMana) {
-        this.maxMana = maxMana;
     }
 
     public int getStrength() {
@@ -345,6 +325,12 @@ public class Character {
         inventory.addAll(items);
     }
 
+    public void send(OutputMessage message) {
+        if (null != connection) {
+            this.connection.send(message);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -353,26 +339,25 @@ public class Character {
         if (!(o instanceof Character other)) {
             return false;
         }
-        return currentHealth == other.currentHealth && maxHealth == other.maxHealth && currentMana == other.currentMana
-                && maxMana == other.maxMana && strength == other.strength && dexterity == other.dexterity
-                && constitution == other.constitution && intelligence == other.intelligence && wisdom == other.wisdom
-                && charisma == other.charisma && Objects.equals(id, other.id)
-                && Objects.equals(accountId, other.accountId) && Objects.equals(name, other.name)
-                && Objects.equals(currentRoomId, other.currentRoomId) && race == other.race;
+        return currentHealth == other.currentHealth && maxHealth == other.maxHealth && strength == other.strength
+                && dexterity == other.dexterity && constitution == other.constitution
+                && intelligence == other.intelligence && wisdom == other.wisdom && charisma == other.charisma
+                && Objects.equals(id, other.id) && Objects.equals(accountId, other.accountId)
+                && Objects.equals(name, other.name) && Objects.equals(currentRoomId, other.currentRoomId)
+                && race == other.race;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, accountId, name, currentRoomId, race, currentHealth, maxHealth, currentMana, maxMana,
-                strength, dexterity, constitution, intelligence, wisdom, charisma);
+        return Objects.hash(id, accountId, name, currentRoomId, race, currentHealth, maxHealth, strength, dexterity,
+                constitution, intelligence, wisdom, charisma);
     }
 
     @Override
     public String toString() {
         return "Character[id=" + id + ", accountId=" + accountId + ", name=" + name + ", currentRoomId=" + currentRoomId
-                + ", race=" + race + ", currentHealth=" + currentHealth + ", maxHealth=" + maxHealth + ", currentMana="
-                + currentMana + ", maxMana=" + maxMana + ", strength=" + strength + ", dexterity=" + dexterity
-                + ", constitution=" + constitution + ", intelligence=" + intelligence + ", wisdom=" + wisdom
-                + ", charisma=" + charisma + "]";
+                + ", race=" + race + ", currentHealth=" + currentHealth + ", maxHealth=" + maxHealth + ", strength="
+                + strength + ", dexterity=" + dexterity + ", constitution=" + constitution + ", intelligence="
+                + intelligence + ", wisdom=" + wisdom + ", charisma=" + charisma + "]";
     }
 }

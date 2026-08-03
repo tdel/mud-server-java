@@ -3,12 +3,12 @@ package fr.idev.mudserver.domain;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static fr.idev.mudserver.domain.Ability.CHARISMA;
-import static fr.idev.mudserver.domain.Ability.CONSTITUTION;
-import static fr.idev.mudserver.domain.Ability.DEXTERITY;
-import static fr.idev.mudserver.domain.Ability.INTELLIGENCE;
-import static fr.idev.mudserver.domain.Ability.STRENGTH;
-import static fr.idev.mudserver.domain.Ability.WISDOM;
+import static fr.idev.mudserver.domain.Attribute.CHARISMA;
+import static fr.idev.mudserver.domain.Attribute.CONSTITUTION;
+import static fr.idev.mudserver.domain.Attribute.DEXTERITY;
+import static fr.idev.mudserver.domain.Attribute.INTELLIGENCE;
+import static fr.idev.mudserver.domain.Attribute.STRENGTH;
+import static fr.idev.mudserver.domain.Attribute.WISDOM;
 
 public enum Race {
     DWARF, HUMAN, HIGH_ELF, ORC;
@@ -28,8 +28,8 @@ public enum Race {
      * {@code Map.of(...)} ne garantit pas (ordre d'itération volontairement
      * randomisé par la JVM).
      */
-    public Map<Ability, Integer> abilityScoreBonuses() {
-        Map<Ability, Integer> bonuses = new LinkedHashMap<>();
+    public Map<Attribute, Integer> attributeScoreBonuses() {
+        Map<Attribute, Integer> bonuses = new LinkedHashMap<>();
         switch (this) {
             case DWARF -> {
                 bonuses.put(STRENGTH, 2);

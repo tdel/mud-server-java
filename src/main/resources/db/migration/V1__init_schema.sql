@@ -41,8 +41,6 @@ CREATE TABLE character (
     race           VARCHAR(20) NOT NULL,
     current_health INT NOT NULL,
     max_health     INT NOT NULL,
-    current_mana   INT NOT NULL DEFAULT 10,
-    max_mana       INT NOT NULL DEFAULT 10,
     strength       INT NOT NULL DEFAULT 10,
     dexterity      INT NOT NULL DEFAULT 10,
     constitution   INT NOT NULL DEFAULT 10,

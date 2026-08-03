@@ -43,7 +43,7 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     void insertsAndFindsById() {
         seedAccountAndRooms();
         Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA.getId(), Race.ORC,
-                14, 14, 10, 10, 14, 11, 12, 10, 11, 10);
+                14, 14, 14, 11, 12, 10, 11, 10);
 
         characterDao.insert(character);
 
@@ -56,7 +56,7 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     void updatesCurrentRoom() {
         seedAccountAndRooms();
         Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA.getId(), Race.ORC,
-                14, 14, 10, 10, 14, 11, 12, 10, 11, 10);
+                14, 14, 14, 11, 12, 10, 11, 10);
         characterDao.insert(character);
 
         characterDao.updateCurrentRoom(character.getId(), roomB.getId());
@@ -68,12 +68,11 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     void updatesProgress() {
         seedAccountAndRooms();
         Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA.getId(), Race.ORC,
-                14, 14, 10, 10, 14, 11, 12, 10, 11, 10);
+                14, 14, 14, 11, 12, 10, 11, 10);
         characterDao.insert(character);
 
         character.setCurrentRoomId(roomB.getId());
         character.setCurrentHealth(7);
-        character.setCurrentMana(3);
         characterDao.update(character);
 
         assertThat(characterDao.findById(character.getId())).contains(character);
@@ -83,7 +82,7 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     void deletesById() {
         seedAccountAndRooms();
         Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA.getId(), Race.ORC,
-                14, 14, 10, 10, 14, 11, 12, 10, 11, 10);
+                14, 14, 14, 11, 12, 10, 11, 10);
         characterDao.insert(character);
 
         characterDao.deleteById(character.getId());

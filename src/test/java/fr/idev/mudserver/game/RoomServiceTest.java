@@ -79,7 +79,7 @@ class RoomServiceTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "erin", "hashed-password", null);
         accountDao.insert(account);
         Character character = new Character(UUID.randomUUID(), account.getId(), "Erin", origin.getId(), Race.HUMAN, 10,
-                10, 10, 10, 10, 10, 10, 10, 10, 10);
+                10, 10, 10, 10, 10, 10, 10);
         characterDao.insert(character);
         room(origin.getId()).join(character);
 
@@ -119,7 +119,7 @@ class RoomServiceTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "finn", "hashed-password", null);
         accountDao.insert(account);
         Character character = new Character(UUID.randomUUID(), account.getId(), "Finn", room.getId(), Race.HUMAN, 10,
-                10, 10, 10, 10, 10, 10, 10, 10, 10);
+                10, 10, 10, 10, 10, 10, 10);
         characterDao.insert(character);
 
         roomService.spawnCharacter(character);

@@ -24,14 +24,12 @@ public class CharacterDao {
 
     public void insert(Character character) {
         dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_ROOM_ID,
-                CHARACTER.RACE, CHARACTER.CURRENT_HEALTH, CHARACTER.MAX_HEALTH, CHARACTER.CURRENT_MANA,
-                CHARACTER.MAX_MANA, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
-                CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA)
+                CHARACTER.RACE, CHARACTER.CURRENT_HEALTH, CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY,
+                CHARACTER.CONSTITUTION, CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA)
                 .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentRoomId(),
                         character.getRace().name(), character.getCurrentHealth(), character.getMaxHealth(),
-                        character.getCurrentMana(), character.getMaxMana(), character.getStrength(),
-                        character.getDexterity(), character.getConstitution(), character.getIntelligence(),
-                        character.getWisdom(), character.getCharisma())
+                        character.getStrength(), character.getDexterity(), character.getConstitution(),
+                        character.getIntelligence(), character.getWisdom(), character.getCharisma())
                 .execute();
     }
 
@@ -53,14 +51,12 @@ public class CharacterDao {
     }
 
     /**
-     * Ne persiste que les champs qui évoluent réellement en jeu (position, santé,
-     * mana) ; race/stats/nom restent figés à la création, pas besoin de les
-     * réécrire.
+     * Ne persiste que les champs qui évoluent réellement en jeu (position, santé) ;
+     * race/stats/nom restent figés à la création, pas besoin de les réécrire.
      */
     public void update(Character character) {
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_ROOM_ID, character.getCurrentRoomId())
-                .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth())
-                .set(CHARACTER.CURRENT_MANA, character.getCurrentMana()).where(CHARACTER.ID.eq(character.getId()))
+                .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).where(CHARACTER.ID.eq(character.getId()))
                 .execute();
     }
 
@@ -70,8 +66,8 @@ public class CharacterDao {
 
     private static Character toDomain(CharacterRecord record) {
         return new Character(record.getId(), record.getAccountId(), record.getName(), record.getCurrentRoomId(),
-                Race.valueOf(record.getRace()), record.getCurrentHealth(), record.getMaxHealth(),
-                record.getCurrentMana(), record.getMaxMana(), record.getStrength(), record.getDexterity(),
-                record.getConstitution(), record.getIntelligence(), record.getWisdom(), record.getCharisma());
+                Race.valueOf(record.getRace()), record.getCurrentHealth(), record.getMaxHealth(), record.getStrength(),
+                record.getDexterity(), record.getConstitution(), record.getIntelligence(), record.getWisdom(),
+                record.getCharisma());
     }
 }

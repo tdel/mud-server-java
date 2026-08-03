@@ -110,7 +110,7 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), login, "hashed-password", null);
         accountDao.insert(account);
         Character character = new Character(UUID.randomUUID(), account.getId(), login, room.getId(), Race.HUMAN, 10, 10,
-                10, 10, 10, 10, 10, 10, 10, 10);
+                10, 10, 10, 10, 10, 10);
         characterDao.insert(character);
         room(room.getId()).join(character);
         return character;
