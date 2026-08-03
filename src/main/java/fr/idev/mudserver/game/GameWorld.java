@@ -35,7 +35,7 @@ public class GameWorld {
         character.setConnection(connection);
         character.setInventory(itemService.loadInventory(character));
         characters.put(connection, character);
-        roomService.moveCharacter(character, character.getCurrentRoomId());
+        character.spawnToRoom(roomService.room(character.getCurrentRoomId()));
     }
 
     public void exitWorld(Connection connection) {

@@ -6,22 +6,26 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.event.CharacterMovedToRoom;
+import fr.idev.mudserver.domain.event.CharacterSpawnedToRoom;
 import fr.idev.mudserver.persistence.CharacterDao;
 import fr.idev.mudserver.persistence.RoomDao;
 
 /**
- * Point d'entrée unique pour le cache des rooms et les déplacements entre
- * elles. {@code Room} (depuis la fusion de RoomInstance, voir historique) reste
- * à la fois l'entité persistée et le conteneur runtime des personnages présents
- * ; {@code RoomService} est la couche cache/cycle de vie au-dessus
- * (warm/lookup/déplacement) — les mutations d'appartenance
- * ({@code join}/{@code leave}/{@code disconnect}/{@code broadcast}) restent
- * portées par {@link Room} lui-même, appelées directement sur l'objet renvoyé
- * par {@link #room}.
+ * Point d'entrée unique pour le cache des rooms. {@code Room} (depuis la fusion
+ * de RoomInstance, voir historique) reste à la fois l'entité persistée et le
+ * conteneur runtime des personnages présents ; {@code RoomService} est la
+ * couche cache/cycle de vie au-dessus (warm/lookup) — les mutations
+ * d'appartenance ({@code join}/{@code leave}/{@code disconnect}/
+ * {@code broadcast}) restent portées par {@link Room} lui-même, appelées
+ * directement sur l'objet renvoyé par {@link #room}, ou via
+ * {@code Character#moveToRoom}/{@code Character#spawnToRoom}. Cette classe
+ * réagit ensuite aux événements qu'ils publient pour répercuter le changement
+ * en base.
  */
 @Service
 public class RoomService {
@@ -54,11 +58,15 @@ public class RoomService {
         return rooms.values().stream().filter(room -> Boolean.TRUE.equals(room.isStartingRoom())).findFirst();
     }
 
-    public void moveCharacter(Character character, UUID roomId) {
-        Room newRoom = room(roomId);
+    @EventListener
+    void onCharacterMovedToRoom(CharacterMovedToRoom event) {
+        event.character().setCurrentRoomId(event.to().getId());
+        characterDao.updateCurrentRoom(event.character().getId(), event.to().getId());
+    }
 
-        room(character.getCurrentRoomId()).leave(character, newRoom);
-        newRoom.join(character);
-        characterDao.updateCurrentRoom(character.getId(), roomId);
+    @EventListener
+    void onCharacterSpawnedToRoom(CharacterSpawnedToRoom event) {
+        event.character().setCurrentRoomId(event.room().getId());
+        characterDao.updateCurrentRoom(event.character().getId(), event.room().getId());
     }
 }

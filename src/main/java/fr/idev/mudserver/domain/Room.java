@@ -80,14 +80,14 @@ public class Room {
     }
 
     public void join(Character character) {
-        character.setCurrentRoomId(id);
+        character.setCurrentRoom(this);
         clients.put(character.getId(), character);
         broadcast(new CharacterJoinedRoom(character.getName()), character);
     }
 
-    public void leave(Character character, Room destination) {
+    public void leave(Character character) {
         clients.remove(character.getId());
-        broadcast(new CharacterLeftRoom(character.getName(), destination.getName()), character);
+        broadcast(new CharacterLeftRoom(character.getName()), character);
     }
 
     public void disconnect(Character character) {
@@ -127,7 +127,7 @@ public class Room {
 
     public void broadcast(OutputMessage message, Character exclude) {
         for (Character character : clients.values()) {
-            if (character == exclude) {
+            if (character == exclude || character.getConnection() == null) {
                 continue;
             }
             character.getConnection().send(message);

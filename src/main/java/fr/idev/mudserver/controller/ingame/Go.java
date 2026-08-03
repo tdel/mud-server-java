@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomExit;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.RoomService;
@@ -14,20 +15,17 @@ import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.ingame.NoSuchExit;
-import fr.idev.mudserver.persistence.RoomDao;
 import fr.idev.mudserver.persistence.RoomExitDao;
 
 @Component
 public class Go implements ControllerHandler {
 
-    private final RoomDao roomDao;
     private final RoomExitDao roomExitDao;
     private final GameWorld gameWorld;
     private final RoomService roomService;
     private final Look lookAction;
 
-    public Go(RoomDao roomDao, RoomExitDao roomExitDao, GameWorld gameWorld, RoomService roomService, Look lookAction) {
-        this.roomDao = roomDao;
+    public Go(RoomExitDao roomExitDao, GameWorld gameWorld, RoomService roomService, Look lookAction) {
         this.roomExitDao = roomExitDao;
         this.gameWorld = gameWorld;
         this.roomService = roomService;
@@ -60,7 +58,8 @@ public class Go implements ControllerHandler {
             return;
         }
 
-        roomService.moveCharacter(character, exit.get().getTargetRoomId());
+        Room destination = roomService.room(exit.get().getTargetRoomId());
+        character.moveToRoom(destination);
 
         lookAction.onReceive(connection, "");
     }

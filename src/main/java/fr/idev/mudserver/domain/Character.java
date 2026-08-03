@@ -5,15 +5,19 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import fr.idev.mudserver.domain.event.CharacterMovedToRoom;
+import fr.idev.mudserver.domain.event.CharacterSpawnedToRoom;
+import fr.idev.mudserver.domain.event.DomainEventPublisher;
+import fr.idev.mudserver.domain.event.ItemPickedUp;
 import fr.idev.mudserver.network.Connection;
 
 /**
- * {@code connection} n'est jamais persisté ni pris en compte par
- * {@link #equals}/{@link #hashCode} : il ne représente rien en base, seulement
- * la session réseau qui porte ce personnage tant qu'il est en jeu (voir
+ * {@code connection}, {@code currentRoom} ne sont jamais persistés ni pris en
+ * compte par {@link #equals}/{@link #hashCode} : ils ne représentent rien en
+ * base, seulement l'état vivant du personnage tant qu'il est en jeu (voir
  * {@code GameWorld.enterWorld}). Un personnage fraîchement chargé depuis
- * {@code CharacterDao} n'a pas encore de connexion tant qu'il n'a pas rejoint
- * le monde.
+ * {@code CharacterDao} n'a ni connexion ni room courante tant qu'il n'a pas
+ * rejoint le monde via {@link #spawnToRoom} ou {@link #moveToRoom}.
  */
 public class Character {
 
@@ -34,6 +38,7 @@ public class Character {
     private int charisma;
 
     private Connection connection;
+    private Room currentRoom;
     private final List<Item> inventory = new CopyOnWriteArrayList<>();
 
     public Character(UUID id, UUID accountId, String name, UUID currentRoomId, Race race, int currentHealth,
@@ -182,6 +187,45 @@ public class Character {
 
     public void setConnection(Connection connection) {
         this.connection = connection;
+    }
+
+    public Room getCurrentRoom() {
+        return currentRoom;
+    }
+
+    public void setCurrentRoom(Room currentRoom) {
+        this.currentRoom = currentRoom;
+    }
+
+    /**
+     * Précondition : le personnage est déjà dans le monde, donc {@code currentRoom}
+     * est déjà renseigné (voir {@link #spawnToRoom} pour l'entrée initiale, qui n'a
+     * pas de room d'origine).
+     */
+    public void moveToRoom(Room destination) {
+        Room previous = this.currentRoom;
+        previous.leave(this);
+        destination.join(this);
+        DomainEventPublisher.publish(new CharacterMovedToRoom(this, previous, destination));
+    }
+
+    public void spawnToRoom(Room room) {
+        room.join(this);
+        DomainEventPublisher.publish(new CharacterSpawnedToRoom(this, room));
+    }
+
+    /**
+     * Précondition : {@code item.getRoomId()} désigne {@code currentRoom} — garanti
+     * par {@code ItemService.findItemInRoomByName}, seul point d'entrée du
+     * ramassage, et par le fait que tout personnage capable d'atteindre l'état
+     * {@code INGAME} a déjà traversé {@link #spawnToRoom} (à la création ou à
+     * l'entrée en jeu).
+     */
+    public void pickUpItem(Item item) {
+        currentRoom.removeItem(item);
+        item.assignToCharacter(id);
+        addItem(item);
+        DomainEventPublisher.publish(new ItemPickedUp(this, item));
     }
 
     public List<Item> getInventory() {

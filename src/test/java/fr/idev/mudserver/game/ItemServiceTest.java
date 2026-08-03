@@ -121,6 +121,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
         Character character = new Character(UUID.randomUUID(), account.getId(), "Gus", room.getId(), Race.HUMAN, 10, 10,
                 10, 10, 10, 10, 10, 10, 10, 10);
         characterDao.insert(character);
+        roomService.room(room.getId()).join(character);
 
         Item torch = new Item(UUID.randomUUID(), template.getId(), room.getId(), null, null);
         itemDao.insert(torch);

@@ -83,7 +83,7 @@ class RoomServiceTest extends AbstractIntegrationTest {
         characterDao.insert(character);
         roomService.room(origin.getId()).join(character);
 
-        roomService.moveCharacter(character, destination.getId());
+        character.moveToRoom(roomService.room(destination.getId()));
 
         assertThat(roomService.room(destination.getId()).characters()).extracting(Character::getId)
                 .contains(character.getId());

@@ -123,6 +123,7 @@ public class CharacterCreate implements ControllerHandler {
                 scores.get(Ability.CHARISMA));
 
         characterDao.insert(character);
+        character.spawnToRoom(startingRoom);
 
         connection.send(new CharacterCreated(name));
         connection.send(new CharacterStats(character));

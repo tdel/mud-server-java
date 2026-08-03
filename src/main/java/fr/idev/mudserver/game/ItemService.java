@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.event.ItemPickedUp;
 import fr.idev.mudserver.persistence.ItemDao;
 import fr.idev.mudserver.persistence.ItemTemplateDao;
 
@@ -132,7 +134,10 @@ public class ItemService {
      * joueur l'a déjà pris entre-temps. Deux joueurs peuvent réellement se disputer
      * un item non possédé sous les virtual threads — cette méthode relit la ligne
      * sous verrou pessimiste (dans une transaction) avant de décider si l'item est
-     * encore libre. Voir {@link ItemDao#findByIdForUpdate}.
+     * encore libre. Voir {@link ItemDao#findByIdForUpdate}. Une fois la course
+     * tranchée, la mutation (domaine + DB) est déléguée à
+     * {@link Character#pickUpItem} et à son événement — jamais avant, pour ne pas
+     * rouvrir la fenêtre de course que le verrou vient de fermer.
      *
      * @return true si {@code target} porte désormais l'item, false s'il a été pris
      *         entre-temps
@@ -145,14 +150,13 @@ public class ItemService {
             return false;
         }
 
-        UUID previousRoomId = item.getRoomId();
-        itemDao.assignToCharacter(item.getId(), target.getId());
-        item.assignToCharacter(target.getId());
-        if (previousRoomId != null) {
-            roomService.room(previousRoomId).removeItem(item);
-        }
-        target.addItem(item);
+        target.pickUpItem(item);
         return true;
+    }
+
+    @EventListener
+    void onItemPickedUp(ItemPickedUp event) {
+        itemDao.assignToCharacter(event.item().getId(), event.character().getId());
     }
 
     public void removeItemFromInventory(Item item, Character target) {
