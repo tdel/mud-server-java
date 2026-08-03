@@ -57,7 +57,9 @@ public class ItemService {
     }
 
     public List<Item> loadInventory(Character character) {
-        return attachTemplates(itemDao.findByCharacterId(character.getId()));
+        List<Item> items = attachTemplates(itemDao.findByCharacterId(character.getId()));
+        items.forEach(item -> item.attachCharacter(character));
+        return items;
     }
 
     /**
@@ -69,7 +71,9 @@ public class ItemService {
      */
     public void warmRoomItems(Collection<Room> rooms) {
         for (Room room : rooms) {
-            room.setItems(attachTemplates(itemDao.findByRoomId(room.getId())));
+            List<Item> items = attachTemplates(itemDao.findByRoomId(room.getId()));
+            items.forEach(item -> item.attachRoom(room));
+            room.setItems(items);
         }
     }
 

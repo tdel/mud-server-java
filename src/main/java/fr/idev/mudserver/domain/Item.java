@@ -5,17 +5,26 @@ import java.util.UUID;
 
 /**
  * Appartient à exactement une room OU un character, jamais les deux — invariant
- * appliqué par {@code fr.idev.mudserver.game.ItemService}, pas ici.
+ * appliqué par {@link #setCharacter}/{@link #setRoom}, qui se nettoient
+ * mutuellement à chaque changement de possesseur.
  */
 public class Item {
 
     private UUID id;
     private UUID templateId;
+
+    // Ne servent qu'à la persistance (ItemDao) — le code applicatif doit utiliser
+    // getCharacter()/getRoom(), attachées au chargement par
+    // ItemService.loadInventory/warmRoomItems, et tenues à jour par
+    // setCharacter()/setRoom() lors des changements de possesseur en jeu.
     private UUID roomId;
     private UUID characterId;
+
     private EquipmentSlot slot;
 
     private ItemTemplate template;
+    private Character character;
+    private Room room;
 
     public Item(UUID id, UUID templateId, UUID roomId, UUID characterId, EquipmentSlot slot) {
         this.id = id;
@@ -31,6 +40,22 @@ public class Item {
 
     public ItemTemplate getTemplate() {
         return template;
+    }
+
+    public void attachCharacter(Character character) {
+        this.character = character;
+    }
+
+    public void attachRoom(Room room) {
+        this.room = room;
+    }
+
+    public Character getCharacter() {
+        return character;
+    }
+
+    public Room getRoom() {
+        return room;
     }
 
     public String getName() {
@@ -56,14 +81,18 @@ public class Item {
         return template;
     }
 
-    public void assignToCharacter(UUID characterId) {
-        this.characterId = characterId;
+    public void setCharacter(Character character) {
+        this.character = character;
+        this.characterId = character.getId();
+        this.room = null;
         this.roomId = null;
         this.slot = null;
     }
 
-    public void assignToRoom(UUID roomId) {
-        this.roomId = roomId;
+    public void setRoom(Room room) {
+        this.room = room;
+        this.roomId = room.getId();
+        this.character = null;
         this.characterId = null;
         this.slot = null;
     }
@@ -88,16 +117,8 @@ public class Item {
         return roomId;
     }
 
-    public void setRoomId(UUID roomId) {
-        this.roomId = roomId;
-    }
-
     public UUID getCharacterId() {
         return characterId;
-    }
-
-    public void setCharacterId(UUID characterId) {
-        this.characterId = characterId;
     }
 
     public EquipmentSlot getSlot() {

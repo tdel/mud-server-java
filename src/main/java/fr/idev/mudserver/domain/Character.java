@@ -220,7 +220,7 @@ public class Character {
     }
 
     /**
-     * Précondition : {@code item.getRoomId()} désigne {@code currentRoom} — garanti
+     * Précondition : {@code item.getRoom()} désigne {@code currentRoom} — garanti
      * par {@link Room#findOneByName}, seul point d'entrée du ramassage, et par le
      * fait que tout personnage capable d'atteindre l'état {@code INGAME} a déjà
      * traversé {@link #spawnToRoom} (à la création ou à l'entrée en jeu). Suppose
@@ -238,19 +238,22 @@ public class Character {
      * coup via l'événement {@link ItemPickedUp}. {@code synchronized} ne bloque
      * plus (« pin ») les virtual threads sur leur carrier depuis JEP 491 (JDK 24+),
      * donc ce verrou respecte la contrainte de
-     * {@code config.VirtualThreadExecutorConfig}.
+     * {@code config.VirtualThreadExecutorConfig}. Le retrait de {@code currentRoom}
+     * vit aussi dans le bloc verrouillé : toute la transition de possesseur (item
+     * quitte la room, rejoint le personnage gagnant) reste une unité atomique face
+     * à un autre {@code pickUpItem} concurrent sur le même item.
      *
      * @return true si {@code this} porte désormais l'item, false si un autre
      *         personnage l'a pris entre-temps
      */
     public boolean pickUpItem(Item item) {
         synchronized (item) {
-            if (item.getCharacterId() != null) {
+            if (item.getCharacter() != null) {
                 return false;
             }
-            item.assignToCharacter(id);
+            item.setCharacter(this);
+            currentRoom.removeItem(item);
         }
-        currentRoom.removeItem(item);
         addItem(item);
         DomainEventPublisher.publish(new ItemPickedUp(this, item));
         return true;
@@ -307,7 +310,7 @@ public class Character {
      * d'entrée du drop.
      */
     public void dropItem(Item item) {
-        item.assignToRoom(currentRoom.getId());
+        item.setRoom(currentRoom);
         removeItem(item);
         currentRoom.addItem(item);
         DomainEventPublisher.publish(new CharacterDroppedItem(this, item, currentRoom));
