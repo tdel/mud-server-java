@@ -221,14 +221,13 @@ public class Character {
 
     /**
      * Précondition : {@code item.getRoomId()} désigne {@code currentRoom} — garanti
-     * par {@code ItemService.findItemInRoomByName}, seul point d'entrée du
-     * ramassage, et par le fait que tout personnage capable d'atteindre l'état
-     * {@code INGAME} a déjà traversé {@link #spawnToRoom} (à la création ou à
-     * l'entrée en jeu). Suppose aussi qu'il n'existe jamais qu'une seule instance
-     * JVM vivante de {@code item} (cache chaud de {@code RoomService}/
-     * {@code ItemService}, jamais rechargé par requête) — sinon
-     * {@code synchronized(item)} ne synchroniserait rien entre deux appels
-     * concurrents portant sur des instances différentes du même item.
+     * par {@link Room#findOneByName}, seul point d'entrée du ramassage, et par le
+     * fait que tout personnage capable d'atteindre l'état {@code INGAME} a déjà
+     * traversé {@link #spawnToRoom} (à la création ou à l'entrée en jeu). Suppose
+     * aussi qu'il n'existe jamais qu'une seule instance JVM vivante de {@code item}
+     * (cache chaud de {@code RoomService}/ {@code ItemService}, jamais rechargé par
+     * requête) — sinon {@code synchronized(item)} ne synchroniserait rien entre
+     * deux appels concurrents portant sur des instances différentes du même item.
      *
      * <p>
      * Deux joueurs peuvent réellement se disputer un item non possédé sous les
@@ -304,8 +303,8 @@ public class Character {
      * {@link #unequipItem}, voir leur Javadoc) : un personnage n'est piloté que par
      * sa propre connexion, dont les commandes sont traitées une par une par un
      * unique virtual thread. Précondition : {@code item} fait partie de
-     * l'inventaire de {@code this} — garanti par
-     * {@code ItemService.findItemByName}, seul point d'entrée du drop.
+     * l'inventaire de {@code this} — garanti par {@link #findOneByName}, seul point
+     * d'entrée du drop.
      */
     public void dropItem(Item item) {
         item.assignToRoom(currentRoom.getId());
@@ -316,6 +315,10 @@ public class Character {
 
     public List<Item> getInventory() {
         return List.copyOf(inventory);
+    }
+
+    public Optional<Item> findOneByName(String name) {
+        return inventory.stream().filter(item -> item.getName().equalsIgnoreCase(name)).findFirst();
     }
 
     public List<Item> getCarriedItems() {

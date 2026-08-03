@@ -8,8 +8,9 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Item;
+import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.ItemService;
+import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -19,12 +20,12 @@ import fr.idev.mudserver.network.message.ingame.ItemTaken;
 @Component
 public class Take implements ControllerHandler {
 
-    private final ItemService itemService;
     private final GameWorld gameWorld;
+    private final RoomService roomService;
 
-    public Take(ItemService itemService, GameWorld gameWorld) {
-        this.itemService = itemService;
+    public Take(GameWorld gameWorld, RoomService roomService) {
         this.gameWorld = gameWorld;
+        this.roomService = roomService;
     }
 
     @Override
@@ -47,7 +48,8 @@ public class Take implements ControllerHandler {
             return;
         }
 
-        Optional<Item> item = itemService.findItemInRoomByName(character.getCurrentRoomId(), name);
+        Room room = roomService.room(character.getCurrentRoomId());
+        Optional<Item> item = room.findOneByName(name);
 
         if (item.isEmpty()) {
             connection.send(new ItemNotFound(name));

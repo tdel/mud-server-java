@@ -10,7 +10,6 @@ import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -21,11 +20,9 @@ import fr.idev.mudserver.network.message.ingame.ItemNotEquippable;
 @Component
 public class Equip implements ControllerHandler {
 
-    private final ItemService itemService;
     private final GameWorld gameWorld;
 
-    public Equip(ItemService itemService, GameWorld gameWorld) {
-        this.itemService = itemService;
+    public Equip(GameWorld gameWorld) {
         this.gameWorld = gameWorld;
     }
 
@@ -49,7 +46,7 @@ public class Equip implements ControllerHandler {
             return;
         }
 
-        Optional<Item> item = itemService.findItemByName(character, name);
+        Optional<Item> item = character.findOneByName(name);
 
         if (item.isEmpty()) {
             connection.send(new ItemNotCarried(name));

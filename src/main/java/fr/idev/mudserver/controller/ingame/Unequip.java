@@ -9,7 +9,6 @@ import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -20,11 +19,9 @@ import fr.idev.mudserver.network.message.ingame.ItemUnequipped;
 @Component
 public class Unequip implements ControllerHandler {
 
-    private final ItemService itemService;
     private final GameWorld gameWorld;
 
-    public Unequip(ItemService itemService, GameWorld gameWorld) {
-        this.itemService = itemService;
+    public Unequip(GameWorld gameWorld) {
         this.gameWorld = gameWorld;
     }
 
@@ -48,7 +45,7 @@ public class Unequip implements ControllerHandler {
             return;
         }
 
-        Optional<Item> item = itemService.findItemByName(character, name);
+        Optional<Item> item = character.findOneByName(name);
 
         if (item.isEmpty()) {
             connection.send(new ItemNotCarried(name));

@@ -3,7 +3,6 @@ package fr.idev.mudserver.game;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -45,17 +44,32 @@ public class ItemService {
 
     private final ItemDao itemDao;
     private final ItemTemplateDao itemTemplateDao;
-    private final RoomService roomService;
 
-    public ItemService(ItemDao itemDao, ItemTemplateDao itemTemplateDao, RoomService roomService) {
+    public ItemService(ItemDao itemDao, ItemTemplateDao itemTemplateDao) {
         this.itemDao = itemDao;
         this.itemTemplateDao = itemTemplateDao;
-        this.roomService = roomService;
     }
 
     public void warmItemTemplates() {
         for (ItemTemplate template : itemTemplateDao.findAll()) {
             templates.put(template.getId(), template);
+        }
+    }
+
+    public List<Item> loadInventory(Character character) {
+        return attachTemplates(itemDao.findByCharacterId(character.getId()));
+    }
+
+    /**
+     * Précharge les items au sol de chaque room, une fois pour toute la durée du
+     * process — appelé depuis {@code TelnetServer.start()} juste après
+     * {@code RoomService.warmRooms()} et {@link #warmItemTemplates()}, sur le même
+     * principe : une {@code Room} n'est jamais rechargée par session, contrairement
+     * à un {@code Character}.
+     */
+    public void warmRoomItems(Collection<Room> rooms) {
+        for (Room room : rooms) {
+            room.setItems(attachTemplates(itemDao.findByRoomId(room.getId())));
         }
     }
 
@@ -72,44 +86,6 @@ public class ItemService {
     private List<Item> attachTemplates(List<Item> items) {
         items.forEach(this::attachTemplate);
         return items;
-    }
-
-    public List<Item> loadInventory(Character character) {
-        return attachTemplates(itemDao.findByCharacterId(character.getId()));
-    }
-
-    /**
-     * Charge les items au sol de {@code room} depuis la base, une fois, pour les
-     * attacher à la room (voir {@link #warmRoomItems}) — {@link Room#getItems()}
-     * passe ensuite par le cache de la room plutôt que par une nouvelle requête.
-     */
-    public List<Item> loadRoomItems(Room room) {
-        return attachTemplates(itemDao.findByRoomId(room.getId()));
-    }
-
-    /**
-     * Précharge les items au sol de chaque room, une fois pour toute la durée du
-     * process — appelé depuis {@code TelnetServer.start()} juste après
-     * {@code RoomService.warmRooms()} et {@link #warmItemTemplates()}, sur le même
-     * principe : une {@code Room} n'est jamais rechargée par session, contrairement
-     * à un {@code Character}.
-     */
-    public void warmRoomItems(Collection<Room> rooms) {
-        for (Room room : rooms) {
-            room.setItems(loadRoomItems(room));
-        }
-    }
-
-    public Optional<Item> findItemByName(Character character, String name) {
-        return findByTemplateName(character.getInventory(), name);
-    }
-
-    public Optional<Item> findItemInRoomByName(UUID roomId, String name) {
-        return findByTemplateName(roomService.room(roomId).getItems(), name);
-    }
-
-    private Optional<Item> findByTemplateName(List<Item> items, String name) {
-        return items.stream().filter(item -> item.getName().equalsIgnoreCase(name)).findFirst();
     }
 
     @EventListener
