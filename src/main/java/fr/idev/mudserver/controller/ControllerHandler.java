@@ -15,5 +15,5 @@ public interface ControllerHandler {
 
     Set<ConnectionState> states();
 
-    void onReceive(Connection session, String argument);
+    void onReceive(Connection connection, String argument);
 }

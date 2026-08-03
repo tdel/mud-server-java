@@ -47,23 +47,23 @@ public class Logout implements ControllerHandler {
     }
 
     @Override
-    public void onReceive(Connection session, String argument) {
-        if (session.state() == ConnectionState.INGAME) {
-            Client client = gameWorld.client(session);
+    public void onReceive(Connection connection, String argument) {
+        if (connection.state() == ConnectionState.INGAME) {
+            Client client = gameWorld.client(connection);
             Character character = client.character();
 
-            gameWorld.exitWorld(session);
+            gameWorld.exitWorld(connection);
             Account account = accountDao.findById(character.getAccountId()).orElseThrow();
-            authWorld.enterWorld(session, account);
+            authWorld.enterWorld(connection, account);
 
-            session.send(new StoppedPlaying(character.getName()));
-            characterListAction.onReceive(session, "");
+            connection.send(new StoppedPlaying(character.getName()));
+            characterListAction.onReceive(connection, "");
             return;
         }
 
-        if (session.state() == ConnectionState.AUTHED) {
-            authWorld.exitWorld(session);
-            session.send(new LoggedOut());
+        if (connection.state() == ConnectionState.AUTHED) {
+            authWorld.exitWorld(connection);
+            connection.send(new LoggedOut());
             return;
         }
 

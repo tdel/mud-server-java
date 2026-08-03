@@ -24,7 +24,7 @@ import fr.idev.mudserver.network.Connection;
 @Component
 public class AuthWorld {
 
-    private final Map<Connection, Account> connectedSessions = new ConcurrentHashMap<>();
+    private final Map<Connection, Account> connections = new ConcurrentHashMap<>();
 
     private final GameWorld gameWorld;
     private final AccountDao accountDao;
@@ -34,31 +34,31 @@ public class AuthWorld {
         this.accountDao = accountDao;
     }
 
-    public void enterWorld(Connection session, Account account) {
-        connectedSessions.put(session, account);
-        session.setState(ConnectionState.AUTHED);
+    public void enterWorld(Connection connection, Account account) {
+        connections.put(connection, account);
+        connection.setState(ConnectionState.AUTHED);
     }
 
-    public void exitWorld(Connection session) {
-        connectedSessions.remove(session);
-        session.setState(ConnectionState.CONNECTED);
+    public void exitWorld(Connection connection) {
+        connections.remove(connection);
+        connection.setState(ConnectionState.CONNECTED);
     }
 
-    public void moveToGameWorld(Connection session, Character character) {
-        Account account = connectedSessions.remove(session);
+    public void moveToGameWorld(Connection connection, Character character) {
+        Account account = connections.remove(connection);
 
         accountDao.updateCurrentCharacter(account.getId(), character.getId());
 
-        Client client = new Client(session, character);
-        session.setState(ConnectionState.INGAME);
-        gameWorld.enterWorld(session, client);
+        Client client = new Client(connection, character);
+        connection.setState(ConnectionState.INGAME);
+        gameWorld.enterWorld(connection, client);
     }
 
-    public Account account(Connection session) {
-        return connectedSessions.get(session);
+    public Account account(Connection connection) {
+        return connections.get(connection);
     }
 
     public boolean isAlreadyConnected(UUID accountId) {
-        return connectedSessions.values().stream().anyMatch(account -> account.getId().equals(accountId));
+        return connections.values().stream().anyMatch(account -> account.getId().equals(accountId));
     }
 }

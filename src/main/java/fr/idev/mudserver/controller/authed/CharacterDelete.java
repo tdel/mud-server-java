@@ -45,21 +45,21 @@ public class CharacterDelete implements ControllerHandler {
     }
 
     @Override
-    public void onReceive(Connection session, String argument) {
+    public void onReceive(Connection connection, String argument) {
         String name = argument.trim();
 
         if (name.isEmpty()) {
-            session.send(new Usage("character-delete <name>"));
-            characterListAction.onReceive(session, "");
+            connection.send(new Usage("character-delete <name>"));
+            characterListAction.onReceive(connection, "");
             return;
         }
 
-        Account account = authWorld.account(session);
+        Account account = authWorld.account(connection);
 
         Optional<Character> character = characterDao.findByAccountIdAndName(account.getId(), name);
         if (character.isEmpty()) {
-            session.send(new NoCharacterNamed(name));
-            characterListAction.onReceive(session, "");
+            connection.send(new NoCharacterNamed(name));
+            characterListAction.onReceive(connection, "");
             return;
         }
 
@@ -70,7 +70,7 @@ public class CharacterDelete implements ControllerHandler {
 
         characterDao.deleteById(characterId);
 
-        session.send(new CharacterDeleted(name));
-        characterListAction.onReceive(session, "");
+        connection.send(new CharacterDeleted(name));
+        characterListAction.onReceive(connection, "");
     }
 }

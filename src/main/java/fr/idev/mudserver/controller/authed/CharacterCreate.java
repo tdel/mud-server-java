@@ -60,44 +60,44 @@ public class CharacterCreate implements ControllerHandler {
     }
 
     @Override
-    public void onReceive(Connection session, String argument) {
+    public void onReceive(Connection connection, String argument) {
         String name = argument.trim();
 
         if (name.isEmpty()) {
-            session.send(new Usage("character-create <name>"));
-            characterListAction.onReceive(session, "");
+            connection.send(new Usage("character-create <name>"));
+            characterListAction.onReceive(connection, "");
             return;
         }
 
-        Account account = authWorld.account(session);
+        Account account = authWorld.account(connection);
 
         if (characterDao.findByAccountIdAndName(account.getId(), name).isPresent()) {
-            session.send(new CharacterAlreadyExists(name));
-            characterListAction.onReceive(session, "");
+            connection.send(new CharacterAlreadyExists(name));
+            characterListAction.onReceive(connection, "");
             return;
         }
 
         Optional<Room> startingRoom = roomDao.findStartingRoom();
         if (startingRoom.isEmpty()) {
-            session.send(new NoStartingRoom());
-            characterListAction.onReceive(session, "");
+            connection.send(new NoStartingRoom());
+            characterListAction.onReceive(connection, "");
             return;
         }
 
-        promptRace(session, account, startingRoom.get(), name);
+        promptRace(connection, account, startingRoom.get(), name);
     }
 
-    private void promptRace(Connection session, Account account, Room startingRoom, String name) {
-        session.requestBlocking(new ChooseRace(), line -> {
+    private void promptRace(Connection connection, Account account, Room startingRoom, String name) {
+        connection.requestBlocking(new ChooseRace(), line -> {
             Race race = parseRace(line);
 
             if (race == null) {
-                session.send(new InvalidRace(line.trim()));
-                promptRace(session, account, startingRoom, name);
+                connection.send(new InvalidRace(line.trim()));
+                promptRace(connection, account, startingRoom, name);
                 return;
             }
 
-            createCharacter(session, account, startingRoom, name, race);
+            createCharacter(connection, account, startingRoom, name, race);
         });
     }
 
@@ -110,7 +110,7 @@ public class CharacterCreate implements ControllerHandler {
         }
     }
 
-    private void createCharacter(Connection session, Account account, Room startingRoom, String name, Race race) {
+    private void createCharacter(Connection connection, Account account, Room startingRoom, String name, Race race) {
         Map<Ability, Integer> scores = rollAbilityScores();
 
         for (Map.Entry<Ability, Integer> bonus : race.abilityScoreBonuses().entrySet()) {
@@ -124,9 +124,9 @@ public class CharacterCreate implements ControllerHandler {
 
         characterDao.insert(character);
 
-        session.send(new CharacterCreated(name));
-        session.send(new CharacterStats(character));
-        characterListAction.onReceive(session, "");
+        connection.send(new CharacterCreated(name));
+        connection.send(new CharacterStats(character));
+        characterListAction.onReceive(connection, "");
     }
 
     private Map<Ability, Integer> rollAbilityScores() {

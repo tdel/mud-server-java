@@ -33,8 +33,8 @@ public class GameWorld {
         this.roomDao = roomDao;
     }
 
-    public void enterWorld(Connection session, Client client) {
-        clients.put(session, client);
+    public void enterWorld(Connection connection, Client client) {
+        clients.put(connection, client);
         moveClient(client, client.character().getCurrentRoomId());
     }
 
@@ -46,8 +46,8 @@ public class GameWorld {
         characterDao.updateCurrentRoom(client.character().getId(), roomId);
     }
 
-    public void exitWorld(Connection session) {
-        Client client = clients.remove(session);
+    public void exitWorld(Connection connection) {
+        Client client = clients.remove(connection);
         if (client == null) {
             return;
         }
@@ -55,8 +55,8 @@ public class GameWorld {
         roomInstance(client.character().getCurrentRoomId()).disconnect(client);
     }
 
-    public Client client(Connection session) {
-        return clients.get(session);
+    public Client client(Connection connection) {
+        return clients.get(connection);
     }
 
     public RoomInstance roomInstance(UUID roomId) {

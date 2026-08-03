@@ -31,8 +31,8 @@ public class Stats implements ControllerHandler {
     }
 
     @Override
-    public void onReceive(Connection session, String argument) {
-        Client client = gameWorld.client(session);
+    public void onReceive(Connection connection, String argument) {
+        Client client = gameWorld.client(connection);
         client.send(new CharacterStats(client.character()));
     }
 }

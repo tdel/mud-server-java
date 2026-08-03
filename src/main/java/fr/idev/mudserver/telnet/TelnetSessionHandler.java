@@ -16,7 +16,7 @@ import fr.idev.mudserver.game.GameWorld;
  * Frontière Netty <-> logique métier. Chaque connexion obtient exactement un
  * virtual thread, démarré à {@code channelActive} et vivant jusqu'à la
  * déconnexion : c'est lui, et lui seul, qui exécute
- * {@code session.handleLine(...)}, en dépilant une file FIFO alimentée par
+ * {@code connection.handleLine(...)}, en dépilant une file FIFO alimentée par
  * {@code channelRead0}. C'est le calque direct du "un coroutine par connexion"
  * de Swoole côté PHP (TelnetConnectionHandler::run()).
  *
@@ -30,7 +30,7 @@ import fr.idev.mudserver.game.GameWorld;
  */
 public class TelnetSessionHandler extends SimpleChannelInboundHandler<String> {
 
-    private static final AttributeKey<TelnetConnection> SESSION_KEY = AttributeKey.valueOf("telnetSession");
+    private static final AttributeKey<TelnetConnection> CONNECTION_KEY = AttributeKey.valueOf("telnetConnection");
     private static final AttributeKey<BlockingQueue<String>> INBOX_KEY = AttributeKey.valueOf("telnetInbox");
     private static final String POISON_PILL = new String();
 
@@ -51,11 +51,11 @@ public class TelnetSessionHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        TelnetConnection session = new TelnetConnection(ctx.channel(), controllerDispatcher, authWorld, gameWorld);
+        TelnetConnection connection = new TelnetConnection(ctx.channel(), controllerDispatcher, authWorld, gameWorld);
         BlockingQueue<String> inbox = new LinkedBlockingQueue<>();
-        ctx.channel().attr(SESSION_KEY).set(session);
+        ctx.channel().attr(CONNECTION_KEY).set(connection);
         ctx.channel().attr(INBOX_KEY).set(inbox);
-        virtualThreadExecutor.execute(() -> runConnectionLoop(session, inbox));
+        virtualThreadExecutor.execute(() -> runConnectionLoop(connection, inbox));
     }
 
     @Override
@@ -71,20 +71,20 @@ public class TelnetSessionHandler extends SimpleChannelInboundHandler<String> {
         }
     }
 
-    private void runConnectionLoop(TelnetConnection session, BlockingQueue<String> inbox) {
-        session.write(WELCOME);
+    private void runConnectionLoop(TelnetConnection connection, BlockingQueue<String> inbox) {
+        connection.write(WELCOME);
         try {
             while (true) {
                 String line = inbox.take();
                 if (line == POISON_PILL) {
                     return;
                 }
-                session.handleLine(line);
+                connection.handleLine(line);
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } finally {
-            session.handleClose();
+            connection.handleClose();
         }
     }
 }

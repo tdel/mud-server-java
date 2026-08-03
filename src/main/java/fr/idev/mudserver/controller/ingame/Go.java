@@ -42,8 +42,8 @@ public class Go implements ControllerHandler {
     }
 
     @Override
-    public void onReceive(Connection session, String argument) {
-        Client client = gameWorld.client(session);
+    public void onReceive(Connection connection, String argument) {
+        Client client = gameWorld.client(connection);
         String direction = argument.trim();
 
         if (direction.isEmpty()) {
@@ -60,6 +60,6 @@ public class Go implements ControllerHandler {
 
         gameWorld.moveClient(client, exit.get().getTargetRoomId());
 
-        lookAction.onReceive(session, "");
+        lookAction.onReceive(connection, "");
     }
 }

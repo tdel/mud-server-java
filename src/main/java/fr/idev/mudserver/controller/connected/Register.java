@@ -54,35 +54,35 @@ public class Register implements ControllerHandler {
     }
 
     @Override
-    public void onReceive(Connection session, String argument) {
+    public void onReceive(Connection connection, String argument) {
         String login = argument.trim();
         if (login.isEmpty()) {
-            session.send(new Usage("register <name>"));
+            connection.send(new Usage("register <name>"));
             return;
         }
 
         if (accountDao.findByLogin(login).isPresent()) {
-            session.send(new LoginAlreadyTaken(login));
+            connection.send(new LoginAlreadyTaken(login));
             return;
         }
 
-        session.requestBlocking(new RequestPassword(), password -> onPasswordEntered(session, login, password));
+        connection.requestBlocking(new RequestPassword(), password -> onPasswordEntered(connection, login, password));
     }
 
-    private void onPasswordEntered(Connection session, String login, String password) {
+    private void onPasswordEntered(Connection connection, String login, String password) {
         List<String> reasons = validatePassword(password);
         if (!reasons.isEmpty()) {
-            session.send(new InvalidPassword(reasons));
+            connection.send(new InvalidPassword(reasons));
             return;
         }
 
-        session.requestBlocking(new ConfirmPassword(),
-                confirmation -> onPasswordConfirmed(session, login, password, confirmation));
+        connection.requestBlocking(new ConfirmPassword(),
+                confirmation -> onPasswordConfirmed(connection, login, password, confirmation));
     }
 
-    private void onPasswordConfirmed(Connection session, String login, String password, String confirmation) {
+    private void onPasswordConfirmed(Connection connection, String login, String password, String confirmation) {
         if (!password.equals(confirmation)) {
-            session.send(new PasswordMismatch());
+            connection.send(new PasswordMismatch());
             return;
         }
 
@@ -90,14 +90,14 @@ public class Register implements ControllerHandler {
         try {
             accountDao.insert(account);
         } catch (DuplicateKeyException e) {
-            session.send(new LoginAlreadyTaken(login));
+            connection.send(new LoginAlreadyTaken(login));
             return;
         }
 
-        authWorld.enterWorld(session, account);
+        authWorld.enterWorld(connection, account);
 
-        session.send(new AccountCreated(login));
-        characterListAction.onReceive(session, "");
+        connection.send(new AccountCreated(login));
+        characterListAction.onReceive(connection, "");
     }
 
     private List<String> validatePassword(String password) {

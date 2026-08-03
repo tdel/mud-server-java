@@ -23,8 +23,8 @@ public class Quit implements ControllerHandler {
     }
 
     @Override
-    public void onReceive(Connection session, String argument) {
-        session.send(new Goodbye());
-        session.close();
+    public void onReceive(Connection connection, String argument) {
+        connection.send(new Goodbye());
+        connection.close();
     }
 }

@@ -6,11 +6,11 @@ import fr.idev.mudserver.network.Connection;
 
 public class Client {
 
-    private final Connection session;
+    private final Connection connection;
     private final Character character;
 
-    public Client(Connection session, Character character) {
-        this.session = session;
+    public Client(Connection connection, Character character) {
+        this.connection = connection;
         this.character = character;
     }
 
@@ -19,6 +19,6 @@ public class Client {
     }
 
     public void send(OutputMessage message) {
-        session.send(message);
+        connection.send(message);
     }
 }

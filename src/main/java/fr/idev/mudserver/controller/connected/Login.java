@@ -50,37 +50,37 @@ public class Login implements ControllerHandler {
     }
 
     @Override
-    public void onReceive(Connection session, String argument) {
+    public void onReceive(Connection connection, String argument) {
         String login = argument.trim();
         if (login.isEmpty()) {
-            session.send(new Usage("login <name>"));
+            connection.send(new Usage("login <name>"));
             return;
         }
 
         Optional<Account> account = accountDao.findByLogin(login);
         if (account.isEmpty()) {
-            session.send(new AccountNotFound(login));
+            connection.send(new AccountNotFound(login));
             return;
         }
 
-        session.requestBlocking(new RequestPassword(),
-                password -> onPasswordEntered(session, account.get(), login, password));
+        connection.requestBlocking(new RequestPassword(),
+                password -> onPasswordEntered(connection, account.get(), login, password));
     }
 
-    private void onPasswordEntered(Connection session, Account account, String login, String password) {
+    private void onPasswordEntered(Connection connection, Account account, String login, String password) {
         if (!passwordEncoder.matches(password, account.getPassword())) {
-            session.send(new IncorrectPassword());
+            connection.send(new IncorrectPassword());
             return;
         }
 
         if (authWorld.isAlreadyConnected(account.getId()) || gameWorld.isAlreadyConnected(account.getId())) {
-            session.send(new AccountAlreadyConnected(login));
+            connection.send(new AccountAlreadyConnected(login));
             return;
         }
 
-        authWorld.enterWorld(session, account);
+        authWorld.enterWorld(connection, account);
 
-        session.send(new WelcomeBack(login));
-        characterListAction.onReceive(session, "");
+        connection.send(new WelcomeBack(login));
+        characterListAction.onReceive(connection, "");
     }
 }

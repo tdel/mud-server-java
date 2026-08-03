@@ -39,8 +39,8 @@ public class Inventory implements ControllerHandler {
     }
 
     @Override
-    public void onReceive(Connection session, String argument) {
-        Client client = gameWorld.client(session);
+    public void onReceive(Connection connection, String argument) {
+        Client client = gameWorld.client(connection);
 
         List<Item> items = itemService.getInventory(client.character());
         List<String> names = items.stream()

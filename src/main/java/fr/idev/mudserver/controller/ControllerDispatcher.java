@@ -14,8 +14,8 @@ public class ControllerDispatcher {
         this.registry = registry;
     }
 
-    public void dispatch(Connection session, String actionName, String argument) {
-        registry.find(session.state(), actionName).ifPresentOrElse(action -> action.onReceive(session, argument),
-                () -> session.send(new ActionNotFound()));
+    public void dispatch(Connection connection, String actionName, String argument) {
+        registry.find(connection.state(), actionName).ifPresentOrElse(action -> action.onReceive(connection, argument),
+                () -> connection.send(new ActionNotFound()));
     }
 }
