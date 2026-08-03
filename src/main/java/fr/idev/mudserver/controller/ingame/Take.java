@@ -48,8 +48,7 @@ public class Take implements ControllerHandler {
             return;
         }
 
-        Room room = roomService.room(character.getCurrentRoomId());
-        Optional<Item> item = room.findOneByName(name);
+        Optional<Item> item = character.getCurrentRoom().findOneByName(name);
 
         if (item.isEmpty()) {
             connection.send(new ItemNotFound(name));

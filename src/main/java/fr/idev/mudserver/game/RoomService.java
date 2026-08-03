@@ -55,7 +55,7 @@ public class RoomService {
         for (Room room : rooms) {
             List<RoomExit> exits = roomExitDao.findBySourceRoomId(room.getId());
             for (RoomExit exit : exits) {
-                exit.attachRooms(room, room(exit.getTargetRoomId()));
+                exit.attachRooms(room, this.rooms.get(exit.getTargetRoomId()));
             }
             room.setExits(exits);
         }

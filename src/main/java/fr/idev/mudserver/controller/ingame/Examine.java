@@ -45,7 +45,7 @@ public class Examine implements ControllerHandler {
             return;
         }
 
-        Character target = roomService.room(character.getCurrentRoomId()).findCharacterByName(name);
+        Character target = character.getCurrentRoom().findCharacterByName(name);
 
         if (target == null) {
             connection.send(new CharacterNotFound(name));

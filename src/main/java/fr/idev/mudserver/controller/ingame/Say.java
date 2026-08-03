@@ -45,7 +45,7 @@ public class Say implements ControllerHandler {
             return;
         }
 
-        roomService.room(character.getCurrentRoomId()).broadcast(new Chat(character.getName(), message), character);
+        character.getCurrentRoom().broadcast(new Chat(character.getName(), message), character);
 
         connection.send(new YouSaid(message));
     }

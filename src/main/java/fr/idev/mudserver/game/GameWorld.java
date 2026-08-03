@@ -31,6 +31,13 @@ public class GameWorld {
         this.itemService = itemService;
     }
 
+    /**
+     * Passe par {@code roomService.room(...)}, pas
+     * {@code character.getCurrentRoom()} : ce dernier n'est renseigné qu'après un
+     * premier {@code spawnToRoom}/ {@code moveToRoom} — un personnage qui vient
+     * d'être chargé depuis {@code CharacterDao} n'a que son {@code currentRoomId}
+     * persistée.
+     */
     public void enterWorld(Connection connection, Character character) {
         character.setConnection(connection);
         character.setInventory(itemService.loadInventory(character));
@@ -45,7 +52,7 @@ public class GameWorld {
         }
 
         characterDao.update(character);
-        roomService.room(character.getCurrentRoomId()).disconnect(character);
+        character.getCurrentRoom().disconnect(character);
     }
 
     public Character character(Connection connection) {

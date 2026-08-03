@@ -45,8 +45,7 @@ public class Look implements ControllerHandler {
     }
 
     private RoomDescription describeRoom(Character character) {
-        UUID roomId = character.getCurrentRoomId();
-        Room room = roomService.room(roomId);
+        Room room = character.getCurrentRoom();
 
         List<RoomExit> exits = room.getExits();
         List<Character> characters = room.characters();
