@@ -11,7 +11,7 @@ import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.ItemService;
-import fr.idev.mudserver.game.PlayerInstance;
+import fr.idev.mudserver.game.Client;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -45,19 +45,19 @@ public class Unequip implements ControllerHandler {
 
     @Override
     public void onReceive(Connection session, String argument) {
-        PlayerInstance player = gameWorld.player(session);
+        Client client = gameWorld.client(session);
         String name = argument.trim();
 
         if (name.isEmpty()) {
-            player.send(new Usage("unequip <name>"));
+            client.send(new Usage("unequip <name>"));
             return;
         }
 
-        Character character = player.character();
+        Character character = client.character();
         Optional<Item> item = itemService.findItemByName(character, name);
 
         if (item.isEmpty()) {
-            player.send(new ItemNotCarried(name));
+            client.send(new ItemNotCarried(name));
             return;
         }
 
@@ -65,12 +65,12 @@ public class Unequip implements ControllerHandler {
                 .orElseThrow();
 
         if (item.get().getSlot() == null) {
-            player.send(new ItemNotEquipped(templateName));
+            client.send(new ItemNotEquipped(templateName));
             return;
         }
 
         itemService.unequipItem(item.get());
 
-        player.send(new ItemUnequipped(templateName));
+        client.send(new ItemUnequipped(templateName));
     }
 }

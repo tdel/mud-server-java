@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.PlayerInstance;
+import fr.idev.mudserver.game.Client;
 import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.Connection;
@@ -37,11 +37,11 @@ public class Roll implements ControllerHandler {
 
     @Override
     public void onReceive(Connection session, String argument) {
-        PlayerInstance player = gameWorld.player(session);
+        Client client = gameWorld.client(session);
         String notation = argument.trim();
 
         if (notation.isEmpty()) {
-            player.send(new Usage("roll <XdY+Z>"));
+            client.send(new Usage("roll <XdY+Z>"));
             return;
         }
 
@@ -49,10 +49,10 @@ public class Roll implements ControllerHandler {
         try {
             expression = DiceExpression.parse(notation);
         } catch (IllegalArgumentException e) {
-            player.send(new Usage("roll <XdY+Z>"));
+            client.send(new Usage("roll <XdY+Z>"));
             return;
         }
 
-        player.send(new DiceRolled(expression, diceRoller.roll(expression)));
+        client.send(new DiceRolled(expression, diceRoller.roll(expression)));
     }
 }

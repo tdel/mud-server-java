@@ -10,32 +10,25 @@ import fr.idev.mudserver.controller.ingame.Look;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.PlayerInstance;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.authed.NoCharacterNamed;
 import fr.idev.mudserver.network.message.authed.NowPlaying;
-import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 
 @Component
 public class CharacterSelect implements ControllerHandler {
 
     private final CharacterDao characterDao;
-    private final AccountDao accountDao;
     private final AuthWorld authWorld;
-    private final GameWorld gameWorld;
     private final CharacterList characterListAction;
     private final Look lookAction;
 
-    public CharacterSelect(CharacterDao characterDao, AccountDao accountDao, AuthWorld authWorld, GameWorld gameWorld,
-            CharacterList characterListAction, Look lookAction) {
+    public CharacterSelect(CharacterDao characterDao, AuthWorld authWorld, CharacterList characterListAction,
+            Look lookAction) {
         this.characterDao = characterDao;
-        this.accountDao = accountDao;
         this.authWorld = authWorld;
-        this.gameWorld = gameWorld;
         this.characterListAction = characterListAction;
         this.lookAction = lookAction;
     }
@@ -69,15 +62,7 @@ public class CharacterSelect implements ControllerHandler {
             return;
         }
 
-        accountDao.updateCurrentCharacter(account.getId(), character.get().getId());
-
-        // détache de l'AuthWorld, attache la PlayerInstance à la session, fait passer
-        // l'état
-        // à INGAME, puis fait rejoindre GameWorld (broadcast d'arrivée dans la room).
-        authWorld.moveToGameWorld(session);
-        PlayerInstance player = new PlayerInstance(session, character.get(), characterDao);
-        session.setState(ConnectionState.INGAME);
-        gameWorld.enterWorld(session, player);
+        authWorld.moveToGameWorld(session, character.get());
 
         session.send(new NowPlaying(character.get().getName()));
         lookAction.onReceive(session, "");

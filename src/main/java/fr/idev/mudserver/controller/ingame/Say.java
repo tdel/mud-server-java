@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.PlayerInstance;
+import fr.idev.mudserver.game.Client;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ingame.Chat;
@@ -35,18 +35,18 @@ public class Say implements ControllerHandler {
 
     @Override
     public void onReceive(Connection session, String argument) {
-        PlayerInstance player = gameWorld.player(session);
+        Client client = gameWorld.client(session);
         String message = argument.trim();
 
         if (message.isEmpty()) {
-            player.send(new SayNothing());
+            client.send(new SayNothing());
             return;
         }
 
-        Character character = player.character();
+        Character character = client.character();
 
-        gameWorld.roomInstance(character.getCurrentRoomId()).broadcast(new Chat(character.getName(), message), player);
+        gameWorld.roomInstance(character.getCurrentRoomId()).broadcast(new Chat(character.getName(), message), client);
 
-        player.send(new YouSaid(message));
+        client.send(new YouSaid(message));
     }
 }

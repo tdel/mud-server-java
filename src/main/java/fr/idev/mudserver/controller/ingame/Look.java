@@ -13,7 +13,7 @@ import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomExit;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.PlayerInstance;
+import fr.idev.mudserver.game.Client;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ingame.RoomDescription;
@@ -52,8 +52,8 @@ public class Look implements ControllerHandler {
 
     @Override
     public void onReceive(Connection session, String argument) {
-        PlayerInstance player = gameWorld.player(session);
-        player.send(describeRoom(player.character()));
+        Client client = gameWorld.client(session);
+        client.send(describeRoom(client.character()));
     }
 
     private RoomDescription describeRoom(Character character) {

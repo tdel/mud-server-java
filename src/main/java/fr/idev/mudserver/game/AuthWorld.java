@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.persistence.AccountDao;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.Account;
@@ -24,6 +26,14 @@ public class AuthWorld {
 
     private final Map<Connection, Account> connectedSessions = new ConcurrentHashMap<>();
 
+    private final GameWorld gameWorld;
+    private final AccountDao accountDao;
+
+    public AuthWorld(GameWorld gameWorld, AccountDao accountDao) {
+        this.gameWorld = gameWorld;
+        this.accountDao = accountDao;
+    }
+
     public void enterWorld(Connection session, Account account) {
         connectedSessions.put(session, account);
         session.setState(ConnectionState.AUTHED);
@@ -34,15 +44,14 @@ public class AuthWorld {
         session.setState(ConnectionState.CONNECTED);
     }
 
-    /**
-     * Détache la session du suivi "connecté mais pas en jeu" sans repasser par
-     * l'état {@code CONNECTED} — l'appelant (voir {@code CharacterSelect}) enchaîne
-     * directement sur l'état {@code INGAME}. Ne pas remplacer par
-     * {@code exitWorld()} + {@code setState()} : {@code exitWorld()} vide aussi le
-     * compte attaché à la session.
-     */
-    public void moveToGameWorld(Connection session) {
-        connectedSessions.remove(session);
+    public void moveToGameWorld(Connection session, Character character) {
+        Account account = connectedSessions.remove(session);
+
+        accountDao.updateCurrentCharacter(account.getId(), character.getId());
+
+        Client client = new Client(session, character);
+        session.setState(ConnectionState.INGAME);
+        gameWorld.enterWorld(session, client);
     }
 
     public Account account(Connection session) {

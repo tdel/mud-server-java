@@ -59,7 +59,7 @@ public class TelnetServer {
 
     @EventListener(ApplicationReadyEvent.class)
     public void start() throws InterruptedException {
-        gameWorld.warmRoomInstances(roomDao.findAll());
+        gameWorld.warmRoomInstances();
 
         EventLoopGroup bossGroup = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
         EventLoopGroup workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());

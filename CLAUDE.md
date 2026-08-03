@@ -19,8 +19,6 @@ The Docker socket mount is required even for plain `mvn test` — it's not just 
 
 Separately, `docker-compose.yml` at the repo root runs a persistent Postgres for local dev (not for tests): host port **5433** → container 5432 (db `mud-server-java`). The telnet server itself listens on a different port, **4001** (`app.telnet.port` in `application.yml`) — don't confuse the two.
 
-CLI seed commands run through the same jar via positional args, e.g. `room-create --name=Foo --description=Bar` appended after the `mvn spring-boot:run` invocation, or `java -jar target/*.jar room-create ...` if running the jar directly (see `cli/CliCommandRunner`). Passing any positional arg short-circuits normal boot before the telnet server starts.
-
 ## Stack specifics
 
 - Java 25, Spring Boot 4.1.0. Persistence is jOOQ (`DSLContext`, `spring-boot-starter-jooq`) — a type-safe SQL builder, not an ORM: no persistence-context, no lazy loading, no dirty-checking. Chosen over JPA/Hibernate specifically because DAO call sites never run inside a transaction except `ItemService` (see below), which would fight an ORM's session/entity-lifecycle assumptions.
@@ -43,6 +41,6 @@ CLI seed commands run through the same jar via positional args, e.g. `room-creat
 ## Conventions
 
 - Non-obvious classes get French-language Javadoc explaining *why*, not *what* (often comparing against a prior PHP/Swoole implementation being ported). Follow this style for new non-obvious code.
-- Package-by-feature at the top level (`cli`, `config`, `domain`, `game`, `network`, `persistence`, `telnet`), package-by-layer within. Domain entities and outbound network messages are Java `record`s.
+- Package-by-feature at the top level (`config`, `domain`, `game`, `network`, `persistence`, `telnet`), package-by-layer within. Domain entities and outbound network messages are Java `record`s.
 - One `ActionHandler` class per in-game command verb under `network/action/{connected,authed,ingame}`, paired with a response `record` under `network/message/**`. Use `/add-command` to scaffold a new one.
 - Commit messages: French, no phase-numbering scheme (earlier history used "Phase N : ..." — don't continue that numbering).

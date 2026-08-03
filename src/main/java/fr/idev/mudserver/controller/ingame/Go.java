@@ -2,15 +2,13 @@ package fr.idev.mudserver.controller.ingame;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomExit;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.PlayerInstance;
+import fr.idev.mudserver.game.Client;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -45,27 +43,22 @@ public class Go implements ControllerHandler {
 
     @Override
     public void onReceive(Connection session, String argument) {
-        PlayerInstance player = gameWorld.player(session);
+        Client client = gameWorld.client(session);
         String direction = argument.trim();
 
         if (direction.isEmpty()) {
-            player.send(new Usage("go <direction>"));
+            client.send(new Usage("go <direction>"));
             return;
         }
 
-        UUID oldRoomId = player.currentRoomId();
-
-        Optional<RoomExit> exit = roomExitDao.findBySourceRoomIdAndDirection(oldRoomId, direction);
+        Optional<RoomExit> exit = roomExitDao.findBySourceRoomIdAndDirection(client.character().getCurrentRoomId(),
+                direction);
         if (exit.isEmpty()) {
-            player.send(new NoSuchExit(direction));
+            client.send(new NoSuchExit(direction));
             return;
         }
 
-        UUID newRoomId = exit.get().getTargetRoomId();
-        Room newRoom = roomDao.findById(newRoomId).orElseThrow();
-
-        gameWorld.roomInstance(oldRoomId).leave(player, newRoom);
-        gameWorld.roomInstance(newRoomId).join(player);
+        gameWorld.moveClient(client, exit.get().getTargetRoomId());
 
         lookAction.onReceive(session, "");
     }

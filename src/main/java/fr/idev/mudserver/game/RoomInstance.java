@@ -28,32 +28,32 @@ import fr.idev.mudserver.network.message.ingame.CharacterLeftRoom;
 public class RoomInstance {
 
     private final UUID roomId;
-    private final Set<PlayerInstance> players = ConcurrentHashMap.newKeySet();
+    private final Set<Client> clients = ConcurrentHashMap.newKeySet();
 
     RoomInstance(UUID roomId) {
         this.roomId = roomId;
     }
 
-    public void join(PlayerInstance player) {
-        player.moveToRoom(roomId);
-        players.add(player);
-        broadcast(new CharacterJoinedRoom(player.character().getName()), player);
+    public void join(Client client) {
+        client.character().setCurrentRoomId(roomId);
+        clients.add(client);
+        broadcast(new CharacterJoinedRoom(client.character().getName()), client);
     }
 
-    public void leave(PlayerInstance player, Room destination) {
-        players.remove(player);
-        broadcast(new CharacterLeftRoom(player.character().getName(), destination.getName()), player);
+    public void leave(Client client, Room destination) {
+        clients.remove(client);
+        broadcast(new CharacterLeftRoom(client.character().getName(), destination.getName()), client);
     }
 
-    public void disconnect(PlayerInstance player) {
-        players.remove(player);
-        broadcast(new CharacterDisconnected(player.character().getName()), player);
+    public void disconnect(Client client) {
+        clients.remove(client);
+        broadcast(new CharacterDisconnected(client.character().getName()), client);
     }
 
     public Character findCharacterByName(String name) {
-        for (PlayerInstance player : players) {
-            if (player.character().getName().equalsIgnoreCase(name)) {
-                return player.character();
+        for (Client client : clients) {
+            if (client.character().getName().equalsIgnoreCase(name)) {
+                return client.character();
             }
         }
         return null;
@@ -61,18 +61,18 @@ public class RoomInstance {
 
     public List<Character> characters() {
         List<Character> characters = new ArrayList<>();
-        for (PlayerInstance player : players) {
-            characters.add(player.character());
+        for (Client client : clients) {
+            characters.add(client.character());
         }
         return characters;
     }
 
-    public void broadcast(OutputMessage message, PlayerInstance exclude) {
-        for (PlayerInstance player : players) {
-            if (player == exclude) {
+    public void broadcast(OutputMessage message, Client exclude) {
+        for (Client client : clients) {
+            if (client == exclude) {
                 continue;
             }
-            player.send(message);
+            client.send(message);
         }
     }
 }

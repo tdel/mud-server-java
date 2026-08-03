@@ -10,7 +10,7 @@ import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.ItemService;
-import fr.idev.mudserver.game.PlayerInstance;
+import fr.idev.mudserver.game.Client;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.persistence.ItemTemplateDao;
@@ -40,13 +40,13 @@ public class Inventory implements ControllerHandler {
 
     @Override
     public void onReceive(Connection session, String argument) {
-        PlayerInstance player = gameWorld.player(session);
+        Client client = gameWorld.client(session);
 
-        List<Item> items = itemService.getInventory(player.character());
+        List<Item> items = itemService.getInventory(client.character());
         List<String> names = items.stream()
                 .map(item -> itemTemplateDao.findById(item.getTemplateId()).map(ItemTemplate::getName).orElseThrow())
                 .toList();
 
-        player.send(new fr.idev.mudserver.network.message.ingame.Inventory(names));
+        client.send(new fr.idev.mudserver.network.message.ingame.Inventory(names));
     }
 }
