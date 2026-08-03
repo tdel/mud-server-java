@@ -12,7 +12,6 @@ import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomExit;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -23,13 +22,11 @@ import fr.idev.mudserver.persistence.RoomExitDao;
 public class Look implements ControllerHandler {
 
     private final RoomExitDao roomExitDao;
-    private final ItemService itemService;
     private final GameWorld gameWorld;
     private final RoomService roomService;
 
-    public Look(RoomExitDao roomExitDao, ItemService itemService, GameWorld gameWorld, RoomService roomService) {
+    public Look(RoomExitDao roomExitDao, GameWorld gameWorld, RoomService roomService) {
         this.roomExitDao = roomExitDao;
-        this.itemService = itemService;
         this.gameWorld = gameWorld;
         this.roomService = roomService;
     }
@@ -56,7 +53,7 @@ public class Look implements ControllerHandler {
 
         List<RoomExit> exits = roomExitDao.findBySourceRoomId(roomId);
         List<Character> characters = room.characters();
-        List<Item> items = itemService.findRoomItems(roomId);
+        List<Item> items = room.getItems();
 
         List<String> exitNames = exits.stream().map(RoomExit::getDirection).toList();
         List<String> characterNames = characters.stream().filter(other -> !other.getId().equals(character.getId()))

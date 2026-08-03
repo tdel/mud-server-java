@@ -78,13 +78,9 @@ public class ItemService {
         return attachTemplates(itemDao.findByCharacterId(character.getId()));
     }
 
-    public List<Item> getInventory(Character character) {
-        return character.getInventory();
-    }
-
     /**
      * Charge les items au sol de {@code room} depuis la base, une fois, pour les
-     * attacher à la room (voir {@link #warmRoomItems}) — {@link #findRoomItems}
+     * attacher à la room (voir {@link #warmRoomItems}) — {@link Room#getItems()}
      * passe ensuite par le cache de la room plutôt que par une nouvelle requête.
      */
     public List<Item> loadRoomItems(Room room) {
@@ -104,16 +100,12 @@ public class ItemService {
         }
     }
 
-    public List<Item> findRoomItems(UUID roomId) {
-        return roomService.room(roomId).getItems();
-    }
-
     public Optional<Item> findItemByName(Character character, String name) {
         return findByTemplateName(character.getInventory(), name);
     }
 
     public Optional<Item> findItemInRoomByName(UUID roomId, String name) {
-        return findByTemplateName(findRoomItems(roomId), name);
+        return findByTemplateName(roomService.room(roomId).getItems(), name);
     }
 
     private Optional<Item> findByTemplateName(List<Item> items, String name) {

@@ -9,18 +9,15 @@ import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 
 @Component
 public class Inventory implements ControllerHandler {
 
-    private final ItemService itemService;
     private final GameWorld gameWorld;
 
-    public Inventory(ItemService itemService, GameWorld gameWorld) {
-        this.itemService = itemService;
+    public Inventory(GameWorld gameWorld) {
         this.gameWorld = gameWorld;
     }
 
@@ -38,7 +35,7 @@ public class Inventory implements ControllerHandler {
     public void onReceive(Connection connection, String argument) {
         Character character = gameWorld.character(connection);
 
-        List<Item> items = itemService.getInventory(character);
+        List<Item> items = character.getInventory();
         List<String> names = items.stream().map(Item::getName).toList();
 
         connection.send(new fr.idev.mudserver.network.message.ingame.Inventory(names));

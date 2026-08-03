@@ -104,7 +104,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
         character.setInventory(itemService.loadInventory(character));
 
-        assertThat(itemService.getInventory(character)).extracting(Item::getName).containsExactly("Potion de soin");
+        assertThat(character.getInventory()).extracting(Item::getName).containsExactly("Potion de soin");
         assertThat(itemService.findItemByName(character, "potion de soin")).map(Item::getId).contains(potion.getId());
     }
 
@@ -130,12 +130,12 @@ class ItemServiceTest extends AbstractIntegrationTest {
         Item torchWithTemplate = itemService.findItemInRoomByName(room.getId(), "Torche").orElseThrow();
 
         assertThat(character.pickUpItem(torchWithTemplate)).isTrue();
-        assertThat(itemService.getInventory(character)).containsExactly(torchWithTemplate);
-        assertThat(itemService.findRoomItems(room.getId())).isEmpty();
+        assertThat(character.getInventory()).containsExactly(torchWithTemplate);
+        assertThat(roomService.room(room.getId()).getItems()).isEmpty();
 
         character.dropItem(torchWithTemplate);
-        assertThat(itemService.getInventory(character)).isEmpty();
-        assertThat(itemService.findRoomItems(room.getId())).containsExactly(torchWithTemplate);
+        assertThat(character.getInventory()).isEmpty();
+        assertThat(roomService.room(room.getId()).getItems()).containsExactly(torchWithTemplate);
     }
 
     @Test
