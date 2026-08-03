@@ -18,21 +18,17 @@ import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ingame.RoomDescription;
 import fr.idev.mudserver.persistence.ItemDao;
 import fr.idev.mudserver.persistence.ItemTemplateDao;
-import fr.idev.mudserver.persistence.RoomDao;
 import fr.idev.mudserver.persistence.RoomExitDao;
 
 @Component
 public class Look implements ControllerHandler {
 
-    private final RoomDao roomDao;
     private final RoomExitDao roomExitDao;
     private final ItemDao itemDao;
     private final ItemTemplateDao itemTemplateDao;
     private final GameWorld gameWorld;
 
-    public Look(RoomDao roomDao, RoomExitDao roomExitDao, ItemDao itemDao, ItemTemplateDao itemTemplateDao,
-            GameWorld gameWorld) {
-        this.roomDao = roomDao;
+    public Look(RoomExitDao roomExitDao, ItemDao itemDao, ItemTemplateDao itemTemplateDao, GameWorld gameWorld) {
         this.roomExitDao = roomExitDao;
         this.itemDao = itemDao;
         this.itemTemplateDao = itemTemplateDao;
@@ -57,10 +53,10 @@ public class Look implements ControllerHandler {
 
     private RoomDescription describeRoom(Character character) {
         UUID roomId = character.getCurrentRoomId();
-        Room room = roomDao.findById(roomId).orElseThrow();
+        Room room = gameWorld.room(roomId);
 
         List<RoomExit> exits = roomExitDao.findBySourceRoomId(roomId);
-        List<Character> characters = gameWorld.roomInstance(roomId).characters();
+        List<Character> characters = room.characters();
         List<Item> items = itemDao.findByRoomId(roomId);
 
         List<String> exitNames = exits.stream().map(RoomExit::getDirection).toList();

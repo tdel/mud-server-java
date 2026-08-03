@@ -17,6 +17,7 @@ import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.game.AuthWorld;
+import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.Connection;
@@ -29,21 +30,20 @@ import fr.idev.mudserver.network.message.authed.InvalidRace;
 import fr.idev.mudserver.network.message.authed.NoStartingRoom;
 import fr.idev.mudserver.network.message.ingame.CharacterStats;
 import fr.idev.mudserver.persistence.CharacterDao;
-import fr.idev.mudserver.persistence.RoomDao;
 
 @Component
 public class CharacterCreate implements ControllerHandler {
 
     private final CharacterDao characterDao;
-    private final RoomDao roomDao;
+    private final GameWorld gameWorld;
     private final CharacterList characterListAction;
     private final DiceRoller diceRoller;
     private final AuthWorld authWorld;
 
-    public CharacterCreate(CharacterDao characterDao, RoomDao roomDao, CharacterList characterListAction,
+    public CharacterCreate(CharacterDao characterDao, GameWorld gameWorld, CharacterList characterListAction,
             DiceRoller diceRoller, AuthWorld authWorld) {
         this.characterDao = characterDao;
-        this.roomDao = roomDao;
+        this.gameWorld = gameWorld;
         this.characterListAction = characterListAction;
         this.diceRoller = diceRoller;
         this.authWorld = authWorld;
@@ -77,7 +77,7 @@ public class CharacterCreate implements ControllerHandler {
             return;
         }
 
-        Optional<Room> startingRoom = roomDao.findStartingRoom();
+        Optional<Room> startingRoom = gameWorld.startingRoom();
         if (startingRoom.isEmpty()) {
             connection.send(new NoStartingRoom());
             characterListAction.onReceive(connection, "");

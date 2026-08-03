@@ -42,7 +42,7 @@ public class Examine implements ControllerHandler {
             return;
         }
 
-        Character target = gameWorld.roomInstance(character.getCurrentRoomId()).findCharacterByName(name);
+        Character target = gameWorld.room(character.getCurrentRoomId()).findCharacterByName(name);
 
         if (target == null) {
             connection.send(new CharacterNotFound(name));

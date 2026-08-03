@@ -1,7 +1,7 @@
 package fr.idev.mudserver.game;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,7 +22,7 @@ import fr.idev.mudserver.network.Connection;
 @Component
 public class GameWorld {
 
-    private final Map<UUID, RoomInstance> roomInstances = new ConcurrentHashMap<>();
+    private final Map<UUID, Room> rooms = new ConcurrentHashMap<>();
     private final Map<Connection, Character> characters = new ConcurrentHashMap<>();
 
     private final CharacterDao characterDao;
@@ -40,10 +40,10 @@ public class GameWorld {
 
     public void moveCharacter(Connection connection, UUID roomId) {
         Character character = characters.get(connection);
-        Room newRoom = roomDao.findById(roomId).orElseThrow();
+        Room newRoom = room(roomId);
 
-        roomInstance(character.getCurrentRoomId()).leave(connection, character, newRoom);
-        roomInstance(roomId).join(connection, character);
+        room(character.getCurrentRoomId()).leave(connection, character, newRoom);
+        newRoom.join(connection, character);
         characterDao.updateCurrentRoom(character.getId(), roomId);
     }
 
@@ -53,22 +53,24 @@ public class GameWorld {
             return;
         }
 
-        roomInstance(character.getCurrentRoomId()).disconnect(connection, character);
+        room(character.getCurrentRoomId()).disconnect(connection, character);
     }
 
     public Character character(Connection connection) {
         return characters.get(connection);
     }
 
-    public RoomInstance roomInstance(UUID roomId) {
-        return roomInstances.get(roomId);
+    public Room room(UUID roomId) {
+        return rooms.get(roomId);
     }
 
-    public void warmRoomInstances() {
-        List<Room> rooms = roomDao.findAll();
+    public Optional<Room> startingRoom() {
+        return rooms.values().stream().filter(room -> Boolean.TRUE.equals(room.isStartingRoom())).findFirst();
+    }
 
-        for (Room room : rooms) {
-            roomInstances.put(room.getId(), new RoomInstance(room.getId()));
+    public void warmRooms() {
+        for (Room room : roomDao.findAll()) {
+            rooms.put(room.getId(), room);
         }
     }
 
