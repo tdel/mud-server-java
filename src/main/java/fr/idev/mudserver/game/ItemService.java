@@ -12,21 +12,27 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.domain.Character;
-import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.event.CharacterDroppedItem;
+import fr.idev.mudserver.domain.event.CharacterEquippedItem;
+import fr.idev.mudserver.domain.event.CharacterUnequippedItem;
 import fr.idev.mudserver.domain.event.ItemPickedUp;
 import fr.idev.mudserver.persistence.ItemDao;
 import fr.idev.mudserver.persistence.ItemTemplateDao;
 
 /**
- * Point d'entrée unique pour lire et muter les items d'un personnage — le sac
- * comme les emplacements équipés — et ceux posés au sol dans une room. Toute
- * nouvelle mutation d'inventaire (take/drop/equip/unequip, un futur
- * craft/loot/trade) doit passer par ici plutôt que par {@link ItemDao}
- * directement. Précharge aussi l'ensemble des {@link ItemTemplate} en mémoire
- * ({@link #warmItemTemplates()}, sur le même principe que
+ * Cache de lecture pour les items d'un personnage — le sac comme les
+ * emplacements équipés — et ceux posés au sol dans une room, et point de
+ * persistance réactif pour leurs mutations : ramassage, dépôt, équipement et
+ * déséquipement vivent tous désormais sur {@code Character}
+ * ({@link Character#pickUpItem}/{@link Character#dropItem}/
+ * {@link Character#equipItem}/{@link Character#unequipItem}), qui publie un
+ * événement de domaine après chaque mutation en mémoire ; les méthodes
+ * {@code @EventListener} de cette classe répercutent chacune en base via
+ * {@link ItemDao}. Précharge aussi l'ensemble des {@link ItemTemplate} en
+ * mémoire ({@link #warmItemTemplates()}, sur le même principe que
  * {@code RoomService.warmRooms()}) et attache le template correspondant à
  * chaque {@code Item} avant de le renvoyer à l'appelant — un {@code Item} sorti
  * d'ici a donc toujours son template, contrairement à un {@code Item} lu
@@ -68,27 +74,12 @@ public class ItemService {
         return items;
     }
 
-    /**
-     * Charge l'inventaire de {@code character} depuis la base, une fois, pour
-     * l'attacher au personnage (voir {@code GameWorld.enterWorld}) — les lectures
-     * suivantes ({@link #getInventory}, {@link #getCarriedItems},
-     * {@link #getEquippedItems}) passent ensuite par le cache du personnage plutôt
-     * que par une nouvelle requête.
-     */
     public List<Item> loadInventory(Character character) {
         return attachTemplates(itemDao.findByCharacterId(character.getId()));
     }
 
     public List<Item> getInventory(Character character) {
         return character.getInventory();
-    }
-
-    public List<Item> getCarriedItems(Character character) {
-        return character.getCarriedItems();
-    }
-
-    public List<Item> getEquippedItems(Character character) {
-        return character.getEquippedItems();
     }
 
     /**
@@ -129,74 +120,36 @@ public class ItemService {
         return items.stream().filter(item -> item.getName().equalsIgnoreCase(name)).findFirst();
     }
 
-    /**
-     * Fait passer {@code item} dans le sac de {@code target}, sauf si un autre
-     * joueur l'a déjà pris entre-temps. Deux joueurs peuvent réellement se disputer
-     * un item non possédé sous les virtual threads — cette méthode relit la ligne
-     * sous verrou pessimiste (dans une transaction) avant de décider si l'item est
-     * encore libre. Voir {@link ItemDao#findByIdForUpdate}. Une fois la course
-     * tranchée, la mutation (domaine + DB) est déléguée à
-     * {@link Character#pickUpItem} et à son événement — jamais avant, pour ne pas
-     * rouvrir la fenêtre de course que le verrou vient de fermer.
-     *
-     * @return true si {@code target} porte désormais l'item, false s'il a été pris
-     *         entre-temps
-     */
-    @Transactional
-    public boolean addItemToInventory(Item item, Character target) {
-        Item locked = itemDao.findByIdForUpdate(item.getId()).orElseThrow();
-
-        if (locked.getCharacterId() != null) {
-            return false;
-        }
-
-        target.pickUpItem(item);
-        return true;
-    }
-
     @EventListener
     void onItemPickedUp(ItemPickedUp event) {
         itemDao.assignToCharacter(event.item().getId(), event.character().getId());
     }
 
-    public void removeItemFromInventory(Item item, Character target) {
-        itemDao.assignToRoom(item.getId(), target.getCurrentRoomId());
-        item.assignToRoom(target.getCurrentRoomId());
-        target.removeItem(item);
-        roomService.room(target.getCurrentRoomId()).addItem(item);
+    @EventListener
+    void onCharacterDroppedItem(CharacterDroppedItem event) {
+        itemDao.assignToRoom(event.item().getId(), event.room().getId());
     }
 
     /**
-     * {@code @Transactional} pour de vrai ici, contrairement à avant : les deux
-     * {@code updateSlot} (déséquiper l'ancien occupant du slot, équiper le nouveau)
-     * doivent partager une transaction pour que la contrainte différée
+     * {@code @Transactional} pour de vrai ici : les deux {@code updateSlot}
+     * (déséquiper l'ancien occupant du slot, équiper le nouveau) doivent partager
+     * une transaction pour que la contrainte différée
      * {@code uniq_character_slot DEFERRABLE INITIALLY DEFERRED} (voir
      * V1__init_schema.sql) protège réellement le chevauchement transitoire entre
      * les deux UPDATE — sans transaction commune, chaque UPDATE valide
      * immédiatement en autocommit et la déférence de la contrainte ne sert à rien.
      */
+    @EventListener
     @Transactional
-    public Optional<EquipmentSlot> equipItem(Item item, Character target) {
-        Optional<EquipmentSlot> slot = item.getType().equipmentSlot();
-
-        if (slot.isEmpty()) {
-            return Optional.empty();
+    void onCharacterEquippedItem(CharacterEquippedItem event) {
+        for (Item previousOccupant : event.previousOccupants()) {
+            itemDao.updateSlot(previousOccupant.getId(), null);
         }
-
-        for (Item existing : target.getEquippedItems()) {
-            if (!existing.getId().equals(item.getId()) && existing.getSlot() == slot.get()) {
-                itemDao.updateSlot(existing.getId(), null);
-                existing.setSlot(null);
-            }
-        }
-
-        itemDao.updateSlot(item.getId(), slot.get());
-        item.setSlot(slot.get());
-        return slot;
+        itemDao.updateSlot(event.item().getId(), event.slot());
     }
 
-    public void unequipItem(Item item) {
-        itemDao.updateSlot(item.getId(), null);
-        item.setSlot(null);
+    @EventListener
+    void onCharacterUnequippedItem(CharacterUnequippedItem event) {
+        itemDao.updateSlot(event.item().getId(), null);
     }
 }

@@ -62,7 +62,7 @@ public class Unequip implements ControllerHandler {
             return;
         }
 
-        itemService.unequipItem(item.get());
+        character.unequipItem(item.get());
 
         connection.send(new ItemUnequipped(templateName));
     }

@@ -57,7 +57,7 @@ public class Equip implements ControllerHandler {
         }
 
         String templateName = item.get().getName();
-        Optional<EquipmentSlot> slot = itemService.equipItem(item.get(), character);
+        Optional<EquipmentSlot> slot = character.equipItem(item.get());
 
         if (slot.isEmpty()) {
             connection.send(new ItemNotEquippable(templateName));

@@ -33,16 +33,6 @@ public class ItemDao {
         return dsl.selectFrom(ITEM).where(ITEM.ID.eq(id)).fetchOptional(ItemDao::toDomain);
     }
 
-    /**
-     * Verrou pessimiste — équivalent du {@code LockMode::PESSIMISTIC_WRITE} PHP. À
-     * n'appeler que dans une transaction (méthode appelante {@code @Transactional})
-     * : bloque toute autre transaction voulant lire/modifier cette ligne jusqu'au
-     * commit/rollback.
-     */
-    public Optional<Item> findByIdForUpdate(UUID id) {
-        return dsl.selectFrom(ITEM).where(ITEM.ID.eq(id)).forUpdate().fetchOptional(ItemDao::toDomain);
-    }
-
     public List<Item> findByRoomId(UUID roomId) {
         return dsl.selectFrom(ITEM).where(ITEM.ROOM_ID.eq(roomId)).fetch(ItemDao::toDomain);
     }

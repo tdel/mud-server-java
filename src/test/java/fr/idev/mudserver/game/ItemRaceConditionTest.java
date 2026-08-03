@@ -31,19 +31,18 @@ import static org.assertj.core.api.Assertions.assertThat;
  * appels {@code dispatch()} séquentiels sur le même thread — pas une vraie
  * race), ce test induit une concurrence réelle : deux virtual threads,
  * synchronisés par un {@link CyclicBarrier} pour arriver au plus près l'un de
- * l'autre, appellent {@link ItemService#addItemToInventory} sur le même item.
- * Volontairement pas {@code @Transactional} : chaque appel doit ouvrir sa
- * PROPRE transaction/connexion (le verrou pessimiste n'a de sens qu'entre deux
- * transactions distinctes) — un {@code @Transactional} au niveau du test
- * partagerait la connexion du thread de test, pas celle des deux virtual
- * threads qui font le vrai travail.
+ * l'autre, appellent {@link Character#pickUpItem} sur le même item. Objectif :
+ * prouver que le {@code synchronized(item)} de {@code pickUpItem} sérialise
+ * réellement deux virtual threads concurrents (voir historique : ce test
+ * couvrait auparavant un verrou DB {@code SELECT ... FOR UPDATE}, remplacé par
+ * ce verrou JVM puisque la gestion des items est désormais entièrement en
+ * mémoire). Volontairement pas {@code @Transactional} au niveau du test — les
+ * écritures DB déclenchées par l'événement {@code ItemPickedUp} ne doivent pas
+ * partager la connexion/transaction du thread de test.
  */
 class ItemRaceConditionTest extends AbstractIntegrationTest {
 
     private static final int ITERATIONS = 50;
-
-    @Autowired
-    private ItemService itemService;
 
     @Autowired
     private ItemDao itemDao;
@@ -84,11 +83,11 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
                 CyclicBarrier barrier = new CyclicBarrier(2);
                 Callable<Boolean> aliceAttempt = () -> {
                     barrier.await();
-                    return itemService.addItemToInventory(item, alice);
+                    return alice.pickUpItem(item);
                 };
                 Callable<Boolean> bobAttempt = () -> {
                     barrier.await();
-                    return itemService.addItemToInventory(item, bob);
+                    return bob.pickUpItem(item);
                 };
 
                 Future<Boolean> aliceResult = executor.submit(aliceAttempt);

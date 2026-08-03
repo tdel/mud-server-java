@@ -24,11 +24,12 @@ import fr.idev.mudserver.persistence.RoomDao;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Non-régression migration jOOQ : ItemService#equipItem est désormais
- * {@code @Transactional} (voir ItemService.java) pour que les deux updateSlot
- * (déséquiper l'ancien occupant, équiper le nouveau) partagent une transaction,
- * comme le suppose la contrainte différée uniq_character_slot de
- * V1__init_schema.sql.
+ * Non-régression : Character#equipItem publie un seul événement
+ * (CharacterEquippedItem) portant à la fois le nouvel item et l'éventuel
+ * occupant précédent du slot, pour que le listener
+ * ItemService#onCharacterEquippedItem (@Transactional, voir ItemService.java)
+ * applique les deux updateSlot dans une même transaction, comme le suppose la
+ * contrainte différée uniq_character_slot de V1__init_schema.sql.
  */
 @Transactional
 class ItemServiceTest extends AbstractIntegrationTest {
@@ -77,8 +78,8 @@ class ItemServiceTest extends AbstractIntegrationTest {
         itemDao.insert(secondSword);
         character.addItem(secondSword);
 
-        assertThat(itemService.equipItem(firstSword, character)).contains(EquipmentSlot.WEAPON);
-        assertThat(itemService.equipItem(secondSword, character)).contains(EquipmentSlot.WEAPON);
+        assertThat(character.equipItem(firstSword)).contains(EquipmentSlot.WEAPON);
+        assertThat(character.equipItem(secondSword)).contains(EquipmentSlot.WEAPON);
 
         assertThat(itemDao.findById(firstSword.getId())).map(Item::getSlot).isEmpty();
         assertThat(itemDao.findById(secondSword.getId())).map(Item::getSlot).contains(EquipmentSlot.WEAPON);
@@ -128,11 +129,11 @@ class ItemServiceTest extends AbstractIntegrationTest {
         itemService.warmRoomItems(roomService.allRooms());
         Item torchWithTemplate = itemService.findItemInRoomByName(room.getId(), "Torche").orElseThrow();
 
-        assertThat(itemService.addItemToInventory(torchWithTemplate, character)).isTrue();
+        assertThat(character.pickUpItem(torchWithTemplate)).isTrue();
         assertThat(itemService.getInventory(character)).containsExactly(torchWithTemplate);
         assertThat(itemService.findRoomItems(room.getId())).isEmpty();
 
-        itemService.removeItemFromInventory(torchWithTemplate, character);
+        character.dropItem(torchWithTemplate);
         assertThat(itemService.getInventory(character)).isEmpty();
         assertThat(itemService.findRoomItems(room.getId())).containsExactly(torchWithTemplate);
     }

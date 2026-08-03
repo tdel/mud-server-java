@@ -55,7 +55,7 @@ public class Drop implements ControllerHandler {
         }
 
         String templateName = item.get().getName();
-        itemService.removeItemFromInventory(item.get(), character);
+        character.dropItem(item.get());
 
         connection.send(new ItemDropped(templateName));
     }

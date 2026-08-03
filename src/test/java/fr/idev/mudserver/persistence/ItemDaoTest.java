@@ -102,13 +102,4 @@ class ItemDaoTest extends AbstractIntegrationTest {
         itemDao.updateSlot(item.getId(), null);
         assertThat(itemDao.findById(item.getId()).orElseThrow().getSlot()).isNull();
     }
-
-    @Test
-    void findByIdForUpdateReadsTheSameRow() {
-        seedTemplateRoomAndCharacter();
-        Item item = new Item(UUID.randomUUID(), template.getId(), room.getId(), null, null);
-        itemDao.insert(item);
-
-        assertThat(itemDao.findByIdForUpdate(item.getId())).contains(item);
-    }
 }

@@ -54,7 +54,7 @@ public class Take implements ControllerHandler {
             return;
         }
 
-        if (!itemService.addItemToInventory(item.get(), character)) {
+        if (!character.pickUpItem(item.get())) {
             // Quelqu'un d'autre l'a pris entre-temps — du point de vue de ce joueur,
             // indiscernable du fait qu'il n'était jamais là.
             connection.send(new ItemNotFound(name));
