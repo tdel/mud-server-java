@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.game.GameWorld;
+import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ingame.Chat;
@@ -17,9 +18,11 @@ import fr.idev.mudserver.network.message.ingame.YouSaid;
 public class Say implements ControllerHandler {
 
     private final GameWorld gameWorld;
+    private final RoomService roomService;
 
-    public Say(GameWorld gameWorld) {
+    public Say(GameWorld gameWorld, RoomService roomService) {
         this.gameWorld = gameWorld;
+        this.roomService = roomService;
     }
 
     @Override
@@ -42,7 +45,7 @@ public class Say implements ControllerHandler {
             return;
         }
 
-        gameWorld.room(character.getCurrentRoomId()).broadcast(new Chat(character.getName(), message), character);
+        roomService.room(character.getCurrentRoomId()).broadcast(new Chat(character.getName(), message), character);
 
         connection.send(new YouSaid(message));
     }

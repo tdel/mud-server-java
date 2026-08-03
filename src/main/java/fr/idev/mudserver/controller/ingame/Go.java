@@ -9,6 +9,7 @@ import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.RoomExit;
 import fr.idev.mudserver.game.GameWorld;
+import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -22,12 +23,14 @@ public class Go implements ControllerHandler {
     private final RoomDao roomDao;
     private final RoomExitDao roomExitDao;
     private final GameWorld gameWorld;
+    private final RoomService roomService;
     private final Look lookAction;
 
-    public Go(RoomDao roomDao, RoomExitDao roomExitDao, GameWorld gameWorld, Look lookAction) {
+    public Go(RoomDao roomDao, RoomExitDao roomExitDao, GameWorld gameWorld, RoomService roomService, Look lookAction) {
         this.roomDao = roomDao;
         this.roomExitDao = roomExitDao;
         this.gameWorld = gameWorld;
+        this.roomService = roomService;
         this.lookAction = lookAction;
     }
 
@@ -57,7 +60,7 @@ public class Go implements ControllerHandler {
             return;
         }
 
-        gameWorld.moveCharacter(connection, exit.get().getTargetRoomId());
+        roomService.moveCharacter(character, exit.get().getTargetRoomId());
 
         lookAction.onReceive(connection, "");
     }

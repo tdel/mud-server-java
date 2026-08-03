@@ -13,6 +13,7 @@ import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomExit;
 import fr.idev.mudserver.game.GameWorld;
+import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ingame.RoomDescription;
@@ -27,12 +28,15 @@ public class Look implements ControllerHandler {
     private final ItemDao itemDao;
     private final ItemTemplateDao itemTemplateDao;
     private final GameWorld gameWorld;
+    private final RoomService roomService;
 
-    public Look(RoomExitDao roomExitDao, ItemDao itemDao, ItemTemplateDao itemTemplateDao, GameWorld gameWorld) {
+    public Look(RoomExitDao roomExitDao, ItemDao itemDao, ItemTemplateDao itemTemplateDao, GameWorld gameWorld,
+            RoomService roomService) {
         this.roomExitDao = roomExitDao;
         this.itemDao = itemDao;
         this.itemTemplateDao = itemTemplateDao;
         this.gameWorld = gameWorld;
+        this.roomService = roomService;
     }
 
     @Override
@@ -53,7 +57,7 @@ public class Look implements ControllerHandler {
 
     private RoomDescription describeRoom(Character character) {
         UUID roomId = character.getCurrentRoomId();
-        Room room = gameWorld.room(roomId);
+        Room room = roomService.room(roomId);
 
         List<RoomExit> exits = roomExitDao.findBySourceRoomId(roomId);
         List<Character> characters = room.characters();

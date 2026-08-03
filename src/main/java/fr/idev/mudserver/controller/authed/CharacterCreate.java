@@ -17,7 +17,7 @@ import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.GameWorld;
+import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.Connection;
@@ -35,15 +35,15 @@ import fr.idev.mudserver.persistence.CharacterDao;
 public class CharacterCreate implements ControllerHandler {
 
     private final CharacterDao characterDao;
-    private final GameWorld gameWorld;
+    private final RoomService roomService;
     private final CharacterList characterListAction;
     private final DiceRoller diceRoller;
     private final AuthWorld authWorld;
 
-    public CharacterCreate(CharacterDao characterDao, GameWorld gameWorld, CharacterList characterListAction,
+    public CharacterCreate(CharacterDao characterDao, RoomService roomService, CharacterList characterListAction,
             DiceRoller diceRoller, AuthWorld authWorld) {
         this.characterDao = characterDao;
-        this.gameWorld = gameWorld;
+        this.roomService = roomService;
         this.characterListAction = characterListAction;
         this.diceRoller = diceRoller;
         this.authWorld = authWorld;
@@ -77,7 +77,7 @@ public class CharacterCreate implements ControllerHandler {
             return;
         }
 
-        Optional<Room> startingRoom = gameWorld.startingRoom();
+        Optional<Room> startingRoom = roomService.startingRoom();
         if (startingRoom.isEmpty()) {
             connection.send(new NoStartingRoom());
             characterListAction.onReceive(connection, "");

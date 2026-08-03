@@ -1,16 +1,13 @@
 package fr.idev.mudserver.game;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import fr.idev.mudserver.persistence.CharacterDao;
-import fr.idev.mudserver.persistence.RoomDao;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.Character;
-import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.network.Connection;
 
 /**
@@ -22,30 +19,20 @@ import fr.idev.mudserver.network.Connection;
 @Component
 public class GameWorld {
 
-    private final Map<UUID, Room> rooms = new ConcurrentHashMap<>();
     private final Map<Connection, Character> characters = new ConcurrentHashMap<>();
 
     private final CharacterDao characterDao;
-    private final RoomDao roomDao;
+    private final RoomService roomService;
 
-    public GameWorld(CharacterDao characterDao, RoomDao roomDao) {
+    public GameWorld(CharacterDao characterDao, RoomService roomService) {
         this.characterDao = characterDao;
-        this.roomDao = roomDao;
+        this.roomService = roomService;
     }
 
     public void enterWorld(Connection connection, Character character) {
         character.setConnection(connection);
         characters.put(connection, character);
-        moveCharacter(connection, character.getCurrentRoomId());
-    }
-
-    public void moveCharacter(Connection connection, UUID roomId) {
-        Character character = characters.get(connection);
-        Room newRoom = room(roomId);
-
-        room(character.getCurrentRoomId()).leave(character, newRoom);
-        newRoom.join(character);
-        characterDao.updateCurrentRoom(character.getId(), roomId);
+        roomService.moveCharacter(character, character.getCurrentRoomId());
     }
 
     public void exitWorld(Connection connection) {
@@ -55,7 +42,7 @@ public class GameWorld {
         }
 
         characterDao.update(character);
-        room(character.getCurrentRoomId()).disconnect(character);
+        roomService.room(character.getCurrentRoomId()).disconnect(character);
     }
 
     public Character character(Connection connection) {
@@ -64,20 +51,6 @@ public class GameWorld {
 
     public boolean isCharacterInGame(UUID characterId) {
         return characters.values().stream().anyMatch(character -> character.getId().equals(characterId));
-    }
-
-    public Room room(UUID roomId) {
-        return rooms.get(roomId);
-    }
-
-    public Optional<Room> startingRoom() {
-        return rooms.values().stream().filter(room -> Boolean.TRUE.equals(room.isStartingRoom())).findFirst();
-    }
-
-    public void warmRooms() {
-        for (Room room : roomDao.findAll()) {
-            rooms.put(room.getId(), room);
-        }
     }
 
     public boolean isAlreadyConnected(UUID accountId) {
