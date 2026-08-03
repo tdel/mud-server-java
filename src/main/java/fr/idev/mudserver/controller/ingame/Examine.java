@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.Client;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -35,21 +34,21 @@ public class Examine implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        Client client = gameWorld.client(connection);
+        Character character = gameWorld.character(connection);
         String name = argument.trim();
 
         if (name.isEmpty()) {
-            client.send(new Usage("examine <name>"));
+            connection.send(new Usage("examine <name>"));
             return;
         }
 
-        Character target = gameWorld.roomInstance(client.character().getCurrentRoomId()).findCharacterByName(name);
+        Character target = gameWorld.roomInstance(character.getCurrentRoomId()).findCharacterByName(name);
 
         if (target == null) {
-            client.send(new CharacterNotFound(name));
+            connection.send(new CharacterNotFound(name));
             return;
         }
 
-        client.send(new CharacterStats(target));
+        connection.send(new CharacterStats(target));
     }
 }

@@ -49,9 +49,8 @@ public class AuthWorld {
 
         accountDao.updateCurrentCharacter(account.getId(), character.getId());
 
-        Client client = new Client(connection, character);
         connection.setState(ConnectionState.INGAME);
-        gameWorld.enterWorld(connection, client);
+        gameWorld.enterWorld(connection, character);
     }
 
     public Account account(Connection connection) {

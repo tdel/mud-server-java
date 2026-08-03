@@ -12,7 +12,6 @@ import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.ItemService;
-import fr.idev.mudserver.game.Client;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -46,19 +45,18 @@ public class Equip implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        Client client = gameWorld.client(connection);
+        Character character = gameWorld.character(connection);
         String name = argument.trim();
 
         if (name.isEmpty()) {
-            client.send(new Usage("equip <name>"));
+            connection.send(new Usage("equip <name>"));
             return;
         }
 
-        Character character = client.character();
         Optional<Item> item = itemService.findItemByName(character, name);
 
         if (item.isEmpty()) {
-            client.send(new ItemNotCarried(name));
+            connection.send(new ItemNotCarried(name));
             return;
         }
 
@@ -67,10 +65,10 @@ public class Equip implements ControllerHandler {
         Optional<EquipmentSlot> slot = itemService.equipItem(item.get(), character);
 
         if (slot.isEmpty()) {
-            client.send(new ItemNotEquippable(templateName));
+            connection.send(new ItemNotEquippable(templateName));
             return;
         }
 
-        client.send(new ItemEquipped(templateName, slot.get()));
+        connection.send(new ItemEquipped(templateName, slot.get()));
     }
 }

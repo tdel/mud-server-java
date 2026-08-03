@@ -6,11 +6,11 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
+import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.ItemService;
-import fr.idev.mudserver.game.Client;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.persistence.ItemTemplateDao;
@@ -40,13 +40,13 @@ public class Inventory implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        Client client = gameWorld.client(connection);
+        Character character = gameWorld.character(connection);
 
-        List<Item> items = itemService.getInventory(client.character());
+        List<Item> items = itemService.getInventory(character);
         List<String> names = items.stream()
                 .map(item -> itemTemplateDao.findById(item.getTemplateId()).map(ItemTemplate::getName).orElseThrow())
                 .toList();
 
-        client.send(new fr.idev.mudserver.network.message.ingame.Inventory(names));
+        connection.send(new fr.idev.mudserver.network.message.ingame.Inventory(names));
     }
 }

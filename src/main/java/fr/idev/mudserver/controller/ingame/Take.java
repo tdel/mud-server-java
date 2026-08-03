@@ -11,7 +11,6 @@ import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.ItemService;
-import fr.idev.mudserver.game.Client;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -44,31 +43,30 @@ public class Take implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        Client client = gameWorld.client(connection);
+        Character character = gameWorld.character(connection);
         String name = argument.trim();
 
         if (name.isEmpty()) {
-            client.send(new Usage("take <name>"));
+            connection.send(new Usage("take <name>"));
             return;
         }
 
-        Character character = client.character();
         Optional<Item> item = itemService.findItemInRoomByName(character.getCurrentRoomId(), name);
 
         if (item.isEmpty()) {
-            client.send(new ItemNotFound(name));
+            connection.send(new ItemNotFound(name));
             return;
         }
 
         if (!itemService.addItemToInventory(item.get(), character)) {
             // Quelqu'un d'autre l'a pris entre-temps — du point de vue de ce joueur,
             // indiscernable du fait qu'il n'était jamais là.
-            client.send(new ItemNotFound(name));
+            connection.send(new ItemNotFound(name));
             return;
         }
 
         String templateName = itemTemplateDao.findById(item.get().getTemplateId()).map(ItemTemplate::getName)
                 .orElseThrow();
-        client.send(new ItemTaken(templateName));
+        connection.send(new ItemTaken(templateName));
     }
 }

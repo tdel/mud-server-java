@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.Client;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ingame.CharacterStats;
@@ -32,7 +31,6 @@ public class Stats implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        Client client = gameWorld.client(connection);
-        client.send(new CharacterStats(client.character()));
+        connection.send(new CharacterStats(gameWorld.character(connection)));
     }
 }

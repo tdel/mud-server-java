@@ -6,9 +6,9 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
+import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.RoomExit;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.Client;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -43,22 +43,21 @@ public class Go implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        Client client = gameWorld.client(connection);
+        Character character = gameWorld.character(connection);
         String direction = argument.trim();
 
         if (direction.isEmpty()) {
-            client.send(new Usage("go <direction>"));
+            connection.send(new Usage("go <direction>"));
             return;
         }
 
-        Optional<RoomExit> exit = roomExitDao.findBySourceRoomIdAndDirection(client.character().getCurrentRoomId(),
-                direction);
+        Optional<RoomExit> exit = roomExitDao.findBySourceRoomIdAndDirection(character.getCurrentRoomId(), direction);
         if (exit.isEmpty()) {
-            client.send(new NoSuchExit(direction));
+            connection.send(new NoSuchExit(direction));
             return;
         }
 
-        gameWorld.moveClient(client, exit.get().getTargetRoomId());
+        gameWorld.moveCharacter(connection, exit.get().getTargetRoomId());
 
         lookAction.onReceive(connection, "");
     }
