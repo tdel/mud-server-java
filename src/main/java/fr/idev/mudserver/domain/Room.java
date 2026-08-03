@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import fr.idev.mudserver.network.OutputMessage;
 import fr.idev.mudserver.network.message.ingame.CharacterDisconnected;
@@ -37,6 +38,7 @@ public class Room {
     private Boolean isStartingRoom;
 
     private final Map<UUID, Character> clients = new ConcurrentHashMap<>();
+    private final List<Item> items = new CopyOnWriteArrayList<>();
 
     public Room(UUID id, String name, String description, Boolean isStartingRoom) {
         this.id = id;
@@ -104,6 +106,23 @@ public class Room {
 
     public List<Character> characters() {
         return new ArrayList<>(clients.values());
+    }
+
+    public List<Item> getItems() {
+        return List.copyOf(items);
+    }
+
+    public void addItem(Item item) {
+        items.add(item);
+    }
+
+    public void removeItem(Item item) {
+        items.remove(item);
+    }
+
+    public void setItems(List<Item> items) {
+        this.items.clear();
+        this.items.addAll(items);
     }
 
     public void broadcast(OutputMessage message, Character exclude) {

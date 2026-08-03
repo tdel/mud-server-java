@@ -51,6 +51,9 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Autowired
     private CharacterDao characterDao;
 
+    @Autowired
+    private RoomService roomService;
+
     @Test
     void equippingANewWeaponUnequipsThePreviousOneInTheSameTransaction() {
         ItemTemplate weaponTemplate = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3);
@@ -65,14 +68,89 @@ class ItemServiceTest extends AbstractIntegrationTest {
         characterDao.insert(character);
 
         Item firstSword = new Item(UUID.randomUUID(), weaponTemplate.getId(), null, character.getId(), null);
+        firstSword.attachTemplate(weaponTemplate);
         itemDao.insert(firstSword);
+        character.addItem(firstSword);
+
         Item secondSword = new Item(UUID.randomUUID(), weaponTemplate.getId(), null, character.getId(), null);
+        secondSword.attachTemplate(weaponTemplate);
         itemDao.insert(secondSword);
+        character.addItem(secondSword);
 
         assertThat(itemService.equipItem(firstSword, character)).contains(EquipmentSlot.WEAPON);
         assertThat(itemService.equipItem(secondSword, character)).contains(EquipmentSlot.WEAPON);
 
         assertThat(itemDao.findById(firstSword.getId())).map(Item::getSlot).isEmpty();
         assertThat(itemDao.findById(secondSword.getId())).map(Item::getSlot).contains(EquipmentSlot.WEAPON);
+    }
+
+    @Test
+    void loadInventoryAttachesTemplatesAndFeedsTheCharacterCache() {
+        ItemTemplate potionTemplate = new ItemTemplate(UUID.randomUUID(), "Potion de soin", null, ItemType.POTION, 1);
+        itemTemplateDao.insert(potionTemplate);
+        itemService.warmItemTemplates();
+
+        Room room = new Room(UUID.randomUUID(), "Salle B", "...", true);
+        roomDao.insert(room);
+        Account account = new Account(UUID.randomUUID(), "fay", "hashed-password", null);
+        accountDao.insert(account);
+        Character character = new Character(UUID.randomUUID(), account.getId(), "Fay", room.getId(), Race.HUMAN, 10, 10,
+                10, 10, 10, 10, 10, 10, 10, 10);
+        characterDao.insert(character);
+
+        Item potion = new Item(UUID.randomUUID(), potionTemplate.getId(), null, character.getId(), null);
+        itemDao.insert(potion);
+
+        character.setInventory(itemService.loadInventory(character));
+
+        assertThat(itemService.getInventory(character)).extracting(Item::getName).containsExactly("Potion de soin");
+        assertThat(itemService.findItemByName(character, "potion de soin")).map(Item::getId).contains(potion.getId());
+    }
+
+    @Test
+    void addAndRemoveItemFromInventoryKeepTheCharacterAndRoomCachesInSync() {
+        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Torche", null, ItemType.MISC, 1);
+        itemTemplateDao.insert(template);
+        itemService.warmItemTemplates();
+
+        Room room = new Room(UUID.randomUUID(), "Salle C", "...", null);
+        roomDao.insert(room);
+        roomService.warmRooms();
+        Account account = new Account(UUID.randomUUID(), "gus", "hashed-password", null);
+        accountDao.insert(account);
+        Character character = new Character(UUID.randomUUID(), account.getId(), "Gus", room.getId(), Race.HUMAN, 10, 10,
+                10, 10, 10, 10, 10, 10, 10, 10);
+        characterDao.insert(character);
+
+        Item torch = new Item(UUID.randomUUID(), template.getId(), room.getId(), null, null);
+        itemDao.insert(torch);
+        itemService.warmRoomItems(roomService.allRooms());
+        Item torchWithTemplate = itemService.findItemInRoomByName(room.getId(), "Torche").orElseThrow();
+
+        assertThat(itemService.addItemToInventory(torchWithTemplate, character)).isTrue();
+        assertThat(itemService.getInventory(character)).containsExactly(torchWithTemplate);
+        assertThat(itemService.findRoomItems(room.getId())).isEmpty();
+
+        itemService.removeItemFromInventory(torchWithTemplate, character);
+        assertThat(itemService.getInventory(character)).isEmpty();
+        assertThat(itemService.findRoomItems(room.getId())).containsExactly(torchWithTemplate);
+    }
+
+    @Test
+    void warmRoomItemsAttachesTemplatesToItemsOnTheGround() {
+        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Bouclier", null, ItemType.ARMOR, 4);
+        itemTemplateDao.insert(template);
+        itemService.warmItemTemplates();
+
+        Room room = new Room(UUID.randomUUID(), "Salle D", "...", null);
+        roomDao.insert(room);
+        roomService.warmRooms();
+
+        Item shield = new Item(UUID.randomUUID(), template.getId(), room.getId(), null, null);
+        itemDao.insert(shield);
+
+        itemService.warmRoomItems(roomService.allRooms());
+
+        assertThat(roomService.room(room.getId()).getItems()).extracting(Item::getName).containsExactly("Bouclier");
     }
 }

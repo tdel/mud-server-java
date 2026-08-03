@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.GameWorld;
+import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.game.RoomService;
 
 /**
@@ -45,21 +46,26 @@ public class TelnetServer {
     private final AuthWorld authWorld;
     private final GameWorld gameWorld;
     private final RoomService roomService;
+    private final ItemService itemService;
     private final int port;
 
     public TelnetServer(ExecutorService virtualThreadExecutor, ControllerDispatcher controllerDispatcher,
-            AuthWorld authWorld, GameWorld gameWorld, RoomService roomService, @Value("${app.telnet.port}") int port) {
+            AuthWorld authWorld, GameWorld gameWorld, RoomService roomService, ItemService itemService,
+            @Value("${app.telnet.port}") int port) {
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.controllerDispatcher = controllerDispatcher;
         this.authWorld = authWorld;
         this.gameWorld = gameWorld;
         this.roomService = roomService;
+        this.itemService = itemService;
         this.port = port;
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void start() throws InterruptedException {
         roomService.warmRooms();
+        itemService.warmItemTemplates();
+        itemService.warmRoomItems(roomService.allRooms());
 
         EventLoopGroup bossGroup = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
         EventLoopGroup workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());

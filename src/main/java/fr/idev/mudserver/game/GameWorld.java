@@ -23,14 +23,17 @@ public class GameWorld {
 
     private final CharacterDao characterDao;
     private final RoomService roomService;
+    private final ItemService itemService;
 
-    public GameWorld(CharacterDao characterDao, RoomService roomService) {
+    public GameWorld(CharacterDao characterDao, RoomService roomService, ItemService itemService) {
         this.characterDao = characterDao;
         this.roomService = roomService;
+        this.itemService = itemService;
     }
 
     public void enterWorld(Connection connection, Character character) {
         character.setConnection(connection);
+        character.setInventory(itemService.loadInventory(character));
         characters.put(connection, character);
         roomService.moveCharacter(character, character.getCurrentRoomId());
     }

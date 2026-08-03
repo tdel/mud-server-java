@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Item;
-import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.network.Connection;
@@ -16,18 +15,15 @@ import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.ingame.ItemDropped;
 import fr.idev.mudserver.network.message.ingame.ItemNotCarried;
-import fr.idev.mudserver.persistence.ItemTemplateDao;
 
 @Component
 public class Drop implements ControllerHandler {
 
     private final ItemService itemService;
-    private final ItemTemplateDao itemTemplateDao;
     private final GameWorld gameWorld;
 
-    public Drop(ItemService itemService, ItemTemplateDao itemTemplateDao, GameWorld gameWorld) {
+    public Drop(ItemService itemService, GameWorld gameWorld) {
         this.itemService = itemService;
-        this.itemTemplateDao = itemTemplateDao;
         this.gameWorld = gameWorld;
     }
 
@@ -58,10 +54,9 @@ public class Drop implements ControllerHandler {
             return;
         }
 
+        String templateName = item.get().getName();
         itemService.removeItemFromInventory(item.get(), character);
 
-        String templateName = itemTemplateDao.findById(item.get().getTemplateId()).map(ItemTemplate::getName)
-                .orElseThrow();
         connection.send(new ItemDropped(templateName));
     }
 }

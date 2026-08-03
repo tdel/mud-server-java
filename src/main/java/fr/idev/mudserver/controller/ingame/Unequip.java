@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Item;
-import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.network.Connection;
@@ -17,18 +16,15 @@ import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.ingame.ItemNotCarried;
 import fr.idev.mudserver.network.message.ingame.ItemNotEquipped;
 import fr.idev.mudserver.network.message.ingame.ItemUnequipped;
-import fr.idev.mudserver.persistence.ItemTemplateDao;
 
 @Component
 public class Unequip implements ControllerHandler {
 
     private final ItemService itemService;
-    private final ItemTemplateDao itemTemplateDao;
     private final GameWorld gameWorld;
 
-    public Unequip(ItemService itemService, ItemTemplateDao itemTemplateDao, GameWorld gameWorld) {
+    public Unequip(ItemService itemService, GameWorld gameWorld) {
         this.itemService = itemService;
-        this.itemTemplateDao = itemTemplateDao;
         this.gameWorld = gameWorld;
     }
 
@@ -59,8 +55,7 @@ public class Unequip implements ControllerHandler {
             return;
         }
 
-        String templateName = itemTemplateDao.findById(item.get().getTemplateId()).map(ItemTemplate::getName)
-                .orElseThrow();
+        String templateName = item.get().getName();
 
         if (item.get().getSlot() == null) {
             connection.send(new ItemNotEquipped(templateName));

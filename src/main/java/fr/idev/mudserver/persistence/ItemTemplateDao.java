@@ -2,6 +2,7 @@ package fr.idev.mudserver.persistence;
 
 import static fr.idev.mudserver.persistence.jooq.Tables.ITEM_TEMPLATE;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,6 +32,10 @@ public class ItemTemplateDao {
 
     public Optional<ItemTemplate> findById(UUID id) {
         return dsl.selectFrom(ITEM_TEMPLATE).where(ITEM_TEMPLATE.ID.eq(id)).fetchOptional(ItemTemplateDao::toDomain);
+    }
+
+    public List<ItemTemplate> findAll() {
+        return dsl.selectFrom(ITEM_TEMPLATE).fetch(ItemTemplateDao::toDomain);
     }
 
     public Optional<ItemTemplate> findByName(String name) {

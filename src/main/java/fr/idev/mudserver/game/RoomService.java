@@ -1,5 +1,6 @@
 package fr.idev.mudserver.game;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,6 +44,10 @@ public class RoomService {
 
     public Room room(UUID roomId) {
         return rooms.get(roomId);
+    }
+
+    public Collection<Room> allRooms() {
+        return rooms.values();
     }
 
     public Optional<Room> startingRoom() {

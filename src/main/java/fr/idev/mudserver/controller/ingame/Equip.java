@@ -9,7 +9,6 @@ import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
-import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.network.Connection;
@@ -18,18 +17,15 @@ import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.ingame.ItemEquipped;
 import fr.idev.mudserver.network.message.ingame.ItemNotCarried;
 import fr.idev.mudserver.network.message.ingame.ItemNotEquippable;
-import fr.idev.mudserver.persistence.ItemTemplateDao;
 
 @Component
 public class Equip implements ControllerHandler {
 
     private final ItemService itemService;
-    private final ItemTemplateDao itemTemplateDao;
     private final GameWorld gameWorld;
 
-    public Equip(ItemService itemService, ItemTemplateDao itemTemplateDao, GameWorld gameWorld) {
+    public Equip(ItemService itemService, GameWorld gameWorld) {
         this.itemService = itemService;
-        this.itemTemplateDao = itemTemplateDao;
         this.gameWorld = gameWorld;
     }
 
@@ -60,8 +56,7 @@ public class Equip implements ControllerHandler {
             return;
         }
 
-        String templateName = itemTemplateDao.findById(item.get().getTemplateId()).map(ItemTemplate::getName)
-                .orElseThrow();
+        String templateName = item.get().getName();
         Optional<EquipmentSlot> slot = itemService.equipItem(item.get(), character);
 
         if (slot.isEmpty()) {

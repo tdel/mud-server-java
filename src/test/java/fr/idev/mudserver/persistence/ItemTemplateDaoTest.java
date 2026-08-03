@@ -46,4 +46,14 @@ class ItemTemplateDaoTest extends AbstractIntegrationTest {
 
         assertThat(itemTemplateDao.existsById(id)).isTrue();
     }
+
+    @Test
+    void findAllReturnsEveryTemplate() {
+        ItemTemplate first = new ItemTemplate(UUID.randomUUID(), "Bouclier", null, ItemType.ARMOR, 4);
+        ItemTemplate second = new ItemTemplate(UUID.randomUUID(), "Bottes", null, ItemType.BOOTS, 2);
+        itemTemplateDao.insert(first);
+        itemTemplateDao.insert(second);
+
+        assertThat(itemTemplateDao.findAll()).contains(first, second);
+    }
 }

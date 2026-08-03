@@ -1,8 +1,11 @@
 package fr.idev.mudserver.game;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,55 +14,117 @@ import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
+import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.persistence.ItemDao;
 import fr.idev.mudserver.persistence.ItemTemplateDao;
 
 /**
  * Point d'entrée unique pour lire et muter les items d'un personnage — le sac
- * comme les emplacements équipés. Toute nouvelle mutation d'inventaire
- * (take/drop/equip/unequip, un futur craft/loot/trade) doit passer par ici
- * plutôt que par {@link ItemDao} directement.
+ * comme les emplacements équipés — et ceux posés au sol dans une room. Toute
+ * nouvelle mutation d'inventaire (take/drop/equip/unequip, un futur
+ * craft/loot/trade) doit passer par ici plutôt que par {@link ItemDao}
+ * directement. Précharge aussi l'ensemble des {@link ItemTemplate} en mémoire
+ * ({@link #warmItemTemplates()}, sur le même principe que
+ * {@code RoomService.warmRooms()}) et attache le template correspondant à
+ * chaque {@code Item} avant de le renvoyer à l'appelant — un {@code Item} sorti
+ * d'ici a donc toujours son template, contrairement à un {@code Item} lu
+ * directement via {@link ItemDao}.
  */
 @Service
 public class ItemService {
 
+    private final Map<UUID, ItemTemplate> templates = new ConcurrentHashMap<>();
+
     private final ItemDao itemDao;
     private final ItemTemplateDao itemTemplateDao;
+    private final RoomService roomService;
 
-    public ItemService(ItemDao itemDao, ItemTemplateDao itemTemplateDao) {
+    public ItemService(ItemDao itemDao, ItemTemplateDao itemTemplateDao, RoomService roomService) {
         this.itemDao = itemDao;
         this.itemTemplateDao = itemTemplateDao;
+        this.roomService = roomService;
+    }
+
+    public void warmItemTemplates() {
+        for (ItemTemplate template : itemTemplateDao.findAll()) {
+            templates.put(template.getId(), template);
+        }
+    }
+
+    private Item attachTemplate(Item item) {
+        ItemTemplate template = templates.get(item.getTemplateId());
+        if (template == null) {
+            throw new IllegalStateException("ItemTemplate " + item.getTemplateId()
+                    + " absent du cache — warmItemTemplates() a-t-il été appelé ?");
+        }
+        item.attachTemplate(template);
+        return item;
+    }
+
+    private List<Item> attachTemplates(List<Item> items) {
+        items.forEach(this::attachTemplate);
+        return items;
+    }
+
+    /**
+     * Charge l'inventaire de {@code character} depuis la base, une fois, pour
+     * l'attacher au personnage (voir {@code GameWorld.enterWorld}) — les lectures
+     * suivantes ({@link #getInventory}, {@link #getCarriedItems},
+     * {@link #getEquippedItems}) passent ensuite par le cache du personnage plutôt
+     * que par une nouvelle requête.
+     */
+    public List<Item> loadInventory(Character character) {
+        return attachTemplates(itemDao.findByCharacterId(character.getId()));
     }
 
     public List<Item> getInventory(Character character) {
-        return itemDao.findByCharacterId(character.getId());
+        return character.getInventory();
     }
 
     public List<Item> getCarriedItems(Character character) {
-        return getInventory(character).stream().filter(item -> item.getSlot() == null).toList();
+        return character.getCarriedItems();
     }
 
     public List<Item> getEquippedItems(Character character) {
-        return getInventory(character).stream().filter(item -> item.getSlot() != null).toList();
+        return character.getEquippedItems();
+    }
+
+    /**
+     * Charge les items au sol de {@code room} depuis la base, une fois, pour les
+     * attacher à la room (voir {@link #warmRoomItems}) — {@link #findRoomItems}
+     * passe ensuite par le cache de la room plutôt que par une nouvelle requête.
+     */
+    public List<Item> loadRoomItems(Room room) {
+        return attachTemplates(itemDao.findByRoomId(room.getId()));
+    }
+
+    /**
+     * Précharge les items au sol de chaque room, une fois pour toute la durée du
+     * process — appelé depuis {@code TelnetServer.start()} juste après
+     * {@code RoomService.warmRooms()} et {@link #warmItemTemplates()}, sur le même
+     * principe : une {@code Room} n'est jamais rechargée par session, contrairement
+     * à un {@code Character}.
+     */
+    public void warmRoomItems(Collection<Room> rooms) {
+        for (Room room : rooms) {
+            room.setItems(loadRoomItems(room));
+        }
+    }
+
+    public List<Item> findRoomItems(UUID roomId) {
+        return roomService.room(roomId).getItems();
     }
 
     public Optional<Item> findItemByName(Character character, String name) {
-        return findByTemplateName(getInventory(character), name);
+        return findByTemplateName(character.getInventory(), name);
     }
 
     public Optional<Item> findItemInRoomByName(UUID roomId, String name) {
-        return findByTemplateName(itemDao.findByRoomId(roomId), name);
+        return findByTemplateName(findRoomItems(roomId), name);
     }
 
     private Optional<Item> findByTemplateName(List<Item> items, String name) {
-        for (Item item : items) {
-            String templateName = itemTemplateDao.findById(item.getTemplateId()).map(ItemTemplate::getName)
-                    .orElseThrow();
-            if (templateName.equalsIgnoreCase(name)) {
-                return Optional.of(item);
-            }
-        }
-        return Optional.empty();
+        return items.stream().filter(item -> item.getName().equalsIgnoreCase(name)).findFirst();
     }
 
     /**
@@ -80,12 +145,21 @@ public class ItemService {
             return false;
         }
 
+        UUID previousRoomId = item.getRoomId();
         itemDao.assignToCharacter(item.getId(), target.getId());
+        item.assignToCharacter(target.getId());
+        if (previousRoomId != null) {
+            roomService.room(previousRoomId).removeItem(item);
+        }
+        target.addItem(item);
         return true;
     }
 
     public void removeItemFromInventory(Item item, Character target) {
         itemDao.assignToRoom(item.getId(), target.getCurrentRoomId());
+        item.assignToRoom(target.getCurrentRoomId());
+        target.removeItem(item);
+        roomService.room(target.getCurrentRoomId()).addItem(item);
     }
 
     /**
@@ -99,24 +173,26 @@ public class ItemService {
      */
     @Transactional
     public Optional<EquipmentSlot> equipItem(Item item, Character target) {
-        ItemTemplate template = itemTemplateDao.findById(item.getTemplateId()).orElseThrow();
-        Optional<EquipmentSlot> slot = template.getType().equipmentSlot();
+        Optional<EquipmentSlot> slot = item.getType().equipmentSlot();
 
         if (slot.isEmpty()) {
             return Optional.empty();
         }
 
-        for (Item existing : getEquippedItems(target)) {
+        for (Item existing : target.getEquippedItems()) {
             if (!existing.getId().equals(item.getId()) && existing.getSlot() == slot.get()) {
                 itemDao.updateSlot(existing.getId(), null);
+                existing.setSlot(null);
             }
         }
 
         itemDao.updateSlot(item.getId(), slot.get());
+        item.setSlot(slot.get());
         return slot;
     }
 
     public void unequipItem(Item item) {
         itemDao.updateSlot(item.getId(), null);
+        item.setSlot(null);
     }
 }

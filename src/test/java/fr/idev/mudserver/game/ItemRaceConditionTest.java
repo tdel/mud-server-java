@@ -60,10 +60,14 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
     @Autowired
     private ItemTemplateDao itemTemplateDao;
 
+    @Autowired
+    private RoomService roomService;
+
     @Test
     void exactlyOneCharacterWinsTheRace() throws Exception {
         Room room = new Room(UUID.randomUUID(), "Race test room", "...", null);
         roomDao.insert(room);
+        roomService.warmRooms();
 
         Character alice = seedCharacter(room, "race-alice-" + UUID.randomUUID());
         Character bob = seedCharacter(room, "race-bob-" + UUID.randomUUID());

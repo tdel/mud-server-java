@@ -1,7 +1,9 @@
 package fr.idev.mudserver.domain;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import fr.idev.mudserver.network.Connection;
 
@@ -32,6 +34,7 @@ public class Character {
     private int charisma;
 
     private Connection connection;
+    private final List<Item> inventory = new CopyOnWriteArrayList<>();
 
     public Character(UUID id, UUID accountId, String name, UUID currentRoomId, Race race, int currentHealth,
             int maxHealth, int currentMana, int maxMana, int strength, int dexterity, int constitution,
@@ -179,6 +182,31 @@ public class Character {
 
     public void setConnection(Connection connection) {
         this.connection = connection;
+    }
+
+    public List<Item> getInventory() {
+        return List.copyOf(inventory);
+    }
+
+    public List<Item> getCarriedItems() {
+        return inventory.stream().filter(item -> item.getSlot() == null).toList();
+    }
+
+    public List<Item> getEquippedItems() {
+        return inventory.stream().filter(item -> item.getSlot() != null).toList();
+    }
+
+    public void addItem(Item item) {
+        inventory.add(item);
+    }
+
+    public void removeItem(Item item) {
+        inventory.remove(item);
+    }
+
+    public void setInventory(List<Item> items) {
+        inventory.clear();
+        inventory.addAll(items);
     }
 
     @Override
