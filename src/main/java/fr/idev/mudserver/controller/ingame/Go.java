@@ -7,28 +7,21 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Character;
-import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomExit;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.ingame.NoSuchExit;
-import fr.idev.mudserver.persistence.RoomExitDao;
 
 @Component
 public class Go implements ControllerHandler {
 
-    private final RoomExitDao roomExitDao;
     private final GameWorld gameWorld;
-    private final RoomService roomService;
     private final Look lookAction;
 
-    public Go(RoomExitDao roomExitDao, GameWorld gameWorld, RoomService roomService, Look lookAction) {
-        this.roomExitDao = roomExitDao;
+    public Go(GameWorld gameWorld, Look lookAction) {
         this.gameWorld = gameWorld;
-        this.roomService = roomService;
         this.lookAction = lookAction;
     }
 
@@ -52,14 +45,13 @@ public class Go implements ControllerHandler {
             return;
         }
 
-        Optional<RoomExit> exit = roomExitDao.findBySourceRoomIdAndDirection(character.getCurrentRoomId(), direction);
+        Optional<RoomExit> exit = character.getCurrentRoom().findOneByDirection(direction);
         if (exit.isEmpty()) {
             connection.send(new NoSuchExit(direction));
             return;
         }
 
-        Room destination = roomService.room(exit.get().getTargetRoomId());
-        character.moveToRoom(destination);
+        character.moveToRoom(exit.get().getTargetRoom());
 
         lookAction.onReceive(connection, "");
     }

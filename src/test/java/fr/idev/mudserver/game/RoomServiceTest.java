@@ -11,9 +11,11 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomExit;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 import fr.idev.mudserver.persistence.RoomDao;
+import fr.idev.mudserver.persistence.RoomExitDao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,6 +33,9 @@ class RoomServiceTest extends AbstractIntegrationTest {
 
     @Autowired
     private CharacterDao characterDao;
+
+    @Autowired
+    private RoomExitDao roomExitDao;
 
     @Test
     void warmRoomsPopulatesTheCacheFromTheDatabase() {
@@ -91,5 +96,24 @@ class RoomServiceTest extends AbstractIntegrationTest {
                 .doesNotContain(character.getId());
         assertThat(characterDao.findById(character.getId())).map(Character::getCurrentRoomId)
                 .contains(destination.getId());
+    }
+
+    @Test
+    void warmRoomExitsPopulatesTheCacheAndAttachesTheSourceAndTargetRooms() {
+        Room source = new Room(UUID.randomUUID(), "Place du village", "...", null);
+        Room target = new Room(UUID.randomUUID(), "Forêt", "...", null);
+        roomDao.insert(source);
+        roomDao.insert(target);
+        roomExitDao.insert(new RoomExit(UUID.randomUUID(), "nord", source.getId(), target.getId()));
+
+        roomService.warmRooms();
+        roomService.warmRoomExits(roomService.allRooms());
+
+        Room warmedSource = roomService.room(source.getId());
+        assertThat(warmedSource.getExits()).extracting(RoomExit::getDirection).containsExactly("nord");
+        assertThat(warmedSource.findOneByDirection("nord")).map(RoomExit::getSourceRoom).contains(warmedSource);
+        assertThat(warmedSource.findOneByDirection("nord")).map(RoomExit::getTargetRoom).map(Room::getId)
+                .contains(target.getId());
+        assertThat(warmedSource.findOneByDirection("sud")).isEmpty();
     }
 }

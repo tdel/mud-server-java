@@ -16,17 +16,14 @@ import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ingame.RoomDescription;
-import fr.idev.mudserver.persistence.RoomExitDao;
 
 @Component
 public class Look implements ControllerHandler {
 
-    private final RoomExitDao roomExitDao;
     private final GameWorld gameWorld;
     private final RoomService roomService;
 
-    public Look(RoomExitDao roomExitDao, GameWorld gameWorld, RoomService roomService) {
-        this.roomExitDao = roomExitDao;
+    public Look(GameWorld gameWorld, RoomService roomService) {
         this.gameWorld = gameWorld;
         this.roomService = roomService;
     }
@@ -51,7 +48,7 @@ public class Look implements ControllerHandler {
         UUID roomId = character.getCurrentRoomId();
         Room room = roomService.room(roomId);
 
-        List<RoomExit> exits = roomExitDao.findBySourceRoomId(roomId);
+        List<RoomExit> exits = room.getExits();
         List<Character> characters = room.characters();
         List<Item> items = room.getItems();
 

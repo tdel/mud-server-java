@@ -40,6 +40,7 @@ public class Room {
 
     private final Map<UUID, Character> clients = new ConcurrentHashMap<>();
     private final List<Item> items = new CopyOnWriteArrayList<>();
+    private final List<RoomExit> exits = new CopyOnWriteArrayList<>();
 
     public Room(UUID id, String name, String description, Boolean isStartingRoom) {
         this.id = id;
@@ -128,6 +129,19 @@ public class Room {
     public void setItems(List<Item> items) {
         this.items.clear();
         this.items.addAll(items);
+    }
+
+    public List<RoomExit> getExits() {
+        return List.copyOf(exits);
+    }
+
+    public void setExits(List<RoomExit> exits) {
+        this.exits.clear();
+        this.exits.addAll(exits);
+    }
+
+    public Optional<RoomExit> findOneByDirection(String direction) {
+        return exits.stream().filter(exit -> exit.getDirection().equals(direction)).findFirst();
     }
 
     public void broadcast(OutputMessage message, Character exclude) {
