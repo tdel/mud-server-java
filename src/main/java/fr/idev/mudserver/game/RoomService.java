@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomExit;
 import fr.idev.mudserver.domain.event.CharacterMovedToRoom;
@@ -24,11 +25,13 @@ import fr.idev.mudserver.persistence.RoomExitDao;
  * conteneur runtime des personnages présents ; {@code RoomService} est la
  * couche cache/cycle de vie au-dessus (warm/lookup) — les mutations
  * d'appartenance ({@code join}/{@code leave}/{@code disconnect}/
- * {@code broadcast}) restent portées par {@link Room} lui-même, appelées
- * directement sur l'objet renvoyé par {@link #room}, ou via
- * {@code Character#moveToRoom}/{@code Character#spawnToRoom}. Cette classe
- * réagit ensuite aux événements qu'ils publient pour répercuter le changement
- * en base.
+ * {@code broadcast}) restent portées par {@link Room} lui-même, appelées via
+ * {@code Character#moveToRoom}/{@link #spawnCharacter}. Cette classe réagit
+ * ensuite aux événements qu'ils publient pour répercuter le changement en base.
+ * Pas d'accesseur générique {@code room(UUID)} : en dehors du warm-up/des
+ * tests, tout code applicatif doit passer par une méthode qui exprime une
+ * intention métier ({@link #spawnCharacter}), jamais par une résolution d'UUID
+ * brute.
  */
 @Service
 public class RoomService {
@@ -61,8 +64,8 @@ public class RoomService {
         }
     }
 
-    public Room room(UUID roomId) {
-        return rooms.get(roomId);
+    public void spawnCharacter(Character character) {
+        character.spawnToRoom(rooms.get(character.getCurrentRoomId()));
     }
 
     public Collection<Room> allRooms() {

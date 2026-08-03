@@ -44,12 +44,7 @@ class RoomServiceTest extends AbstractIntegrationTest {
 
         roomService.warmRooms();
 
-        assertThat(roomService.room(room.getId())).isEqualTo(room);
-    }
-
-    @Test
-    void roomReturnsNullForAnUnknownId() {
-        assertThat(roomService.room(UUID.randomUUID())).isNull();
+        assertThat(roomService.allRooms()).contains(room);
     }
 
     @Test
@@ -86,14 +81,12 @@ class RoomServiceTest extends AbstractIntegrationTest {
         Character character = new Character(UUID.randomUUID(), account.getId(), "Erin", origin.getId(), Race.HUMAN, 10,
                 10, 10, 10, 10, 10, 10, 10, 10, 10);
         characterDao.insert(character);
-        roomService.room(origin.getId()).join(character);
+        room(origin.getId()).join(character);
 
-        character.moveToRoom(roomService.room(destination.getId()));
+        character.moveToRoom(room(destination.getId()));
 
-        assertThat(roomService.room(destination.getId()).characters()).extracting(Character::getId)
-                .contains(character.getId());
-        assertThat(roomService.room(origin.getId()).characters()).extracting(Character::getId)
-                .doesNotContain(character.getId());
+        assertThat(room(destination.getId()).characters()).extracting(Character::getId).contains(character.getId());
+        assertThat(room(origin.getId()).characters()).extracting(Character::getId).doesNotContain(character.getId());
         assertThat(characterDao.findById(character.getId())).map(Character::getCurrentRoomId)
                 .contains(destination.getId());
     }
@@ -109,11 +102,33 @@ class RoomServiceTest extends AbstractIntegrationTest {
         roomService.warmRooms();
         roomService.warmRoomExits(roomService.allRooms());
 
-        Room warmedSource = roomService.room(source.getId());
+        Room warmedSource = room(source.getId());
         assertThat(warmedSource.getExits()).extracting(RoomExit::getDirection).containsExactly("nord");
         assertThat(warmedSource.findOneByDirection("nord")).map(RoomExit::getSourceRoom).contains(warmedSource);
         assertThat(warmedSource.findOneByDirection("nord")).map(RoomExit::getTargetRoom).map(Room::getId)
                 .contains(target.getId());
         assertThat(warmedSource.findOneByDirection("sud")).isEmpty();
+    }
+
+    @Test
+    void spawnCharacterResolvesTheCurrentRoomFromCurrentRoomIdAndJoinsIt() {
+        Room room = new Room(UUID.randomUUID(), "Salle A", "...", null);
+        roomDao.insert(room);
+        roomService.warmRooms();
+
+        Account account = new Account(UUID.randomUUID(), "finn", "hashed-password", null);
+        accountDao.insert(account);
+        Character character = new Character(UUID.randomUUID(), account.getId(), "Finn", room.getId(), Race.HUMAN, 10,
+                10, 10, 10, 10, 10, 10, 10, 10, 10);
+        characterDao.insert(character);
+
+        roomService.spawnCharacter(character);
+
+        assertThat(character.getCurrentRoom()).isEqualTo(room);
+        assertThat(character.getCurrentRoom().characters()).extracting(Character::getId).contains(character.getId());
+    }
+
+    private Room room(UUID roomId) {
+        return roomService.allRooms().stream().filter(room -> room.getId().equals(roomId)).findFirst().orElseThrow();
     }
 }

@@ -112,7 +112,11 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
         Character character = new Character(UUID.randomUUID(), account.getId(), login, room.getId(), Race.HUMAN, 10, 10,
                 10, 10, 10, 10, 10, 10, 10, 10);
         characterDao.insert(character);
-        roomService.room(room.getId()).join(character);
+        room(room.getId()).join(character);
         return character;
+    }
+
+    private Room room(UUID roomId) {
+        return roomService.allRooms().stream().filter(room -> room.getId().equals(roomId)).findFirst().orElseThrow();
     }
 }

@@ -32,17 +32,20 @@ public class GameWorld {
     }
 
     /**
-     * Passe par {@code roomService.room(...)}, pas
-     * {@code character.getCurrentRoom()} : ce dernier n'est renseigné qu'après un
-     * premier {@code spawnToRoom}/ {@code moveToRoom} — un personnage qui vient
-     * d'être chargé depuis {@code CharacterDao} n'a que son {@code currentRoomId}
-     * persistée.
+     * Délègue la résolution de la room de départ à
+     * {@link RoomService#spawnCharacter} : un personnage qui vient d'être chargé
+     * depuis {@code CharacterDao} n'a que son {@code currentRoomId} persistée
+     * ({@code character.getCurrentRoom()} n'est renseigné qu'en effet de bord de
+     * {@code Character#spawnToRoom}) — même principe que
+     * {@code itemService.loadInventory(character)} juste au-dessus : le service
+     * résout tout à partir du {@code Character}, {@code GameWorld} ne manipule
+     * jamais d'UUID directement.
      */
     public void enterWorld(Connection connection, Character character) {
         character.setConnection(connection);
         character.setInventory(itemService.loadInventory(character));
         characters.put(connection, character);
-        character.spawnToRoom(roomService.room(character.getCurrentRoomId()));
+        roomService.spawnCharacter(character);
     }
 
     public void exitWorld(Connection connection) {

@@ -1,5 +1,6 @@
 package fr.idev.mudserver.game;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -86,6 +87,35 @@ class ItemServiceTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void loadInventoryStillReturnsAnEquippedItemOnAFreshLoad() {
+        ItemTemplate weaponTemplate = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3);
+        itemTemplateDao.insert(weaponTemplate);
+        itemService.warmItemTemplates();
+
+        Room room = new Room(UUID.randomUUID(), "Salle A", "...", true);
+        roomDao.insert(room);
+        Account account = new Account(UUID.randomUUID(), "gwen", "hashed-password", null);
+        accountDao.insert(account);
+        Character character = new Character(UUID.randomUUID(), account.getId(), "Gwen", room.getId(), Race.HUMAN, 10,
+                10, 10, 10, 10, 10, 10, 10, 10, 10);
+        characterDao.insert(character);
+
+        Item sword = new Item(UUID.randomUUID(), weaponTemplate.getId(), null, character.getId(), null);
+        sword.attachTemplate(weaponTemplate);
+        itemDao.insert(sword);
+        character.addItem(sword);
+        character.equipItem(sword);
+
+        // Simule une reconnexion : on recharge l'inventaire depuis la base plutôt
+        // que de lire le cache en mémoire de `character`.
+        List<Item> reloadedInventory = itemService.loadInventory(character);
+
+        assertThat(reloadedInventory).extracting(Item::getId).contains(sword.getId());
+        assertThat(reloadedInventory).filteredOn(item -> item.getId().equals(sword.getId())).extracting(Item::getSlot)
+                .containsExactly(EquipmentSlot.WEAPON);
+    }
+
+    @Test
     void loadInventoryAttachesTemplatesAndFeedsTheCharacterCache() {
         ItemTemplate potionTemplate = new ItemTemplate(UUID.randomUUID(), "Potion de soin", null, ItemType.POTION, 1);
         itemTemplateDao.insert(potionTemplate);
@@ -117,25 +147,26 @@ class ItemServiceTest extends AbstractIntegrationTest {
         Room room = new Room(UUID.randomUUID(), "Salle C", "...", null);
         roomDao.insert(room);
         roomService.warmRooms();
+        Room warmedRoom = room(room.getId());
         Account account = new Account(UUID.randomUUID(), "gus", "hashed-password", null);
         accountDao.insert(account);
         Character character = new Character(UUID.randomUUID(), account.getId(), "Gus", room.getId(), Race.HUMAN, 10, 10,
                 10, 10, 10, 10, 10, 10, 10, 10);
         characterDao.insert(character);
-        roomService.room(room.getId()).join(character);
+        warmedRoom.join(character);
 
         Item torch = new Item(UUID.randomUUID(), template.getId(), room.getId(), null, null);
         itemDao.insert(torch);
         itemService.warmRoomItems(roomService.allRooms());
-        Item torchWithTemplate = roomService.room(room.getId()).findOneByName("Torche").orElseThrow();
+        Item torchWithTemplate = warmedRoom.findOneByName("Torche").orElseThrow();
 
         assertThat(character.pickUpItem(torchWithTemplate)).isTrue();
         assertThat(character.getInventory()).containsExactly(torchWithTemplate);
-        assertThat(roomService.room(room.getId()).getItems()).isEmpty();
+        assertThat(warmedRoom.getItems()).isEmpty();
 
         character.dropItem(torchWithTemplate);
         assertThat(character.getInventory()).isEmpty();
-        assertThat(roomService.room(room.getId()).getItems()).containsExactly(torchWithTemplate);
+        assertThat(warmedRoom.getItems()).containsExactly(torchWithTemplate);
     }
 
     @Test
@@ -153,6 +184,10 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
         itemService.warmRoomItems(roomService.allRooms());
 
-        assertThat(roomService.room(room.getId()).getItems()).extracting(Item::getName).containsExactly("Bouclier");
+        assertThat(room(room.getId()).getItems()).extracting(Item::getName).containsExactly("Bouclier");
+    }
+
+    private Room room(UUID roomId) {
+        return roomService.allRooms().stream().filter(room -> room.getId().equals(roomId)).findFirst().orElseThrow();
     }
 }
