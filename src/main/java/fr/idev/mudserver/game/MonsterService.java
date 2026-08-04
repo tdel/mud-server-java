@@ -50,8 +50,9 @@ public class MonsterService {
 
     void loadMonsters(MonsterFileDefinition file, Collection<Room> rooms) {
         for (MonsterTemplateDefinition definition : file.templates()) {
-            templates.put(definition.id(), new MonsterTemplate(definition.id(), definition.name(),
-                    definition.description(), definition.maxHealth(), definition.attributes()));
+            templates.put(definition.id(),
+                    new MonsterTemplate(definition.id(), definition.name(), definition.description(),
+                            definition.maxHealth(), definition.attributes(), definition.naturalArmorClass()));
         }
 
         Map<UUID, Room> roomsById = new ConcurrentHashMap<>();
@@ -83,7 +84,7 @@ public class MonsterService {
     }
 
     record MonsterTemplateDefinition(UUID id, String name, String description, int maxHealth,
-            Map<Attribute, Integer> attributes) {
+            Map<Attribute, Integer> attributes, Integer naturalArmorClass) {
     }
 
     record MonsterSpawnDefinition(UUID id, UUID templateId, UUID roomId) {

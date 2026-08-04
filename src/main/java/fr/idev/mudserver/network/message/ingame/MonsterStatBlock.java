@@ -11,8 +11,8 @@ public record MonsterStatBlock(GameMonster monster) implements OutputTelnetMessa
     public void toTelnet(TelnetOutput output) {
         GameMonster m = monster;
         output.write(String.format(
-                "== %s ==\n%s\nHealth: %d/%d\nStrength: %d (%+d)  Dexterity: %d (%+d)  Constitution: %d (%+d)\nIntelligence: %d (%+d)  Wisdom: %d (%+d)  Charisma: %d (%+d)\n",
-                m.getName(), m.getDescription(), m.getCurrentHealth(), m.getMaxHealth(),
+                "== %s ==\n%s\nHealth: %d/%d\nArmor Class: %d\nStrength: %d (%+d)  Dexterity: %d (%+d)  Constitution: %d (%+d)\nIntelligence: %d (%+d)  Wisdom: %d (%+d)  Charisma: %d (%+d)\n",
+                m.getName(), m.getDescription(), m.getCurrentHealth(), m.getMaxHealth(), m.getArmorClass(),
                 m.getAttribute(Attribute.STRENGTH), m.getModifier(Attribute.STRENGTH),
                 m.getAttribute(Attribute.DEXTERITY), m.getModifier(Attribute.DEXTERITY),
                 m.getAttribute(Attribute.CONSTITUTION), m.getModifier(Attribute.CONSTITUTION),

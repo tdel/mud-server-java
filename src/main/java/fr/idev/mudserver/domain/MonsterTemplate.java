@@ -11,14 +11,16 @@ public class MonsterTemplate {
     private String description;
     private int maxHealth;
     private Map<Attribute, Integer> attributes;
+    private Integer naturalArmorClass;
 
-    public MonsterTemplate(UUID id, String name, String description, int maxHealth,
-            Map<Attribute, Integer> attributes) {
+    public MonsterTemplate(UUID id, String name, String description, int maxHealth, Map<Attribute, Integer> attributes,
+            Integer naturalArmorClass) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.maxHealth = maxHealth;
         this.attributes = attributes;
+        this.naturalArmorClass = naturalArmorClass;
     }
 
     public UUID getId() {
@@ -61,6 +63,14 @@ public class MonsterTemplate {
         this.attributes = attributes;
     }
 
+    public Integer getNaturalArmorClass() {
+        return naturalArmorClass;
+    }
+
+    public void setNaturalArmorClass(Integer naturalArmorClass) {
+        this.naturalArmorClass = naturalArmorClass;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -70,17 +80,18 @@ public class MonsterTemplate {
             return false;
         }
         return maxHealth == other.maxHealth && Objects.equals(id, other.id) && Objects.equals(name, other.name)
-                && Objects.equals(description, other.description) && Objects.equals(attributes, other.attributes);
+                && Objects.equals(description, other.description) && Objects.equals(attributes, other.attributes)
+                && Objects.equals(naturalArmorClass, other.naturalArmorClass);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, maxHealth, attributes);
+        return Objects.hash(id, name, description, maxHealth, attributes, naturalArmorClass);
     }
 
     @Override
     public String toString() {
         return "MonsterTemplate[id=" + id + ", name=" + name + ", description=" + description + ", maxHealth="
-                + maxHealth + ", attributes=" + attributes + "]";
+                + maxHealth + ", attributes=" + attributes + ", naturalArmorClass=" + naturalArmorClass + "]";
     }
 }

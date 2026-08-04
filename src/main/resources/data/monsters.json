@@ -5,6 +5,7 @@
             "name": "Gobelin",
             "description": "Une petite créature verte armée d'une dague rouillée.",
             "maxHealth": 7,
+            "naturalArmorClass": 15,
             "attributes": {
                 "STRENGTH": 8,
                 "DEXTERITY": 14,

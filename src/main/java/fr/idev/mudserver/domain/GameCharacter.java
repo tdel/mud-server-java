@@ -44,6 +44,10 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
         return Math.floorDiv(getAttribute(attribute) - 10, 2);
     }
 
+    public int getArmorClass() {
+        return 10 + getModifier(Attribute.DEXTERITY);
+    }
+
     public Map<Attribute, Integer> getAttributes() {
         return Map.copyOf(attributes);
     }

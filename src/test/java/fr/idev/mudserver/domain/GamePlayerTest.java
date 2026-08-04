@@ -28,6 +28,68 @@ class GamePlayerTest {
         assertThat(character(10, 10, 10, 10, 10, 10, 20).getProficiencyBonus()).isEqualTo(6);
     }
 
+    @Test
+    void armorClassWithNoChestArmorFallsBackToTenPlusDexModifier() {
+        GamePlayer character = character(10, 16, 10, 10, 10, 10, 1);
+
+        assertThat(character.getArmorClass()).isEqualTo(13);
+    }
+
+    @Test
+    void armorClassWithLightArmorAddsTheFullDexModifier() {
+        GamePlayer character = character(10, 16, 10, 10, 10, 10, 1);
+        equip(character, armor("Cuir", ArmorCategory.LIGHT, 11));
+
+        assertThat(character.getArmorClass()).isEqualTo(14);
+    }
+
+    @Test
+    void armorClassWithMediumArmorCapsTheDexModifierAtTwo() {
+        GamePlayer character = character(10, 18, 10, 10, 10, 10, 1);
+        equip(character, armor("Cotte de mailles", ArmorCategory.MEDIUM, 13));
+
+        assertThat(character.getArmorClass()).isEqualTo(15);
+    }
+
+    @Test
+    void armorClassWithHeavyArmorIgnoresTheDexModifierEntirely() {
+        GamePlayer character = character(10, 18, 10, 10, 10, 10, 1);
+        equip(character, armor("Plates", ArmorCategory.HEAVY, 18));
+
+        assertThat(character.getArmorClass()).isEqualTo(18);
+    }
+
+    @Test
+    void armorClassAddsTheShieldBonusOnTopOfBodyArmor() {
+        GamePlayer character = character(10, 14, 10, 10, 10, 10, 1);
+        equip(character, armor("Cuir", ArmorCategory.LIGHT, 11));
+        equip(character, shield());
+
+        assertThat(character.getArmorClass()).isEqualTo(15);
+    }
+
+    // N'appelle pas GamePlayer#equipItem : celui-ci publie un événement de domaine
+    // via DomainEventPublisher, qui suppose un contexte Spring initialisé
+    // (voir sa Javadoc) — absent de ce test unitaire pur. On construit donc
+    // directement l'Item avec son slot déjà renseigné.
+    private void equip(GamePlayer character, Item item) {
+        character.addItem(item);
+    }
+
+    private Item armor(String name, ArmorCategory category, int baseAc) {
+        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), name, null, ItemType.ARMOR, 5, category, baseAc);
+        Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.CHEST);
+        item.attachTemplate(template);
+        return item;
+    }
+
+    private Item shield() {
+        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Bouclier", null, ItemType.SHIELD, 3, null, 2);
+        Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.OFF_HAND);
+        item.attachTemplate(template);
+        return item;
+    }
+
     private GamePlayer character(int strength, int dexterity, int constitution, int intelligence, int wisdom,
             int charisma, int level) {
         return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Test", UUID.randomUUID(), Race.HUMAN,

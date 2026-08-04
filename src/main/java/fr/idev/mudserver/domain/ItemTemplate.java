@@ -10,13 +10,18 @@ public class ItemTemplate {
     private String description;
     private ItemType type;
     private int weight;
+    private ArmorCategory armorCategory;
+    private int baseAc;
 
-    public ItemTemplate(UUID id, String name, String description, ItemType type, int weight) {
+    public ItemTemplate(UUID id, String name, String description, ItemType type, int weight,
+            ArmorCategory armorCategory, int baseAc) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.type = type;
         this.weight = weight;
+        this.armorCategory = armorCategory;
+        this.baseAc = baseAc;
     }
 
     public UUID getId() {
@@ -59,6 +64,22 @@ public class ItemTemplate {
         this.weight = weight;
     }
 
+    public ArmorCategory getArmorCategory() {
+        return armorCategory;
+    }
+
+    public void setArmorCategory(ArmorCategory armorCategory) {
+        this.armorCategory = armorCategory;
+    }
+
+    public int getBaseAc() {
+        return baseAc;
+    }
+
+    public void setBaseAc(int baseAc) {
+        this.baseAc = baseAc;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -67,18 +88,19 @@ public class ItemTemplate {
         if (!(o instanceof ItemTemplate other)) {
             return false;
         }
-        return weight == other.weight && Objects.equals(id, other.id) && Objects.equals(name, other.name)
-                && Objects.equals(description, other.description) && type == other.type;
+        return weight == other.weight && baseAc == other.baseAc && Objects.equals(id, other.id)
+                && Objects.equals(name, other.name) && Objects.equals(description, other.description)
+                && type == other.type && armorCategory == other.armorCategory;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, type, weight);
+        return Objects.hash(id, name, description, type, weight, armorCategory, baseAc);
     }
 
     @Override
     public String toString() {
         return "ItemTemplate[id=" + id + ", name=" + name + ", description=" + description + ", type=" + type
-                + ", weight=" + weight + "]";
+                + ", weight=" + weight + ", armorCategory=" + armorCategory + ", baseAc=" + baseAc + "]";
     }
 }

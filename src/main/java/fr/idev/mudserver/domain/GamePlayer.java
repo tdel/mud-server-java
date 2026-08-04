@@ -93,6 +93,24 @@ public final class GamePlayer extends GameCharacter {
         return 2 + Math.floorDiv(level - 1, 4);
     }
 
+    @Override
+    public int getArmorClass() {
+        int ac = getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.CHEST).findFirst()
+                .map(this::armorAc).orElseGet(super::getArmorClass);
+
+        return ac + getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.OFF_HAND)
+                .mapToInt(Item::getBaseAc).sum();
+    }
+
+    private int armorAc(Item armor) {
+        int dexMod = getModifier(Attribute.DEXTERITY);
+        return switch (armor.getArmorCategory()) {
+            case LIGHT -> armor.getBaseAc() + dexMod;
+            case MEDIUM -> armor.getBaseAc() + Math.min(dexMod, 2);
+            case HEAVY -> armor.getBaseAc();
+        };
+    }
+
     public Connection getConnection() {
         return connection;
     }

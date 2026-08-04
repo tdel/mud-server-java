@@ -52,7 +52,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
     @Test
     void equippingANewWeaponUnequipsThePreviousOneInTheSameTransaction() {
-        ItemTemplate weaponTemplate = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3);
+        ItemTemplate weaponTemplate = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3, null, 0);
 
         Account account = new Account(UUID.randomUUID(), "erin", "hashed-password", null);
         accountDao.insert(account);
@@ -79,7 +79,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
     @Test
     void loadInventoryStillReturnsAnEquippedItemOnAFreshLoad() {
-        ItemTemplate weaponTemplate = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3);
+        ItemTemplate weaponTemplate = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3, null, 0);
         itemService.registerTemplate(weaponTemplate);
 
         Account account = new Account(UUID.randomUUID(), "gwen", "hashed-password", null);
@@ -105,7 +105,8 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
     @Test
     void loadInventoryAttachesTemplatesAndFeedsTheCharacterCache() {
-        ItemTemplate potionTemplate = new ItemTemplate(UUID.randomUUID(), "Potion de soin", null, ItemType.POTION, 1);
+        ItemTemplate potionTemplate = new ItemTemplate(UUID.randomUUID(), "Potion de soin", null, ItemType.POTION, 1,
+                null, 0);
         itemService.registerTemplate(potionTemplate);
 
         Account account = new Account(UUID.randomUUID(), "fay", "hashed-password", null);
@@ -125,7 +126,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
     @Test
     void addAndRemoveItemFromInventoryKeepTheCharacterAndRoomCachesInSync() {
-        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Torche", null, ItemType.MISC, 1);
+        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Torche", null, ItemType.MISC, 1, null, 0);
         itemService.registerTemplate(template);
 
         roomService.warmRooms();
@@ -153,7 +154,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
     @Test
     void warmRoomItemsAttachesTemplatesToItemsOnTheGround() {
-        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Bouclier", null, ItemType.ARMOR, 4);
+        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Bouclier", null, ItemType.ARMOR, 4, null, 0);
         itemService.registerTemplate(template);
 
         roomService.warmRooms();

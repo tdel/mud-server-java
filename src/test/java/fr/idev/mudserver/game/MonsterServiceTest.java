@@ -31,6 +31,7 @@ class MonsterServiceTest {
         assertThat(goblin.getMaxHealth()).isEqualTo(7);
         assertThat(goblin.getCurrentHealth()).isEqualTo(7);
         assertThat(goblin.getAttribute(Attribute.DEXTERITY)).isEqualTo(14);
+        assertThat(goblin.getArmorClass()).isEqualTo(15);
         assertThat(goblin.getCurrentRoom()).isEqualTo(clearing);
         assertThat(goblin.getDescription()).isNotBlank();
     }
@@ -49,7 +50,7 @@ class MonsterServiceTest {
         MonsterService isolated = new MonsterService(new ObjectMapper());
         UUID templateId = UUID.randomUUID();
         MonsterService.MonsterTemplateDefinition template = new MonsterService.MonsterTemplateDefinition(templateId,
-                "Test", "...", 5, TestAttributes.of(10, 10, 10, 10, 10, 10));
+                "Test", "...", 5, TestAttributes.of(10, 10, 10, 10, 10, 10), null);
         MonsterService.MonsterFileDefinition file = new MonsterService.MonsterFileDefinition(List.of(template),
                 List.of(new MonsterService.MonsterSpawnDefinition(UUID.randomUUID(), templateId, UUID.randomUUID())));
 

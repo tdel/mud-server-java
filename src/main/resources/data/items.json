@@ -3,18 +3,52 @@
         "id": "019fa0a5-80bf-7e84-87bf-5cf699c00315",
         "name": "Potion de soin",
         "type": "POTION",
-        "weight": 1
+        "weight": 1,
+        "baseAc": 0
     },
     {
         "id": "019fa0a5-80c0-7035-9c2d-113b09a275df",
         "name": "Epée courte",
         "type": "WEAPON",
-        "weight": 1
+        "weight": 1,
+        "baseAc": 0
     },
     {
         "id": "019faec6-116d-723d-b04c-76d51a2a2cb7",
         "name": "Casque de fer",
         "type": "HELMET",
-        "weight": 2
+        "weight": 2,
+        "baseAc": 0
+    },
+    {
+        "id": "019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518",
+        "name": "Armure de cuir",
+        "type": "ARMOR",
+        "weight": 5,
+        "armorCategory": "LIGHT",
+        "baseAc": 11
+    },
+    {
+        "id": "019fcf0d-1f8c-7d43-9e98-a9944b4ccefe",
+        "name": "Cotte de mailles",
+        "type": "ARMOR",
+        "weight": 10,
+        "armorCategory": "MEDIUM",
+        "baseAc": 13
+    },
+    {
+        "id": "019fcf0d-1f8d-7c4c-9275-33c4af4410a8",
+        "name": "Armure de plates",
+        "type": "ARMOR",
+        "weight": 30,
+        "armorCategory": "HEAVY",
+        "baseAc": 18
+    },
+    {
+        "id": "019fcf0d-1f8f-7d01-8e4f-fd592812a1a7",
+        "name": "Bouclier",
+        "type": "SHIELD",
+        "weight": 3,
+        "baseAc": 2
     }
 ]

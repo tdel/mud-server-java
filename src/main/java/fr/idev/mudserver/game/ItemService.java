@@ -12,6 +12,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import fr.idev.mudserver.domain.ArmorCategory;
 import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
@@ -65,7 +66,7 @@ public class ItemService {
                     });
             for (ItemTemplateDefinition definition : definitions) {
                 registerTemplate(new ItemTemplate(definition.id(), definition.name(), definition.description(),
-                        definition.type(), definition.weight()));
+                        definition.type(), definition.weight(), definition.armorCategory(), definition.baseAc()));
             }
         } catch (IOException | JacksonException e) {
             throw new IllegalStateException("Impossible de charger " + ITEM_TEMPLATE_RESOURCE, e);
@@ -145,6 +146,7 @@ public class ItemService {
         itemDao.updateSlot(event.item().getId(), null);
     }
 
-    private record ItemTemplateDefinition(UUID id, String name, String description, ItemType type, int weight) {
+    private record ItemTemplateDefinition(UUID id, String name, String description, ItemType type, int weight,
+            ArmorCategory armorCategory, int baseAc) {
     }
 }

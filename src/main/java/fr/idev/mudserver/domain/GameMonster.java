@@ -42,6 +42,12 @@ public final class GameMonster extends GameCharacter {
         return requireTemplate().getDescription();
     }
 
+    @Override
+    public int getArmorClass() {
+        Integer natural = requireTemplate().getNaturalArmorClass();
+        return natural != null ? natural : super.getArmorClass();
+    }
+
     private MonsterTemplate requireTemplate() {
         if (template == null) {
             throw new IllegalStateException("GameMonster " + getId() + " has no MonsterTemplate attached");

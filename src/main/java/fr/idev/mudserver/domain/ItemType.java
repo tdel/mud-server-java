@@ -3,7 +3,7 @@ package fr.idev.mudserver.domain;
 import java.util.Optional;
 
 public enum ItemType {
-    WEAPON, HELMET, ARMOR, PANTS, BOOTS, GLOVES, POTION, KEY, TOOL, MISC;
+    WEAPON, HELMET, ARMOR, PANTS, BOOTS, GLOVES, SHIELD, POTION, KEY, TOOL, MISC;
 
     public Optional<EquipmentSlot> equipmentSlot() {
         return switch (this) {
@@ -13,6 +13,7 @@ public enum ItemType {
             case PANTS -> Optional.of(EquipmentSlot.LEGS);
             case BOOTS -> Optional.of(EquipmentSlot.FEET);
             case GLOVES -> Optional.of(EquipmentSlot.HANDS);
+            case SHIELD -> Optional.of(EquipmentSlot.OFF_HAND);
             default -> Optional.empty();
         };
     }

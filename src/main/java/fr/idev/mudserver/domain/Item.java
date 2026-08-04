@@ -74,6 +74,14 @@ public class Item {
         return requireTemplate().getWeight();
     }
 
+    public ArmorCategory getArmorCategory() {
+        return requireTemplate().getArmorCategory();
+    }
+
+    public int getBaseAc() {
+        return requireTemplate().getBaseAc();
+    }
+
     private ItemTemplate requireTemplate() {
         if (template == null) {
             throw new IllegalStateException("Item " + id + " has no ItemTemplate attached");
