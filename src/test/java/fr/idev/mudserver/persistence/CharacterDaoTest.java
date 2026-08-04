@@ -11,6 +11,7 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.TestAttributes;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,7 +44,7 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     void insertsAndFindsById() {
         seedAccountAndRooms();
         Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA.getId(), Race.ORC,
-                14, 14, 14, 11, 12, 10, 11, 10);
+                1, 14, 14, TestAttributes.of(14, 11, 12, 10, 11, 10));
 
         characterDao.insert(character);
 
@@ -56,7 +57,7 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     void updatesCurrentRoom() {
         seedAccountAndRooms();
         Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA.getId(), Race.ORC,
-                14, 14, 14, 11, 12, 10, 11, 10);
+                1, 14, 14, TestAttributes.of(14, 11, 12, 10, 11, 10));
         characterDao.insert(character);
 
         characterDao.updateCurrentRoom(character.getId(), roomB.getId());
@@ -68,7 +69,7 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     void updatesProgress() {
         seedAccountAndRooms();
         Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA.getId(), Race.ORC,
-                14, 14, 14, 11, 12, 10, 11, 10);
+                1, 14, 14, TestAttributes.of(14, 11, 12, 10, 11, 10));
         characterDao.insert(character);
 
         character.setCurrentRoomId(roomB.getId());
@@ -82,7 +83,7 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     void deletesById() {
         seedAccountAndRooms();
         Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA.getId(), Race.ORC,
-                14, 14, 14, 11, 12, 10, 11, 10);
+                1, 14, 14, TestAttributes.of(14, 11, 12, 10, 11, 10));
         characterDao.insert(character);
 
         characterDao.deleteById(character.getId());

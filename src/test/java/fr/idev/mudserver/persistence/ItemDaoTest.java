@@ -15,6 +15,7 @@ import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.ItemType;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.TestAttributes;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,8 +48,8 @@ class ItemDaoTest extends AbstractIntegrationTest {
         roomDao.insert(room);
         Account account = new Account(UUID.randomUUID(), "dave", "hashed-password", null);
         accountDao.insert(account);
-        character = new Character(UUID.randomUUID(), account.getId(), "Dave le Nain", room.getId(), Race.DWARF, 12, 12,
-                12, 10, 12, 10, 10, 10);
+        character = new Character(UUID.randomUUID(), account.getId(), "Dave le Nain", room.getId(), Race.DWARF, 1, 12,
+                12, TestAttributes.of(12, 10, 12, 10, 10, 10));
         characterDao.insert(character);
     }
 

@@ -2,13 +2,16 @@ package fr.idev.mudserver.persistence;
 
 import static fr.idev.mudserver.persistence.jooq.Tables.CHARACTER;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
+import fr.idev.mudserver.domain.Attribute;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.persistence.jooq.tables.records.CharacterRecord;
@@ -24,12 +27,15 @@ public class CharacterDao {
 
     public void insert(Character character) {
         dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_ROOM_ID,
-                CHARACTER.RACE, CHARACTER.CURRENT_HEALTH, CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY,
-                CHARACTER.CONSTITUTION, CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA)
+                CHARACTER.RACE, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH, CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH,
+                CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION, CHARACTER.INTELLIGENCE, CHARACTER.WISDOM,
+                CHARACTER.CHARISMA)
                 .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentRoomId(),
-                        character.getRace().name(), character.getCurrentHealth(), character.getMaxHealth(),
-                        character.getStrength(), character.getDexterity(), character.getConstitution(),
-                        character.getIntelligence(), character.getWisdom(), character.getCharisma())
+                        character.getRace().name(), character.getLevel(), character.getCurrentHealth(),
+                        character.getMaxHealth(), character.getAttribute(Attribute.STRENGTH),
+                        character.getAttribute(Attribute.DEXTERITY), character.getAttribute(Attribute.CONSTITUTION),
+                        character.getAttribute(Attribute.INTELLIGENCE), character.getAttribute(Attribute.WISDOM),
+                        character.getAttribute(Attribute.CHARISMA))
                 .execute();
     }
 
@@ -65,9 +71,16 @@ public class CharacterDao {
     }
 
     private static Character toDomain(CharacterRecord record) {
+        Map<Attribute, Integer> attributes = new EnumMap<>(Attribute.class);
+        attributes.put(Attribute.STRENGTH, record.getStrength());
+        attributes.put(Attribute.DEXTERITY, record.getDexterity());
+        attributes.put(Attribute.CONSTITUTION, record.getConstitution());
+        attributes.put(Attribute.INTELLIGENCE, record.getIntelligence());
+        attributes.put(Attribute.WISDOM, record.getWisdom());
+        attributes.put(Attribute.CHARISMA, record.getCharisma());
+
         return new Character(record.getId(), record.getAccountId(), record.getName(), record.getCurrentRoomId(),
-                Race.valueOf(record.getRace()), record.getCurrentHealth(), record.getMaxHealth(), record.getStrength(),
-                record.getDexterity(), record.getConstitution(), record.getIntelligence(), record.getWisdom(),
-                record.getCharisma());
+                Race.valueOf(record.getRace()), record.getLevel(), record.getCurrentHealth(), record.getMaxHealth(),
+                attributes);
     }
 }

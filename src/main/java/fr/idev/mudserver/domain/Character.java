@@ -1,7 +1,9 @@
 package fr.idev.mudserver.domain;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,34 +34,26 @@ public class Character {
     private String name;
     private UUID currentRoomId;
     private Race race;
+    private int level;
     private int currentHealth;
     private int maxHealth;
-    private int strength;
-    private int dexterity;
-    private int constitution;
-    private int intelligence;
-    private int wisdom;
-    private int charisma;
+    private final Map<Attribute, Integer> attributes;
 
     private Connection connection;
     private Room currentRoom;
     private final List<Item> inventory = new CopyOnWriteArrayList<>();
 
-    public Character(UUID id, UUID accountId, String name, UUID currentRoomId, Race race, int currentHealth,
-            int maxHealth, int strength, int dexterity, int constitution, int intelligence, int wisdom, int charisma) {
+    public Character(UUID id, UUID accountId, String name, UUID currentRoomId, Race race, int level, int currentHealth,
+            int maxHealth, Map<Attribute, Integer> attributes) {
         this.id = id;
         this.accountId = accountId;
         this.name = name;
         this.currentRoomId = currentRoomId;
         this.race = race;
+        this.level = level;
         this.currentHealth = currentHealth;
         this.maxHealth = maxHealth;
-        this.strength = strength;
-        this.dexterity = dexterity;
-        this.constitution = constitution;
-        this.intelligence = intelligence;
-        this.wisdom = wisdom;
-        this.charisma = charisma;
+        this.attributes = new EnumMap<>(attributes);
     }
 
     public UUID getId() {
@@ -102,6 +96,26 @@ public class Character {
         this.race = race;
     }
 
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public int getAttribute(Attribute attribute) {
+        return attributes.get(attribute);
+    }
+
+    public int getModifier(Attribute attribute) {
+        return Math.floorDiv(getAttribute(attribute) - 10, 2);
+    }
+
+    public int getProficiencyBonus() {
+        return 2 + Math.floorDiv(level - 1, 4);
+    }
+
     public int getCurrentHealth() {
         return currentHealth;
     }
@@ -116,54 +130,6 @@ public class Character {
 
     public void setMaxHealth(int maxHealth) {
         this.maxHealth = maxHealth;
-    }
-
-    public int getStrength() {
-        return strength;
-    }
-
-    public void setStrength(int strength) {
-        this.strength = strength;
-    }
-
-    public int getDexterity() {
-        return dexterity;
-    }
-
-    public void setDexterity(int dexterity) {
-        this.dexterity = dexterity;
-    }
-
-    public int getConstitution() {
-        return constitution;
-    }
-
-    public void setConstitution(int constitution) {
-        this.constitution = constitution;
-    }
-
-    public int getIntelligence() {
-        return intelligence;
-    }
-
-    public void setIntelligence(int intelligence) {
-        this.intelligence = intelligence;
-    }
-
-    public int getWisdom() {
-        return wisdom;
-    }
-
-    public void setWisdom(int wisdom) {
-        this.wisdom = wisdom;
-    }
-
-    public int getCharisma() {
-        return charisma;
-    }
-
-    public void setCharisma(int charisma) {
-        this.charisma = charisma;
     }
 
     public Connection getConnection() {
@@ -339,25 +305,21 @@ public class Character {
         if (!(o instanceof Character other)) {
             return false;
         }
-        return currentHealth == other.currentHealth && maxHealth == other.maxHealth && strength == other.strength
-                && dexterity == other.dexterity && constitution == other.constitution
-                && intelligence == other.intelligence && wisdom == other.wisdom && charisma == other.charisma
+        return level == other.level && currentHealth == other.currentHealth && maxHealth == other.maxHealth
                 && Objects.equals(id, other.id) && Objects.equals(accountId, other.accountId)
                 && Objects.equals(name, other.name) && Objects.equals(currentRoomId, other.currentRoomId)
-                && race == other.race;
+                && race == other.race && Objects.equals(attributes, other.attributes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, accountId, name, currentRoomId, race, currentHealth, maxHealth, strength, dexterity,
-                constitution, intelligence, wisdom, charisma);
+        return Objects.hash(id, accountId, name, currentRoomId, race, level, currentHealth, maxHealth, attributes);
     }
 
     @Override
     public String toString() {
         return "Character[id=" + id + ", accountId=" + accountId + ", name=" + name + ", currentRoomId=" + currentRoomId
-                + ", race=" + race + ", currentHealth=" + currentHealth + ", maxHealth=" + maxHealth + ", strength="
-                + strength + ", dexterity=" + dexterity + ", constitution=" + constitution + ", intelligence="
-                + intelligence + ", wisdom=" + wisdom + ", charisma=" + charisma + "]";
+                + ", race=" + race + ", level=" + level + ", currentHealth=" + currentHealth + ", maxHealth="
+                + maxHealth + ", attributes=" + attributes + "]";
     }
 }

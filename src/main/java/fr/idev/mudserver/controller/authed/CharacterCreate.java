@@ -1,25 +1,18 @@
 package fr.idev.mudserver.controller.authed;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.Attribute;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.RoomService;
-import fr.idev.mudserver.game.dice.DiceRoll;
-import fr.idev.mudserver.game.dice.DiceRoller;
+import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -29,23 +22,17 @@ import fr.idev.mudserver.network.message.authed.ChooseRace;
 import fr.idev.mudserver.network.message.authed.InvalidRace;
 import fr.idev.mudserver.network.message.authed.NoStartingRoom;
 import fr.idev.mudserver.network.message.ingame.CharacterStats;
-import fr.idev.mudserver.persistence.CharacterDao;
 
 @Component
 public class CharacterCreate implements ControllerHandler {
 
-    private final CharacterDao characterDao;
-    private final RoomService roomService;
     private final CharacterList characterListAction;
-    private final DiceRoller diceRoller;
+    private final GameWorld gameWorld;
     private final AuthWorld authWorld;
 
-    public CharacterCreate(CharacterDao characterDao, RoomService roomService, CharacterList characterListAction,
-            DiceRoller diceRoller, AuthWorld authWorld) {
-        this.characterDao = characterDao;
-        this.roomService = roomService;
+    public CharacterCreate(CharacterList characterListAction, GameWorld gameWorld, AuthWorld authWorld) {
         this.characterListAction = characterListAction;
-        this.diceRoller = diceRoller;
+        this.gameWorld = gameWorld;
         this.authWorld = authWorld;
     }
 
@@ -71,33 +58,26 @@ public class CharacterCreate implements ControllerHandler {
 
         Account account = authWorld.account(connection);
 
-        if (characterDao.findByAccountIdAndName(account.getId(), name).isPresent()) {
+        if (gameWorld.isCharacterNameTaken(account.getId(), name)) {
             connection.send(new CharacterAlreadyExists(name));
             characterListAction.onReceive(connection, "");
             return;
         }
 
-        Optional<Room> startingRoom = roomService.startingRoom();
-        if (startingRoom.isEmpty()) {
-            connection.send(new NoStartingRoom());
-            characterListAction.onReceive(connection, "");
-            return;
-        }
-
-        promptRace(connection, account, startingRoom.get(), name);
+        promptRace(connection, account, name);
     }
 
-    private void promptRace(Connection connection, Account account, Room startingRoom, String name) {
+    private void promptRace(Connection connection, Account account, String name) {
         connection.requestBlocking(new ChooseRace(), line -> {
             Race race = parseRace(line);
 
             if (race == null) {
                 connection.send(new InvalidRace(line.trim()));
-                promptRace(connection, account, startingRoom, name);
+                promptRace(connection, account, name);
                 return;
             }
 
-            createCharacter(connection, account, startingRoom, name, race);
+            createCharacter(connection, account, name, race);
         });
     }
 
@@ -110,43 +90,11 @@ public class CharacterCreate implements ControllerHandler {
         }
     }
 
-    private void createCharacter(Connection connection, Account account, Room startingRoom, String name, Race race) {
-        Map<Attribute, Integer> scores = rollAttributeScores();
-
-        for (Map.Entry<Attribute, Integer> bonus : race.attributeScoreBonuses().entrySet()) {
-            scores.merge(bonus.getKey(), bonus.getValue(), Integer::sum);
-        }
-
-        Character character = new Character(UUID.randomUUID(), account.getId(), name, startingRoom.getId(), race, 100,
-                100, scores.get(Attribute.STRENGTH), scores.get(Attribute.DEXTERITY),
-                scores.get(Attribute.CONSTITUTION), scores.get(Attribute.INTELLIGENCE), scores.get(Attribute.WISDOM),
-                scores.get(Attribute.CHARISMA));
-
-        characterDao.insert(character);
-        character.spawnToRoom(startingRoom);
+    private void createCharacter(Connection connection, Account account, String name, Race race) {
+        Character character = gameWorld.createCharacter(account, name, race);
 
         connection.send(new CharacterCreated(name));
         connection.send(new CharacterStats(character));
         characterListAction.onReceive(connection, "");
-    }
-
-    private Map<Attribute, Integer> rollAttributeScores() {
-        Map<Attribute, Integer> scores = new LinkedHashMap<>();
-        for (Attribute attribute : Attribute.values()) {
-            scores.put(attribute, rollAttributeScore());
-        }
-        return scores;
-    }
-
-    private int rollAttributeScore() {
-        // Official 5e method: roll 4d6, drop the lowest single die, sum the rest.
-        DiceRoll roll = diceRoller.roll("4d6");
-        int[] dice = roll.rolls().clone();
-        Arrays.sort(dice);
-        int sum = 0;
-        for (int i = 1; i < dice.length; i++) {
-            sum += dice[i];
-        }
-        return sum;
     }
 }

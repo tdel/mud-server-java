@@ -1,14 +1,19 @@
 package fr.idev.mudserver.game;
 
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import fr.idev.mudserver.persistence.CharacterDao;
+import fr.idev.mudserver.domain.*;
+import fr.idev.mudserver.domain.Character;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.event.DomainEventPublisher;
+import fr.idev.mudserver.domain.event.NewCharacterCreated;
+import fr.idev.mudserver.game.dice.DiceRoll;
+import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.Connection;
+import fr.idev.mudserver.persistence.CharacterDao;
 
 /**
  * Suit tous les joueurs actuellement dans le monde de jeu, pour toute la durée
@@ -24,11 +29,14 @@ public class GameWorld {
     private final CharacterDao characterDao;
     private final RoomService roomService;
     private final ItemService itemService;
+    private final DiceRoller diceRoller;
 
-    public GameWorld(CharacterDao characterDao, RoomService roomService, ItemService itemService) {
+    public GameWorld(CharacterDao characterDao, RoomService roomService, ItemService itemService,
+            DiceRoller diceRoller) {
         this.characterDao = characterDao;
         this.roomService = roomService;
         this.itemService = itemService;
+        this.diceRoller = diceRoller;
     }
 
     /**
@@ -68,5 +76,51 @@ public class GameWorld {
 
     public boolean isAlreadyConnected(UUID accountId) {
         return characters.values().stream().anyMatch(character -> character.getAccountId().equals(accountId));
+    }
+
+    public boolean isCharacterNameTaken(UUID accountId, String name) {
+        return characterDao.findByAccountIdAndName(accountId, name).isPresent();
+    }
+
+    public Character createCharacter(Account account, String name, Race race) {
+        Optional<Room> startingRoom = roomService.startingRoom();
+
+        Map<Attribute, Integer> scores = rollAttributeScores();
+        for (Map.Entry<Attribute, Integer> bonus : race.attributeScoreBonuses().entrySet()) {
+            scores.merge(bonus.getKey(), bonus.getValue(), Integer::sum);
+        }
+
+        Character character = new Character(UUID.randomUUID(), account.getId(), name, startingRoom.get().getId(), race,
+                1, 100, 100, scores);
+
+        DomainEventPublisher.publish(new NewCharacterCreated(character));
+        character.spawnToRoom(startingRoom.get());
+
+        return character;
+    }
+
+    private Map<Attribute, Integer> rollAttributeScores() {
+        Map<Attribute, Integer> scores = new LinkedHashMap<>();
+        for (Attribute attribute : Attribute.values()) {
+            scores.put(attribute, rollAttributeScore());
+        }
+        return scores;
+    }
+
+    private int rollAttributeScore() {
+        // Official 5e method: roll 4d6, drop the lowest single die, sum the rest.
+        DiceRoll roll = diceRoller.roll("4d6");
+        int[] dice = roll.rolls().clone();
+        Arrays.sort(dice);
+        int sum = 0;
+        for (int i = 1; i < dice.length; i++) {
+            sum += dice[i];
+        }
+        return sum;
+    }
+
+    @EventListener
+    void onNewCharacterCreated(NewCharacterCreated event) {
+        characterDao.insert(event.character());
     }
 }
