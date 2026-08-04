@@ -18,12 +18,8 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.ClassService;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.ItemService;
-import fr.idev.mudserver.game.LevelService;
-import fr.idev.mudserver.game.RaceService;
-import fr.idev.mudserver.game.RoomService;
+import fr.idev.mudserver.game.WarmupRunner;
 
 /**
  * Démarré sur {@link ApplicationReadyEvent} plutôt qu'en tant que commande
@@ -36,7 +32,11 @@ import fr.idev.mudserver.game.RoomService;
  * retourner. Sans le flag {@code app.telnet.enabled=false} (voir
  * {@code src/test/resources/application.yml}), n'importe quel
  * {@code @SpringBootTest} resterait bloqué indéfiniment au démarrage du
- * contexte.
+ * contexte. Le peuplement des caches statiques (rooms, items, races, classes,
+ * niveaux) ne se fait plus ici : c'est la responsabilité de
+ * {@link WarmupRunner}, un {@code ApplicationRunner} garanti de s'exécuter
+ * avant que {@code ApplicationReadyEvent} ne soit publié, donc avant cette
+ * méthode.
  */
 @Component
 @ConditionalOnProperty(prefix = "app.telnet", name = "enabled", havingValue = "true", matchIfMissing = true)
@@ -48,38 +48,19 @@ public class TelnetServer {
     private final ControllerDispatcher controllerDispatcher;
     private final AuthWorld authWorld;
     private final GameWorld gameWorld;
-    private final RoomService roomService;
-    private final ItemService itemService;
-    private final RaceService raceService;
-    private final ClassService classService;
-    private final LevelService levelService;
     private final int port;
 
     public TelnetServer(ExecutorService virtualThreadExecutor, ControllerDispatcher controllerDispatcher,
-            AuthWorld authWorld, GameWorld gameWorld, RoomService roomService, ItemService itemService,
-            RaceService raceService, ClassService classService, LevelService levelService,
-            @Value("${app.telnet.port}") int port) {
+            AuthWorld authWorld, GameWorld gameWorld, @Value("${app.telnet.port}") int port) {
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.controllerDispatcher = controllerDispatcher;
         this.authWorld = authWorld;
         this.gameWorld = gameWorld;
-        this.roomService = roomService;
-        this.itemService = itemService;
-        this.raceService = raceService;
-        this.classService = classService;
-        this.levelService = levelService;
         this.port = port;
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void start() throws InterruptedException {
-        roomService.warmRooms();
-        itemService.warmItemTemplates();
-        itemService.warmRoomItems(roomService.allRooms());
-        raceService.warmRaceBonuses();
-        classService.warmClassHitDice();
-        levelService.warmXpThresholds();
-
         EventLoopGroup bossGroup = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
         EventLoopGroup workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
         try {
