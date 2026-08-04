@@ -21,7 +21,6 @@ import fr.idev.mudserver.domain.TestAttributes;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 import fr.idev.mudserver.persistence.ItemDao;
-import fr.idev.mudserver.persistence.RoomDao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,9 +46,6 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
     private ItemDao itemDao;
 
     @Autowired
-    private RoomDao roomDao;
-
-    @Autowired
     private AccountDao accountDao;
 
     @Autowired
@@ -60,9 +56,8 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
 
     @Test
     void exactlyOneCharacterWinsTheRace() throws Exception {
-        Room room = new Room(UUID.randomUUID(), "Race test room", "...", null);
-        roomDao.insert(room);
         roomService.warmRooms();
+        Room room = roomService.allRooms().iterator().next();
 
         Character alice = seedCharacter(room, "race-alice-" + UUID.randomUUID());
         Character bob = seedCharacter(room, "race-bob-" + UUID.randomUUID());

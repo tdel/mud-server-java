@@ -1,0 +1,37 @@
+[
+    {
+        "id": "5e4ada37-37e1-438c-9233-581f10c055c7",
+        "name": "Place du village",
+        "description": "Une place pavée au centre du village. Une fontaine gargouille en son centre.",
+        "isStartingRoom": true,
+        "exits": [
+            { "direction": "nord", "targetRoomId": "9a884ac7-b954-4cd6-ab67-c677d472cb0f" },
+            { "direction": "est", "targetRoomId": "e1da77bd-f0b3-4d5a-95da-e8765c4fc973" }
+        ]
+    },
+    {
+        "id": "9a884ac7-b954-4cd6-ab67-c677d472cb0f",
+        "name": "Orée de la forêt",
+        "description": "Les arbres se resserrent au nord, la lumière du village faiblit derrière vous.",
+        "exits": [
+            { "direction": "sud", "targetRoomId": "5e4ada37-37e1-438c-9233-581f10c055c7" },
+            { "direction": "est", "targetRoomId": "7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5" }
+        ]
+    },
+    {
+        "id": "e1da77bd-f0b3-4d5a-95da-e8765c4fc973",
+        "name": "Taverne du Sanglier Roux",
+        "description": "Une salle enfumée, chaleureuse, où résonnent quelques rires avinés.",
+        "exits": [
+            { "direction": "ouest", "targetRoomId": "5e4ada37-37e1-438c-9233-581f10c055c7" }
+        ]
+    },
+    {
+        "id": "7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5",
+        "name": "Clairière",
+        "description": "Une clairière baignée de soleil, au cœur de la forêt.",
+        "exits": [
+            { "direction": "ouest", "targetRoomId": "9a884ac7-b954-4cd6-ab67-c677d472cb0f" }
+        ]
+    }
+]

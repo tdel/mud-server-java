@@ -21,7 +21,6 @@ import fr.idev.mudserver.domain.TestAttributes;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 import fr.idev.mudserver.persistence.ItemDao;
-import fr.idev.mudserver.persistence.RoomDao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,9 +42,6 @@ class ItemServiceTest extends AbstractIntegrationTest {
     private ItemDao itemDao;
 
     @Autowired
-    private RoomDao roomDao;
-
-    @Autowired
     private AccountDao accountDao;
 
     @Autowired
@@ -58,11 +54,9 @@ class ItemServiceTest extends AbstractIntegrationTest {
     void equippingANewWeaponUnequipsThePreviousOneInTheSameTransaction() {
         ItemTemplate weaponTemplate = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3);
 
-        Room room = new Room(UUID.randomUUID(), "Salle A", "...", true);
-        roomDao.insert(room);
         Account account = new Account(UUID.randomUUID(), "erin", "hashed-password", null);
         accountDao.insert(account);
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Erin", room.getId(), Race.HUMAN,
+        Character character = new Character(UUID.randomUUID(), account.getId(), "Erin", UUID.randomUUID(), Race.HUMAN,
                 CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
 
@@ -88,11 +82,9 @@ class ItemServiceTest extends AbstractIntegrationTest {
         ItemTemplate weaponTemplate = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3);
         itemService.registerTemplate(weaponTemplate);
 
-        Room room = new Room(UUID.randomUUID(), "Salle A", "...", true);
-        roomDao.insert(room);
         Account account = new Account(UUID.randomUUID(), "gwen", "hashed-password", null);
         accountDao.insert(account);
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Gwen", room.getId(), Race.HUMAN,
+        Character character = new Character(UUID.randomUUID(), account.getId(), "Gwen", UUID.randomUUID(), Race.HUMAN,
                 CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
 
@@ -116,11 +108,9 @@ class ItemServiceTest extends AbstractIntegrationTest {
         ItemTemplate potionTemplate = new ItemTemplate(UUID.randomUUID(), "Potion de soin", null, ItemType.POTION, 1);
         itemService.registerTemplate(potionTemplate);
 
-        Room room = new Room(UUID.randomUUID(), "Salle B", "...", true);
-        roomDao.insert(room);
         Account account = new Account(UUID.randomUUID(), "fay", "hashed-password", null);
         accountDao.insert(account);
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Fay", room.getId(), Race.HUMAN,
+        Character character = new Character(UUID.randomUUID(), account.getId(), "Fay", UUID.randomUUID(), Race.HUMAN,
                 CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
 
@@ -138,18 +128,16 @@ class ItemServiceTest extends AbstractIntegrationTest {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Torche", null, ItemType.MISC, 1);
         itemService.registerTemplate(template);
 
-        Room room = new Room(UUID.randomUUID(), "Salle C", "...", null);
-        roomDao.insert(room);
         roomService.warmRooms();
-        Room warmedRoom = room(room.getId());
+        Room warmedRoom = roomService.allRooms().iterator().next();
         Account account = new Account(UUID.randomUUID(), "gus", "hashed-password", null);
         accountDao.insert(account);
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Gus", room.getId(), Race.HUMAN,
+        Character character = new Character(UUID.randomUUID(), account.getId(), "Gus", warmedRoom.getId(), Race.HUMAN,
                 CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
         warmedRoom.join(character);
 
-        Item torch = new Item(UUID.randomUUID(), template.getId(), room.getId(), null, null);
+        Item torch = new Item(UUID.randomUUID(), template.getId(), warmedRoom.getId(), null, null);
         itemDao.insert(torch);
         itemService.warmRoomItems(roomService.allRooms());
         Item torchWithTemplate = warmedRoom.findOneByName("Torche").orElseThrow();
@@ -168,9 +156,8 @@ class ItemServiceTest extends AbstractIntegrationTest {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Bouclier", null, ItemType.ARMOR, 4);
         itemService.registerTemplate(template);
 
-        Room room = new Room(UUID.randomUUID(), "Salle D", "...", null);
-        roomDao.insert(room);
         roomService.warmRooms();
+        Room room = roomService.allRooms().iterator().next();
 
         Item shield = new Item(UUID.randomUUID(), template.getId(), room.getId(), null, null);
         itemDao.insert(shield);

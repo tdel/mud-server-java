@@ -13,16 +13,12 @@ import fr.idev.mudserver.domain.CharacterClass;
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.Race;
-import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.TestAttributes;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
 class ItemDaoTest extends AbstractIntegrationTest {
-
-    @Autowired
-    private RoomDao roomDao;
 
     @Autowired
     private AccountDao accountDao;
@@ -34,16 +30,15 @@ class ItemDaoTest extends AbstractIntegrationTest {
     private ItemDao itemDao;
 
     private UUID templateId;
-    private Room room;
+    private UUID roomId;
     private Character character;
 
     private void seedTemplateRoomAndCharacter() {
         templateId = UUID.randomUUID();
-        room = new Room(UUID.randomUUID(), "Salle A", "...", true);
-        roomDao.insert(room);
+        roomId = UUID.randomUUID();
         Account account = new Account(UUID.randomUUID(), "dave", "hashed-password", null);
         accountDao.insert(account);
-        character = new Character(UUID.randomUUID(), account.getId(), "Dave le Nain", room.getId(), Race.DWARF,
+        character = new Character(UUID.randomUUID(), account.getId(), "Dave le Nain", roomId, Race.DWARF,
                 CharacterClass.FIGHTER, 1, 12, 12, TestAttributes.of(12, 10, 12, 10, 10, 10));
         characterDao.insert(character);
     }
@@ -51,18 +46,18 @@ class ItemDaoTest extends AbstractIntegrationTest {
     @Test
     void insertsAndFindsById() {
         seedTemplateRoomAndCharacter();
-        Item item = new Item(UUID.randomUUID(), templateId, room.getId(), null, null);
+        Item item = new Item(UUID.randomUUID(), templateId, roomId, null, null);
 
         itemDao.insert(item);
 
         assertThat(itemDao.findById(item.getId())).contains(item);
-        assertThat(itemDao.findByRoomId(room.getId())).containsExactly(item);
+        assertThat(itemDao.findByRoomId(roomId)).containsExactly(item);
     }
 
     @Test
     void assignToCharacterClearsRoomAndSlot() {
         seedTemplateRoomAndCharacter();
-        Item item = new Item(UUID.randomUUID(), templateId, room.getId(), null, null);
+        Item item = new Item(UUID.randomUUID(), templateId, roomId, null, null);
         itemDao.insert(item);
 
         itemDao.assignToCharacter(item.getId(), character.getId());
@@ -79,10 +74,10 @@ class ItemDaoTest extends AbstractIntegrationTest {
         Item item = new Item(UUID.randomUUID(), templateId, null, character.getId(), null);
         itemDao.insert(item);
 
-        itemDao.assignToRoom(item.getId(), room.getId());
+        itemDao.assignToRoom(item.getId(), roomId);
 
         Item updated = itemDao.findById(item.getId()).orElseThrow();
-        assertThat(updated.getRoomId()).isEqualTo(room.getId());
+        assertThat(updated.getRoomId()).isEqualTo(roomId);
         assertThat(updated.getCharacterId()).isNull();
     }
 

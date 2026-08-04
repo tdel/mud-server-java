@@ -74,7 +74,6 @@ public class TelnetServer {
     @EventListener(ApplicationReadyEvent.class)
     public void start() throws InterruptedException {
         roomService.warmRooms();
-        roomService.warmRoomExits(roomService.allRooms());
         itemService.warmItemTemplates();
         itemService.warmRoomItems(roomService.allRooms());
         raceService.warmRaceBonuses();

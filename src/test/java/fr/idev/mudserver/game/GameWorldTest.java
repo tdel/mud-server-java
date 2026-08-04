@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
@@ -16,7 +15,6 @@ import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
-import fr.idev.mudserver.persistence.RoomDao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,14 +25,14 @@ import static org.assertj.core.api.Assertions.assertThat;
  * l'indirection par l'événement.
  *
  * <p>
- * {@code @DirtiesContext} : {@code RoomService.warmRooms()} accumule dans un
- * cache mémoire jamais vidé, que {@code @Transactional} ne peut pas annuler (ce
- * n'est pas de l'état DB) — sans ça, la starting room insérée ici pollue le
- * singleton {@code RoomService} pour les classes de test suivantes (ex:
- * {@code RoomServiceTest#startingRoomIsEmptyWhenNoRoomIsMarkedAsStarting}).
+ * Pas besoin de {@code @DirtiesContext} : {@code RoomService.warmRooms()}
+ * recharge désormais le même ensemble fixe de rooms depuis
+ * {@code data/rooms.json} à chaque appel (chaque room est reconstruite, pas
+ * accumulée), donc rejouer {@code warmRooms()} ici ne laisse aucun état
+ * arbitraire qui pourrait polluer le singleton {@code RoomService} pour les
+ * classes de test suivantes.
  */
 @Transactional
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class GameWorldTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -42,9 +40,6 @@ class GameWorldTest extends AbstractIntegrationTest {
 
     @Autowired
     private AccountDao accountDao;
-
-    @Autowired
-    private RoomDao roomDao;
 
     @Autowired
     private RoomService roomService;
@@ -62,9 +57,8 @@ class GameWorldTest extends AbstractIntegrationTest {
     void createCharacterRollsScoresAppliesRaceBonusesPersistsAndSpawnsToTheStartingRoom() {
         Account account = new Account(UUID.randomUUID(), "hilde", "hashed-password", null);
         accountDao.insert(account);
-        Room startingRoom = new Room(UUID.randomUUID(), "Place du village", "...", true);
-        roomDao.insert(startingRoom);
         roomService.warmRooms();
+        Room startingRoom = roomService.startingRoom().orElseThrow();
         raceService.warmRaceBonuses();
         classService.warmClassHitDice();
 

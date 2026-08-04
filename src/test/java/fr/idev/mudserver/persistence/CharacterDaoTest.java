@@ -11,7 +11,6 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.CharacterClass;
 import fr.idev.mudserver.domain.Race;
-import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.TestAttributes;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,28 +22,23 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     private AccountDao accountDao;
 
     @Autowired
-    private RoomDao roomDao;
-
-    @Autowired
     private CharacterDao characterDao;
 
     private Account account;
-    private Room roomA;
-    private Room roomB;
+    private UUID roomA;
+    private UUID roomB;
 
     private void seedAccountAndRooms() {
         account = new Account(UUID.randomUUID(), "carol", "hashed-password", null);
         accountDao.insert(account);
-        roomA = new Room(UUID.randomUUID(), "Salle A", "...", true);
-        roomB = new Room(UUID.randomUUID(), "Salle B", "...", null);
-        roomDao.insert(roomA);
-        roomDao.insert(roomB);
+        roomA = UUID.randomUUID();
+        roomB = UUID.randomUUID();
     }
 
     @Test
     void insertsAndFindsById() {
         seedAccountAndRooms();
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA.getId(), Race.ORC,
+        Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA, Race.ORC,
                 CharacterClass.BARBARIAN, 1, 14, 14, TestAttributes.of(14, 11, 12, 10, 11, 10));
 
         characterDao.insert(character);
@@ -57,23 +51,23 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     @Test
     void updatesCurrentRoom() {
         seedAccountAndRooms();
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA.getId(), Race.ORC,
+        Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA, Race.ORC,
                 CharacterClass.BARBARIAN, 1, 14, 14, TestAttributes.of(14, 11, 12, 10, 11, 10));
         characterDao.insert(character);
 
-        characterDao.updateCurrentRoom(character.getId(), roomB.getId());
+        characterDao.updateCurrentRoom(character.getId(), roomB);
 
-        assertThat(characterDao.findById(character.getId())).map(Character::getCurrentRoomId).contains(roomB.getId());
+        assertThat(characterDao.findById(character.getId())).map(Character::getCurrentRoomId).contains(roomB);
     }
 
     @Test
     void updatesProgress() {
         seedAccountAndRooms();
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA.getId(), Race.ORC,
+        Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA, Race.ORC,
                 CharacterClass.BARBARIAN, 1, 14, 14, TestAttributes.of(14, 11, 12, 10, 11, 10));
         characterDao.insert(character);
 
-        character.setCurrentRoomId(roomB.getId());
+        character.setCurrentRoomId(roomB);
         character.setCurrentHealth(7);
         characterDao.update(character);
 
@@ -83,7 +77,7 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     @Test
     void deletesById() {
         seedAccountAndRooms();
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA.getId(), Race.ORC,
+        Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA, Race.ORC,
                 CharacterClass.BARBARIAN, 1, 14, 14, TestAttributes.of(14, 11, 12, 10, 11, 10));
         characterDao.insert(character);
 

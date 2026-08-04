@@ -1,5 +1,6 @@
 package fr.idev.mudserver.game;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -16,19 +17,19 @@ import fr.idev.mudserver.domain.RoomExit;
 import fr.idev.mudserver.domain.TestAttributes;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
-import fr.idev.mudserver.persistence.RoomDao;
-import fr.idev.mudserver.persistence.RoomExitDao;
+import tools.jackson.databind.ObjectMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Transactional
 class RoomServiceTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private RoomService roomService;
+    private static final UUID VILLAGE_SQUARE_ID = UUID.fromString("5e4ada37-37e1-438c-9233-581f10c055c7");
+    private static final UUID FOREST_EDGE_ID = UUID.fromString("9a884ac7-b954-4cd6-ab67-c677d472cb0f");
 
     @Autowired
-    private RoomDao roomDao;
+    private RoomService roomService;
 
     @Autowired
     private AccountDao accountDao;
@@ -36,87 +37,81 @@ class RoomServiceTest extends AbstractIntegrationTest {
     @Autowired
     private CharacterDao characterDao;
 
-    @Autowired
-    private RoomExitDao roomExitDao;
-
     @Test
-    void warmRoomsPopulatesTheCacheFromTheDatabase() {
-        Room room = new Room(UUID.randomUUID(), "Salle A", "...", null);
-        roomDao.insert(room);
-
+    void warmRoomsLoadsTheRealCatalogFromJson() {
         roomService.warmRooms();
 
-        assertThat(roomService.allRooms()).contains(room);
+        Room villageSquare = room(VILLAGE_SQUARE_ID);
+        assertThat(villageSquare.getName()).isEqualTo("Place du village");
+        assertThat(villageSquare.isStartingRoom()).isTrue();
+        assertThat(villageSquare.findOneByDirection("nord")).map(RoomExit::getTargetRoom).map(Room::getId)
+                .contains(FOREST_EDGE_ID);
+        assertThat(roomService.startingRoom()).map(Room::getId).contains(VILLAGE_SQUARE_ID);
     }
 
     @Test
-    void startingRoomFindsTheRoomMarkedAsStarting() {
-        Room notStarting = new Room(UUID.randomUUID(), "Salle A", "...", null);
-        Room starting = new Room(UUID.randomUUID(), "Salle B", "...", true);
-        roomDao.insert(notStarting);
-        roomDao.insert(starting);
+    void loadRoomsThrowsWhenMoreThanOneRoomIsMarkedAsStarting() {
+        RoomService isolated = new RoomService(new ObjectMapper(), characterDao);
+        List<RoomService.RoomDefinition> definitions = List.of(
+                new RoomService.RoomDefinition(UUID.randomUUID(), "A", "...", true, List.of()),
+                new RoomService.RoomDefinition(UUID.randomUUID(), "B", "...", true, List.of()));
 
-        roomService.warmRooms();
-
-        assertThat(roomService.startingRoom()).map(Room::getId).contains(starting.getId());
+        assertThatThrownBy(() -> isolated.loadRooms(definitions)).isInstanceOf(IllegalStateException.class);
     }
 
     @Test
-    void startingRoomIsEmptyWhenNoRoomIsMarkedAsStarting() {
-        roomDao.insert(new Room(UUID.randomUUID(), "Salle A", "...", null));
+    void loadRoomsThrowsWhenAnExitTargetsAnUnknownRoom() {
+        RoomService isolated = new RoomService(new ObjectMapper(), characterDao);
+        List<RoomService.RoomDefinition> definitions = List.of(new RoomService.RoomDefinition(UUID.randomUUID(), "A",
+                "...", null, List.of(new RoomService.ExitDefinition("nord", UUID.randomUUID()))));
 
-        roomService.warmRooms();
+        assertThatThrownBy(() -> isolated.loadRooms(definitions)).isInstanceOf(IllegalStateException.class);
+    }
 
-        assertThat(roomService.startingRoom()).isEmpty();
+    @Test
+    void loadRoomsResolvesExitsToTheAttachedSourceAndTargetRooms() {
+        RoomService isolated = new RoomService(new ObjectMapper(), characterDao);
+        UUID sourceId = UUID.randomUUID();
+        UUID targetId = UUID.randomUUID();
+        List<RoomService.RoomDefinition> definitions = List.of(
+                new RoomService.RoomDefinition(sourceId, "Source", "...", null,
+                        List.of(new RoomService.ExitDefinition("nord", targetId))),
+                new RoomService.RoomDefinition(targetId, "Target", "...", null, List.of()));
+
+        isolated.loadRooms(definitions);
+
+        Room source = isolated.allRooms().stream().filter(room -> room.getId().equals(sourceId)).findFirst()
+                .orElseThrow();
+        assertThat(source.findOneByDirection("nord")).map(RoomExit::getSourceRoom).contains(source);
+        assertThat(source.findOneByDirection("nord")).map(RoomExit::getTargetRoom).map(Room::getId).contains(targetId);
+        assertThat(source.findOneByDirection("sud")).isEmpty();
     }
 
     @Test
     void moveCharacterJoinsTheNewRoomAndPersistsIt() {
-        Room origin = new Room(UUID.randomUUID(), "Salle A", "...", null);
-        Room destination = new Room(UUID.randomUUID(), "Salle B", "...", null);
-        roomDao.insert(origin);
-        roomDao.insert(destination);
         roomService.warmRooms();
+        Room origin = room(VILLAGE_SQUARE_ID);
+        Room destination = room(FOREST_EDGE_ID);
 
         Account account = new Account(UUID.randomUUID(), "erin", "hashed-password", null);
         accountDao.insert(account);
         Character character = new Character(UUID.randomUUID(), account.getId(), "Erin", origin.getId(), Race.HUMAN,
                 CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
-        room(origin.getId()).join(character);
+        origin.join(character);
 
-        character.moveToRoom(room(destination.getId()));
+        character.moveToRoom(destination);
 
-        assertThat(room(destination.getId()).characters()).extracting(Character::getId).contains(character.getId());
-        assertThat(room(origin.getId()).characters()).extracting(Character::getId).doesNotContain(character.getId());
+        assertThat(destination.characters()).extracting(Character::getId).contains(character.getId());
+        assertThat(origin.characters()).extracting(Character::getId).doesNotContain(character.getId());
         assertThat(characterDao.findById(character.getId())).map(Character::getCurrentRoomId)
                 .contains(destination.getId());
     }
 
     @Test
-    void warmRoomExitsPopulatesTheCacheAndAttachesTheSourceAndTargetRooms() {
-        Room source = new Room(UUID.randomUUID(), "Place du village", "...", null);
-        Room target = new Room(UUID.randomUUID(), "Forêt", "...", null);
-        roomDao.insert(source);
-        roomDao.insert(target);
-        roomExitDao.insert(new RoomExit(UUID.randomUUID(), "nord", source.getId(), target.getId()));
-
-        roomService.warmRooms();
-        roomService.warmRoomExits(roomService.allRooms());
-
-        Room warmedSource = room(source.getId());
-        assertThat(warmedSource.getExits()).extracting(RoomExit::getDirection).containsExactly("nord");
-        assertThat(warmedSource.findOneByDirection("nord")).map(RoomExit::getSourceRoom).contains(warmedSource);
-        assertThat(warmedSource.findOneByDirection("nord")).map(RoomExit::getTargetRoom).map(Room::getId)
-                .contains(target.getId());
-        assertThat(warmedSource.findOneByDirection("sud")).isEmpty();
-    }
-
-    @Test
     void spawnCharacterResolvesTheCurrentRoomFromCurrentRoomIdAndJoinsIt() {
-        Room room = new Room(UUID.randomUUID(), "Salle A", "...", null);
-        roomDao.insert(room);
         roomService.warmRooms();
+        Room room = room(VILLAGE_SQUARE_ID);
 
         Account account = new Account(UUID.randomUUID(), "finn", "hashed-password", null);
         accountDao.insert(account);

@@ -16,7 +16,11 @@ import fr.idev.mudserver.network.message.ingame.CharacterLeftRoom;
 
 /**
  * {@code isStartingRoom} is a nullable sentinel, not a plain boolean: NULL/TRUE
- * only, never FALSE (see V1__init_schema.sql's uniq_room_starting index).
+ * only, never FALSE. Rooms are loaded from {@code data/rooms.json} (see
+ * {@code RoomService.warmRooms()}), not persisted in DB, so "at most one
+ * starting room" is no longer enforced by a Postgres unique index — it's
+ * validated at the application layer in {@code RoomService.loadRooms()}
+ * instead.
  *
  * <p>
  * {@code clients} suit les joueurs actuellement présents dans la room, et sert
