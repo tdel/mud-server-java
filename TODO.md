@@ -21,7 +21,7 @@ Le projet est un MUD Java/Spring Boot qui vise à reprendre les règles DnD5e. C
 ### 1. Fondations de personnage (bloquant pour presque tout le reste)
 - ~~**Modificateurs de caractéristiques** : `(score-10)/2` n'existe nulle part, même pas comme méthode utilitaire sur `Attribute`/`Character`. Tout système ultérieur (combat, compétences, jets de sauvegarde) en dépend.~~
 - ~~**Bonus de maîtrise (proficiency bonus)** : absent, dépend du niveau.~~
-- **Classe de personnage** (Guerrier, Magicien, etc.) : totalement absente — pas de table, pas d'enum, pas de champ. Impacte points de vie par niveau, jets de sauvegarde maîtrisés, compétences, accès aux sorts.
+- ~~**Classe de personnage** (Guerrier, Magicien, etc.) : totalement absente — pas de table, pas d'enum, pas de champ. Impacte points de vie par niveau, jets de sauvegarde maîtrisés, compétences, accès aux sorts.~~
 - **Niveau / XP** : absents. Aucun champ, aucune table.
 - Ordre suggéré : modificateurs de caractéristiques → bonus de maîtrise/niveau → classe → XP.
 
