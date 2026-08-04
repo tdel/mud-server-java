@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.WarmupRunner;
 
 /**
  * Démarré sur {@link ApplicationReadyEvent} plutôt qu'en tant que commande
@@ -34,9 +33,9 @@ import fr.idev.mudserver.game.WarmupRunner;
  * {@code @SpringBootTest} resterait bloqué indéfiniment au démarrage du
  * contexte. Le peuplement des caches statiques (rooms, items, races, classes,
  * niveaux) ne se fait plus ici : c'est la responsabilité de
- * {@link WarmupRunner}, un {@code ApplicationRunner} garanti de s'exécuter
- * avant que {@code ApplicationReadyEvent} ne soit publié, donc avant cette
- * méthode.
+ * {@code ServerApplication.warmupRunner}, un {@code ApplicationRunner} garanti
+ * de s'exécuter avant que {@code ApplicationReadyEvent} ne soit publié, donc
+ * avant cette méthode.
  */
 @Component
 @ConditionalOnProperty(prefix = "app.telnet", name = "enabled", havingValue = "true", matchIfMissing = true)

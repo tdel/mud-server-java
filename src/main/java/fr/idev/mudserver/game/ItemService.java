@@ -84,7 +84,7 @@ public class ItemService {
 
     /**
      * Précharge les items au sol de chaque room, une fois pour toute la durée du
-     * process — appelé depuis {@code TelnetServer.start()} juste après
+     * process — appelé depuis {@code ServerApplication.warmupRunner} juste après
      * {@code RoomService.warmRooms()} et {@link #warmItemTemplates()}, sur le même
      * principe : une {@code Room} n'est jamais rechargée par session, contrairement
      * à un {@code Character}.
