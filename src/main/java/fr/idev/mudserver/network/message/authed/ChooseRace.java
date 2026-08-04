@@ -7,7 +7,7 @@ import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
-public record ChooseRace() implements OutputTelnetMessage {
+public record ChooseRace(Map<Race, Map<Attribute, Integer>> bonusesByRace) implements OutputTelnetMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
@@ -20,7 +20,7 @@ public record ChooseRace() implements OutputTelnetMessage {
     }
 
     private String describeBonuses(Race race) {
-        Map<Attribute, Integer> bonuses = race.attributeScoreBonuses();
+        Map<Attribute, Integer> bonuses = bonusesByRace.get(race);
 
         if (bonuses.size() == 6) {
             int bonus = bonuses.values().iterator().next();

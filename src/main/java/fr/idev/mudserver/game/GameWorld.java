@@ -29,13 +29,15 @@ public class GameWorld {
     private final CharacterDao characterDao;
     private final RoomService roomService;
     private final ItemService itemService;
+    private final RaceService raceService;
     private final DiceRoller diceRoller;
 
     public GameWorld(CharacterDao characterDao, RoomService roomService, ItemService itemService,
-            DiceRoller diceRoller) {
+            RaceService raceService, DiceRoller diceRoller) {
         this.characterDao = characterDao;
         this.roomService = roomService;
         this.itemService = itemService;
+        this.raceService = raceService;
         this.diceRoller = diceRoller;
     }
 
@@ -86,7 +88,7 @@ public class GameWorld {
         Optional<Room> startingRoom = roomService.startingRoom();
 
         Map<Attribute, Integer> scores = rollAttributeScores();
-        for (Map.Entry<Attribute, Integer> bonus : race.attributeScoreBonuses().entrySet()) {
+        for (Map.Entry<Attribute, Integer> bonus : raceService.attributeScoreBonuses(race).entrySet()) {
             scores.merge(bonus.getKey(), bonus.getValue(), Integer::sum);
         }
 

@@ -1,6 +1,8 @@
 package fr.idev.mudserver.controller.authed;
 
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -8,11 +10,13 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Account;
+import fr.idev.mudserver.domain.Attribute;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.GameWorld;
+import fr.idev.mudserver.game.RaceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -28,11 +32,14 @@ public class CharacterCreate implements ControllerHandler {
 
     private final CharacterList characterListAction;
     private final GameWorld gameWorld;
+    private final RaceService raceService;
     private final AuthWorld authWorld;
 
-    public CharacterCreate(CharacterList characterListAction, GameWorld gameWorld, AuthWorld authWorld) {
+    public CharacterCreate(CharacterList characterListAction, GameWorld gameWorld, RaceService raceService,
+            AuthWorld authWorld) {
         this.characterListAction = characterListAction;
         this.gameWorld = gameWorld;
+        this.raceService = raceService;
         this.authWorld = authWorld;
     }
 
@@ -68,7 +75,12 @@ public class CharacterCreate implements ControllerHandler {
     }
 
     private void promptRace(Connection connection, Account account, String name) {
-        connection.requestBlocking(new ChooseRace(), line -> {
+        Map<Race, Map<Attribute, Integer>> bonusesByRace = new LinkedHashMap<>();
+        for (Race race : Race.values()) {
+            bonusesByRace.put(race, raceService.attributeScoreBonuses(race));
+        }
+
+        connection.requestBlocking(new ChooseRace(bonusesByRace), line -> {
             Race race = parseRace(line);
 
             if (race == null) {

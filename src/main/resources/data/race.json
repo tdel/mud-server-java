@@ -1,0 +1,6 @@
+[
+  { "name": "DWARF", "attributes": { "STRENGTH": 2, "CONSTITUTION": 2 } },
+  { "name": "HUMAN", "attributes": { "STRENGTH": 1, "DEXTERITY": 1, "CONSTITUTION": 1, "INTELLIGENCE": 1, "WISDOM": 1, "CHARISMA": 1 } },
+  { "name": "HIGH_ELF", "attributes": { "DEXTERITY": 2, "INTELLIGENCE": 2, "WISDOM": 1, "CHARISMA": 1 } },
+  { "name": "ORC", "attributes": { "STRENGTH": 2, "DEXTERITY": 1, "WISDOM": 1 } }
+]

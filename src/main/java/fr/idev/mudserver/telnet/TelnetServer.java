@@ -20,6 +20,7 @@ import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.ItemService;
+import fr.idev.mudserver.game.RaceService;
 import fr.idev.mudserver.game.RoomService;
 
 /**
@@ -47,17 +48,19 @@ public class TelnetServer {
     private final GameWorld gameWorld;
     private final RoomService roomService;
     private final ItemService itemService;
+    private final RaceService raceService;
     private final int port;
 
     public TelnetServer(ExecutorService virtualThreadExecutor, ControllerDispatcher controllerDispatcher,
             AuthWorld authWorld, GameWorld gameWorld, RoomService roomService, ItemService itemService,
-            @Value("${app.telnet.port}") int port) {
+            RaceService raceService, @Value("${app.telnet.port}") int port) {
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.controllerDispatcher = controllerDispatcher;
         this.authWorld = authWorld;
         this.gameWorld = gameWorld;
         this.roomService = roomService;
         this.itemService = itemService;
+        this.raceService = raceService;
         this.port = port;
     }
 
@@ -67,6 +70,7 @@ public class TelnetServer {
         roomService.warmRoomExits(roomService.allRooms());
         itemService.warmItemTemplates();
         itemService.warmRoomItems(roomService.allRooms());
+        raceService.warmRaceBonuses();
 
         EventLoopGroup bossGroup = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
         EventLoopGroup workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());

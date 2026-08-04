@@ -49,6 +49,9 @@ class GameWorldTest extends AbstractIntegrationTest {
     private RoomService roomService;
 
     @Autowired
+    private RaceService raceService;
+
+    @Autowired
     private CharacterDao characterDao;
 
     @Test
@@ -58,6 +61,7 @@ class GameWorldTest extends AbstractIntegrationTest {
         Room startingRoom = new Room(UUID.randomUUID(), "Place du village", "...", true);
         roomDao.insert(startingRoom);
         roomService.warmRooms();
+        raceService.warmRaceBonuses();
 
         Character character = gameWorld.createCharacter(account, "Hilde", Race.HUMAN);
 
