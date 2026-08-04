@@ -30,7 +30,8 @@ class CharacterTest {
 
     private Character character(int strength, int dexterity, int constitution, int intelligence, int wisdom,
             int charisma, int level) {
-        return new Character(UUID.randomUUID(), UUID.randomUUID(), "Test", UUID.randomUUID(), Race.HUMAN, level, 10, 10,
+        return new Character(UUID.randomUUID(), UUID.randomUUID(), "Test", UUID.randomUUID(), Race.HUMAN,
+                CharacterClass.FIGHTER, level, 10, 10,
                 TestAttributes.of(strength, dexterity, constitution, intelligence, wisdom, charisma));
     }
 }

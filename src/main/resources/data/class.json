@@ -1,0 +1,14 @@
+[
+  { "name": "BARBARIAN", "hitDie": 12 },
+  { "name": "BARD", "hitDie": 8 },
+  { "name": "CLERIC", "hitDie": 8 },
+  { "name": "DRUID", "hitDie": 8 },
+  { "name": "FIGHTER", "hitDie": 10 },
+  { "name": "MONK", "hitDie": 8 },
+  { "name": "PALADIN", "hitDie": 10 },
+  { "name": "RANGER", "hitDie": 10 },
+  { "name": "ROGUE", "hitDie": 8 },
+  { "name": "SORCERER", "hitDie": 6 },
+  { "name": "WARLOCK", "hitDie": 8 },
+  { "name": "WIZARD", "hitDie": 6 }
+]

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.CharacterClass;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
@@ -102,8 +103,8 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
     private Character seedCharacter(Room room, String login) {
         Account account = new Account(UUID.randomUUID(), login, "hashed-password", null);
         accountDao.insert(account);
-        Character character = new Character(UUID.randomUUID(), account.getId(), login, room.getId(), Race.HUMAN, 1, 10,
-                10, TestAttributes.of(10, 10, 10, 10, 10, 10));
+        Character character = new Character(UUID.randomUUID(), account.getId(), login, room.getId(), Race.HUMAN,
+                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
         room(room.getId()).join(character);
         return character;

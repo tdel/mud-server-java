@@ -12,9 +12,11 @@ import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Attribute;
 import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.CharacterClass;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.game.AuthWorld;
+import fr.idev.mudserver.game.ClassService;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.RaceService;
 import fr.idev.mudserver.network.Connection;
@@ -22,7 +24,9 @@ import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.authed.CharacterAlreadyExists;
 import fr.idev.mudserver.network.message.authed.CharacterCreated;
+import fr.idev.mudserver.network.message.authed.ChooseClass;
 import fr.idev.mudserver.network.message.authed.ChooseRace;
+import fr.idev.mudserver.network.message.authed.InvalidClass;
 import fr.idev.mudserver.network.message.authed.InvalidRace;
 import fr.idev.mudserver.network.message.authed.NoStartingRoom;
 import fr.idev.mudserver.network.message.ingame.CharacterStats;
@@ -33,13 +37,15 @@ public class CharacterCreate implements ControllerHandler {
     private final CharacterList characterListAction;
     private final GameWorld gameWorld;
     private final RaceService raceService;
+    private final ClassService classService;
     private final AuthWorld authWorld;
 
     public CharacterCreate(CharacterList characterListAction, GameWorld gameWorld, RaceService raceService,
-            AuthWorld authWorld) {
+            ClassService classService, AuthWorld authWorld) {
         this.characterListAction = characterListAction;
         this.gameWorld = gameWorld;
         this.raceService = raceService;
+        this.classService = classService;
         this.authWorld = authWorld;
     }
 
@@ -89,7 +95,7 @@ public class CharacterCreate implements ControllerHandler {
                 return;
             }
 
-            createCharacter(connection, account, name, race);
+            promptClass(connection, account, name, race);
         });
     }
 
@@ -102,8 +108,37 @@ public class CharacterCreate implements ControllerHandler {
         }
     }
 
-    private void createCharacter(Connection connection, Account account, String name, Race race) {
-        Character character = gameWorld.createCharacter(account, name, race);
+    private void promptClass(Connection connection, Account account, String name, Race race) {
+        Map<CharacterClass, Integer> hitDiceByClass = new LinkedHashMap<>();
+        for (CharacterClass characterClass : CharacterClass.values()) {
+            hitDiceByClass.put(characterClass, classService.hitDie(characterClass));
+        }
+
+        connection.requestBlocking(new ChooseClass(hitDiceByClass), line -> {
+            CharacterClass characterClass = parseClass(line);
+
+            if (characterClass == null) {
+                connection.send(new InvalidClass(line.trim()));
+                promptClass(connection, account, name, race);
+                return;
+            }
+
+            createCharacter(connection, account, name, race, characterClass);
+        });
+    }
+
+    private CharacterClass parseClass(String input) {
+        String normalized = input.strip().toLowerCase(Locale.ROOT).replace(' ', '_').replace('-', '_');
+        try {
+            return CharacterClass.valueOf(normalized.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    private void createCharacter(Connection connection, Account account, String name, Race race,
+            CharacterClass characterClass) {
+        Character character = gameWorld.createCharacter(account, name, race, characterClass);
 
         connection.send(new CharacterCreated(name));
         connection.send(new CharacterStats(character));

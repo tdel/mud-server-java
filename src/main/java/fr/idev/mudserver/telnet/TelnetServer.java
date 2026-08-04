@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
+import fr.idev.mudserver.game.ClassService;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.game.RaceService;
@@ -49,11 +50,12 @@ public class TelnetServer {
     private final RoomService roomService;
     private final ItemService itemService;
     private final RaceService raceService;
+    private final ClassService classService;
     private final int port;
 
     public TelnetServer(ExecutorService virtualThreadExecutor, ControllerDispatcher controllerDispatcher,
             AuthWorld authWorld, GameWorld gameWorld, RoomService roomService, ItemService itemService,
-            RaceService raceService, @Value("${app.telnet.port}") int port) {
+            RaceService raceService, ClassService classService, @Value("${app.telnet.port}") int port) {
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.controllerDispatcher = controllerDispatcher;
         this.authWorld = authWorld;
@@ -61,6 +63,7 @@ public class TelnetServer {
         this.roomService = roomService;
         this.itemService = itemService;
         this.raceService = raceService;
+        this.classService = classService;
         this.port = port;
     }
 
@@ -71,6 +74,7 @@ public class TelnetServer {
         itemService.warmItemTemplates();
         itemService.warmRoomItems(roomService.allRooms());
         raceService.warmRaceBonuses();
+        classService.warmClassHitDice();
 
         EventLoopGroup bossGroup = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
         EventLoopGroup workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());

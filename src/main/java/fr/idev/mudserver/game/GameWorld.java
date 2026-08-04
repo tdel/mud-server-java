@@ -30,14 +30,16 @@ public class GameWorld {
     private final RoomService roomService;
     private final ItemService itemService;
     private final RaceService raceService;
+    private final ClassService classService;
     private final DiceRoller diceRoller;
 
     public GameWorld(CharacterDao characterDao, RoomService roomService, ItemService itemService,
-            RaceService raceService, DiceRoller diceRoller) {
+            RaceService raceService, ClassService classService, DiceRoller diceRoller) {
         this.characterDao = characterDao;
         this.roomService = roomService;
         this.itemService = itemService;
         this.raceService = raceService;
+        this.classService = classService;
         this.diceRoller = diceRoller;
     }
 
@@ -84,7 +86,7 @@ public class GameWorld {
         return characterDao.findByAccountIdAndName(accountId, name).isPresent();
     }
 
-    public Character createCharacter(Account account, String name, Race race) {
+    public Character createCharacter(Account account, String name, Race race, CharacterClass characterClass) {
         Optional<Room> startingRoom = roomService.startingRoom();
 
         Map<Attribute, Integer> scores = rollAttributeScores();
@@ -92,8 +94,13 @@ public class GameWorld {
             scores.merge(bonus.getKey(), bonus.getValue(), Integer::sum);
         }
 
+        // 5e niveau 1 : PV max = valeur MAXIMALE du dé de vie de la classe (pas un jet)
+        // + modificateur de CON.
+        int constitutionModifier = Math.floorDiv(scores.get(Attribute.CONSTITUTION) - 10, 2);
+        int maxHealth = Math.max(1, classService.hitDie(characterClass) + constitutionModifier);
+
         Character character = new Character(UUID.randomUUID(), account.getId(), name, startingRoom.get().getId(), race,
-                1, 100, 100, scores);
+                characterClass, 1, maxHealth, maxHealth, scores);
 
         DomainEventPublisher.publish(new NewCharacterCreated(character));
         character.spawnToRoom(startingRoom.get());

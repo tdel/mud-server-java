@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.CharacterClass;
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.Race;
@@ -42,8 +43,8 @@ class ItemDaoTest extends AbstractIntegrationTest {
         roomDao.insert(room);
         Account account = new Account(UUID.randomUUID(), "dave", "hashed-password", null);
         accountDao.insert(account);
-        character = new Character(UUID.randomUUID(), account.getId(), "Dave le Nain", room.getId(), Race.DWARF, 1, 12,
-                12, TestAttributes.of(12, 10, 12, 10, 10, 10));
+        character = new Character(UUID.randomUUID(), account.getId(), "Dave le Nain", room.getId(), Race.DWARF,
+                CharacterClass.FIGHTER, 1, 12, 12, TestAttributes.of(12, 10, 12, 10, 10, 10));
         characterDao.insert(character);
     }
 

@@ -34,6 +34,7 @@ public class Character {
     private String name;
     private UUID currentRoomId;
     private Race race;
+    private CharacterClass characterClass;
     private int level;
     private int currentHealth;
     private int maxHealth;
@@ -43,13 +44,14 @@ public class Character {
     private Room currentRoom;
     private final List<Item> inventory = new CopyOnWriteArrayList<>();
 
-    public Character(UUID id, UUID accountId, String name, UUID currentRoomId, Race race, int level, int currentHealth,
-            int maxHealth, Map<Attribute, Integer> attributes) {
+    public Character(UUID id, UUID accountId, String name, UUID currentRoomId, Race race, CharacterClass characterClass,
+            int level, int currentHealth, int maxHealth, Map<Attribute, Integer> attributes) {
         this.id = id;
         this.accountId = accountId;
         this.name = name;
         this.currentRoomId = currentRoomId;
         this.race = race;
+        this.characterClass = characterClass;
         this.level = level;
         this.currentHealth = currentHealth;
         this.maxHealth = maxHealth;
@@ -94,6 +96,14 @@ public class Character {
 
     public void setRace(Race race) {
         this.race = race;
+    }
+
+    public CharacterClass getCharacterClass() {
+        return characterClass;
+    }
+
+    public void setCharacterClass(CharacterClass characterClass) {
+        this.characterClass = characterClass;
     }
 
     public int getLevel() {
@@ -308,18 +318,20 @@ public class Character {
         return level == other.level && currentHealth == other.currentHealth && maxHealth == other.maxHealth
                 && Objects.equals(id, other.id) && Objects.equals(accountId, other.accountId)
                 && Objects.equals(name, other.name) && Objects.equals(currentRoomId, other.currentRoomId)
-                && race == other.race && Objects.equals(attributes, other.attributes);
+                && race == other.race && characterClass == other.characterClass
+                && Objects.equals(attributes, other.attributes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, accountId, name, currentRoomId, race, level, currentHealth, maxHealth, attributes);
+        return Objects.hash(id, accountId, name, currentRoomId, race, characterClass, level, currentHealth, maxHealth,
+                attributes);
     }
 
     @Override
     public String toString() {
         return "Character[id=" + id + ", accountId=" + accountId + ", name=" + name + ", currentRoomId=" + currentRoomId
-                + ", race=" + race + ", level=" + level + ", currentHealth=" + currentHealth + ", maxHealth="
-                + maxHealth + ", attributes=" + attributes + "]";
+                + ", race=" + race + ", characterClass=" + characterClass + ", level=" + level + ", currentHealth="
+                + currentHealth + ", maxHealth=" + maxHealth + ", attributes=" + attributes + "]";
     }
 }

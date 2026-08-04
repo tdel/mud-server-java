@@ -11,6 +11,7 @@ import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Attribute;
 import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.CharacterClass;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.persistence.AccountDao;
@@ -52,6 +53,9 @@ class GameWorldTest extends AbstractIntegrationTest {
     private RaceService raceService;
 
     @Autowired
+    private ClassService classService;
+
+    @Autowired
     private CharacterDao characterDao;
 
     @Test
@@ -62,13 +66,16 @@ class GameWorldTest extends AbstractIntegrationTest {
         roomDao.insert(startingRoom);
         roomService.warmRooms();
         raceService.warmRaceBonuses();
+        classService.warmClassHitDice();
 
-        Character character = gameWorld.createCharacter(account, "Hilde", Race.HUMAN);
+        Character character = gameWorld.createCharacter(account, "Hilde", Race.HUMAN, CharacterClass.FIGHTER);
 
         assertThat(characterDao.findById(character.getId())).contains(character);
         assertThat(character.getLevel()).isEqualTo(1);
-        assertThat(character.getCurrentHealth()).isEqualTo(100);
-        assertThat(character.getMaxHealth()).isEqualTo(100);
+        int expectedConstitutionModifier = character.getModifier(Attribute.CONSTITUTION);
+        int expectedMaxHealth = Math.max(1, classService.hitDie(CharacterClass.FIGHTER) + expectedConstitutionModifier);
+        assertThat(character.getMaxHealth()).isEqualTo(expectedMaxHealth);
+        assertThat(character.getCurrentHealth()).isEqualTo(expectedMaxHealth);
         // Human: +1 to all six attributes on top of a 4d6-drop-lowest roll (3-18).
         assertThat(character.getAttribute(Attribute.STRENGTH)).isBetween(4, 19);
         assertThat(character.getAttribute(Attribute.DEXTERITY)).isBetween(4, 19);

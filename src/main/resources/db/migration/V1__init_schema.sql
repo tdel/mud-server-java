@@ -31,6 +31,7 @@ CREATE TABLE character (
     name           VARCHAR(255) NOT NULL,
     current_room_id UUID NOT NULL REFERENCES room(id),
     race           VARCHAR(20) NOT NULL,
+    character_class VARCHAR(20) NOT NULL,
     level          INT NOT NULL DEFAULT 1,
     current_health INT NOT NULL,
     max_health     INT NOT NULL,
