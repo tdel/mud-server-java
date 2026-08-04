@@ -23,7 +23,7 @@ public class Item {
     private EquipmentSlot slot;
 
     private ItemTemplate template;
-    private Character character;
+    private GamePlayer character;
     private Room room;
 
     public Item(UUID id, UUID templateId, UUID roomId, UUID characterId, EquipmentSlot slot) {
@@ -42,7 +42,7 @@ public class Item {
         return template;
     }
 
-    public void attachCharacter(Character character) {
+    public void attachCharacter(GamePlayer character) {
         this.character = character;
     }
 
@@ -50,7 +50,7 @@ public class Item {
         this.room = room;
     }
 
-    public Character getCharacter() {
+    public GamePlayer getCharacter() {
         return character;
     }
 
@@ -81,7 +81,7 @@ public class Item {
         return template;
     }
 
-    public void setCharacter(Character character) {
+    public void setCharacter(GamePlayer character) {
         this.character = character;
         this.characterId = character.getId();
         this.room = null;

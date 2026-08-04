@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.CharacterClass;
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
@@ -31,14 +31,14 @@ class ItemDaoTest extends AbstractIntegrationTest {
 
     private UUID templateId;
     private UUID roomId;
-    private Character character;
+    private GamePlayer character;
 
     private void seedTemplateRoomAndCharacter() {
         templateId = UUID.randomUUID();
         roomId = UUID.randomUUID();
         Account account = new Account(UUID.randomUUID(), "dave", "hashed-password", null);
         accountDao.insert(account);
-        character = new Character(UUID.randomUUID(), account.getId(), "Dave le Nain", roomId, Race.DWARF,
+        character = new GamePlayer(UUID.randomUUID(), account.getId(), "Dave le Nain", roomId, Race.DWARF,
                 CharacterClass.FIGHTER, 1, 12, 12, TestAttributes.of(12, 10, 12, 10, 10, 10));
         characterDao.insert(character);
     }

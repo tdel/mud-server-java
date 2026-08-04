@@ -7,7 +7,9 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GameMonster;
+import fr.idev.mudserver.domain.GameNpc;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomExit;
@@ -40,22 +42,27 @@ public class Look implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        Character character = gameWorld.character(connection);
+        GamePlayer character = gameWorld.character(connection);
         connection.send(describeRoom(character));
     }
 
-    private RoomDescription describeRoom(Character character) {
+    private RoomDescription describeRoom(GamePlayer character) {
         Room room = character.getCurrentRoom();
 
         List<RoomExit> exits = room.getExits();
-        List<Character> characters = room.characters();
+        List<GamePlayer> characters = room.characters();
         List<Item> items = room.getItems();
+        List<GameMonster> monsters = room.getMonsters();
+        List<GameNpc> npcs = room.getNpcs();
 
         List<String> exitNames = exits.stream().map(RoomExit::getDirection).toList();
         List<String> characterNames = characters.stream().filter(other -> !other.getId().equals(character.getId()))
-                .map(Character::getName).toList();
+                .map(GamePlayer::getName).toList();
         List<String> itemNames = items.stream().map(Item::getName).toList();
+        List<String> monsterNames = monsters.stream().map(GameMonster::getName).toList();
+        List<String> npcNames = npcs.stream().map(GameNpc::getName).toList();
 
-        return new RoomDescription(room.getName(), room.getDescription(), exitNames, characterNames, itemNames);
+        return new RoomDescription(room.getName(), room.getDescription(), exitNames, characterNames, itemNames,
+                monsterNames, npcNames);
     }
 }

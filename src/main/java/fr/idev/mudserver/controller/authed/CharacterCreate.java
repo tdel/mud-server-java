@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Attribute;
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.CharacterClass;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
@@ -29,7 +29,7 @@ import fr.idev.mudserver.network.message.authed.ChooseRace;
 import fr.idev.mudserver.network.message.authed.InvalidClass;
 import fr.idev.mudserver.network.message.authed.InvalidRace;
 import fr.idev.mudserver.network.message.authed.NoStartingRoom;
-import fr.idev.mudserver.network.message.ingame.CharacterStats;
+import fr.idev.mudserver.network.message.ingame.GamePlayerStats;
 
 @Component
 public class CharacterCreate implements ControllerHandler {
@@ -138,10 +138,10 @@ public class CharacterCreate implements ControllerHandler {
 
     private void createCharacter(Connection connection, Account account, String name, Race race,
             CharacterClass characterClass) {
-        Character character = gameWorld.createCharacter(account, name, race, characterClass);
+        GamePlayer character = gameWorld.createCharacter(account, name, race, characterClass);
 
         connection.send(new CharacterCreated(name));
-        connection.send(new CharacterStats(character));
+        connection.send(new GamePlayerStats(character));
         characterListAction.onReceive(connection, "");
     }
 }

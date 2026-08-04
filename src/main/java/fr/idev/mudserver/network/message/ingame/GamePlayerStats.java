@@ -1,15 +1,15 @@
 package fr.idev.mudserver.network.message.ingame;
 
 import fr.idev.mudserver.domain.Attribute;
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
-public record CharacterStats(Character character) implements OutputTelnetMessage {
+public record GamePlayerStats(GamePlayer character) implements OutputTelnetMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        Character c = character;
+        GamePlayer c = character;
         output.write(String.format(
                 "== %s (Level %d %s) ==\nHealth: %d/%d\nProficiency: %+d\nStrength: %d (%+d)  Dexterity: %d (%+d)  Constitution: %d (%+d)\nIntelligence: %d (%+d)  Wisdom: %d (%+d)  Charisma: %d (%+d)\n",
                 c.getName(), c.getLevel(), c.getCharacterClass().label(), c.getCurrentHealth(), c.getMaxHealth(),

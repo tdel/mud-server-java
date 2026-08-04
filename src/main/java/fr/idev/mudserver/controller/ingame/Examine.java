@@ -4,15 +4,22 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GameCharacter;
+import fr.idev.mudserver.domain.GameMonster;
+import fr.idev.mudserver.domain.GameNpc;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
-import fr.idev.mudserver.network.message.ingame.CharacterNotFound;
-import fr.idev.mudserver.network.message.ingame.CharacterStats;
+import fr.idev.mudserver.network.message.ingame.GamePlayerStats;
+import fr.idev.mudserver.network.message.ingame.MonsterStatBlock;
+import fr.idev.mudserver.network.message.ingame.NpcDescription;
+import fr.idev.mudserver.network.message.ingame.TargetNotFound;
 
 @Component
 public class Examine implements ControllerHandler {
@@ -37,7 +44,7 @@ public class Examine implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        Character character = gameWorld.character(connection);
+        GamePlayer character = gameWorld.character(connection);
         String name = argument.trim();
 
         if (name.isEmpty()) {
@@ -45,13 +52,17 @@ public class Examine implements ControllerHandler {
             return;
         }
 
-        Character target = character.getCurrentRoom().findCharacterByName(name);
+        Optional<GameCharacter> target = character.getCurrentRoom().findOccupantByName(name);
 
-        if (target == null) {
-            connection.send(new CharacterNotFound(name));
+        if (target.isEmpty()) {
+            connection.send(new TargetNotFound(name));
             return;
         }
 
-        connection.send(new CharacterStats(target));
+        switch (target.get()) {
+            case GamePlayer p -> connection.send(new GamePlayerStats(p));
+            case GameMonster m -> connection.send(new MonsterStatBlock(m));
+            case GameNpc n -> connection.send(new NpcDescription(n));
+        }
     }
 }

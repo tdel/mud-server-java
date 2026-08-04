@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.CharacterClass;
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
@@ -25,10 +25,10 @@ import fr.idev.mudserver.persistence.ItemDao;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Non-régression : Character#equipItem publie un seul événement
- * (CharacterEquippedItem) portant à la fois le nouvel item et l'éventuel
+ * Non-régression : GamePlayer#equipItem publie un seul événement
+ * (GamePlayerEquippedItem) portant à la fois le nouvel item et l'éventuel
  * occupant précédent du slot, pour que le listener
- * ItemService#onCharacterEquippedItem (@Transactional, voir ItemService.java)
+ * ItemService#onGamePlayerEquippedItem (@Transactional, voir ItemService.java)
  * applique les deux updateSlot dans une même transaction, comme le suppose la
  * contrainte différée uniq_character_slot de V1__init_schema.sql.
  */
@@ -56,7 +56,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
         Account account = new Account(UUID.randomUUID(), "erin", "hashed-password", null);
         accountDao.insert(account);
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Erin", UUID.randomUUID(), Race.HUMAN,
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Erin", UUID.randomUUID(), Race.HUMAN,
                 CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
 
@@ -84,7 +84,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
         Account account = new Account(UUID.randomUUID(), "gwen", "hashed-password", null);
         accountDao.insert(account);
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Gwen", UUID.randomUUID(), Race.HUMAN,
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Gwen", UUID.randomUUID(), Race.HUMAN,
                 CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
 
@@ -110,7 +110,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
         Account account = new Account(UUID.randomUUID(), "fay", "hashed-password", null);
         accountDao.insert(account);
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Fay", UUID.randomUUID(), Race.HUMAN,
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Fay", UUID.randomUUID(), Race.HUMAN,
                 CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
 
@@ -132,7 +132,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
         Room warmedRoom = roomService.allRooms().iterator().next();
         Account account = new Account(UUID.randomUUID(), "gus", "hashed-password", null);
         accountDao.insert(account);
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Gus", warmedRoom.getId(), Race.HUMAN,
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Gus", warmedRoom.getId(), Race.HUMAN,
                 CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
         warmedRoom.join(character);

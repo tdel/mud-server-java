@@ -7,6 +7,6 @@ public record CharacterDeleted(String name) implements OutputTelnetMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        output.write("Character \"" + name + "\" deleted.\n");
+        output.write("GamePlayer \"" + name + "\" deleted.\n");
     }
 }

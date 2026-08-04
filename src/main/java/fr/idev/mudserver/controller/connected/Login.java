@@ -77,8 +77,8 @@ public class Login implements ControllerHandler {
         // même instant peuvent toutes deux passer ce test avant que l'une ou l'autre
         // ne s'enregistre ci-dessous — l'exclusivité connexion<->compte n'est donc pas
         // réellement garantie. Plusieurs invariants du domaine en dépendent
-        // silencieusement (un seul virtual thread pilote un Character à la fois — voir
-        // Character.pickUpItem/equipItem/unequipItem) sans que rien ne les protège
+        // silencieusement (un seul virtual thread pilote un GamePlayer à la fois — voir
+        // GamePlayer.pickUpItem/equipItem/unequipItem) sans que rien ne les protège
         // vraiment aujourd'hui si ce compte est doublé. À corriger en rendant cet
         // enregistrement atomique (ex. ConcurrentHashMap.putIfAbsent par accountId
         // dans AuthWorld/GameWorld) plutôt qu'un scan puis un put séparé.

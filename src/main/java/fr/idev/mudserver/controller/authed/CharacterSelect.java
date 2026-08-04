@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.controller.ingame.Look;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -55,7 +55,7 @@ public class CharacterSelect implements ControllerHandler {
 
         Account account = authWorld.account(connection);
 
-        Optional<Character> character = characterDao.findByAccountIdAndName(account.getId(), name);
+        Optional<GamePlayer> character = characterDao.findByAccountIdAndName(account.getId(), name);
         if (character.isEmpty()) {
             connection.send(new NoCharacterNamed(name));
             characterListAction.onReceive(connection, "");

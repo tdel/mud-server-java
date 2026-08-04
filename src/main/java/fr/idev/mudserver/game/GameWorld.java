@@ -4,12 +4,12 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import fr.idev.mudserver.domain.*;
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GamePlayer;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.event.DomainEventPublisher;
-import fr.idev.mudserver.domain.event.NewCharacterCreated;
+import fr.idev.mudserver.domain.event.NewGamePlayerCreated;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.Connection;
@@ -24,7 +24,7 @@ import fr.idev.mudserver.persistence.CharacterDao;
 @Component
 public class GameWorld {
 
-    private final Map<Connection, Character> characters = new ConcurrentHashMap<>();
+    private final Map<Connection, GamePlayer> characters = new ConcurrentHashMap<>();
 
     private final CharacterDao characterDao;
     private final RoomService roomService;
@@ -48,12 +48,12 @@ public class GameWorld {
      * {@link RoomService#spawnCharacter} : un personnage qui vient d'être chargé
      * depuis {@code CharacterDao} n'a que son {@code currentRoomId} persistée
      * ({@code character.getCurrentRoom()} n'est renseigné qu'en effet de bord de
-     * {@code Character#spawnToRoom}) — même principe que
+     * {@code GamePlayer#spawnToRoom}) — même principe que
      * {@code itemService.loadInventory(character)} juste au-dessus : le service
-     * résout tout à partir du {@code Character}, {@code GameWorld} ne manipule
+     * résout tout à partir du {@code GamePlayer}, {@code GameWorld} ne manipule
      * jamais d'UUID directement.
      */
-    public void enterWorld(Connection connection, Character character) {
+    public void enterWorld(Connection connection, GamePlayer character) {
         character.setConnection(connection);
         character.setInventory(itemService.loadInventory(character));
         characters.put(connection, character);
@@ -61,7 +61,7 @@ public class GameWorld {
     }
 
     public void exitWorld(Connection connection) {
-        Character character = characters.remove(connection);
+        GamePlayer character = characters.remove(connection);
         if (character == null) {
             return;
         }
@@ -70,7 +70,7 @@ public class GameWorld {
         character.getCurrentRoom().disconnect(character);
     }
 
-    public Character character(Connection connection) {
+    public GamePlayer character(Connection connection) {
         return characters.get(connection);
     }
 
@@ -86,7 +86,7 @@ public class GameWorld {
         return characterDao.findByAccountIdAndName(accountId, name).isPresent();
     }
 
-    public Character createCharacter(Account account, String name, Race race, CharacterClass characterClass) {
+    public GamePlayer createCharacter(Account account, String name, Race race, CharacterClass characterClass) {
         Optional<Room> startingRoom = roomService.startingRoom();
 
         Map<Attribute, Integer> scores = rollAttributeScores();
@@ -99,10 +99,10 @@ public class GameWorld {
         int constitutionModifier = Math.floorDiv(scores.get(Attribute.CONSTITUTION) - 10, 2);
         int maxHealth = Math.max(1, classService.hitDie(characterClass) + constitutionModifier);
 
-        Character character = new Character(UUID.randomUUID(), account.getId(), name, startingRoom.get().getId(), race,
-                characterClass, 1, maxHealth, maxHealth, scores);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), name, startingRoom.get().getId(),
+                race, characterClass, 1, maxHealth, maxHealth, scores);
 
-        DomainEventPublisher.publish(new NewCharacterCreated(character));
+        DomainEventPublisher.publish(new NewGamePlayerCreated(character));
         character.spawnToRoom(startingRoom.get());
 
         return character;
@@ -129,7 +129,7 @@ public class GameWorld {
     }
 
     @EventListener
-    void onNewCharacterCreated(NewCharacterCreated event) {
+    void onNewGamePlayerCreated(NewGamePlayerCreated event) {
         characterDao.insert(event.character());
     }
 }

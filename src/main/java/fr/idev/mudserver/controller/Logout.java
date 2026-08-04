@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.authed.CharacterList;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
@@ -48,7 +48,7 @@ public class Logout implements ControllerHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         if (connection.state() == ConnectionState.INGAME) {
-            Character character = gameWorld.character(connection);
+            GamePlayer character = gameWorld.character(connection);
 
             gameWorld.exitWorld(connection);
             Account account = accountDao.findById(character.getAccountId()).orElseThrow();

@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.CharacterClass;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.TestAttributes;
@@ -39,7 +39,7 @@ class AccountDaoTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "bob", "hashed-password", null);
         accountDao.insert(account);
 
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Bob le Nain", UUID.randomUUID(),
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Bob le Nain", UUID.randomUUID(),
                 Race.DWARF, CharacterClass.FIGHTER, 1, 12, 12, TestAttributes.of(12, 10, 12, 10, 10, 10));
         characterDao.insert(character);
 
@@ -54,8 +54,8 @@ class AccountDaoTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "carol", "hashed-password", null);
         accountDao.insert(account);
 
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Carol", UUID.randomUUID(), Race.DWARF,
-                CharacterClass.FIGHTER, 1, 12, 12, TestAttributes.of(12, 10, 12, 10, 10, 10));
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Carol", UUID.randomUUID(),
+                Race.DWARF, CharacterClass.FIGHTER, 1, 12, 12, TestAttributes.of(12, 10, 12, 10, 10, 10));
         characterDao.insert(character);
         accountDao.updateCurrentCharacter(account.getId(), character.getId());
 

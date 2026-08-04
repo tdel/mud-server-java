@@ -3,7 +3,7 @@ package fr.idev.mudserver.network.message.ingame;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
-public record CharacterDisconnected(String characterName) implements OutputTelnetMessage {
+public record GamePlayerDisconnected(String characterName) implements OutputTelnetMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {

@@ -6,13 +6,16 @@ import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
 public record RoomDescription(String roomName, String description, List<String> exitNames, List<String> characterNames,
-        List<String> itemNames) implements OutputTelnetMessage {
+        List<String> itemNames, List<String> monsterNames, List<String> npcNames) implements OutputTelnetMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        output.write(String.format("== %s ==\n%s\n\nExits: %s\nCharacters here: %s\nItems: %s\n", roomName, description,
-                exitNames.isEmpty() ? "none." : String.join(", ", exitNames),
-                characterNames.isEmpty() ? "no one else." : String.join(", ", characterNames),
-                itemNames.isEmpty() ? "none." : String.join(", ", itemNames)));
+        output.write(
+                String.format("== %s ==\n%s\n\nExits: %s\nCharacters here: %s\nItems: %s\nMonsters: %s\nNPCs: %s\n",
+                        roomName, description, exitNames.isEmpty() ? "none." : String.join(", ", exitNames),
+                        characterNames.isEmpty() ? "no one else." : String.join(", ", characterNames),
+                        itemNames.isEmpty() ? "none." : String.join(", ", itemNames),
+                        monsterNames.isEmpty() ? "none." : String.join(", ", monsterNames),
+                        npcNames.isEmpty() ? "none." : String.join(", ", npcNames)));
     }
 }

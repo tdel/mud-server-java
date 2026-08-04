@@ -12,14 +12,14 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.ItemType;
 import fr.idev.mudserver.domain.Room;
-import fr.idev.mudserver.domain.event.CharacterDroppedItem;
-import fr.idev.mudserver.domain.event.CharacterEquippedItem;
-import fr.idev.mudserver.domain.event.CharacterUnequippedItem;
+import fr.idev.mudserver.domain.event.GamePlayerDroppedItem;
+import fr.idev.mudserver.domain.event.GamePlayerEquippedItem;
+import fr.idev.mudserver.domain.event.GamePlayerUnequippedItem;
 import fr.idev.mudserver.domain.event.ItemPickedUp;
 import fr.idev.mudserver.persistence.ItemDao;
 import tools.jackson.core.JacksonException;
@@ -30,9 +30,9 @@ import tools.jackson.databind.ObjectMapper;
  * Cache de lecture pour les items d'un personnage — le sac comme les
  * emplacements équipés — et ceux posés au sol dans une room, et point de
  * persistance réactif pour leurs mutations : ramassage, dépôt, équipement et
- * déséquipement vivent tous désormais sur {@code Character}
- * ({@link Character#pickUpItem}/{@link Character#dropItem}/
- * {@link Character#equipItem}/{@link Character#unequipItem}), qui publie un
+ * déséquipement vivent tous désormais sur {@code GamePlayer}
+ * ({@link GamePlayer#pickUpItem}/{@link GamePlayer#dropItem}/
+ * {@link GamePlayer#equipItem}/{@link GamePlayer#unequipItem}), qui publie un
  * événement de domaine après chaque mutation en mémoire ; les méthodes
  * {@code @EventListener} de cette classe répercutent chacune en base via
  * {@link ItemDao}. Précharge aussi l'ensemble des {@link ItemTemplate} en
@@ -76,7 +76,7 @@ public class ItemService {
         templates.put(template.getId(), template);
     }
 
-    public List<Item> loadInventory(Character character) {
+    public List<Item> loadInventory(GamePlayer character) {
         List<Item> items = attachTemplates(itemDao.findByCharacterId(character.getId()));
         items.forEach(item -> item.attachCharacter(character));
         return items;
@@ -87,7 +87,7 @@ public class ItemService {
      * process — appelé depuis {@code ServerApplication.warmupRunner} juste après
      * {@code RoomService.warmRooms()} et {@link #warmItemTemplates()}, sur le même
      * principe : une {@code Room} n'est jamais rechargée par session, contrairement
-     * à un {@code Character}.
+     * à un {@code GamePlayer}.
      */
     public void warmRoomItems(Collection<Room> rooms) {
         for (Room room : rooms) {
@@ -118,7 +118,7 @@ public class ItemService {
     }
 
     @EventListener
-    void onCharacterDroppedItem(CharacterDroppedItem event) {
+    void onGamePlayerDroppedItem(GamePlayerDroppedItem event) {
         itemDao.assignToRoom(event.item().getId(), event.room().getId());
     }
 
@@ -133,7 +133,7 @@ public class ItemService {
      */
     @EventListener
     @Transactional
-    void onCharacterEquippedItem(CharacterEquippedItem event) {
+    void onGamePlayerEquippedItem(GamePlayerEquippedItem event) {
         for (Item previousOccupant : event.previousOccupants()) {
             itemDao.updateSlot(previousOccupant.getId(), null);
         }
@@ -141,7 +141,7 @@ public class ItemService {
     }
 
     @EventListener
-    void onCharacterUnequippedItem(CharacterUnequippedItem event) {
+    void onGamePlayerUnequippedItem(GamePlayerUnequippedItem event) {
         itemDao.updateSlot(event.item().getId(), null);
     }
 

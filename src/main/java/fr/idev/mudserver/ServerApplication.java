@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Bean;
 import fr.idev.mudserver.game.ClassService;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.game.LevelService;
+import fr.idev.mudserver.game.MonsterService;
+import fr.idev.mudserver.game.NpcService;
 import fr.idev.mudserver.game.RaceService;
 import fr.idev.mudserver.game.RoomService;
 
@@ -20,7 +22,10 @@ import fr.idev.mudserver.game.RoomService;
  * deux listeners du même événement via {@code @Order}. L'ordre des appels
  * ci-dessous est significatif : {@code warmRoomItems()} dépend du contenu déjà
  * chargé par {@code warmRooms()} (les rooms) et {@code warmItemTemplates()}
- * (les templates), voir {@link ItemService#warmRoomItems}.
+ * (les templates), voir {@link ItemService#warmRoomItems}. Même raison pour
+ * {@code monsterService.warmMonsters}/{@code npcService.warmNpcs}, appelés
+ * juste après {@code warmRooms()} : ils placent leurs instances dans les rooms
+ * déjà chargées.
  *
  * <p>
  * Le {@code @ConditionalOnProperty} ci-dessous est porté par la
@@ -48,9 +53,12 @@ public class ServerApplication {
     @Bean
     @ConditionalOnProperty(prefix = "app.telnet", name = "enabled", havingValue = "true", matchIfMissing = true)
     public ApplicationRunner warmupRunner(RoomService roomService, ItemService itemService, RaceService raceService,
-            ClassService classService, LevelService levelService) {
+            ClassService classService, LevelService levelService, MonsterService monsterService,
+            NpcService npcService) {
         return args -> {
             roomService.warmRooms();
+            monsterService.warmMonsters(roomService.allRooms());
+            npcService.warmNpcs(roomService.allRooms());
             itemService.warmItemTemplates();
             itemService.warmRoomItems(roomService.allRooms());
             raceService.warmRaceBonuses();

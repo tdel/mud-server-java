@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CharacterTest {
+class GamePlayerTest {
 
     @Test
     void modifierRoundsDownForOddScores() {
-        Character character = character(7, 10, 12, 20, 10, 10, 1);
+        GamePlayer character = character(7, 10, 12, 20, 10, 10, 1);
 
         assertThat(character.getModifier(Attribute.STRENGTH)).isEqualTo(-2);
         assertThat(character.getModifier(Attribute.DEXTERITY)).isEqualTo(0);
@@ -28,9 +28,9 @@ class CharacterTest {
         assertThat(character(10, 10, 10, 10, 10, 10, 20).getProficiencyBonus()).isEqualTo(6);
     }
 
-    private Character character(int strength, int dexterity, int constitution, int intelligence, int wisdom,
+    private GamePlayer character(int strength, int dexterity, int constitution, int intelligence, int wisdom,
             int charisma, int level) {
-        return new Character(UUID.randomUUID(), UUID.randomUUID(), "Test", UUID.randomUUID(), Race.HUMAN,
+        return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Test", UUID.randomUUID(), Race.HUMAN,
                 CharacterClass.FIGHTER, level, 10, 10,
                 TestAttributes.of(strength, dexterity, constitution, intelligence, wisdom, charisma));
     }

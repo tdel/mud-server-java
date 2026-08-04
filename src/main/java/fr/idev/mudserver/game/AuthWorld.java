@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.persistence.AccountDao;
 import org.springframework.stereotype.Component;
 
@@ -44,7 +44,7 @@ public class AuthWorld {
         connection.setState(ConnectionState.CONNECTED);
     }
 
-    public void moveToGameWorld(Connection connection, Character character) {
+    public void moveToGameWorld(Connection connection, GamePlayer character) {
         Account account = connections.remove(connection);
 
         accountDao.updateCurrentCharacter(account.getId(), character.getId());

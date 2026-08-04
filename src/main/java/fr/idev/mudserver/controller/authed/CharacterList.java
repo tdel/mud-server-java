@@ -6,7 +6,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -35,8 +35,8 @@ public class CharacterList implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        List<Character> characters = characterDao.findByAccountId(authWorld.account(connection).getId());
-        List<String> names = characters.stream().map(Character::getName).toList();
+        List<GamePlayer> characters = characterDao.findByAccountId(authWorld.account(connection).getId());
+        List<String> names = characters.stream().map(GamePlayer::getName).toList();
         connection.send(new fr.idev.mudserver.network.message.authed.CharacterList(names));
     }
 }

@@ -6,7 +6,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.game.GameWorld;
@@ -38,7 +38,7 @@ public class Equip implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        Character character = gameWorld.character(connection);
+        GamePlayer character = gameWorld.character(connection);
         String name = argument.trim();
 
         if (name.isEmpty()) {

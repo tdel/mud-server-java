@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.CharacterClass;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.TestAttributes;
@@ -38,7 +38,7 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     @Test
     void insertsAndFindsById() {
         seedAccountAndRooms();
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA, Race.ORC,
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA, Race.ORC,
                 CharacterClass.BARBARIAN, 1, 14, 14, TestAttributes.of(14, 11, 12, 10, 11, 10));
 
         characterDao.insert(character);
@@ -51,19 +51,19 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     @Test
     void updatesCurrentRoom() {
         seedAccountAndRooms();
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA, Race.ORC,
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA, Race.ORC,
                 CharacterClass.BARBARIAN, 1, 14, 14, TestAttributes.of(14, 11, 12, 10, 11, 10));
         characterDao.insert(character);
 
         characterDao.updateCurrentRoom(character.getId(), roomB);
 
-        assertThat(characterDao.findById(character.getId())).map(Character::getCurrentRoomId).contains(roomB);
+        assertThat(characterDao.findById(character.getId())).map(GamePlayer::getCurrentRoomId).contains(roomB);
     }
 
     @Test
     void updatesProgress() {
         seedAccountAndRooms();
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA, Race.ORC,
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA, Race.ORC,
                 CharacterClass.BARBARIAN, 1, 14, 14, TestAttributes.of(14, 11, 12, 10, 11, 10));
         characterDao.insert(character);
 
@@ -77,7 +77,7 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     @Test
     void deletesById() {
         seedAccountAndRooms();
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA, Race.ORC,
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA, Race.ORC,
                 CharacterClass.BARBARIAN, 1, 14, 14, TestAttributes.of(14, 11, 12, 10, 11, 10));
         characterDao.insert(character);
 

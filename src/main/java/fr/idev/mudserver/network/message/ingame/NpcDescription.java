@@ -1,12 +1,13 @@
 package fr.idev.mudserver.network.message.ingame;
 
+import fr.idev.mudserver.domain.GameNpc;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
-public record CharacterLeftRoom(String characterName) implements OutputTelnetMessage {
+public record NpcDescription(GameNpc npc) implements OutputTelnetMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        output.write(characterName + " est parti.\n");
+        output.write("== " + npc.getName() + " ==\n");
     }
 }

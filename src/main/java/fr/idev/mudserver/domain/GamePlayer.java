@@ -1,7 +1,6 @@
 package fr.idev.mudserver.domain;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -9,61 +8,45 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import fr.idev.mudserver.domain.event.CharacterDroppedItem;
-import fr.idev.mudserver.domain.event.CharacterEquippedItem;
-import fr.idev.mudserver.domain.event.CharacterMovedToRoom;
-import fr.idev.mudserver.domain.event.CharacterSpawnedToRoom;
-import fr.idev.mudserver.domain.event.CharacterUnequippedItem;
 import fr.idev.mudserver.domain.event.DomainEventPublisher;
+import fr.idev.mudserver.domain.event.GamePlayerDroppedItem;
+import fr.idev.mudserver.domain.event.GamePlayerEquippedItem;
+import fr.idev.mudserver.domain.event.GamePlayerMovedToRoom;
+import fr.idev.mudserver.domain.event.GamePlayerSpawnedToRoom;
+import fr.idev.mudserver.domain.event.GamePlayerUnequippedItem;
 import fr.idev.mudserver.domain.event.ItemPickedUp;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.OutputMessage;
 
 /**
- * {@code connection}, {@code currentRoom} ne sont jamais persistés ni pris en
- * compte par {@link #equals}/{@link #hashCode} : ils ne représentent rien en
- * base, seulement l'état vivant du personnage tant qu'il est en jeu (voir
- * {@code GameWorld.enterWorld}). Un personnage fraîchement chargé depuis
+ * {@code connection} n'est jamais persisté ni pris en compte par
+ * {@link #equals}/{@link #hashCode} : il ne représente rien en base, seulement
+ * l'état vivant du personnage tant qu'il est en jeu (voir
+ * {@code GameWorld.enterWorld}) — même convention pour {@code currentRoom},
+ * porté par {@link GameCharacter}. Un personnage fraîchement chargé depuis
  * {@code CharacterDao} n'a ni connexion ni room courante tant qu'il n'a pas
  * rejoint le monde via {@link #spawnToRoom} ou {@link #moveToRoom}.
  */
-public class Character {
+public final class GamePlayer extends GameCharacter {
 
-    private UUID id;
     private UUID accountId;
-    private String name;
     private UUID currentRoomId;
     private Race race;
     private CharacterClass characterClass;
     private int level;
-    private int currentHealth;
-    private int maxHealth;
-    private final Map<Attribute, Integer> attributes;
 
     private Connection connection;
-    private Room currentRoom;
     private final List<Item> inventory = new CopyOnWriteArrayList<>();
 
-    public Character(UUID id, UUID accountId, String name, UUID currentRoomId, Race race, CharacterClass characterClass,
-            int level, int currentHealth, int maxHealth, Map<Attribute, Integer> attributes) {
-        this.id = id;
+    public GamePlayer(UUID id, UUID accountId, String name, UUID currentRoomId, Race race,
+            CharacterClass characterClass, int level, int currentHealth, int maxHealth,
+            Map<Attribute, Integer> attributes) {
+        super(id, name, attributes, currentHealth, maxHealth);
         this.accountId = accountId;
-        this.name = name;
         this.currentRoomId = currentRoomId;
         this.race = race;
         this.characterClass = characterClass;
         this.level = level;
-        this.currentHealth = currentHealth;
-        this.maxHealth = maxHealth;
-        this.attributes = new EnumMap<>(attributes);
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     public UUID getAccountId() {
@@ -72,14 +55,6 @@ public class Character {
 
     public void setAccountId(UUID accountId) {
         this.accountId = accountId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public UUID getCurrentRoomId() {
@@ -114,32 +89,8 @@ public class Character {
         this.level = level;
     }
 
-    public int getAttribute(Attribute attribute) {
-        return attributes.get(attribute);
-    }
-
-    public int getModifier(Attribute attribute) {
-        return Math.floorDiv(getAttribute(attribute) - 10, 2);
-    }
-
     public int getProficiencyBonus() {
         return 2 + Math.floorDiv(level - 1, 4);
-    }
-
-    public int getCurrentHealth() {
-        return currentHealth;
-    }
-
-    public void setCurrentHealth(int currentHealth) {
-        this.currentHealth = currentHealth;
-    }
-
-    public int getMaxHealth() {
-        return maxHealth;
-    }
-
-    public void setMaxHealth(int maxHealth) {
-        this.maxHealth = maxHealth;
     }
 
     public Connection getConnection() {
@@ -150,29 +101,21 @@ public class Character {
         this.connection = connection;
     }
 
-    public Room getCurrentRoom() {
-        return currentRoom;
-    }
-
-    public void setCurrentRoom(Room currentRoom) {
-        this.currentRoom = currentRoom;
-    }
-
     /**
      * Précondition : le personnage est déjà dans le monde, donc {@code currentRoom}
      * est déjà renseigné (voir {@link #spawnToRoom} pour l'entrée initiale, qui n'a
      * pas de room d'origine).
      */
     public void moveToRoom(Room destination) {
-        Room previous = this.currentRoom;
+        Room previous = getCurrentRoom();
         previous.leave(this);
         destination.join(this);
-        DomainEventPublisher.publish(new CharacterMovedToRoom(this, previous, destination));
+        DomainEventPublisher.publish(new GamePlayerMovedToRoom(this, previous, destination));
     }
 
     public void spawnToRoom(Room room) {
         room.join(this);
-        DomainEventPublisher.publish(new CharacterSpawnedToRoom(this, room));
+        DomainEventPublisher.publish(new GamePlayerSpawnedToRoom(this, room));
     }
 
     /**
@@ -208,7 +151,7 @@ public class Character {
                 return false;
             }
             item.setCharacter(this);
-            currentRoom.removeItem(item);
+            getCurrentRoom().removeItem(item);
         }
         addItem(item);
         DomainEventPublisher.publish(new ItemPickedUp(this, item));
@@ -248,13 +191,13 @@ public class Character {
         }
 
         item.setSlot(slot.get());
-        DomainEventPublisher.publish(new CharacterEquippedItem(this, item, slot.get(), previousOccupants));
+        DomainEventPublisher.publish(new GamePlayerEquippedItem(this, item, slot.get(), previousOccupants));
         return slot;
     }
 
     public void unequipItem(Item item) {
         item.setSlot(null);
-        DomainEventPublisher.publish(new CharacterUnequippedItem(this, item));
+        DomainEventPublisher.publish(new GamePlayerUnequippedItem(this, item));
     }
 
     /**
@@ -266,10 +209,11 @@ public class Character {
      * d'entrée du drop.
      */
     public void dropItem(Item item) {
+        Room currentRoom = getCurrentRoom();
         item.setRoom(currentRoom);
         removeItem(item);
         currentRoom.addItem(item);
-        DomainEventPublisher.publish(new CharacterDroppedItem(this, item, currentRoom));
+        DomainEventPublisher.publish(new GamePlayerDroppedItem(this, item, currentRoom));
     }
 
     public List<Item> getInventory() {
@@ -312,26 +256,27 @@ public class Character {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Character other)) {
+        if (!(o instanceof GamePlayer other)) {
             return false;
         }
-        return level == other.level && currentHealth == other.currentHealth && maxHealth == other.maxHealth
-                && Objects.equals(id, other.id) && Objects.equals(accountId, other.accountId)
-                && Objects.equals(name, other.name) && Objects.equals(currentRoomId, other.currentRoomId)
-                && race == other.race && characterClass == other.characterClass
-                && Objects.equals(attributes, other.attributes);
+        return level == other.level && getCurrentHealth() == other.getCurrentHealth()
+                && getMaxHealth() == other.getMaxHealth() && Objects.equals(getId(), other.getId())
+                && Objects.equals(accountId, other.accountId) && Objects.equals(getName(), other.getName())
+                && Objects.equals(currentRoomId, other.currentRoomId) && race == other.race
+                && characterClass == other.characterClass && Objects.equals(getAttributes(), other.getAttributes());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, accountId, name, currentRoomId, race, characterClass, level, currentHealth, maxHealth,
-                attributes);
+        return Objects.hash(getId(), accountId, getName(), currentRoomId, race, characterClass, level,
+                getCurrentHealth(), getMaxHealth(), getAttributes());
     }
 
     @Override
     public String toString() {
-        return "Character[id=" + id + ", accountId=" + accountId + ", name=" + name + ", currentRoomId=" + currentRoomId
-                + ", race=" + race + ", characterClass=" + characterClass + ", level=" + level + ", currentHealth="
-                + currentHealth + ", maxHealth=" + maxHealth + ", attributes=" + attributes + "]";
+        return "GamePlayer[id=" + getId() + ", accountId=" + accountId + ", name=" + getName() + ", currentRoomId="
+                + currentRoomId + ", race=" + race + ", characterClass=" + characterClass + ", level=" + level
+                + ", currentHealth=" + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + ", attributes="
+                + getAttributes() + "]";
     }
 }

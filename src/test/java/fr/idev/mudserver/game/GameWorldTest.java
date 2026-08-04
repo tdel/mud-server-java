@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Attribute;
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.CharacterClass;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
@@ -19,8 +19,8 @@ import fr.idev.mudserver.persistence.CharacterDao;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Non-régression : GameWorld#createCharacter publie NewCharacterCreated, dont
- * le listener onNewCharacterCreated (dans cette même classe) fait le
+ * Non-régression : GameWorld#createCharacter publie NewGamePlayerCreated, dont
+ * le listener onNewGamePlayerCreated (dans cette même classe) fait le
  * characterDao.insert — ce test prouve que la persistance a bien lieu malgré
  * l'indirection par l'événement.
  *
@@ -62,7 +62,7 @@ class GameWorldTest extends AbstractIntegrationTest {
         raceService.warmRaceBonuses();
         classService.warmClassHitDice();
 
-        Character character = gameWorld.createCharacter(account, "Hilde", Race.HUMAN, CharacterClass.FIGHTER);
+        GamePlayer character = gameWorld.createCharacter(account, "Hilde", Race.HUMAN, CharacterClass.FIGHTER);
 
         assertThat(characterDao.findById(character.getId())).contains(character);
         assertThat(character.getLevel()).isEqualTo(1);

@@ -12,11 +12,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomExit;
-import fr.idev.mudserver.domain.event.CharacterMovedToRoom;
-import fr.idev.mudserver.domain.event.CharacterSpawnedToRoom;
+import fr.idev.mudserver.domain.event.GamePlayerMovedToRoom;
+import fr.idev.mudserver.domain.event.GamePlayerSpawnedToRoom;
 import fr.idev.mudserver.persistence.CharacterDao;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
@@ -29,7 +29,7 @@ import tools.jackson.databind.ObjectMapper;
  * couche cache/cycle de vie au-dessus (warm/lookup) — les mutations
  * d'appartenance ({@code join}/{@code leave}/{@code disconnect}/
  * {@code broadcast}) restent portées par {@link Room} lui-même, appelées via
- * {@code Character#moveToRoom}/{@link #spawnCharacter}. Précharge rooms et
+ * {@code GamePlayer#moveToRoom}/{@link #spawnCharacter}. Précharge rooms et
  * exits en une seule passe depuis {@code data/rooms.json} (voir
  * {@link #warmRooms()}), sur le même principe que
  * {@code ItemService.warmItemTemplates()} : donnée de contenu statique, jamais
@@ -95,7 +95,7 @@ public class RoomService {
         }
     }
 
-    public void spawnCharacter(Character character) {
+    public void spawnCharacter(GamePlayer character) {
         character.spawnToRoom(rooms.get(character.getCurrentRoomId()));
     }
 
@@ -108,13 +108,13 @@ public class RoomService {
     }
 
     @EventListener
-    void onCharacterMovedToRoom(CharacterMovedToRoom event) {
+    void onGamePlayerMovedToRoom(GamePlayerMovedToRoom event) {
         event.character().setCurrentRoomId(event.to().getId());
         characterDao.updateCurrentRoom(event.character().getId(), event.to().getId());
     }
 
     @EventListener
-    void onCharacterSpawnedToRoom(CharacterSpawnedToRoom event) {
+    void onGamePlayerSpawnedToRoom(GamePlayerSpawnedToRoom event) {
         event.character().setCurrentRoomId(event.room().getId());
         characterDao.updateCurrentRoom(event.character().getId(), event.room().getId());
     }

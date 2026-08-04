@@ -1,0 +1,25 @@
+{
+    "templates": [
+        {
+            "id": "c1a6b8f0-3b3e-4b0a-9f0a-1e2d3c4b5a6f",
+            "name": "Gobelin",
+            "description": "Une petite créature verte armée d'une dague rouillée.",
+            "maxHealth": 7,
+            "attributes": {
+                "STRENGTH": 8,
+                "DEXTERITY": 14,
+                "CONSTITUTION": 10,
+                "INTELLIGENCE": 10,
+                "WISDOM": 8,
+                "CHARISMA": 8
+            }
+        }
+    ],
+    "spawns": [
+        {
+            "id": "d2b7c9f1-4c4f-4c1b-8f1b-2f3e4d5c6b7a",
+            "templateId": "c1a6b8f0-3b3e-4b0a-9f0a-1e2d3c4b5a6f",
+            "roomId": "7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5"
+        }
+    ]
+}

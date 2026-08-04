@@ -7,6 +7,6 @@ public record CharacterCurrentlyInGame(String name) implements OutputTelnetMessa
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        output.write("Character \"" + name + "\" is currently in game.\n");
+        output.write("GamePlayer \"" + name + "\" is currently in game.\n");
     }
 }

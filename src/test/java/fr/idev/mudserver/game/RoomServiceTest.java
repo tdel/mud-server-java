@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.CharacterClass;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
@@ -95,16 +95,16 @@ class RoomServiceTest extends AbstractIntegrationTest {
 
         Account account = new Account(UUID.randomUUID(), "erin", "hashed-password", null);
         accountDao.insert(account);
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Erin", origin.getId(), Race.HUMAN,
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Erin", origin.getId(), Race.HUMAN,
                 CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
         origin.join(character);
 
         character.moveToRoom(destination);
 
-        assertThat(destination.characters()).extracting(Character::getId).contains(character.getId());
-        assertThat(origin.characters()).extracting(Character::getId).doesNotContain(character.getId());
-        assertThat(characterDao.findById(character.getId())).map(Character::getCurrentRoomId)
+        assertThat(destination.characters()).extracting(GamePlayer::getId).contains(character.getId());
+        assertThat(origin.characters()).extracting(GamePlayer::getId).doesNotContain(character.getId());
+        assertThat(characterDao.findById(character.getId())).map(GamePlayer::getCurrentRoomId)
                 .contains(destination.getId());
     }
 
@@ -115,14 +115,14 @@ class RoomServiceTest extends AbstractIntegrationTest {
 
         Account account = new Account(UUID.randomUUID(), "finn", "hashed-password", null);
         accountDao.insert(account);
-        Character character = new Character(UUID.randomUUID(), account.getId(), "Finn", room.getId(), Race.HUMAN,
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Finn", room.getId(), Race.HUMAN,
                 CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
 
         roomService.spawnCharacter(character);
 
         assertThat(character.getCurrentRoom()).isEqualTo(room);
-        assertThat(character.getCurrentRoom().characters()).extracting(Character::getId).contains(character.getId());
+        assertThat(character.getCurrentRoom().characters()).extracting(GamePlayer::getId).contains(character.getId());
     }
 
     private Room room(UUID roomId) {

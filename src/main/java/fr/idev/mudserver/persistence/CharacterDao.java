@@ -12,7 +12,7 @@ import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
 import fr.idev.mudserver.domain.Attribute;
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.CharacterClass;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.persistence.jooq.tables.records.CharacterRecord;
@@ -26,7 +26,7 @@ public class CharacterDao {
         this.dsl = dsl;
     }
 
-    public void insert(Character character) {
+    public void insert(GamePlayer character) {
         dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_ROOM_ID,
                 CHARACTER.RACE, CHARACTER.CHARACTER_CLASS, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH,
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
@@ -40,15 +40,15 @@ public class CharacterDao {
                 .execute();
     }
 
-    public Optional<Character> findById(UUID id) {
+    public Optional<GamePlayer> findById(UUID id) {
         return dsl.selectFrom(CHARACTER).where(CHARACTER.ID.eq(id)).fetchOptional(CharacterDao::toDomain);
     }
 
-    public List<Character> findByAccountId(UUID accountId) {
+    public List<GamePlayer> findByAccountId(UUID accountId) {
         return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(accountId)).fetch(CharacterDao::toDomain);
     }
 
-    public Optional<Character> findByAccountIdAndName(UUID accountId, String name) {
+    public Optional<GamePlayer> findByAccountIdAndName(UUID accountId, String name) {
         return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(accountId)).and(CHARACTER.NAME.eq(name))
                 .fetchOptional(CharacterDao::toDomain);
     }
@@ -61,7 +61,7 @@ public class CharacterDao {
      * Ne persiste que les champs qui évoluent réellement en jeu (position, santé) ;
      * race/stats/nom restent figés à la création, pas besoin de les réécrire.
      */
-    public void update(Character character) {
+    public void update(GamePlayer character) {
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_ROOM_ID, character.getCurrentRoomId())
                 .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).where(CHARACTER.ID.eq(character.getId()))
                 .execute();
@@ -71,7 +71,7 @@ public class CharacterDao {
         dsl.deleteFrom(CHARACTER).where(CHARACTER.ID.eq(characterId)).execute();
     }
 
-    private static Character toDomain(CharacterRecord record) {
+    private static GamePlayer toDomain(CharacterRecord record) {
         Map<Attribute, Integer> attributes = new EnumMap<>(Attribute.class);
         attributes.put(Attribute.STRENGTH, record.getStrength());
         attributes.put(Attribute.DEXTERITY, record.getDexterity());
@@ -80,7 +80,7 @@ public class CharacterDao {
         attributes.put(Attribute.WISDOM, record.getWisdom());
         attributes.put(Attribute.CHARISMA, record.getCharisma());
 
-        return new Character(record.getId(), record.getAccountId(), record.getName(), record.getCurrentRoomId(),
+        return new GamePlayer(record.getId(), record.getAccountId(), record.getName(), record.getCurrentRoomId(),
                 Race.valueOf(record.getRace()), CharacterClass.valueOf(record.getCharacterClass()), record.getLevel(),
                 record.getCurrentHealth(), record.getMaxHealth(), attributes);
     }

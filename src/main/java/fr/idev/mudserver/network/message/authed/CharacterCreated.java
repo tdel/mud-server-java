@@ -7,6 +7,6 @@ public record CharacterCreated(String name) implements OutputTelnetMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        output.write("Character \"" + name + "\" created.\n");
+        output.write("GamePlayer \"" + name + "\" created.\n");
     }
 }

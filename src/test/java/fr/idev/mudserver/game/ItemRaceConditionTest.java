@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.Character;
+import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.CharacterClass;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.Race;
@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * appels {@code dispatch()} séquentiels sur le même thread — pas une vraie
  * race), ce test induit une concurrence réelle : deux virtual threads,
  * synchronisés par un {@link CyclicBarrier} pour arriver au plus près l'un de
- * l'autre, appellent {@link Character#pickUpItem} sur le même item. Objectif :
+ * l'autre, appellent {@link GamePlayer#pickUpItem} sur le même item. Objectif :
  * prouver que le {@code synchronized(item)} de {@code pickUpItem} sérialise
  * réellement deux virtual threads concurrents (voir historique : ce test
  * couvrait auparavant un verrou DB {@code SELECT ... FOR UPDATE}, remplacé par
@@ -59,8 +59,8 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
         roomService.warmRooms();
         Room room = roomService.allRooms().iterator().next();
 
-        Character alice = seedCharacter(room, "race-alice-" + UUID.randomUUID());
-        Character bob = seedCharacter(room, "race-bob-" + UUID.randomUUID());
+        GamePlayer alice = seedCharacter(room, "race-alice-" + UUID.randomUUID());
+        GamePlayer bob = seedCharacter(room, "race-bob-" + UUID.randomUUID());
 
         UUID templateId = UUID.randomUUID();
 
@@ -95,10 +95,10 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
         }
     }
 
-    private Character seedCharacter(Room room, String login) {
+    private GamePlayer seedCharacter(Room room, String login) {
         Account account = new Account(UUID.randomUUID(), login, "hashed-password", null);
         accountDao.insert(account);
-        Character character = new Character(UUID.randomUUID(), account.getId(), login, room.getId(), Race.HUMAN,
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), login, room.getId(), Race.HUMAN,
                 CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
         room(room.getId()).join(character);
