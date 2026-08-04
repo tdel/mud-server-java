@@ -2,14 +2,6 @@
 -- côté PHP, consolidées ici en une seule puisqu'il s'agit d'un schéma neuf).
 -- UUID générés côté application (pas de DEFAULT gen_random_uuid()), comme en PHP.
 
-CREATE TABLE item_template (
-    id          UUID PRIMARY KEY,
-    name        VARCHAR(255) NOT NULL UNIQUE,
-    description TEXT NULL,
-    type        VARCHAR(50) NOT NULL,
-    weight      INT NOT NULL
-);
-
 CREATE TABLE room (
     id               UUID PRIMARY KEY,
     name             VARCHAR(255) NOT NULL,
@@ -62,9 +54,12 @@ CREATE TABLE room_exit (
     target_room_id UUID NOT NULL REFERENCES room(id)
 );
 
+-- template_id n'est plus une FK vers une table item_template : les ItemTemplate sont
+-- chargés en mémoire depuis data/items.json (voir ItemService.warmItemTemplates()),
+-- pas persistés en DB. Validé côté application, comme character.race.
 CREATE TABLE item (
     id           UUID PRIMARY KEY,
-    template_id  UUID NOT NULL REFERENCES item_template(id),
+    template_id  UUID NOT NULL,
     room_id      UUID NULL REFERENCES room(id),
     character_id UUID NULL REFERENCES character(id),
     slot         VARCHAR(20) NULL

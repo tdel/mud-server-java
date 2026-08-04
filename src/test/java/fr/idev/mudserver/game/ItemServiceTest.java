@@ -20,7 +20,6 @@ import fr.idev.mudserver.domain.TestAttributes;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 import fr.idev.mudserver.persistence.ItemDao;
-import fr.idev.mudserver.persistence.ItemTemplateDao;
 import fr.idev.mudserver.persistence.RoomDao;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,9 +42,6 @@ class ItemServiceTest extends AbstractIntegrationTest {
     private ItemDao itemDao;
 
     @Autowired
-    private ItemTemplateDao itemTemplateDao;
-
-    @Autowired
     private RoomDao roomDao;
 
     @Autowired
@@ -60,7 +56,6 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void equippingANewWeaponUnequipsThePreviousOneInTheSameTransaction() {
         ItemTemplate weaponTemplate = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3);
-        itemTemplateDao.insert(weaponTemplate);
 
         Room room = new Room(UUID.randomUUID(), "Salle A", "...", true);
         roomDao.insert(room);
@@ -90,8 +85,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void loadInventoryStillReturnsAnEquippedItemOnAFreshLoad() {
         ItemTemplate weaponTemplate = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3);
-        itemTemplateDao.insert(weaponTemplate);
-        itemService.warmItemTemplates();
+        itemService.registerTemplate(weaponTemplate);
 
         Room room = new Room(UUID.randomUUID(), "Salle A", "...", true);
         roomDao.insert(room);
@@ -119,8 +113,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void loadInventoryAttachesTemplatesAndFeedsTheCharacterCache() {
         ItemTemplate potionTemplate = new ItemTemplate(UUID.randomUUID(), "Potion de soin", null, ItemType.POTION, 1);
-        itemTemplateDao.insert(potionTemplate);
-        itemService.warmItemTemplates();
+        itemService.registerTemplate(potionTemplate);
 
         Room room = new Room(UUID.randomUUID(), "Salle B", "...", true);
         roomDao.insert(room);
@@ -142,8 +135,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void addAndRemoveItemFromInventoryKeepTheCharacterAndRoomCachesInSync() {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Torche", null, ItemType.MISC, 1);
-        itemTemplateDao.insert(template);
-        itemService.warmItemTemplates();
+        itemService.registerTemplate(template);
 
         Room room = new Room(UUID.randomUUID(), "Salle C", "...", null);
         roomDao.insert(room);
@@ -173,8 +165,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void warmRoomItemsAttachesTemplatesToItemsOnTheGround() {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Bouclier", null, ItemType.ARMOR, 4);
-        itemTemplateDao.insert(template);
-        itemService.warmItemTemplates();
+        itemService.registerTemplate(template);
 
         Room room = new Room(UUID.randomUUID(), "Salle D", "...", null);
         roomDao.insert(room);
@@ -186,6 +177,25 @@ class ItemServiceTest extends AbstractIntegrationTest {
         itemService.warmRoomItems(roomService.allRooms());
 
         assertThat(room(room.getId()).getItems()).extracting(Item::getName).containsExactly("Bouclier");
+    }
+
+    @Test
+    void warmItemTemplatesLoadsTheRealCatalogFromJson() {
+        itemService.warmItemTemplates();
+
+        Item potion = itemService.attachTemplate(
+                new Item(UUID.randomUUID(), UUID.fromString("019fa0a5-80bf-7e84-87bf-5cf699c00315"), null, null, null));
+        Item sword = itemService.attachTemplate(
+                new Item(UUID.randomUUID(), UUID.fromString("019fa0a5-80c0-7035-9c2d-113b09a275df"), null, null, null));
+        Item helmet = itemService.attachTemplate(
+                new Item(UUID.randomUUID(), UUID.fromString("019faec6-116d-723d-b04c-76d51a2a2cb7"), null, null, null));
+
+        assertThat(potion.getName()).isEqualTo("Potion de soin");
+        assertThat(potion.getType()).isEqualTo(ItemType.POTION);
+        assertThat(sword.getName()).isEqualTo("Epée courte");
+        assertThat(sword.getType()).isEqualTo(ItemType.WEAPON);
+        assertThat(helmet.getName()).isEqualTo("Casque de fer");
+        assertThat(helmet.getType()).isEqualTo(ItemType.HELMET);
     }
 
     private Room room(UUID roomId) {

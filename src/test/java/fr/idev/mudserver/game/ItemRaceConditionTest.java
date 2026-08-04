@@ -14,15 +14,12 @@ import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Character;
 import fr.idev.mudserver.domain.Item;
-import fr.idev.mudserver.domain.ItemTemplate;
-import fr.idev.mudserver.domain.ItemType;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.TestAttributes;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 import fr.idev.mudserver.persistence.ItemDao;
-import fr.idev.mudserver.persistence.ItemTemplateDao;
 import fr.idev.mudserver.persistence.RoomDao;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,9 +55,6 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
     private CharacterDao characterDao;
 
     @Autowired
-    private ItemTemplateDao itemTemplateDao;
-
-    @Autowired
     private RoomService roomService;
 
     @Test
@@ -72,13 +66,11 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
         Character alice = seedCharacter(room, "race-alice-" + UUID.randomUUID());
         Character bob = seedCharacter(room, "race-bob-" + UUID.randomUUID());
 
-        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "race-item-" + UUID.randomUUID(), null,
-                ItemType.MISC, 1);
-        itemTemplateDao.insert(template);
+        UUID templateId = UUID.randomUUID();
 
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             for (int i = 0; i < ITERATIONS; i++) {
-                Item item = new Item(UUID.randomUUID(), template.getId(), room.getId(), null, null);
+                Item item = new Item(UUID.randomUUID(), templateId, room.getId(), null, null);
                 itemDao.insert(item);
 
                 CyclicBarrier barrier = new CyclicBarrier(2);
