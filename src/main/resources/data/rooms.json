@@ -6,7 +6,9 @@
         "isStartingRoom": true,
         "exits": [
             { "direction": "nord", "targetRoomId": "9a884ac7-b954-4cd6-ab67-c677d472cb0f" },
-            { "direction": "est", "targetRoomId": "e1da77bd-f0b3-4d5a-95da-e8765c4fc973" }
+            { "direction": "est", "targetRoomId": "e1da77bd-f0b3-4d5a-95da-e8765c4fc973" },
+            { "direction": "ouest", "targetRoomId": "82affabe-27e7-425c-87aa-e63f9b826513" },
+            { "direction": "sud", "targetRoomId": "4dae9974-45f7-46c9-8e66-12cdac759860" }
         ]
     },
     {
@@ -31,7 +33,59 @@
         "name": "Clairière",
         "description": "Une clairière baignée de soleil, au cœur de la forêt.",
         "exits": [
-            { "direction": "ouest", "targetRoomId": "9a884ac7-b954-4cd6-ab67-c677d472cb0f" }
+            { "direction": "ouest", "targetRoomId": "9a884ac7-b954-4cd6-ab67-c677d472cb0f" },
+            { "direction": "nord", "targetRoomId": "8203e5a0-9fa2-4799-a6d8-398b11292c17" }
+        ]
+    },
+    {
+        "id": "82affabe-27e7-425c-87aa-e63f9b826513",
+        "name": "Rue du Forgeron",
+        "description": "Une ruelle étroite qui sent la fumée de forge, bordée d'outils rouillés accrochés aux murs.",
+        "exits": [
+            { "direction": "est", "targetRoomId": "5e4ada37-37e1-438c-9233-581f10c055c7" },
+            { "direction": "nord", "targetRoomId": "21a9aa96-286e-4ea7-ac3b-9e6ab58b323c" }
+        ]
+    },
+    {
+        "id": "21a9aa96-286e-4ea7-ac3b-9e6ab58b323c",
+        "name": "Forge du forgeron",
+        "description": "La chaleur d'une forge crépitante emplit la pièce ; des armes à demi terminées reposent sur l'établi.",
+        "exits": [
+            { "direction": "sud", "targetRoomId": "82affabe-27e7-425c-87aa-e63f9b826513" }
+        ]
+    },
+    {
+        "id": "4dae9974-45f7-46c9-8e66-12cdac759860",
+        "name": "Chemin du cimetière",
+        "description": "Un chemin de terre battue serpente entre des ifs noueux, en direction d'un silence pesant.",
+        "exits": [
+            { "direction": "nord", "targetRoomId": "5e4ada37-37e1-438c-9233-581f10c055c7" },
+            { "direction": "sud", "targetRoomId": "a73e8fb0-c05b-4aa8-9c57-4b097644cd0d" }
+        ]
+    },
+    {
+        "id": "a73e8fb0-c05b-4aa8-9c57-4b097644cd0d",
+        "name": "Cimetière abandonné",
+        "description": "Des pierres tombales penchées émergent des herbes hautes, sous un ciel bas et gris.",
+        "exits": [
+            { "direction": "nord", "targetRoomId": "4dae9974-45f7-46c9-8e66-12cdac759860" }
+        ]
+    },
+    {
+        "id": "8203e5a0-9fa2-4799-a6d8-398b11292c17",
+        "name": "Sentier broussailleux",
+        "description": "Les ronces griffent les mollets tandis que la canopée se referme au-dessus du chemin.",
+        "exits": [
+            { "direction": "sud", "targetRoomId": "7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5" },
+            { "direction": "est", "targetRoomId": "6aade027-6918-4521-925d-86529ac4657e" }
+        ]
+    },
+    {
+        "id": "6aade027-6918-4521-925d-86529ac4657e",
+        "name": "Repaire sauvage",
+        "description": "Un enchevêtrement de branches et d'ossements marque l'antre d'une créature.",
+        "exits": [
+            { "direction": "ouest", "targetRoomId": "8203e5a0-9fa2-4799-a6d8-398b11292c17" }
         ]
     }
 ]
