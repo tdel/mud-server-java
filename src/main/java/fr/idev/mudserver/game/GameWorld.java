@@ -86,7 +86,8 @@ public class GameWorld {
         return characterDao.findByAccountIdAndName(accountId, name).isPresent();
     }
 
-    public GamePlayer createCharacter(Account account, String name, Race race, CharacterClass characterClass) {
+    public GamePlayer createCharacter(Account account, String name, Gender gender, Race race,
+            CharacterClass characterClass) {
         Optional<Room> startingRoom = roomService.startingRoom();
 
         Map<Attribute, Integer> scores = rollAttributeScores();
@@ -100,7 +101,7 @@ public class GameWorld {
         int maxHealth = Math.max(1, classService.hitDie(characterClass) + constitutionModifier);
 
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), name, startingRoom.get().getId(),
-                race, characterClass, 1, maxHealth, maxHealth, scores);
+                gender, race, characterClass, 1, maxHealth, maxHealth, scores);
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));
         character.spawnToRoom(startingRoom.get());

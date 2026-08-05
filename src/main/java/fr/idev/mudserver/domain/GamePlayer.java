@@ -31,6 +31,7 @@ public final class GamePlayer extends GameCharacter {
 
     private UUID accountId;
     private UUID currentRoomId;
+    private Gender gender;
     private Race race;
     private CharacterClass characterClass;
     private int level;
@@ -39,12 +40,13 @@ public final class GamePlayer extends GameCharacter {
     private final List<Item> inventory = new CopyOnWriteArrayList<>();
     private GameMonster target;
 
-    public GamePlayer(UUID id, UUID accountId, String name, UUID currentRoomId, Race race,
+    public GamePlayer(UUID id, UUID accountId, String name, UUID currentRoomId, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes) {
         super(id, name, attributes, currentHealth, maxHealth);
         this.accountId = accountId;
         this.currentRoomId = currentRoomId;
+        this.gender = gender;
         this.race = race;
         this.characterClass = characterClass;
         this.level = level;
@@ -64,6 +66,14 @@ public final class GamePlayer extends GameCharacter {
 
     public void setCurrentRoomId(UUID currentRoomId) {
         this.currentRoomId = currentRoomId;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
     }
 
     public Race getRace() {
@@ -289,21 +299,21 @@ public final class GamePlayer extends GameCharacter {
         return level == other.level && getCurrentHealth() == other.getCurrentHealth()
                 && getMaxHealth() == other.getMaxHealth() && Objects.equals(getId(), other.getId())
                 && Objects.equals(accountId, other.accountId) && Objects.equals(getName(), other.getName())
-                && Objects.equals(currentRoomId, other.currentRoomId) && race == other.race
+                && Objects.equals(currentRoomId, other.currentRoomId) && gender == other.gender && race == other.race
                 && characterClass == other.characterClass && Objects.equals(getAttributes(), other.getAttributes());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), accountId, getName(), currentRoomId, race, characterClass, level,
+        return Objects.hash(getId(), accountId, getName(), currentRoomId, gender, race, characterClass, level,
                 getCurrentHealth(), getMaxHealth(), getAttributes());
     }
 
     @Override
     public String toString() {
         return "GamePlayer[id=" + getId() + ", accountId=" + accountId + ", name=" + getName() + ", currentRoomId="
-                + currentRoomId + ", race=" + race + ", characterClass=" + characterClass + ", level=" + level
-                + ", currentHealth=" + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + ", attributes="
-                + getAttributes() + "]";
+                + currentRoomId + ", gender=" + gender + ", race=" + race + ", characterClass=" + characterClass
+                + ", level=" + level + ", currentHealth=" + getCurrentHealth() + ", maxHealth=" + getMaxHealth()
+                + ", attributes=" + getAttributes() + "]";
     }
 }

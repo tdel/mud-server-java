@@ -14,6 +14,7 @@ import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.CharacterClass;
+import fr.idev.mudserver.domain.Gender;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
@@ -98,8 +99,8 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
     private GamePlayer seedCharacter(Room room, String login) {
         Account account = new Account(UUID.randomUUID(), login, "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), login, room.getId(), Race.HUMAN,
-                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), login, room.getId(), Gender.MAN,
+                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
         room(room.getId()).join(character);
         return character;

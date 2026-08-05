@@ -13,6 +13,7 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Attribute;
 import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.CharacterClass;
+import fr.idev.mudserver.domain.Gender;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.game.AuthWorld;
@@ -25,8 +26,10 @@ import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.authed.CharacterAlreadyExists;
 import fr.idev.mudserver.network.message.authed.CharacterCreated;
 import fr.idev.mudserver.network.message.authed.ChooseClass;
+import fr.idev.mudserver.network.message.authed.ChooseGender;
 import fr.idev.mudserver.network.message.authed.ChooseRace;
 import fr.idev.mudserver.network.message.authed.InvalidClass;
+import fr.idev.mudserver.network.message.authed.InvalidGender;
 import fr.idev.mudserver.network.message.authed.InvalidRace;
 import fr.idev.mudserver.network.message.authed.NoStartingRoom;
 import fr.idev.mudserver.network.message.ingame.GamePlayerStats;
@@ -77,10 +80,33 @@ public class CharacterCreate implements ControllerHandler {
             return;
         }
 
-        promptRace(connection, account, name);
+        promptGender(connection, account, name);
     }
 
-    private void promptRace(Connection connection, Account account, String name) {
+    private void promptGender(Connection connection, Account account, String name) {
+        connection.requestBlocking(new ChooseGender(), line -> {
+            Gender gender = parseGender(line);
+
+            if (gender == null) {
+                connection.send(new InvalidGender(line.trim()));
+                promptGender(connection, account, name);
+                return;
+            }
+
+            promptRace(connection, account, name, gender);
+        });
+    }
+
+    private Gender parseGender(String input) {
+        String normalized = input.strip().toLowerCase(Locale.ROOT).replace(' ', '_').replace('-', '_');
+        try {
+            return Gender.valueOf(normalized.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    private void promptRace(Connection connection, Account account, String name, Gender gender) {
         Map<Race, Map<Attribute, Integer>> bonusesByRace = new LinkedHashMap<>();
         for (Race race : Race.values()) {
             bonusesByRace.put(race, raceService.attributeScoreBonuses(race));
@@ -91,11 +117,11 @@ public class CharacterCreate implements ControllerHandler {
 
             if (race == null) {
                 connection.send(new InvalidRace(line.trim()));
-                promptRace(connection, account, name);
+                promptRace(connection, account, name, gender);
                 return;
             }
 
-            promptClass(connection, account, name, race);
+            promptClass(connection, account, name, gender, race);
         });
     }
 
@@ -108,7 +134,7 @@ public class CharacterCreate implements ControllerHandler {
         }
     }
 
-    private void promptClass(Connection connection, Account account, String name, Race race) {
+    private void promptClass(Connection connection, Account account, String name, Gender gender, Race race) {
         Map<CharacterClass, Integer> hitDiceByClass = new LinkedHashMap<>();
         for (CharacterClass characterClass : CharacterClass.values()) {
             hitDiceByClass.put(characterClass, classService.hitDie(characterClass));
@@ -119,11 +145,11 @@ public class CharacterCreate implements ControllerHandler {
 
             if (characterClass == null) {
                 connection.send(new InvalidClass(line.trim()));
-                promptClass(connection, account, name, race);
+                promptClass(connection, account, name, gender, race);
                 return;
             }
 
-            createCharacter(connection, account, name, race, characterClass);
+            createCharacter(connection, account, name, gender, race, characterClass);
         });
     }
 
@@ -136,9 +162,9 @@ public class CharacterCreate implements ControllerHandler {
         }
     }
 
-    private void createCharacter(Connection connection, Account account, String name, Race race,
+    private void createCharacter(Connection connection, Account account, String name, Gender gender, Race race,
             CharacterClass characterClass) {
-        GamePlayer character = gameWorld.createCharacter(account, name, race, characterClass);
+        GamePlayer character = gameWorld.createCharacter(account, name, gender, race, characterClass);
 
         connection.send(new CharacterCreated(name));
         connection.send(new GamePlayerStats(character));

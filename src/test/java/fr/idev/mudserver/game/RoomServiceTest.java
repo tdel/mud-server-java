@@ -11,6 +11,7 @@ import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.CharacterClass;
+import fr.idev.mudserver.domain.Gender;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomExit;
@@ -95,8 +96,8 @@ class RoomServiceTest extends AbstractIntegrationTest {
 
         Account account = new Account(UUID.randomUUID(), "erin", "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Erin", origin.getId(), Race.HUMAN,
-                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Erin", origin.getId(), Gender.WOMAN,
+                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
         origin.join(character);
 
@@ -115,8 +116,8 @@ class RoomServiceTest extends AbstractIntegrationTest {
 
         Account account = new Account(UUID.randomUUID(), "finn", "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Finn", room.getId(), Race.HUMAN,
-                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Finn", room.getId(), Gender.MAN,
+                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
 
         roomService.spawnCharacter(character);

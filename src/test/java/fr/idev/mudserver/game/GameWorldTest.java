@@ -11,6 +11,7 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Attribute;
 import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.CharacterClass;
+import fr.idev.mudserver.domain.Gender;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.persistence.AccountDao;
@@ -62,9 +63,11 @@ class GameWorldTest extends AbstractIntegrationTest {
         raceService.warmRaceBonuses();
         classService.warmClassHitDice();
 
-        GamePlayer character = gameWorld.createCharacter(account, "Hilde", Race.HUMAN, CharacterClass.FIGHTER);
+        GamePlayer character = gameWorld.createCharacter(account, "Hilde", Gender.WOMAN, Race.HUMAN,
+                CharacterClass.FIGHTER);
 
         assertThat(characterDao.findById(character.getId())).contains(character);
+        assertThat(character.getGender()).isEqualTo(Gender.WOMAN);
         assertThat(character.getLevel()).isEqualTo(1);
         int expectedConstitutionModifier = character.getModifier(Attribute.CONSTITUTION);
         int expectedMaxHealth = Math.max(1, classService.hitDie(CharacterClass.FIGHTER) + expectedConstitutionModifier);

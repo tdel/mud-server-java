@@ -12,6 +12,7 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.CharacterClass;
 import fr.idev.mudserver.domain.EquipmentSlot;
+import fr.idev.mudserver.domain.Gender;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.ItemType;
@@ -57,8 +58,8 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
         Account account = new Account(UUID.randomUUID(), "erin", "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Erin", UUID.randomUUID(), Race.HUMAN,
-                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Erin", UUID.randomUUID(),
+                Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
 
         Item firstSword = new Item(UUID.randomUUID(), weaponTemplate.getId(), null, character.getId(), null);
@@ -86,8 +87,8 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
         Account account = new Account(UUID.randomUUID(), "gwen", "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Gwen", UUID.randomUUID(), Race.HUMAN,
-                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Gwen", UUID.randomUUID(),
+                Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
 
         Item sword = new Item(UUID.randomUUID(), weaponTemplate.getId(), null, character.getId(), null);
@@ -113,8 +114,8 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
         Account account = new Account(UUID.randomUUID(), "fay", "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Fay", UUID.randomUUID(), Race.HUMAN,
-                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Fay", UUID.randomUUID(),
+                Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
 
         Item potion = new Item(UUID.randomUUID(), potionTemplate.getId(), null, character.getId(), null);
@@ -135,8 +136,8 @@ class ItemServiceTest extends AbstractIntegrationTest {
         Room warmedRoom = roomService.allRooms().iterator().next();
         Account account = new Account(UUID.randomUUID(), "gus", "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Gus", warmedRoom.getId(), Race.HUMAN,
-                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Gus", warmedRoom.getId(), Gender.MAN,
+                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10));
         characterDao.insert(character);
         warmedRoom.join(character);
 

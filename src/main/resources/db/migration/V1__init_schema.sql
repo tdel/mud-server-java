@@ -20,6 +20,7 @@ CREATE TABLE character (
     account_id     UUID NOT NULL REFERENCES account(id),
     name           VARCHAR(255) NOT NULL,
     current_room_id UUID NOT NULL,
+    gender         VARCHAR(10) NOT NULL,
     race           VARCHAR(20) NOT NULL,
     character_class VARCHAR(20) NOT NULL,
     level          INT NOT NULL DEFAULT 1,

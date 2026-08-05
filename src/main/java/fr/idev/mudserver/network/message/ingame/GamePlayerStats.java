@@ -11,9 +11,9 @@ public record GamePlayerStats(GamePlayer character) implements OutputTelnetMessa
     public void toTelnet(TelnetOutput output) {
         GamePlayer c = character;
         output.write(String.format(
-                "== %s (Level %d %s) ==\nHealth: %d/%d\nArmor Class: %d\nProficiency: %+d\nStrength: %d (%+d)  Dexterity: %d (%+d)  Constitution: %d (%+d)\nIntelligence: %d (%+d)  Wisdom: %d (%+d)  Charisma: %d (%+d)\n",
-                c.getName(), c.getLevel(), c.getCharacterClass().label(), c.getCurrentHealth(), c.getMaxHealth(),
-                c.getArmorClass(), c.getProficiencyBonus(), c.getAttribute(Attribute.STRENGTH),
+                "== %s (%s, Level %d %s) ==\nHealth: %d/%d\nArmor Class: %d\nProficiency: %+d\nStrength: %d (%+d)  Dexterity: %d (%+d)  Constitution: %d (%+d)\nIntelligence: %d (%+d)  Wisdom: %d (%+d)  Charisma: %d (%+d)\n",
+                c.getName(), c.getGender().label(), c.getLevel(), c.getCharacterClass().label(), c.getCurrentHealth(),
+                c.getMaxHealth(), c.getArmorClass(), c.getProficiencyBonus(), c.getAttribute(Attribute.STRENGTH),
                 c.getModifier(Attribute.STRENGTH), c.getAttribute(Attribute.DEXTERITY),
                 c.getModifier(Attribute.DEXTERITY), c.getAttribute(Attribute.CONSTITUTION),
                 c.getModifier(Attribute.CONSTITUTION), c.getAttribute(Attribute.INTELLIGENCE),

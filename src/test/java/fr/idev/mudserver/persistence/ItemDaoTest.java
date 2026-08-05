@@ -11,6 +11,7 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.CharacterClass;
 import fr.idev.mudserver.domain.EquipmentSlot;
+import fr.idev.mudserver.domain.Gender;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.domain.TestAttributes;
@@ -38,7 +39,7 @@ class ItemDaoTest extends AbstractIntegrationTest {
         roomId = UUID.randomUUID();
         Account account = new Account(UUID.randomUUID(), "dave", "hashed-password", null);
         accountDao.insert(account);
-        character = new GamePlayer(UUID.randomUUID(), account.getId(), "Dave le Nain", roomId, Race.DWARF,
+        character = new GamePlayer(UUID.randomUUID(), account.getId(), "Dave le Nain", roomId, Gender.MAN, Race.DWARF,
                 CharacterClass.FIGHTER, 1, 12, 12, TestAttributes.of(12, 10, 12, 10, 10, 10));
         characterDao.insert(character);
     }

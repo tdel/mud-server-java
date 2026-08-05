@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import fr.idev.mudserver.domain.Attribute;
 import fr.idev.mudserver.domain.GamePlayer;
 import fr.idev.mudserver.domain.CharacterClass;
+import fr.idev.mudserver.domain.Gender;
 import fr.idev.mudserver.domain.Race;
 import fr.idev.mudserver.persistence.jooq.tables.records.CharacterRecord;
 
@@ -28,12 +29,12 @@ public class CharacterDao {
 
     public void insert(GamePlayer character) {
         dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_ROOM_ID,
-                CHARACTER.RACE, CHARACTER.CHARACTER_CLASS, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH,
+                CHARACTER.GENDER, CHARACTER.RACE, CHARACTER.CHARACTER_CLASS, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH,
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
                 CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA)
                 .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentRoomId(),
-                        character.getRace().name(), character.getCharacterClass().name(), character.getLevel(),
-                        character.getCurrentHealth(), character.getMaxHealth(),
+                        character.getGender().name(), character.getRace().name(), character.getCharacterClass().name(),
+                        character.getLevel(), character.getCurrentHealth(), character.getMaxHealth(),
                         character.getAttribute(Attribute.STRENGTH), character.getAttribute(Attribute.DEXTERITY),
                         character.getAttribute(Attribute.CONSTITUTION), character.getAttribute(Attribute.INTELLIGENCE),
                         character.getAttribute(Attribute.WISDOM), character.getAttribute(Attribute.CHARISMA))
@@ -81,7 +82,8 @@ public class CharacterDao {
         attributes.put(Attribute.CHARISMA, record.getCharisma());
 
         return new GamePlayer(record.getId(), record.getAccountId(), record.getName(), record.getCurrentRoomId(),
-                Race.valueOf(record.getRace()), CharacterClass.valueOf(record.getCharacterClass()), record.getLevel(),
-                record.getCurrentHealth(), record.getMaxHealth(), attributes);
+                Gender.valueOf(record.getGender()), Race.valueOf(record.getRace()),
+                CharacterClass.valueOf(record.getCharacterClass()), record.getLevel(), record.getCurrentHealth(),
+                record.getMaxHealth(), attributes);
     }
 }

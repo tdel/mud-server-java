@@ -8,6 +8,7 @@ import fr.idev.mudserver.domain.CharacterClass;
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.GameMonster;
 import fr.idev.mudserver.domain.GamePlayer;
+import fr.idev.mudserver.domain.Gender;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.ItemType;
@@ -133,8 +134,8 @@ class CombatServiceTest {
     }
 
     private GamePlayer player(int strength, int level) {
-        return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Attaquant", UUID.randomUUID(), Race.HUMAN,
-                CharacterClass.FIGHTER, level, 10, 10, TestAttributes.of(strength, 10, 10, 10, 10, 10));
+        return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Attaquant", UUID.randomUUID(), Gender.MAN,
+                Race.HUMAN, CharacterClass.FIGHTER, level, 10, 10, TestAttributes.of(strength, 10, 10, 10, 10, 10));
     }
 
     private GameMonster monster(Room room, int maxHealth, Integer naturalArmorClass) {
