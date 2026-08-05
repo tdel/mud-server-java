@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import fr.idev.mudserver.domain.GamePlayer;
+import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.persistence.AccountDao;
 import org.springframework.stereotype.Component;
 

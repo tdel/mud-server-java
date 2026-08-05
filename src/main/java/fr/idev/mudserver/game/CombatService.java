@@ -4,10 +4,10 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import fr.idev.mudserver.domain.Attribute;
+import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.EquipmentSlot;
-import fr.idev.mudserver.domain.GameMonster;
-import fr.idev.mudserver.domain.GamePlayer;
+import fr.idev.mudserver.domain.actor.GameMonster;
+import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoll;

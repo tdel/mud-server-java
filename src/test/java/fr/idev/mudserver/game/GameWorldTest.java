@@ -8,12 +8,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.Attribute;
-import fr.idev.mudserver.domain.GamePlayer;
-import fr.idev.mudserver.domain.CharacterClass;
-import fr.idev.mudserver.domain.Gender;
-import fr.idev.mudserver.domain.Race;
+import fr.idev.mudserver.domain.actor.Attribute;
+import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.CharacterClass;
+import fr.idev.mudserver.domain.actor.Gender;
+import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.game.actor.ClassService;
+import fr.idev.mudserver.game.actor.RaceService;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 

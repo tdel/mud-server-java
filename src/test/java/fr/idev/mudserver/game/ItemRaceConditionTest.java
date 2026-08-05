@@ -12,13 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.GamePlayer;
-import fr.idev.mudserver.domain.CharacterClass;
-import fr.idev.mudserver.domain.Gender;
+import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.CharacterClass;
+import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.Item;
-import fr.idev.mudserver.domain.Race;
+import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.Room;
-import fr.idev.mudserver.domain.TestAttributes;
+import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 import fr.idev.mudserver.persistence.ItemDao;

@@ -3,6 +3,8 @@ package fr.idev.mudserver.domain;
 import java.util.Objects;
 import java.util.UUID;
 
+import fr.idev.mudserver.domain.actor.GamePlayer;
+
 /**
  * Appartient à exactement une room OU un character, jamais les deux — invariant
  * appliqué par {@link #setCharacter}/{@link #setRoom}, qui se nettoient

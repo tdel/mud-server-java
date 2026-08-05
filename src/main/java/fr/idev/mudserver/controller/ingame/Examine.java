@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.GameCharacter;
-import fr.idev.mudserver.domain.GameMonster;
-import fr.idev.mudserver.domain.GameNpc;
-import fr.idev.mudserver.domain.GamePlayer;
+import fr.idev.mudserver.domain.actor.GameCharacter;
+import fr.idev.mudserver.domain.actor.GameMonster;
+import fr.idev.mudserver.domain.actor.GameNpc;
+import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.Connection;

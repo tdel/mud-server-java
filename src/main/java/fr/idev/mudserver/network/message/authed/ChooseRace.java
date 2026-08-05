@@ -2,8 +2,8 @@ package fr.idev.mudserver.network.message.authed;
 
 import java.util.Map;
 
-import fr.idev.mudserver.domain.Attribute;
-import fr.idev.mudserver.domain.Race;
+import fr.idev.mudserver.domain.actor.Attribute;
+import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 

@@ -11,11 +11,11 @@ import java.util.UUID;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
-import fr.idev.mudserver.domain.Attribute;
-import fr.idev.mudserver.domain.GamePlayer;
-import fr.idev.mudserver.domain.CharacterClass;
-import fr.idev.mudserver.domain.Gender;
-import fr.idev.mudserver.domain.Race;
+import fr.idev.mudserver.domain.actor.Attribute;
+import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.CharacterClass;
+import fr.idev.mudserver.domain.actor.Gender;
+import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.persistence.jooq.tables.records.CharacterRecord;
 
 @Repository

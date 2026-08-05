@@ -4,12 +4,18 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import fr.idev.mudserver.domain.*;
-import fr.idev.mudserver.domain.GamePlayer;
+import fr.idev.mudserver.domain.actor.Attribute;
+import fr.idev.mudserver.domain.actor.CharacterClass;
+import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.Gender;
+import fr.idev.mudserver.domain.actor.Race;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import fr.idev.mudserver.domain.event.DomainEventPublisher;
-import fr.idev.mudserver.domain.event.NewGamePlayerCreated;
+import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
+import fr.idev.mudserver.domain.actor.event.NewGamePlayerCreated;
+import fr.idev.mudserver.game.actor.ClassService;
+import fr.idev.mudserver.game.actor.RaceService;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.Connection;

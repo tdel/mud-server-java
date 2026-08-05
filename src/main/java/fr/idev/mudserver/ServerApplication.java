@@ -6,12 +6,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
-import fr.idev.mudserver.game.ClassService;
+import fr.idev.mudserver.game.actor.ClassService;
 import fr.idev.mudserver.game.ItemService;
-import fr.idev.mudserver.game.LevelService;
-import fr.idev.mudserver.game.MonsterService;
-import fr.idev.mudserver.game.NpcService;
-import fr.idev.mudserver.game.RaceService;
+import fr.idev.mudserver.game.actor.LevelService;
+import fr.idev.mudserver.game.actor.MonsterService;
+import fr.idev.mudserver.game.actor.NpcService;
+import fr.idev.mudserver.game.actor.RaceService;
 import fr.idev.mudserver.game.RoomService;
 
 /**

@@ -12,11 +12,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import fr.idev.mudserver.domain.GamePlayer;
+import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomExit;
-import fr.idev.mudserver.domain.event.GamePlayerMovedToRoom;
-import fr.idev.mudserver.domain.event.GamePlayerSpawnedToRoom;
+import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
+import fr.idev.mudserver.domain.actor.event.GamePlayerSpawnedToRoom;
 import fr.idev.mudserver.persistence.CharacterDao;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;

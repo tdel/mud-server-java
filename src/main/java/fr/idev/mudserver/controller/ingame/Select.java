@@ -6,8 +6,8 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.GameMonster;
-import fr.idev.mudserver.domain.GamePlayer;
+import fr.idev.mudserver.domain.actor.GameMonster;
+import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;

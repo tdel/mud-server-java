@@ -9,6 +9,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import fr.idev.mudserver.domain.actor.GameCharacter;
+import fr.idev.mudserver.domain.actor.GameMonster;
+import fr.idev.mudserver.domain.actor.GameNpc;
+import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.network.OutputMessage;
 import fr.idev.mudserver.network.message.ingame.GamePlayerDisconnected;
 import fr.idev.mudserver.network.message.ingame.GamePlayerJoinedRoom;

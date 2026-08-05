@@ -1,7 +1,7 @@
 package fr.idev.mudserver.network.message.ingame;
 
-import fr.idev.mudserver.domain.Attribute;
-import fr.idev.mudserver.domain.GamePlayer;
+import fr.idev.mudserver.domain.actor.Attribute;
+import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 

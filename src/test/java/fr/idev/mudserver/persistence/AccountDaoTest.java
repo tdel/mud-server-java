@@ -8,11 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.GamePlayer;
-import fr.idev.mudserver.domain.CharacterClass;
-import fr.idev.mudserver.domain.Gender;
-import fr.idev.mudserver.domain.Race;
-import fr.idev.mudserver.domain.TestAttributes;
+import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.CharacterClass;
+import fr.idev.mudserver.domain.actor.Gender;
+import fr.idev.mudserver.domain.actor.Race;
+import fr.idev.mudserver.domain.actor.TestAttributes;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

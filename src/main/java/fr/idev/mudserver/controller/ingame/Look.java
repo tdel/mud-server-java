@@ -7,9 +7,9 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.GameMonster;
-import fr.idev.mudserver.domain.GameNpc;
-import fr.idev.mudserver.domain.GamePlayer;
+import fr.idev.mudserver.domain.actor.GameMonster;
+import fr.idev.mudserver.domain.actor.GameNpc;
+import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomExit;

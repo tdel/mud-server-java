@@ -3,7 +3,7 @@ package fr.idev.mudserver.config;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import fr.idev.mudserver.domain.event.DomainEventPublisher;
+import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 
 /**
  * Capture l'{@link ApplicationEventPublisher} Spring dans le holder statique

@@ -4,18 +4,18 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import fr.idev.mudserver.domain.CharacterClass;
+import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.EquipmentSlot;
-import fr.idev.mudserver.domain.GameMonster;
-import fr.idev.mudserver.domain.GamePlayer;
-import fr.idev.mudserver.domain.Gender;
+import fr.idev.mudserver.domain.actor.GameMonster;
+import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.ItemType;
-import fr.idev.mudserver.domain.MonsterTemplate;
-import fr.idev.mudserver.domain.Race;
+import fr.idev.mudserver.domain.actor.MonsterTemplate;
+import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.Room;
-import fr.idev.mudserver.domain.TestAttributes;
+import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.game.dice.DiceRoller;
 
 import static org.assertj.core.api.Assertions.assertThat;

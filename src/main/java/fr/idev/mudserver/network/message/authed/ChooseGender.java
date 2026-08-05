@@ -1,6 +1,6 @@
 package fr.idev.mudserver.network.message.authed;
 
-import fr.idev.mudserver.domain.Gender;
+import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
