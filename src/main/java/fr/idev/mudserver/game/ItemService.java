@@ -66,7 +66,8 @@ public class ItemService {
                     });
             for (ItemTemplateDefinition definition : definitions) {
                 registerTemplate(new ItemTemplate(definition.id(), definition.name(), definition.description(),
-                        definition.type(), definition.weight(), definition.armorCategory(), definition.baseAc()));
+                        definition.type(), definition.weight(), definition.armorCategory(), definition.baseAc(),
+                        definition.damageDice()));
             }
         } catch (IOException | JacksonException e) {
             throw new IllegalStateException("Impossible de charger " + ITEM_TEMPLATE_RESOURCE, e);
@@ -147,6 +148,6 @@ public class ItemService {
     }
 
     private record ItemTemplateDefinition(UUID id, String name, String description, ItemType type, int weight,
-            ArmorCategory armorCategory, int baseAc) {
+            ArmorCategory armorCategory, int baseAc, String damageDice) {
     }
 }

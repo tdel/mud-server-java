@@ -12,9 +12,10 @@ public class ItemTemplate {
     private int weight;
     private ArmorCategory armorCategory;
     private int baseAc;
+    private String damageDice;
 
     public ItemTemplate(UUID id, String name, String description, ItemType type, int weight,
-            ArmorCategory armorCategory, int baseAc) {
+            ArmorCategory armorCategory, int baseAc, String damageDice) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -22,6 +23,7 @@ public class ItemTemplate {
         this.weight = weight;
         this.armorCategory = armorCategory;
         this.baseAc = baseAc;
+        this.damageDice = damageDice;
     }
 
     public UUID getId() {
@@ -80,6 +82,14 @@ public class ItemTemplate {
         this.baseAc = baseAc;
     }
 
+    public String getDamageDice() {
+        return damageDice;
+    }
+
+    public void setDamageDice(String damageDice) {
+        this.damageDice = damageDice;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -90,17 +100,19 @@ public class ItemTemplate {
         }
         return weight == other.weight && baseAc == other.baseAc && Objects.equals(id, other.id)
                 && Objects.equals(name, other.name) && Objects.equals(description, other.description)
-                && type == other.type && armorCategory == other.armorCategory;
+                && type == other.type && armorCategory == other.armorCategory
+                && Objects.equals(damageDice, other.damageDice);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, type, weight, armorCategory, baseAc);
+        return Objects.hash(id, name, description, type, weight, armorCategory, baseAc, damageDice);
     }
 
     @Override
     public String toString() {
         return "ItemTemplate[id=" + id + ", name=" + name + ", description=" + description + ", type=" + type
-                + ", weight=" + weight + ", armorCategory=" + armorCategory + ", baseAc=" + baseAc + "]";
+                + ", weight=" + weight + ", armorCategory=" + armorCategory + ", baseAc=" + baseAc + ", damageDice="
+                + damageDice + "]";
     }
 }

@@ -82,6 +82,10 @@ public class Item {
         return requireTemplate().getBaseAc();
     }
 
+    public String getDamageDice() {
+        return requireTemplate().getDamageDice();
+    }
+
     private ItemTemplate requireTemplate() {
         if (template == null) {
             throw new IllegalStateException("Item " + id + " has no ItemTemplate attached");

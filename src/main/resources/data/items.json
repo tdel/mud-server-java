@@ -11,7 +11,8 @@
         "name": "Epée courte",
         "type": "WEAPON",
         "weight": 1,
-        "baseAc": 0
+        "baseAc": 0,
+        "damageDice": "1d6"
     },
     {
         "id": "019faec6-116d-723d-b04c-76d51a2a2cb7",

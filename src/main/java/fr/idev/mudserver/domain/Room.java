@@ -138,6 +138,14 @@ public class Room {
         monsters.add(monster);
     }
 
+    public void removeMonster(GameMonster monster) {
+        monsters.remove(monster);
+    }
+
+    public Optional<GameMonster> findMonsterByName(String name) {
+        return monsters.stream().filter(monster -> monster.getName().equalsIgnoreCase(name)).findFirst();
+    }
+
     public void setMonsters(List<GameMonster> monsters) {
         this.monsters.clear();
         this.monsters.addAll(monsters);

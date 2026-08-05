@@ -30,6 +30,28 @@ public final class GameMonster extends GameCharacter {
         this.roomId = roomId;
     }
 
+    /**
+     * Verrou sur l'instance vivante unique (monstres jamais rechargés, warmés une
+     * seule fois par {@code MonsterService}) — même pattern que
+     * {@code GamePlayer#pickUpItem}. Deux joueurs attaquant ce monstre en même
+     * temps se sérialisent ici ; celui dont l'appel fait passer les PV à 0 ou moins
+     * reçoit {@code true} (« coup fatal »), un seul gagnant possible : la garde sur
+     * un monstre déjà à 0 PV empêche un appel concurrent arrivé juste après de se
+     * croire lui aussi le coup fatal. {@code synchronized} ne pine plus les virtual
+     * threads sur leur carrier depuis JEP 491 (JDK 24+).
+     *
+     * @return true si ce coup est celui qui a fait passer les PV à 0 ou moins
+     */
+    public boolean takeDamage(int amount) {
+        synchronized (this) {
+            if (getCurrentHealth() <= 0) {
+                return false;
+            }
+            setCurrentHealth(Math.max(0, getCurrentHealth() - amount));
+            return getCurrentHealth() <= 0;
+        }
+    }
+
     public void attachTemplate(MonsterTemplate template) {
         this.template = template;
     }

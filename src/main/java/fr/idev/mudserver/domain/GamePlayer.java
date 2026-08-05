@@ -37,6 +37,7 @@ public final class GamePlayer extends GameCharacter {
 
     private Connection connection;
     private final List<Item> inventory = new CopyOnWriteArrayList<>();
+    private GameMonster target;
 
     public GamePlayer(UUID id, UUID accountId, String name, UUID currentRoomId, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
@@ -117,6 +118,14 @@ public final class GamePlayer extends GameCharacter {
 
     public void setConnection(Connection connection) {
         this.connection = connection;
+    }
+
+    public GameMonster getTarget() {
+        return target;
+    }
+
+    public void setTarget(GameMonster target) {
+        this.target = target;
     }
 
     /**
