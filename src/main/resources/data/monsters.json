@@ -6,6 +6,7 @@
             "description": "Une petite créature verte armée d'une dague rouillée.",
             "maxHealth": 7,
             "naturalArmorClass": 15,
+            "xpReward": 50,
             "attributes": {
                 "STRENGTH": 8,
                 "DEXTERITY": 14,
@@ -21,6 +22,7 @@
             "description": "Un rongeur de la taille d'un chien, aux dents jaunies et acérées.",
             "maxHealth": 7,
             "naturalArmorClass": 12,
+            "xpReward": 25,
             "attributes": {
                 "STRENGTH": 7,
                 "DEXTERITY": 15,
@@ -36,6 +38,7 @@
             "description": "Un loup gris au pelage hirsute, les babines retroussées.",
             "maxHealth": 11,
             "naturalArmorClass": 13,
+            "xpReward": 50,
             "attributes": {
                 "STRENGTH": 12,
                 "DEXTERITY": 15,
@@ -51,6 +54,7 @@
             "description": "Un amas d'os articulés qui s'anime d'une lueur froide dans les orbites.",
             "maxHealth": 13,
             "naturalArmorClass": 13,
+            "xpReward": 50,
             "attributes": {
                 "STRENGTH": 10,
                 "DEXTERITY": 14,
@@ -66,6 +70,7 @@
             "description": "Un vagabond patibulaire, la main posée sur le pommeau d'une épée courte.",
             "maxHealth": 11,
             "naturalArmorClass": 12,
+            "xpReward": 25,
             "attributes": {
                 "STRENGTH": 11,
                 "DEXTERITY": 12,
@@ -81,6 +86,7 @@
             "description": "Une araignée de la taille d'un cheval, tissant une toile poisseuse entre les arbres.",
             "maxHealth": 26,
             "naturalArmorClass": 14,
+            "xpReward": 200,
             "attributes": {
                 "STRENGTH": 14,
                 "DEXTERITY": 16,
@@ -96,6 +102,7 @@
             "description": "Un ours massif au pelage sombre, dressé sur ses pattes arrière.",
             "maxHealth": 19,
             "naturalArmorClass": 11,
+            "xpReward": 100,
             "attributes": {
                 "STRENGTH": 15,
                 "DEXTERITY": 10,

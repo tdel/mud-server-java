@@ -102,6 +102,6 @@ class GamePlayerTest {
             int charisma, int level) {
         return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Test", UUID.randomUUID(), Gender.MAN, Race.HUMAN,
                 CharacterClass.FIGHTER, level, 10, 10,
-                TestAttributes.of(strength, dexterity, constitution, intelligence, wisdom, charisma));
+                TestAttributes.of(strength, dexterity, constitution, intelligence, wisdom, charisma), 0);
     }
 }

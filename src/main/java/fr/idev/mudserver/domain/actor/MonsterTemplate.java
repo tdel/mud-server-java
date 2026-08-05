@@ -12,15 +12,17 @@ public class MonsterTemplate {
     private int maxHealth;
     private Map<Attribute, Integer> attributes;
     private Integer naturalArmorClass;
+    private int xpReward;
 
     public MonsterTemplate(UUID id, String name, String description, int maxHealth, Map<Attribute, Integer> attributes,
-            Integer naturalArmorClass) {
+            Integer naturalArmorClass, int xpReward) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.maxHealth = maxHealth;
         this.attributes = attributes;
         this.naturalArmorClass = naturalArmorClass;
+        this.xpReward = xpReward;
     }
 
     public UUID getId() {
@@ -71,6 +73,14 @@ public class MonsterTemplate {
         this.naturalArmorClass = naturalArmorClass;
     }
 
+    public int getXpReward() {
+        return xpReward;
+    }
+
+    public void setXpReward(int xpReward) {
+        this.xpReward = xpReward;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -79,19 +89,21 @@ public class MonsterTemplate {
         if (!(o instanceof MonsterTemplate other)) {
             return false;
         }
-        return maxHealth == other.maxHealth && Objects.equals(id, other.id) && Objects.equals(name, other.name)
-                && Objects.equals(description, other.description) && Objects.equals(attributes, other.attributes)
+        return maxHealth == other.maxHealth && xpReward == other.xpReward && Objects.equals(id, other.id)
+                && Objects.equals(name, other.name) && Objects.equals(description, other.description)
+                && Objects.equals(attributes, other.attributes)
                 && Objects.equals(naturalArmorClass, other.naturalArmorClass);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, maxHealth, attributes, naturalArmorClass);
+        return Objects.hash(id, name, description, maxHealth, attributes, naturalArmorClass, xpReward);
     }
 
     @Override
     public String toString() {
         return "MonsterTemplate[id=" + id + ", name=" + name + ", description=" + description + ", maxHealth="
-                + maxHealth + ", attributes=" + attributes + ", naturalArmorClass=" + naturalArmorClass + "]";
+                + maxHealth + ", attributes=" + attributes + ", naturalArmorClass=" + naturalArmorClass + ", xpReward="
+                + xpReward + "]";
     }
 }

@@ -27,6 +27,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  * déterministes par la seule CA : ils retentent quelques fois (RNG réel, pas de
  * mock) jusqu'à obtenir le résultat attendu. Probabilité d'échec du test après
  * 20 tentatives : (1/20)^20, négligeable.
+ *
+ * <p>
+ * Test unitaire pur (pas de contexte Spring) : {@code tryAttack} ne fait plus
+ * que résoudre le jet d'attaque et le jet de dégâts, sans jamais appliquer les
+ * dégâts ni publier d'événement (voir sa Javadoc) — l'application des dégâts et
+ * la cascade « mort du monstre » sont désormais exercées directement sur
+ * {@code GameMonster#takeDamage}, dans {@code GameMonsterTest}.
  */
 class CombatServiceTest {
 
@@ -60,7 +67,6 @@ class CombatServiceTest {
 
         // 1d6 (1-6) + modificateur de FOR (+3) : entre 4 et 9.
         assertThat(result.damage()).isBetween(4, 9);
-        assertThat(result.monsterDefeated()).isFalse();
     }
 
     @Test
@@ -77,23 +83,6 @@ class CombatServiceTest {
     }
 
     @Test
-    void aLethalHitRemovesTheMonsterFromTheRoomAndClearsTheAttackersTarget() {
-        GamePlayer attacker = player(16, 1);
-        equipWeapon(attacker, "1d6");
-        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
-        attacker.setCurrentRoom(room);
-        GameMonster monster = monster(room, 1, -100);
-        attacker.setTarget(monster);
-
-        CombatResult result = attackUntilHit(attacker, monster);
-
-        assertThat(result.monsterDefeated()).isTrue();
-        assertThat(result.remainingHealth()).isZero();
-        assertThat(room.getMonsters()).doesNotContain(monster);
-        assertThat(attacker.getTarget()).isNull();
-    }
-
-    @Test
     void aMissDealsNoDamageAndLeavesTheMonsterUntouched() {
         GamePlayer attacker = player(10, 1);
         Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
@@ -104,10 +93,10 @@ class CombatServiceTest {
         // "PV inchangés" de la tentative qui rate enfin.
         for (int i = 0; i < 20; i++) {
             GameMonster monster = monster(room, 100, 9999);
-            CombatResult result = combatService.attack(attacker, monster);
+            CombatResult result = combatService.tryAttack(attacker, monster);
             if (!result.hit()) {
                 assertThat(result.damage()).isZero();
-                assertThat(result.remainingHealth()).isEqualTo(100);
+                assertThat(monster.getCurrentHealth()).isEqualTo(100);
                 assertThat(room.getMonsters()).contains(monster);
                 return;
             }
@@ -117,7 +106,7 @@ class CombatServiceTest {
 
     private CombatResult attackUntilHit(GamePlayer attacker, GameMonster monster) {
         for (int i = 0; i < 20; i++) {
-            CombatResult result = combatService.attack(attacker, monster);
+            CombatResult result = combatService.tryAttack(attacker, monster);
             if (result.hit()) {
                 return result;
             }
@@ -135,12 +124,12 @@ class CombatServiceTest {
 
     private GamePlayer player(int strength, int level) {
         return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Attaquant", UUID.randomUUID(), Gender.MAN,
-                Race.HUMAN, CharacterClass.FIGHTER, level, 10, 10, TestAttributes.of(strength, 10, 10, 10, 10, 10));
+                Race.HUMAN, CharacterClass.FIGHTER, level, 10, 10, TestAttributes.of(strength, 10, 10, 10, 10, 10), 0);
     }
 
     private GameMonster monster(Room room, int maxHealth, Integer naturalArmorClass) {
         MonsterTemplate template = new MonsterTemplate(UUID.randomUUID(), "Mannequin", "Un mannequin d'entraînement",
-                maxHealth, TestAttributes.of(10, 10, 10, 10, 10, 10), naturalArmorClass);
+                maxHealth, TestAttributes.of(10, 10, 10, 10, 10, 10), naturalArmorClass, 0);
         GameMonster monster = new GameMonster(UUID.randomUUID(), template.getName(), template.getId(), room.getId(),
                 template.getAttributes(), maxHealth);
         monster.attachTemplate(template);

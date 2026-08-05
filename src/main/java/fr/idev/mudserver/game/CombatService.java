@@ -12,16 +12,19 @@ import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
-import fr.idev.mudserver.network.message.ingame.MonsterDefeated;
 
 /**
- * Résout une attaque au corps-à-corps selon les règles DnD5e : jet d'attaque
- * (1d20 + modificateur de FOR + bonus de maîtrise) comparé à la CA de la cible,
- * dégâts de l'arme équipée (ou à mains nues) + modificateur de FOR en cas de
- * réussite. Le monstre encaisse via {@link GameMonster#takeDamage}, seul point
- * d'entrée qui protège la mutation des PV contre deux attaquants concurrents
- * (voir sa Javadoc). Aucune riposte du monstre pour l'instant — combat à sens
- * unique, voir CLAUDE.md/la conversation d'origine.
+ * Résout uniquement la phase « jet d'attaque + jet de dégâts » d'une attaque au
+ * corps-à-corps selon les règles DnD5e : jet d'attaque (1d20 + modificateur de
+ * FOR + bonus de maîtrise) comparé à la CA de la cible, dégâts de l'arme
+ * équipée (ou à mains nues) + modificateur de FOR en cas de réussite.
+ * {@code tryAttack} ne touche jamais aux PV du monstre — l'appelant
+ * ({@code controller.ingame.Attack}) applique lui-même les dégâts via
+ * {@link GameMonster#takeDamage}, qui gère seul la mutation concurrente des PV
+ * et la publication de {@code CharacterDied} sur mise à mort (voir sa Javadoc).
+ * Cette séparation garde cette classe pure et testable en unitaire, sans
+ * dépendre d'un contexte Spring. Aucune riposte du monstre pour l'instant —
+ * combat à sens unique, voir CLAUDE.md/la conversation d'origine.
  */
 @Service
 public class CombatService {
@@ -32,7 +35,7 @@ public class CombatService {
         this.diceRoller = diceRoller;
     }
 
-    public CombatResult attack(GamePlayer attacker, GameMonster target) {
+    public CombatResult tryAttack(GamePlayer attacker, GameMonster target) {
         int strengthModifier = attacker.getModifier(Attribute.STRENGTH);
         int attackBonus = strengthModifier + attacker.getProficiencyBonus();
 
@@ -43,21 +46,11 @@ public class CombatService {
         boolean hit = resolveHit(naturalRoll, attackRoll.total(), armorClass);
 
         if (!hit) {
-            return new CombatResult(target.getName(), false, false, attackRoll.total(), armorClass, 0,
-                    target.getCurrentHealth(), false);
+            return new CombatResult(target.getName(), false, false, attackRoll.total(), armorClass, 0);
         }
 
         int damage = rollDamage(attacker, strengthModifier, criticalHit);
-        boolean defeated = target.takeDamage(damage);
-
-        if (defeated) {
-            attacker.getCurrentRoom().removeMonster(target);
-            attacker.setTarget(null);
-            attacker.getCurrentRoom().broadcast(new MonsterDefeated(target.getName()), attacker);
-        }
-
-        return new CombatResult(target.getName(), true, criticalHit, attackRoll.total(), armorClass, damage,
-                target.getCurrentHealth(), defeated);
+        return new CombatResult(target.getName(), true, criticalHit, attackRoll.total(), armorClass, damage);
     }
 
     /**

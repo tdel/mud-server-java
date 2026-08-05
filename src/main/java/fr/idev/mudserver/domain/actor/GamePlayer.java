@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDroppedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEquippedItem;
@@ -42,10 +43,11 @@ public final class GamePlayer extends GameCharacter {
     private Connection connection;
     private final List<Item> inventory = new CopyOnWriteArrayList<>();
     private GameMonster target;
+    private int xp;
 
     public GamePlayer(UUID id, UUID accountId, String name, UUID currentRoomId, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
-            Map<Attribute, Integer> attributes) {
+            Map<Attribute, Integer> attributes, int xp) {
         super(id, name, attributes, currentHealth, maxHealth);
         this.accountId = accountId;
         this.currentRoomId = currentRoomId;
@@ -53,6 +55,7 @@ public final class GamePlayer extends GameCharacter {
         this.race = race;
         this.characterClass = characterClass;
         this.level = level;
+        this.xp = xp;
     }
 
     public UUID getAccountId() {
@@ -139,6 +142,23 @@ public final class GamePlayer extends GameCharacter {
 
     public void setTarget(GameMonster target) {
         this.target = target;
+    }
+
+    public int getXp() {
+        return xp;
+    }
+
+    /**
+     * Seul point d'entrée pour muter l'XP — pas de setter public, sur le même
+     * principe que {@link #pickUpItem}/{@link #equipItem} : la mutation publie
+     * toujours {@link CharacterGainedXp}, dont le listener (voir
+     * {@code game.actor.CharacterService}) décide d'un éventuel passage de niveau,
+     * hors de portée d'un simple POJO sans accès à {@code LevelService}/
+     * {@code ClassService}.
+     */
+    public void gainXp(int amount) {
+        this.xp += amount;
+        DomainEventPublisher.publish(new CharacterGainedXp(this, amount));
     }
 
     /**
@@ -299,7 +319,7 @@ public final class GamePlayer extends GameCharacter {
         if (!(o instanceof GamePlayer other)) {
             return false;
         }
-        return level == other.level && getCurrentHealth() == other.getCurrentHealth()
+        return level == other.level && xp == other.xp && getCurrentHealth() == other.getCurrentHealth()
                 && getMaxHealth() == other.getMaxHealth() && Objects.equals(getId(), other.getId())
                 && Objects.equals(accountId, other.accountId) && Objects.equals(getName(), other.getName())
                 && Objects.equals(currentRoomId, other.currentRoomId) && gender == other.gender && race == other.race
@@ -308,7 +328,7 @@ public final class GamePlayer extends GameCharacter {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), accountId, getName(), currentRoomId, gender, race, characterClass, level,
+        return Objects.hash(getId(), accountId, getName(), currentRoomId, gender, race, characterClass, level, xp,
                 getCurrentHealth(), getMaxHealth(), getAttributes());
     }
 
@@ -316,7 +336,7 @@ public final class GamePlayer extends GameCharacter {
     public String toString() {
         return "GamePlayer[id=" + getId() + ", accountId=" + accountId + ", name=" + getName() + ", currentRoomId="
                 + currentRoomId + ", gender=" + gender + ", race=" + race + ", characterClass=" + characterClass
-                + ", level=" + level + ", currentHealth=" + getCurrentHealth() + ", maxHealth=" + getMaxHealth()
-                + ", attributes=" + getAttributes() + "]";
+                + ", level=" + level + ", xp=" + xp + ", currentHealth=" + getCurrentHealth() + ", maxHealth="
+                + getMaxHealth() + ", attributes=" + getAttributes() + "]";
     }
 }

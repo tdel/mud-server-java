@@ -107,7 +107,7 @@ public class GameWorld {
         int maxHealth = Math.max(1, classService.hitDie(characterClass) + constitutionModifier);
 
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), name, startingRoom.get().getId(),
-                gender, race, characterClass, 1, maxHealth, maxHealth, scores);
+                gender, race, characterClass, 1, maxHealth, maxHealth, scores, 0);
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));
         character.spawnToRoom(startingRoom.get());

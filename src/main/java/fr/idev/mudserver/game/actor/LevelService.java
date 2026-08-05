@@ -52,6 +52,10 @@ public class LevelService {
         return xp;
     }
 
+    public int maxLevel() {
+        return xpRequiredByLevel.size();
+    }
+
     private record LevelDefinition(int level, int xp) {
     }
 }

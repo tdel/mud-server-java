@@ -4,6 +4,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import fr.idev.mudserver.domain.actor.event.CharacterDied;
+import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
+
 /**
  * Contrairement à {@link Item}, qui délègue {@code getName()}/{@code getType()}
  * à son template en lecture à chaque appel, {@code GameMonster} copie au moment
@@ -40,16 +43,29 @@ public final class GameMonster extends GameCharacter {
      * croire lui aussi le coup fatal. {@code synchronized} ne pine plus les virtual
      * threads sur leur carrier depuis JEP 491 (JDK 24+).
      *
+     * <p>
+     * Sur le coup fatal, publie {@link CharacterDied} — hors du bloc
+     * {@code synchronized}, même principe que {@code GamePlayer#pickUpItem}
+     * (trancher sous verrou, publier après) : c'est cette méthode, plutôt que
+     * l'appelant, qui garantit qu'un événement part dès que ce monstre meurt, quel
+     * que soit le code qui a déclenché le coup ({@code CombatService.tryAttack} ne
+     * fait qu'exposer les dégâts à appliquer, voir sa Javadoc).
+     *
      * @return true si ce coup est celui qui a fait passer les PV à 0 ou moins
      */
-    public boolean takeDamage(int amount) {
+    public boolean takeDamage(int amount, GamePlayer attacker) {
+        boolean defeated;
         synchronized (this) {
             if (getCurrentHealth() <= 0) {
                 return false;
             }
             setCurrentHealth(Math.max(0, getCurrentHealth() - amount));
-            return getCurrentHealth() <= 0;
+            defeated = getCurrentHealth() <= 0;
         }
+        if (defeated) {
+            DomainEventPublisher.publish(new CharacterDied(this, attacker));
+        }
+        return defeated;
     }
 
     public void attachTemplate(MonsterTemplate template) {

@@ -41,7 +41,8 @@ class AccountDaoTest extends AbstractIntegrationTest {
         accountDao.insert(account);
 
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Bob le Nain", UUID.randomUUID(),
-                Gender.MAN, Race.DWARF, CharacterClass.FIGHTER, 1, 12, 12, TestAttributes.of(12, 10, 12, 10, 10, 10));
+                Gender.MAN, Race.DWARF, CharacterClass.FIGHTER, 1, 12, 12, TestAttributes.of(12, 10, 12, 10, 10, 10),
+                0);
         characterDao.insert(character);
 
         accountDao.updateCurrentCharacter(account.getId(), character.getId());
@@ -56,7 +57,8 @@ class AccountDaoTest extends AbstractIntegrationTest {
         accountDao.insert(account);
 
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Carol", UUID.randomUUID(),
-                Gender.WOMAN, Race.DWARF, CharacterClass.FIGHTER, 1, 12, 12, TestAttributes.of(12, 10, 12, 10, 10, 10));
+                Gender.WOMAN, Race.DWARF, CharacterClass.FIGHTER, 1, 12, 12, TestAttributes.of(12, 10, 12, 10, 10, 10),
+                0);
         characterDao.insert(character);
         accountDao.updateCurrentCharacter(account.getId(), character.getId());
 

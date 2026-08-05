@@ -10,13 +10,16 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomExit;
+import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
 import fr.idev.mudserver.domain.actor.event.GamePlayerSpawnedToRoom;
+import fr.idev.mudserver.network.message.ingame.MonsterDefeated;
 import fr.idev.mudserver.persistence.CharacterDao;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
@@ -35,12 +38,15 @@ import tools.jackson.databind.ObjectMapper;
  * {@code ItemService.warmItemTemplates()} : donnée de contenu statique, jamais
  * mutée en jeu, chargée depuis le classpath plutôt que la DB. Garde malgré tout
  * une dépendance à {@link CharacterDao} : contrairement aux rooms,
- * {@code character.current_room_id} reste une colonne DB mutable en jeu — les
- * deux {@code @EventListener} ci-dessous la répercutent à chaque déplacement.
- * Pas d'accesseur générique {@code room(UUID)} : en dehors du warm-up/des
- * tests, tout code applicatif doit passer par une méthode qui exprime une
- * intention métier ({@link #spawnCharacter}), jamais par une résolution d'UUID
- * brute.
+ * {@code character.current_room_id} reste une colonne DB mutable en jeu —
+ * {@link #onGamePlayerMovedToRoom}/{@link #onGamePlayerSpawnedToRoom} la
+ * répercutent à chaque déplacement. {@link #onCharacterDied} retire le monstre
+ * mort de sa room et diffuse {@code MonsterDefeated} — la mort elle-même
+ * (détection du coup fatal, crédit d'XP) reste hors du périmètre de cette
+ * classe, voir {@code CombatService}/{@code CharacterService}. Pas d'accesseur
+ * générique {@code room(UUID)} : en dehors du warm-up/des tests, tout code
+ * applicatif doit passer par une méthode qui exprime une intention métier
+ * ({@link #spawnCharacter}), jamais par une résolution d'UUID brute.
  */
 @Service
 public class RoomService {
@@ -117,6 +123,22 @@ public class RoomService {
     void onGamePlayerSpawnedToRoom(GamePlayerSpawnedToRoom event) {
         event.character().setCurrentRoomId(event.room().getId());
         characterDao.updateCurrentRoom(event.character().getId(), event.room().getId());
+    }
+
+    /**
+     * {@code @Order(1)} : ce listener doit diffuser {@code MonsterDefeated} avant
+     * que {@code CharacterService#onCharacterDied} ne déclenche le crédit d'XP (et
+     * une éventuelle montée de niveau) sur ce même événement — l'ordre des messages
+     * reçus par le joueur (mort du monstre avant XP/niveau) en dépend. Diffusé à
+     * toute la room sans exclusion : le tueur reçoit lui-même ce message comme tout
+     * le monde.
+     */
+    @EventListener
+    @Order(1)
+    void onCharacterDied(CharacterDied event) {
+        Room room = event.character().getCurrentRoom();
+        room.removeMonster(event.character());
+        room.broadcast(new MonsterDefeated(event.character().getName()), null);
     }
 
     record RoomDefinition(UUID id, String name, String description, Boolean isStartingRoom,

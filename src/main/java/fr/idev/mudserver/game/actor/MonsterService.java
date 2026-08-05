@@ -52,7 +52,8 @@ public class MonsterService {
         for (MonsterTemplateDefinition definition : file.templates()) {
             templates.put(definition.id(),
                     new MonsterTemplate(definition.id(), definition.name(), definition.description(),
-                            definition.maxHealth(), definition.attributes(), definition.naturalArmorClass()));
+                            definition.maxHealth(), definition.attributes(), definition.naturalArmorClass(),
+                            definition.xpReward()));
         }
 
         Map<UUID, Room> roomsById = new ConcurrentHashMap<>();
@@ -84,7 +85,7 @@ public class MonsterService {
     }
 
     record MonsterTemplateDefinition(UUID id, String name, String description, int maxHealth,
-            Map<Attribute, Integer> attributes, Integer naturalArmorClass) {
+            Map<Attribute, Integer> attributes, Integer naturalArmorClass, int xpReward) {
     }
 
     record MonsterSpawnDefinition(UUID id, UUID templateId, UUID roomId) {
