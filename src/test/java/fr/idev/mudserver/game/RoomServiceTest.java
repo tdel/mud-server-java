@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.HexCoordinate;
+import fr.idev.mudserver.domain.MonsterSpawn;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomPortal;
 import fr.idev.mudserver.domain.actor.CharacterClass;
@@ -19,6 +20,7 @@ import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.domain.actor.TestProficiencies;
 import fr.idev.mudserver.game.RoomService.CellDefinition;
+import fr.idev.mudserver.game.RoomService.MonsterSpawnDefinition;
 import fr.idev.mudserver.game.RoomService.PortalDefinition;
 import fr.idev.mudserver.game.RoomService.RoomDefinition;
 import fr.idev.mudserver.game.actor.ClassService;
@@ -28,6 +30,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 
 @Transactional
 class RoomServiceTest extends AbstractIntegrationTest {
@@ -63,8 +66,10 @@ class RoomServiceTest extends AbstractIntegrationTest {
     void loadRoomsThrowsWhenMoreThanOneRoomIsMarkedAsStarting() {
         RoomService isolated = new RoomService(new ObjectMapper(), characterDao);
         List<RoomDefinition> definitions = List.of(
-                new RoomDefinition(UUID.randomUUID(), "A", "...", true, 16, 8, new CellDefinition(8, 4), List.of()),
-                new RoomDefinition(UUID.randomUUID(), "B", "...", true, 16, 8, new CellDefinition(8, 4), List.of()));
+                new RoomDefinition(UUID.randomUUID(), "A", "...", true, 16, 8, new CellDefinition(8, 4), List.of(),
+                        List.of()),
+                new RoomDefinition(UUID.randomUUID(), "B", "...", true, 16, 8, new CellDefinition(8, 4), List.of(),
+                        List.of()));
 
         assertThatThrownBy(() -> isolated.loadRooms(definitions)).isInstanceOf(IllegalStateException.class);
     }
@@ -74,7 +79,8 @@ class RoomServiceTest extends AbstractIntegrationTest {
         RoomService isolated = new RoomService(new ObjectMapper(), characterDao);
         List<RoomDefinition> definitions = List.of(new RoomDefinition(UUID.randomUUID(), "A", "...", null, 16, 8,
                 new CellDefinition(8, 4), List.of(new PortalDefinition(new CellDefinition(15, 4), "E",
-                        UUID.randomUUID(), new CellDefinition(0, 4)))));
+                        UUID.randomUUID(), new CellDefinition(0, 4))),
+                List.of()));
 
         assertThatThrownBy(() -> isolated.loadRooms(definitions)).isInstanceOf(IllegalStateException.class);
     }
@@ -87,8 +93,10 @@ class RoomServiceTest extends AbstractIntegrationTest {
         List<RoomDefinition> definitions = List.of(
                 new RoomDefinition(sourceId, "Source", "...", null, 16, 8, new CellDefinition(8, 4),
                         List.of(new PortalDefinition(new CellDefinition(8, 4), "E", targetId,
-                                new CellDefinition(0, 4)))),
-                new RoomDefinition(targetId, "Target", "...", null, 16, 8, new CellDefinition(8, 4), List.of()));
+                                new CellDefinition(0, 4))),
+                        List.of()),
+                new RoomDefinition(targetId, "Target", "...", null, 16, 8, new CellDefinition(8, 4), List.of(),
+                        List.of()));
 
         assertThatThrownBy(() -> isolated.loadRooms(definitions)).isInstanceOf(IllegalStateException.class);
     }
@@ -101,8 +109,10 @@ class RoomServiceTest extends AbstractIntegrationTest {
         List<RoomDefinition> definitions = List.of(
                 new RoomDefinition(sourceId, "Source", "...", null, 16, 8, new CellDefinition(8, 4),
                         List.of(new PortalDefinition(new CellDefinition(15, 4), "E", targetId,
-                                new CellDefinition(99, 99)))),
-                new RoomDefinition(targetId, "Target", "...", null, 16, 8, new CellDefinition(8, 4), List.of()));
+                                new CellDefinition(99, 99))),
+                        List.of()),
+                new RoomDefinition(targetId, "Target", "...", null, 16, 8, new CellDefinition(8, 4), List.of(),
+                        List.of()));
 
         assertThatThrownBy(() -> isolated.loadRooms(definitions)).isInstanceOf(IllegalStateException.class);
     }
@@ -115,8 +125,10 @@ class RoomServiceTest extends AbstractIntegrationTest {
         List<RoomDefinition> definitions = List.of(new RoomDefinition(sourceId, "Source", "...", null, 16, 8,
                 new CellDefinition(8, 4),
                 List.of(new PortalDefinition(new CellDefinition(15, 4), "E", targetId, new CellDefinition(0, 4)),
-                        new PortalDefinition(new CellDefinition(15, 4), "E", targetId, new CellDefinition(0, 5)))),
-                new RoomDefinition(targetId, "Target", "...", null, 16, 8, new CellDefinition(8, 4), List.of()));
+                        new PortalDefinition(new CellDefinition(15, 4), "E", targetId, new CellDefinition(0, 5))),
+                List.of()),
+                new RoomDefinition(targetId, "Target", "...", null, 16, 8, new CellDefinition(8, 4), List.of(),
+                        List.of()));
 
         assertThatThrownBy(() -> isolated.loadRooms(definitions)).isInstanceOf(IllegalStateException.class);
     }
@@ -129,8 +141,10 @@ class RoomServiceTest extends AbstractIntegrationTest {
         List<RoomDefinition> definitions = List.of(
                 new RoomDefinition(sourceId, "Source", "...", null, 16, 8, new CellDefinition(8, 4),
                         List.of(new PortalDefinition(new CellDefinition(15, 4), "E", targetId,
-                                new CellDefinition(0, 4)))),
-                new RoomDefinition(targetId, "Target", "...", null, 16, 8, new CellDefinition(8, 4), List.of()));
+                                new CellDefinition(0, 4))),
+                        List.of()),
+                new RoomDefinition(targetId, "Target", "...", null, 16, 8, new CellDefinition(8, 4), List.of(),
+                        List.of()));
 
         isolated.loadRooms(definitions);
 
@@ -140,6 +154,23 @@ class RoomServiceTest extends AbstractIntegrationTest {
         assertThat(source.findPortalAt(new HexCoordinate(15, 4))).map(RoomPortal::targetRoom).map(Room::getId)
                 .contains(targetId);
         assertThat(source.findPortalAt(new HexCoordinate(0, 0))).isEmpty();
+    }
+
+    @Test
+    void loadRoomsResolvesMonsterSpawnsToTheAttachedRoom() {
+        RoomService isolated = new RoomService(new ObjectMapper(), characterDao);
+        UUID roomId = UUID.randomUUID();
+        UUID spawnId = UUID.randomUUID();
+        UUID templateId = UUID.randomUUID();
+        List<RoomDefinition> definitions = List
+                .of(new RoomDefinition(roomId, "Room", "...", null, 16, 8, new CellDefinition(8, 4), List.of(),
+                        List.of(new MonsterSpawnDefinition(spawnId, templateId, new CellDefinition(4, 2)))));
+
+        isolated.loadRooms(definitions);
+
+        Room room = isolated.allRooms().stream().filter(r -> r.getId().equals(roomId)).findFirst().orElseThrow();
+        assertThat(room.getMonsterSpawns()).extracting(MonsterSpawn::id, MonsterSpawn::templateId, MonsterSpawn::cell)
+                .containsExactly(tuple(spawnId, templateId, new HexCoordinate(4, 2)));
     }
 
     @Test

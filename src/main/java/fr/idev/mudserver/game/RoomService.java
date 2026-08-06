@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.HexCoordinate;
+import fr.idev.mudserver.domain.MonsterSpawn;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomPortal;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
@@ -35,13 +36,17 @@ import tools.jackson.databind.ObjectMapper;
  * couche cache/cycle de vie au-dessus (warm/lookup) — les mutations
  * d'appartenance ({@code join}/{@code leave}/{@code disconnect}/
  * {@code broadcast}) restent portées par {@link Room} lui-même, appelées via
- * {@code GamePlayer#moveToRoom}/{@link #spawnCharacter}. Précharge rooms et
- * exits en une seule passe depuis {@code data/rooms.json} (voir
- * {@link #warmRooms()}), sur le même principe que
+ * {@code GamePlayer#moveToRoom}/{@link #spawnCharacter}. Précharge rooms, exits
+ * et points de spawn de monstres en une seule passe depuis
+ * {@code data/rooms.json} (voir {@link #warmRooms()}), sur le même principe que
  * {@code ItemService.warmItemTemplates()} : donnée de contenu statique, jamais
- * mutée en jeu, chargée depuis le classpath plutôt que la DB. Garde malgré tout
- * une dépendance à {@link CharacterDao} : contrairement aux rooms,
- * {@code character.current_room_id} reste une colonne DB mutable en jeu —
+ * mutée en jeu, chargée depuis le classpath plutôt que la DB.
+ * {@code data/monsters.json} ne garde que les templates — c'est
+ * {@code MonsterService.loadMonsters} qui, après {@link #warmRooms()}, consomme
+ * {@link Room#getMonsterSpawns()} pour instancier et placer les monstres de
+ * chaque room. Garde malgré tout une dépendance à {@link CharacterDao} :
+ * contrairement aux rooms, {@code character.current_room_id} reste une colonne
+ * DB mutable en jeu —
  * {@link #onGamePlayerMovedToRoom}/{@link #onGamePlayerSpawnedToRoom} la
  * répercutent à chaque déplacement. {@link #onCharacterDied} retire le monstre
  * mort de sa room et diffuse {@code MonsterDefeated} — la mort elle-même
@@ -96,6 +101,8 @@ public class RoomService {
                 throw new IllegalStateException("Room " + definition.id() + " a une case de spawn " + spawnCell
                         + " hors des bornes de sa grille (" + definition.width() + "x" + definition.height() + ")");
             }
+            room.setMonsterSpawns(definition.monsterSpawns().stream().map(spawn -> new MonsterSpawn(spawn.id(),
+                    spawn.templateId(), new HexCoordinate(spawn.cell().q(), spawn.cell().r()))).toList());
             rooms.put(room.getId(), room);
         }
 
@@ -195,10 +202,13 @@ public class RoomService {
     }
 
     record RoomDefinition(UUID id, String name, String description, Boolean isStartingRoom, int width, int height,
-            CellDefinition spawnCell, List<PortalDefinition> portals) {
+            CellDefinition spawnCell, List<PortalDefinition> portals, List<MonsterSpawnDefinition> monsterSpawns) {
     }
 
     record CellDefinition(int q, int r) {
+    }
+
+    record MonsterSpawnDefinition(UUID id, UUID templateId, CellDefinition cell) {
     }
 
     record PortalDefinition(CellDefinition cell, String direction, UUID targetRoomId, CellDefinition targetCell) {

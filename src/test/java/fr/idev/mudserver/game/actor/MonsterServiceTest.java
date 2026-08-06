@@ -1,14 +1,21 @@
 package fr.idev.mudserver.game.actor;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.GameMonster;
+import fr.idev.mudserver.domain.actor.MonsterTemplate.LootTableEntry;
+import fr.idev.mudserver.domain.HexCoordinate;
+import fr.idev.mudserver.domain.MonsterSpawn;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.actor.TestAttributes;
+import fr.idev.mudserver.game.ItemService;
+import fr.idev.mudserver.game.RoomService;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,16 +29,44 @@ class MonsterServiceTest {
     private static final UUID CLEARING_ID = UUID.fromString("7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5");
     private static final UUID CEMETERY_PATH_ID = UUID.fromString("4dae9974-45f7-46c9-8e66-12cdac759860");
 
+    /**
+     * Tirée d'une {@code ItemService} jetable (pas de DAO nécessaire, {@code
+     * warmItemTemplates}/{@code templateIds} ne touchent jamais la DB) plutôt que
+     * recopiée à la main, pour rester synchronisée avec {@code data/items.json}
+     * sans dépendre d'un contexte Spring dans ce test unitaire pur.
+     */
+    private static Set<UUID> realItemTemplateIds() {
+        ItemService itemService = new ItemService(null, new ObjectMapper());
+        itemService.warmItemTemplates();
+        return itemService.templateIds();
+    }
+
+    /**
+     * Même principe que {@link #realItemTemplateIds()} : les spawns vivent
+     * maintenant dans {@code data/rooms.json}, donc obtenir des {@code Room} avec
+     * leurs vrais {@code monsterSpawns} passe par un {@code RoomService} jetable
+     * plutôt que par des {@code Room} construites à la main. Pas de
+     * {@code CharacterDao} nécessaire tant qu'on ne touche que
+     * {@code warmRooms()}/{@code allRooms()}.
+     */
+    private static Collection<Room> realRooms() {
+        RoomService roomService = new RoomService(new ObjectMapper(), null);
+        roomService.warmRooms();
+        return roomService.allRooms();
+    }
+
     @Test
     void warmMonstersLoadsTheRealCatalogFromJsonAndPlacesItInItsRoom() {
         MonsterService monsterService = new MonsterService(new ObjectMapper());
-        Room villageSquare = new Room(VILLAGE_SQUARE_ID, "Place du village", "...", null);
-        Room forestEdge = new Room(FOREST_EDGE_ID, "Orée de la forêt", "...", null);
-        Room tavern = new Room(TAVERN_ID, "Taverne du Sanglier Roux", "...", null);
-        Room clearing = new Room(CLEARING_ID, "Clairière", "...", null);
-        Room cemeteryPath = new Room(CEMETERY_PATH_ID, "Chemin du cimetière", "...", null);
+        Collection<Room> rooms = realRooms();
 
-        monsterService.warmMonsters(List.of(villageSquare, forestEdge, tavern, clearing, cemeteryPath));
+        monsterService.warmMonsters(rooms, realItemTemplateIds());
+
+        Room villageSquare = room(rooms, VILLAGE_SQUARE_ID);
+        Room forestEdge = room(rooms, FOREST_EDGE_ID);
+        Room tavern = room(rooms, TAVERN_ID);
+        Room clearing = room(rooms, CLEARING_ID);
+        Room cemeteryPath = room(rooms, CEMETERY_PATH_ID);
 
         assertThat(villageSquare.getMonsters()).hasSize(0);
         assertThat(forestEdge.getMonsters()).hasSize(2);
@@ -47,28 +82,46 @@ class MonsterServiceTest {
         assertThat(goblin.getCurrentRoom()).isEqualTo(clearing);
         assertThat(goblin.getDescription()).isNotBlank();
         assertThat(goblin.getTemplate().getXpReward()).isEqualTo(50);
+        assertThat(goblin.getTemplate().getGoldReward()).isEqualTo(5);
+        assertThat(goblin.getTemplate().getLootTable()).isNotEmpty();
     }
 
     @Test
     void loadMonstersThrowsWhenASpawnReferencesAnUnknownTemplate() {
         MonsterService isolated = new MonsterService(new ObjectMapper());
-        MonsterService.MonsterFileDefinition file = new MonsterService.MonsterFileDefinition(List.of(),
-                List.of(new MonsterService.MonsterSpawnDefinition(UUID.randomUUID(), UUID.randomUUID(),
-                        UUID.randomUUID(), new MonsterService.CellDefinition(0, 0))));
+        Room room = new Room(UUID.randomUUID(), "Test", "...", null);
+        room.setMonsterSpawns(List.of(new MonsterSpawn(UUID.randomUUID(), UUID.randomUUID(), new HexCoordinate(0, 0))));
 
-        assertThatThrownBy(() -> isolated.loadMonsters(file, List.of())).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> isolated.loadMonsters(List.of(), List.of(room), Set.of()))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
-    void loadMonstersThrowsWhenASpawnReferencesAnUnknownRoom() {
+    void loadMonstersThrowsWhenALootTableEntryReferencesAnUnknownItemTemplate() {
         MonsterService isolated = new MonsterService(new ObjectMapper());
         UUID templateId = UUID.randomUUID();
         MonsterService.MonsterTemplateDefinition template = new MonsterService.MonsterTemplateDefinition(templateId,
-                "Test", "...", 5, TestAttributes.of(10, 10, 10, 10, 10, 10), null, 0, "1d4");
-        MonsterService.MonsterFileDefinition file = new MonsterService.MonsterFileDefinition(List.of(template),
-                List.of(new MonsterService.MonsterSpawnDefinition(UUID.randomUUID(), templateId, UUID.randomUUID(),
-                        new MonsterService.CellDefinition(0, 0))));
+                "Test", "...", 5, TestAttributes.of(10, 10, 10, 10, 10, 10), null, 0, "1d4", 0,
+                List.of(new LootTableEntry(UUID.randomUUID(), 0.1)));
 
-        assertThatThrownBy(() -> isolated.loadMonsters(file, List.of())).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> isolated.loadMonsters(List.of(template), List.of(), Set.of()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void loadMonstersThrowsWhenALootTableEntryHasADropChanceOutOfRange() {
+        MonsterService isolated = new MonsterService(new ObjectMapper());
+        UUID templateId = UUID.randomUUID();
+        UUID itemTemplateId = UUID.randomUUID();
+        MonsterService.MonsterTemplateDefinition template = new MonsterService.MonsterTemplateDefinition(templateId,
+                "Test", "...", 5, TestAttributes.of(10, 10, 10, 10, 10, 10), null, 0, "1d4", 0,
+                List.of(new LootTableEntry(itemTemplateId, 1.5)));
+
+        assertThatThrownBy(() -> isolated.loadMonsters(List.of(template), List.of(), Set.of(itemTemplateId)))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    private static Room room(Collection<Room> rooms, UUID roomId) {
+        return rooms.stream().filter(room -> room.getId().equals(roomId)).findFirst().orElseThrow();
     }
 }

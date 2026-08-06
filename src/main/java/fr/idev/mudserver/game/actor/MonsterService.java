@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,19 +14,23 @@ import org.springframework.stereotype.Service;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.MonsterTemplate;
-import fr.idev.mudserver.domain.HexCoordinate;
+import fr.idev.mudserver.domain.actor.MonsterTemplate.LootTableEntry;
+import fr.idev.mudserver.domain.MonsterSpawn;
 import fr.idev.mudserver.domain.Room;
 import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * Précharge les monstres depuis {@code data/monsters.json}, sur le même
- * principe que {@code ItemService}/{@code RoomService} : donnée de contenu
+ * Précharge les templates de monstres depuis {@code data/monsters.json}, sur le
+ * même principe que {@code ItemService}/{@code RoomService} : donnée de contenu
  * statique, jamais mutée en jeu, chargée depuis le classpath plutôt que la DB —
- * pas de table monstre dans {@code V1__init_schema.sql}. Contrairement à
- * {@code ItemService}, templates et instances (« spawns ») partagent le même
- * fichier, donc une seule méthode/lecture ({@link #warmMonsters}) plutôt que le
- * split {@code warmItemTemplates()}/{@code warmRoomItems()}.
+ * pas de table monstre dans {@code V1__init_schema.sql}. Les instances («
+ * spawns ») ne vivent plus dans ce fichier : elles sont portées par chaque
+ * {@code Room} (voir {@link Room#getMonsterSpawns()}, peuplé par
+ * {@code RoomService.loadRooms} depuis {@code data/rooms.json}) — c'est
+ * {@link #loadMonsters} qui les consomme pour instancier et placer les
+ * {@link GameMonster} correspondants, une fois les templates chargés.
  */
 @Service
 public class MonsterService {
@@ -40,58 +45,56 @@ public class MonsterService {
         this.objectMapper = objectMapper;
     }
 
-    public void warmMonsters(Collection<Room> rooms) {
+    public void warmMonsters(Collection<Room> rooms, Set<UUID> knownItemTemplateIds) {
         try (InputStream in = getClass().getResourceAsStream(MONSTERS_RESOURCE)) {
-            MonsterFileDefinition file = objectMapper.readValue(in, MonsterFileDefinition.class);
-            loadMonsters(file, rooms);
+            List<MonsterTemplateDefinition> definitions = objectMapper.readValue(in,
+                    new TypeReference<List<MonsterTemplateDefinition>>() {
+                    });
+            loadMonsters(definitions, rooms, knownItemTemplateIds);
         } catch (IOException | JacksonException e) {
             throw new IllegalStateException("Impossible de charger " + MONSTERS_RESOURCE, e);
         }
     }
 
-    void loadMonsters(MonsterFileDefinition file, Collection<Room> rooms) {
-        for (MonsterTemplateDefinition definition : file.templates()) {
+    void loadMonsters(List<MonsterTemplateDefinition> definitions, Collection<Room> rooms,
+            Set<UUID> knownItemTemplateIds) {
+        for (MonsterTemplateDefinition definition : definitions) {
+            for (LootTableEntry entry : definition.lootTable()) {
+                if (entry.dropChance() < 0 || entry.dropChance() > 1) {
+                    throw new IllegalStateException("Template " + definition.id() + " a une entrée de lootTable avec "
+                            + "dropChance=" + entry.dropChance() + " hors de [0, 1] dans " + MONSTERS_RESOURCE);
+                }
+                if (!knownItemTemplateIds.contains(entry.itemTemplateId())) {
+                    throw new IllegalStateException("Template " + definition.id() + " référence l'item "
+                            + entry.itemTemplateId() + " dans sa lootTable, absent de data/items.json");
+                }
+            }
             templates.put(definition.id(),
                     new MonsterTemplate(definition.id(), definition.name(), definition.description(),
                             definition.maxHealth(), definition.attributes(), definition.naturalArmorClass(),
-                            definition.xpReward(), definition.naturalDamageDice()));
+                            definition.xpReward(), definition.naturalDamageDice(), definition.goldReward(),
+                            definition.lootTable()));
         }
 
-        Map<UUID, Room> roomsById = new ConcurrentHashMap<>();
         for (Room room : rooms) {
-            roomsById.put(room.getId(), room);
-        }
+            for (MonsterSpawn spawn : room.getMonsterSpawns()) {
+                MonsterTemplate template = templates.get(spawn.templateId());
+                if (template == null) {
+                    throw new IllegalStateException("Spawn " + spawn.id() + " de la room " + room.getId()
+                            + " référence le template " + spawn.templateId() + ", absent de " + MONSTERS_RESOURCE);
+                }
 
-        for (MonsterSpawnDefinition spawn : file.spawns()) {
-            MonsterTemplate template = templates.get(spawn.templateId());
-            if (template == null) {
-                throw new IllegalStateException("Spawn " + spawn.id() + " référence le template " + spawn.templateId()
-                        + ", absent de " + MONSTERS_RESOURCE);
+                GameMonster monster = new GameMonster(spawn.id(), template.getName(), template.getId(), room.getId(),
+                        template.getAttributes(), template.getMaxHealth());
+                monster.attachTemplate(template);
+                monster.setCurrentRoom(room);
+                room.placeMonster(monster, spawn.cell());
             }
-            Room room = roomsById.get(spawn.roomId());
-            if (room == null) {
-                throw new IllegalStateException("Spawn " + spawn.id() + " référence la room " + spawn.roomId()
-                        + ", absente de data/rooms.json");
-            }
-
-            GameMonster monster = new GameMonster(spawn.id(), template.getName(), template.getId(), room.getId(),
-                    template.getAttributes(), template.getMaxHealth());
-            monster.attachTemplate(template);
-            monster.setCurrentRoom(room);
-            room.placeMonster(monster, new HexCoordinate(spawn.cell().q(), spawn.cell().r()));
         }
-    }
-
-    record MonsterFileDefinition(List<MonsterTemplateDefinition> templates, List<MonsterSpawnDefinition> spawns) {
     }
 
     record MonsterTemplateDefinition(UUID id, String name, String description, int maxHealth,
-            Map<Attribute, Integer> attributes, Integer naturalArmorClass, int xpReward, String naturalDamageDice) {
-    }
-
-    record MonsterSpawnDefinition(UUID id, UUID templateId, UUID roomId, CellDefinition cell) {
-    }
-
-    record CellDefinition(int q, int r) {
+            Map<Attribute, Integer> attributes, Integer naturalArmorClass, int xpReward, String naturalDamageDice,
+            int goldReward, List<LootTableEntry> lootTable) {
     }
 }

@@ -23,9 +23,16 @@ import fr.idev.mudserver.game.RoomService;
  * ci-dessous est significatif : {@code warmRoomItems()} dépend du contenu déjà
  * chargé par {@code warmRooms()} (les rooms) et {@code warmItemTemplates()}
  * (les templates), voir {@link ItemService#warmRoomItems}. Même raison pour
- * {@code monsterService.warmMonsters}/{@code npcService.warmNpcs}, appelés
- * juste après {@code warmRooms()} : ils placent leurs instances dans les rooms
- * déjà chargées.
+ * {@code npcService.warmNpcs} : place ses instances dans les rooms déjà
+ * chargées. {@code monsterService.warmMonsters} dépend lui aussi de
+ * {@code warmRooms()} — les points de spawn eux-mêmes viennent maintenant de
+ * {@code data/rooms.json} (voir {@code Room#getMonsterSpawns()}),
+ * {@code data/monsters.json} ne portant plus que les templates — <em>et</em> de
+ * {@code warmItemTemplates()}, appelé avant lui plutôt qu'après comme les
+ * autres : ses tables de butin (voir {@code data/monsters.json}) référencent
+ * des identifiants d'{@code ItemTemplate}, validés au chargement contre
+ * {@link ItemService#templateIds()} pour échouer tôt sur un UUID invalide
+ * plutôt qu'au premier drop en jeu.
  *
  * <p>
  * Le {@code @ConditionalOnProperty} ci-dessous est porté par la
@@ -57,9 +64,9 @@ public class ServerApplication {
             NpcService npcService) {
         return args -> {
             roomService.warmRooms();
-            monsterService.warmMonsters(roomService.allRooms());
-            npcService.warmNpcs(roomService.allRooms());
             itemService.warmItemTemplates();
+            monsterService.warmMonsters(roomService.allRooms(), itemService.templateIds());
+            npcService.warmNpcs(roomService.allRooms());
             itemService.warmRoomItems(roomService.allRooms());
             raceService.warmRaceBonuses();
             classService.warmClassDefinitions();

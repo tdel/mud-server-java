@@ -46,7 +46,11 @@ import fr.idev.mudserver.network.message.ingame.GamePlayerLeftRoom;
  * {@code NpcService.warmNpcs}) — contrairement à {@code clients}, ils ne
  * rejoignent/quittent jamais dynamiquement dans ce périmètre (pas d'IA, pas de
  * déplacement), donc pas de notification {@code broadcast} à leur
- * ajout/retrait.
+ * ajout/retrait. {@code monsterSpawns} n'est pas cette liste runtime, mais la
+ * config statique lue depuis {@code data/rooms.json} (voir
+ * {@code RoomService.loadRooms()}) qui sert à peupler {@code monsters} au
+ * démarrage — {@code MonsterService.loadMonsters} en consomme le contenu, ne le
+ * mute jamais.
  *
  * <p>
  * {@code width}/{@code height}/{@code spawnCell} définissent la grille
@@ -77,6 +81,7 @@ public class Room {
     private final Map<UUID, GamePlayer> clients = new ConcurrentHashMap<>();
     private final List<Item> items = new CopyOnWriteArrayList<>();
     private final List<GameMonster> monsters = new CopyOnWriteArrayList<>();
+    private final List<MonsterSpawn> monsterSpawns = new CopyOnWriteArrayList<>();
     private final List<GameNpc> npcs = new CopyOnWriteArrayList<>();
     private final Map<HexCoordinate, GameCharacter> occupants = new ConcurrentHashMap<>();
     private final Map<HexCoordinate, RoomPortal> portals = new ConcurrentHashMap<>();
@@ -213,6 +218,21 @@ public class Room {
     public void setMonsters(List<GameMonster> monsters) {
         this.monsters.clear();
         this.monsters.addAll(monsters);
+    }
+
+    public List<MonsterSpawn> getMonsterSpawns() {
+        return List.copyOf(monsterSpawns);
+    }
+
+    /**
+     * Point d'entrée utilisé par {@code RoomService.loadRooms} : config statique de
+     * placement (contrairement à {@link #monsters}, jamais mutée en jeu), lue par
+     * {@code MonsterService.loadMonsters} pour instancier les {@link GameMonster}
+     * de cette room au démarrage.
+     */
+    public void setMonsterSpawns(List<MonsterSpawn> monsterSpawns) {
+        this.monsterSpawns.clear();
+        this.monsterSpawns.addAll(monsterSpawns);
     }
 
     /**
