@@ -9,3 +9,4 @@ docker/build/
 .project
 .settings/
 bin/
+docs/demo/.venv/
