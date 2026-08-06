@@ -12,6 +12,7 @@ import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.game.RoomService;
+import fr.idev.mudserver.game.actor.ClassService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.OutputMessage;
@@ -40,6 +41,9 @@ class GamePlayerDeathTest extends AbstractIntegrationTest {
 
     @Autowired
     private CharacterDao characterDao;
+
+    @Autowired
+    private ClassService classService;
 
     @Test
     void takeDamageReducesHealthWithoutGoingBelowZeroAndReportsTheKillingBlow() {
@@ -121,11 +125,13 @@ class GamePlayerDeathTest extends AbstractIntegrationTest {
     }
 
     private GamePlayer seedCharacter(Room room) {
+        classService.warmClassDefinitions();
         Account account = new Account(UUID.randomUUID(), "death-test-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), account.getLogin(), room.getId(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
-                0);
+                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
+                TestProficiencies.skills(CharacterClass.FIGHTER), 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
+                0, 0);
         characterDao.insert(character);
         room.join(character);
         return character;

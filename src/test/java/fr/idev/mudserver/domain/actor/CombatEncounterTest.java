@@ -201,7 +201,9 @@ class CombatEncounterTest {
 
     private GamePlayer player(int dexterity) {
         return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Joueur", UUID.randomUUID(), Gender.MAN, Race.HUMAN,
-                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, dexterity, 10, 10, 10, 10), 0, 0);
+                CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
+                TestProficiencies.skills(CharacterClass.FIGHTER), 1, 10, 10,
+                TestAttributes.of(10, dexterity, 10, 10, 10, 10), 0, 0);
     }
 
     private GameMonster monster(int dexterity) {

@@ -17,6 +17,7 @@ import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
+import fr.idev.mudserver.domain.actor.TestProficiencies;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.OutputMessage;
@@ -53,7 +54,8 @@ class CharacterServiceTest extends AbstractIntegrationTest {
         accountDao.insert(account);
         // FIGHTER, CON 10 (modificateur nul) : hpGain par niveau = hitDie/2+1+0 = 6.
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Héros", UUID.randomUUID(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, level, 10, 10,
+                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
+                TestProficiencies.skills(CharacterClass.FIGHTER), level, 10, 10,
                 TestAttributes.of(10, 10, 10, 10, 10, 10), xp, 0);
         characterDao.insert(character);
         // CharacterService diffuse toujours à character.getCurrentRoom() en cas de

@@ -13,6 +13,8 @@ import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
+import fr.idev.mudserver.domain.actor.TestProficiencies;
+import fr.idev.mudserver.game.actor.ClassService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,22 +27,32 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     @Autowired
     private CharacterDao characterDao;
 
+    @Autowired
+    private ClassService classService;
+
     private Account account;
     private UUID roomA;
     private UUID roomB;
 
     private void seedAccountAndRooms() {
+        classService.warmClassDefinitions();
         account = new Account(UUID.randomUUID(), "carol", "hashed-password", null);
         accountDao.insert(account);
         roomA = UUID.randomUUID();
         roomB = UUID.randomUUID();
     }
 
+    private GamePlayer newBarbarian(UUID roomId) {
+        return new GamePlayer(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomId, Gender.WOMAN, Race.ORC,
+                CharacterClass.BARBARIAN, TestProficiencies.savingThrows(CharacterClass.BARBARIAN),
+                TestProficiencies.skills(CharacterClass.BARBARIAN), 1, 14, 14,
+                TestAttributes.of(14, 11, 12, 10, 11, 10), 0, 0);
+    }
+
     @Test
     void insertsAndFindsById() {
         seedAccountAndRooms();
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA, Gender.WOMAN,
-                Race.ORC, CharacterClass.BARBARIAN, 1, 14, 14, TestAttributes.of(14, 11, 12, 10, 11, 10), 0, 0);
+        GamePlayer character = newBarbarian(roomA);
 
         characterDao.insert(character);
 
@@ -52,8 +64,7 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     @Test
     void updatesCurrentRoom() {
         seedAccountAndRooms();
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA, Gender.WOMAN,
-                Race.ORC, CharacterClass.BARBARIAN, 1, 14, 14, TestAttributes.of(14, 11, 12, 10, 11, 10), 0, 0);
+        GamePlayer character = newBarbarian(roomA);
         characterDao.insert(character);
 
         characterDao.updateCurrentRoom(character.getId(), roomB);
@@ -64,8 +75,7 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     @Test
     void updatesProgress() {
         seedAccountAndRooms();
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA, Gender.WOMAN,
-                Race.ORC, CharacterClass.BARBARIAN, 1, 14, 14, TestAttributes.of(14, 11, 12, 10, 11, 10), 0, 0);
+        GamePlayer character = newBarbarian(roomA);
         characterDao.insert(character);
 
         character.setCurrentRoomId(roomB);
@@ -80,8 +90,7 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     @Test
     void updatePersistsXpGainedInGame() {
         seedAccountAndRooms();
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA, Gender.WOMAN,
-                Race.ORC, CharacterClass.BARBARIAN, 1, 14, 14, TestAttributes.of(14, 11, 12, 10, 11, 10), 0, 0);
+        GamePlayer character = newBarbarian(roomA);
         characterDao.insert(character);
 
         // Ne franchit aucun palier de niveau (le premier est à 300 XP) : n'exerce que
@@ -95,8 +104,7 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     @Test
     void deletesById() {
         seedAccountAndRooms();
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Carol l'Orc", roomA, Gender.WOMAN,
-                Race.ORC, CharacterClass.BARBARIAN, 1, 14, 14, TestAttributes.of(14, 11, 12, 10, 11, 10), 0, 0);
+        GamePlayer character = newBarbarian(roomA);
         characterDao.insert(character);
 
         characterDao.deleteById(character.getId());

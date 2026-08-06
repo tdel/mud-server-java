@@ -1,14 +1,14 @@
 [
-  { "name": "BARBARIAN", "hitDie": 12, "startingGoldDice": "2d4", "startingGoldMultiplier": 10 },
-  { "name": "BARD", "hitDie": 8, "startingGoldDice": "5d4", "startingGoldMultiplier": 10 },
-  { "name": "CLERIC", "hitDie": 8, "startingGoldDice": "5d4", "startingGoldMultiplier": 10 },
-  { "name": "DRUID", "hitDie": 8, "startingGoldDice": "2d4", "startingGoldMultiplier": 10 },
-  { "name": "FIGHTER", "hitDie": 10, "startingGoldDice": "5d4", "startingGoldMultiplier": 10 },
-  { "name": "MONK", "hitDie": 8, "startingGoldDice": "5d4", "startingGoldMultiplier": 1 },
-  { "name": "PALADIN", "hitDie": 10, "startingGoldDice": "5d4", "startingGoldMultiplier": 10 },
-  { "name": "RANGER", "hitDie": 10, "startingGoldDice": "5d4", "startingGoldMultiplier": 10 },
-  { "name": "ROGUE", "hitDie": 8, "startingGoldDice": "4d4", "startingGoldMultiplier": 10 },
-  { "name": "SORCERER", "hitDie": 6, "startingGoldDice": "3d4", "startingGoldMultiplier": 10 },
-  { "name": "WARLOCK", "hitDie": 8, "startingGoldDice": "4d4", "startingGoldMultiplier": 10 },
-  { "name": "WIZARD", "hitDie": 6, "startingGoldDice": "4d4", "startingGoldMultiplier": 10 }
+  { "name": "BARBARIAN", "hitDie": 12, "startingGoldDice": "2d4", "startingGoldMultiplier": 10, "savingThrows": ["STRENGTH", "CONSTITUTION"], "skills": ["ATHLETICS", "INTIMIDATION"] },
+  { "name": "BARD", "hitDie": 8, "startingGoldDice": "5d4", "startingGoldMultiplier": 10, "savingThrows": ["DEXTERITY", "CHARISMA"], "skills": ["PERFORMANCE", "PERSUASION"] },
+  { "name": "CLERIC", "hitDie": 8, "startingGoldDice": "5d4", "startingGoldMultiplier": 10, "savingThrows": ["WISDOM", "CHARISMA"], "skills": ["INSIGHT", "RELIGION"] },
+  { "name": "DRUID", "hitDie": 8, "startingGoldDice": "2d4", "startingGoldMultiplier": 10, "savingThrows": ["INTELLIGENCE", "WISDOM"], "skills": ["NATURE", "SURVIVAL"] },
+  { "name": "FIGHTER", "hitDie": 10, "startingGoldDice": "5d4", "startingGoldMultiplier": 10, "savingThrows": ["STRENGTH", "CONSTITUTION"], "skills": ["ATHLETICS", "PERCEPTION"] },
+  { "name": "MONK", "hitDie": 8, "startingGoldDice": "5d4", "startingGoldMultiplier": 1, "savingThrows": ["STRENGTH", "DEXTERITY"], "skills": ["ACROBATICS", "STEALTH"] },
+  { "name": "PALADIN", "hitDie": 10, "startingGoldDice": "5d4", "startingGoldMultiplier": 10, "savingThrows": ["WISDOM", "CHARISMA"], "skills": ["PERSUASION", "RELIGION"] },
+  { "name": "RANGER", "hitDie": 10, "startingGoldDice": "5d4", "startingGoldMultiplier": 10, "savingThrows": ["STRENGTH", "DEXTERITY"], "skills": ["PERCEPTION", "SURVIVAL"] },
+  { "name": "ROGUE", "hitDie": 8, "startingGoldDice": "4d4", "startingGoldMultiplier": 10, "savingThrows": ["DEXTERITY", "INTELLIGENCE"], "skills": ["STEALTH", "SLEIGHT_OF_HAND"] },
+  { "name": "SORCERER", "hitDie": 6, "startingGoldDice": "3d4", "startingGoldMultiplier": 10, "savingThrows": ["CONSTITUTION", "CHARISMA"], "skills": ["ARCANA", "PERSUASION"] },
+  { "name": "WARLOCK", "hitDie": 8, "startingGoldDice": "4d4", "startingGoldMultiplier": 10, "savingThrows": ["WISDOM", "CHARISMA"], "skills": ["ARCANA", "DECEPTION"] },
+  { "name": "WIZARD", "hitDie": 6, "startingGoldDice": "4d4", "startingGoldMultiplier": 10, "savingThrows": ["INTELLIGENCE", "WISDOM"], "skills": ["ARCANA", "INVESTIGATION"] }
 ]

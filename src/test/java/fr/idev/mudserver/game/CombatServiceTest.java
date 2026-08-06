@@ -17,6 +17,7 @@ import fr.idev.mudserver.domain.actor.MonsterTemplate;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.actor.TestAttributes;
+import fr.idev.mudserver.domain.actor.TestProficiencies;
 import fr.idev.mudserver.game.dice.DiceRoller;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -194,7 +195,8 @@ class CombatServiceTest {
 
     private GamePlayer player(int strength, int dexterity, int level) {
         return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Attaquant", UUID.randomUUID(), Gender.MAN,
-                Race.HUMAN, CharacterClass.FIGHTER, level, 10, 10,
+                Race.HUMAN, CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
+                TestProficiencies.skills(CharacterClass.FIGHTER), level, 10, 10,
                 TestAttributes.of(strength, dexterity, 10, 10, 10, 10), 0, 0);
     }
 

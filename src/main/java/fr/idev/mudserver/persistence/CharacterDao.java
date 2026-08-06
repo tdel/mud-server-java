@@ -16,15 +16,18 @@ import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
+import fr.idev.mudserver.game.actor.ClassService;
 import fr.idev.mudserver.persistence.jooq.tables.records.CharacterRecord;
 
 @Repository
 public class CharacterDao {
 
     private final DSLContext dsl;
+    private final ClassService classService;
 
-    public CharacterDao(DSLContext dsl) {
+    public CharacterDao(DSLContext dsl, ClassService classService) {
         this.dsl = dsl;
+        this.classService = classService;
     }
 
     public void insert(GamePlayer character) {
@@ -43,16 +46,16 @@ public class CharacterDao {
     }
 
     public Optional<GamePlayer> findById(UUID id) {
-        return dsl.selectFrom(CHARACTER).where(CHARACTER.ID.eq(id)).fetchOptional(CharacterDao::toDomain);
+        return dsl.selectFrom(CHARACTER).where(CHARACTER.ID.eq(id)).fetchOptional(this::toDomain);
     }
 
     public List<GamePlayer> findByAccountId(UUID accountId) {
-        return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(accountId)).fetch(CharacterDao::toDomain);
+        return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(accountId)).fetch(this::toDomain);
     }
 
     public Optional<GamePlayer> findByAccountIdAndName(UUID accountId, String name) {
         return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(accountId)).and(CHARACTER.NAME.eq(name))
-                .fetchOptional(CharacterDao::toDomain);
+                .fetchOptional(this::toDomain);
     }
 
     public void updateCurrentRoom(UUID characterId, UUID roomId) {
@@ -75,7 +78,7 @@ public class CharacterDao {
         dsl.deleteFrom(CHARACTER).where(CHARACTER.ID.eq(characterId)).execute();
     }
 
-    private static GamePlayer toDomain(CharacterRecord record) {
+    private GamePlayer toDomain(CharacterRecord record) {
         Map<Attribute, Integer> attributes = new EnumMap<>(Attribute.class);
         attributes.put(Attribute.STRENGTH, record.getStrength());
         attributes.put(Attribute.DEXTERITY, record.getDexterity());
@@ -84,9 +87,12 @@ public class CharacterDao {
         attributes.put(Attribute.WISDOM, record.getWisdom());
         attributes.put(Attribute.CHARISMA, record.getCharisma());
 
+        CharacterClass characterClass = CharacterClass.valueOf(record.getCharacterClass());
+
         return new GamePlayer(record.getId(), record.getAccountId(), record.getName(), record.getCurrentRoomId(),
-                Gender.valueOf(record.getGender()), Race.valueOf(record.getRace()),
-                CharacterClass.valueOf(record.getCharacterClass()), record.getLevel(), record.getCurrentHealth(),
-                record.getMaxHealth(), attributes, record.getXp(), record.getGold());
+                Gender.valueOf(record.getGender()), Race.valueOf(record.getRace()), characterClass,
+                classService.savingThrowProficiencies(characterClass), classService.skillProficiencies(characterClass),
+                record.getLevel(), record.getCurrentHealth(), record.getMaxHealth(), attributes, record.getXp(),
+                record.getGold());
     }
 }

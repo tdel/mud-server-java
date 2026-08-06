@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
@@ -38,6 +39,8 @@ public final class GamePlayer extends GameCharacter {
     private Gender gender;
     private Race race;
     private CharacterClass characterClass;
+    private final Set<Attribute> savingThrowProficiencies;
+    private final Set<Skill> skillProficiencies;
     private int level;
 
     private Connection connection;
@@ -46,14 +49,16 @@ public final class GamePlayer extends GameCharacter {
     private int xp;
 
     public GamePlayer(UUID id, UUID accountId, String name, UUID currentRoomId, Gender gender, Race race,
-            CharacterClass characterClass, int level, int currentHealth, int maxHealth,
-            Map<Attribute, Integer> attributes, int xp, int gold) {
+            CharacterClass characterClass, Set<Attribute> savingThrowProficiencies, Set<Skill> skillProficiencies,
+            int level, int currentHealth, int maxHealth, Map<Attribute, Integer> attributes, int xp, int gold) {
         super(id, name, attributes, currentHealth, maxHealth);
         this.accountId = accountId;
         this.currentRoomId = currentRoomId;
         this.gender = gender;
         this.race = race;
         this.characterClass = characterClass;
+        this.savingThrowProficiencies = Set.copyOf(savingThrowProficiencies);
+        this.skillProficiencies = Set.copyOf(skillProficiencies);
         this.level = level;
         this.xp = xp;
         this.inventory = new PlayerInventory(gold);
@@ -97,6 +102,14 @@ public final class GamePlayer extends GameCharacter {
 
     public void setCharacterClass(CharacterClass characterClass) {
         this.characterClass = characterClass;
+    }
+
+    public Set<Attribute> getSavingThrowProficiencies() {
+        return savingThrowProficiencies;
+    }
+
+    public Set<Skill> getSkillProficiencies() {
+        return skillProficiencies;
     }
 
     public int getLevel() {

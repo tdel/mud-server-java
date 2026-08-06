@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
 
+import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.CharacterClass;
+import fr.idev.mudserver.domain.actor.Skill;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -52,6 +55,14 @@ public class ClassService {
         return new StartingGold(definition.startingGoldDice(), definition.startingGoldMultiplier());
     }
 
+    public Set<Attribute> savingThrowProficiencies(CharacterClass characterClass) {
+        return Set.copyOf(definition(characterClass).savingThrows());
+    }
+
+    public Set<Skill> skillProficiencies(CharacterClass characterClass) {
+        return Set.copyOf(definition(characterClass).skills());
+    }
+
     private ClassDefinition definition(CharacterClass characterClass) {
         ClassDefinition definition = definitionsByClass.get(characterClass);
         if (definition == null) {
@@ -64,7 +75,7 @@ public class ClassService {
     public record StartingGold(String dice, int multiplier) {
     }
 
-    private record ClassDefinition(CharacterClass name, int hitDie, String startingGoldDice,
-            int startingGoldMultiplier) {
+    private record ClassDefinition(CharacterClass name, int hitDie, String startingGoldDice, int startingGoldMultiplier,
+            List<Attribute> savingThrows, List<Skill> skills) {
     }
 }

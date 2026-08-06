@@ -2,7 +2,9 @@ package fr.idev.mudserver.game.actor;
 
 import org.junit.jupiter.api.Test;
 
+import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.CharacterClass;
+import fr.idev.mudserver.domain.actor.Skill;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,6 +57,50 @@ class ClassServiceTest {
         ClassService classService = new ClassService(new ObjectMapper());
 
         assertThatThrownBy(() -> classService.startingGold(CharacterClass.FIGHTER))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void warmClassDefinitionsLoadsTheOfficial5eSavingThrowProficienciesForEveryClass() {
+        ClassService classService = new ClassService(new ObjectMapper());
+
+        classService.warmClassDefinitions();
+
+        assertThat(classService.savingThrowProficiencies(CharacterClass.BARBARIAN))
+                .containsExactlyInAnyOrder(Attribute.STRENGTH, Attribute.CONSTITUTION);
+        assertThat(classService.savingThrowProficiencies(CharacterClass.MONK))
+                .containsExactlyInAnyOrder(Attribute.STRENGTH, Attribute.DEXTERITY);
+        assertThat(classService.savingThrowProficiencies(CharacterClass.WIZARD))
+                .containsExactlyInAnyOrder(Attribute.INTELLIGENCE, Attribute.WISDOM);
+    }
+
+    @Test
+    void savingThrowProficienciesThrowsBeforeWarmUp() {
+        ClassService classService = new ClassService(new ObjectMapper());
+
+        assertThatThrownBy(() -> classService.savingThrowProficiencies(CharacterClass.FIGHTER))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void warmClassDefinitionsLoadsSkillProficienciesForEveryClass() {
+        ClassService classService = new ClassService(new ObjectMapper());
+
+        classService.warmClassDefinitions();
+
+        assertThat(classService.skillProficiencies(CharacterClass.BARBARIAN)).containsExactlyInAnyOrder(Skill.ATHLETICS,
+                Skill.INTIMIDATION);
+        assertThat(classService.skillProficiencies(CharacterClass.MONK)).containsExactlyInAnyOrder(Skill.ACROBATICS,
+                Skill.STEALTH);
+        assertThat(classService.skillProficiencies(CharacterClass.WIZARD)).containsExactlyInAnyOrder(Skill.ARCANA,
+                Skill.INVESTIGATION);
+    }
+
+    @Test
+    void skillProficienciesThrowsBeforeWarmUp() {
+        ClassService classService = new ClassService(new ObjectMapper());
+
+        assertThatThrownBy(() -> classService.skillProficiencies(CharacterClass.FIGHTER))
                 .isInstanceOf(IllegalStateException.class);
     }
 }

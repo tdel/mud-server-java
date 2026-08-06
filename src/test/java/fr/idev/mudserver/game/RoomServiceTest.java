@@ -16,6 +16,8 @@ import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomExit;
 import fr.idev.mudserver.domain.actor.TestAttributes;
+import fr.idev.mudserver.domain.actor.TestProficiencies;
+import fr.idev.mudserver.game.actor.ClassService;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 import tools.jackson.databind.ObjectMapper;
@@ -37,6 +39,9 @@ class RoomServiceTest extends AbstractIntegrationTest {
 
     @Autowired
     private CharacterDao characterDao;
+
+    @Autowired
+    private ClassService classService;
 
     @Test
     void warmRoomsLoadsTheRealCatalogFromJson() {
@@ -91,13 +96,16 @@ class RoomServiceTest extends AbstractIntegrationTest {
     @Test
     void moveCharacterJoinsTheNewRoomAndPersistsIt() {
         roomService.warmRooms();
+        classService.warmClassDefinitions();
         Room origin = room(VILLAGE_SQUARE_ID);
         Room destination = room(FOREST_EDGE_ID);
 
         Account account = new Account(UUID.randomUUID(), "erin", "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Erin", origin.getId(), Gender.WOMAN,
-                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+                Race.HUMAN, CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
+                TestProficiencies.skills(CharacterClass.FIGHTER), 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
+                0, 0);
         characterDao.insert(character);
         origin.join(character);
 
@@ -112,12 +120,15 @@ class RoomServiceTest extends AbstractIntegrationTest {
     @Test
     void spawnCharacterResolvesTheCurrentRoomFromCurrentRoomIdAndJoinsIt() {
         roomService.warmRooms();
+        classService.warmClassDefinitions();
         Room room = room(VILLAGE_SQUARE_ID);
 
         Account account = new Account(UUID.randomUUID(), "finn", "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Finn", room.getId(), Gender.MAN,
-                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+                Race.HUMAN, CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
+                TestProficiencies.skills(CharacterClass.FIGHTER), 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
+                0, 0);
         characterDao.insert(character);
 
         roomService.spawnCharacter(character);

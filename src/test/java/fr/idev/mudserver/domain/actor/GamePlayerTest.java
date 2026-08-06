@@ -101,7 +101,8 @@ class GamePlayerTest {
     private GamePlayer character(int strength, int dexterity, int constitution, int intelligence, int wisdom,
             int charisma, int level) {
         return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Test", UUID.randomUUID(), Gender.MAN, Race.HUMAN,
-                CharacterClass.FIGHTER, level, 10, 10,
+                CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
+                TestProficiencies.skills(CharacterClass.FIGHTER), level, 10, 10,
                 TestAttributes.of(strength, dexterity, constitution, intelligence, wisdom, charisma), 0, 0);
     }
 }

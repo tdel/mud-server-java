@@ -110,7 +110,8 @@ public class GameWorld {
         int gold = diceRoller.roll(startingGold.dice()).total() * startingGold.multiplier();
 
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), name, startingRoom.get().getId(),
-                gender, race, characterClass, 1, maxHealth, maxHealth, scores, 0, gold);
+                gender, race, characterClass, classService.savingThrowProficiencies(characterClass),
+                classService.skillProficiencies(characterClass), 1, maxHealth, maxHealth, scores, 0, gold);
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));
         character.spawnToRoom(startingRoom.get());
