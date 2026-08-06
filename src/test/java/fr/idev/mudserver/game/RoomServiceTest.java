@@ -9,14 +9,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.HexCoordinate;
+import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomPortal;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
+import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Race;
-import fr.idev.mudserver.domain.Room;
-import fr.idev.mudserver.domain.RoomExit;
 import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.domain.actor.TestProficiencies;
+import fr.idev.mudserver.game.RoomService.CellDefinition;
+import fr.idev.mudserver.game.RoomService.PortalDefinition;
+import fr.idev.mudserver.game.RoomService.RoomDefinition;
 import fr.idev.mudserver.game.actor.ClassService;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
@@ -50,7 +54,7 @@ class RoomServiceTest extends AbstractIntegrationTest {
         Room villageSquare = room(VILLAGE_SQUARE_ID);
         assertThat(villageSquare.getName()).isEqualTo("Place du village");
         assertThat(villageSquare.isStartingRoom()).isTrue();
-        assertThat(villageSquare.findOneByDirection("nord")).map(RoomExit::getTargetRoom).map(Room::getId)
+        assertThat(villageSquare.findPortalAt(new HexCoordinate(15, 0))).map(RoomPortal::targetRoom).map(Room::getId)
                 .contains(FOREST_EDGE_ID);
         assertThat(roomService.startingRoom()).map(Room::getId).contains(VILLAGE_SQUARE_ID);
     }
@@ -58,39 +62,84 @@ class RoomServiceTest extends AbstractIntegrationTest {
     @Test
     void loadRoomsThrowsWhenMoreThanOneRoomIsMarkedAsStarting() {
         RoomService isolated = new RoomService(new ObjectMapper(), characterDao);
-        List<RoomService.RoomDefinition> definitions = List.of(
-                new RoomService.RoomDefinition(UUID.randomUUID(), "A", "...", true, List.of()),
-                new RoomService.RoomDefinition(UUID.randomUUID(), "B", "...", true, List.of()));
+        List<RoomDefinition> definitions = List.of(
+                new RoomDefinition(UUID.randomUUID(), "A", "...", true, 16, 8, new CellDefinition(8, 4), List.of()),
+                new RoomDefinition(UUID.randomUUID(), "B", "...", true, 16, 8, new CellDefinition(8, 4), List.of()));
 
         assertThatThrownBy(() -> isolated.loadRooms(definitions)).isInstanceOf(IllegalStateException.class);
     }
 
     @Test
-    void loadRoomsThrowsWhenAnExitTargetsAnUnknownRoom() {
+    void loadRoomsThrowsWhenAPortalTargetsAnUnknownRoom() {
         RoomService isolated = new RoomService(new ObjectMapper(), characterDao);
-        List<RoomService.RoomDefinition> definitions = List.of(new RoomService.RoomDefinition(UUID.randomUUID(), "A",
-                "...", null, List.of(new RoomService.ExitDefinition("nord", UUID.randomUUID()))));
+        List<RoomDefinition> definitions = List.of(new RoomDefinition(UUID.randomUUID(), "A", "...", null, 16, 8,
+                new CellDefinition(8, 4), List.of(new PortalDefinition(new CellDefinition(15, 4), "E",
+                        UUID.randomUUID(), new CellDefinition(0, 4)))));
 
         assertThatThrownBy(() -> isolated.loadRooms(definitions)).isInstanceOf(IllegalStateException.class);
     }
 
     @Test
-    void loadRoomsResolvesExitsToTheAttachedSourceAndTargetRooms() {
+    void loadRoomsThrowsWhenAPortalCellIsNotOnTheBorder() {
         RoomService isolated = new RoomService(new ObjectMapper(), characterDao);
         UUID sourceId = UUID.randomUUID();
         UUID targetId = UUID.randomUUID();
-        List<RoomService.RoomDefinition> definitions = List.of(
-                new RoomService.RoomDefinition(sourceId, "Source", "...", null,
-                        List.of(new RoomService.ExitDefinition("nord", targetId))),
-                new RoomService.RoomDefinition(targetId, "Target", "...", null, List.of()));
+        List<RoomDefinition> definitions = List.of(
+                new RoomDefinition(sourceId, "Source", "...", null, 16, 8, new CellDefinition(8, 4),
+                        List.of(new PortalDefinition(new CellDefinition(8, 4), "E", targetId,
+                                new CellDefinition(0, 4)))),
+                new RoomDefinition(targetId, "Target", "...", null, 16, 8, new CellDefinition(8, 4), List.of()));
+
+        assertThatThrownBy(() -> isolated.loadRooms(definitions)).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void loadRoomsThrowsWhenAPortalTargetCellIsOutOfBoundsInTheTargetRoom() {
+        RoomService isolated = new RoomService(new ObjectMapper(), characterDao);
+        UUID sourceId = UUID.randomUUID();
+        UUID targetId = UUID.randomUUID();
+        List<RoomDefinition> definitions = List.of(
+                new RoomDefinition(sourceId, "Source", "...", null, 16, 8, new CellDefinition(8, 4),
+                        List.of(new PortalDefinition(new CellDefinition(15, 4), "E", targetId,
+                                new CellDefinition(99, 99)))),
+                new RoomDefinition(targetId, "Target", "...", null, 16, 8, new CellDefinition(8, 4), List.of()));
+
+        assertThatThrownBy(() -> isolated.loadRooms(definitions)).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void loadRoomsThrowsWhenTwoPortalsShareTheSameCell() {
+        RoomService isolated = new RoomService(new ObjectMapper(), characterDao);
+        UUID sourceId = UUID.randomUUID();
+        UUID targetId = UUID.randomUUID();
+        List<RoomDefinition> definitions = List.of(new RoomDefinition(sourceId, "Source", "...", null, 16, 8,
+                new CellDefinition(8, 4),
+                List.of(new PortalDefinition(new CellDefinition(15, 4), "E", targetId, new CellDefinition(0, 4)),
+                        new PortalDefinition(new CellDefinition(15, 4), "E", targetId, new CellDefinition(0, 5)))),
+                new RoomDefinition(targetId, "Target", "...", null, 16, 8, new CellDefinition(8, 4), List.of()));
+
+        assertThatThrownBy(() -> isolated.loadRooms(definitions)).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void loadRoomsResolvesPortalsToTheAttachedSourceAndTargetRooms() {
+        RoomService isolated = new RoomService(new ObjectMapper(), characterDao);
+        UUID sourceId = UUID.randomUUID();
+        UUID targetId = UUID.randomUUID();
+        List<RoomDefinition> definitions = List.of(
+                new RoomDefinition(sourceId, "Source", "...", null, 16, 8, new CellDefinition(8, 4),
+                        List.of(new PortalDefinition(new CellDefinition(15, 4), "E", targetId,
+                                new CellDefinition(0, 4)))),
+                new RoomDefinition(targetId, "Target", "...", null, 16, 8, new CellDefinition(8, 4), List.of()));
 
         isolated.loadRooms(definitions);
 
         Room source = isolated.allRooms().stream().filter(room -> room.getId().equals(sourceId)).findFirst()
                 .orElseThrow();
-        assertThat(source.findOneByDirection("nord")).map(RoomExit::getSourceRoom).contains(source);
-        assertThat(source.findOneByDirection("nord")).map(RoomExit::getTargetRoom).map(Room::getId).contains(targetId);
-        assertThat(source.findOneByDirection("sud")).isEmpty();
+        assertThat(source.findPortalAt(new HexCoordinate(15, 4))).map(RoomPortal::sourceRoom).contains(source);
+        assertThat(source.findPortalAt(new HexCoordinate(15, 4))).map(RoomPortal::targetRoom).map(Room::getId)
+                .contains(targetId);
+        assertThat(source.findPortalAt(new HexCoordinate(0, 0))).isEmpty();
     }
 
     @Test
@@ -113,6 +162,7 @@ class RoomServiceTest extends AbstractIntegrationTest {
 
         assertThat(destination.characters()).extracting(GamePlayer::getId).contains(character.getId());
         assertThat(origin.characters()).extracting(GamePlayer::getId).doesNotContain(character.getId());
+        assertThat(character.getPosition()).isEqualTo(destination.getSpawnCell());
         assertThat(characterDao.findById(character.getId())).map(GamePlayer::getCurrentRoomId)
                 .contains(destination.getId());
     }
@@ -134,6 +184,7 @@ class RoomServiceTest extends AbstractIntegrationTest {
         roomService.spawnCharacter(character);
 
         assertThat(character.getCurrentRoom()).isEqualTo(room);
+        assertThat(character.getPosition()).isEqualTo(room.getSpawnCell());
         assertThat(character.getCurrentRoom().characters()).extracting(GamePlayer::getId).contains(character.getId());
     }
 

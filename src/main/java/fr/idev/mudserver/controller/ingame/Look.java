@@ -2,18 +2,18 @@ package fr.idev.mudserver.controller.ingame;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
+import fr.idev.mudserver.domain.Item;
+import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.actor.GameCharacter;
 import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.GameNpc;
 import fr.idev.mudserver.domain.actor.GamePlayer;
-import fr.idev.mudserver.domain.Item;
-import fr.idev.mudserver.domain.Room;
-import fr.idev.mudserver.domain.RoomExit;
 import fr.idev.mudserver.game.GameWorld;
+import fr.idev.mudserver.game.HexGridRenderer;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -49,20 +49,19 @@ public class Look implements ControllerHandler {
     private RoomDescription describeRoom(GamePlayer character) {
         Room room = character.getCurrentRoom();
 
-        List<RoomExit> exits = room.getExits();
-        List<GamePlayer> characters = room.characters();
-        List<Item> items = room.getItems();
-        List<GameMonster> monsters = room.getMonsters();
-        List<GameNpc> npcs = room.getNpcs();
+        List<String> gridLines = HexGridRenderer.render(room, character);
+        List<GameCharacter> nearby = room.occupantsWithin(character.getPosition(), HexGridRenderer.VIEWPORT_RADIUS);
 
-        List<String> exitNames = exits.stream().map(RoomExit::getDirection).toList();
-        List<String> characterNames = characters.stream().filter(other -> !other.getId().equals(character.getId()))
-                .map(GamePlayer::getName).toList();
-        List<String> itemNames = items.stream().map(Item::getName).toList();
-        List<String> monsterNames = monsters.stream().map(GameMonster::getName).toList();
-        List<String> npcNames = npcs.stream().map(GameNpc::getName).toList();
+        List<String> portalSummaries = room.getPortals().stream()
+                .map(portal -> portal.direction() + ": " + portal.targetRoom().getName()).toList();
+        List<String> characterNames = nearby.stream().filter(GamePlayer.class::isInstance)
+                .filter(other -> !other.getId().equals(character.getId())).map(GameCharacter::getName).toList();
+        List<String> itemNames = room.getItems().stream().map(Item::getName).toList();
+        List<String> monsterNames = nearby.stream().filter(GameMonster.class::isInstance).map(GameCharacter::getName)
+                .toList();
+        List<String> npcNames = nearby.stream().filter(GameNpc.class::isInstance).map(GameCharacter::getName).toList();
 
-        return new RoomDescription(room.getName(), room.getDescription(), exitNames, characterNames, itemNames,
-                monsterNames, npcNames);
+        return new RoomDescription(room.getName(), room.getDescription(), gridLines, HexGridRenderer.LEGEND,
+                portalSummaries, characterNames, itemNames, monsterNames, npcNames);
     }
 }

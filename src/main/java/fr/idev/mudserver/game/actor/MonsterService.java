@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.MonsterTemplate;
+import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.Room;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
@@ -77,7 +78,7 @@ public class MonsterService {
                     template.getAttributes(), template.getMaxHealth());
             monster.attachTemplate(template);
             monster.setCurrentRoom(room);
-            room.addMonster(monster);
+            room.placeMonster(monster, new HexCoordinate(spawn.cell().q(), spawn.cell().r()));
         }
     }
 
@@ -88,6 +89,9 @@ public class MonsterService {
             Map<Attribute, Integer> attributes, Integer naturalArmorClass, int xpReward, String naturalDamageDice) {
     }
 
-    record MonsterSpawnDefinition(UUID id, UUID templateId, UUID roomId) {
+    record MonsterSpawnDefinition(UUID id, UUID templateId, UUID roomId, CellDefinition cell) {
+    }
+
+    record CellDefinition(int q, int r) {
     }
 }

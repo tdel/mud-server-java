@@ -2,11 +2,13 @@
     {
         "id": "a3c8d0f2-5d5f-4d2c-9f2c-3f4e5d6c7b8a",
         "name": "Aubergiste",
-        "roomId": "e1da77bd-f0b3-4d5a-95da-e8765c4fc973"
+        "roomId": "e1da77bd-f0b3-4d5a-95da-e8765c4fc973",
+        "cell": { "q": 4, "r": 4 }
     },
     {
         "id": "b0362279-5a46-4461-9672-6f4e0b2cf7e0",
         "name": "Garde du village",
-        "roomId": "5e4ada37-37e1-438c-9233-581f10c055c7"
+        "roomId": "5e4ada37-37e1-438c-9233-581f10c055c7",
+        "cell": { "q": 2, "r": 2 }
     }
 ]

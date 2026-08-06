@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.actor.GameNpc;
+import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.Room;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
@@ -59,10 +60,13 @@ public class NpcService {
 
             GameNpc npc = new GameNpc(definition.id(), definition.name(), room.getId());
             npc.setCurrentRoom(room);
-            room.addNpc(npc);
+            room.placeNpc(npc, new HexCoordinate(definition.cell().q(), definition.cell().r()));
         }
     }
 
-    record NpcDefinition(UUID id, String name, UUID roomId) {
+    record NpcDefinition(UUID id, String name, UUID roomId, CellDefinition cell) {
+    }
+
+    record CellDefinition(int q, int r) {
     }
 }

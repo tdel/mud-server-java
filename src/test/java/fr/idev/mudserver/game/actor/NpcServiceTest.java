@@ -39,8 +39,8 @@ class NpcServiceTest {
     @Test
     void loadNpcsThrowsWhenAnNpcReferencesAnUnknownRoom() {
         NpcService isolated = new NpcService(new ObjectMapper());
-        List<NpcService.NpcDefinition> definitions = List
-                .of(new NpcService.NpcDefinition(UUID.randomUUID(), "Test", UUID.randomUUID()));
+        List<NpcService.NpcDefinition> definitions = List.of(new NpcService.NpcDefinition(UUID.randomUUID(), "Test",
+                UUID.randomUUID(), new NpcService.CellDefinition(0, 0)));
 
         assertThatThrownBy(() -> isolated.loadNpcs(definitions, List.of())).isInstanceOf(IllegalStateException.class);
     }

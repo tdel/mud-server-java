@@ -124,37 +124,44 @@
         {
             "id": "d2b7c9f1-4c4f-4c1b-8f1b-2f3e4d5c6b7a",
             "templateId": "c1a6b8f0-3b3e-4b0a-9f0a-1e2d3c4b5a6f",
-            "roomId": "7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5"
+            "roomId": "7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5",
+            "cell": { "q": 4, "r": 2 }
         },
         {
             "id": "7c799ffd-da9d-423e-a835-501c496059bb",
             "templateId": "f6630034-a160-4ffc-888e-eb2fee9d9428",
-            "roomId": "4dae9974-45f7-46c9-8e66-12cdac759860"
+            "roomId": "4dae9974-45f7-46c9-8e66-12cdac759860",
+            "cell": { "q": 4, "r": 6 }
         },
         {
             "id": "e4f86247-f78c-4e4d-be31-5b2c6e959c2d",
             "templateId": "dcff9d89-1f33-41e2-8011-e5b3b7092f0d",
-            "roomId": "e1da77bd-f0b3-4d5a-95da-e8765c4fc973"
+            "roomId": "e1da77bd-f0b3-4d5a-95da-e8765c4fc973",
+            "cell": { "q": 12, "r": 6 }
         },
         {
             "id": "1a860cf0-a4b3-4d82-90b3-f3f8d5f8c6f1",
             "templateId": "e6caeb0d-f861-401b-b0c1-c88e315097c5",
-            "roomId": "9a884ac7-b954-4cd6-ab67-c677d472cb0f"
+            "roomId": "9a884ac7-b954-4cd6-ab67-c677d472cb0f",
+            "cell": { "q": 4, "r": 2 }
         },
         {
             "id": "4f1d327c-afc6-4986-998e-06cfed4f61d8",
             "templateId": "026ce1a2-091d-4179-b715-65006480cfbe",
-            "roomId": "9a884ac7-b954-4cd6-ab67-c677d472cb0f"
+            "roomId": "9a884ac7-b954-4cd6-ab67-c677d472cb0f",
+            "cell": { "q": 12, "r": 2 }
         },
         {
             "id": "e561c97e-1eb8-4dfe-a491-51e66a9ddd80",
             "templateId": "7dfe22be-6147-45b3-bd07-89711810791d",
-            "roomId": "7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5"
+            "roomId": "7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5",
+            "cell": { "q": 12, "r": 2 }
         },
         {
             "id": "2a3e9829-d00b-444e-a2a7-d7750beecfb8",
             "templateId": "49e91691-3a13-4e2b-967f-bc1acf8cf03a",
-            "roomId": "7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5"
+            "roomId": "7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5",
+            "cell": { "q": 8, "r": 6 }
         }
     ]
 }

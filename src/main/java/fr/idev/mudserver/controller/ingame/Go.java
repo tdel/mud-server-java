@@ -6,16 +6,29 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
+import fr.idev.mudserver.domain.HexDirection;
+import fr.idev.mudserver.domain.actor.GameCharacter.MovementOutcome;
 import fr.idev.mudserver.domain.actor.GamePlayer;
-import fr.idev.mudserver.domain.RoomExit;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
-import fr.idev.mudserver.network.message.ingame.NoSuchExit;
+import fr.idev.mudserver.network.message.ingame.MovementBlockedByBounds;
+import fr.idev.mudserver.network.message.ingame.MovementBlockedByOccupant;
+import fr.idev.mudserver.network.message.ingame.NoSuchDirection;
 
+/**
+ * Ne téléporte plus d'une {@code Room} à l'autre : déplace le personnage de 1 à
+ * N cases (N borné par sa vitesse) dans la grille hexagonale de sa room
+ * actuelle — voir
+ * {@link fr.idev.mudserver.domain.actor.GameCharacter#moveToCell}. Atterrir sur
+ * une case-portail fait automatiquement traverser vers la room liée, à la case
+ * cible correspondante.
+ */
 @Component
 public class Go implements ControllerHandler {
+
+    private static final int DEFAULT_STEP_COUNT = 1;
 
     private final GameWorld gameWorld;
     private final Look lookAction;
@@ -38,21 +51,41 @@ public class Go implements ControllerHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         GamePlayer character = gameWorld.character(connection);
-        String direction = argument.trim();
+        String[] tokens = argument.trim().split("\\s+");
 
+        if (argument.isBlank()) {
+            connection.send(new Usage("go <direction> [count]"));
+            return;
+        }
+
+        Optional<HexDirection> direction = HexDirection.fromToken(tokens[0]);
         if (direction.isEmpty()) {
-            connection.send(new Usage("go <direction>"));
+            connection.send(new NoSuchDirection(tokens[0]));
             return;
         }
 
-        Optional<RoomExit> exit = character.getCurrentRoom().findOneByDirection(direction);
-        if (exit.isEmpty()) {
-            connection.send(new NoSuchExit(direction));
+        int requestedCells = tokens.length > 1 ? parsePositiveInt(tokens[1]) : DEFAULT_STEP_COUNT;
+        if (requestedCells <= 0) {
+            connection.send(new Usage("go <direction> [count]"));
             return;
         }
 
-        character.moveToRoom(exit.get().getTargetRoom());
+        MovementOutcome outcome = character.moveToCell(direction.get(), requestedCells);
+
+        if (outcome.cellsMoved() == 0) {
+            connection.send(
+                    outcome.blockedByOccupant() ? new MovementBlockedByOccupant() : new MovementBlockedByBounds());
+            return;
+        }
 
         lookAction.onReceive(connection, "");
+    }
+
+    private int parsePositiveInt(String token) {
+        try {
+            return Integer.parseInt(token);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 }

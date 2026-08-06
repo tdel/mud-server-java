@@ -2,9 +2,13 @@ package fr.idev.mudserver.domain.actor;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
+import fr.idev.mudserver.domain.HexCoordinate;
+import fr.idev.mudserver.domain.HexDirection;
 import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomPortal;
 
 /**
  * Racine commune à tout ce qui porte des caractéristiques DnD5e et une santé,
@@ -34,14 +38,39 @@ import fr.idev.mudserver.domain.Room;
  * {@code volatile} garantit la visibilité immédiate de cette réassignation aux
  * lectures simples ({@link #isInCombat()}) qui n'ont pas besoin d'un verrou
  * complet sur {@link CombatEncounter}.
+ *
+ * <p>
+ * {@code position}/{@code speed} suivent la même convention "état vivant du
+ * process, jamais persisté" que {@code currentRoom} : la case exacte occupée
+ * dans la grille hexagonale de {@code currentRoom} (voir {@code Room.width}/
+ * {@code Room.height}) ne survit ni à une déconnexion ni à un redémarrage — le
+ * personnage réapparaît sur la case de spawn de la room (ou la case cible d'un
+ * portail) à chaque {@code join}. {@code speed} borne le nombre de cases
+ * franchissables par une commande {@code go} (voir {@link #moveToCell}) ; la
+ * valeur par défaut (6) reprend par analogie la vitesse de marche 5e standard
+ * (30 ft ≈ 6 cases de 5 ft), cohérente avec le reste du projet qui émule les
+ * règles 5e ailleurs (initiative, jets de sauvegarde).
+ *
+ * <p>
+ * {@link #moveToCell} est partagé par les trois sous-types : bornage par
+ * vitesse, avance case par case et réclamation/libération atomique de case
+ * (voir {@link Room#tryClaimCell}) ne dépendent d'aucun champ propre à
+ * {@link GamePlayer}. Seul le franchissement d'un {@link RoomPortal} diffère
+ * par sous-type, via le point d'extension {@link #crossPortal} : la base ne
+ * fait rien (un monstre/PNJ s'arrête sur la case-portail sans changer de room),
+ * {@link GamePlayer} redéfinit pour réellement traverser vers la room liée.
  */
 public abstract sealed class GameCharacter extends GameObject permits GamePlayer, GameMonster, GameNpc {
+
+    public static final int DEFAULT_SPEED = 6;
 
     private final Map<Attribute, Integer> attributes;
     private int currentHealth;
     private int maxHealth;
 
     private Room currentRoom;
+    private HexCoordinate position;
+    private int speed = DEFAULT_SPEED;
     private volatile CombatEncounter encounter;
 
     protected GameCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
@@ -92,6 +121,22 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
         this.currentRoom = currentRoom;
     }
 
+    public HexCoordinate getPosition() {
+        return position;
+    }
+
+    public void setPosition(HexCoordinate position) {
+        this.position = position;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
     public boolean isInCombat() {
         return encounter != null;
     }
@@ -102,5 +147,66 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
 
     public void setEncounter(CombatEncounter encounter) {
         this.encounter = encounter;
+    }
+
+    /**
+     * Avance d'une case à la fois vers {@code direction}, jusqu'à
+     * {@code min(requestedCells, getSpeed())} : chaque pas réclame la case suivante
+     * ({@link Room#tryClaimCell}) avant de libérer l'ancienne, jamais l'inverse —
+     * un personnage ne perd ainsi jamais son propre pied d'appui face à un
+     * concurrent visant la même case. Le déplacement intra-room ne touche jamais la
+     * DB ni ne publie d'événement ; seul {@link #crossPortal} peut le faire pour le
+     * sous-type qui le redéfinit. Atterrir sur un portail consomme le reste du
+     * budget de déplacement : pas d'enchaînement dans la nouvelle room en une seule
+     * commande {@code go} (simplification assumée).
+     */
+    public MovementOutcome moveToCell(HexDirection direction, int requestedCells) {
+        int budget = Math.min(requestedCells, getSpeed());
+        Room room = getCurrentRoom();
+        HexCoordinate current = getPosition();
+
+        int cellsMoved = 0;
+        boolean blockedByOccupant = false;
+        boolean crossedPortal = false;
+
+        for (int i = 0; i < budget; i++) {
+            HexCoordinate next = current.neighbor(direction);
+            if (!room.isInBounds(next)) {
+                break;
+            }
+            if (!room.tryClaimCell(next, this)) {
+                blockedByOccupant = true;
+                break;
+            }
+            room.releaseCell(current, this);
+            setPosition(next);
+            current = next;
+            cellsMoved++;
+
+            Optional<RoomPortal> portal = room.findPortalAt(current);
+            if (portal.isPresent()) {
+                crossedPortal = crossPortal(portal.get());
+                break;
+            }
+        }
+
+        boolean blockedByBounds = cellsMoved == 0 && !blockedByOccupant;
+        return new MovementOutcome(cellsMoved, blockedByBounds, blockedByOccupant, crossedPortal);
+    }
+
+    /**
+     * Point d'extension de {@link #moveToCell} : {@link GameMonster}/
+     * {@link GameNpc} restent sur place (la boucle s'est déjà arrêtée sur la
+     * case-portail), seul {@link GamePlayer} redéfinit pour réellement traverser
+     * vers la room liée.
+     *
+     * @return true si {@code this} a effectivement changé de room
+     */
+    protected boolean crossPortal(RoomPortal portal) {
+        return false;
+    }
+
+    public record MovementOutcome(int cellsMoved, boolean blockedByBounds, boolean blockedByOccupant,
+            boolean crossedPortal) {
     }
 }

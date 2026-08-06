@@ -18,8 +18,10 @@ import fr.idev.mudserver.domain.actor.event.GamePlayerSpawnedToRoom;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUnequippedItem;
 import fr.idev.mudserver.domain.actor.event.ItemPickedUp;
 import fr.idev.mudserver.domain.EquipmentSlot;
+import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomPortal;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.OutputMessage;
 
@@ -204,13 +206,36 @@ public final class GamePlayer extends GameCharacter {
     /**
      * Précondition : le personnage est déjà dans le monde, donc {@code currentRoom}
      * est déjà renseigné (voir {@link #spawnToRoom} pour l'entrée initiale, qui n'a
-     * pas de room d'origine).
+     * pas de room d'origine). Place le personnage sur la case de spawn de
+     * {@code destination} — utilisé par la restauration après la mort
+     * ({@code CharacterService#onGamePlayerDied}), où il n'y a pas de case cible de
+     * portail à respecter.
      */
     public void moveToRoom(Room destination) {
+        moveToRoom(destination, destination.getSpawnCell());
+    }
+
+    /**
+     * Variante utilisée par {@link #crossPortal} lorsqu'un déplacement case par
+     * case fait franchir un {@code RoomPortal} : {@code targetCell} est la case
+     * cible du portail plutôt que la case de spawn de la room.
+     */
+    public void moveToRoom(Room destination, HexCoordinate targetCell) {
         Room previous = getCurrentRoom();
         previous.leave(this);
-        destination.join(this);
+        destination.join(this, targetCell);
         DomainEventPublisher.publish(new GamePlayerMovedToRoom(this, previous, destination));
+    }
+
+    /**
+     * Seul sous-type à réellement traverser un {@link RoomPortal} rencontré par
+     * {@link #moveToCell} : {@link GameMonster}/{@link GameNpc} restent sur la
+     * case-portail (voir la base {@code GameCharacter#crossPortal}).
+     */
+    @Override
+    protected boolean crossPortal(RoomPortal portal) {
+        moveToRoom(portal.targetRoom(), portal.targetCell());
+        return true;
     }
 
     public void spawnToRoom(Room room) {

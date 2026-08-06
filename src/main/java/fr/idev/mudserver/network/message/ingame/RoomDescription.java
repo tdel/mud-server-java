@@ -5,17 +5,30 @@ import java.util.List;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
-public record RoomDescription(String roomName, String description, List<String> exitNames, List<String> characterNames,
-        List<String> itemNames, List<String> monsterNames, List<String> npcNames) implements OutputTelnetMessage {
+/**
+ * {@code gridLines}/{@code legend} portent le viewport hexagonal construit par
+ * {@code game.HexGridRenderer} (rayon fixe autour du personnage, jamais la
+ * grille entière). {@code characterNames}/{@code monsterNames}/{@code npcNames}
+ * sont désormais bornés à ce même viewport, cohérents avec ce que la grille
+ * affiche ; {@code itemNames} reste à l'échelle de la room entière (les items
+ * n'ont pas de position en case dans cette phase). {@code portalSummaries}
+ * remplace l'ancien {@code exitNames} et reste lui aussi à l'échelle de la room
+ * entière (pas de "brouillard de guerre") — nécessaire pour que la navigation
+ * reste praticable dans une grille 64x64.
+ */
+public record RoomDescription(String roomName, String description, List<String> gridLines, String legend,
+        List<String> portalSummaries, List<String> characterNames, List<String> itemNames, List<String> monsterNames,
+        List<String> npcNames) implements OutputTelnetMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        output.write(
-                String.format("== %s ==\n%s\n\nExits: %s\nCharacters here: %s\nItems: %s\nMonsters: %s\nNPCs: %s\n",
-                        roomName, description, exitNames.isEmpty() ? "none." : String.join(", ", exitNames),
-                        characterNames.isEmpty() ? "no one else." : String.join(", ", characterNames),
-                        itemNames.isEmpty() ? "none." : String.join(", ", itemNames),
-                        monsterNames.isEmpty() ? "none." : String.join(", ", monsterNames),
-                        npcNames.isEmpty() ? "none." : String.join(", ", npcNames)));
+        output.write(String.format(
+                "== %s ==\n%s\n\n%s\n\n%s\n\nPortals: %s\nCharacters here: %s\nItems: %s\nMonsters: %s\nNPCs: %s\n",
+                roomName, description, String.join("\n", gridLines), legend,
+                portalSummaries.isEmpty() ? "none." : String.join(", ", portalSummaries),
+                characterNames.isEmpty() ? "no one else." : String.join(", ", characterNames),
+                itemNames.isEmpty() ? "none." : String.join(", ", itemNames),
+                monsterNames.isEmpty() ? "none." : String.join(", ", monsterNames),
+                npcNames.isEmpty() ? "none." : String.join(", ", npcNames)));
     }
 }

@@ -14,8 +14,9 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.Room;
-import fr.idev.mudserver.domain.RoomExit;
+import fr.idev.mudserver.domain.RoomPortal;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
@@ -84,22 +85,57 @@ public class RoomService {
         }
 
         for (RoomDefinition definition : definitions) {
+            HexCoordinate spawnCell = new HexCoordinate(definition.spawnCell().q(), definition.spawnCell().r());
+            if (definition.width() <= 0 || definition.height() <= 0) {
+                throw new IllegalStateException("Room " + definition.id() + " a une grille invalide ("
+                        + definition.width() + "x" + definition.height() + ") dans " + ROOMS_RESOURCE);
+            }
             Room room = new Room(definition.id(), definition.name(), definition.description(),
-                    definition.isStartingRoom());
+                    definition.isStartingRoom(), definition.width(), definition.height(), spawnCell);
+            if (!room.isInBounds(spawnCell)) {
+                throw new IllegalStateException("Room " + definition.id() + " a une case de spawn " + spawnCell
+                        + " hors des bornes de sa grille (" + definition.width() + "x" + definition.height() + ")");
+            }
             rooms.put(room.getId(), room);
         }
 
         for (RoomDefinition definition : definitions) {
             Room source = rooms.get(definition.id());
-            List<RoomExit> exits = definition.exits().stream().map(exit -> {
-                Room target = rooms.get(exit.targetRoomId());
-                if (target == null) {
-                    throw new IllegalStateException("Room " + definition.id() + " a un exit '" + exit.direction()
-                            + "' vers " + exit.targetRoomId() + ", absente de " + ROOMS_RESOURCE);
-                }
-                return new RoomExit(exit.direction(), source, target);
-            }).toList();
-            source.setExits(exits);
+            List<RoomPortal> portals = definition.portals().stream()
+                    .map(portal -> resolvePortal(definition, source, portal)).toList();
+            checkNoDuplicatePortalCell(definition, portals);
+            source.setPortals(portals);
+        }
+    }
+
+    private RoomPortal resolvePortal(RoomDefinition definition, Room source, PortalDefinition portal) {
+        Room target = rooms.get(portal.targetRoomId());
+        if (target == null) {
+            throw new IllegalStateException("Room " + definition.id() + " a un portail '" + portal.direction()
+                    + "' vers " + portal.targetRoomId() + ", absente de " + ROOMS_RESOURCE);
+        }
+
+        HexCoordinate cell = new HexCoordinate(portal.cell().q(), portal.cell().r());
+        if (!source.isBorderCell(cell)) {
+            throw new IllegalStateException("Room " + definition.id() + " a un portail en " + cell
+                    + " hors des bords de sa grille (" + source.getWidth() + "x" + source.getHeight() + ")");
+        }
+
+        HexCoordinate targetCell = new HexCoordinate(portal.targetCell().q(), portal.targetCell().r());
+        if (!target.isInBounds(targetCell)) {
+            throw new IllegalStateException("Room " + definition.id() + " a un portail vers " + targetCell
+                    + " hors des bornes de la grille " + "de la room cible " + portal.targetRoomId() + " ("
+                    + target.getWidth() + "x" + target.getHeight() + ")");
+        }
+
+        return new RoomPortal(cell, portal.direction(), source, target, targetCell);
+    }
+
+    private void checkNoDuplicatePortalCell(RoomDefinition definition, List<RoomPortal> portals) {
+        long distinctCells = portals.stream().map(RoomPortal::cell).distinct().count();
+        if (distinctCells != portals.size()) {
+            throw new IllegalStateException(
+                    "Room " + definition.id() + " a plusieurs portails sur la même case dans " + ROOMS_RESOURCE);
         }
     }
 
@@ -158,10 +194,13 @@ public class RoomService {
                 event.character());
     }
 
-    record RoomDefinition(UUID id, String name, String description, Boolean isStartingRoom,
-            List<ExitDefinition> exits) {
+    record RoomDefinition(UUID id, String name, String description, Boolean isStartingRoom, int width, int height,
+            CellDefinition spawnCell, List<PortalDefinition> portals) {
     }
 
-    record ExitDefinition(String direction, UUID targetRoomId) {
+    record CellDefinition(int q, int r) {
+    }
+
+    record PortalDefinition(CellDefinition cell, String direction, UUID targetRoomId, CellDefinition targetCell) {
     }
 }

@@ -52,8 +52,9 @@ class MonsterServiceTest {
     @Test
     void loadMonstersThrowsWhenASpawnReferencesAnUnknownTemplate() {
         MonsterService isolated = new MonsterService(new ObjectMapper());
-        MonsterService.MonsterFileDefinition file = new MonsterService.MonsterFileDefinition(List.of(), List.of(
-                new MonsterService.MonsterSpawnDefinition(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID())));
+        MonsterService.MonsterFileDefinition file = new MonsterService.MonsterFileDefinition(List.of(),
+                List.of(new MonsterService.MonsterSpawnDefinition(UUID.randomUUID(), UUID.randomUUID(),
+                        UUID.randomUUID(), new MonsterService.CellDefinition(0, 0))));
 
         assertThatThrownBy(() -> isolated.loadMonsters(file, List.of())).isInstanceOf(IllegalStateException.class);
     }
@@ -65,7 +66,8 @@ class MonsterServiceTest {
         MonsterService.MonsterTemplateDefinition template = new MonsterService.MonsterTemplateDefinition(templateId,
                 "Test", "...", 5, TestAttributes.of(10, 10, 10, 10, 10, 10), null, 0, "1d4");
         MonsterService.MonsterFileDefinition file = new MonsterService.MonsterFileDefinition(List.of(template),
-                List.of(new MonsterService.MonsterSpawnDefinition(UUID.randomUUID(), templateId, UUID.randomUUID())));
+                List.of(new MonsterService.MonsterSpawnDefinition(UUID.randomUUID(), templateId, UUID.randomUUID(),
+                        new MonsterService.CellDefinition(0, 0))));
 
         assertThatThrownBy(() -> isolated.loadMonsters(file, List.of())).isInstanceOf(IllegalStateException.class);
     }

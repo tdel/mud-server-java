@@ -3,10 +3,10 @@ package fr.idev.mudserver.network.message.ingame;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
-public record NoSuchExit(String direction) implements OutputTelnetMessage {
+public record MovementBlockedByOccupant() implements OutputTelnetMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        output.write("No exit to the \"" + direction + "\".\n");
+        output.write("Someone is already there.\n");
     }
 }
