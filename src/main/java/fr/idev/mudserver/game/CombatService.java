@@ -108,7 +108,7 @@ public class CombatService {
     }
 
     private int rollDamage(GamePlayer attacker, int strengthModifier, boolean criticalHit) {
-        Optional<Item> weapon = attacker.getEquippedItems().stream()
+        Optional<Item> weapon = attacker.getInventory().getEquippedItems().stream()
                 .filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
 
         if (weapon.isEmpty()) {

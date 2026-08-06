@@ -61,7 +61,7 @@ public class GameWorld {
      */
     public void enterWorld(Connection connection, GamePlayer character) {
         character.setConnection(connection);
-        character.setInventory(itemService.loadInventory(character));
+        character.getInventory().replaceItems(itemService.loadInventory(character));
         characters.put(connection, character);
         roomService.spawnCharacter(character);
     }
@@ -106,8 +106,11 @@ public class GameWorld {
         int constitutionModifier = Math.floorDiv(scores.get(Attribute.CONSTITUTION) - 10, 2);
         int maxHealth = Math.max(1, classService.hitDie(characterClass) + constitutionModifier);
 
+        ClassService.StartingGold startingGold = classService.startingGold(characterClass);
+        int gold = diceRoller.roll(startingGold.dice()).total() * startingGold.multiplier();
+
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), name, startingRoom.get().getId(),
-                gender, race, characterClass, 1, maxHealth, maxHealth, scores, 0);
+                gender, race, characterClass, 1, maxHealth, maxHealth, scores, 0, gold);
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));
         character.spawnToRoom(startingRoom.get());

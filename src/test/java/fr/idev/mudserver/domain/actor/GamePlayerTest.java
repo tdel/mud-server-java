@@ -79,7 +79,7 @@ class GamePlayerTest {
     // (voir sa Javadoc) — absent de ce test unitaire pur. On construit donc
     // directement l'Item avec son slot déjà renseigné.
     private void equip(GamePlayer character, Item item) {
-        character.addItem(item);
+        character.getInventory().addItem(item);
     }
 
     private Item armor(String name, ArmorCategory category, int baseAc) {
@@ -102,6 +102,6 @@ class GamePlayerTest {
             int charisma, int level) {
         return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Test", UUID.randomUUID(), Gender.MAN, Race.HUMAN,
                 CharacterClass.FIGHTER, level, 10, 10,
-                TestAttributes.of(strength, dexterity, constitution, intelligence, wisdom, charisma), 0);
+                TestAttributes.of(strength, dexterity, constitution, intelligence, wisdom, charisma), 0, 0);
     }
 }

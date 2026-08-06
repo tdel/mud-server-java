@@ -16,8 +16,8 @@ import tools.jackson.databind.ObjectMapper;
  * Précharge la table officielle des points d'expérience requis par niveau
  * depuis {@code data/levels.json} (voir {@link #warmXpThresholds()}), sur le
  * même principe que {@code RaceService.warmRaceBonuses()}/
- * {@code ClassService.warmClassHitDice()} : donnée de règles statique, jamais
- * mutée en jeu, chargée depuis le classpath plutôt que la DB.
+ * {@code ClassService.warmClassDefinitions()} : donnée de règles statique,
+ * jamais mutée en jeu, chargée depuis le classpath plutôt que la DB.
  */
 @Service
 public class LevelService {

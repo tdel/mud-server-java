@@ -14,8 +14,8 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * Précharge le dé de vie de chaque classe depuis {@code data/class.json} (voir
- * {@link #warmClassHitDice()}), sur le même principe que
+ * Précharge les données de règles par classe depuis {@code data/class.json}
+ * (voir {@link #warmClassDefinitions()}), sur le même principe que
  * {@code RaceService.warmRaceBonuses()} : donnée de règles statique, jamais
  * mutée en jeu, chargée depuis le classpath plutôt que la DB.
  */
@@ -24,19 +24,19 @@ public class ClassService {
 
     private static final String CLASS_RESOURCE = "/data/class.json";
 
-    private final Map<CharacterClass, Integer> hitDiceByClass = new ConcurrentHashMap<>();
+    private final Map<CharacterClass, ClassDefinition> definitionsByClass = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper;
 
     public ClassService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
-    public void warmClassHitDice() {
+    public void warmClassDefinitions() {
         try (InputStream in = getClass().getResourceAsStream(CLASS_RESOURCE)) {
             List<ClassDefinition> definitions = objectMapper.readValue(in, new TypeReference<List<ClassDefinition>>() {
             });
             for (ClassDefinition definition : definitions) {
-                hitDiceByClass.put(definition.name(), definition.hitDie());
+                definitionsByClass.put(definition.name(), definition);
             }
         } catch (IOException | JacksonException e) {
             throw new IllegalStateException("Impossible de charger " + CLASS_RESOURCE, e);
@@ -44,14 +44,27 @@ public class ClassService {
     }
 
     public int hitDie(CharacterClass characterClass) {
-        Integer hitDie = hitDiceByClass.get(characterClass);
-        if (hitDie == null) {
-            throw new IllegalStateException(
-                    "Dé de vie de " + characterClass + " absent du cache — warmClassHitDice() a-t-il été appelé ?");
-        }
-        return hitDie;
+        return definition(characterClass).hitDie();
     }
 
-    private record ClassDefinition(CharacterClass name, int hitDie) {
+    public StartingGold startingGold(CharacterClass characterClass) {
+        ClassDefinition definition = definition(characterClass);
+        return new StartingGold(definition.startingGoldDice(), definition.startingGoldMultiplier());
+    }
+
+    private ClassDefinition definition(CharacterClass characterClass) {
+        ClassDefinition definition = definitionsByClass.get(characterClass);
+        if (definition == null) {
+            throw new IllegalStateException("Définition de " + characterClass
+                    + " absente du cache — warmClassDefinitions() a-t-il été appelé ?");
+        }
+        return definition;
+    }
+
+    public record StartingGold(String dice, int multiplier) {
+    }
+
+    private record ClassDefinition(CharacterClass name, int hitDie, String startingGoldDice,
+            int startingGoldMultiplier) {
     }
 }

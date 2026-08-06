@@ -40,7 +40,7 @@ class ItemDaoTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "dave", "hashed-password", null);
         accountDao.insert(account);
         character = new GamePlayer(UUID.randomUUID(), account.getId(), "Dave le Nain", roomId, Gender.MAN, Race.DWARF,
-                CharacterClass.FIGHTER, 1, 12, 12, TestAttributes.of(12, 10, 12, 10, 10, 10), 0);
+                CharacterClass.FIGHTER, 1, 12, 12, TestAttributes.of(12, 10, 12, 10, 10, 10), 0, 0);
         characterDao.insert(character);
     }
 

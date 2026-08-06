@@ -58,7 +58,7 @@ public class Use implements ControllerHandler {
             return;
         }
 
-        Optional<Item> item = character.findOneByName(name);
+        Optional<Item> item = character.getInventory().findOneByName(name);
         if (item.isEmpty()) {
             connection.send(new ItemNotCarried(name));
             return;

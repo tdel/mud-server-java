@@ -62,7 +62,7 @@ public class ServerApplication {
             itemService.warmItemTemplates();
             itemService.warmRoomItems(roomService.allRooms());
             raceService.warmRaceBonuses();
-            classService.warmClassHitDice();
+            classService.warmClassDefinitions();
             levelService.warmXpThresholds();
         };
     }

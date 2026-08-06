@@ -1,14 +1,14 @@
 [
-  { "name": "BARBARIAN", "hitDie": 12 },
-  { "name": "BARD", "hitDie": 8 },
-  { "name": "CLERIC", "hitDie": 8 },
-  { "name": "DRUID", "hitDie": 8 },
-  { "name": "FIGHTER", "hitDie": 10 },
-  { "name": "MONK", "hitDie": 8 },
-  { "name": "PALADIN", "hitDie": 10 },
-  { "name": "RANGER", "hitDie": 10 },
-  { "name": "ROGUE", "hitDie": 8 },
-  { "name": "SORCERER", "hitDie": 6 },
-  { "name": "WARLOCK", "hitDie": 8 },
-  { "name": "WIZARD", "hitDie": 6 }
+  { "name": "BARBARIAN", "hitDie": 12, "startingGoldDice": "2d4", "startingGoldMultiplier": 10 },
+  { "name": "BARD", "hitDie": 8, "startingGoldDice": "5d4", "startingGoldMultiplier": 10 },
+  { "name": "CLERIC", "hitDie": 8, "startingGoldDice": "5d4", "startingGoldMultiplier": 10 },
+  { "name": "DRUID", "hitDie": 8, "startingGoldDice": "2d4", "startingGoldMultiplier": 10 },
+  { "name": "FIGHTER", "hitDie": 10, "startingGoldDice": "5d4", "startingGoldMultiplier": 10 },
+  { "name": "MONK", "hitDie": 8, "startingGoldDice": "5d4", "startingGoldMultiplier": 1 },
+  { "name": "PALADIN", "hitDie": 10, "startingGoldDice": "5d4", "startingGoldMultiplier": 10 },
+  { "name": "RANGER", "hitDie": 10, "startingGoldDice": "5d4", "startingGoldMultiplier": 10 },
+  { "name": "ROGUE", "hitDie": 8, "startingGoldDice": "4d4", "startingGoldMultiplier": 10 },
+  { "name": "SORCERER", "hitDie": 6, "startingGoldDice": "3d4", "startingGoldMultiplier": 10 },
+  { "name": "WARLOCK", "hitDie": 8, "startingGoldDice": "4d4", "startingGoldMultiplier": 10 },
+  { "name": "WIZARD", "hitDie": 6, "startingGoldDice": "4d4", "startingGoldMultiplier": 10 }
 ]

@@ -54,7 +54,7 @@ class CharacterServiceTest extends AbstractIntegrationTest {
         // FIGHTER, CON 10 (modificateur nul) : hpGain par niveau = hitDie/2+1+0 = 6.
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Héros", UUID.randomUUID(),
                 Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, level, 10, 10,
-                TestAttributes.of(10, 10, 10, 10, 10, 10), xp);
+                TestAttributes.of(10, 10, 10, 10, 10, 10), xp, 0);
         characterDao.insert(character);
         // CharacterService diffuse toujours à character.getCurrentRoom() en cas de
         // montée de niveau : il faut donc une room, même quand le test ne
@@ -65,7 +65,7 @@ class CharacterServiceTest extends AbstractIntegrationTest {
 
     @Test
     void crossingOneThresholdLevelsUpAndGrantsHitPointsFromTheClassHitDie() {
-        classService.warmClassHitDice();
+        classService.warmClassDefinitions();
         levelService.warmXpThresholds();
         GamePlayer character = fighter(1, 0);
 
@@ -80,7 +80,7 @@ class CharacterServiceTest extends AbstractIntegrationTest {
 
     @Test
     void crossingTwoThresholdsInOneGainLevelsUpTwiceApplyingHpGainEachTime() {
-        classService.warmClassHitDice();
+        classService.warmClassDefinitions();
         levelService.warmXpThresholds();
         GamePlayer character = fighter(1, 0);
 
@@ -94,7 +94,7 @@ class CharacterServiceTest extends AbstractIntegrationTest {
 
     @Test
     void gainingXpWithoutCrossingAThresholdLeavesLevelUnchangedButPersistsXp() {
-        classService.warmClassHitDice();
+        classService.warmClassDefinitions();
         levelService.warmXpThresholds();
         GamePlayer character = fighter(1, 0);
 
@@ -108,7 +108,7 @@ class CharacterServiceTest extends AbstractIntegrationTest {
 
     @Test
     void levelTwentyIsACapEvenWithOverwhelmingXp() {
-        classService.warmClassHitDice();
+        classService.warmClassDefinitions();
         levelService.warmXpThresholds();
         GamePlayer character = fighter(20, 355000);
 
@@ -120,7 +120,7 @@ class CharacterServiceTest extends AbstractIntegrationTest {
 
     @Test
     void levelingUpBroadcastsOnlyToPlayersInTheSameRoom() {
-        classService.warmClassHitDice();
+        classService.warmClassDefinitions();
         levelService.warmXpThresholds();
 
         GamePlayer leveler = fighter(1, 0);
@@ -155,7 +155,7 @@ class CharacterServiceTest extends AbstractIntegrationTest {
 
     @Test
     void gainingXpWithoutCrossingAThresholdStillSendsXpGainedButNoLevelUpMessage() {
-        classService.warmClassHitDice();
+        classService.warmClassDefinitions();
         levelService.warmXpThresholds();
         GamePlayer character = fighter(1, 0);
         RecordingConnection connection = new RecordingConnection();

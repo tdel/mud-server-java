@@ -5,12 +5,13 @@ import java.util.List;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
-public record Inventory(List<String> itemNames) implements OutputTelnetMessage {
+public record Inventory(List<String> itemNames, int gold) implements OutputTelnetMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
         output.write(itemNames.isEmpty()
                 ? "You aren't carrying anything.\n"
                 : "You are carrying: " + String.join(", ", itemNames) + "\n");
+        output.write("Gold: " + gold + " gp\n");
     }
 }

@@ -60,18 +60,18 @@ class ItemServiceTest extends AbstractIntegrationTest {
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Erin", UUID.randomUUID(),
                 Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0);
+                0, 0);
         characterDao.insert(character);
 
         Item firstSword = new Item(UUID.randomUUID(), weaponTemplate.getId(), null, character.getId(), null);
         firstSword.attachTemplate(weaponTemplate);
         itemDao.insert(firstSword);
-        character.addItem(firstSword);
+        character.getInventory().addItem(firstSword);
 
         Item secondSword = new Item(UUID.randomUUID(), weaponTemplate.getId(), null, character.getId(), null);
         secondSword.attachTemplate(weaponTemplate);
         itemDao.insert(secondSword);
-        character.addItem(secondSword);
+        character.getInventory().addItem(secondSword);
 
         assertThat(character.equipItem(firstSword)).contains(EquipmentSlot.WEAPON);
         assertThat(character.equipItem(secondSword)).contains(EquipmentSlot.WEAPON);
@@ -90,13 +90,13 @@ class ItemServiceTest extends AbstractIntegrationTest {
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Gwen", UUID.randomUUID(),
                 Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0);
+                0, 0);
         characterDao.insert(character);
 
         Item sword = new Item(UUID.randomUUID(), weaponTemplate.getId(), null, character.getId(), null);
         sword.attachTemplate(weaponTemplate);
         itemDao.insert(sword);
-        character.addItem(sword);
+        character.getInventory().addItem(sword);
         character.equipItem(sword);
 
         // Simule une reconnexion : on recharge l'inventaire depuis la base plutôt
@@ -118,16 +118,16 @@ class ItemServiceTest extends AbstractIntegrationTest {
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Fay", UUID.randomUUID(),
                 Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0);
+                0, 0);
         characterDao.insert(character);
 
         Item potion = new Item(UUID.randomUUID(), potionTemplate.getId(), null, character.getId(), null);
         itemDao.insert(potion);
 
-        character.setInventory(itemService.loadInventory(character));
+        character.getInventory().replaceItems(itemService.loadInventory(character));
 
-        assertThat(character.getInventory()).extracting(Item::getName).containsExactly("Potion de soin");
-        assertThat(character.findOneByName("potion de soin")).map(Item::getId).contains(potion.getId());
+        assertThat(character.getInventory().getItems()).extracting(Item::getName).containsExactly("Potion de soin");
+        assertThat(character.getInventory().findOneByName("potion de soin")).map(Item::getId).contains(potion.getId());
     }
 
     @Test
@@ -140,7 +140,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "gus", "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Gus", warmedRoom.getId(), Gender.MAN,
-                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0);
+                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
         warmedRoom.join(character);
 
@@ -150,11 +150,11 @@ class ItemServiceTest extends AbstractIntegrationTest {
         Item torchWithTemplate = warmedRoom.findOneByName("Torche").orElseThrow();
 
         assertThat(character.pickUpItem(torchWithTemplate)).isTrue();
-        assertThat(character.getInventory()).containsExactly(torchWithTemplate);
+        assertThat(character.getInventory().getItems()).containsExactly(torchWithTemplate);
         assertThat(warmedRoom.getItems()).isEmpty();
 
         character.dropItem(torchWithTemplate);
-        assertThat(character.getInventory()).isEmpty();
+        assertThat(character.getInventory().getItems()).isEmpty();
         assertThat(warmedRoom.getItems()).containsExactly(torchWithTemplate);
     }
 

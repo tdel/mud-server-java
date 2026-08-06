@@ -31,14 +31,14 @@ public class CharacterDao {
         dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_ROOM_ID,
                 CHARACTER.GENDER, CHARACTER.RACE, CHARACTER.CHARACTER_CLASS, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH,
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
-                CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA, CHARACTER.XP)
+                CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA, CHARACTER.XP, CHARACTER.GOLD)
                 .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentRoomId(),
                         character.getGender().name(), character.getRace().name(), character.getCharacterClass().name(),
                         character.getLevel(), character.getCurrentHealth(), character.getMaxHealth(),
                         character.getAttribute(Attribute.STRENGTH), character.getAttribute(Attribute.DEXTERITY),
                         character.getAttribute(Attribute.CONSTITUTION), character.getAttribute(Attribute.INTELLIGENCE),
                         character.getAttribute(Attribute.WISDOM), character.getAttribute(Attribute.CHARISMA),
-                        character.getXp())
+                        character.getXp(), character.getInventory().getGold())
                 .execute();
     }
 
@@ -87,6 +87,6 @@ public class CharacterDao {
         return new GamePlayer(record.getId(), record.getAccountId(), record.getName(), record.getCurrentRoomId(),
                 Gender.valueOf(record.getGender()), Race.valueOf(record.getRace()),
                 CharacterClass.valueOf(record.getCharacterClass()), record.getLevel(), record.getCurrentHealth(),
-                record.getMaxHealth(), attributes, record.getXp());
+                record.getMaxHealth(), attributes, record.getXp(), record.getGold());
     }
 }

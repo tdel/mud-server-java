@@ -11,10 +11,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class ClassServiceTest {
 
     @Test
-    void warmClassHitDiceLoadsTheOfficial5eHitDieForEveryClass() {
+    void warmClassDefinitionsLoadsTheOfficial5eHitDieForEveryClass() {
         ClassService classService = new ClassService(new ObjectMapper());
 
-        classService.warmClassHitDice();
+        classService.warmClassDefinitions();
 
         assertThat(classService.hitDie(CharacterClass.BARBARIAN)).isEqualTo(12);
         assertThat(classService.hitDie(CharacterClass.BARD)).isEqualTo(8);
@@ -35,5 +35,26 @@ class ClassServiceTest {
         ClassService classService = new ClassService(new ObjectMapper());
 
         assertThatThrownBy(() -> classService.hitDie(CharacterClass.FIGHTER)).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void warmClassDefinitionsLoadsTheOfficial5eStartingGoldForEveryClass() {
+        ClassService classService = new ClassService(new ObjectMapper());
+
+        classService.warmClassDefinitions();
+
+        assertThat(classService.startingGold(CharacterClass.BARBARIAN))
+                .isEqualTo(new ClassService.StartingGold("2d4", 10));
+        assertThat(classService.startingGold(CharacterClass.MONK)).isEqualTo(new ClassService.StartingGold("5d4", 1));
+        assertThat(classService.startingGold(CharacterClass.WIZARD))
+                .isEqualTo(new ClassService.StartingGold("4d4", 10));
+    }
+
+    @Test
+    void startingGoldThrowsBeforeWarmUp() {
+        ClassService classService = new ClassService(new ObjectMapper());
+
+        assertThatThrownBy(() -> classService.startingGold(CharacterClass.FIGHTER))
+                .isInstanceOf(IllegalStateException.class);
     }
 }

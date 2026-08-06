@@ -177,7 +177,7 @@ class CombatServiceTest {
                 damageDice);
         Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.WEAPON);
         item.attachTemplate(template);
-        character.addItem(item);
+        character.getInventory().addItem(item);
     }
 
     private void equipArmor(GamePlayer character, int baseAc) {
@@ -185,7 +185,7 @@ class CombatServiceTest {
                 ArmorCategory.HEAVY, baseAc, null);
         Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.CHEST);
         item.attachTemplate(template);
-        character.addItem(item);
+        character.getInventory().addItem(item);
     }
 
     private GamePlayer player(int strength, int level) {
@@ -195,7 +195,7 @@ class CombatServiceTest {
     private GamePlayer player(int strength, int dexterity, int level) {
         return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Attaquant", UUID.randomUUID(), Gender.MAN,
                 Race.HUMAN, CharacterClass.FIGHTER, level, 10, 10,
-                TestAttributes.of(strength, dexterity, 10, 10, 10, 10), 0);
+                TestAttributes.of(strength, dexterity, 10, 10, 10, 10), 0, 0);
     }
 
     private GameMonster monster(Room room, int maxHealth, Integer naturalArmorClass) {

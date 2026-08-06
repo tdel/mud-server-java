@@ -63,7 +63,7 @@ class GameWorldTest extends AbstractIntegrationTest {
         roomService.warmRooms();
         Room startingRoom = roomService.startingRoom().orElseThrow();
         raceService.warmRaceBonuses();
-        classService.warmClassHitDice();
+        classService.warmClassDefinitions();
 
         GamePlayer character = gameWorld.createCharacter(account, "Hilde", Gender.WOMAN, Race.HUMAN,
                 CharacterClass.FIGHTER);
@@ -83,5 +83,7 @@ class GameWorldTest extends AbstractIntegrationTest {
         assertThat(character.getAttribute(Attribute.WISDOM)).isBetween(4, 19);
         assertThat(character.getAttribute(Attribute.CHARISMA)).isBetween(4, 19);
         assertThat(character.getCurrentRoom()).isEqualTo(startingRoom);
+        // Fighter: 5d4 x 10 gp.
+        assertThat(character.getInventory().getGold()).isBetween(50, 200);
     }
 }

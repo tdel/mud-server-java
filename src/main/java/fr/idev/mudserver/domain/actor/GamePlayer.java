@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
@@ -42,13 +41,13 @@ public final class GamePlayer extends GameCharacter {
     private int level;
 
     private Connection connection;
-    private final List<Item> inventory = new CopyOnWriteArrayList<>();
+    private final PlayerInventory inventory;
     private GameMonster target;
     private int xp;
 
     public GamePlayer(UUID id, UUID accountId, String name, UUID currentRoomId, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
-            Map<Attribute, Integer> attributes, int xp) {
+            Map<Attribute, Integer> attributes, int xp, int gold) {
         super(id, name, attributes, currentHealth, maxHealth);
         this.accountId = accountId;
         this.currentRoomId = currentRoomId;
@@ -57,6 +56,7 @@ public final class GamePlayer extends GameCharacter {
         this.characterClass = characterClass;
         this.level = level;
         this.xp = xp;
+        this.inventory = new PlayerInventory(gold);
     }
 
     public UUID getAccountId() {
@@ -113,10 +113,10 @@ public final class GamePlayer extends GameCharacter {
 
     @Override
     public int getArmorClass() {
-        int ac = getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.CHEST).findFirst()
+        int ac = inventory.getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.CHEST).findFirst()
                 .map(this::armorAc).orElseGet(super::getArmorClass);
 
-        return ac + getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.OFF_HAND)
+        return ac + inventory.getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.OFF_HAND)
                 .mapToInt(Item::getBaseAc).sum();
     }
 
@@ -240,7 +240,7 @@ public final class GamePlayer extends GameCharacter {
             item.setCharacter(this);
             getCurrentRoom().removeItem(item);
         }
-        addItem(item);
+        inventory.addItem(item);
         DomainEventPublisher.publish(new ItemPickedUp(this, item));
         return true;
     }
@@ -270,7 +270,7 @@ public final class GamePlayer extends GameCharacter {
         }
 
         List<Item> previousOccupants = new ArrayList<>();
-        for (Item existing : getEquippedItems()) {
+        for (Item existing : inventory.getEquippedItems()) {
             if (!existing.getId().equals(item.getId()) && existing.getSlot() == slot.get()) {
                 previousOccupants.add(existing);
                 existing.setSlot(null);
@@ -298,38 +298,13 @@ public final class GamePlayer extends GameCharacter {
     public void dropItem(Item item) {
         Room currentRoom = getCurrentRoom();
         item.setRoom(currentRoom);
-        removeItem(item);
+        inventory.removeItem(item);
         currentRoom.addItem(item);
         DomainEventPublisher.publish(new GamePlayerDroppedItem(this, item, currentRoom));
     }
 
-    public List<Item> getInventory() {
-        return List.copyOf(inventory);
-    }
-
-    public Optional<Item> findOneByName(String name) {
-        return inventory.stream().filter(item -> item.getName().equalsIgnoreCase(name)).findFirst();
-    }
-
-    public List<Item> getCarriedItems() {
-        return inventory.stream().filter(item -> item.getSlot() == null).toList();
-    }
-
-    public List<Item> getEquippedItems() {
-        return inventory.stream().filter(item -> item.getSlot() != null).toList();
-    }
-
-    public void addItem(Item item) {
-        inventory.add(item);
-    }
-
-    public void removeItem(Item item) {
-        inventory.remove(item);
-    }
-
-    public void setInventory(List<Item> items) {
-        inventory.clear();
-        inventory.addAll(items);
+    public PlayerInventory getInventory() {
+        return inventory;
     }
 
     public void send(OutputMessage message) {
@@ -346,24 +321,25 @@ public final class GamePlayer extends GameCharacter {
         if (!(o instanceof GamePlayer other)) {
             return false;
         }
-        return level == other.level && xp == other.xp && getCurrentHealth() == other.getCurrentHealth()
-                && getMaxHealth() == other.getMaxHealth() && Objects.equals(getId(), other.getId())
-                && Objects.equals(accountId, other.accountId) && Objects.equals(getName(), other.getName())
-                && Objects.equals(currentRoomId, other.currentRoomId) && gender == other.gender && race == other.race
-                && characterClass == other.characterClass && Objects.equals(getAttributes(), other.getAttributes());
+        return level == other.level && xp == other.xp && inventory.getGold() == other.inventory.getGold()
+                && getCurrentHealth() == other.getCurrentHealth() && getMaxHealth() == other.getMaxHealth()
+                && Objects.equals(getId(), other.getId()) && Objects.equals(accountId, other.accountId)
+                && Objects.equals(getName(), other.getName()) && Objects.equals(currentRoomId, other.currentRoomId)
+                && gender == other.gender && race == other.race && characterClass == other.characterClass
+                && Objects.equals(getAttributes(), other.getAttributes());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getId(), accountId, getName(), currentRoomId, gender, race, characterClass, level, xp,
-                getCurrentHealth(), getMaxHealth(), getAttributes());
+                inventory.getGold(), getCurrentHealth(), getMaxHealth(), getAttributes());
     }
 
     @Override
     public String toString() {
         return "GamePlayer[id=" + getId() + ", accountId=" + accountId + ", name=" + getName() + ", currentRoomId="
                 + currentRoomId + ", gender=" + gender + ", race=" + race + ", characterClass=" + characterClass
-                + ", level=" + level + ", xp=" + xp + ", currentHealth=" + getCurrentHealth() + ", maxHealth="
-                + getMaxHealth() + ", attributes=" + getAttributes() + "]";
+                + ", level=" + level + ", xp=" + xp + ", gold=" + inventory.getGold() + ", currentHealth="
+                + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + ", attributes=" + getAttributes() + "]";
     }
 }
