@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
+import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
+import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDroppedItem;
@@ -175,6 +177,39 @@ public final class GamePlayer extends GameCharacter {
     public void gainXp(int amount) {
         this.xp += amount;
         DomainEventPublisher.publish(new CharacterGainedXp(this, amount));
+    }
+
+    /**
+     * Même principe que {@link #gainXp} : mute l'état en mémoire puis publie
+     * {@link CharacterReceivedGold}, dont le listener ({@code game.actor
+     * .CharacterService}) persiste et envoie le message au joueur — un simple POJO
+     * n'a pas accès à {@code CharacterDao}. Appelé depuis {@code game.actor
+     * .LootService} sur la mort d'un monstre ; aucun verrou nécessaire, même
+     * raisonnement que {@link #equipItem}/{@link #unequipItem} : un joueur ne mute
+     * jamais son propre inventaire que depuis le thread virtuel unique de sa propre
+     * connexion (ici, celui qui exécute la commande {@code attack} portant le coup
+     * fatal).
+     */
+    public void receiveGold(int amount) {
+        inventory.addGold(amount);
+        DomainEventPublisher.publish(new CharacterReceivedGold(this, amount));
+    }
+
+    /**
+     * Contrairement à {@link #pickUpItem}, {@code item} n'a jamais existé en room
+     * ni en base — c'est un objet fraîchement créé par {@code game.actor
+     * .LootService} à partir d'une table de butin. Pas de disputé possible entre
+     * joueurs (personne d'autre ne détient de référence vers cette instance avant
+     * cet appel), donc pas de {@code synchronized} nécessaire ici, contrairement à
+     * {@link #pickUpItem}. Publie {@link CharacterLootedItem}, dont le listener
+     * ({@code game.ItemService}) attache le template et insère la ligne en base
+     * (contrairement à {@code ItemPickedUp}, qui ne fait que réassigner une ligne
+     * déjà existante).
+     */
+    public void receiveLootItem(Item item) {
+        item.setCharacter(this);
+        inventory.addItem(item);
+        DomainEventPublisher.publish(new CharacterLootedItem(this, item));
     }
 
     /**

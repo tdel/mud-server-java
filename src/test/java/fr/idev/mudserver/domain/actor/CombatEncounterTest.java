@@ -1,5 +1,6 @@
 package fr.idev.mudserver.domain.actor;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -208,7 +209,7 @@ class CombatEncounterTest {
 
     private GameMonster monster(int dexterity) {
         MonsterTemplate template = new MonsterTemplate(UUID.randomUUID(), "Mannequin", "...", 10,
-                TestAttributes.of(10, dexterity, 10, 10, 10, 10), null, 0, "1d4");
+                TestAttributes.of(10, dexterity, 10, 10, 10, 10), null, 0, "1d4", 0, List.of());
         GameMonster monster = new GameMonster(UUID.randomUUID(), template.getName(), template.getId(), room.getId(),
                 template.getAttributes(), 10);
         monster.attachTemplate(template);

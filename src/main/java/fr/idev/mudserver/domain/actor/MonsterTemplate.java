@@ -1,5 +1,6 @@
 package fr.idev.mudserver.domain.actor;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -14,9 +15,12 @@ public class MonsterTemplate {
     private Integer naturalArmorClass;
     private int xpReward;
     private String naturalDamageDice;
+    private int goldReward;
+    private List<LootTableEntry> lootTable;
 
     public MonsterTemplate(UUID id, String name, String description, int maxHealth, Map<Attribute, Integer> attributes,
-            Integer naturalArmorClass, int xpReward, String naturalDamageDice) {
+            Integer naturalArmorClass, int xpReward, String naturalDamageDice, int goldReward,
+            List<LootTableEntry> lootTable) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -25,6 +29,8 @@ public class MonsterTemplate {
         this.naturalArmorClass = naturalArmorClass;
         this.xpReward = xpReward;
         this.naturalDamageDice = naturalDamageDice;
+        this.goldReward = goldReward;
+        this.lootTable = lootTable;
     }
 
     public UUID getId() {
@@ -91,6 +97,22 @@ public class MonsterTemplate {
         this.naturalDamageDice = naturalDamageDice;
     }
 
+    public int getGoldReward() {
+        return goldReward;
+    }
+
+    public void setGoldReward(int goldReward) {
+        this.goldReward = goldReward;
+    }
+
+    public List<LootTableEntry> getLootTable() {
+        return lootTable;
+    }
+
+    public void setLootTable(List<LootTableEntry> lootTable) {
+        this.lootTable = lootTable;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -99,23 +121,35 @@ public class MonsterTemplate {
         if (!(o instanceof MonsterTemplate other)) {
             return false;
         }
-        return maxHealth == other.maxHealth && xpReward == other.xpReward && Objects.equals(id, other.id)
-                && Objects.equals(name, other.name) && Objects.equals(description, other.description)
-                && Objects.equals(attributes, other.attributes)
+        return maxHealth == other.maxHealth && xpReward == other.xpReward && goldReward == other.goldReward
+                && Objects.equals(id, other.id) && Objects.equals(name, other.name)
+                && Objects.equals(description, other.description) && Objects.equals(attributes, other.attributes)
                 && Objects.equals(naturalArmorClass, other.naturalArmorClass)
-                && Objects.equals(naturalDamageDice, other.naturalDamageDice);
+                && Objects.equals(naturalDamageDice, other.naturalDamageDice)
+                && Objects.equals(lootTable, other.lootTable);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, name, description, maxHealth, attributes, naturalArmorClass, xpReward,
-                naturalDamageDice);
+                naturalDamageDice, goldReward, lootTable);
     }
 
     @Override
     public String toString() {
         return "MonsterTemplate[id=" + id + ", name=" + name + ", description=" + description + ", maxHealth="
                 + maxHealth + ", attributes=" + attributes + ", naturalArmorClass=" + naturalArmorClass + ", xpReward="
-                + xpReward + ", naturalDamageDice=" + naturalDamageDice + "]";
+                + xpReward + ", naturalDamageDice=" + naturalDamageDice + ", goldReward=" + goldReward + ", lootTable="
+                + lootTable + "]";
+    }
+
+    /**
+     * Une entrée de table de butin : {@code dropChance} est une probabilité
+     * indépendante entre 0 et 1 (0.001 = 0.1 %, 0.10 = 10 %) — chaque entrée est
+     * tirée séparément à la mort du monstre ({@code game.actor.LootService}), donc
+     * un même monstre peut faire tomber zéro, un ou plusieurs objets sur un seul
+     * kill.
+     */
+    public record LootTableEntry(UUID itemTemplateId, double dropChance) {
     }
 }

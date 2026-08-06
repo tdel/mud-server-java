@@ -21,6 +21,7 @@ import fr.idev.mudserver.domain.actor.TestProficiencies;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.OutputMessage;
+import fr.idev.mudserver.network.message.ingame.GoldLooted;
 import fr.idev.mudserver.network.message.ingame.PlayerLeveledUp;
 import fr.idev.mudserver.network.message.ingame.XpGained;
 import fr.idev.mudserver.persistence.AccountDao;
@@ -153,6 +154,19 @@ class CharacterServiceTest extends AbstractIntegrationTest {
         assertThat(bystanderConnection.received)
                 .anySatisfy(message -> assertThat(message).isEqualTo(new PlayerLeveledUp(leveler.getName(), 2)));
         assertThat(strangerConnection.received).noneMatch(PlayerLeveledUp.class::isInstance);
+    }
+
+    @Test
+    void receivingGoldPersistsItAndNotifiesTheCharacterOnly() {
+        GamePlayer character = fighter(1, 0);
+        RecordingConnection connection = new RecordingConnection();
+        character.setConnection(connection);
+
+        character.receiveGold(25);
+
+        assertThat(character.getInventory().getGold()).isEqualTo(25);
+        assertThat(connection.received).containsExactly(new GoldLooted(25));
+        assertThat(characterDao.findById(character.getId())).contains(character);
     }
 
     @Test

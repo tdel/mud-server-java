@@ -64,14 +64,15 @@ public class CharacterDao {
 
     /**
      * Ne persiste que les champs qui évoluent réellement en jeu (position, santé,
-     * XP, niveau) ; race/stats/nom restent figés à la création, pas besoin de les
-     * réécrire.
+     * XP, niveau, or) ; race/stats/nom restent figés à la création, pas besoin de
+     * les réécrire.
      */
     public void update(GamePlayer character) {
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_ROOM_ID, character.getCurrentRoomId())
                 .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).set(CHARACTER.XP, character.getXp())
                 .set(CHARACTER.LEVEL, character.getLevel()).set(CHARACTER.MAX_HEALTH, character.getMaxHealth())
-                .where(CHARACTER.ID.eq(character.getId())).execute();
+                .set(CHARACTER.GOLD, character.getInventory().getGold()).where(CHARACTER.ID.eq(character.getId()))
+                .execute();
     }
 
     public void deleteById(UUID characterId) {

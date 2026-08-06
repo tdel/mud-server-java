@@ -11,13 +11,20 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
+import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.OutputMessage;
+import fr.idev.mudserver.network.message.ingame.EquipmentLooted;
+import fr.idev.mudserver.network.message.ingame.GoldLooted;
 import fr.idev.mudserver.network.message.ingame.MonsterDefeated;
+import fr.idev.mudserver.persistence.AccountDao;
+import fr.idev.mudserver.persistence.CharacterDao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,6 +38,18 @@ import static org.assertj.core.api.Assertions.assertThat;
  * déclenche (même raison que {@code ItemRaceConditionTest}).
  */
 class GameMonsterTest extends AbstractIntegrationTest {
+
+    private static final UUID HEALING_POTION_TEMPLATE_ID = UUID.fromString("019fa0a5-80bf-7e84-87bf-5cf699c00315");
+    private static final UUID SHORT_SWORD_TEMPLATE_ID = UUID.fromString("019fa0a5-80c0-7035-9c2d-113b09a275df");
+
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private AccountDao accountDao;
+
+    @Autowired
+    private CharacterDao characterDao;
 
     @Test
     void armorClassUsesTheTemplateNaturalArmorClassWhenSet() {
@@ -131,13 +150,106 @@ class GameMonsterTest extends AbstractIntegrationTest {
         assertThat(attacker.getTarget()).isNull();
     }
 
+    @Test
+    void aKillingBlowGrantsTheMonstersGoldRewardToTheKillerOnly() {
+        GameMonster monster = monster(TestAttributes.of(10, 10, 10, 10, 10, 10), null, 0, 25, List.of());
+        GamePlayer attacker = player("Attaquant");
+        RecordingConnection attackerConnection = new RecordingConnection();
+        attacker.setConnection(attackerConnection);
+        monster.getCurrentRoom().join(attacker);
+
+        monster.takeDamage(100, attacker);
+
+        assertThat(attacker.getInventory().getGold()).isEqualTo(25);
+        assertThat(attackerConnection.received).contains(new GoldLooted(25));
+    }
+
+    @Test
+    void aKillingBlowWithFullDropChanceAlwaysGrantsTheLootedItem() {
+        itemService.warmItemTemplates();
+        GameMonster monster = monster(TestAttributes.of(10, 10, 10, 10, 10, 10), null, 0, 0,
+                List.of(new MonsterTemplate.LootTableEntry(HEALING_POTION_TEMPLATE_ID, 1.0)));
+        GamePlayer attacker = persistedPlayer("Attaquant");
+        RecordingConnection attackerConnection = new RecordingConnection();
+        attacker.setConnection(attackerConnection);
+        monster.getCurrentRoom().join(attacker);
+
+        monster.takeDamage(100, attacker);
+
+        assertThat(attacker.getInventory().getItems())
+                .anySatisfy(item -> assertThat(item.getTemplateId()).isEqualTo(HEALING_POTION_TEMPLATE_ID));
+        assertThat(attackerConnection.received).anyMatch(EquipmentLooted.class::isInstance);
+    }
+
+    @Test
+    void aKillingBlowWithZeroDropChanceNeverGrantsTheLootedItem() {
+        itemService.warmItemTemplates();
+        GameMonster monster = monster(TestAttributes.of(10, 10, 10, 10, 10, 10), null, 0, 0,
+                List.of(new MonsterTemplate.LootTableEntry(HEALING_POTION_TEMPLATE_ID, 0.0)));
+        GamePlayer attacker = player("Attaquant");
+        RecordingConnection attackerConnection = new RecordingConnection();
+        attacker.setConnection(attackerConnection);
+        monster.getCurrentRoom().join(attacker);
+
+        monster.takeDamage(100, attacker);
+
+        assertThat(attacker.getInventory().getItems()).isEmpty();
+        assertThat(attackerConnection.received).noneMatch(EquipmentLooted.class::isInstance);
+    }
+
+    @Test
+    void aKillingBlowCanGrantSeveralLootedItemsAtOnce() {
+        itemService.warmItemTemplates();
+        GameMonster monster = monster(TestAttributes.of(10, 10, 10, 10, 10, 10), null, 0, 0,
+                List.of(new MonsterTemplate.LootTableEntry(HEALING_POTION_TEMPLATE_ID, 1.0),
+                        new MonsterTemplate.LootTableEntry(SHORT_SWORD_TEMPLATE_ID, 1.0)));
+        GamePlayer attacker = persistedPlayer("Attaquant");
+        attacker.setConnection(new RecordingConnection());
+        monster.getCurrentRoom().join(attacker);
+
+        monster.takeDamage(100, attacker);
+
+        assertThat(attacker.getInventory().getItems()).extracting("templateId")
+                .containsExactlyInAnyOrder(HEALING_POTION_TEMPLATE_ID, SHORT_SWORD_TEMPLATE_ID);
+    }
+
+    @Test
+    void aKillingBlowNeverSendsLootMessagesToBystanders() {
+        itemService.warmItemTemplates();
+        GameMonster monster = monster(TestAttributes.of(10, 10, 10, 10, 10, 10), null, 0, 25,
+                List.of(new MonsterTemplate.LootTableEntry(HEALING_POTION_TEMPLATE_ID, 1.0)));
+        Room room = monster.getCurrentRoom();
+        GamePlayer attacker = persistedPlayer("Attaquant");
+        GamePlayer bystander = player("Témoin");
+        RecordingConnection attackerConnection = new RecordingConnection();
+        RecordingConnection bystanderConnection = new RecordingConnection();
+        attacker.setConnection(attackerConnection);
+        bystander.setConnection(bystanderConnection);
+        room.join(attacker);
+        room.join(bystander);
+        attackerConnection.received.clear();
+        bystanderConnection.received.clear();
+
+        monster.takeDamage(100, attacker);
+
+        assertThat(attackerConnection.received).anyMatch(GoldLooted.class::isInstance)
+                .anyMatch(EquipmentLooted.class::isInstance);
+        assertThat(bystanderConnection.received).noneMatch(GoldLooted.class::isInstance)
+                .noneMatch(EquipmentLooted.class::isInstance);
+    }
+
     private GameMonster monster(Map<Attribute, Integer> attributes, Integer naturalArmorClass) {
         return monster(attributes, naturalArmorClass, 0);
     }
 
     private GameMonster monster(Map<Attribute, Integer> attributes, Integer naturalArmorClass, int xpReward) {
+        return monster(attributes, naturalArmorClass, xpReward, 0, List.of());
+    }
+
+    private GameMonster monster(Map<Attribute, Integer> attributes, Integer naturalArmorClass, int xpReward,
+            int goldReward, List<MonsterTemplate.LootTableEntry> lootTable) {
         MonsterTemplate template = new MonsterTemplate(UUID.randomUUID(), "Gobelin", "Une créature verte", 7,
-                attributes, naturalArmorClass, xpReward, "1d4");
+                attributes, naturalArmorClass, xpReward, "1d4", goldReward, lootTable);
         GameMonster monster = new GameMonster(UUID.randomUUID(), template.getName(), template.getId(),
                 UUID.randomUUID(), attributes, template.getMaxHealth());
         monster.attachTemplate(template);
@@ -152,6 +264,20 @@ class GameMonsterTest extends AbstractIntegrationTest {
                 CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
                 TestProficiencies.skills(CharacterClass.FIGHTER), 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
                 0, 0);
+    }
+
+    /**
+     * Contrairement à {@link #player}, insère une vraie ligne {@code account}/
+     * {@code character} en base — nécessaire pour les tests de butin d'objet :
+     * {@code ItemDao.insert} (déclenché par {@code ItemService
+     * .onCharacterLootedItem}) porte une contrainte de clé étrangère réelle sur
+     * {@code item.character_id}.
+     */
+    private GamePlayer persistedPlayer(String name) {
+        GamePlayer character = player(name);
+        accountDao.insert(new Account(character.getAccountId(), "acct-" + UUID.randomUUID(), "hashed-password", null));
+        characterDao.insert(character);
+        return character;
     }
 
     private static final class RecordingConnection implements Connection {

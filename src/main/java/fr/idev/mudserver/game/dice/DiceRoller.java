@@ -16,6 +16,15 @@ public class DiceRoller {
         return roll(DiceExpression.parse(expression));
     }
 
+    /**
+     * Tirage de probabilité indépendant (0 à 1), utilisé pour les tables de butin
+     * ({@code game.actor.LootService}) plutôt qu'une notation de dés — réutilise le
+     * même {@link Random} que {@link #roll}, pas de source d'aléa parallèle.
+     */
+    public boolean rollChance(double probability) {
+        return random.nextDouble() < probability;
+    }
+
     public DiceRoll roll(DiceExpression expression) {
         int[] rolls = new int[expression.count()];
         for (int i = 0; i < expression.count(); i++) {

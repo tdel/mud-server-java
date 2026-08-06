@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,10 +19,12 @@ import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.ItemType;
 import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDroppedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEquippedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUnequippedItem;
 import fr.idev.mudserver.domain.actor.event.ItemPickedUp;
+import fr.idev.mudserver.network.message.ingame.EquipmentLooted;
 import fr.idev.mudserver.persistence.ItemDao;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
@@ -76,6 +79,18 @@ public class ItemService {
 
     void registerTemplate(ItemTemplate template) {
         templates.put(template.getId(), template);
+    }
+
+    /**
+     * Exposé pour {@code MonsterService.loadMonsters}, qui valide au démarrage que
+     * chaque {@code itemTemplateId} référencé par une table de butin de
+     * {@code data/monsters.json} existe réellement — un simple {@code Set<UUID>}
+     * plutôt qu'une dépendance directe à {@code ItemService} pour ne pas forcer
+     * {@code MonsterServiceTest} (test JUnit pur, sans contexte Spring/DB) à
+     * dépendre d'un {@code ItemDao} réel.
+     */
+    public Set<UUID> templateIds() {
+        return Set.copyOf(templates.keySet());
     }
 
     public List<Item> loadInventory(GamePlayer character) {
@@ -145,6 +160,19 @@ public class ItemService {
     @EventListener
     void onGamePlayerUnequippedItem(GamePlayerUnequippedItem event) {
         itemDao.updateSlot(event.item().getId(), null);
+    }
+
+    /**
+     * Contrairement à {@link #onItemPickedUp} (simple réassignation d'une ligne
+     * déjà existante), l'item issu d'un butin n'a encore aucune ligne en base —
+     * {@code insert} plutôt qu'un {@code update}. Le template doit être attaché
+     * avant d'envoyer le message : {@code getName()} en dépend.
+     */
+    @EventListener
+    void onCharacterLootedItem(CharacterLootedItem event) {
+        attachTemplate(event.item());
+        itemDao.insert(event.item());
+        event.character().send(new EquipmentLooted(event.item().getName()));
     }
 
     private record ItemTemplateDefinition(UUID id, String name, String description, ItemType type, int weight,

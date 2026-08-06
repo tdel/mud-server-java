@@ -8,9 +8,11 @@ import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
+import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.game.RoomService;
+import fr.idev.mudserver.network.message.ingame.GoldLooted;
 import fr.idev.mudserver.network.message.ingame.PlayerLeveledUp;
 import fr.idev.mudserver.network.message.ingame.PlayerRespawned;
 import fr.idev.mudserver.network.message.ingame.XpGained;
@@ -71,6 +73,17 @@ public class CharacterService {
         if (leveledUp) {
             character.getCurrentRoom().broadcast(new PlayerLeveledUp(character.getName(), character.getLevel()), null);
         }
+    }
+
+    /**
+     * Persiste l'or gagné (butin, voir {@code game.actor.LootService}) et notifie
+     * le joueur seul — jamais de broadcast à la room, contrairement à {@code
+     * MonsterDefeated}/{@code PlayerLeveledUp}.
+     */
+    @EventListener
+    void onCharacterReceivedGold(CharacterReceivedGold event) {
+        characterDao.update(event.character());
+        event.character().send(new GoldLooted(event.amount()));
     }
 
     /**

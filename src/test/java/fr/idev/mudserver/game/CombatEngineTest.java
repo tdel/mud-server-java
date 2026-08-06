@@ -256,7 +256,7 @@ class CombatEngineTest extends AbstractIntegrationTest {
             String naturalDamageDice) {
         MonsterTemplate template = new MonsterTemplate(UUID.randomUUID(), "Mannequin " + UUID.randomUUID(),
                 "Un mannequin d'entraînement", maxHealth, TestAttributes.of(strength, dexterity, 10, 10, 10, 10),
-                naturalArmorClass, 0, naturalDamageDice);
+                naturalArmorClass, 0, naturalDamageDice, 0, List.of());
         GameMonster monster = new GameMonster(UUID.randomUUID(), template.getName(), template.getId(), room.getId(),
                 template.getAttributes(), maxHealth);
         monster.attachTemplate(template);

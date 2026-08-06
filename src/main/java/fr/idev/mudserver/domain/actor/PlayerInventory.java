@@ -7,15 +7,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import fr.idev.mudserver.domain.Item;
 
 /**
- * Regroupe les items portés par un {@link GamePlayer} et son or — l'or est figé
- * à la construction (roulé selon la classe à la création du personnage, voir
- * {@code GameWorld.createCharacter}) : aucune boutique/butin n'existe encore
- * pour le faire varier, donc pas de mutateur spéculatif ici.
+ * Regroupe les items portés par un {@link GamePlayer} et son or — l'or initial
+ * est roulé selon la classe à la création du personnage (voir
+ * {@code GameWorld.createCharacter}), puis varie en jeu via {@link #addGold}
+ * (butin, voir {@code game.actor.LootService}) ; pas de mutateur négatif ici
+ * tant qu'aucune boutique n'existe pour dépenser cet or.
  */
 public final class PlayerInventory {
 
     private final List<Item> items = new CopyOnWriteArrayList<>();
-    private final int gold;
+    private int gold;
 
     public PlayerInventory(int gold) {
         this.gold = gold;
@@ -23,6 +24,10 @@ public final class PlayerInventory {
 
     public int getGold() {
         return gold;
+    }
+
+    public void addGold(int amount) {
+        this.gold += amount;
     }
 
     public List<Item> getItems() {
