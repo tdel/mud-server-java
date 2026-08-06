@@ -8,7 +8,11 @@ import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
+import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
+import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.message.ingame.PlayerLeveledUp;
+import fr.idev.mudserver.network.message.ingame.PlayerRespawned;
 import fr.idev.mudserver.network.message.ingame.XpGained;
 import fr.idev.mudserver.persistence.CharacterDao;
 
@@ -34,11 +38,14 @@ public class CharacterService {
     private final CharacterDao characterDao;
     private final LevelService levelService;
     private final ClassService classService;
+    private final RoomService roomService;
 
-    public CharacterService(CharacterDao characterDao, LevelService levelService, ClassService classService) {
+    public CharacterService(CharacterDao characterDao, LevelService levelService, ClassService classService,
+            RoomService roomService) {
         this.characterDao = characterDao;
         this.levelService = levelService;
         this.classService = classService;
+        this.roomService = roomService;
     }
 
     @EventListener
@@ -78,5 +85,27 @@ public class CharacterService {
         GamePlayer killer = event.killer();
         killer.gainXp(event.character().getTemplate().getXpReward());
         killer.setTarget(null);
+    }
+
+    /**
+     * {@code @Order(2)} : s'exécute après {@code RoomService#onGamePlayerDied}, qui
+     * a déjà diffusé l'annonce de la mort à la room d'origine avant que
+     * {@code moveToRoom} ne l'écrase. Restauration complète des PV, pas de pénalité
+     * (XP, niveau...) — non demandée. Le retrait de l'affrontement lui-même est
+     * géré par {@code CombatEngine#onGamePlayerDied}, indépendamment de cette
+     * méthode.
+     */
+    @EventListener
+    @Order(2)
+    void onGamePlayerDied(GamePlayerDied event) {
+        GamePlayer character = event.character();
+        Room startingRoom = roomService.startingRoom()
+                .orElseThrow(() -> new IllegalStateException("Aucune starting room configurée"));
+
+        character.setCurrentHealth(character.getMaxHealth());
+        character.moveToRoom(startingRoom);
+        characterDao.update(character);
+
+        character.send(new PlayerRespawned(startingRoom.getName()));
     }
 }

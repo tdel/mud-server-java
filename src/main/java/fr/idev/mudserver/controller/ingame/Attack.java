@@ -8,12 +8,10 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.GamePlayer;
-import fr.idev.mudserver.game.CombatResult;
-import fr.idev.mudserver.game.CombatService;
+import fr.idev.mudserver.game.CombatEngine;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
-import fr.idev.mudserver.network.message.ingame.AttackResult;
 import fr.idev.mudserver.network.message.ingame.NoTargetSelected;
 import fr.idev.mudserver.network.message.ingame.TargetNotFound;
 
@@ -21,17 +19,21 @@ import fr.idev.mudserver.network.message.ingame.TargetNotFound;
  * Accepte deux formes : {@code attack} seul réutilise la cible déjà choisie via
  * {@code select <monster name>} ({@link GamePlayer#getTarget()}) ; {@code
  * attack <character name>} force une sélection au moment même de l'attaque, en
- * résolvant le nom dans la room courante — même logique que {@link Select}.
+ * résolvant le nom dans la room courante — même logique que {@link Select}. Le
+ * champ {@code target} reste une simple commodité UX (« qui vise `attack` sans
+ * argument »), indépendante de l'affrontement effectif
+ * ({@link GamePlayer#getEncounter()}) — toute la logique de
+ * rejoindre/fusionner/résoudre le tour est déléguée à {@link CombatEngine}.
  */
 @Component
 public class Attack implements ControllerHandler {
 
     private final GameWorld gameWorld;
-    private final CombatService combatService;
+    private final CombatEngine combatEngine;
 
-    public Attack(GameWorld gameWorld, CombatService combatService) {
+    public Attack(GameWorld gameWorld, CombatEngine combatEngine) {
         this.gameWorld = gameWorld;
-        this.combatService = combatService;
+        this.combatEngine = combatEngine;
     }
 
     @Override
@@ -71,11 +73,6 @@ public class Attack implements ControllerHandler {
             character.setTarget(target);
         }
 
-        CombatResult result = combatService.tryAttack(character, target);
-        connection.send(new AttackResult(result));
-
-        if (result.hit()) {
-            target.takeDamage(result.damage(), character);
-        }
+        combatEngine.attack(character, target);
     }
 }

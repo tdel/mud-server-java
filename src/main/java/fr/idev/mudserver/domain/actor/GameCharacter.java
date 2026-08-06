@@ -21,6 +21,19 @@ import fr.idev.mudserver.domain.Room;
  * {@code GameNpc} hérite {@code attributes}/{@code currentHealth}/
  * {@code maxHealth} sans qu'aucune règle ne les exploite encore — un NPC reste
  * pour l'instant juste un nom et une localisation (voir sa Javadoc).
+ *
+ * <p>
+ * {@code encounter} porte la même sémantique « état vivant du process, jamais
+ * persisté » que {@code currentRoom} ci-dessous, mais est {@code volatile}
+ * plutôt qu'un simple champ : contrairement à
+ * {@code currentRoom}/{@code GamePlayer.connection}/{@code GamePlayer.target},
+ * qui ne sont jamais mutés que par le thread de la connexion du personnage
+ * lui-même, une cascade de {@code game.CombatEngine} peut réassigner
+ * l'{@code encounter} d'un <em>autre</em> participant (celui qui vient de
+ * mourir ou d'être retiré) depuis le thread d'un troisième personnage —
+ * {@code volatile} garantit la visibilité immédiate de cette réassignation aux
+ * lectures simples ({@link #isInCombat()}) qui n'ont pas besoin d'un verrou
+ * complet sur {@link CombatEncounter}.
  */
 public abstract sealed class GameCharacter extends GameObject permits GamePlayer, GameMonster, GameNpc {
 
@@ -29,6 +42,7 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
     private int maxHealth;
 
     private Room currentRoom;
+    private volatile CombatEncounter encounter;
 
     protected GameCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
             int maxHealth) {
@@ -76,5 +90,17 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
 
     public void setCurrentRoom(Room currentRoom) {
         this.currentRoom = currentRoom;
+    }
+
+    public boolean isInCombat() {
+        return encounter != null;
+    }
+
+    public CombatEncounter getEncounter() {
+        return encounter;
+    }
+
+    public void setEncounter(CombatEncounter encounter) {
+        this.encounter = encounter;
     }
 }

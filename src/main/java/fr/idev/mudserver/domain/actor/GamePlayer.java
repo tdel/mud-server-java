@@ -10,6 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
+import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDroppedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEquippedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
@@ -159,6 +160,32 @@ public final class GamePlayer extends GameCharacter {
     public void gainXp(int amount) {
         this.xp += amount;
         DomainEventPublisher.publish(new CharacterGainedXp(this, amount));
+    }
+
+    /**
+     * Contrairement à {@link GameMonster#takeDamage}, aucun verrou propre n'est
+     * nécessaire ici : un joueur n'appartient jamais qu'à un seul
+     * {@link CombatEncounter} à la fois (la règle de fusion de
+     * {@code game.CombatEngine} refuse un second affrontement concurrent), et toute
+     * mutation de PV liée au combat n'a lieu que pendant qu'un thread détient déjà
+     * le verrou de cet affrontement (son propre tour, ou la riposte d'un monstre
+     * pendant la cascade) — la sérialisation est donc héritée de ce verrou-là,
+     * transitivement, plutôt que portée par cette méthode elle-même. Publie
+     * {@link GamePlayerDied} sur le coup fatal, pendant côté joueur de
+     * {@link GameMonster#takeDamage}.
+     *
+     * @return true si ce coup est celui qui a fait passer les PV à 0 ou moins
+     */
+    public boolean takeDamage(int amount, GameMonster attacker) {
+        if (getCurrentHealth() <= 0) {
+            return false;
+        }
+        setCurrentHealth(Math.max(0, getCurrentHealth() - amount));
+        boolean defeated = getCurrentHealth() <= 0;
+        if (defeated) {
+            DomainEventPublisher.publish(new GamePlayerDied(this, attacker));
+        }
+        return defeated;
     }
 
     /**

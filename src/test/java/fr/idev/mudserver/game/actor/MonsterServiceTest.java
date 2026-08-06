@@ -63,7 +63,7 @@ class MonsterServiceTest {
         MonsterService isolated = new MonsterService(new ObjectMapper());
         UUID templateId = UUID.randomUUID();
         MonsterService.MonsterTemplateDefinition template = new MonsterService.MonsterTemplateDefinition(templateId,
-                "Test", "...", 5, TestAttributes.of(10, 10, 10, 10, 10, 10), null, 0);
+                "Test", "...", 5, TestAttributes.of(10, 10, 10, 10, 10, 10), null, 0, "1d4");
         MonsterService.MonsterFileDefinition file = new MonsterService.MonsterFileDefinition(List.of(template),
                 List.of(new MonsterService.MonsterSpawnDefinition(UUID.randomUUID(), templateId, UUID.randomUUID())));
 

@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 import fr.idev.mudserver.domain.actor.CharacterClass;
+import fr.idev.mudserver.domain.ArmorCategory;
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.GamePlayer;
@@ -104,10 +105,67 @@ class CombatServiceTest {
         throw new AssertionError("no miss happened in 20 attempts despite an impossible armor class");
     }
 
+    @Test
+    void monsterAttackDealsNaturalDiceDamagePlusStrengthModifier() {
+        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        GameMonster attacker = monster(room, 10, null, 16, "1d6"); // STR 16 => mod +3
+        GamePlayer target = player(10, -100, 1); // DEX ridicule => CA quasi nulle, coup quasi garanti
+        target.setCurrentRoom(room);
+
+        CombatResult result = monsterAttackUntilHit(attacker, target);
+
+        // 1d6 (1-6) + modificateur de FOR (+3) : entre 4 et 9.
+        assertThat(result.damage()).isBetween(4, 9);
+    }
+
+    @Test
+    void monsterAttackMissLeavesTheTargetUntouched() {
+        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        GamePlayer target = player(10, 10, 1);
+
+        // Un attaquant neuf à chaque tentative : un coup accidentel (nat 20 malgré la
+        // CA
+        // énorme) sur une tentative précédente ne doit pas fausser l'assertion.
+        for (int i = 0; i < 20; i++) {
+            equipArmor(target, 9999);
+            GameMonster attacker = monster(room, 10, null, 10, "1d6");
+            CombatResult result = combatService.tryMonsterAttack(attacker, target);
+            if (!result.hit()) {
+                assertThat(result.damage()).isZero();
+                return;
+            }
+        }
+        throw new AssertionError("no miss happened in 20 attempts despite an impossible armor class");
+    }
+
+    @Test
+    void rollInitiativeIsWithinTheExpectedRangeForTheDexterityModifier() {
+        GamePlayer character = player(10, 18, 1); // DEX 18 => modificateur +4
+
+        for (int i = 0; i < 50; i++) {
+            assertThat(combatService.rollInitiative(character)).isBetween(1 + 4, 20 + 4);
+        }
+    }
+
+    /**
+     * Exclut délibérément les critiques (double les dés de dégâts) : les tests
+     * appelants vérifient une plage de dégâts précise pour un coup normal, qu'un
+     * critique élargirait.
+     */
     private CombatResult attackUntilHit(GamePlayer attacker, GameMonster monster) {
         for (int i = 0; i < 20; i++) {
             CombatResult result = combatService.tryAttack(attacker, monster);
-            if (result.hit()) {
+            if (result.hit() && !result.criticalHit()) {
+                return result;
+            }
+        }
+        throw new AssertionError("no non-critical hit landed in 20 attempts despite a trivial armor class");
+    }
+
+    private CombatResult monsterAttackUntilHit(GameMonster attacker, GamePlayer target) {
+        for (int i = 0; i < 20; i++) {
+            CombatResult result = combatService.tryMonsterAttack(attacker, target);
+            if (result.hit() && !result.criticalHit()) {
                 return result;
             }
         }
@@ -122,14 +180,32 @@ class CombatServiceTest {
         character.addItem(item);
     }
 
+    private void equipArmor(GamePlayer character, int baseAc) {
+        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Armure", null, ItemType.ARMOR, 10,
+                ArmorCategory.HEAVY, baseAc, null);
+        Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.CHEST);
+        item.attachTemplate(template);
+        character.addItem(item);
+    }
+
     private GamePlayer player(int strength, int level) {
+        return player(strength, 10, level);
+    }
+
+    private GamePlayer player(int strength, int dexterity, int level) {
         return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Attaquant", UUID.randomUUID(), Gender.MAN,
-                Race.HUMAN, CharacterClass.FIGHTER, level, 10, 10, TestAttributes.of(strength, 10, 10, 10, 10, 10), 0);
+                Race.HUMAN, CharacterClass.FIGHTER, level, 10, 10,
+                TestAttributes.of(strength, dexterity, 10, 10, 10, 10), 0);
     }
 
     private GameMonster monster(Room room, int maxHealth, Integer naturalArmorClass) {
+        return monster(room, maxHealth, naturalArmorClass, 10, "1d6");
+    }
+
+    private GameMonster monster(Room room, int maxHealth, Integer naturalArmorClass, int strength,
+            String naturalDamageDice) {
         MonsterTemplate template = new MonsterTemplate(UUID.randomUUID(), "Mannequin", "Un mannequin d'entraînement",
-                maxHealth, TestAttributes.of(10, 10, 10, 10, 10, 10), naturalArmorClass, 0);
+                maxHealth, TestAttributes.of(strength, 10, 10, 10, 10, 10), naturalArmorClass, 0, naturalDamageDice);
         GameMonster monster = new GameMonster(UUID.randomUUID(), template.getName(), template.getId(), room.getId(),
                 template.getAttributes(), maxHealth);
         monster.attachTemplate(template);

@@ -17,8 +17,10 @@ import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomExit;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
+import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
 import fr.idev.mudserver.domain.actor.event.GamePlayerSpawnedToRoom;
+import fr.idev.mudserver.network.message.ingame.GamePlayerDefeated;
 import fr.idev.mudserver.network.message.ingame.MonsterDefeated;
 import fr.idev.mudserver.persistence.CharacterDao;
 import tools.jackson.core.JacksonException;
@@ -139,6 +141,21 @@ public class RoomService {
         Room room = event.character().getCurrentRoom();
         room.removeMonster(event.character());
         room.broadcast(new MonsterDefeated(event.character().getName()), null);
+    }
+
+    /**
+     * {@code @Order(1)} : doit s'exécuter avant que
+     * {@code CharacterService#onGamePlayerDied} ne téléporte le mourant hors de
+     * cette room — sinon {@code event.character().getCurrentRoom()} pointerait déjà
+     * vers la starting room. Le mourant est exclu du broadcast : il reçoit son
+     * propre message ({@code PlayerRespawned}) via {@code CharacterService}.
+     */
+    @EventListener
+    @Order(1)
+    void onGamePlayerDied(GamePlayerDied event) {
+        Room room = event.character().getCurrentRoom();
+        room.broadcast(new GamePlayerDefeated(event.character().getName(), event.killer().getName()),
+                event.character());
     }
 
     record RoomDefinition(UUID id, String name, String description, Boolean isStartingRoom,

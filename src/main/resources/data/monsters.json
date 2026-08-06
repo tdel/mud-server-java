@@ -7,6 +7,7 @@
             "maxHealth": 7,
             "naturalArmorClass": 15,
             "xpReward": 50,
+            "naturalDamageDice": "1d6",
             "attributes": {
                 "STRENGTH": 8,
                 "DEXTERITY": 14,
@@ -23,6 +24,7 @@
             "maxHealth": 7,
             "naturalArmorClass": 12,
             "xpReward": 25,
+            "naturalDamageDice": "1d3",
             "attributes": {
                 "STRENGTH": 7,
                 "DEXTERITY": 15,
@@ -39,6 +41,7 @@
             "maxHealth": 11,
             "naturalArmorClass": 13,
             "xpReward": 50,
+            "naturalDamageDice": "2d4",
             "attributes": {
                 "STRENGTH": 12,
                 "DEXTERITY": 15,
@@ -55,6 +58,7 @@
             "maxHealth": 13,
             "naturalArmorClass": 13,
             "xpReward": 50,
+            "naturalDamageDice": "1d6",
             "attributes": {
                 "STRENGTH": 10,
                 "DEXTERITY": 14,
@@ -71,6 +75,7 @@
             "maxHealth": 11,
             "naturalArmorClass": 12,
             "xpReward": 25,
+            "naturalDamageDice": "1d6",
             "attributes": {
                 "STRENGTH": 11,
                 "DEXTERITY": 12,
@@ -87,6 +92,7 @@
             "maxHealth": 26,
             "naturalArmorClass": 14,
             "xpReward": 200,
+            "naturalDamageDice": "1d8",
             "attributes": {
                 "STRENGTH": 14,
                 "DEXTERITY": 16,
@@ -103,6 +109,7 @@
             "maxHealth": 19,
             "naturalArmorClass": 11,
             "xpReward": 100,
+            "naturalDamageDice": "1d6",
             "attributes": {
                 "STRENGTH": 15,
                 "DEXTERITY": 10,
