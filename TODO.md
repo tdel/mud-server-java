@@ -7,71 +7,68 @@ Le projet est un MUD Java/Spring Boot qui vise à reprendre les règles DnD5e. C
 ## Ce qui existe déjà (pour référence, ne pas refaire)
 
 - **Comptes/session** : login/register/logout/quit, BCrypt, un seul virtual thread par connexion avec queue ordonnée.
-- **Personnage** : création avec génération 4d6-drop-lowest (`CharacterCreate.java`), 4 races (`Race.java`) avec bonus de caractéristiques DnD5e corrects, `Attribute` (les 6 caractéristiques, sans modificateur calculé).
+- **Personnage** : création avec génération 4d6-drop-lowest (`CharacterCreate.java`), 4 races (`Race.java`) avec bonus de caractéristiques DnD5e corrects, `Attribute` (les 6 caractéristiques), modificateur `(score-10)/2` calculé (`GameCharacter.getModifier`).
+- **Classe de personnage** : enum `CharacterClass` (12 classes DnD5e), choisie à la création (`ChooseClass`), données par classe (`game/actor/ClassService.java` + `data/class.json`) : dé de vie (`hitDie`) et or de départ (dés + multiplicateur). Pas de compétences/jets de sauvegarde maîtrisés ni d'accès aux sorts par classe — ces données n'existent pas encore.
+- **Bonus de maîtrise** : `GamePlayer.getProficiencyBonus()` (`2 + (niveau-1)/4`), appliqué aux jets d'attaque et affiché dans `stats`. Les monstres utilisent un bonus fixe (+2), n'ayant pas de progression de niveau/CR.
+- **Niveau / XP** : `GamePlayer.level`/`xp`, gain via `gainXp` (événement `CharacterGainedXp`) crédité au tueur d'un monstre (`MonsterTemplate.xpReward`). Seuils par niveau dans `game/actor/LevelService.java` + `data/levels.json`. Montée de niveau (`CharacterService.onCharacterGainedXp`) : PV gagnés = `hitDie/2 + 1 + mod CON`, plusieurs niveaux possibles en un seul kill, diffusion `PlayerLeveledUp`.
+- **Or** : `PlayerInventory.gold`, tiré à la création selon la classe (`GameWorld.createCharacter`), persisté (`V3__add_gold.sql`), affiché uniquement via `inventory` (volontairement absent de `stats`/`examine`). Immuable après création — aucune boutique ni butin ne le fait varier.
+- **Points de vie réels** : PV max au niveau 1 = `hitDie` + mod CON (plus figés à 100/100). `currentHealth` est modifié par les dégâts de combat, la mort/respawn et la montée de niveau.
 - **Monde** : `Room`/`RoomExit` en cache mémoire chaud, navigation (`go`), description (`look`), broadcast d'arrivée/départ.
-- **Objets** : `ItemTemplate`/`Item`, 10 types, 6 slots d'équipement, take/drop/equip/unequip avec gestion de concurrence (`synchronized(item)`, événements de domaine + projection DB).
-- **Social minimal** : `say` (chat de salle), `stats`/`examine` (affichage HP + caractéristiques brutes, sans modificateurs).
-- **Utilitaire** : lanceur de dés générique `roll XdY+Z` (`game/dice/`), réutilisé pour la génération de personnage.
+- **Objets** : `ItemTemplate`/`Item`, 10 types, 6 slots d'équipement, take/drop/equip/unequip avec gestion de concurrence (`synchronized(item)`, événements de domaine + projection DB). Armures : catégorie (léger/moyen/lourd) + CA de base ; armes : dé de dégâts (`damageDice`).
+- **Combat** : verbe `attack` (`controller/ingame/Attack.java`, réutilise une cible déjà `select`-ée ou en prend une nouvelle), `game/CombatService.java` (jet d'attaque 1d20+STR+maîtrise vs CA, échec critique sur 1 / réussite critique sur 20, dégâts d'arme ou à mains nues, jet d'initiative 1d20+DEX), `game/CombatEngine.java` (orchestration : fusion des combattants dans un même affrontement, verrou de tour, cascade des tours monstres consécutifs). Classe d'Armure réelle : `10 + mod DEX`, cappée selon la catégorie d'armure équipée, + bonus de bouclier (main secondaire). Ordre d'initiative DnD5e correct avec insertion de retardataires (`domain/actor/CombatEncounter.java`). Mort/respawn : le joueur réapparaît à PV pleins dans la salle de départ ; un monstre tué est retiré définitivement de sa salle et crédite l'XP au tueur.
+- **Monstres** : `GameMonster` (sous-type scellé de `GameCharacter`, distinct du joueur), gabarits + spawns fixes chargés au démarrage (`game/actor/MonsterService.java` + `data/monsters.json`, 7 gabarits). Ripostent avec leur propre initiative une fois attaqués, mais n'ont aucune IA/agressivité propre (n'initient jamais un combat, ne se déplacent pas).
+- **Social minimal** : `say` (chat de salle), `stats`/`examine` (affichage HP + caractéristiques, modificateurs, maîtrise).
+- **Utilitaire** : lanceur de dés générique `roll XdY+Z` (`game/dice/`), réutilisé pour la génération de personnage et les jets de combat.
 - **Modèle de concurrence** : aucun `@Scheduled` nulle part — la boucle de jeu est 100% réactive aux commandes joueur, pas de tick de fond.
-
-`currentHealth`/`maxHealth` existent en base et en Java mais sont figés à 100/100 à la création et ne sont **jamais** modifiés ni lus ailleurs que l'affichage — donc aucun dégât, aucune mort n'est possible aujourd'hui.
+- **Tests** : couverture large sur `game`/`persistence`/`domain` (dont `CombatServiceTest`, `CombatEngineTest`, `CombatEncounterTest`, `GameMonsterTest`, `GamePlayerDeathTest`, `MonsterServiceTest`, `CharacterServiceTest`, `LevelServiceTest`), plus un premier test au niveau `controller/**` (`ControllerDispatcherTest`, verrouillage des verbes autorisés pendant un combat).
 
 ## Systèmes absents ou à l'état de simple champ de données
 
-### 1. Fondations de personnage (bloquant pour presque tout le reste)
-- ~~**Modificateurs de caractéristiques** : `(score-10)/2` n'existe nulle part, même pas comme méthode utilitaire sur `Attribute`/`Character`. Tout système ultérieur (combat, compétences, jets de sauvegarde) en dépend.~~
-- ~~**Bonus de maîtrise (proficiency bonus)** : absent, dépend du niveau.~~
-- ~~**Classe de personnage** (Guerrier, Magicien, etc.) : totalement absente — pas de table, pas d'enum, pas de champ. Impacte points de vie par niveau, jets de sauvegarde maîtrisés, compétences, accès aux sorts.~~
-- **Niveau / XP** : absents. Aucun champ, aucune table.
-- Ordre suggéré : modificateurs de caractéristiques → bonus de maîtrise/niveau → classe → XP.
+### 1. Compétences et jets de sauvegarde maîtrisés par classe
+Aucune donnée de proficiency n'existe dans `CharacterClass`/`data/class.json` (seuls `hitDie` et l'or de départ y sont). Sans cette donnée, impossible de savoir quelles compétences/sauvegardes une classe maîtrise.
+- Débloqué dès maintenant : modificateurs de caractéristiques et bonus de maîtrise existent déjà (voir ci-dessus), il ne manque que la donnée par classe et la résolution DC (comparer 1d20+modificateur[+maîtrise] à une difficulté).
 
-### 2. Combat
-Rien n'existe : pas de verbe `attack`/`fight`, pas de `CombatService`, pas de message de sortie (`Attacked`/`Damaged`/`Died`), pas de résolution de touche, pas de Classe d'Armure, pas d'initiative/ordre de tour. C'est le plus gros chantier vide du projet.
-- **Classe d'Armure (CA)** : `ItemType.ARMOR` existe comme catégorie de slot mais ne contribue à aucune valeur numérique.
-- **Jet d'attaque / dégâts** : le lanceur de dés générique existe déjà et peut être réutilisé tel quel pour les jets de dégâts d'arme, mais aucun objet (`Item`) ne porte de dé de dégâts.
-- **Initiative / ordre de tour** : absent.
-- **Mort / réapparition** : rien ne teste `currentHealth <= 0`.
-- Dépend de : modificateurs de caractéristiques, bonus de maîtrise, et d'une cible à combattre (§4 PNJ/monstres) pour être testable en jeu.
+### 2. Jets de sauvegarde et compétences (résolution)
+Aucune mécanique de jet contre une DC n'existe (le `roll` générique ne fait que renvoyer un résultat brut, sans comparaison). Dépend de §1 pour savoir quelles compétences/sauvegardes sont maîtrisées.
 
-### 3. Jets de sauvegarde et compétences
-Absents. Nécessitent modificateurs de caractéristiques + bonus de maîtrise + (pour les compétences maîtrisées) la classe de personnage.
+### 3. Combat — raffinements restants
+Le socle (jets d'attaque, CA, dégâts, initiative, multi-combattants, mort/respawn) est fait. Ce qui manque encore :
+- **PvP** : absent — `Attack.java` ne résout que des cibles `GameMonster`.
+- **Butin** : aucun drop à la mort d'un monstre, il est simplement retiré de la salle.
+- **Respawn de monstre** : aucun — les spawns sont fixes et chargés une seule fois au démarrage.
+- **IA/agressivité** : les monstres ne font que riposter une fois attaqués ; pas de déplacement, pas d'initiative d'attaque de leur part.
 
-### 4. PNJ / Monstres / IA
-Rien n'existe : `Room.clients` ne contient que des `Character` joueurs, aucun type de domaine monstre, aucune table de spawn, aucune IA d'agressivité. Prérequis direct pour rendre le combat jouable en solo/PvE (le MUD n'a aujourd'hui aucun adversaire possible hors PvP, qui lui-même n'existe pas non plus).
+### 4. PNJ / contenu de monde
+`GameNpc` existe (nom + salle, `data/npcs.json`, visible via `examine`) mais reste décoratif : pas de dialogue, pas de quêtes, pas de factions, pas d'alignement.
 
 ### 5. Sorts / lancer de sorts
-Totalement absent (pas de table, pas de slot de sort, pas de composant verbal/somatique/matériel). Dépend de la classe de personnage.
+Totalement absent (pas de table, pas d'emplacement de sort, pas de composant verbal/somatique/matériel, pas de commande `cast`). Dépend de §1 (accès aux sorts par classe).
 
 ### 6. États (conditions)
-Absents (empoisonné, étourdi, paralysé, charmé, effrayé...). Dépend d'avoir un système de combat pour être déclenché.
+Absents (empoisonné, étourdi, paralysé, charmé, effrayé...). Le combat sur lequel ils s'appliqueraient existe désormais — ce système est débloqué et prêt à construire.
 
 ### 7. Repos (courte/longue pause)
-Absent. Dépend d'avoir des ressources à restaurer (HP, emplacements de sorts) pour avoir un sens.
+Absent. Les PV se restaurent déjà via la mort/respawn ; l'intérêt principal d'un repos sera de restaurer les futurs emplacements de sorts (§5), donc à construire après eux.
 
 ### 8. Économie
-- **Monnaie** : totalement absente (pas de or/argent/cuivre).
+- **Monnaie** : l'or existe mais est figé à la création — aucune mécanique ne le fait gagner ou dépenser.
 - **Encombrement** : `item_template.weight` est stocké et lisible (`ItemTemplate.weight`, `Item.getWeight()`) mais rien ne fait la somme ni ne la compare à la Force — champ mort aujourd'hui.
 - **Boutiques/marchands** : absents.
 
-### 9. Contenu de monde
-Quêtes, dialogues PNJ, factions, alignement : tous absents. Dépendent des PNJ (§4).
-
-### 10. Commandes sociales/admin manquantes
-`who`, `tell`/`whisper`, `emote`, `help`, `give` (transfert d'objet entre joueurs), commandes de modération/wizard : aucune n'existe. Indépendantes du reste, faisables à tout moment via `/add-command`.
+### 9. Commandes sociales/admin manquantes
+`who`, `tell`/`whisper`, `emote`, `help`, `give` (transfert d'objet entre joueurs), commandes de modération/wizard : aucune n'existe (`say` existe déjà). Indépendantes du reste, faisables à tout moment via `/add-command`.
 
 ## Lacune transverse notée en passant
 
-Aucun test au niveau `controller/**` (Login, CharacterCreate, Go, Take, Equip, Roll, etc.) — seule la couche `game`/`persistence` est testée. Ce n'est pas un "système DnD5e" mais ça vaut d'être su avant d'empiler des commandes de combat par-dessus une couche non testée.
+Un premier test existe désormais au niveau `controller/**` (`ControllerDispatcherTest`), mais il couvre le dispatcher (verrouillage des verbes pendant un combat), pas les handlers un par un — aucun test dédié pour `Login`, `CharacterCreate`, `Take`, `Equip`, `Roll`, `Attack`, etc. À garder en tête avant d'empiler de nouvelles commandes par-dessus une couche encore peu testée individuellement.
 
 ## Ordre de construction suggéré
 
-1. Modificateurs de caractéristiques + bonus de maîtrise (petit, débloque tout le reste)
-2. Classe de personnage + Niveau/XP (fondation de progression)
-3. PNJ/monstres basiques (cible statique, sans IA) dans `Room`
-4. Combat minimal : CA, jet d'attaque, dégâts, mort (contre les PNJ de l'étape 3)
-5. Jets de sauvegarde et compétences (réutilisent les modificateurs de l'étape 1)
-6. États, repos (s'appuient sur le combat)
-7. Sorts (s'appuie sur classe + combat + états)
-8. Monnaie, encombrement (utilise `weight` déjà stocké), boutiques
-9. Quêtes, dialogues PNJ, factions, alignement (contenu, dépend de tout le reste)
-10. Commandes sociales/admin (`who`, `tell`, `emote`, `help`) — indépendant, à intercaler n'importe quand
+1. Compétences/jets de sauvegarde maîtrisés par classe + résolution de jets contre une DC (petit, débloqué immédiatement — modificateurs et bonus de maîtrise existent déjà)
+2. Raffinements combat/monstres : PvP, butin, respawn de monstre, agressivité simple
+3. États (conditions) — s'appuie sur le combat déjà existant
+4. Sorts — dépend des proficiencies de classe (étape 1) et bénéficie des états (étape 3) pour ses effets
+5. Repos — dépend des sorts (emplacements à restaurer)
+6. Économie : boutiques, dépense d'or, encombrement (utilise `weight` déjà stocké)
+7. Contenu de monde : PNJ interactifs, dialogues, quêtes, factions, alignement
+8. Commandes sociales/admin (`who`, `tell`, `emote`, `help`, `give`) — indépendant, à intercaler n'importe quand
