@@ -168,6 +168,7 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
         int cellsMoved = 0;
         boolean blockedByOccupant = false;
         boolean crossedPortal = false;
+        boolean triggeredCombat = false;
 
         for (int i = 0; i < budget; i++) {
             HexCoordinate next = current.neighbor(direction);
@@ -183,6 +184,11 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
             current = next;
             cellsMoved++;
 
+            if (onEnteredCell(current)) {
+                triggeredCombat = true;
+                break;
+            }
+
             Optional<RoomPortal> portal = room.findPortalAt(current);
             if (portal.isPresent()) {
                 crossedPortal = crossPortal(portal.get());
@@ -191,7 +197,7 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
         }
 
         boolean blockedByBounds = cellsMoved == 0 && !blockedByOccupant;
-        return new MovementOutcome(cellsMoved, blockedByBounds, blockedByOccupant, crossedPortal);
+        return new MovementOutcome(cellsMoved, blockedByBounds, blockedByOccupant, crossedPortal, triggeredCombat);
     }
 
     /**
@@ -206,7 +212,21 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
         return false;
     }
 
+    /**
+     * Point d'extension de {@link #moveToCell}, appelé à chaque case franchie
+     * (avant le test de portail, voir sa Javadoc) : seul {@link GamePlayer}
+     * redéfinit, pour détecter l'entrée dans la zone de présence d'un
+     * {@link GameMonster} — un monstre/PNJ ne déclenche jamais de combat en se
+     * déplaçant lui-même (aucun n'a d'IA de déplacement à ce jour).
+     *
+     * @return true si {@code this} vient d'entrer en combat, ce qui consomme le
+     *         reste du budget de déplacement de cette commande, comme un portail
+     */
+    protected boolean onEnteredCell(HexCoordinate cell) {
+        return false;
+    }
+
     public record MovementOutcome(int cellsMoved, boolean blockedByBounds, boolean blockedByOccupant,
-            boolean crossedPortal) {
+            boolean crossedPortal, boolean triggeredCombat) {
     }
 }

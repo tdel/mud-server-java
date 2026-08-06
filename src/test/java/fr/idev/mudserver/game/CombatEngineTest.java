@@ -14,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
+import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.actor.CharacterClass;
+import fr.idev.mudserver.domain.actor.CombatEncounter;
 import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Gender;
@@ -23,6 +25,7 @@ import fr.idev.mudserver.domain.actor.MonsterTemplate;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.domain.actor.TestProficiencies;
+import fr.idev.mudserver.domain.actor.event.GamePlayerEnteredCell;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.OutputMessage;
@@ -227,6 +230,67 @@ class CombatEngineTest extends AbstractIntegrationTest {
         assertThat(survivor.getEncounter().participants()).contains(survivor, monster).doesNotContain(victim);
     }
 
+    @Test
+    void aggroWithNoActiveEncounterStartsANewOneWithoutAFreeHit() {
+        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        // DEX 100 => la victime gagne quasi systématiquement l'initiative face au
+        // monstre (DEX 10) : si le monstre avait un coup d'ouverture hors ordre (comme
+        // startNewEncounter), ses PV auraient déjà baissé ici — la décision de design
+        // actée (pas d'embuscade) veut au contraire que rien ne se passe avant que
+        // l'ordre d'initiative ne désigne un participant.
+        GamePlayer victim = player("Victime", 10, 100, room);
+        GameMonster wolf = monster(room, 1000, -1000, 10, 10, "1d6", 5);
+        wolf.setPosition(victim.getPosition());
+
+        combatEngine.onGamePlayerEnteredCell(new GamePlayerEnteredCell(victim, victim.getPosition()));
+
+        assertThat(victim.isInCombat()).isTrue();
+        assertThat(wolf.isInCombat()).isTrue();
+        assertThat(victim.getEncounter()).isSameAs(wolf.getEncounter());
+        assertThat(wolf.getEncounter().isInitiativeRolled()).isTrue();
+        assertThat(wolf.getEncounter().currentParticipant()).isEqualTo(victim);
+        assertThat(wolf.getCurrentHealth()).as("no free hit for the founding monster").isEqualTo(1000);
+    }
+
+    @Test
+    void aggroJoinsAnAlreadyFightingMonstersEncounter() {
+        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        GamePlayer founder = player("Fondateur", 10, 10, room);
+        GameMonster wolf = monster(room, 1000, -1000, 10, 10, "1d6", 5);
+        combatEngine.attack(founder, wolf);
+
+        GamePlayer victim = player("Victime", 10, 10, room);
+        wolf.setPosition(victim.getPosition());
+
+        combatEngine.onGamePlayerEnteredCell(new GamePlayerEnteredCell(victim, victim.getPosition()));
+
+        assertThat(victim.isInCombat()).isTrue();
+        assertThat(victim.getEncounter()).isSameAs(wolf.getEncounter());
+        assertThat(wolf.getEncounter().participants()).contains(founder, victim, wolf);
+    }
+
+    @Test
+    void aggroMergesASecondFreeMonsterInTheSameEncounter() {
+        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        GamePlayer founder = player("Fondateur", 10, 10, room);
+        GameMonster wolf = monster(room, 1000, -1000, 10, 10, "1d6", 5);
+        combatEngine.attack(founder, wolf);
+
+        GamePlayer victim = player("Victime", 10, 10, room);
+        wolf.setPosition(victim.getPosition());
+        GameMonster spider = monster(room, 1000, -1000, 10, 10, "1d6", 5);
+        spider.setPosition(victim.getPosition());
+
+        combatEngine.onGamePlayerEnteredCell(new GamePlayerEnteredCell(victim, victim.getPosition()));
+
+        assertThat(victim.isInCombat()).isTrue();
+        assertThat(spider.isInCombat()).isTrue();
+        CombatEncounter encounter = wolf.getEncounter();
+        assertThat(victim.getEncounter()).isSameAs(encounter);
+        assertThat(spider.getEncounter()).isSameAs(encounter);
+        assertThat(encounter.participants()).contains(founder, victim, wolf, spider);
+    }
+
     private GamePlayer player(String name, int strength, int dexterity, Room room) {
         return player(name, strength, dexterity, room, 1000);
     }
@@ -254,9 +318,14 @@ class CombatEngineTest extends AbstractIntegrationTest {
 
     private GameMonster monster(Room room, int maxHealth, Integer naturalArmorClass, int strength, int dexterity,
             String naturalDamageDice) {
+        return monster(room, maxHealth, naturalArmorClass, strength, dexterity, naturalDamageDice, 0);
+    }
+
+    private GameMonster monster(Room room, int maxHealth, Integer naturalArmorClass, int strength, int dexterity,
+            String naturalDamageDice, int presenceRadius) {
         MonsterTemplate template = new MonsterTemplate(UUID.randomUUID(), "Mannequin " + UUID.randomUUID(),
                 "Un mannequin d'entraînement", maxHealth, TestAttributes.of(strength, dexterity, 10, 10, 10, 10),
-                naturalArmorClass, 0, naturalDamageDice, 0, List.of());
+                naturalArmorClass, 0, naturalDamageDice, 0, List.of(), presenceRadius);
         GameMonster monster = new GameMonster(UUID.randomUUID(), template.getName(), template.getId(), room.getId(),
                 template.getAttributes(), maxHealth);
         monster.attachTemplate(template);

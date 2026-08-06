@@ -249,7 +249,7 @@ class GameMonsterTest extends AbstractIntegrationTest {
     private GameMonster monster(Map<Attribute, Integer> attributes, Integer naturalArmorClass, int xpReward,
             int goldReward, List<MonsterTemplate.LootTableEntry> lootTable) {
         MonsterTemplate template = new MonsterTemplate(UUID.randomUUID(), "Gobelin", "Une créature verte", 7,
-                attributes, naturalArmorClass, xpReward, "1d4", goldReward, lootTable);
+                attributes, naturalArmorClass, xpReward, "1d4", goldReward, lootTable, 0);
         GameMonster monster = new GameMonster(UUID.randomUUID(), template.getName(), template.getId(),
                 UUID.randomUUID(), attributes, template.getMaxHealth());
         monster.attachTemplate(template);

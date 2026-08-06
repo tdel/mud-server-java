@@ -17,10 +17,11 @@ public class MonsterTemplate {
     private String naturalDamageDice;
     private int goldReward;
     private List<LootTableEntry> lootTable;
+    private int presenceRadius;
 
     public MonsterTemplate(UUID id, String name, String description, int maxHealth, Map<Attribute, Integer> attributes,
             Integer naturalArmorClass, int xpReward, String naturalDamageDice, int goldReward,
-            List<LootTableEntry> lootTable) {
+            List<LootTableEntry> lootTable, int presenceRadius) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -31,6 +32,7 @@ public class MonsterTemplate {
         this.naturalDamageDice = naturalDamageDice;
         this.goldReward = goldReward;
         this.lootTable = lootTable;
+        this.presenceRadius = presenceRadius;
     }
 
     public UUID getId() {
@@ -113,6 +115,14 @@ public class MonsterTemplate {
         this.lootTable = lootTable;
     }
 
+    public int getPresenceRadius() {
+        return presenceRadius;
+    }
+
+    public void setPresenceRadius(int presenceRadius) {
+        this.presenceRadius = presenceRadius;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -122,8 +132,9 @@ public class MonsterTemplate {
             return false;
         }
         return maxHealth == other.maxHealth && xpReward == other.xpReward && goldReward == other.goldReward
-                && Objects.equals(id, other.id) && Objects.equals(name, other.name)
-                && Objects.equals(description, other.description) && Objects.equals(attributes, other.attributes)
+                && presenceRadius == other.presenceRadius && Objects.equals(id, other.id)
+                && Objects.equals(name, other.name) && Objects.equals(description, other.description)
+                && Objects.equals(attributes, other.attributes)
                 && Objects.equals(naturalArmorClass, other.naturalArmorClass)
                 && Objects.equals(naturalDamageDice, other.naturalDamageDice)
                 && Objects.equals(lootTable, other.lootTable);
@@ -132,7 +143,7 @@ public class MonsterTemplate {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, description, maxHealth, attributes, naturalArmorClass, xpReward,
-                naturalDamageDice, goldReward, lootTable);
+                naturalDamageDice, goldReward, lootTable, presenceRadius);
     }
 
     @Override
@@ -140,7 +151,7 @@ public class MonsterTemplate {
         return "MonsterTemplate[id=" + id + ", name=" + name + ", description=" + description + ", maxHealth="
                 + maxHealth + ", attributes=" + attributes + ", naturalArmorClass=" + naturalArmorClass + ", xpReward="
                 + xpReward + ", naturalDamageDice=" + naturalDamageDice + ", goldReward=" + goldReward + ", lootTable="
-                + lootTable + "]";
+                + lootTable + ", presenceRadius=" + presenceRadius + "]";
     }
 
     /**

@@ -1,5 +1,6 @@
 package fr.idev.mudserver.domain.actor;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -104,6 +105,71 @@ class GameCharacterTest extends AbstractIntegrationTest {
         assertThat(monster.getCurrentRoom()).isEqualTo(village);
     }
 
+    @Test
+    void movingIntoAMonstersPresenceRadiusStartsCombat() {
+        Room village = warmVillage();
+        GamePlayer character = seedCharacter(village, 100);
+        GameMonster wolf = seedMonsterWithPresence(village, new HexCoordinate(12, 4), 2);
+
+        MovementOutcome outcome = character.moveToCell(HexDirection.E, 6);
+
+        assertThat(outcome.triggeredCombat()).isTrue();
+        assertThat(outcome.cellsMoved()).isEqualTo(2);
+        assertThat(character.getPosition()).isEqualTo(new HexCoordinate(10, 4));
+        assertThat(character.isInCombat()).isTrue();
+        assertThat(wolf.isInCombat()).isTrue();
+        assertThat(character.getEncounter()).isSameAs(wolf.getEncounter());
+    }
+
+    @Test
+    void movingOutsideAnyMonstersRadiusDoesNotStartCombat() {
+        Room village = warmVillage();
+        GamePlayer character = seedCharacter(village, 100);
+        GameMonster wolf = seedMonsterWithPresence(village, new HexCoordinate(12, 4), 1);
+
+        MovementOutcome outcome = character.moveToCell(HexDirection.E, 1);
+
+        assertThat(outcome.triggeredCombat()).isFalse();
+        assertThat(character.isInCombat()).isFalse();
+        assertThat(wolf.isInCombat()).isFalse();
+    }
+
+    @Test
+    void remainingInAMonstersRadiusAcrossMultipleMovesDoesNotRetriggerAmbush() {
+        Room village = warmVillage();
+        GamePlayer character = seedCharacter(village, 100);
+        GameMonster wolf = seedMonsterWithPresence(village, new HexCoordinate(12, 4), 2);
+
+        character.moveToCell(HexDirection.E, 6);
+        CombatEncounter encounterAfterFirstMove = character.getEncounter();
+        assertThat(encounterAfterFirstMove).isNotNull();
+
+        MovementOutcome secondOutcome = character.moveToCell(HexDirection.E, 1);
+
+        assertThat(secondOutcome.triggeredCombat()).isFalse();
+        assertThat(character.getEncounter()).isSameAs(encounterAfterFirstMove);
+        assertThat(wolf.getEncounter()).isSameAs(encounterAfterFirstMove);
+    }
+
+    @Test
+    void secondMonsterInRangeSimultaneouslyJoinsTheSameEncounter() {
+        Room village = warmVillage();
+        GamePlayer character = seedCharacter(village, 100);
+        GameMonster wolf = seedMonsterWithPresence(village, new HexCoordinate(11, 4), 1);
+        GameMonster spider = seedMonsterWithPresence(village, new HexCoordinate(12, 4), 2);
+
+        MovementOutcome outcome = character.moveToCell(HexDirection.E, 6);
+
+        assertThat(outcome.triggeredCombat()).isTrue();
+        assertThat(character.getPosition()).isEqualTo(new HexCoordinate(10, 4));
+        assertThat(character.isInCombat()).isTrue();
+        assertThat(wolf.isInCombat()).isTrue();
+        assertThat(spider.isInCombat()).isTrue();
+        CombatEncounter encounter = character.getEncounter();
+        assertThat(wolf.getEncounter()).isSameAs(encounter);
+        assertThat(spider.getEncounter()).isSameAs(encounter);
+    }
+
     private Room warmVillage() {
         roomService.warmRooms();
         classService.warmClassDefinitions();
@@ -112,11 +178,15 @@ class GameCharacterTest extends AbstractIntegrationTest {
     }
 
     private GamePlayer seedCharacter(Room room) {
+        return seedCharacter(room, 10);
+    }
+
+    private GamePlayer seedCharacter(Room room, int hp) {
         Account account = new Account(UUID.randomUUID(), "movement-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Mover", room.getId(), Gender.MAN,
                 Race.HUMAN, CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER), 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
+                TestProficiencies.skills(CharacterClass.FIGHTER), 1, hp, hp, TestAttributes.of(10, 10, 10, 10, 10, 10),
                 0, 0);
         characterDao.insert(character);
         room.join(character);
@@ -126,6 +196,25 @@ class GameCharacterTest extends AbstractIntegrationTest {
     private GameMonster seedMonster(Room room, HexCoordinate cell) {
         GameMonster monster = new GameMonster(UUID.randomUUID(), "Loup", UUID.randomUUID(), room.getId(),
                 TestAttributes.of(10, 10, 10, 10, 10, 10), 10);
+        monster.setCurrentRoom(room);
+        room.placeMonster(monster, cell);
+        return monster;
+    }
+
+    /**
+     * Contrairement à {@link #seedMonster}, attache un {@link MonsterTemplate} réel
+     * avec un {@code presenceRadius} configuré : nécessaire pour tout test d'aggro,
+     * {@link GameMonster#getPresenceRadius()} délégant au template et levant sinon
+     * une {@code IllegalStateException}. Dégâts naturels bornés à {@code 1d2} pour
+     * que le joueur (100 PV dans ces tests) survive à coup sûr au coup d'ouverture
+     * si le monstre gagne l'initiative.
+     */
+    private GameMonster seedMonsterWithPresence(Room room, HexCoordinate cell, int presenceRadius) {
+        MonsterTemplate template = new MonsterTemplate(UUID.randomUUID(), "Loup", "Un loup gris.", 10,
+                TestAttributes.of(10, 10, 10, 10, 10, 10), 10, 0, "1d2", 0, List.of(), presenceRadius);
+        GameMonster monster = new GameMonster(UUID.randomUUID(), template.getName(), template.getId(), room.getId(),
+                template.getAttributes(), template.getMaxHealth());
+        monster.attachTemplate(template);
         monster.setCurrentRoom(room);
         room.placeMonster(monster, cell);
         return monster;

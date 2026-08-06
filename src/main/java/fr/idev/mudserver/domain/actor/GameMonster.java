@@ -84,6 +84,10 @@ public final class GameMonster extends GameCharacter {
         return requireTemplate().getNaturalDamageDice();
     }
 
+    public int getPresenceRadius() {
+        return requireTemplate().getPresenceRadius();
+    }
+
     @Override
     public int getArmorClass() {
         Integer natural = requireTemplate().getNaturalArmorClass();

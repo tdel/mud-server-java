@@ -209,7 +209,7 @@ class CombatServiceTest {
             String naturalDamageDice) {
         MonsterTemplate template = new MonsterTemplate(UUID.randomUUID(), "Mannequin", "Un mannequin d'entraînement",
                 maxHealth, TestAttributes.of(strength, 10, 10, 10, 10, 10), naturalArmorClass, 0, naturalDamageDice, 0,
-                List.of());
+                List.of(), 0);
         GameMonster monster = new GameMonster(UUID.randomUUID(), template.getName(), template.getId(), room.getId(),
                 template.getAttributes(), maxHealth);
         monster.attachTemplate(template);

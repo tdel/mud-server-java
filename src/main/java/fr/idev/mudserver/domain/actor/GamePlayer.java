@@ -14,6 +14,7 @@ import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDroppedItem;
+import fr.idev.mudserver.domain.actor.event.GamePlayerEnteredCell;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEquippedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
 import fr.idev.mudserver.domain.actor.event.GamePlayerSpawnedToRoom;
@@ -271,6 +272,25 @@ public final class GamePlayer extends GameCharacter {
     protected boolean crossPortal(RoomPortal portal) {
         moveToRoom(portal.targetRoom(), portal.targetCell());
         return true;
+    }
+
+    /**
+     * Seul sous-type à publier {@link GamePlayerEnteredCell} : {@link GameMonster}/
+     * {@link GameNpc} restent la source, jamais la cible, d'une zone de présence
+     * (aucun n'a d'IA de déplacement à ce jour). Le garde {@link #isInCombat()} en
+     * tête évite de republier l'événement à chaque commande {@code go} tant que le
+     * joueur reste dans une zone déjà engagée — {@code game.CombatEngine} l'écoute
+     * de façon synchrone (pas de {@code @Async} dans le projet), donc au retour de
+     * {@code publish}, l'affrontement éventuel a déjà été résolu jusqu'au tour
+     * suivant du joueur.
+     */
+    @Override
+    protected boolean onEnteredCell(HexCoordinate cell) {
+        if (isInCombat()) {
+            return false;
+        }
+        DomainEventPublisher.publish(new GamePlayerEnteredCell(this, cell));
+        return isInCombat();
     }
 
     public void spawnToRoom(Room room) {

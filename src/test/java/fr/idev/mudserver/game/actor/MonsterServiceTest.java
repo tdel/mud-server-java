@@ -84,6 +84,7 @@ class MonsterServiceTest {
         assertThat(goblin.getTemplate().getXpReward()).isEqualTo(50);
         assertThat(goblin.getTemplate().getGoldReward()).isEqualTo(5);
         assertThat(goblin.getTemplate().getLootTable()).isNotEmpty();
+        assertThat(goblin.getPresenceRadius()).isEqualTo(2);
     }
 
     @Test
@@ -102,7 +103,7 @@ class MonsterServiceTest {
         UUID templateId = UUID.randomUUID();
         MonsterService.MonsterTemplateDefinition template = new MonsterService.MonsterTemplateDefinition(templateId,
                 "Test", "...", 5, TestAttributes.of(10, 10, 10, 10, 10, 10), null, 0, "1d4", 0,
-                List.of(new LootTableEntry(UUID.randomUUID(), 0.1)));
+                List.of(new LootTableEntry(UUID.randomUUID(), 0.1)), 0);
 
         assertThatThrownBy(() -> isolated.loadMonsters(List.of(template), List.of(), Set.of()))
                 .isInstanceOf(IllegalStateException.class);
@@ -115,7 +116,7 @@ class MonsterServiceTest {
         UUID itemTemplateId = UUID.randomUUID();
         MonsterService.MonsterTemplateDefinition template = new MonsterService.MonsterTemplateDefinition(templateId,
                 "Test", "...", 5, TestAttributes.of(10, 10, 10, 10, 10, 10), null, 0, "1d4", 0,
-                List.of(new LootTableEntry(itemTemplateId, 1.5)));
+                List.of(new LootTableEntry(itemTemplateId, 1.5)), 0);
 
         assertThatThrownBy(() -> isolated.loadMonsters(List.of(template), List.of(), Set.of(itemTemplateId)))
                 .isInstanceOf(IllegalStateException.class);

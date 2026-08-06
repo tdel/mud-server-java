@@ -1,6 +1,7 @@
 package fr.idev.mudserver.game;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
+import fr.idev.mudserver.domain.actor.event.GamePlayerEnteredCell;
 import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.message.ingame.AlreadyInAnotherEncounter;
@@ -20,6 +22,8 @@ import fr.idev.mudserver.network.message.ingame.CombatantJoined;
 import fr.idev.mudserver.network.message.ingame.EncounterEnded;
 import fr.idev.mudserver.network.message.ingame.ItemUseNotImplemented;
 import fr.idev.mudserver.network.message.ingame.ItemUseRequiresCombat;
+import fr.idev.mudserver.network.message.ingame.MonsterAggroBroadcast;
+import fr.idev.mudserver.network.message.ingame.MonsterAggroTriggered;
 import fr.idev.mudserver.network.message.ingame.MonsterAttackBroadcast;
 import fr.idev.mudserver.network.message.ingame.MonsterAttackResult;
 import fr.idev.mudserver.network.message.ingame.NotYourTurn;
@@ -180,6 +184,53 @@ public class CombatEngine {
         }
     }
 
+    /**
+     * Contrepartie de {@link #startNewEncounter} pour un combat déclenché par une
+     * zone de présence plutôt que par la commande {@code attack} d'un joueur :
+     * contrairement à {@link #startNewEncounter}, pas de coup d'ouverture hors
+     * ordre — le monstre n'a pas d'avantage garanti sur le joueur simplement parce
+     * qu'il a déclenché l'affrontement (décision de design actée). L'initiative est
+     * donc tirée immédiatement pour {@code founder} et {@code victim}, et
+     * {@link #resolveFromCurrentTurn} gère seul la suite, y compris si le monstre
+     * gagne l'initiative et frappe en premier. Même récupération de course que
+     * {@link #startNewEncounter} (verrou A test-et-création, relâché avant le
+     * verrou B) : deux victimes distinctes peuvent entrer simultanément dans la
+     * zone de présence du même monstre, sur deux threads différents.
+     */
+    private CombatEncounter startAggroEncounter(GameMonster founder, GamePlayer victim) {
+        CombatEncounter encounter;
+        boolean foundedHere;
+        synchronized (founder) {
+            if (founder.getEncounter() != null) {
+                encounter = founder.getEncounter();
+                foundedHere = false;
+            } else {
+                encounter = new CombatEncounter(founder.getCurrentRoom());
+                founder.setEncounter(encounter);
+                foundedHere = true;
+            }
+        }
+
+        if (!foundedHere) {
+            // Course perdue : une autre victime a déjà fondé cet affrontement avec le même
+            // monstre entre la lecture initiale (non verrouillée, dans
+            // onGamePlayerEnteredCell) et l'acquisition du verrou A ci-dessus.
+            joinPlayerInto(encounter, victim);
+            return encounter;
+        }
+
+        victim.setEncounter(encounter);
+        synchronized (encounter) {
+            encounter.joinBeforeInitiative(founder);
+            encounter.joinBeforeInitiative(victim);
+            victim.send(new MonsterAggroTriggered(founder.getName()));
+            encounter.getRoom().broadcast(new MonsterAggroBroadcast(victim.getName(), founder.getName()), victim);
+            encounter.establishInitiativeOrder(combatService::rollInitiative);
+            resolveFromCurrentTurn(encounter);
+        }
+        return encounter;
+    }
+
     private void performTurnAttack(CombatEncounter encounter, GamePlayer attacker, GameMonster target) {
         synchronized (encounter) {
             if (encounter.currentParticipant() != attacker) {
@@ -293,5 +344,51 @@ public class CombatEngine {
         }
         encounter.remove(player);
         player.setEncounter(null);
+    }
+
+    /**
+     * Déclenché par {@link GamePlayer#onEnteredCell} à chaque case franchie —
+     * l'aggro se comporte comme une attaque de joueur ordinaire une fois
+     * l'affrontement identifié : rejoint un affrontement déjà en cours porté par
+     * l'un des monstres à portée ({@link #joinPlayerInto}), sinon en fonde un
+     * nouveau ({@link #startAggroEncounter}), puis fusionne tout autre monstre à
+     * portée resté libre ({@link #mergeMonsterInto}), même logique que plusieurs
+     * monstres rejoignant un combat déjà déclenché par {@code attack}.
+     */
+    @EventListener
+    void onGamePlayerEnteredCell(GamePlayerEnteredCell event) {
+        GamePlayer victim = event.character();
+        if (victim.isInCombat()) {
+            return;
+        }
+
+        List<GameMonster> aggressors = victim.getCurrentRoom().getMonsters().stream()
+                .filter(monster -> monster.getCurrentHealth() > 0)
+                .filter(monster -> monster.getPosition().distanceTo(event.cell()) <= monster.getPresenceRadius())
+                .toList();
+        if (aggressors.isEmpty()) {
+            return;
+        }
+
+        Optional<GameMonster> alreadyFighting = aggressors.stream().filter(monster -> monster.getEncounter() != null)
+                .findFirst();
+        if (alreadyFighting.isPresent()) {
+            joinPlayerInto(alreadyFighting.get().getEncounter(), victim);
+        } else {
+            startAggroEncounter(aggressors.get(0), victim);
+        }
+
+        if (!victim.isInCombat()) {
+            // Le combat vient déjà de se terminer (ex. le monstre gagne l'initiative et
+            // tue la victime dès le premier tour) avant d'avoir pu agréger le reste des
+            // monstres à portée.
+            return;
+        }
+        CombatEncounter encounter = victim.getEncounter();
+        for (GameMonster monster : aggressors) {
+            if (monster.getEncounter() == null) {
+                mergeMonsterInto(encounter, monster);
+            }
+        }
     }
 }

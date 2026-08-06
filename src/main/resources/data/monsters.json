@@ -19,7 +19,8 @@
         "lootTable": [
             { "itemTemplateId": "019fa0a5-80bf-7e84-87bf-5cf699c00315", "dropChance": 0.10 },
             { "itemTemplateId": "019fa0a5-80c0-7035-9c2d-113b09a275df", "dropChance": 0.01 }
-        ]
+        ],
+        "presenceRadius": 2
     },
     {
         "id": "dcff9d89-1f33-41e2-8011-e5b3b7092f0d",
@@ -38,7 +39,8 @@
             "CHARISMA": 4
         },
         "goldReward": 1,
-        "lootTable": []
+        "lootTable": [],
+        "presenceRadius": 1
     },
     {
         "id": "e6caeb0d-f861-401b-b0c1-c88e315097c5",
@@ -57,7 +59,8 @@
             "CHARISMA": 6
         },
         "goldReward": 2,
-        "lootTable": []
+        "lootTable": [],
+        "presenceRadius": 3
     },
     {
         "id": "7dfe22be-6147-45b3-bd07-89711810791d",
@@ -79,7 +82,8 @@
         "lootTable": [
             { "itemTemplateId": "019fa0a5-80c0-7035-9c2d-113b09a275df", "dropChance": 0.05 },
             { "itemTemplateId": "019faec6-116d-723d-b04c-76d51a2a2cb7", "dropChance": 0.001 }
-        ]
+        ],
+        "presenceRadius": 2
     },
     {
         "id": "f6630034-a160-4ffc-888e-eb2fee9d9428",
@@ -102,7 +106,8 @@
             { "itemTemplateId": "019fa0a5-80c0-7035-9c2d-113b09a275df", "dropChance": 0.10 },
             { "itemTemplateId": "019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518", "dropChance": 0.05 },
             { "itemTemplateId": "019faec6-116d-723d-b04c-76d51a2a2cb7", "dropChance": 0.02 }
-        ]
+        ],
+        "presenceRadius": 2
     },
     {
         "id": "026ce1a2-091d-4179-b715-65006480cfbe",
@@ -124,7 +129,8 @@
         "lootTable": [
             { "itemTemplateId": "019fa0a5-80bf-7e84-87bf-5cf699c00315", "dropChance": 0.10 },
             { "itemTemplateId": "019fcf0d-1f8f-7d01-8e4f-fd592812a1a7", "dropChance": 0.001 }
-        ]
+        ],
+        "presenceRadius": 3
     },
     {
         "id": "49e91691-3a13-4e2b-967f-bc1acf8cf03a",
@@ -146,6 +152,7 @@
         "lootTable": [
             { "itemTemplateId": "019fa0a5-80bf-7e84-87bf-5cf699c00315", "dropChance": 0.05 },
             { "itemTemplateId": "019fcf0d-1f8d-7c4c-9275-33c4af4410a8", "dropChance": 0.0001 }
-        ]
+        ],
+        "presenceRadius": 3
     }
 ]

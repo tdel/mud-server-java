@@ -73,7 +73,7 @@ public class MonsterService {
                     new MonsterTemplate(definition.id(), definition.name(), definition.description(),
                             definition.maxHealth(), definition.attributes(), definition.naturalArmorClass(),
                             definition.xpReward(), definition.naturalDamageDice(), definition.goldReward(),
-                            definition.lootTable()));
+                            definition.lootTable(), definition.presenceRadius()));
         }
 
         for (Room room : rooms) {
@@ -95,6 +95,6 @@ public class MonsterService {
 
     record MonsterTemplateDefinition(UUID id, String name, String description, int maxHealth,
             Map<Attribute, Integer> attributes, Integer naturalArmorClass, int xpReward, String naturalDamageDice,
-            int goldReward, List<LootTableEntry> lootTable) {
+            int goldReward, List<LootTableEntry> lootTable, int presenceRadius) {
     }
 }
