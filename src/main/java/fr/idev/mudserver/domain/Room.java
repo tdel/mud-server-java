@@ -268,6 +268,10 @@ public class Room {
         npc.setPosition(claimNearestFreeCell(cell, npc));
     }
 
+    public Optional<GameNpc> findNpcByName(String name) {
+        return npcs.stream().filter(npc -> npc.getName().equalsIgnoreCase(name)).findFirst();
+    }
+
     public List<Item> getItems() {
         return List.copyOf(items);
     }

@@ -9,10 +9,12 @@ import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
 import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
+import fr.idev.mudserver.domain.actor.event.CharacterSpentGold;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.message.ingame.GoldLooted;
+import fr.idev.mudserver.network.message.ingame.GoldSpent;
 import fr.idev.mudserver.network.message.ingame.PlayerLeveledUp;
 import fr.idev.mudserver.network.message.ingame.PlayerRespawned;
 import fr.idev.mudserver.network.message.ingame.XpGained;
@@ -84,6 +86,17 @@ public class CharacterService {
     void onCharacterReceivedGold(CharacterReceivedGold event) {
         characterDao.update(event.character());
         event.character().send(new GoldLooted(event.amount()));
+    }
+
+    /**
+     * Symétrique de {@link #onCharacterReceivedGold} pour une dépense (boutique
+     * PNJ, voir {@link GamePlayer#buyItem}) : persiste le nouveau solde et confirme
+     * au joueur.
+     */
+    @EventListener
+    void onCharacterSpentGold(CharacterSpentGold event) {
+        characterDao.update(event.character());
+        event.character().send(new GoldSpent(event.amount()));
     }
 
     /**

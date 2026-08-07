@@ -11,6 +11,7 @@ import java.util.UUID;
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
 import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
 import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
+import fr.idev.mudserver.domain.actor.event.CharacterSpentGold;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDroppedItem;
@@ -20,6 +21,7 @@ import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
 import fr.idev.mudserver.domain.actor.event.GamePlayerSpawnedToRoom;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUnequippedItem;
 import fr.idev.mudserver.domain.actor.event.ItemPickedUp;
+import fr.idev.mudserver.domain.actor.event.ItemPurchased;
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.Item;
@@ -211,6 +213,34 @@ public final class GamePlayer extends GameCharacter {
         item.setCharacter(this);
         inventory.addItem(item);
         DomainEventPublisher.publish(new CharacterLootedItem(this, item));
+    }
+
+    /**
+     * Même principe que {@link #receiveGold}/{@link #receiveLootItem}, combinés :
+     * débite {@code price} avant d'attacher {@code item}, contrairement à un butin
+     * qui ne peut pas échouer. {@code item} est construit par l'appelant
+     * ({@code controller.ingame.Talk}) exactement comme {@code game.actor
+     * .LootService} construit un item de butin ({@code new Item(UUID.randomUUID(),
+     * templateId, null, getId(), null)}). Publie {@link CharacterSpentGold} puis
+     * {@link ItemPurchased} — deux événements distincts plutôt qu'un seul combiné,
+     * chacun écouté par le service propriétaire de sa donnée
+     * ({@code game.actor.CharacterService} pour l'or, {@code game.ItemService} pour
+     * l'item), même séparation que {@code game.actor.LootService
+     * .onCharacterDied} qui appelle {@link #receiveGold} et
+     * {@link #receiveLootItem} séparément.
+     *
+     * @return true si l'achat a réussi (or suffisant), false sinon — aucune
+     *         mutation n'a lieu dans ce cas
+     */
+    public boolean buyItem(Item item, int price) {
+        if (!inventory.trySpendGold(price)) {
+            return false;
+        }
+        DomainEventPublisher.publish(new CharacterSpentGold(this, price));
+        item.setCharacter(this);
+        inventory.addItem(item);
+        DomainEventPublisher.publish(new ItemPurchased(this, item, price));
+        return true;
     }
 
     /**

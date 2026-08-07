@@ -21,7 +21,10 @@ import fr.idev.mudserver.domain.actor.TestProficiencies;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.OutputMessage;
+import fr.idev.mudserver.domain.Item;
+import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.network.message.ingame.GoldLooted;
+import fr.idev.mudserver.network.message.ingame.GoldSpent;
 import fr.idev.mudserver.network.message.ingame.PlayerLeveledUp;
 import fr.idev.mudserver.network.message.ingame.XpGained;
 import fr.idev.mudserver.persistence.AccountDao;
@@ -49,6 +52,9 @@ class CharacterServiceTest extends AbstractIntegrationTest {
 
     @Autowired
     private LevelService levelService;
+
+    @Autowired
+    private ItemService itemService;
 
     private GamePlayer fighter(int level, int xp) {
         Account account = new Account(UUID.randomUUID(), "hero-" + UUID.randomUUID(), "hashed-password", null);
@@ -167,6 +173,24 @@ class CharacterServiceTest extends AbstractIntegrationTest {
         assertThat(character.getInventory().getGold()).isEqualTo(25);
         assertThat(connection.received).containsExactly(new GoldLooted(25));
         assertThat(characterDao.findById(character.getId())).contains(character);
+    }
+
+    @Test
+    void spendingGoldPersistsItAndNotifiesTheCharacterOnly() {
+        GamePlayer character = fighter(1, 0);
+        character.receiveGold(100);
+        RecordingConnection connection = new RecordingConnection();
+        character.setConnection(connection);
+
+        itemService.warmItemTemplates();
+        UUID potionTemplateId = UUID.fromString("019fa0a5-80bf-7e84-87bf-5cf699c00315");
+        Item item = new Item(UUID.randomUUID(), potionTemplateId, null, character.getId(), null);
+        boolean bought = character.buyItem(item, 50);
+
+        assertThat(bought).isTrue();
+        assertThat(character.getInventory().getGold()).isEqualTo(50);
+        assertThat(connection.received).contains(new GoldSpent(50));
+        assertThat(characterDao.findById(character.getId()).map(c -> c.getInventory().getGold())).contains(50);
     }
 
     @Test

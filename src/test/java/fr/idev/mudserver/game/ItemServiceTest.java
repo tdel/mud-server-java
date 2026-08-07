@@ -55,7 +55,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void equippingANewWeaponUnequipsThePreviousOneInTheSameTransaction() {
         ItemTemplate weaponTemplate = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3, null, 0,
-                null);
+                null, 0);
 
         Account account = new Account(UUID.randomUUID(), "erin", "hashed-password", null);
         accountDao.insert(account);
@@ -86,7 +86,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void loadInventoryStillReturnsAnEquippedItemOnAFreshLoad() {
         ItemTemplate weaponTemplate = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3, null, 0,
-                null);
+                null, 0);
         itemService.registerTemplate(weaponTemplate);
 
         Account account = new Account(UUID.randomUUID(), "gwen", "hashed-password", null);
@@ -116,7 +116,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void loadInventoryAttachesTemplatesAndFeedsTheCharacterCache() {
         ItemTemplate potionTemplate = new ItemTemplate(UUID.randomUUID(), "Potion de soin", null, ItemType.POTION, 1,
-                null, 0, null);
+                null, 0, null, 0);
         itemService.registerTemplate(potionTemplate);
 
         Account account = new Account(UUID.randomUUID(), "fay", "hashed-password", null);
@@ -139,7 +139,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
     @Test
     void addAndRemoveItemFromInventoryKeepTheCharacterAndRoomCachesInSync() {
-        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Torche", null, ItemType.MISC, 1, null, 0, null);
+        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Torche", null, ItemType.MISC, 1, null, 0, null, 0);
         itemService.registerTemplate(template);
 
         roomService.warmRooms();
@@ -169,7 +169,8 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
     @Test
     void warmRoomItemsAttachesTemplatesToItemsOnTheGround() {
-        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Bouclier", null, ItemType.ARMOR, 4, null, 0, null);
+        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Bouclier", null, ItemType.ARMOR, 4, null, 0, null,
+                0);
         itemService.registerTemplate(template);
 
         roomService.warmRooms();
@@ -181,6 +182,55 @@ class ItemServiceTest extends AbstractIntegrationTest {
         itemService.warmRoomItems(roomService.allRooms());
 
         assertThat(room(room.getId()).getItems()).extracting(Item::getName).containsExactly("Bouclier");
+    }
+
+    @Test
+    void buyItemSpendsGoldAndPersistsTheNewItem() {
+        ItemTemplate potionTemplate = new ItemTemplate(UUID.randomUUID(), "Potion de soin", null, ItemType.POTION, 1,
+                null, 0, null, 50);
+        itemService.registerTemplate(potionTemplate);
+
+        Account account = new Account(UUID.randomUUID(), "mika", "hashed-password", null);
+        accountDao.insert(account);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Mika", UUID.randomUUID(),
+                Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER,
+                TestProficiencies.savingThrows(CharacterClass.FIGHTER),
+                TestProficiencies.skills(CharacterClass.FIGHTER), 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
+                0, 100);
+        characterDao.insert(character);
+
+        Item item = new Item(UUID.randomUUID(), potionTemplate.getId(), null, character.getId(), null);
+        boolean bought = character.buyItem(item, 50);
+
+        assertThat(bought).isTrue();
+        assertThat(character.getInventory().getGold()).isEqualTo(50);
+        assertThat(character.getInventory().getItems()).containsExactly(item);
+        assertThat(characterDao.findById(character.getId()).map(c -> c.getInventory().getGold())).contains(50);
+        assertThat(itemDao.findById(item.getId())).map(Item::getTemplateId).contains(potionTemplate.getId());
+    }
+
+    @Test
+    void buyItemFailsAndChangesNothingWhenGoldIsInsufficient() {
+        ItemTemplate potionTemplate = new ItemTemplate(UUID.randomUUID(), "Potion de soin", null, ItemType.POTION, 1,
+                null, 0, null, 50);
+        itemService.registerTemplate(potionTemplate);
+
+        Account account = new Account(UUID.randomUUID(), "nao", "hashed-password", null);
+        accountDao.insert(account);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Nao", UUID.randomUUID(),
+                Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER,
+                TestProficiencies.savingThrows(CharacterClass.FIGHTER),
+                TestProficiencies.skills(CharacterClass.FIGHTER), 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
+                0, 10);
+        characterDao.insert(character);
+
+        Item item = new Item(UUID.randomUUID(), potionTemplate.getId(), null, character.getId(), null);
+        boolean bought = character.buyItem(item, 50);
+
+        assertThat(bought).isFalse();
+        assertThat(character.getInventory().getGold()).isEqualTo(10);
+        assertThat(character.getInventory().getItems()).isEmpty();
+        assertThat(itemDao.findById(item.getId())).isEmpty();
     }
 
     @Test

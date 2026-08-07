@@ -4,7 +4,8 @@
         "name": "Potion de soin",
         "type": "POTION",
         "weight": 1,
-        "baseAc": 0
+        "baseAc": 0,
+        "price": 50
     },
     {
         "id": "019fa0a5-80c0-7035-9c2d-113b09a275df",
@@ -12,14 +13,16 @@
         "type": "WEAPON",
         "weight": 1,
         "baseAc": 0,
-        "damageDice": "1d6"
+        "damageDice": "1d6",
+        "price": 10
     },
     {
         "id": "019faec6-116d-723d-b04c-76d51a2a2cb7",
         "name": "Casque de fer",
         "type": "HELMET",
         "weight": 2,
-        "baseAc": 0
+        "baseAc": 0,
+        "price": 10
     },
     {
         "id": "019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518",
@@ -27,7 +30,8 @@
         "type": "ARMOR",
         "weight": 5,
         "armorCategory": "LIGHT",
-        "baseAc": 11
+        "baseAc": 11,
+        "price": 10
     },
     {
         "id": "019fcf0d-1f8c-7d43-9e98-a9944b4ccefe",
@@ -35,7 +39,8 @@
         "type": "ARMOR",
         "weight": 10,
         "armorCategory": "MEDIUM",
-        "baseAc": 13
+        "baseAc": 13,
+        "price": 50
     },
     {
         "id": "019fcf0d-1f8d-7c4c-9275-33c4af4410a8",
@@ -43,13 +48,15 @@
         "type": "ARMOR",
         "weight": 30,
         "armorCategory": "HEAVY",
-        "baseAc": 18
+        "baseAc": 18,
+        "price": 1500
     },
     {
         "id": "019fcf0d-1f8f-7d01-8e4f-fd592812a1a7",
         "name": "Bouclier",
         "type": "SHIELD",
         "weight": 3,
-        "baseAc": 2
+        "baseAc": 2,
+        "price": 10
     }
 ]

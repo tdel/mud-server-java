@@ -10,8 +10,8 @@ import fr.idev.mudserver.domain.Item;
  * Regroupe les items portés par un {@link GamePlayer} et son or — l'or initial
  * est roulé selon la classe à la création du personnage (voir
  * {@code GameWorld.createCharacter}), puis varie en jeu via {@link #addGold}
- * (butin, voir {@code game.actor.LootService}) ; pas de mutateur négatif ici
- * tant qu'aucune boutique n'existe pour dépenser cet or.
+ * (butin, voir {@code game.actor.LootService}) ou {@link #trySpendGold} (achat
+ * auprès d'un PNJ marchand, voir {@code controller.ingame.Talk}).
  */
 public final class PlayerInventory {
 
@@ -28,6 +28,20 @@ public final class PlayerInventory {
 
     public void addGold(int amount) {
         this.gold += amount;
+    }
+
+    /**
+     * Retourne {@code false} sans rien muter si le solde est insuffisant, plutôt
+     * que de lever une exception : l'appelant ({@link GamePlayer#buyItem}) réagit
+     * ainsi normalement (message « pas assez d'or ») sans try/catch, même style que
+     * {@link GamePlayer#pickUpItem}.
+     */
+    public boolean trySpendGold(int amount) {
+        if (gold < amount) {
+            return false;
+        }
+        gold -= amount;
+        return true;
     }
 
     public List<Item> getItems() {

@@ -176,7 +176,7 @@ class CombatServiceTest {
 
     private void equipWeapon(GamePlayer character, String damageDice) {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3, null, 0,
-                damageDice);
+                damageDice, 0);
         Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.WEAPON);
         item.attachTemplate(template);
         character.getInventory().addItem(item);
@@ -184,7 +184,7 @@ class CombatServiceTest {
 
     private void equipArmor(GamePlayer character, int baseAc) {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Armure", null, ItemType.ARMOR, 10,
-                ArmorCategory.HEAVY, baseAc, null);
+                ArmorCategory.HEAVY, baseAc, null, 0);
         Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.CHEST);
         item.attachTemplate(template);
         character.getInventory().addItem(item);

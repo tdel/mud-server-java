@@ -32,7 +32,12 @@ import fr.idev.mudserver.game.RoomService;
  * autres : ses tables de butin (voir {@code data/monsters.json}) référencent
  * des identifiants d'{@code ItemTemplate}, validés au chargement contre
  * {@link ItemService#templateIds()} pour échouer tôt sur un UUID invalide
- * plutôt qu'au premier drop en jeu.
+ * plutôt qu'au premier drop en jeu. {@code npcService.warmNpcs} reçoit
+ * désormais lui aussi {@link ItemService#templateNamesById()}, pour la même
+ * raison — et pour dénormaliser le nom de chaque article vendu sur
+ * {@code GameNpcSeller.NpcShopEntry} : le catalogue boutique d'un PNJ marchand
+ * (voir {@code data/npcs.json}) est validé au démarrage plutôt qu'au premier
+ * achat en jeu.
  *
  * <p>
  * Le {@code @ConditionalOnProperty} ci-dessous est porté par la
@@ -66,7 +71,7 @@ public class ServerApplication {
             roomService.warmRooms();
             itemService.warmItemTemplates();
             monsterService.warmMonsters(roomService.allRooms(), itemService.templateIds());
-            npcService.warmNpcs(roomService.allRooms());
+            npcService.warmNpcs(roomService.allRooms(), itemService.templateNamesById());
             itemService.warmRoomItems(roomService.allRooms());
             raceService.warmRaceBonuses();
             classService.warmClassDefinitions();

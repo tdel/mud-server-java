@@ -13,9 +13,10 @@ public class ItemTemplate {
     private ArmorCategory armorCategory;
     private int baseAc;
     private String damageDice;
+    private int price;
 
     public ItemTemplate(UUID id, String name, String description, ItemType type, int weight,
-            ArmorCategory armorCategory, int baseAc, String damageDice) {
+            ArmorCategory armorCategory, int baseAc, String damageDice, int price) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -24,6 +25,7 @@ public class ItemTemplate {
         this.armorCategory = armorCategory;
         this.baseAc = baseAc;
         this.damageDice = damageDice;
+        this.price = price;
     }
 
     public UUID getId() {
@@ -90,6 +92,14 @@ public class ItemTemplate {
         this.damageDice = damageDice;
     }
 
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -98,7 +108,7 @@ public class ItemTemplate {
         if (!(o instanceof ItemTemplate other)) {
             return false;
         }
-        return weight == other.weight && baseAc == other.baseAc && Objects.equals(id, other.id)
+        return weight == other.weight && baseAc == other.baseAc && price == other.price && Objects.equals(id, other.id)
                 && Objects.equals(name, other.name) && Objects.equals(description, other.description)
                 && type == other.type && armorCategory == other.armorCategory
                 && Objects.equals(damageDice, other.damageDice);
@@ -106,13 +116,13 @@ public class ItemTemplate {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, type, weight, armorCategory, baseAc, damageDice);
+        return Objects.hash(id, name, description, type, weight, armorCategory, baseAc, damageDice, price);
     }
 
     @Override
     public String toString() {
         return "ItemTemplate[id=" + id + ", name=" + name + ", description=" + description + ", type=" + type
                 + ", weight=" + weight + ", armorCategory=" + armorCategory + ", baseAc=" + baseAc + ", damageDice="
-                + damageDice + "]";
+                + damageDice + ", price=" + price + "]";
     }
 }

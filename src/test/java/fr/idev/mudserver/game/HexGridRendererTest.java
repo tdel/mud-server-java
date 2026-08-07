@@ -35,7 +35,7 @@ class HexGridRendererTest {
                 TestAttributes.of(10, 10, 10, 10, 10, 10), 10);
         room.placeMonster(monster, new HexCoordinate(3, 2));
 
-        GameNpc npc = new GameNpc(UUID.randomUUID(), "Aubergiste", room.getId());
+        GameNpc npc = new GameNpc(UUID.randomUUID(), "Aubergiste", room.getId(), "...", null);
         room.placeNpc(npc, new HexCoordinate(1, 2));
 
         Room target = new Room(UUID.randomUUID(), "Elsewhere", "...", null);

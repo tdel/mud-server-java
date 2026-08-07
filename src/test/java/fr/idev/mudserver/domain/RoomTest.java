@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
+import fr.idev.mudserver.domain.actor.GameNpc;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
@@ -87,6 +88,15 @@ class RoomTest {
 
         assertThat(room.occupantAt(new HexCoordinate(1, 1))).isEmpty();
         assertThat(alice.getPosition()).isNull();
+    }
+
+    @Test
+    void findNpcByNameIsCaseInsensitiveAndIgnoresOtherOccupants() {
+        GameNpc innkeeper = new GameNpc(UUID.randomUUID(), "Aubergiste", room.getId(), "...", null);
+        room.placeNpc(innkeeper, new HexCoordinate(1, 1));
+
+        assertThat(room.findNpcByName("aubergiste")).contains(innkeeper);
+        assertThat(room.findNpcByName("inconnu")).isEmpty();
     }
 
     private GamePlayer player(String name) {

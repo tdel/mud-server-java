@@ -3,12 +3,33 @@
         "id": "a3c8d0f2-5d5f-4d2c-9f2c-3f4e5d6c7b8a",
         "name": "Aubergiste",
         "roomId": "e1da77bd-f0b3-4d5a-95da-e8765c4fc973",
-        "cell": { "q": 4, "r": 4 }
+        "cell": { "q": 4, "r": 4 },
+        "description": "Un aubergiste jovial essuie un verre derrière son comptoir.",
+        "dialogue": {
+            "greeting": "Bonjour, je vends plusieurs choses intéressantes, veux-tu voir ?",
+            "options": [
+                { "label": "Voir ce que tu vends", "type": "SHOP" },
+                {
+                    "label": "D'où viens-tu ?",
+                    "type": "RESPONSE",
+                    "response": "Je viens des terres du nord, j'ai ouvert cette auberge il y a dix ans."
+                },
+                { "label": "Au revoir", "type": "LEAVE" }
+            ],
+            "shop": {
+                "items": [
+                    { "itemTemplateId": "019fa0a5-80bf-7e84-87bf-5cf699c00315", "price": 50 },
+                    { "itemTemplateId": "019fa0a5-80c0-7035-9c2d-113b09a275df", "price": 10 },
+                    { "itemTemplateId": "019fcf0d-1f8f-7d01-8e4f-fd592812a1a7", "price": 10 }
+                ]
+            }
+        }
     },
     {
         "id": "b0362279-5a46-4461-9672-6f4e0b2cf7e0",
         "name": "Garde du village",
         "roomId": "5e4ada37-37e1-438c-9233-581f10c055c7",
-        "cell": { "q": 2, "r": 2 }
+        "cell": { "q": 2, "r": 2 },
+        "description": "Un garde en armure de cuir surveille la place d'un œil sévère."
     }
 ]

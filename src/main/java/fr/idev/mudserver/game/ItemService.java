@@ -24,7 +24,9 @@ import fr.idev.mudserver.domain.actor.event.GamePlayerDroppedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEquippedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUnequippedItem;
 import fr.idev.mudserver.domain.actor.event.ItemPickedUp;
+import fr.idev.mudserver.domain.actor.event.ItemPurchased;
 import fr.idev.mudserver.network.message.ingame.EquipmentLooted;
+import fr.idev.mudserver.network.message.ingame.ItemBought;
 import fr.idev.mudserver.persistence.ItemDao;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
@@ -70,7 +72,7 @@ public class ItemService {
             for (ItemTemplateDefinition definition : definitions) {
                 registerTemplate(new ItemTemplate(definition.id(), definition.name(), definition.description(),
                         definition.type(), definition.weight(), definition.armorCategory(), definition.baseAc(),
-                        definition.damageDice()));
+                        definition.damageDice(), definition.price()));
             }
         } catch (IOException | JacksonException e) {
             throw new IllegalStateException("Impossible de charger " + ITEM_TEMPLATE_RESOURCE, e);
@@ -91,6 +93,18 @@ public class ItemService {
      */
     public Set<UUID> templateIds() {
         return Set.copyOf(templates.keySet());
+    }
+
+    /**
+     * Utilisé par {@code NpcService.warmNpcs} pour dénormaliser le nom d'article
+     * sur chaque {@code GameNpcSeller.NpcShopEntry} au chargement, sur le même
+     * principe que {@link #templateIds()} — juste assez de donnée pour ne pas
+     * forcer une vraie dépendance à {@code ItemService}/{@code ItemDao}.
+     */
+    public Map<UUID, String> templateNamesById() {
+        Map<UUID, String> names = new ConcurrentHashMap<>();
+        templates.forEach((id, template) -> names.put(id, template.getName()));
+        return names;
     }
 
     public List<Item> loadInventory(GamePlayer character) {
@@ -175,7 +189,20 @@ public class ItemService {
         event.character().send(new EquipmentLooted(event.item().getName()));
     }
 
+    /**
+     * Contrairement à {@link #onItemPickedUp}, l'item acheté n'a encore aucune
+     * ligne en base — {@code insert}, même raisonnement que
+     * {@link #onCharacterLootedItem}. Le template doit être attaché avant d'envoyer
+     * le message : {@code getName()} en dépend.
+     */
+    @EventListener
+    void onItemPurchased(ItemPurchased event) {
+        attachTemplate(event.item());
+        itemDao.insert(event.item());
+        event.character().send(new ItemBought(event.item().getName(), event.price()));
+    }
+
     private record ItemTemplateDefinition(UUID id, String name, String description, ItemType type, int weight,
-            ArmorCategory armorCategory, int baseAc, String damageDice) {
+            ArmorCategory armorCategory, int baseAc, String damageDice, int price) {
     }
 }
