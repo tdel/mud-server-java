@@ -1,16 +1,66 @@
 # mud-server-java
 
 Portage Java/Spring Boot d'un serveur MUD telnet (initialement en PHP/Swoole), avec des
-règles de jeu inspirées de DnD5e : combat au tour par tour, personnages avec caractéristiques
-et classes, objets/équipement, monstres.
+règles de jeu inspirées de DnD5e : combat au tour par tour, personnages avec caractéristiques,
+classes et compétences maîtrisées, déplacement sur grille hexagonale, objets/équipement,
+monstres avec butin et zones d'agressivité, PNJ marchands.
 
 ## Démo
 
-![Démo d'une session telnet : connexion, déplacement et combat](docs/demo/demo.svg)
+![Démo d'une session telnet : connexion, déplacement, boutique et combat](docs/demo/demo.svg)
 
-Connexion, sélection d'un personnage, déplacement dans le monde, combat contre un monstre —
-une vraie session telnet enregistrée contre le serveur (voir [`docs/demo/`](docs/demo/) pour
-régénérer cette démo).
+Connexion, sélection d'un personnage, jet de compétence, déplacement sur la grille hexagonale,
+achat auprès d'un PNJ marchand, combat déclenché automatiquement à l'approche d'un monstre et
+butin récupéré à sa mort — une vraie session telnet enregistrée contre le serveur (voir
+[`docs/demo/`](docs/demo/) pour régénérer cette démo).
+
+## Commandes
+
+Une commande par ligne, groupées par état de connexion — voir `network/ConnectionState`
+et les classes `ControllerHandler` sous `controller/{connected,authed,ingame}`.
+
+**Non connecté**
+
+| Commande | Effet |
+| --- | --- |
+| `register` | Créer un compte |
+| `login` | Se connecter à un compte existant |
+| `quit` | Fermer la connexion |
+
+**Connecté, avant sélection de personnage**
+
+| Commande | Effet |
+| --- | --- |
+| `characters-list` | Lister les personnages du compte |
+| `character-create` | Créer un personnage (nom, genre, race, classe) |
+| `character-select` | Incarner un personnage existant |
+| `character-delete` | Supprimer un personnage |
+
+**En jeu**
+
+| Commande | Effet |
+| --- | --- |
+| `look` | Décrire la room et la grille hexagonale courantes |
+| `examine` | Examiner un objet, un PNJ ou un monstre |
+| `go` | Se déplacer de 1 à N cases dans une direction (`go <direction> [nombre]`) |
+| `say` | Parler aux autres joueurs de la room |
+| `talk` | Engager le dialogue avec un PNJ (peut ouvrir sa boutique) |
+| `take` / `drop` | Ramasser / déposer un objet au sol |
+| `equip` / `unequip` | Équiper / retirer un objet |
+| `inventory` | Lister son inventaire et son équipement |
+| `use` | Utiliser un objet consommable |
+| `stats` | Afficher sa fiche de personnage |
+| `roll` | Lancer un dé |
+| `check` | Faire un jet de compétence ou de sauvegarde contre une difficulté |
+| `select` | Choisir sa cible de combat |
+| `attack` | Attaquer sa cible sélectionnée |
+| `save` | Sauvegarder l'état du personnage |
+
+**Dans tout état authentifié**
+
+| Commande | Effet |
+| --- | --- |
+| `logout` | Se déconnecter et revenir à l'écran de connexion |
 
 ## Stack
 
