@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.actor.GamePlayer;
@@ -33,6 +34,20 @@ import fr.idev.mudserver.game.dice.DiceRoller;
  * CombatEngine#onCharacterDied} (pas d'@Order, nettoyage de l'encounter) — le
  * joueur voit donc la mort du monstre, puis l'XP/niveau, puis son butin, dans
  * cet ordre.
+ *
+ * <p>
+ * {@code onCharacterDied} est {@code @Transactional} bien que cette classe ne
+ * détienne aucun DAO : {@code receiveGold}/{@code receiveLootItem} publient
+ * chacun un événement traité en synchrone, sur ce même thread, par {@code
+ * CharacterService#onCharacterReceivedGold} ({@code characterDao.update}) et
+ * {@code ItemService#onCharacterLootedItem} ({@code itemDao.insert}). Ces deux
+ * listeners ne sont pas eux-mêmes {@code @Transactional} ; ils rejoignent la
+ * transaction ouverte ici parce que jOOQ résout sa connexion via le
+ * gestionnaire de transaction Spring lié au thread courant (même mécanisme que
+ * {@code ItemService#onGamePlayerEquippedItem}, sauf qu'ici la frontière
+ * transactionnelle traverse plusieurs beans via des événements imbriqués plutôt
+ * que d'agir au sein d'une seule méthode). Sans ça, un crash en cours de boucle
+ * de butin pouvait créditer l'or sans persister l'item, ou l'inverse.
  */
 @Service
 public class LootService {
@@ -47,6 +62,7 @@ public class LootService {
 
     @EventListener
     @Order(3)
+    @Transactional
     void onCharacterDied(CharacterDied event) {
         MonsterTemplate template = event.character().getTemplate();
         GamePlayer killer = event.killer();
