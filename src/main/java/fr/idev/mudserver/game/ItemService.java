@@ -78,6 +78,7 @@ public class ItemService {
                         definition.type(), definition.weight(), definition.armorCategory(), definition.baseAc(),
                         definition.damageDice(), definition.price()));
             }
+            log.info("item.templates_loaded count={}", templates.size());
         } catch (IOException | JacksonException e) {
             throw new IllegalStateException("Impossible de charger " + ITEM_TEMPLATE_RESOURCE, e);
         }
@@ -125,11 +126,14 @@ public class ItemService {
      * à un {@code GamePlayer}.
      */
     public void warmRoomItems(Collection<Room> rooms) {
+        int totalItems = 0;
         for (Room room : rooms) {
             List<Item> items = attachTemplates(itemDao.findByRoomId(room.getId()));
             items.forEach(item -> item.attachRoom(room));
             room.setItems(items);
+            totalItems += items.size();
         }
+        log.info("item.room_items_loaded count={} rooms={}", totalItems, rooms.size());
     }
 
     Item attachTemplate(Item item) {

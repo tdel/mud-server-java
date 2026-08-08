@@ -1,5 +1,7 @@
 package fr.idev.mudserver;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -58,6 +60,8 @@ import fr.idev.mudserver.game.RoomService;
 @SpringBootApplication
 public class ServerApplication {
 
+    private static final Logger log = LoggerFactory.getLogger(ServerApplication.class);
+
     public static void main(String[] args) {
         SpringApplication.run(ServerApplication.class, args);
     }
@@ -68,6 +72,8 @@ public class ServerApplication {
             ClassService classService, LevelService levelService, MonsterService monsterService,
             NpcService npcService) {
         return args -> {
+            long start = System.currentTimeMillis();
+            log.info("startup.warmup_started");
             roomService.warmRooms();
             itemService.warmItemTemplates();
             monsterService.warmMonsters(roomService.allRooms(), itemService.templateIds());
@@ -76,6 +82,7 @@ public class ServerApplication {
             raceService.warmRaceBonuses();
             classService.warmClassDefinitions();
             levelService.warmXpThresholds();
+            log.info("startup.warmup_completed durationMs={}", System.currentTimeMillis() - start);
         };
     }
 }

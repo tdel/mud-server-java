@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.actor.Attribute;
@@ -34,6 +36,8 @@ import tools.jackson.databind.ObjectMapper;
  */
 @Service
 public class MonsterService {
+
+    private static final Logger log = LoggerFactory.getLogger(MonsterService.class);
 
     private static final String MONSTERS_RESOURCE = "/data/monsters.json";
 
@@ -76,6 +80,7 @@ public class MonsterService {
                             definition.lootTable(), definition.presenceRadius()));
         }
 
+        int placedCount = 0;
         for (Room room : rooms) {
             for (MonsterSpawn spawn : room.getMonsterSpawns()) {
                 MonsterTemplate template = templates.get(spawn.templateId());
@@ -89,8 +94,11 @@ public class MonsterService {
                 monster.attachTemplate(template);
                 monster.setCurrentRoom(room);
                 room.placeMonster(monster, spawn.cell());
+                placedCount++;
             }
         }
+
+        log.info("monster.warmup_completed templates={} instancesPlaced={}", templates.size(), placedCount);
     }
 
     record MonsterTemplateDefinition(UUID id, String name, String description, int maxHealth,

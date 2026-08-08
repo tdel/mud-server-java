@@ -117,6 +117,8 @@ public class RoomService {
             checkNoDuplicatePortalCell(definition, portals);
             source.setPortals(portals);
         }
+
+        log.info("room.rooms_loaded count={}", rooms.size());
     }
 
     private RoomPortal resolvePortal(RoomDefinition definition, Room source, PortalDefinition portal) {

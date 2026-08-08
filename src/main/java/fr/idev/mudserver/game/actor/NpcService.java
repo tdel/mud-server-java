@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.actor.GameNpc;
@@ -39,6 +41,8 @@ import tools.jackson.databind.ObjectMapper;
  */
 @Service
 public class NpcService {
+
+    private static final Logger log = LoggerFactory.getLogger(NpcService.class);
 
     private static final String NPCS_RESOURCE = "/data/npcs.json";
 
@@ -81,6 +85,8 @@ public class NpcService {
             npc.setCurrentRoom(room);
             room.placeNpc(npc, new HexCoordinate(definition.cell().q(), definition.cell().r()));
         }
+
+        log.info("npc.instances_placed count={}", definitions.size());
     }
 
     private GameNpc.NpcDialogue toDialogue(NpcDefinition definition) {
