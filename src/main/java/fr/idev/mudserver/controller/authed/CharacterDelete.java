@@ -4,6 +4,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
@@ -22,6 +24,8 @@ import fr.idev.mudserver.persistence.CharacterDao;
 
 @Component
 public class CharacterDelete implements ControllerHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(CharacterDelete.class);
 
     private final CharacterDao characterDao;
     private final AccountDao accountDao;
@@ -80,6 +84,7 @@ public class CharacterDelete implements ControllerHandler {
         }
 
         characterDao.deleteById(characterId);
+        log.info("character.deleted character={} account={}", name, account.getLogin());
 
         connection.send(new CharacterDeleted(name));
         characterListAction.onReceive(connection, "");

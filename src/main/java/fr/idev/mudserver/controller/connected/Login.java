@@ -63,6 +63,7 @@ public class Login implements ControllerHandler {
 
         Optional<Account> account = accountDao.findByLogin(login);
         if (account.isEmpty()) {
+            log.warn("auth.login_failed account={} reason=unknown_account", login);
             connection.send(new AccountNotFound(login));
             return;
         }
@@ -73,6 +74,7 @@ public class Login implements ControllerHandler {
 
     private void onPasswordEntered(Connection connection, Account account, String login, String password) {
         if (!passwordEncoder.matches(password, account.getPassword())) {
+            log.warn("auth.login_failed account={} reason=bad_password", login);
             connection.send(new IncorrectPassword());
             return;
         }
@@ -87,6 +89,7 @@ public class Login implements ControllerHandler {
         // enregistrement atomique (ex. ConcurrentHashMap.putIfAbsent par accountId
         // dans AuthWorld/GameWorld) plutôt qu'un scan puis un put séparé.
         if (authWorld.isAlreadyConnected(account.getId()) || gameWorld.isAlreadyConnected(account.getId())) {
+            log.warn("auth.login_failed account={} reason=already_connected", login);
             connection.send(new AccountAlreadyConnected(login));
             return;
         }

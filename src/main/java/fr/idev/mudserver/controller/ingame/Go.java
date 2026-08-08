@@ -3,6 +3,8 @@ package fr.idev.mudserver.controller.ingame;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
@@ -27,6 +29,8 @@ import fr.idev.mudserver.network.message.ingame.NoSuchDirection;
  */
 @Component
 public class Go implements ControllerHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(Go.class);
 
     private static final int DEFAULT_STEP_COUNT = 1;
 
@@ -73,6 +77,8 @@ public class Go implements ControllerHandler {
         MovementOutcome outcome = character.moveToCell(direction.get(), requestedCells);
 
         if (outcome.cellsMoved() == 0) {
+            String reason = outcome.blockedByOccupant() ? "occupant" : "bounds";
+            log.debug("room.move_blocked reason={} character={}", reason, character.getName());
             connection.send(
                     outcome.blockedByOccupant() ? new MovementBlockedByOccupant() : new MovementBlockedByBounds());
             return;

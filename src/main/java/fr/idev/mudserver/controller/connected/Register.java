@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -26,6 +28,8 @@ import fr.idev.mudserver.persistence.AccountDao;
 
 @Component
 public class Register implements ControllerHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(Register.class);
 
     private static final int MIN_PASSWORD_LENGTH = 8;
     private static final int MAX_PASSWORD_LENGTH = 128;
@@ -90,11 +94,13 @@ public class Register implements ControllerHandler {
         try {
             accountDao.insert(account);
         } catch (DuplicateKeyException e) {
+            log.warn("account.register_conflict account={}", login);
             connection.send(new LoginAlreadyTaken(login));
             return;
         }
 
         authWorld.enterWorld(connection, account);
+        log.info("account.registered account={}", login);
 
         connection.send(new AccountCreated(login));
         characterListAction.onReceive(connection, "");

@@ -2,6 +2,8 @@ package fr.idev.mudserver.controller;
 
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.authed.CharacterList;
@@ -22,6 +24,8 @@ import fr.idev.mudserver.persistence.AccountDao;
  */
 @Component
 public class Logout implements ControllerHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(Logout.class);
 
     private final GameWorld gameWorld;
     private final AuthWorld authWorld;
@@ -60,7 +64,9 @@ public class Logout implements ControllerHandler {
         }
 
         if (connection.state() == ConnectionState.AUTHED) {
+            Account account = authWorld.account(connection);
             authWorld.exitWorld(connection);
+            log.info("auth.logged_out account={}", account.getLogin());
             connection.send(new LoggedOut());
             return;
         }
