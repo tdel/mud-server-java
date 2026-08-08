@@ -4,6 +4,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
@@ -30,6 +33,8 @@ import fr.idev.mudserver.game.GameWorld;
  */
 public class TelnetSessionHandler extends SimpleChannelInboundHandler<String> {
 
+    private static final Logger log = LoggerFactory.getLogger(TelnetSessionHandler.class);
+
     private static final AttributeKey<TelnetConnection> CONNECTION_KEY = AttributeKey.valueOf("telnetConnection");
     private static final AttributeKey<BlockingQueue<String>> INBOX_KEY = AttributeKey.valueOf("telnetInbox");
     private static final String POISON_PILL = new String();
@@ -51,6 +56,7 @@ public class TelnetSessionHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
+        log.info("telnet.connection_opened remote={}", ctx.channel().remoteAddress());
         TelnetConnection connection = new TelnetConnection(ctx.channel(), controllerDispatcher, authWorld, gameWorld);
         BlockingQueue<String> inbox = new LinkedBlockingQueue<>();
         ctx.channel().attr(CONNECTION_KEY).set(connection);
@@ -65,6 +71,7 @@ public class TelnetSessionHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
+        log.info("telnet.connection_closed remote={}", ctx.channel().remoteAddress());
         BlockingQueue<String> inbox = ctx.channel().attr(INBOX_KEY).get();
         if (inbox != null) {
             inbox.add(POISON_PILL);

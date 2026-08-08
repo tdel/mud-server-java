@@ -46,6 +46,7 @@ public class TelnetConnection implements Connection, TelnetOutput {
 
     public void handleLine(String rawLine) {
         boolean secureLine = false;
+        String verb = null;
         try {
             if (pendingLine != null) {
                 Consumer<String> handler = pendingLine;
@@ -61,16 +62,25 @@ public class TelnetConnection implements Connection, TelnetOutput {
             String name = spaceIdx == -1 ? line : line.substring(0, spaceIdx);
             String argument = spaceIdx == -1 ? "" : line.substring(spaceIdx + 1);
 
-            controllerDispatcher.dispatch(this, name.toLowerCase(), argument);
+            verb = name.toLowerCase();
+            controllerDispatcher.dispatch(this, verb, argument);
         } catch (Exception e) {
-            log.error("telnet.command.failed line={}", secureLine ? "[REDACTED]" : rawLine, e);
+            log.error("telnet.command.failed verb={} line={}", verb, secureLine ? "[REDACTED]" : rawLine, e);
             write("Something went wrong processing that command. Please try again.\n");
         }
     }
 
     public void handleClose() {
-        gameWorld.exitWorld(this);
-        authWorld.exitWorld(this);
+        try {
+            gameWorld.exitWorld(this);
+        } catch (Exception e) {
+            log.error("telnet.disconnect_cleanup_failed stage=game", e);
+        }
+        try {
+            authWorld.exitWorld(this);
+        } catch (Exception e) {
+            log.error("telnet.disconnect_cleanup_failed stage=auth", e);
+        }
     }
 
     /**

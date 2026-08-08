@@ -2,6 +2,8 @@ package fr.idev.mudserver.controller;
 
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.actor.GamePlayer;
@@ -24,6 +26,8 @@ import fr.idev.mudserver.network.message.ingame.CombatActionRequired;
 @Component
 public class ControllerDispatcher {
 
+    private static final Logger log = LoggerFactory.getLogger(ControllerDispatcher.class);
+
     private static final Set<String> COMBAT_ALLOWED_VERBS = Set.of("attack", "use", "look", "examine", "inventory",
             "stats");
 
@@ -39,12 +43,16 @@ public class ControllerDispatcher {
         if (connection.state() == ConnectionState.INGAME) {
             GamePlayer character = gameWorld.character(connection);
             if (character != null && character.isInCombat() && !COMBAT_ALLOWED_VERBS.contains(actionName)) {
+                log.debug("combat.action_blocked verb={} character={}", actionName, character.getName());
                 connection.send(new CombatActionRequired());
                 return;
             }
         }
 
         registry.find(connection.state(), actionName).ifPresentOrElse(action -> action.onReceive(connection, argument),
-                () -> connection.send(new ActionNotFound()));
+                () -> {
+                    log.debug("command.unknown verb={} state={}", actionName, connection.state());
+                    connection.send(new ActionNotFound());
+                });
     }
 }
