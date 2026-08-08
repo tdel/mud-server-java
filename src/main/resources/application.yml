@@ -13,6 +13,26 @@ app:
     enabled: true
     port: 4001
 
+logging:
+  level:
+    root: INFO
+  pattern:
+    # %mdc affiche automatiquement connectionId/account/character quand connus
+    # (posés par TelnetSessionHandler/AuthWorld/GameWorld), vide sinon.
+    console: "%d{HH:mm:ss.SSS} %-5level %logger{36} %mdc - %msg%n%wEx"
+  file:
+    name: logs/mud-server.log
+  logback:
+    rollingpolicy:
+      max-file-size: 50MB
+      max-history: 30
+      total-size-cap: 1GB
+  structured:
+    format:
+      # JSON sur disque (support natif Spring Boot, MDC inclus automatiquement),
+      # console volontairement laissée en texte lisible pour le dev local.
+      file: logstash
+
 management:
   server:
     port: 8081

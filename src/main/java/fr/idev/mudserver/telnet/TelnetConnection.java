@@ -27,6 +27,7 @@ public class TelnetConnection implements Connection, TelnetOutput {
 
     private static final Logger log = LoggerFactory.getLogger(TelnetConnection.class);
 
+    private final String connectionId;
     private final Channel channel;
     private final ControllerDispatcher controllerDispatcher;
     private final AuthWorld authWorld;
@@ -36,12 +37,22 @@ public class TelnetConnection implements Connection, TelnetOutput {
     private Consumer<String> pendingLine;
     private boolean pendingLineSecure;
 
-    public TelnetConnection(Channel channel, ControllerDispatcher controllerDispatcher, AuthWorld authWorld,
-            GameWorld gameWorld) {
+    public TelnetConnection(String connectionId, Channel channel, ControllerDispatcher controllerDispatcher,
+            AuthWorld authWorld, GameWorld gameWorld) {
+        this.connectionId = connectionId;
         this.channel = channel;
         this.controllerDispatcher = controllerDispatcher;
         this.authWorld = authWorld;
         this.gameWorld = gameWorld;
+    }
+
+    /**
+     * Identifiant court et lisible, généré une fois par connexion par
+     * {@link TelnetSessionHandler#channelActive} — sert uniquement de clé de
+     * corrélation MDC pour les logs, aucune signification métier.
+     */
+    public String getConnectionId() {
+        return connectionId;
     }
 
     public void handleLine(String rawLine) {

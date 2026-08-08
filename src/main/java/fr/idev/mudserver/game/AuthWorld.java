@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.persistence.AccountDao;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.Account;
@@ -37,11 +38,13 @@ public class AuthWorld {
     public void enterWorld(Connection connection, Account account) {
         connections.put(connection, account);
         connection.setState(ConnectionState.AUTHED);
+        MDC.put("account", account.getLogin());
     }
 
     public void exitWorld(Connection connection) {
         connections.remove(connection);
         connection.setState(ConnectionState.CONNECTED);
+        MDC.remove("account");
     }
 
     public void moveToGameWorld(Connection connection, GamePlayer character) {

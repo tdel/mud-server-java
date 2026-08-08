@@ -3,9 +3,11 @@ package fr.idev.mudserver.telnet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -38,6 +40,9 @@ public class TelnetSessionHandler extends SimpleChannelInboundHandler<String> {
     private static final AttributeKey<TelnetConnection> CONNECTION_KEY = AttributeKey.valueOf("telnetConnection");
     private static final AttributeKey<BlockingQueue<String>> INBOX_KEY = AttributeKey.valueOf("telnetInbox");
     private static final String POISON_PILL = new String();
+    private static final String MDC_CONNECTION_ID = "connectionId";
+
+    private static final AtomicLong CONNECTION_SEQUENCE = new AtomicLong();
 
     private static final String WELCOME = "Welcome to mud-server-java.\nType \"login <name>\" or \"register <name>\" to begin.\n";
 
@@ -56,8 +61,10 @@ public class TelnetSessionHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        log.info("telnet.connection_opened remote={}", ctx.channel().remoteAddress());
-        TelnetConnection connection = new TelnetConnection(ctx.channel(), controllerDispatcher, authWorld, gameWorld);
+        String connectionId = "conn-" + CONNECTION_SEQUENCE.incrementAndGet();
+        log.info("telnet.connection_opened remote={} connectionId={}", ctx.channel().remoteAddress(), connectionId);
+        TelnetConnection connection = new TelnetConnection(connectionId, ctx.channel(), controllerDispatcher, authWorld,
+                gameWorld);
         BlockingQueue<String> inbox = new LinkedBlockingQueue<>();
         ctx.channel().attr(CONNECTION_KEY).set(connection);
         ctx.channel().attr(INBOX_KEY).set(inbox);
@@ -78,7 +85,17 @@ public class TelnetSessionHandler extends SimpleChannelInboundHandler<String> {
         }
     }
 
+    /**
+     * Le MDC est posé ici, pas dans {@code channelActive}, car il vit dans un
+     * {@code ThreadLocal} : il doit être peuplé sur le virtual thread qui exécute
+     * réellement {@code handleLine}/les événements de domaine, pas sur le thread
+     * I/O Netty qui appelle {@code channelActive}. Comme ce virtual thread est
+     * dédié à cette connexion pour toute sa durée de vie (voir Javadoc de classe),
+     * {@code connectionId} reste correct sur toutes les lignes de log émises tant
+     * que la boucle tourne, sans propagation supplémentaire à gérer.
+     */
     private void runConnectionLoop(TelnetConnection connection, BlockingQueue<String> inbox) {
+        MDC.put(MDC_CONNECTION_ID, connection.getConnectionId());
         connection.write(WELCOME);
         try {
             while (true) {
@@ -92,6 +109,7 @@ public class TelnetSessionHandler extends SimpleChannelInboundHandler<String> {
             Thread.currentThread().interrupt();
         } finally {
             connection.handleClose();
+            MDC.clear();
         }
     }
 }

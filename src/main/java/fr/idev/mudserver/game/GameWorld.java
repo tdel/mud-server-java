@@ -11,6 +11,7 @@ import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -68,6 +69,7 @@ public class GameWorld {
         character.getInventory().replaceItems(itemService.loadInventory(character));
         characters.put(connection, character);
         roomService.spawnCharacter(character);
+        MDC.put("character", character.getName());
     }
 
     public void exitWorld(Connection connection) {
@@ -80,6 +82,7 @@ public class GameWorld {
         characterDao.update(character);
         character.getCurrentRoom().disconnect(character);
         log.info("character.session_ended character={} room={}", character.getName(), room.getName());
+        MDC.remove("character");
     }
 
     public GamePlayer character(Connection connection) {
