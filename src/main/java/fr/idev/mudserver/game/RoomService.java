@@ -9,6 +9,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
@@ -58,6 +60,8 @@ import tools.jackson.databind.ObjectMapper;
  */
 @Service
 public class RoomService {
+
+    private static final Logger log = LoggerFactory.getLogger(RoomService.class);
 
     private static final String ROOMS_RESOURCE = "/data/rooms.json";
 
@@ -162,12 +166,14 @@ public class RoomService {
     void onGamePlayerMovedToRoom(GamePlayerMovedToRoom event) {
         event.character().setCurrentRoomId(event.to().getId());
         characterDao.updateCurrentRoom(event.character().getId(), event.to().getId());
+        log.debug("room.player_moved character={} to={}", event.character().getName(), event.to().getName());
     }
 
     @EventListener
     void onGamePlayerSpawnedToRoom(GamePlayerSpawnedToRoom event) {
         event.character().setCurrentRoomId(event.room().getId());
         characterDao.updateCurrentRoom(event.character().getId(), event.room().getId());
+        log.info("room.player_spawned character={} room={}", event.character().getName(), event.room().getName());
     }
 
     /**
@@ -184,6 +190,7 @@ public class RoomService {
         Room room = event.character().getCurrentRoom();
         room.removeMonster(event.character());
         room.broadcast(new MonsterDefeated(event.character().getName()), null);
+        log.info("combat.monster_removed_from_room monster={} room={}", event.character().getName(), room.getName());
     }
 
     /**
@@ -199,6 +206,8 @@ public class RoomService {
         Room room = event.character().getCurrentRoom();
         room.broadcast(new GamePlayerDefeated(event.character().getName(), event.killer().getName()),
                 event.character());
+        log.info("combat.player_defeated character={} killer={} room={}", event.character().getName(),
+                event.killer().getName(), room.getName());
     }
 
     record RoomDefinition(UUID id, String name, String description, Boolean isStartingRoom, int width, int height,

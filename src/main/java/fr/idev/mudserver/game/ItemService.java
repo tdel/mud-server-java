@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +53,8 @@ import tools.jackson.databind.ObjectMapper;
  */
 @Service
 public class ItemService {
+
+    private static final Logger log = LoggerFactory.getLogger(ItemService.class);
 
     private static final String ITEM_TEMPLATE_RESOURCE = "/data/items.json";
 
@@ -146,11 +150,15 @@ public class ItemService {
     @EventListener
     void onItemPickedUp(ItemPickedUp event) {
         itemDao.assignToCharacter(event.item().getId(), event.character().getId());
+        log.info("item.picked_up item={} template={} character={}", event.item().getId(), event.item().getTemplateId(),
+                event.character().getName());
     }
 
     @EventListener
     void onGamePlayerDroppedItem(GamePlayerDroppedItem event) {
         itemDao.assignToRoom(event.item().getId(), event.room().getId());
+        log.info("item.dropped item={} template={} room={}", event.item().getId(), event.item().getTemplateId(),
+                event.room().getName());
     }
 
     /**
@@ -169,11 +177,14 @@ public class ItemService {
             itemDao.updateSlot(previousOccupant.getId(), null);
         }
         itemDao.updateSlot(event.item().getId(), event.slot());
+        log.info("item.equipped item={} slot={} character={} previousOccupants={}", event.item().getName(),
+                event.slot(), event.character().getName(), event.previousOccupants().size());
     }
 
     @EventListener
     void onGamePlayerUnequippedItem(GamePlayerUnequippedItem event) {
         itemDao.updateSlot(event.item().getId(), null);
+        log.info("item.unequipped item={} character={}", event.item().getName(), event.character().getName());
     }
 
     /**
@@ -187,6 +198,7 @@ public class ItemService {
         attachTemplate(event.item());
         itemDao.insert(event.item());
         event.character().send(new EquipmentLooted(event.item().getName()));
+        log.info("item.looted item={} character={}", event.item().getName(), event.character().getName());
     }
 
     /**
@@ -200,6 +212,8 @@ public class ItemService {
         attachTemplate(event.item());
         itemDao.insert(event.item());
         event.character().send(new ItemBought(event.item().getName(), event.price()));
+        log.info("item.purchased item={} character={} price={}", event.item().getName(), event.character().getName(),
+                event.price());
     }
 
     private record ItemTemplateDefinition(UUID id, String name, String description, ItemType type, int weight,

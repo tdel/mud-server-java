@@ -106,7 +106,7 @@ Section distincte de la feuille de route des systèmes DnD5e ci-dessus : ce qui 
 
 ### Priorisation suggérée
 1. ~~Sécurité rapide : ne plus logger `rawLine` tel quel pendant la saisie de mot de passe, retirer `password` du `toString()` de `Account`.~~ **[Résolu]**
-2. Logging applicatif dans les `@EventListener` de `game/*Service` — préalable à tout diagnostic futur.
+2. ~~Logging applicatif dans les `@EventListener` de `game/*Service` — préalable à tout diagnostic futur.~~ **[Résolu]** : SLF4J ajouté à `ItemService`/`RoomService`/`CharacterService`/`LootService`/`CombatEngine` (transactions d'objets/or, mort/respawn, montée de niveau, butin, join/leave d'encounter — `INFO`, déplacement de room et nettoyage d'encounter en `DEBUG`), ainsi qu'à la résolution de combat proprement dite dans `CombatEngine` (`attack`/`performTurnAttack`/`resolveFromCurrentTurn`, hors périmètre strict des `@EventListener` mais nécessaire pour que le combat soit réellement traçable) et au login réussi (`Login.onPasswordEntered`).
 3. Transaction sur `LootService.onCharacterDied`.
 4. Index DB sur les colonnes FK (`account_id`, `character_id`, `room_id`, `template_id`).
 5. Tests : couche telnet, `LootService`, puis les `ControllerHandler` les plus utilisés.

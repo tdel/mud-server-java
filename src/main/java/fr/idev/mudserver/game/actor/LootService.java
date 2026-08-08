@@ -2,6 +2,8 @@ package fr.idev.mudserver.game.actor;
 
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,8 @@ import fr.idev.mudserver.game.dice.DiceRoller;
 @Service
 public class LootService {
 
+    private static final Logger log = LoggerFactory.getLogger(LootService.class);
+
     private final DiceRoller diceRoller;
 
     public LootService(DiceRoller diceRoller) {
@@ -49,12 +53,14 @@ public class LootService {
 
         if (template.getGoldReward() > 0) {
             killer.receiveGold(template.getGoldReward());
+            log.info("loot.gold_dropped killer={} amount={}", killer.getName(), template.getGoldReward());
         }
 
         for (LootTableEntry entry : template.getLootTable()) {
             if (diceRoller.rollChance(entry.dropChance())) {
                 Item item = new Item(UUID.randomUUID(), entry.itemTemplateId(), null, killer.getId(), null);
                 killer.receiveLootItem(item);
+                log.info("loot.item_dropped killer={} item={}", killer.getName(), item.getName());
             }
         }
     }

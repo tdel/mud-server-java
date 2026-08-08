@@ -3,6 +3,8 @@ package fr.idev.mudserver.controller.connected;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +25,8 @@ import fr.idev.mudserver.persistence.AccountDao;
 
 @Component
 public class Login implements ControllerHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(Login.class);
 
     private final AccountDao accountDao;
     private final AuthWorld authWorld;
@@ -88,6 +92,7 @@ public class Login implements ControllerHandler {
         }
 
         authWorld.enterWorld(connection, account);
+        log.info("auth.login_succeeded account={}", login);
 
         connection.send(new WelcomeBack(login));
         characterListAction.onReceive(connection, "");

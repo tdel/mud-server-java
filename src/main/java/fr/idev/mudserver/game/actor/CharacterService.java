@@ -1,5 +1,7 @@
 package fr.idev.mudserver.game.actor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,8 @@ import fr.idev.mudserver.persistence.CharacterDao;
 @Service
 public class CharacterService {
 
+    private static final Logger log = LoggerFactory.getLogger(CharacterService.class);
+
     private final CharacterDao characterDao;
     private final LevelService levelService;
     private final ClassService classService;
@@ -71,6 +75,8 @@ public class CharacterService {
         }
 
         characterDao.update(character);
+        log.info("character.xp_gained character={} amount={} newXp={} leveledUp={} newLevel={}", character.getName(),
+                event.amount(), character.getXp(), leveledUp, character.getLevel());
 
         if (leveledUp) {
             character.getCurrentRoom().broadcast(new PlayerLeveledUp(character.getName(), character.getLevel()), null);
@@ -86,6 +92,8 @@ public class CharacterService {
     void onCharacterReceivedGold(CharacterReceivedGold event) {
         characterDao.update(event.character());
         event.character().send(new GoldLooted(event.amount()));
+        log.info("character.gold_received character={} amount={} newGold={}", event.character().getName(),
+                event.amount(), event.character().getInventory().getGold());
     }
 
     /**
@@ -97,6 +105,8 @@ public class CharacterService {
     void onCharacterSpentGold(CharacterSpentGold event) {
         characterDao.update(event.character());
         event.character().send(new GoldSpent(event.amount()));
+        log.info("character.gold_spent character={} amount={} newGold={}", event.character().getName(), event.amount(),
+                event.character().getInventory().getGold());
     }
 
     /**
@@ -109,8 +119,11 @@ public class CharacterService {
     @Order(2)
     void onCharacterDied(CharacterDied event) {
         GamePlayer killer = event.killer();
-        killer.gainXp(event.character().getTemplate().getXpReward());
+        int xpReward = event.character().getTemplate().getXpReward();
+        killer.gainXp(xpReward);
         killer.setTarget(null);
+        log.info("combat.kill_credited killer={} monster={} xpReward={}", killer.getName(), event.character().getName(),
+                xpReward);
     }
 
     /**
@@ -133,5 +146,6 @@ public class CharacterService {
         characterDao.update(character);
 
         character.send(new PlayerRespawned(startingRoom.getName()));
+        log.info("character.respawned character={} room={}", character.getName(), startingRoom.getName());
     }
 }
