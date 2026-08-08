@@ -71,8 +71,8 @@ Un premier test existe désormais au niveau `controller/**` (`ControllerDispatch
 Section distincte de la feuille de route des systèmes DnD5e ci-dessus : ce qui suit est un audit technique/infra (sécurité, observabilité, cohérence des données, tests, qualité de code), pas des fonctionnalités de jeu. Constats issus d'une passe complète du projet, sans implémentation à ce stade.
 
 ### Sécurité — impact haut, effort faible à moyen
-- **Fuite de mot de passe en clair dans les logs** : `TelnetConnection.handleLine` (`telnet/TelnetConnection.java:46-65`) logge la ligne brute (`log.error("telnet.command.failed line={}", rawLine, e)`) sur toute exception ; la saisie du mot de passe passe par le même mécanisme `pendingLine`/`requestBlocking`, donc une erreur pendant login/register logge le mot de passe en clair au niveau ERROR.
-- `Account.toString()` (`domain/Account.java:71-74`) expose le hash BCrypt — piège pour un futur log de débogage.
+- ~~**Fuite de mot de passe en clair dans les logs**~~ **[Résolu]** : `TelnetConnection.handleLine` (`telnet/TelnetConnection.java:46-65`) logge la ligne brute (`log.error("telnet.command.failed line={}", rawLine, e)`) sur toute exception ; la saisie du mot de passe passe par le même mécanisme `pendingLine`/`requestBlocking`, donc une erreur pendant login/register logge le mot de passe en clair au niveau ERROR. Corrigé en réutilisant le signal `SecureOutputMessage` pour rediger la ligne (`[REDACTED]`) quand elle correspond à une saisie secrète.
+- ~~`Account.toString()` (`domain/Account.java:71-74`) expose le hash BCrypt — piège pour un futur log de débogage.~~ **[Résolu]** : `password` retiré de `toString()`.
 - Aucune protection brute-force sur le login (`controller/connected/Login.java:70-77`) : ni compteur de tentatives, ni délai, ni verrouillage.
 - Pas de filtrage des caractères ANSI/contrôle dans les noms de personnage (`CharacterCreate.java`, seulement `.trim()`) ni dans le chat (`Say.java`, `Talk.java`) — injection possible dans le terminal des autres joueurs.
 - Telnet en clair, sans TLS — acceptable en dev local, bloquant si le port est un jour exposé au-delà du loopback.
@@ -105,7 +105,7 @@ Section distincte de la feuille de route des systèmes DnD5e ci-dessus : ce qui 
 - Pas de pipeline CI (`.github/workflows` absent) : spotless et les tests ne tournent qu'en local, rien ne les impose avant merge.
 
 ### Priorisation suggérée
-1. Sécurité rapide : ne plus logger `rawLine` tel quel pendant la saisie de mot de passe, retirer `password` du `toString()` de `Account`.
+1. ~~Sécurité rapide : ne plus logger `rawLine` tel quel pendant la saisie de mot de passe, retirer `password` du `toString()` de `Account`.~~ **[Résolu]**
 2. Logging applicatif dans les `@EventListener` de `game/*Service` — préalable à tout diagnostic futur.
 3. Transaction sur `LootService.onCharacterDied`.
 4. Index DB sur les colonnes FK (`account_id`, `character_id`, `room_id`, `template_id`).
