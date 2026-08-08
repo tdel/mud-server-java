@@ -9,6 +9,8 @@ import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +31,8 @@ import fr.idev.mudserver.persistence.CharacterDao;
  */
 @Component
 public class GameWorld {
+
+    private static final Logger log = LoggerFactory.getLogger(GameWorld.class);
 
     private final Map<Connection, GamePlayer> characters = new ConcurrentHashMap<>();
 
@@ -72,8 +76,10 @@ public class GameWorld {
             return;
         }
 
+        Room room = character.getCurrentRoom();
         characterDao.update(character);
         character.getCurrentRoom().disconnect(character);
+        log.info("character.session_ended character={} room={}", character.getName(), room.getName());
     }
 
     public GamePlayer character(Connection connection) {
@@ -115,6 +121,8 @@ public class GameWorld {
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));
         character.spawnToRoom(startingRoom.get());
+        log.info("character.created character={} account={} race={} class={}", character.getName(), account.getLogin(),
+                race, characterClass);
 
         return character;
     }
