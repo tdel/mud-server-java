@@ -2,6 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project
+This project is a game. It is built around DnD5e (Dungeon and Dragon 5th edition). Every system in this game must be compliant with DnD5e.
+
 ## Build, test, run
 
 Neither Java nor Maven is installed on the host — Maven runs through Docker instead, using the locally-pulled `maven:3.9.16-eclipse-temurin-25` image:
