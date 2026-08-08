@@ -1,5 +1,6 @@
 package fr.idev.mudserver.network.message.ingame;
 
+import fr.idev.mudserver.telnet.Ansi;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
@@ -7,6 +8,6 @@ public record NpcResponse(String npcName, String response) implements OutputTeln
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        output.write(npcName + " says: " + response + "\n");
+        output.write(Ansi.npc(npcName) + " says: " + response + "\n");
     }
 }

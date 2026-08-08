@@ -1,5 +1,6 @@
 package fr.idev.mudserver.network.message.ingame;
 
+import fr.idev.mudserver.telnet.Ansi;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
@@ -7,6 +8,6 @@ public record DialogueEnded(String npcName) implements OutputTelnetMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        output.write("You end the conversation with " + npcName + ".\n");
+        output.write("You end the conversation with " + Ansi.npc(npcName) + ".\n");
     }
 }

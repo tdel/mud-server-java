@@ -1,5 +1,6 @@
 package fr.idev.mudserver.network.message.ingame;
 
+import fr.idev.mudserver.telnet.Ansi;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
@@ -7,6 +8,6 @@ public record PlayerLeveledUp(String characterName, int newLevel) implements Out
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        output.write(characterName + " reaches level " + newLevel + "!\n");
+        output.write(Ansi.player(characterName) + " " + Ansi.levelUp("reaches level " + newLevel + "!") + "\n");
     }
 }

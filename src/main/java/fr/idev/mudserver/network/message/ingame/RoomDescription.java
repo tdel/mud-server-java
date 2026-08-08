@@ -1,7 +1,10 @@
 package fr.idev.mudserver.network.message.ingame;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import fr.idev.mudserver.telnet.Ansi;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
@@ -24,11 +27,13 @@ public record RoomDescription(String roomName, String description, List<String> 
     public void toTelnet(TelnetOutput output) {
         output.write(String.format(
                 "== %s ==\n%s\n\n%s\n\n%s\n\nPortals: %s\nCharacters here: %s\nItems: %s\nMonsters: %s\nNPCs: %s\n",
-                roomName, description, String.join("\n", gridLines), legend,
+                Ansi.room(roomName), description, String.join("\n", gridLines), legend,
                 portalSummaries.isEmpty() ? "none." : String.join(", ", portalSummaries),
-                characterNames.isEmpty() ? "no one else." : String.join(", ", characterNames),
-                itemNames.isEmpty() ? "none." : String.join(", ", itemNames),
-                monsterNames.isEmpty() ? "none." : String.join(", ", monsterNames),
-                npcNames.isEmpty() ? "none." : String.join(", ", npcNames)));
+                joinColored(characterNames, Ansi::player, "no one else."), joinColored(itemNames, Ansi::item, "none."),
+                joinColored(monsterNames, Ansi::monster, "none."), joinColored(npcNames, Ansi::npc, "none.")));
+    }
+
+    private static String joinColored(List<String> names, Function<String, String> colorize, String whenEmpty) {
+        return names.isEmpty() ? whenEmpty : names.stream().map(colorize).collect(Collectors.joining(", "));
     }
 }
