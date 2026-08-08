@@ -51,6 +51,22 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- Actuator (/health, /info, /metrics) pour donner à un opérateur un signal
+             autre que la ligne de log de démarrage. spring-boot-starter-web est là
+             uniquement pour porter ces endpoints HTTP (Tomcat + infrastructure MVC dont
+             Actuator a besoin pour son propre DispatcherServlet) — aucun trafic
+             applicatif ne passe par ce serveur web, le protocole de jeu reste le telnet
+             brut sur Netty (voir management.server.port séparé du port telnet dans
+             application.yml). -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
         <!-- Persistance : jOOQ (DSLContext) plutôt qu'un ORM classique - pas de
              persistence-context/lazy-loading à gérer hors transaction (voir les 21 sites
              d'appel de DAO qui ne tournent jamais dans une transaction). Apporte aussi
@@ -134,6 +150,16 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <!-- build-info alimente META-INF/build-info.properties, lu par Actuator
+                     pour peupler /actuator/info (nom/version/heure de build) plutôt que de
+                     répondre un objet vide. -->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build-info</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <!-- Génère les classes DSL jOOQ (Tables/Records) à partir du SQL Flyway
                  directement (org.jooq.meta.extensions.ddl.DDLDatabase), sans se connecter à

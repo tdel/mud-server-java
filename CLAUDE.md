@@ -20,7 +20,7 @@ The Docker socket mount is required even for plain `mvn test` — it's not just 
 - `test` — run tests. No unit/integration split exists; every run spins up a Testcontainers Postgres, so Docker access is always required, not optional.
 - `spotless:apply` / `spotless:check` — format / verify formatting. `check` also runs automatically in the `verify` phase (not `test`). Uses the Eclipse formatter, not google-java-format — google-java-format's javac-internals dependency is currently broken on Java 25 ([diffplug/spotless#2468](https://github.com/diffplug/spotless/issues/2468)).
 
-Separately, `docker-compose.yml` at the repo root runs a persistent Postgres for local dev (not for tests): host port **5433** → container 5432 (db `mud-server-java`). The telnet server itself listens on a different port, **4001** (`app.telnet.port` in `application.yml`) — don't confuse the two.
+Separately, `docker-compose.yml` at the repo root runs a persistent Postgres for local dev (not for tests): host port **5433** → container 5432 (db `mud-server-java`). The telnet server itself listens on a different port, **4001** (`app.telnet.port` in `application.yml`) — don't confuse the two. A third port, **8081** (`management.server.port`), serves Spring Boot Actuator (`/actuator/health`, `/actuator/info`, `/actuator/metrics` only — see `management.endpoints.web.exposure.include`); it's the only HTTP surface in the project, added solely to carry Actuator since the game protocol itself stays raw telnet.
 
 ## Stack specifics
 

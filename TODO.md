@@ -80,7 +80,7 @@ Section distincte de la feuille de route des systèmes DnD5e ci-dessus : ce qui 
 
 ### Observabilité — trou structurel
 - Seuls 2 fichiers dans tout `src/main` utilisent SLF4J (`telnet/TelnetConnection.java`, `telnet/TelnetServer.java`). Tous les `@EventListener` qui écrivent en DB (`ItemService`, `RoomService`, `CharacterService`, `LootService`, `CombatEngine`) n'ont aucun log — aucune trace de login réussi, résolution de combat, ou transaction d'objets/or en dehors du catch-all générique.
-- Aucun endpoint actuator (`/health`, `/metrics`, `/info` absents de `pom.xml`) — aucun signal pour un opérateur hormis la ligne de démarrage.
+- ~~Aucun endpoint actuator (`/health`, `/metrics`, `/info` absents de `pom.xml`) — aucun signal pour un opérateur hormis la ligne de démarrage.~~ **[Résolu]** : `spring-boot-starter-actuator` + `spring-boot-starter-web` ajoutés (premier serveur HTTP du projet, dédié à Actuator), exposés sur `management.server.port` séparé (8081) via `management.endpoints.web.exposure.include: health,info,metrics` — seuls ces trois endpoints sont accessibles, le reste (`/env`, `/beans`...) répond 404.
 - Pas de logging structuré (pas de `logback-spring.xml`), config console par défaut.
 
 ### Cohérence des données / transactions

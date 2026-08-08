@@ -12,3 +12,24 @@ app:
   telnet:
     enabled: true
     port: 4001
+
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        # Auto-enabled by Spring Boot when it detects it's running in a
+        # container, which drags root /actuator/health status into the
+        # readiness probe. Readiness never flips to ACCEPTING_TRAFFIC here:
+        # TelnetServer.start() runs as the ApplicationReadyEvent listener and
+        # blocks the main thread for the process lifetime (its designed job),
+        # so the framework's own readiness-event step right after that never
+        # runs. Not a Kubernetes deployment, so disable probes rather than
+        # work around a signal we don't use.
+        enabled: false
