@@ -1,9 +1,6 @@
 package fr.idev.mudserver.controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +17,7 @@ import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.domain.actor.TestProficiencies;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.RoomService;
-import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
-import fr.idev.mudserver.network.OutputMessage;
 import fr.idev.mudserver.network.message.ActionNotFound;
 import fr.idev.mudserver.network.message.ingame.CombatActionRequired;
 import fr.idev.mudserver.network.message.ingame.RoomDescription;
@@ -98,36 +93,5 @@ class ControllerDispatcherTest extends AbstractIntegrationTest {
 
         connection.received.clear();
         return connection;
-    }
-
-    private static final class RecordingConnection implements Connection {
-
-        private final List<OutputMessage> received = new ArrayList<>();
-        private ConnectionState state = ConnectionState.INGAME;
-
-        @Override
-        public void requestBlocking(OutputMessage message, Consumer<String> handler) {
-            // non utilisé par ces tests
-        }
-
-        @Override
-        public ConnectionState state() {
-            return state;
-        }
-
-        @Override
-        public void setState(ConnectionState state) {
-            this.state = state;
-        }
-
-        @Override
-        public void send(OutputMessage message) {
-            received.add(message);
-        }
-
-        @Override
-        public void close() {
-            // non utilisé par ces tests
-        }
     }
 }

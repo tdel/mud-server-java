@@ -54,7 +54,7 @@ Absent. Les PV se restaurent déjà via la mort/respawn ; l'intérêt principal 
 
 ## Lacune transverse notée en passant
 
-Un premier test existe désormais au niveau `controller/**` (`ControllerDispatcherTest`), mais il couvre le dispatcher (verrouillage des verbes pendant un combat), pas les handlers un par un — aucun test dédié pour `Login`, `CharacterCreate`, `Take`, `Equip`, `Roll`, `Attack`, `Check`, `Save`, etc. À garder en tête avant d'empiler de nouvelles commandes par-dessus une couche encore peu testée individuellement.
+`ControllerDispatcherTest` couvre le dispatcher (verrouillage des verbes pendant un combat) ; `Login`, `CharacterCreate`, `Take`, `Equip`, `Roll`, `Attack`, `Check`, `Save` ont désormais chacun leur test dédié (voir item 5 de la dette technique ci-dessous). Les autres handlers (`Quit`, `Register`, `CharacterDelete`, `CharacterList`, `CharacterSelect`, `Drop`, `Examine`, `Go`, `Inventory`, `Look`, `Say`, `Select`, `Stats`, `Talk`, `Unequip`, `Use`) restent sans test dédié — à garder en tête avant d'empiler de nouvelles commandes par-dessus une couche encore partiellement testée individuellement.
 
 ## Ordre de construction suggéré
 
@@ -93,9 +93,9 @@ Section distincte de la feuille de route des systèmes DnD5e ci-dessus : ce qui 
 - Le TOCTOU de double-login déjà connu (`Login.java:76-79`) a un rayon d'impact plus large que prévu : `GamePlayer.equipItem` documente explicitement (javadoc, `GamePlayer.java:376-379`) que l'invariant « une connexion pilote un seul personnage » n'est pas garanti. S'il est un jour déclenché, deviennent réellement concurrents et non protégés : `PlayerInventory.addGold`/`trySpendGold` (`+=` non atomique, `PlayerInventory.java:29-42`), la liste d'inventaire, et `GamePlayer.takeDamage` (protégé seulement par le lock d'engagement du `CombatEngine`). À l'inverse, `Room.tryClaimCell`/`join`/`leave` et `GameMonster.takeDamage` sont déjà correctement verrouillés.
 
 ### Tests — zones non couvertes
-- Couche telnet entièrement non testée : `TelnetSessionHandler`, `TelnetConnection`, `TelnetServer`, `IacFilterDecoder`, `TelnetServerInitializer`.
-- `LootService` n'a aucun test (constat nouveau, pas encore listé dans la lacune transverse ci-dessus) — la logique de probabilité de butin n'est pas vérifiée.
-- Cf. aussi la lacune transverse déjà notée plus haut sur la couverture par `ControllerHandler`.
+- ~~Couche telnet entièrement non testée : `TelnetSessionHandler`, `TelnetConnection`, `TelnetServer`, `IacFilterDecoder`, `TelnetServerInitializer`.~~ **[Résolu]** : voir item 5 de la priorisation ci-dessous.
+- ~~`LootService` n'a aucun test — la logique de probabilité de butin n'est pas vérifiée.~~ **[Résolu]** : voir item 5 de la priorisation ci-dessous.
+- Cf. aussi la lacune transverse déjà notée plus haut sur la couverture par `ControllerHandler` — les handlers les plus utilisés sont désormais couverts (item 5 ci-dessous), le reste ne l'est pas encore.
 
 ### Qualité de code / duplication — effort faible
 - Logique de normalisation + parsing d'enum dupliquée à l'identique 3 fois : `Save.java:63-77`, `Check.java:63-77`, `CharacterCreate.java:101,129,157` (`strip().toLowerCase().replace(' ','_').replace('-','_')` + `valueOf` avec try/catch) — bon candidat pour un utilitaire partagé.
@@ -109,7 +109,7 @@ Section distincte de la feuille de route des systèmes DnD5e ci-dessus : ce qui 
 2. ~~Logging applicatif dans les `@EventListener` de `game/*Service` — préalable à tout diagnostic futur.~~ **[Résolu]** : SLF4J ajouté à `ItemService`/`RoomService`/`CharacterService`/`LootService`/`CombatEngine` (transactions d'objets/or, mort/respawn, montée de niveau, butin, join/leave d'encounter — `INFO`, déplacement de room et nettoyage d'encounter en `DEBUG`), ainsi qu'à la résolution de combat proprement dite dans `CombatEngine` (`attack`/`performTurnAttack`/`resolveFromCurrentTurn`, hors périmètre strict des `@EventListener` mais nécessaire pour que le combat soit réellement traçable) et au login réussi (`Login.onPasswordEntered`).
 3. ~~Transaction sur `LootService.onCharacterDied`.~~ **[Résolu]** : `@Transactional` ajouté sur `LootService.onCharacterDied` — grâce à la propagation par thread du gestionnaire de transaction Spring (même mécanisme que `ItemService.onGamePlayerEquippedItem`), la transaction ouverte ici englobe aussi les écritures faites par les `@EventListener` déclenchés en aval (`CharacterService.onCharacterReceivedGold` → `characterDao.update`, `ItemService.onCharacterLootedItem` → `itemDao.insert`), sans changement dans ces classes.
 4. ~~Index DB sur les colonnes FK (`account_id`, `character_id`, `room_id`, `template_id`).~~ **[Résolu]** : `V4__add_fk_indexes.sql`.
-5. Tests : couche telnet, `LootService`, puis les `ControllerHandler` les plus utilisés.
+5. ~~Tests : couche telnet, `LootService`, puis les `ControllerHandler` les plus utilisés.~~ **[Résolu]** : `IacFilterDecoderTest`, `TelnetConnectionTest`, `TelnetSessionHandlerTest`, `TelnetServerInitializerTest` (couche telnet, via `EmbeddedChannel` et des doublons de test par sous-classement — pas de Mockito dans ce projet — `TelnetServer` volontairement laissé hors périmètre car `start()` bloque sur un vrai bootstrap réseau Netty, non testable unitairement ; nécessiterait un test d'intégration dédié à part) ; `LootServiceTest` (or garanti, drop 100 %/0 % indépendant par entrée, table vide, or + butin dans la même transaction) ; `LoginTest`, `CharacterCreateTest`, `TakeTest`, `EquipTest`, `RollTest`, `AttackTest`, `CheckTest`, `SaveTest` (couverture des `ControllerHandler` les plus utilisés, via un `RecordingConnection` désormais mutualisé sous `controller/RecordingConnection.java`, avec callback de prompt pour piloter les scénarios multi-étapes de `Login`/`CharacterCreate`).
 6. Pipeline CI minimal (build + test + spotless check).
 7. Config secrets/profils avant tout déploiement réel (hors scope tant que ça reste du dev local).
 8. Refactor de la logique normalize+parse dupliquée.
