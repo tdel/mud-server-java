@@ -34,6 +34,7 @@ public class TelnetConnection implements Connection, TelnetOutput {
 
     private ConnectionState state = ConnectionState.CONNECTED;
     private Consumer<String> pendingLine;
+    private boolean pendingLineSecure;
 
     public TelnetConnection(Channel channel, ControllerDispatcher controllerDispatcher, AuthWorld authWorld,
             GameWorld gameWorld) {
@@ -44,10 +45,13 @@ public class TelnetConnection implements Connection, TelnetOutput {
     }
 
     public void handleLine(String rawLine) {
+        boolean secureLine = false;
         try {
             if (pendingLine != null) {
                 Consumer<String> handler = pendingLine;
+                secureLine = pendingLineSecure;
                 pendingLine = null;
+                pendingLineSecure = false;
                 handler.accept(rawLine);
                 return;
             }
@@ -59,7 +63,7 @@ public class TelnetConnection implements Connection, TelnetOutput {
 
             controllerDispatcher.dispatch(this, name.toLowerCase(), argument);
         } catch (Exception e) {
-            log.error("telnet.command.failed line={}", rawLine, e);
+            log.error("telnet.command.failed line={}", secureLine ? "[REDACTED]" : rawLine, e);
             write("Something went wrong processing that command. Please try again.\n");
         }
     }
@@ -82,12 +86,14 @@ public class TelnetConnection implements Connection, TelnetOutput {
         this.send(message);
         if (message instanceof SecureOutputMessage) {
             writeRaw(TelnetEcho.OFF);
+            this.pendingLineSecure = true;
             this.pendingLine = line -> {
                 writeRaw(TelnetEcho.ON);
                 write("\n");
                 handler.accept(line);
             };
         } else {
+            this.pendingLineSecure = false;
             this.pendingLine = handler;
         }
     }
