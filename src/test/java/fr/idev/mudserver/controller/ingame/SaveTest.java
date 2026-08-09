@@ -16,9 +16,9 @@ import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.domain.actor.TestProficiencies;
-import fr.idev.mudserver.game.CheckResult;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.RoomService;
+import fr.idev.mudserver.game.dice.CheckResult;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.ingame.CheckOutcome;
 import fr.idev.mudserver.persistence.AccountDao;
@@ -27,9 +27,9 @@ import fr.idev.mudserver.persistence.CharacterDao;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * {@code save} résout un jet de sauvegarde DnD5e (voir {@code CheckService}),
- * pas une sauvegarde de partie — aucun effet de bord de persistance à vérifier
- * ici, seulement la résolution de la commande.
+ * {@code save} résout un jet de sauvegarde DnD5e (voir {@code DiceRoller}), pas
+ * une sauvegarde de partie — aucun effet de bord de persistance à vérifier ici,
+ * seulement la résolution de la commande.
  */
 @Transactional
 class SaveTest extends AbstractIntegrationTest {
@@ -77,7 +77,7 @@ class SaveTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void validAttributeAndDcSendsCheckOutcomeWithTheCheckServiceSaveResult() {
+    void validAttributeAndDcSendsCheckOutcomeWithTheDiceRollerSaveResult() {
         RecordingConnection connection = enterGame();
 
         save.onReceive(connection, "constitution 15");

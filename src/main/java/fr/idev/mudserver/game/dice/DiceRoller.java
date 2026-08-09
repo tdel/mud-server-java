@@ -5,6 +5,10 @@ import java.util.Random;
 
 import org.springframework.stereotype.Component;
 
+import fr.idev.mudserver.domain.actor.Attribute;
+import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.Skill;
+
 @Component
 public class DiceRoller {
 
@@ -45,6 +49,44 @@ public class DiceRoller {
     public DiceRoll rollD20(int modifier, boolean disadvantage) {
         int kept = disadvantage ? Math.min(rollDie(20), rollDie(20)) : rollDie(20);
         return new DiceRoll(new int[]{kept}, modifier);
+    }
+
+    /**
+     * Résout un jet de compétence DnD5e : 1d20 + modificateur de la caractéristique
+     * gouvernante, + bonus de maîtrise si le personnage est proficient sur cette
+     * compétence (voir {@link GamePlayer#getSkillProficiencies()}, résolues une
+     * fois pour toutes à la construction du personnage), comparé à une DC fournie
+     * par l'appelant. Contrairement à {@code game.CombatService#resolveHit}, aucune
+     * règle de critique sur 1/20 naturel : en DnD5e RAW cette règle est propre aux
+     * jets d'attaque, pas aux jets de compétence/sauvegarde génériques.
+     */
+    public CheckResult check(GamePlayer character, Skill skill, int dc) {
+        boolean proficient = character.getSkillProficiencies().contains(skill);
+        return checkOrSave(character, skill.getGoverningAttribute(), proficient, dc, skill.label());
+    }
+
+    /**
+     * Résout un jet de sauvegarde DnD5e — même mécanique que {@link #check}, mais
+     * la maîtrise vient de {@link GamePlayer#getSavingThrowProficiencies()} plutôt
+     * que des compétences.
+     */
+    public CheckResult save(GamePlayer character, Attribute attribute, int dc) {
+        boolean proficient = character.getSavingThrowProficiencies().contains(attribute);
+        return checkOrSave(character, attribute, proficient, dc, attribute.label());
+    }
+
+    private CheckResult checkOrSave(GamePlayer character, Attribute attribute, boolean proficient, int dc,
+            String label) {
+        int modifier = character.getModifier(attribute) + (proficient ? character.getProficiencyBonus() : 0);
+        boolean disadvantage = (attribute == Attribute.STRENGTH || attribute == Attribute.DEXTERITY)
+                && character.isWearingNonProficientArmor();
+        DiceRoll diceRoll = rollD20(modifier, disadvantage);
+        boolean success = resolveCheck(diceRoll.total(), dc);
+        return new CheckResult(label, diceRoll.total(), dc, proficient, disadvantage, success);
+    }
+
+    static boolean resolveCheck(int total, int dc) {
+        return total >= dc;
     }
 
     private int rollDie(int sides) {

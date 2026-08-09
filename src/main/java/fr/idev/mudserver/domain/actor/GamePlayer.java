@@ -176,7 +176,7 @@ public final class GamePlayer extends GameCharacter {
      * personnage n'a pas — granularité "toute pièce non maîtrisée déclenche le
      * désavantage", cohérente avec le fait que ce jeu modélise déjà l'armure en
      * plusieurs emplacements indépendants plutôt qu'une seule "armure portée" comme
-     * en RAW strict. Consommé par {@code game.CheckService}/
+     * en RAW strict. Consommé par {@code game.dice.DiceRoller}/
      * {@code game.CombatService} pour appliquer le désavantage SRD (jets de
      * FOR/DEX, jets d'attaque) plutôt que de bloquer l'équipement lui-même —
      * {@link #equipItem} ne fait aucune vérification de maîtrise.

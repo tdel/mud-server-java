@@ -16,9 +16,9 @@ import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.domain.actor.TestProficiencies;
-import fr.idev.mudserver.game.CheckResult;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.RoomService;
+import fr.idev.mudserver.game.dice.CheckResult;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.ingame.CheckOutcome;
 import fr.idev.mudserver.persistence.AccountDao;
@@ -72,7 +72,7 @@ class CheckTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void validSkillAndDcSendsCheckOutcomeWithTheCheckServiceResult() {
+    void validSkillAndDcSendsCheckOutcomeWithTheDiceRollerResult() {
         RecordingConnection connection = enterGame();
 
         check.onReceive(connection, "athletics 10");
