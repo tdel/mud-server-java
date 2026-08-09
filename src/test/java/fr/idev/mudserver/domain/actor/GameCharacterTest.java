@@ -15,6 +15,7 @@ import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.actor.GameCharacter.MovementOutcome;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.game.actor.ClassService;
+import fr.idev.mudserver.game.actor.RaceService;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 
@@ -37,6 +38,9 @@ class GameCharacterTest extends AbstractIntegrationTest {
 
     @Autowired
     private ClassService classService;
+
+    @Autowired
+    private RaceService raceService;
 
     @Test
     void singleStepMoveUpdatesPosition() {
@@ -173,6 +177,7 @@ class GameCharacterTest extends AbstractIntegrationTest {
     private Room warmVillage() {
         roomService.warmRooms();
         classService.warmClassDefinitions();
+        raceService.warmRaceBonuses();
         return roomService.allRooms().stream().filter(room -> room.getId().equals(VILLAGE_SQUARE_ID)).findFirst()
                 .orElseThrow();
     }

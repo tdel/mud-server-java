@@ -17,6 +17,7 @@ import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.game.actor.ClassService;
+import fr.idev.mudserver.game.actor.RaceService;
 import fr.idev.mudserver.persistence.jooq.tables.records.CharacterRecord;
 
 @Repository
@@ -24,10 +25,12 @@ public class CharacterDao {
 
     private final DSLContext dsl;
     private final ClassService classService;
+    private final RaceService raceService;
 
-    public CharacterDao(DSLContext dsl, ClassService classService) {
+    public CharacterDao(DSLContext dsl, ClassService classService, RaceService raceService) {
         this.dsl = dsl;
         this.classService = classService;
+        this.raceService = raceService;
     }
 
     public void insert(GamePlayer character) {
@@ -89,11 +92,14 @@ public class CharacterDao {
         attributes.put(Attribute.CHARISMA, record.getCharisma());
 
         CharacterClass characterClass = CharacterClass.valueOf(record.getCharacterClass());
+        Race race = Race.valueOf(record.getRace());
 
-        return new GamePlayer(record.getId(), record.getAccountId(), record.getName(), record.getCurrentRoomId(),
-                Gender.valueOf(record.getGender()), Race.valueOf(record.getRace()), characterClass,
+        GamePlayer character = new GamePlayer(record.getId(), record.getAccountId(), record.getName(),
+                record.getCurrentRoomId(), Gender.valueOf(record.getGender()), race, characterClass,
                 classService.savingThrowProficiencies(characterClass), classService.skillProficiencies(characterClass),
                 record.getLevel(), record.getCurrentHealth(), record.getMaxHealth(), attributes, record.getXp(),
                 record.getGold());
+        character.setSpeed(raceService.speed(race));
+        return character;
     }
 }

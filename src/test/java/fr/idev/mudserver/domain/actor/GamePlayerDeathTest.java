@@ -13,6 +13,7 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.game.actor.ClassService;
+import fr.idev.mudserver.game.actor.RaceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.OutputMessage;
@@ -44,6 +45,9 @@ class GamePlayerDeathTest extends AbstractIntegrationTest {
 
     @Autowired
     private ClassService classService;
+
+    @Autowired
+    private RaceService raceService;
 
     @Test
     void takeDamageReducesHealthWithoutGoingBelowZeroAndReportsTheKillingBlow() {
@@ -126,6 +130,7 @@ class GamePlayerDeathTest extends AbstractIntegrationTest {
 
     private GamePlayer seedCharacter(Room room) {
         classService.warmClassDefinitions();
+        raceService.warmRaceBonuses();
         Account account = new Account(UUID.randomUUID(), "death-test-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), account.getLogin(), room.getId(),

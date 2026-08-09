@@ -27,7 +27,7 @@ public class RaceService {
 
     private static final String RACE_RESOURCE = "/data/race.json";
 
-    private final Map<Race, Map<Attribute, Integer>> attributeScoreBonuses = new ConcurrentHashMap<>();
+    private final Map<Race, RaceDefinition> raceDefinitions = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper;
 
     public RaceService(ObjectMapper objectMapper) {
@@ -39,7 +39,7 @@ public class RaceService {
             List<RaceDefinition> definitions = objectMapper.readValue(in, new TypeReference<List<RaceDefinition>>() {
             });
             for (RaceDefinition definition : definitions) {
-                attributeScoreBonuses.put(definition.name(), Collections.unmodifiableMap(definition.attributes()));
+                raceDefinitions.put(definition.name(), definition);
             }
         } catch (IOException | JacksonException e) {
             throw new IllegalStateException("Impossible de charger " + RACE_RESOURCE, e);
@@ -47,14 +47,25 @@ public class RaceService {
     }
 
     public Map<Attribute, Integer> attributeScoreBonuses(Race race) {
-        Map<Attribute, Integer> bonuses = attributeScoreBonuses.get(race);
-        if (bonuses == null) {
+        return definitionOf(race).attributes();
+    }
+
+    public int speed(Race race) {
+        return definitionOf(race).speed();
+    }
+
+    private RaceDefinition definitionOf(Race race) {
+        RaceDefinition definition = raceDefinitions.get(race);
+        if (definition == null) {
             throw new IllegalStateException(
                     "Bonus de " + race + " absents du cache — warmRaceBonuses() a-t-il été appelé ?");
         }
-        return bonuses;
+        return definition;
     }
 
-    private record RaceDefinition(Race name, Map<Attribute, Integer> attributes) {
+    private record RaceDefinition(Race name, Map<Attribute, Integer> attributes, int speed) {
+        private RaceDefinition {
+            attributes = Collections.unmodifiableMap(attributes);
+        }
     }
 }
