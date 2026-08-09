@@ -23,11 +23,14 @@ public record RoomDescription(String roomName, String description, List<String> 
         List<String> portalSummaries, List<String> characterNames, List<String> itemNames, List<String> monsterNames,
         List<String> npcNames) implements OutputTelnetMessage {
 
+    private static final String MAP_HEADER = "──────── Map ────────";
+
     @Override
     public void toTelnet(TelnetOutput output) {
+        String coloredGrid = gridLines.stream().map(Ansi::gridLine).collect(Collectors.joining("\n"));
         output.write(String.format(
-                "== %s ==\n%s\n\n%s\n\n%s\n\nPortals: %s\nCharacters here: %s\nItems: %s\nMonsters: %s\nNPCs: %s\n",
-                Ansi.room(roomName), description, String.join("\n", gridLines), legend,
+                "== %s ==\n%s\n\n%s\n%s\n\n%s\n\nPortals: %s\nCharacters here: %s\nItems: %s\nMonsters: %s\nNPCs: %s\n",
+                Ansi.room(roomName), description, Ansi.room(MAP_HEADER), coloredGrid, Ansi.gridLegend(legend),
                 portalSummaries.isEmpty() ? "none." : String.join(", ", portalSummaries),
                 joinColored(characterNames, Ansi::player, "no one else."), joinColored(itemNames, Ansi::item, "none."),
                 joinColored(monsterNames, Ansi::monster, "none."), joinColored(npcNames, Ansi::npc, "none.")));
