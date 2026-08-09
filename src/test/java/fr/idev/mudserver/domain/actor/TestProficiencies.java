@@ -2,6 +2,7 @@ package fr.idev.mudserver.domain.actor;
 
 import java.util.Set;
 
+import fr.idev.mudserver.domain.WeaponCategory;
 import fr.idev.mudserver.game.actor.ClassService;
 import tools.jackson.databind.ObjectMapper;
 
@@ -30,5 +31,17 @@ public final class TestProficiencies {
 
     public static Set<Skill> skills(CharacterClass characterClass) {
         return CLASS_SERVICE.skillProficiencies(characterClass);
+    }
+
+    public static Attribute primaryAbility(CharacterClass characterClass) {
+        return CLASS_SERVICE.primaryAbility(characterClass);
+    }
+
+    public static Set<WeaponCategory> weaponProficiencies(CharacterClass characterClass) {
+        return CLASS_SERVICE.weaponProficiencies(characterClass);
+    }
+
+    public static Set<ArmorProficiency> armorProficiencies(CharacterClass characterClass) {
+        return CLASS_SERVICE.armorProficiencies(characterClass);
     }
 }

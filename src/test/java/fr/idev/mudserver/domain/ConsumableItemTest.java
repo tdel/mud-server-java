@@ -62,7 +62,7 @@ class ConsumableItemTest extends AbstractIntegrationTest {
 
     private Item healingPotion(String effectDice) {
         ConsumableItem template = new ConsumableItem(UUID.randomUUID(), "Potion de soin", null, ItemType.POTION, 1,
-                null, 0, null, 50, Rarity.COMMON, 0, ConsumableEffect.HEALING, effectDice, diceRoller);
+                null, 0, null, null, 50, Rarity.COMMON, 0, ConsumableEffect.HEALING, effectDice, diceRoller);
         Item item = new Item(UUID.randomUUID(), template.getId(), null, null, null);
         item.attachTemplate(template);
         return item;
@@ -70,8 +70,11 @@ class ConsumableItemTest extends AbstractIntegrationTest {
 
     private GamePlayer character(int currentHealth, int maxHealth) {
         return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Test", UUID.randomUUID(), Gender.MAN, Race.HUMAN,
-                CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER), 1, currentHealth, maxHealth,
+                CharacterClass.FIGHTER, TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
+                TestProficiencies.savingThrows(CharacterClass.FIGHTER),
+                TestProficiencies.skills(CharacterClass.FIGHTER),
+                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
+                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, currentHealth, maxHealth,
                 TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
     }
 }

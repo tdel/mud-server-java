@@ -2,9 +2,11 @@ package fr.idev.mudserver.game.actor;
 
 import org.junit.jupiter.api.Test;
 
+import fr.idev.mudserver.domain.actor.ArmorProficiency;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Skill;
+import fr.idev.mudserver.domain.WeaponCategory;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -101,6 +103,65 @@ class ClassServiceTest {
         ClassService classService = new ClassService(new ObjectMapper());
 
         assertThatThrownBy(() -> classService.skillProficiencies(CharacterClass.FIGHTER))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void warmClassDefinitionsLoadsThePrimaryAbilityForEveryClass() {
+        ClassService classService = new ClassService(new ObjectMapper());
+
+        classService.warmClassDefinitions();
+
+        assertThat(classService.primaryAbility(CharacterClass.BARBARIAN)).isEqualTo(Attribute.STRENGTH);
+        assertThat(classService.primaryAbility(CharacterClass.MONK)).isEqualTo(Attribute.DEXTERITY);
+        assertThat(classService.primaryAbility(CharacterClass.WIZARD)).isEqualTo(Attribute.INTELLIGENCE);
+    }
+
+    @Test
+    void primaryAbilityThrowsBeforeWarmUp() {
+        ClassService classService = new ClassService(new ObjectMapper());
+
+        assertThatThrownBy(() -> classService.primaryAbility(CharacterClass.FIGHTER))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void warmClassDefinitionsLoadsWeaponProficienciesForEveryClass() {
+        ClassService classService = new ClassService(new ObjectMapper());
+
+        classService.warmClassDefinitions();
+
+        assertThat(classService.weaponProficiencies(CharacterClass.FIGHTER))
+                .containsExactlyInAnyOrder(WeaponCategory.SIMPLE, WeaponCategory.MARTIAL);
+        assertThat(classService.weaponProficiencies(CharacterClass.WIZARD)).containsExactly(WeaponCategory.SIMPLE)
+                .doesNotContain(WeaponCategory.MARTIAL);
+    }
+
+    @Test
+    void weaponProficienciesThrowsBeforeWarmUp() {
+        ClassService classService = new ClassService(new ObjectMapper());
+
+        assertThatThrownBy(() -> classService.weaponProficiencies(CharacterClass.FIGHTER))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void warmClassDefinitionsLoadsArmorProficienciesForEveryClass() {
+        ClassService classService = new ClassService(new ObjectMapper());
+
+        classService.warmClassDefinitions();
+
+        assertThat(classService.armorProficiencies(CharacterClass.FIGHTER)).containsExactlyInAnyOrder(
+                ArmorProficiency.LIGHT, ArmorProficiency.MEDIUM, ArmorProficiency.HEAVY, ArmorProficiency.SHIELDS);
+        assertThat(classService.armorProficiencies(CharacterClass.ROGUE)).containsExactly(ArmorProficiency.LIGHT);
+        assertThat(classService.armorProficiencies(CharacterClass.WIZARD)).isEmpty();
+    }
+
+    @Test
+    void armorProficienciesThrowsBeforeWarmUp() {
+        ClassService classService = new ClassService(new ObjectMapper());
+
+        assertThatThrownBy(() -> classService.armorProficiencies(CharacterClass.FIGHTER))
                 .isInstanceOf(IllegalStateException.class);
     }
 }

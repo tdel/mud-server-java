@@ -33,6 +33,20 @@ public class DiceRoller {
         return new DiceRoll(rolls, expression.modifier());
     }
 
+    /**
+     * Jet de d20 unique DnD5e, avec ou sans désavantage (2d20, garde le plus bas —
+     * pas de variante avantage pour l'instant, aucun appelant n'en a besoin).
+     * Retourne toujours un {@link DiceRoll} à un seul dé dans {@code rolls()} (le
+     * d20 finalement retenu) : {@link DiceRoll#total()} ne double donc jamais le
+     * résultat même quand deux d20 sont physiquement lancés en interne, et les
+     * appelants qui lisent {@code rolls()[0]} comme jet naturel (règle du 1/20
+     * naturel côté {@code game.CombatService}) restent valides sans changement.
+     */
+    public DiceRoll rollD20(int modifier, boolean disadvantage) {
+        int kept = disadvantage ? Math.min(rollDie(20), rollDie(20)) : rollDie(20);
+        return new DiceRoll(new int[]{kept}, modifier);
+    }
+
     private int rollDie(int sides) {
         if (sides == 100) {
             return rollPercentile();

@@ -159,9 +159,13 @@ class LootServiceTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "chasseur-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Chasseur", UUID.randomUUID(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER), 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0, 0);
+                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER,
+                TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
+                TestProficiencies.savingThrows(CharacterClass.FIGHTER),
+                TestProficiencies.skills(CharacterClass.FIGHTER),
+                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
+                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, 10, 10,
+                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
         new Room(UUID.randomUUID(), "Clairière", "...", null).join(character);
         return character;

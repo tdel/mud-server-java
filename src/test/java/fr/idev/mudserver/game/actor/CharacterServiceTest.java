@@ -61,8 +61,12 @@ class CharacterServiceTest extends AbstractIntegrationTest {
         accountDao.insert(account);
         // FIGHTER, CON 10 (modificateur nul) : hpGain par niveau = hitDie/2+1+0 = 6.
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Héros", UUID.randomUUID(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER), level, 10, 10,
+                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER,
+                TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
+                TestProficiencies.savingThrows(CharacterClass.FIGHTER),
+                TestProficiencies.skills(CharacterClass.FIGHTER),
+                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
+                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), level, 10, 10,
                 TestAttributes.of(10, 10, 10, 10, 10, 10), xp, 0);
         characterDao.insert(character);
         // CharacterService diffuse toujours à character.getCurrentRoom() en cas de

@@ -27,6 +27,7 @@ import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomPortal;
+import fr.idev.mudserver.domain.WeaponCategory;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.OutputMessage;
 
@@ -46,8 +47,11 @@ public final class GamePlayer extends GameCharacter {
     private Gender gender;
     private Race race;
     private CharacterClass characterClass;
+    private Attribute primaryAbility;
     private final Set<Attribute> savingThrowProficiencies;
     private final Set<Skill> skillProficiencies;
+    private final Set<WeaponCategory> weaponProficiencies;
+    private final Set<ArmorProficiency> armorProficiencies;
     private int level;
 
     private Connection connection;
@@ -56,16 +60,21 @@ public final class GamePlayer extends GameCharacter {
     private int xp;
 
     public GamePlayer(UUID id, UUID accountId, String name, UUID currentRoomId, Gender gender, Race race,
-            CharacterClass characterClass, Set<Attribute> savingThrowProficiencies, Set<Skill> skillProficiencies,
-            int level, int currentHealth, int maxHealth, Map<Attribute, Integer> attributes, int xp, int gold) {
+            CharacterClass characterClass, Attribute primaryAbility, Set<Attribute> savingThrowProficiencies,
+            Set<Skill> skillProficiencies, Set<WeaponCategory> weaponProficiencies,
+            Set<ArmorProficiency> armorProficiencies, int level, int currentHealth, int maxHealth,
+            Map<Attribute, Integer> attributes, int xp, int gold) {
         super(id, name, attributes, currentHealth, maxHealth);
         this.accountId = accountId;
         this.currentRoomId = currentRoomId;
         this.gender = gender;
         this.race = race;
         this.characterClass = characterClass;
+        this.primaryAbility = primaryAbility;
         this.savingThrowProficiencies = Set.copyOf(savingThrowProficiencies);
         this.skillProficiencies = Set.copyOf(skillProficiencies);
+        this.weaponProficiencies = Set.copyOf(weaponProficiencies);
+        this.armorProficiencies = Set.copyOf(armorProficiencies);
         this.level = level;
         this.xp = xp;
         this.inventory = new PlayerInventory(gold);
@@ -111,12 +120,24 @@ public final class GamePlayer extends GameCharacter {
         this.characterClass = characterClass;
     }
 
+    public Attribute getPrimaryAbility() {
+        return primaryAbility;
+    }
+
     public Set<Attribute> getSavingThrowProficiencies() {
         return savingThrowProficiencies;
     }
 
     public Set<Skill> getSkillProficiencies() {
         return skillProficiencies;
+    }
+
+    public Set<WeaponCategory> getWeaponProficiencies() {
+        return weaponProficiencies;
+    }
+
+    public Set<ArmorProficiency> getArmorProficiencies() {
+        return armorProficiencies;
     }
 
     public int getLevel() {
@@ -147,6 +168,29 @@ public final class GamePlayer extends GameCharacter {
             case LIGHT -> baseAndBonus + dexMod;
             case MEDIUM -> baseAndBonus + Math.min(dexMod, 2);
             case HEAVY -> baseAndBonus;
+        };
+    }
+
+    /**
+     * Vrai si un item actuellement équipé exige une {@link ArmorProficiency} que ce
+     * personnage n'a pas — granularité "toute pièce non maîtrisée déclenche le
+     * désavantage", cohérente avec le fait que ce jeu modélise déjà l'armure en
+     * plusieurs emplacements indépendants plutôt qu'une seule "armure portée" comme
+     * en RAW strict. Consommé par {@code game.CheckService}/
+     * {@code game.CombatService} pour appliquer le désavantage SRD (jets de
+     * FOR/DEX, jets d'attaque) plutôt que de bloquer l'équipement lui-même —
+     * {@link #equipItem} ne fait aucune vérification de maîtrise.
+     */
+    public boolean isWearingNonProficientArmor() {
+        return inventory.getEquippedItems().stream().map(this::requiredArmorProficiency)
+                .anyMatch(required -> required.isPresent() && !armorProficiencies.contains(required.get()));
+    }
+
+    private Optional<ArmorProficiency> requiredArmorProficiency(Item item) {
+        return switch (item.getType()) {
+            case ARMOR, HELMET, PANTS, BOOTS, GLOVES -> Optional.of(ArmorProficiency.of(item.getArmorCategory()));
+            case SHIELD -> Optional.of(ArmorProficiency.SHIELDS);
+            default -> Optional.empty();
         };
     }
 

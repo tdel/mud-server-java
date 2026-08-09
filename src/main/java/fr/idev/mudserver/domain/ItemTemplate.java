@@ -13,12 +13,14 @@ public class ItemTemplate {
     private ArmorCategory armorCategory;
     private int baseAc;
     private String damageDice;
+    private WeaponCategory weaponCategory;
     private int price;
     private Rarity rarity;
     private int bonus;
 
     public ItemTemplate(UUID id, String name, String description, ItemType type, int weight,
-            ArmorCategory armorCategory, int baseAc, String damageDice, int price, Rarity rarity, int bonus) {
+            ArmorCategory armorCategory, int baseAc, String damageDice, WeaponCategory weaponCategory, int price,
+            Rarity rarity, int bonus) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -27,6 +29,7 @@ public class ItemTemplate {
         this.armorCategory = armorCategory;
         this.baseAc = baseAc;
         this.damageDice = damageDice;
+        this.weaponCategory = weaponCategory;
         this.price = price;
         this.rarity = rarity;
         this.bonus = bonus;
@@ -96,6 +99,14 @@ public class ItemTemplate {
         this.damageDice = damageDice;
     }
 
+    public WeaponCategory getWeaponCategory() {
+        return weaponCategory;
+    }
+
+    public void setWeaponCategory(WeaponCategory weaponCategory) {
+        this.weaponCategory = weaponCategory;
+    }
+
     public int getPrice() {
         return price;
     }
@@ -132,19 +143,20 @@ public class ItemTemplate {
                 && Objects.equals(id, other.id) && Objects.equals(name, other.name)
                 && Objects.equals(description, other.description) && type == other.type
                 && armorCategory == other.armorCategory && Objects.equals(damageDice, other.damageDice)
-                && rarity == other.rarity;
+                && weaponCategory == other.weaponCategory && rarity == other.rarity;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, type, weight, armorCategory, baseAc, damageDice, price, rarity,
-                bonus);
+        return Objects.hash(id, name, description, type, weight, armorCategory, baseAc, damageDice, weaponCategory,
+                price, rarity, bonus);
     }
 
     @Override
     public String toString() {
         return "ItemTemplate[id=" + id + ", name=" + name + ", description=" + description + ", type=" + type
                 + ", weight=" + weight + ", armorCategory=" + armorCategory + ", baseAc=" + baseAc + ", damageDice="
-                + damageDice + ", price=" + price + ", rarity=" + rarity + ", bonus=" + bonus + "]";
+                + damageDice + ", weaponCategory=" + weaponCategory + ", price=" + price + ", rarity=" + rarity
+                + ", bonus=" + bonus + "]";
     }
 }

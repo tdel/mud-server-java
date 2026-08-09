@@ -134,9 +134,13 @@ class GamePlayerDeathTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "death-test-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), account.getLogin(), room.getId(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER), 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0, 0);
+                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER,
+                TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
+                TestProficiencies.savingThrows(CharacterClass.FIGHTER),
+                TestProficiencies.skills(CharacterClass.FIGHTER),
+                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
+                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, 10, 10,
+                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
         room.join(character);
         return character;

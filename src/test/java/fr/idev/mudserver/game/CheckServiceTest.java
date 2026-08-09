@@ -12,6 +12,12 @@ import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.Skill;
 import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.domain.actor.TestProficiencies;
+import fr.idev.mudserver.domain.ArmorCategory;
+import fr.idev.mudserver.domain.EquipmentSlot;
+import fr.idev.mudserver.domain.Item;
+import fr.idev.mudserver.domain.ItemTemplate;
+import fr.idev.mudserver.domain.ItemType;
+import fr.idev.mudserver.domain.Rarity;
 import fr.idev.mudserver.game.dice.DiceRoller;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -101,10 +107,69 @@ class CheckServiceTest {
         assertThat(checkService.check(fighter, Skill.ATHLETICS, 9999).success()).isFalse();
     }
 
+    @Test
+    void checkAppliesDisadvantageOnADexterityBasedSkillWhenWearingNonProficientArmor() {
+        // WIZARD n'a aucune maîtrise d'armure ; DEX 10 => mod 0, pas de maîtrise sur
+        // STEALTH non plus.
+        GamePlayer wizard = player(CharacterClass.WIZARD, 10, 1);
+        equipArmor(wizard, ArmorCategory.LIGHT);
+
+        // Désavantage (2d20 garde le plus bas, moyenne ≈ 6.86) : nettement sous la
+        // moyenne sans désavantage (10.5).
+        double average = averageCheckTotal(wizard, Skill.STEALTH, 2000);
+        assertThat(average).isBetween(5.8, 7.9);
+    }
+
+    @Test
+    void checkDoesNotApplyDisadvantageOnAWisdomBasedSkillRegardlessOfArmor() {
+        // PERCEPTION est gouvernée par la SAGESSE, pas la DEX/FOR : le désavantage
+        // d'armure ne doit pas s'appliquer.
+        GamePlayer wizard = player(CharacterClass.WIZARD, 10, 1);
+        equipArmor(wizard, ArmorCategory.LIGHT);
+
+        double average = averageCheckTotal(wizard, Skill.PERCEPTION, 2000);
+        assertThat(average).isBetween(9.5, 11.5);
+    }
+
+    @Test
+    void saveAppliesDisadvantageOnADexteritySavingThrowWhenWearingNonProficientArmor() {
+        GamePlayer wizard = player(CharacterClass.WIZARD, 10, 1);
+        equipArmor(wizard, ArmorCategory.LIGHT);
+
+        double average = averageSaveTotal(wizard, Attribute.DEXTERITY, 2000);
+        assertThat(average).isBetween(5.8, 7.9);
+    }
+
+    private double averageCheckTotal(GamePlayer character, Skill skill, int iterations) {
+        long total = 0;
+        for (int i = 0; i < iterations; i++) {
+            total += checkService.check(character, skill, 0).total();
+        }
+        return (double) total / iterations;
+    }
+
+    private double averageSaveTotal(GamePlayer character, Attribute attribute, int iterations) {
+        long total = 0;
+        for (int i = 0; i < iterations; i++) {
+            total += checkService.save(character, attribute, 0).total();
+        }
+        return (double) total / iterations;
+    }
+
+    private void equipArmor(GamePlayer character, ArmorCategory armorCategory) {
+        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Armure", null, ItemType.ARMOR, 5, armorCategory,
+                11, null, null, 0, Rarity.COMMON, 0);
+        Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.CHEST);
+        item.attachTemplate(template);
+        character.getInventory().addItem(item);
+    }
+
     private GamePlayer player(CharacterClass characterClass, int strength, int level) {
         return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Testeur", UUID.randomUUID(), Gender.MAN,
-                Race.HUMAN, characterClass, TestProficiencies.savingThrows(characterClass),
-                TestProficiencies.skills(characterClass), level, 10, 10,
+                Race.HUMAN, characterClass, TestProficiencies.primaryAbility(characterClass),
+                TestProficiencies.savingThrows(characterClass), TestProficiencies.skills(characterClass),
+                TestProficiencies.weaponProficiencies(characterClass),
+                TestProficiencies.armorProficiencies(characterClass), level, 10, 10,
                 TestAttributes.of(strength, 10, 10, 10, 10, 10), 0, 0);
     }
 }

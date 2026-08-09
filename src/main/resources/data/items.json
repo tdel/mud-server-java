@@ -54,7 +54,20 @@
         "weight": 1,
         "baseAc": 0,
         "damageDice": "1d6",
+        "weaponCategory": "MARTIAL",
         "price": 10,
+        "rarity": "COMMON",
+        "bonus": 0
+    },
+    {
+        "id": "ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd",
+        "name": "Dague",
+        "type": "WEAPON",
+        "weight": 1,
+        "baseAc": 0,
+        "damageDice": "1d4",
+        "weaponCategory": "SIMPLE",
+        "price": 2,
         "rarity": "COMMON",
         "bonus": 0
     },
@@ -118,6 +131,7 @@
         "weight": 3,
         "baseAc": 0,
         "damageDice": "1d8",
+        "weaponCategory": "MARTIAL",
         "price": 500,
         "rarity": "UNCOMMON",
         "bonus": 1
@@ -139,6 +153,7 @@
         "weight": 3,
         "baseAc": 0,
         "damageDice": "1d8",
+        "weaponCategory": "MARTIAL",
         "price": 4000,
         "rarity": "RARE",
         "bonus": 2

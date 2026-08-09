@@ -85,6 +85,41 @@ class GamePlayerTest {
         assertThat(character.getArmorClass()).isEqualTo(23);
     }
 
+    @Test
+    void isWearingNonProficientArmorIsFalseWithNothingEquipped() {
+        GamePlayer character = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.WIZARD);
+
+        assertThat(character.isWearingNonProficientArmor()).isFalse();
+    }
+
+    @Test
+    void isWearingNonProficientArmorIsFalseWhenTheArmorCategoryIsProficient() {
+        // FIGHTER maîtrise l'armure lourde.
+        GamePlayer character = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.FIGHTER);
+        equip(character, armor("Plates", ArmorCategory.HEAVY, 18));
+
+        assertThat(character.isWearingNonProficientArmor()).isFalse();
+    }
+
+    @Test
+    void isWearingNonProficientArmorIsTrueWhenTheArmorCategoryIsNotProficient() {
+        // WIZARD ne maîtrise aucune armure.
+        GamePlayer character = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.WIZARD);
+        equip(character, armor("Cuir", ArmorCategory.LIGHT, 11));
+
+        assertThat(character.isWearingNonProficientArmor()).isTrue();
+    }
+
+    @Test
+    void isWearingNonProficientArmorIsTrueForANonProficientShield() {
+        // Un bouclier n'a pas d'ArmorCategory (voir data/items.json) : sa maîtrise se
+        // dérive du type d'item, jamais de la catégorie d'armure.
+        GamePlayer character = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.WIZARD);
+        equip(character, shield(0));
+
+        assertThat(character.isWearingNonProficientArmor()).isTrue();
+    }
+
     // N'appelle pas GamePlayer#equipItem : celui-ci publie un événement de domaine
     // via DomainEventPublisher, qui suppose un contexte Spring initialisé
     // (voir sa Javadoc) — absent de ce test unitaire pur. On construit donc
@@ -99,7 +134,7 @@ class GamePlayerTest {
 
     private Item armor(String name, ArmorCategory category, int baseAc, int bonus) {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), name, null, ItemType.ARMOR, 5, category, baseAc,
-                null, 0, Rarity.COMMON, bonus);
+                null, null, 0, Rarity.COMMON, bonus);
         Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.CHEST);
         item.attachTemplate(template);
         return item;
@@ -107,7 +142,7 @@ class GamePlayerTest {
 
     private Item shield(int bonus) {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Bouclier", null, ItemType.SHIELD, 3, null, 2, null,
-                0, Rarity.COMMON, bonus);
+                null, 0, Rarity.COMMON, bonus);
         Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.OFF_HAND);
         item.attachTemplate(template);
         return item;
@@ -115,9 +150,17 @@ class GamePlayerTest {
 
     private GamePlayer character(int strength, int dexterity, int constitution, int intelligence, int wisdom,
             int charisma, int level) {
+        return character(strength, dexterity, constitution, intelligence, wisdom, charisma, level,
+                CharacterClass.FIGHTER);
+    }
+
+    private GamePlayer character(int strength, int dexterity, int constitution, int intelligence, int wisdom,
+            int charisma, int level, CharacterClass characterClass) {
         return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Test", UUID.randomUUID(), Gender.MAN, Race.HUMAN,
-                CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER), level, 10, 10,
+                characterClass, TestProficiencies.primaryAbility(characterClass),
+                TestProficiencies.savingThrows(characterClass), TestProficiencies.skills(characterClass),
+                TestProficiencies.weaponProficiencies(characterClass),
+                TestProficiencies.armorProficiencies(characterClass), level, 10, 10,
                 TestAttributes.of(strength, dexterity, constitution, intelligence, wisdom, charisma), 0, 0);
     }
 }

@@ -261,9 +261,12 @@ class GameMonsterTest extends AbstractIntegrationTest {
 
     private GamePlayer player(String name) {
         return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), name, UUID.randomUUID(), Gender.MAN, Race.HUMAN,
-                CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER), 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0, 0);
+                CharacterClass.FIGHTER, TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
+                TestProficiencies.savingThrows(CharacterClass.FIGHTER),
+                TestProficiencies.skills(CharacterClass.FIGHTER),
+                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
+                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, 10, 10,
+                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
     }
 
     /**

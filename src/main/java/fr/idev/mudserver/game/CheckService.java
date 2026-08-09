@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Skill;
-import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 
@@ -41,9 +40,11 @@ public class CheckService {
 
     private CheckResult roll(GamePlayer character, Attribute attribute, boolean proficient, int dc, String label) {
         int modifier = character.getModifier(attribute) + (proficient ? character.getProficiencyBonus() : 0);
-        DiceRoll diceRoll = diceRoller.roll(new DiceExpression(1, 20, modifier));
+        boolean disadvantage = (attribute == Attribute.STRENGTH || attribute == Attribute.DEXTERITY)
+                && character.isWearingNonProficientArmor();
+        DiceRoll diceRoll = diceRoller.rollD20(modifier, disadvantage);
         boolean success = resolveCheck(diceRoll.total(), dc);
-        return new CheckResult(label, diceRoll.total(), dc, proficient, success);
+        return new CheckResult(label, diceRoll.total(), dc, proficient, disadvantage, success);
     }
 
     static boolean resolveCheck(int total, int dc) {

@@ -15,7 +15,7 @@ public record GamePlayerStats(GamePlayer character) implements OutputTelnetMessa
     public void toTelnet(TelnetOutput output) {
         GamePlayer c = character;
         output.write(String.format(
-                "== %s (%s, Level %d %s) ==\nHealth: %d/%d\nArmor Class: %d\nProficiency: %+d\nStrength: %d (%+d)  Dexterity: %d (%+d)  Constitution: %d (%+d)\nIntelligence: %d (%+d)  Wisdom: %d (%+d)  Charisma: %d (%+d)\nSaving Throws: %s\nSkills: %s\n",
+                "== %s (%s, Level %d %s) ==\nHealth: %d/%d\nArmor Class: %d\nProficiency: %+d\nStrength: %d (%+d)  Dexterity: %d (%+d)  Constitution: %d (%+d)\nIntelligence: %d (%+d)  Wisdom: %d (%+d)  Charisma: %d (%+d)\nPrimary Ability: %s\nSaving Throws: %s\nSkills: %s\n",
                 Ansi.player(c.getName()), c.getGender().label(), c.getLevel(), c.getCharacterClass().label(),
                 c.getCurrentHealth(), c.getMaxHealth(), c.getArmorClass(), c.getProficiencyBonus(),
                 c.getAttribute(Attribute.STRENGTH), c.getModifier(Attribute.STRENGTH),
@@ -23,7 +23,7 @@ public record GamePlayerStats(GamePlayer character) implements OutputTelnetMessa
                 c.getAttribute(Attribute.CONSTITUTION), c.getModifier(Attribute.CONSTITUTION),
                 c.getAttribute(Attribute.INTELLIGENCE), c.getModifier(Attribute.INTELLIGENCE),
                 c.getAttribute(Attribute.WISDOM), c.getModifier(Attribute.WISDOM), c.getAttribute(Attribute.CHARISMA),
-                c.getModifier(Attribute.CHARISMA),
+                c.getModifier(Attribute.CHARISMA), c.getPrimaryAbility().label(),
                 c.getSavingThrowProficiencies().stream().sorted().map(Attribute::label)
                         .collect(Collectors.joining(", ")),
                 c.getSkillProficiencies().stream().sorted().map(Skill::label).collect(Collectors.joining(", "))));

@@ -86,9 +86,13 @@ class CharacterCreateTest extends AbstractIntegrationTest {
         RecordingConnection connection = enterAuthed("p2");
         Account account = authWorld.account(connection);
         GamePlayer existing = new GamePlayer(UUID.randomUUID(), account.getId(), "Existing", UUID.randomUUID(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER), 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0, 0);
+                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER,
+                TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
+                TestProficiencies.savingThrows(CharacterClass.FIGHTER),
+                TestProficiencies.skills(CharacterClass.FIGHTER),
+                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
+                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, 10, 10,
+                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(existing);
 
         characterCreate.onReceive(connection, "Existing");

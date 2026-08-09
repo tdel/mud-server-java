@@ -24,6 +24,7 @@ import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.ItemType;
 import fr.idev.mudserver.domain.Rarity;
 import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.WeaponCategory;
 import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDroppedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEquippedItem;
@@ -93,12 +94,12 @@ public class ItemService {
         if (definition.consumableEffect() != null) {
             return new ConsumableItem(definition.id(), definition.name(), definition.description(), definition.type(),
                     definition.weight(), definition.armorCategory(), definition.baseAc(), definition.damageDice(),
-                    definition.price(), definition.rarity(), definition.bonus(), definition.consumableEffect(),
-                    definition.effectDice(), diceRoller);
+                    definition.weaponCategory(), definition.price(), definition.rarity(), definition.bonus(),
+                    definition.consumableEffect(), definition.effectDice(), diceRoller);
         }
         return new ItemTemplate(definition.id(), definition.name(), definition.description(), definition.type(),
                 definition.weight(), definition.armorCategory(), definition.baseAc(), definition.damageDice(),
-                definition.price(), definition.rarity(), definition.bonus());
+                definition.weaponCategory(), definition.price(), definition.rarity(), definition.bonus());
     }
 
     void registerTemplate(ItemTemplate template) {
@@ -255,7 +256,7 @@ public class ItemService {
     }
 
     private record ItemTemplateDefinition(UUID id, String name, String description, ItemType type, int weight,
-            ArmorCategory armorCategory, int baseAc, String damageDice, int price, Rarity rarity, int bonus,
-            ConsumableEffect consumableEffect, String effectDice) {
+            ArmorCategory armorCategory, int baseAc, String damageDice, WeaponCategory weaponCategory, int price,
+            Rarity rarity, int bonus, ConsumableEffect consumableEffect, String effectDice) {
     }
 }

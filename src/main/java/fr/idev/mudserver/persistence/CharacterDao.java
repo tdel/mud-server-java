@@ -96,9 +96,10 @@ public class CharacterDao {
 
         GamePlayer character = new GamePlayer(record.getId(), record.getAccountId(), record.getName(),
                 record.getCurrentRoomId(), Gender.valueOf(record.getGender()), race, characterClass,
-                classService.savingThrowProficiencies(characterClass), classService.skillProficiencies(characterClass),
-                record.getLevel(), record.getCurrentHealth(), record.getMaxHealth(), attributes, record.getXp(),
-                record.getGold());
+                classService.primaryAbility(characterClass), classService.savingThrowProficiencies(characterClass),
+                classService.skillProficiencies(characterClass), classService.weaponProficiencies(characterClass),
+                classService.armorProficiencies(characterClass), record.getLevel(), record.getCurrentHealth(),
+                record.getMaxHealth(), attributes, record.getXp(), record.getGold());
         character.setSpeed(raceService.speed(race));
         return character;
     }

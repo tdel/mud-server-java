@@ -9,9 +9,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
 
+import fr.idev.mudserver.domain.actor.ArmorProficiency;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Skill;
+import fr.idev.mudserver.domain.WeaponCategory;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -63,6 +65,18 @@ public class ClassService {
         return Set.copyOf(definition(characterClass).skills());
     }
 
+    public Attribute primaryAbility(CharacterClass characterClass) {
+        return definition(characterClass).primaryAbility();
+    }
+
+    public Set<WeaponCategory> weaponProficiencies(CharacterClass characterClass) {
+        return Set.copyOf(definition(characterClass).weaponProficiencies());
+    }
+
+    public Set<ArmorProficiency> armorProficiencies(CharacterClass characterClass) {
+        return Set.copyOf(definition(characterClass).armorProficiencies());
+    }
+
     private ClassDefinition definition(CharacterClass characterClass) {
         ClassDefinition definition = definitionsByClass.get(characterClass);
         if (definition == null) {
@@ -76,6 +90,7 @@ public class ClassService {
     }
 
     private record ClassDefinition(CharacterClass name, int hitDie, String startingGoldDice, int startingGoldMultiplier,
-            List<Attribute> savingThrows, List<Skill> skills) {
+            List<Attribute> savingThrows, List<Skill> skills, Attribute primaryAbility,
+            List<WeaponCategory> weaponProficiencies, List<ArmorProficiency> armorProficiencies) {
     }
 }

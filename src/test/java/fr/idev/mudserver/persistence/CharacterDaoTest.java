@@ -49,8 +49,11 @@ class CharacterDaoTest extends AbstractIntegrationTest {
 
     private GamePlayer newBarbarian(UUID roomId) {
         return new GamePlayer(UUID.randomUUID(), account.getId(), "Carol le Demi-Orque", roomId, Gender.WOMAN,
-                Race.HALF_ORC, CharacterClass.BARBARIAN, TestProficiencies.savingThrows(CharacterClass.BARBARIAN),
-                TestProficiencies.skills(CharacterClass.BARBARIAN), 1, 14, 14,
+                Race.HALF_ORC, CharacterClass.BARBARIAN, TestProficiencies.primaryAbility(CharacterClass.BARBARIAN),
+                TestProficiencies.savingThrows(CharacterClass.BARBARIAN),
+                TestProficiencies.skills(CharacterClass.BARBARIAN),
+                TestProficiencies.weaponProficiencies(CharacterClass.BARBARIAN),
+                TestProficiencies.armorProficiencies(CharacterClass.BARBARIAN), 1, 14, 14,
                 TestAttributes.of(14, 11, 12, 10, 11, 10), 0, 0);
     }
 

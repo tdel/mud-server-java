@@ -198,8 +198,11 @@ class UseTest extends AbstractIntegrationTest {
         RecordingConnection connection = new RecordingConnection();
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Buveur-" + UUID.randomUUID(),
                 room.getId(), Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER,
+                TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
                 TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER), 1, currentHealth, maxHealth,
+                TestProficiencies.skills(CharacterClass.FIGHTER),
+                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
+                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, currentHealth, maxHealth,
                 TestAttributes.of(10, dexterity, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
         gameWorld.enterWorld(connection, character);

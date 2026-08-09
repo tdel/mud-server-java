@@ -136,11 +136,13 @@ public class CharacterCreate implements ControllerHandler {
 
     private void promptClass(Connection connection, Account account, String name, Gender gender, Race race) {
         Map<CharacterClass, Integer> hitDiceByClass = new LinkedHashMap<>();
+        Map<CharacterClass, Attribute> primaryAbilityByClass = new LinkedHashMap<>();
         for (CharacterClass characterClass : CharacterClass.values()) {
             hitDiceByClass.put(characterClass, classService.hitDie(characterClass));
+            primaryAbilityByClass.put(characterClass, classService.primaryAbility(characterClass));
         }
 
-        connection.requestBlocking(new ChooseClass(hitDiceByClass), line -> {
+        connection.requestBlocking(new ChooseClass(hitDiceByClass, primaryAbilityByClass), line -> {
             CharacterClass characterClass = parseClass(line);
 
             if (characterClass == null) {

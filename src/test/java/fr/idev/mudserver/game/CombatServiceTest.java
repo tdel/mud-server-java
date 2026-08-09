@@ -20,6 +20,7 @@ import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.domain.actor.TestProficiencies;
+import fr.idev.mudserver.domain.WeaponCategory;
 import fr.idev.mudserver.game.dice.DiceRoller;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -164,6 +165,55 @@ class CombatServiceTest {
         }
     }
 
+    @Test
+    void attackBonusIncludesProficiencyWhenTheWeaponsCategoryMatchesTheClass() {
+        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        GamePlayer attacker = player(10, 10, 1, CharacterClass.FIGHTER); // FIGHTER maîtrise MARTIAL
+        equipWeapon(attacker, "1d6", 0, WeaponCategory.MARTIAL);
+        attacker.setCurrentRoom(room);
+        GameMonster monster = monster(room, 100, 9999); // CA impossible : jamais touché, seul le jet compte
+
+        // FOR mod 0 + bonus de maîtrise niveau 1 (+2) : moyenne 1d20 (10.5) + 2 = 12.5.
+        double average = averageAttackRoll(attacker, monster, 2000);
+        assertThat(average).isBetween(11.5, 13.5);
+    }
+
+    @Test
+    void attackBonusExcludesProficiencyWhenTheWeaponsCategoryDoesNotMatchTheClass() {
+        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        GamePlayer attacker = player(10, 10, 1, CharacterClass.WIZARD); // WIZARD ne maîtrise que SIMPLE
+        equipWeapon(attacker, "1d6", 0, WeaponCategory.MARTIAL);
+        attacker.setCurrentRoom(room);
+        GameMonster monster = monster(room, 100, 9999);
+
+        // FOR mod 0, pas de bonus de maîtrise : moyenne 1d20 (10.5) seule.
+        double average = averageAttackRoll(attacker, monster, 2000);
+        assertThat(average).isBetween(9.5, 11.5);
+    }
+
+    @Test
+    void attackRollUsesDisadvantageWhenWearingNonProficientArmor() {
+        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        GamePlayer attacker = player(10, 10, 1, CharacterClass.WIZARD); // aucune maîtrise d'armure
+        equipArmor(attacker, 10);
+        attacker.setCurrentRoom(room);
+        GameMonster monster = monster(room, 100, 9999);
+
+        // À mains nues (toujours "maîtrisé") : FOR mod 0 + bonus de maîtrise (+2), mais
+        // désavantage sur le jet de 1d20 (2d20 garde le plus bas, moyenne ≈ 6.86) :
+        // moyenne totale ≈ 8.86, nettement sous la moyenne sans désavantage (12.5).
+        double average = averageAttackRoll(attacker, monster, 2000);
+        assertThat(average).isBetween(7.5, 10.2);
+    }
+
+    private double averageAttackRoll(GamePlayer attacker, GameMonster monster, int iterations) {
+        long total = 0;
+        for (int i = 0; i < iterations; i++) {
+            total += combatService.tryAttack(attacker, monster).attackRoll();
+        }
+        return (double) total / iterations;
+    }
+
     /**
      * Exclut délibérément les critiques (double les dés de dégâts) : les tests
      * appelants vérifient une plage de dégâts précise pour un coup normal, qu'un
@@ -194,8 +244,12 @@ class CombatServiceTest {
     }
 
     private void equipWeapon(GamePlayer character, String damageDice, int bonus) {
+        equipWeapon(character, damageDice, bonus, WeaponCategory.MARTIAL);
+    }
+
+    private void equipWeapon(GamePlayer character, String damageDice, int bonus, WeaponCategory category) {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3, null, 0,
-                damageDice, 0, Rarity.COMMON, bonus);
+                damageDice, category, 0, Rarity.COMMON, bonus);
         Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.WEAPON);
         item.attachTemplate(template);
         character.getInventory().addItem(item);
@@ -203,7 +257,7 @@ class CombatServiceTest {
 
     private void equipArmor(GamePlayer character, int baseAc) {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Armure", null, ItemType.ARMOR, 10,
-                ArmorCategory.HEAVY, baseAc, null, 0, Rarity.COMMON, 0);
+                ArmorCategory.HEAVY, baseAc, null, null, 0, Rarity.COMMON, 0);
         Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.CHEST);
         item.attachTemplate(template);
         character.getInventory().addItem(item);
@@ -214,9 +268,15 @@ class CombatServiceTest {
     }
 
     private GamePlayer player(int strength, int dexterity, int level) {
+        return player(strength, dexterity, level, CharacterClass.FIGHTER);
+    }
+
+    private GamePlayer player(int strength, int dexterity, int level, CharacterClass characterClass) {
         return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Attaquant", UUID.randomUUID(), Gender.MAN,
-                Race.HUMAN, CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER), level, 10, 10,
+                Race.HUMAN, characterClass, TestProficiencies.primaryAbility(characterClass),
+                TestProficiencies.savingThrows(characterClass), TestProficiencies.skills(characterClass),
+                TestProficiencies.weaponProficiencies(characterClass),
+                TestProficiencies.armorProficiencies(characterClass), level, 10, 10,
                 TestAttributes.of(strength, dexterity, 10, 10, 10, 10), 0, 0);
     }
 

@@ -32,9 +32,10 @@ public class ConsumableItem extends ItemTemplate {
     private final DiceRoller diceRoller;
 
     public ConsumableItem(UUID id, String name, String description, ItemType type, int weight,
-            ArmorCategory armorCategory, int baseAc, String damageDice, int price, Rarity rarity, int bonus,
-            ConsumableEffect effect, String effectDice, DiceRoller diceRoller) {
-        super(id, name, description, type, weight, armorCategory, baseAc, damageDice, price, rarity, bonus);
+            ArmorCategory armorCategory, int baseAc, String damageDice, WeaponCategory weaponCategory, int price,
+            Rarity rarity, int bonus, ConsumableEffect effect, String effectDice, DiceRoller diceRoller) {
+        super(id, name, description, type, weight, armorCategory, baseAc, damageDice, weaponCategory, price, rarity,
+                bonus);
         this.effect = effect;
         this.effectDice = effectDice;
         this.diceRoller = diceRoller;

@@ -88,6 +88,10 @@ public class Item {
         return requireTemplate().getDamageDice();
     }
 
+    public WeaponCategory getWeaponCategory() {
+        return requireTemplate().getWeaponCategory();
+    }
+
     public Rarity getRarity() {
         return requireTemplate().getRarity();
     }

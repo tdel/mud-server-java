@@ -56,15 +56,18 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void equippingANewWeaponUnequipsThePreviousOneInTheSameTransaction() {
         ItemTemplate weaponTemplate = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3, null, 0,
-                null, 0, Rarity.COMMON, 0);
+                null, null, 0, Rarity.COMMON, 0);
 
         Account account = new Account(UUID.randomUUID(), "erin", "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Erin", UUID.randomUUID(),
                 Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER,
+                TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
                 TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER), 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0, 0);
+                TestProficiencies.skills(CharacterClass.FIGHTER),
+                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
+                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, 10, 10,
+                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
 
         Item firstSword = new Item(UUID.randomUUID(), weaponTemplate.getId(), null, character.getId(), null);
@@ -87,16 +90,19 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void loadInventoryStillReturnsAnEquippedItemOnAFreshLoad() {
         ItemTemplate weaponTemplate = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3, null, 0,
-                null, 0, Rarity.COMMON, 0);
+                null, null, 0, Rarity.COMMON, 0);
         itemService.registerTemplate(weaponTemplate);
 
         Account account = new Account(UUID.randomUUID(), "gwen", "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Gwen", UUID.randomUUID(),
                 Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER,
+                TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
                 TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER), 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0, 0);
+                TestProficiencies.skills(CharacterClass.FIGHTER),
+                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
+                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, 10, 10,
+                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
 
         Item sword = new Item(UUID.randomUUID(), weaponTemplate.getId(), null, character.getId(), null);
@@ -117,16 +123,19 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void loadInventoryAttachesTemplatesAndFeedsTheCharacterCache() {
         ItemTemplate potionTemplate = new ItemTemplate(UUID.randomUUID(), "Potion de soin", null, ItemType.POTION, 1,
-                null, 0, null, 0, Rarity.COMMON, 0);
+                null, 0, null, null, 0, Rarity.COMMON, 0);
         itemService.registerTemplate(potionTemplate);
 
         Account account = new Account(UUID.randomUUID(), "fay", "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Fay", UUID.randomUUID(),
                 Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER,
+                TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
                 TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER), 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0, 0);
+                TestProficiencies.skills(CharacterClass.FIGHTER),
+                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
+                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, 10, 10,
+                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
 
         Item potion = new Item(UUID.randomUUID(), potionTemplate.getId(), null, character.getId(), null);
@@ -140,8 +149,8 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
     @Test
     void addAndRemoveItemFromInventoryKeepTheCharacterAndRoomCachesInSync() {
-        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Torche", null, ItemType.MISC, 1, null, 0, null, 0,
-                Rarity.COMMON, 0);
+        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Torche", null, ItemType.MISC, 1, null, 0, null,
+                null, 0, Rarity.COMMON, 0);
         itemService.registerTemplate(template);
 
         roomService.warmRooms();
@@ -149,9 +158,12 @@ class ItemServiceTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "gus", "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Gus", warmedRoom.getId(), Gender.MAN,
-                Race.HUMAN, CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER), 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0, 0);
+                Race.HUMAN, CharacterClass.FIGHTER, TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
+                TestProficiencies.savingThrows(CharacterClass.FIGHTER),
+                TestProficiencies.skills(CharacterClass.FIGHTER),
+                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
+                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, 10, 10,
+                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
         warmedRoom.join(character);
 
@@ -172,7 +184,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void warmRoomItemsAttachesTemplatesToItemsOnTheGround() {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Bouclier", null, ItemType.ARMOR, 4, null, 0, null,
-                0, Rarity.COMMON, 0);
+                null, 0, Rarity.COMMON, 0);
         itemService.registerTemplate(template);
 
         roomService.warmRooms();
@@ -189,16 +201,19 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void buyItemSpendsGoldAndPersistsTheNewItem() {
         ItemTemplate potionTemplate = new ItemTemplate(UUID.randomUUID(), "Potion de soin", null, ItemType.POTION, 1,
-                null, 0, null, 50, Rarity.COMMON, 0);
+                null, 0, null, null, 50, Rarity.COMMON, 0);
         itemService.registerTemplate(potionTemplate);
 
         Account account = new Account(UUID.randomUUID(), "mika", "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Mika", UUID.randomUUID(),
                 Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER,
+                TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
                 TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER), 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0, 100);
+                TestProficiencies.skills(CharacterClass.FIGHTER),
+                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
+                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, 10, 10,
+                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 100);
         characterDao.insert(character);
 
         Item item = new Item(UUID.randomUUID(), potionTemplate.getId(), null, character.getId(), null);
@@ -214,16 +229,19 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void buyItemFailsAndChangesNothingWhenGoldIsInsufficient() {
         ItemTemplate potionTemplate = new ItemTemplate(UUID.randomUUID(), "Potion de soin", null, ItemType.POTION, 1,
-                null, 0, null, 50, Rarity.COMMON, 0);
+                null, 0, null, null, 50, Rarity.COMMON, 0);
         itemService.registerTemplate(potionTemplate);
 
         Account account = new Account(UUID.randomUUID(), "nao", "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Nao", UUID.randomUUID(),
                 Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER,
+                TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
                 TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER), 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0, 10);
+                TestProficiencies.skills(CharacterClass.FIGHTER),
+                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
+                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, 10, 10,
+                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 10);
         characterDao.insert(character);
 
         Item item = new Item(UUID.randomUUID(), potionTemplate.getId(), null, character.getId(), null);

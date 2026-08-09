@@ -109,8 +109,12 @@ class AttackTest extends AbstractIntegrationTest {
         Room startingRoom = roomService.startingRoom().orElseThrow();
         RecordingConnection connection = new RecordingConnection();
         GamePlayer character = new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Attaquant", startingRoom.getId(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER), 1, 1000, 1000,
+                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER,
+                TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
+                TestProficiencies.savingThrows(CharacterClass.FIGHTER),
+                TestProficiencies.skills(CharacterClass.FIGHTER),
+                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
+                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, 1000, 1000,
                 TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         gameWorld.enterWorld(connection, character);
         connection.received.clear();

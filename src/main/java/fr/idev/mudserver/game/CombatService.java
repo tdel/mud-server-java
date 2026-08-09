@@ -43,22 +43,26 @@ public class CombatService {
         Optional<Item> weapon = attacker.getInventory().getEquippedItems().stream()
                 .filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
         int weaponBonus = weapon.map(Item::getBonus).orElse(0);
+        boolean weaponProficient = weapon
+                .map(item -> attacker.getWeaponProficiencies().contains(item.getWeaponCategory())).orElse(true);
 
         int strengthModifier = attacker.getModifier(Attribute.STRENGTH);
-        int attackBonus = strengthModifier + attacker.getProficiencyBonus() + weaponBonus;
+        int attackBonus = strengthModifier + (weaponProficient ? attacker.getProficiencyBonus() : 0) + weaponBonus;
+        boolean disadvantage = attacker.isWearingNonProficientArmor();
 
-        DiceRoll attackRoll = diceRoller.roll(new DiceExpression(1, 20, attackBonus));
+        DiceRoll attackRoll = diceRoller.rollD20(attackBonus, disadvantage);
         int naturalRoll = attackRoll.rolls()[0];
         boolean criticalHit = naturalRoll == 20;
         int armorClass = target.getArmorClass();
         boolean hit = resolveHit(naturalRoll, attackRoll.total(), armorClass);
 
         if (!hit) {
-            return new CombatResult(target.getName(), false, false, attackRoll.total(), armorClass, 0);
+            return new CombatResult(target.getName(), false, false, attackRoll.total(), armorClass, 0, disadvantage);
         }
 
         int damage = rollDamage(weapon, strengthModifier, criticalHit);
-        return new CombatResult(target.getName(), true, criticalHit, attackRoll.total(), armorClass, damage);
+        return new CombatResult(target.getName(), true, criticalHit, attackRoll.total(), armorClass, damage,
+                disadvantage);
     }
 
     /**
@@ -78,11 +82,11 @@ public class CombatService {
         boolean hit = resolveHit(naturalRoll, attackRoll.total(), armorClass);
 
         if (!hit) {
-            return new CombatResult(target.getName(), false, false, attackRoll.total(), armorClass, 0);
+            return new CombatResult(target.getName(), false, false, attackRoll.total(), armorClass, 0, false);
         }
 
         int damage = rollMonsterDamage(attacker, strengthModifier, criticalHit);
-        return new CombatResult(target.getName(), true, criticalHit, attackRoll.total(), armorClass, damage);
+        return new CombatResult(target.getName(), true, criticalHit, attackRoll.total(), armorClass, damage, false);
     }
 
     /**
