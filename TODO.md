@@ -12,12 +12,16 @@ Le projet est un MUD Java/Spring Boot qui vise à reprendre les règles DnD5e. C
 - **Bonus de maîtrise** : `GamePlayer.getProficiencyBonus()` (`2 + (niveau-1)/4`), appliqué aux jets d'attaque, aux jets de compétence/sauvegarde et affiché dans `stats`. Les monstres utilisent un bonus fixe (+2), n'ayant pas de progression de niveau/CR.
 - **Compétences et jets de sauvegarde** : `game/CheckService.java` résout un jet de compétence (`check <skill> <dc>`) ou de sauvegarde (`save <attribute> <dc>`) — 1d20 + modificateur de la caractéristique gouvernante + bonus de maîtrise si la classe est proficient (`ClassService.skillProficiencies`/`savingThrowProficiencies`), comparé à une DC fournie par le joueur. Pas de règle de critique sur 1/20 naturel (propre aux jets d'attaque en DnD5e RAW). Affiché aussi dans `stats`/`examine` (sections « Saving Throws »/« Skills »).
 - **Niveau / XP** : `GamePlayer.level`/`xp`, gain via `gainXp` (événement `CharacterGainedXp`) crédité au tueur d'un monstre (`MonsterTemplate.xpReward`). Seuils par niveau dans `game/actor/LevelService.java` + `data/levels.json`. Montée de niveau (`CharacterService.onCharacterGainedXp`) : PV gagnés = `hitDie/2 + 1 + mod CON`, plusieurs niveaux possibles en un seul kill, diffusion `PlayerLeveledUp`.
-- **Or** : `PlayerInventory.gold`, tiré à la création selon la classe (`GameWorld.createCharacter`), persisté (`V3__add_gold.sql`), affiché uniquement via `inventory` (volontairement absent de `stats`/`examine`). Immuable après création — aucune boutique ni butin ne le fait varier.
+- **Or** : `PlayerInventory.gold`, tiré à la création selon la classe (`GameWorld.createCharacter`), persisté (`V3__add_gold.sql`), affiché uniquement via `inventory` (volontairement absent de `stats`/`examine`). Varie déjà en jeu par deux voies — voir « Or (complément) » plus bas.
 - **Points de vie réels** : PV max au niveau 1 = `hitDie` + mod CON (plus figés à 100/100). `currentHealth` est modifié par les dégâts de combat, la mort/respawn et la montée de niveau.
 - **Monde** : `Room`/`RoomExit` en cache mémoire chaud, navigation (`go`), description (`look`), broadcast d'arrivée/départ.
 - **Objets** : `ItemTemplate`/`Item`, 10 types, 6 slots d'équipement, take/drop/equip/unequip avec gestion de concurrence (`synchronized(item)`, événements de domaine + projection DB). Armures : catégorie (léger/moyen/lourd) + CA de base ; armes : dé de dégâts (`damageDice`).
-- **Combat** : verbe `attack` (`controller/ingame/Attack.java`, réutilise une cible déjà `select`-ée ou en prend une nouvelle), `game/CombatService.java` (jet d'attaque 1d20+STR+maîtrise vs CA, échec critique sur 1 / réussite critique sur 20, dégâts d'arme ou à mains nues, jet d'initiative 1d20+DEX), `game/CombatEngine.java` (orchestration : fusion des combattants dans un même affrontement, verrou de tour, cascade des tours monstres consécutifs). Classe d'Armure réelle : `10 + mod DEX`, cappée selon la catégorie d'armure équipée, + bonus de bouclier (main secondaire). Ordre d'initiative DnD5e correct avec insertion de retardataires (`domain/actor/CombatEncounter.java`). Mort/respawn : le joueur réapparaît à PV pleins dans la salle de départ ; un monstre tué est retiré définitivement de sa salle et crédite l'XP au tueur.
-- **Monstres** : `GameMonster` (sous-type scellé de `GameCharacter`, distinct du joueur), gabarits + spawns fixes chargés au démarrage (`game/actor/MonsterService.java` + `data/monsters.json`, 7 gabarits). Ripostent avec leur propre initiative une fois attaqués, mais n'ont aucune IA/agressivité propre (n'initient jamais un combat, ne se déplacent pas).
+- **Rareté et objets magiques** : enum `Rarity` DnD5e (COMMON→ARTIFACT) sur `ItemTemplate`, colorée en ANSI dans tous les messages telnet affichant un item (prise, dépôt, équipement, inventaire, description de room, butin, boutique PNJ). Bonus magique `+1`/`+2`/`+3` (champ `bonus`) appliqué au jet d'attaque et aux dégâts de l'arme équipée (`CombatService`) ainsi qu'à la CA de l'armure/du bouclier équipé (`GamePlayer.getArmorClass`) — pas de règle d'attunement (limite du nombre d'objets magiques utilisables simultanément), absente comme le reste des états/conditions.
+- **Consommables** : commande `use <item>`, `ConsumableItem`/`ConsumableEffect` (comportement porté par l'item lui-même, pas par un Service externe). 4 paliers de potion de soin DnD5e (soin, supérieure, majeure, suprême — dés et prix RAW), utilisable hors combat (effet immédiat) ou en combat (coûte le tour, `CombatEngine.useItem`). Seul effet implémenté à ce jour : `HEALING` — le point d'extension existe déjà pour un futur poison/buff.
+- **Combat** : verbe `attack` (`controller/ingame/Attack.java`, réutilise une cible déjà `select`-ée ou en prend une nouvelle), `game/CombatService.java` (jet d'attaque 1d20+STR+maîtrise+bonus magique vs CA, échec critique sur 1 / réussite critique sur 20, dégâts d'arme ou à mains nues, jet d'initiative 1d20+DEX), `game/CombatEngine.java` (orchestration : fusion des combattants dans un même affrontement, verrou de tour, cascade des tours monstres consécutifs). Classe d'Armure réelle : `10 + mod DEX`, cappée selon la catégorie d'armure équipée, + bonus de bouclier (main secondaire) + bonus magique. Ordre d'initiative DnD5e correct avec insertion de retardataires (`domain/actor/CombatEncounter.java`). Mort/respawn : le joueur réapparaît à PV pleins dans la salle de départ ; un monstre tué est retiré définitivement de sa salle, crédite l'XP au tueur et déclenche son butin (or garanti + objets à tirage indépendant par entrée, `game/actor/LootService.java`, transactionnel).
+- **Monstres** : `GameMonster` (sous-type scellé de `GameCharacter`, distinct du joueur), gabarits + spawns fixes chargés au démarrage (`game/actor/MonsterService.java` + `data/monsters.json`, 7 gabarits). Ripostent avec leur propre initiative une fois attaqués. Ont une zone de présence (`getPresenceRadius`) qui déclenche le combat dès qu'un joueur y entre, sans commande `attack` (`GamePlayerEnteredCell` → `CombatEngine.startAggroEncounter`) — de l'agressivité simple existe donc déjà. Ce qui manque encore : aucun déplacement/patrouille, pas de poursuite d'un joueur qui fuit, pas de décision tactique au-delà de la riposte.
+- **PNJ marchands** : `GameNpcSeller` (sous-type de `GameNpc`), catalogue défini dans `data/npcs.json` et dénormalisé contre les templates d'objets au démarrage. `talk` ouvre un dialogue à options (`NpcDialogue` : accueil + liste de réponses), l'option boutique résout un achat réel (`GameNpcSeller.sell` → `GamePlayer.buyItem`) qui débite l'or et ajoute l'objet à l'inventaire (événements `ItemPurchased`/`CharacterSpentGold`, persistés). Aucune vente inverse (le joueur ne peut pas revendre un objet à un PNJ).
+- **Or** (complément) : varie donc déjà en jeu par deux voies — butin de monstre (`LootService.receiveGold`) et achat en boutique (`GamePlayer.buyItem`/`trySpendGold`) — au-delà du montant figé à la création mentionné plus haut.
 - **Social minimal** : `say` (chat de salle), `stats`/`examine` (affichage HP + caractéristiques, modificateurs, maîtrise).
 - **Utilitaire** : lanceur de dés générique `roll XdY+Z` (`game/dice/`), réutilisé pour la génération de personnage et les jets de combat.
 - **Modèle de concurrence** : aucun `@Scheduled` nulle part — la boucle de jeu est 100% réactive aux commandes joueur, pas de tick de fond.
@@ -26,44 +30,44 @@ Le projet est un MUD Java/Spring Boot qui vise à reprendre les règles DnD5e. C
 ## Systèmes absents ou à l'état de simple champ de données
 
 ### 1. Combat — raffinements restants
-Le socle (jets d'attaque, CA, dégâts, initiative, multi-combattants, mort/respawn) est fait. Ce qui manque encore :
+Le socle (jets d'attaque, CA, dégâts, initiative, multi-combattants, mort/respawn, butin, agressivité de zone) est fait. Ce qui manque encore :
 - **PvP** : absent — `Attack.java` ne résout que des cibles `GameMonster`.
-- **Butin** : aucun drop à la mort d'un monstre, il est simplement retiré de la salle.
 - **Respawn de monstre** : aucun — les spawns sont fixes et chargés une seule fois au démarrage.
-- **IA/agressivité** : les monstres ne font que riposter une fois attaqués ; pas de déplacement, pas d'initiative d'attaque de leur part.
+- **IA de déplacement** : les monstres ne quittent jamais leur salle — pas de patrouille, pas de poursuite d'un joueur qui fuit hors de leur zone de présence, aucune décision tactique au-delà de riposter/rejoindre un affrontement déjà engagé.
+- **Attunement d'objets magiques** : aucune limite au nombre d'objets magiques utilisables simultanément (règle DnD5e RAW pour les objets rare+ hors +X armes/armures/boucliers) — non bloquant tant que le nombre d'emplacements d'équipement (6) reste la seule contrainte, mais à revoir si des objets magiques non-équipement (anneaux, bâtons...) sont ajoutés.
+- **Contrainte de Force sur l'armure** : pas de seuil de FOR minimum pour les armures moyennes/lourdes ni de désavantage Discrétion associé (règle DnD5e RAW) — `ArmorCategory` ne porte que la CA de base et le plafond de modificateur DEX.
 
 ### 2. PNJ / contenu de monde
-`GameNpc` existe (nom + salle, `data/npcs.json`, visible via `examine`) mais reste décoratif : pas de dialogue, pas de quêtes, pas de factions, pas d'alignement.
+`GameNpc`/`GameNpcSeller` existent : nom + salle + description (`data/npcs.json`, visible via `examine`), dialogue à options (`talk`, accueil + réponses fixes) et boutique fonctionnelle pour les PNJ marchands (voir « ce qui existe déjà »). Ce qui manque encore : dialogue à état/embranchement (les options sont une liste plate, rejouée à l'identique à chaque `talk`, sans mémoire de ce qui a déjà été dit), quêtes, factions, alignement, PNJ non-marchands avec un rôle actif (garde, soigneur...).
 
 ### 3. Sorts / lancer de sorts
-Totalement absent (pas de table, pas d'emplacement de sort, pas de composant verbal/somatique/matériel, pas de commande `cast`). Dépend des proficiencies de classe (désormais disponibles, voir « ce qui existe déjà ») pour savoir quels sorts une classe peut accéder.
+Totalement absent (pas de table, pas d'emplacement de sort, pas de composant verbal/somatique/matériel, pas de commande `cast`). Dépend des proficiencies de classe (désormais disponibles, voir « ce qui existe déjà ») pour savoir quels sorts une classe peut accéder. `ConsumableItem`/`ConsumableEffect` (voir « ce qui existe déjà ») esquisse déjà le pattern d'effet à instantané appliqué à un `GamePlayer` — probablement réutilisable pour un sort à cible unique et effet immédiat, mais rien n'existe encore pour portée/zone d'effet/durée/concentration.
 
 ### 4. États (conditions)
 Absents (empoisonné, étourdi, paralysé, charmé, effrayé...). Le combat sur lequel ils s'appliqueraient existe désormais — ce système est débloqué et prêt à construire.
 
 ### 5. Repos (courte/longue pause)
-Absent. Les PV se restaurent déjà via la mort/respawn ; l'intérêt principal d'un repos sera de restaurer les futurs emplacements de sorts (§3), donc à construire après eux.
+Absent. Les PV se restaurent déjà via la mort/respawn ou une potion de soin (`use`) ; l'intérêt principal d'un repos sera de restaurer les futurs emplacements de sorts (§3), donc à construire après eux.
 
 ### 6. Économie
-- **Monnaie** : l'or existe mais est figé à la création — aucune mécanique ne le fait gagner ou dépenser.
+- **Monnaie** : gagnée (butin de monstre) et dépensée (achat en boutique PNJ) — voir « ce qui existe déjà ». Ce qui manque : revendre un objet à un PNJ (achat uniquement, pas de vente inverse), et tout échange d'or/objet entre joueurs.
 - **Encombrement** : `item_template.weight` est stocké et lisible (`ItemTemplate.weight`, `Item.getWeight()`) mais rien ne fait la somme ni ne la compare à la Force — champ mort aujourd'hui.
-- **Boutiques/marchands** : absents.
 
 ### 7. Commandes sociales/admin manquantes
 `who`, `tell`/`whisper`, `emote`, `help`, `give` (transfert d'objet entre joueurs), commandes de modération/wizard : aucune n'existe (`say` existe déjà). Indépendantes du reste, faisables à tout moment via `/add-command`.
 
 ## Lacune transverse notée en passant
 
-`ControllerDispatcherTest` couvre le dispatcher (verrouillage des verbes pendant un combat) ; `Login`, `CharacterCreate`, `Take`, `Equip`, `Roll`, `Attack`, `Check`, `Save` ont désormais chacun leur test dédié (voir item 5 de la dette technique ci-dessous). Les autres handlers (`Quit`, `Register`, `CharacterDelete`, `CharacterList`, `CharacterSelect`, `Drop`, `Examine`, `Go`, `Inventory`, `Look`, `Say`, `Select`, `Stats`, `Talk`, `Unequip`, `Use`) restent sans test dédié — à garder en tête avant d'empiler de nouvelles commandes par-dessus une couche encore partiellement testée individuellement.
+`ControllerDispatcherTest` couvre le dispatcher (verrouillage des verbes pendant un combat) ; `Login`, `CharacterCreate`, `Take`, `Equip`, `Roll`, `Attack`, `Check`, `Save`, `Use` ont désormais chacun leur test dédié (voir item 5 de la dette technique ci-dessous). Les autres handlers (`Quit`, `Register`, `CharacterDelete`, `CharacterList`, `CharacterSelect`, `Drop`, `Examine`, `Go`, `Inventory`, `Look`, `Say`, `Select`, `Stats`, `Talk`, `Unequip`) restent sans test dédié — à garder en tête avant d'empiler de nouvelles commandes par-dessus une couche encore partiellement testée individuellement.
 
 ## Ordre de construction suggéré
 
-1. Raffinements combat/monstres : PvP, butin, respawn de monstre, agressivité simple
+1. Raffinements combat/monstres restants : PvP, respawn de monstre, IA de déplacement
 2. États (conditions) — s'appuie sur le combat déjà existant
 3. Sorts — dépend des proficiencies de classe (désormais disponibles) et bénéficie des états (étape 2) pour ses effets
 4. Repos — dépend des sorts (emplacements à restaurer)
-5. Économie : boutiques, dépense d'or, encombrement (utilise `weight` déjà stocké)
-6. Contenu de monde : PNJ interactifs, dialogues, quêtes, factions, alignement
+5. Économie restante : vente inverse à un PNJ, échange entre joueurs, encombrement (utilise `weight` déjà stocké)
+6. Contenu de monde : dialogue à état/embranchement, quêtes, factions, alignement, PNJ non-marchands actifs
 7. Commandes sociales/admin (`who`, `tell`, `emote`, `help`, `give`) — indépendant, à intercaler n'importe quand
 
 ## Dette technique et pistes d'amélioration (audit du 2026-08-08)
