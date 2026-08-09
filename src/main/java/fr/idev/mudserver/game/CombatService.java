@@ -40,8 +40,12 @@ public class CombatService {
     }
 
     public CombatResult tryAttack(GamePlayer attacker, GameMonster target) {
+        Optional<Item> weapon = attacker.getInventory().getEquippedItems().stream()
+                .filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
+        int weaponBonus = weapon.map(Item::getBonus).orElse(0);
+
         int strengthModifier = attacker.getModifier(Attribute.STRENGTH);
-        int attackBonus = strengthModifier + attacker.getProficiencyBonus();
+        int attackBonus = strengthModifier + attacker.getProficiencyBonus() + weaponBonus;
 
         DiceRoll attackRoll = diceRoller.roll(new DiceExpression(1, 20, attackBonus));
         int naturalRoll = attackRoll.rolls()[0];
@@ -53,7 +57,7 @@ public class CombatService {
             return new CombatResult(target.getName(), false, false, attackRoll.total(), armorClass, 0);
         }
 
-        int damage = rollDamage(attacker, strengthModifier, criticalHit);
+        int damage = rollDamage(weapon, strengthModifier, criticalHit);
         return new CombatResult(target.getName(), true, criticalHit, attackRoll.total(), armorClass, damage);
     }
 
@@ -107,10 +111,7 @@ public class CombatService {
         return totalRoll >= armorClass;
     }
 
-    private int rollDamage(GamePlayer attacker, int strengthModifier, boolean criticalHit) {
-        Optional<Item> weapon = attacker.getInventory().getEquippedItems().stream()
-                .filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
-
+    private int rollDamage(Optional<Item> weapon, int strengthModifier, boolean criticalHit) {
         if (weapon.isEmpty()) {
             // Attaque à mains nues (SRD) : 1 + modificateur de FOR, pas de dé donc rien à
             // doubler en cas de critique.
@@ -119,7 +120,8 @@ public class CombatService {
 
         DiceExpression base = DiceExpression.parse(weapon.get().getDamageDice());
         int diceCount = criticalHit ? base.count() * 2 : base.count();
-        return Math.max(0, diceRoller.roll(new DiceExpression(diceCount, base.sides(), strengthModifier)).total());
+        int modifier = strengthModifier + weapon.get().getBonus();
+        return Math.max(0, diceRoller.roll(new DiceExpression(diceCount, base.sides(), modifier)).total());
     }
 
     private int rollMonsterDamage(GameMonster attacker, int strengthModifier, boolean criticalHit) {

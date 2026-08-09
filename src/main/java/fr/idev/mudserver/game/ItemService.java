@@ -77,7 +77,7 @@ public class ItemService {
             for (ItemTemplateDefinition definition : definitions) {
                 registerTemplate(new ItemTemplate(definition.id(), definition.name(), definition.description(),
                         definition.type(), definition.weight(), definition.armorCategory(), definition.baseAc(),
-                        definition.damageDice(), definition.price(), definition.rarity()));
+                        definition.damageDice(), definition.price(), definition.rarity(), definition.bonus()));
             }
             log.info("item.templates_loaded count={}", templates.size());
         } catch (IOException | JacksonException e) {
@@ -226,6 +226,6 @@ public class ItemService {
     }
 
     private record ItemTemplateDefinition(UUID id, String name, String description, ItemType type, int weight,
-            ArmorCategory armorCategory, int baseAc, String damageDice, int price, Rarity rarity) {
+            ArmorCategory armorCategory, int baseAc, String damageDice, int price, Rarity rarity, int bonus) {
     }
 }

@@ -70,9 +70,19 @@ class GamePlayerTest {
     void armorClassAddsTheShieldBonusOnTopOfBodyArmor() {
         GamePlayer character = character(10, 14, 10, 10, 10, 10, 1);
         equip(character, armor("Cuir", ArmorCategory.LIGHT, 11));
-        equip(character, shield());
+        equip(character, shield(0));
 
         assertThat(character.getArmorClass()).isEqualTo(15);
+    }
+
+    @Test
+    void armorClassAddsTheMagicBonusOfEquippedArmorAndShield() {
+        GamePlayer character = character(10, 14, 10, 10, 10, 10, 1);
+        equip(character, armor("Plates +2", ArmorCategory.HEAVY, 18, 2));
+        equip(character, shield(1));
+
+        // 18 (base) + 2 (bonus armure) + 2 (bouclier) + 1 (bonus bouclier).
+        assertThat(character.getArmorClass()).isEqualTo(23);
     }
 
     // N'appelle pas GamePlayer#equipItem : celui-ci publie un événement de domaine
@@ -84,16 +94,20 @@ class GamePlayerTest {
     }
 
     private Item armor(String name, ArmorCategory category, int baseAc) {
+        return armor(name, category, baseAc, 0);
+    }
+
+    private Item armor(String name, ArmorCategory category, int baseAc, int bonus) {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), name, null, ItemType.ARMOR, 5, category, baseAc,
-                null, 0, Rarity.COMMON);
+                null, 0, Rarity.COMMON, bonus);
         Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.CHEST);
         item.attachTemplate(template);
         return item;
     }
 
-    private Item shield() {
+    private Item shield(int bonus) {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Bouclier", null, ItemType.SHIELD, 3, null, 2, null,
-                0, Rarity.COMMON);
+                0, Rarity.COMMON, bonus);
         Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.OFF_HAND);
         item.attachTemplate(template);
         return item;

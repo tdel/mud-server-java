@@ -74,6 +74,20 @@ class CombatServiceTest {
     }
 
     @Test
+    void attackWithAMagicWeaponAddsItsBonusToDamage() {
+        GamePlayer attacker = player(16, 1);
+        equipWeapon(attacker, "1d6", 2);
+        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        attacker.setCurrentRoom(room);
+        GameMonster monster = monster(room, 100, -100);
+
+        CombatResult result = attackUntilHit(attacker, monster);
+
+        // 1d6 (1-6) + modificateur de FOR (+3) + bonus d'arme (+2) : entre 6 et 11.
+        assertThat(result.damage()).isBetween(6, 11);
+    }
+
+    @Test
     void attackWithoutAWeaponDealsUnarmedDamage() {
         GamePlayer attacker = player(14, 1);
         Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
@@ -176,8 +190,12 @@ class CombatServiceTest {
     }
 
     private void equipWeapon(GamePlayer character, String damageDice) {
+        equipWeapon(character, damageDice, 0);
+    }
+
+    private void equipWeapon(GamePlayer character, String damageDice, int bonus) {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3, null, 0,
-                damageDice, 0, Rarity.COMMON);
+                damageDice, 0, Rarity.COMMON, bonus);
         Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.WEAPON);
         item.attachTemplate(template);
         character.getInventory().addItem(item);
@@ -185,7 +203,7 @@ class CombatServiceTest {
 
     private void equipArmor(GamePlayer character, int baseAc) {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Armure", null, ItemType.ARMOR, 10,
-                ArmorCategory.HEAVY, baseAc, null, 0, Rarity.COMMON);
+                ArmorCategory.HEAVY, baseAc, null, 0, Rarity.COMMON, 0);
         Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.CHEST);
         item.attachTemplate(template);
         character.getInventory().addItem(item);

@@ -92,6 +92,10 @@ public class Item {
         return requireTemplate().getRarity();
     }
 
+    public int getBonus() {
+        return requireTemplate().getBonus();
+    }
+
     private ItemTemplate requireTemplate() {
         if (template == null) {
             throw new IllegalStateException("Item " + id + " has no ItemTemplate attached");

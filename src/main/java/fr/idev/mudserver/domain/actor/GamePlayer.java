@@ -137,15 +137,16 @@ public final class GamePlayer extends GameCharacter {
                 .map(this::armorAc).orElseGet(super::getArmorClass);
 
         return ac + inventory.getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.OFF_HAND)
-                .mapToInt(Item::getBaseAc).sum();
+                .mapToInt(item -> item.getBaseAc() + item.getBonus()).sum();
     }
 
     private int armorAc(Item armor) {
         int dexMod = getModifier(Attribute.DEXTERITY);
+        int baseAndBonus = armor.getBaseAc() + armor.getBonus();
         return switch (armor.getArmorCategory()) {
-            case LIGHT -> armor.getBaseAc() + dexMod;
-            case MEDIUM -> armor.getBaseAc() + Math.min(dexMod, 2);
-            case HEAVY -> armor.getBaseAc();
+            case LIGHT -> baseAndBonus + dexMod;
+            case MEDIUM -> baseAndBonus + Math.min(dexMod, 2);
+            case HEAVY -> baseAndBonus;
         };
     }
 

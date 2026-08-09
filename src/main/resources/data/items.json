@@ -6,7 +6,8 @@
         "weight": 1,
         "baseAc": 0,
         "price": 50,
-        "rarity": "COMMON"
+        "rarity": "COMMON",
+        "bonus": 0
     },
     {
         "id": "019fa0a5-80c0-7035-9c2d-113b09a275df",
@@ -16,7 +17,8 @@
         "baseAc": 0,
         "damageDice": "1d6",
         "price": 10,
-        "rarity": "COMMON"
+        "rarity": "COMMON",
+        "bonus": 0
     },
     {
         "id": "019faec6-116d-723d-b04c-76d51a2a2cb7",
@@ -25,7 +27,8 @@
         "weight": 2,
         "baseAc": 0,
         "price": 10,
-        "rarity": "COMMON"
+        "rarity": "COMMON",
+        "bonus": 0
     },
     {
         "id": "019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518",
@@ -35,7 +38,8 @@
         "armorCategory": "LIGHT",
         "baseAc": 11,
         "price": 10,
-        "rarity": "COMMON"
+        "rarity": "COMMON",
+        "bonus": 0
     },
     {
         "id": "019fcf0d-1f8c-7d43-9e98-a9944b4ccefe",
@@ -45,7 +49,8 @@
         "armorCategory": "MEDIUM",
         "baseAc": 13,
         "price": 50,
-        "rarity": "COMMON"
+        "rarity": "COMMON",
+        "bonus": 0
     },
     {
         "id": "019fcf0d-1f8d-7c4c-9275-33c4af4410a8",
@@ -55,7 +60,8 @@
         "armorCategory": "HEAVY",
         "baseAc": 18,
         "price": 1500,
-        "rarity": "UNCOMMON"
+        "rarity": "UNCOMMON",
+        "bonus": 0
     },
     {
         "id": "019fcf0d-1f8f-7d01-8e4f-fd592812a1a7",
@@ -64,6 +70,71 @@
         "weight": 3,
         "baseAc": 2,
         "price": 10,
-        "rarity": "COMMON"
+        "rarity": "COMMON",
+        "bonus": 0
+    },
+    {
+        "id": "019fe3f6-b1ee-78f8-a681-d288c7f87511",
+        "name": "Epée longue +1",
+        "type": "WEAPON",
+        "weight": 3,
+        "baseAc": 0,
+        "damageDice": "1d8",
+        "price": 500,
+        "rarity": "UNCOMMON",
+        "bonus": 1
+    },
+    {
+        "id": "019fe3f6-b1ef-786d-bc17-46dd46660eb0",
+        "name": "Bouclier +1",
+        "type": "SHIELD",
+        "weight": 3,
+        "baseAc": 2,
+        "price": 400,
+        "rarity": "UNCOMMON",
+        "bonus": 1
+    },
+    {
+        "id": "019fe3f6-b1f0-7e00-a18d-ee3ac38f9332",
+        "name": "Epée longue +2",
+        "type": "WEAPON",
+        "weight": 3,
+        "baseAc": 0,
+        "damageDice": "1d8",
+        "price": 4000,
+        "rarity": "RARE",
+        "bonus": 2
+    },
+    {
+        "id": "019fe3f6-b1f2-7ac5-9ca3-2a4aa1f21cde",
+        "name": "Cotte de mailles +1",
+        "type": "ARMOR",
+        "weight": 10,
+        "armorCategory": "MEDIUM",
+        "baseAc": 13,
+        "price": 4500,
+        "rarity": "RARE",
+        "bonus": 1
+    },
+    {
+        "id": "019fe3f6-b1f3-7285-8107-94d2bf661434",
+        "name": "Armure de plates +2",
+        "type": "ARMOR",
+        "weight": 30,
+        "armorCategory": "HEAVY",
+        "baseAc": 18,
+        "price": 40000,
+        "rarity": "VERY_RARE",
+        "bonus": 2
+    },
+    {
+        "id": "019fe3f6-b1f4-78c7-8791-3103eb639821",
+        "name": "Bouclier +3",
+        "type": "SHIELD",
+        "weight": 3,
+        "baseAc": 2,
+        "price": 60000,
+        "rarity": "LEGENDARY",
+        "bonus": 3
     }
 ]
