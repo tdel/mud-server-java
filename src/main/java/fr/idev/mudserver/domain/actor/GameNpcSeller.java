@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import fr.idev.mudserver.domain.Item;
+import fr.idev.mudserver.domain.Rarity;
 
 /**
  * Seul sous-type de {@link GameNpc} : un PNJ marchand, dès que sa
@@ -71,7 +72,7 @@ public final class GameNpcSeller extends GameNpc {
     public record NpcShop(List<NpcShopEntry> items) {
     }
 
-    public record NpcShopEntry(UUID itemTemplateId, String itemName, int price) {
+    public record NpcShopEntry(UUID itemTemplateId, String itemName, Rarity rarity, int price) {
     }
 
     public sealed interface PurchaseOutcome {

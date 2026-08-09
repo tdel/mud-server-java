@@ -88,6 +88,10 @@ public class Item {
         return requireTemplate().getDamageDice();
     }
 
+    public Rarity getRarity() {
+        return requireTemplate().getRarity();
+    }
+
     private ItemTemplate requireTemplate() {
         if (template == null) {
             throw new IllegalStateException("Item " + id + " has no ItemTemplate attached");

@@ -14,9 +14,10 @@ public class ItemTemplate {
     private int baseAc;
     private String damageDice;
     private int price;
+    private Rarity rarity;
 
     public ItemTemplate(UUID id, String name, String description, ItemType type, int weight,
-            ArmorCategory armorCategory, int baseAc, String damageDice, int price) {
+            ArmorCategory armorCategory, int baseAc, String damageDice, int price, Rarity rarity) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -26,6 +27,7 @@ public class ItemTemplate {
         this.baseAc = baseAc;
         this.damageDice = damageDice;
         this.price = price;
+        this.rarity = rarity;
     }
 
     public UUID getId() {
@@ -100,6 +102,14 @@ public class ItemTemplate {
         this.price = price;
     }
 
+    public Rarity getRarity() {
+        return rarity;
+    }
+
+    public void setRarity(Rarity rarity) {
+        this.rarity = rarity;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -111,18 +121,18 @@ public class ItemTemplate {
         return weight == other.weight && baseAc == other.baseAc && price == other.price && Objects.equals(id, other.id)
                 && Objects.equals(name, other.name) && Objects.equals(description, other.description)
                 && type == other.type && armorCategory == other.armorCategory
-                && Objects.equals(damageDice, other.damageDice);
+                && Objects.equals(damageDice, other.damageDice) && rarity == other.rarity;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, type, weight, armorCategory, baseAc, damageDice, price);
+        return Objects.hash(id, name, description, type, weight, armorCategory, baseAc, damageDice, price, rarity);
     }
 
     @Override
     public String toString() {
         return "ItemTemplate[id=" + id + ", name=" + name + ", description=" + description + ", type=" + type
                 + ", weight=" + weight + ", armorCategory=" + armorCategory + ", baseAc=" + baseAc + ", damageDice="
-                + damageDice + ", price=" + price + "]";
+                + damageDice + ", price=" + price + ", rarity=" + rarity + "]";
     }
 }

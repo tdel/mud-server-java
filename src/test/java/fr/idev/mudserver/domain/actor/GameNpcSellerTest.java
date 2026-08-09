@@ -9,6 +9,7 @@ import fr.idev.mudserver.domain.actor.GameNpc.NpcDialogue;
 import fr.idev.mudserver.domain.actor.GameNpcSeller.NpcShop;
 import fr.idev.mudserver.domain.actor.GameNpcSeller.NpcShopEntry;
 import fr.idev.mudserver.domain.actor.GameNpcSeller.PurchaseOutcome;
+import fr.idev.mudserver.domain.Rarity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,8 +22,8 @@ class GameNpcSellerTest {
     void resolveEntryByOneBasedIndex() {
         GameNpcSeller seller = seller();
 
-        assertThat(seller.resolveEntry("1")).contains(new NpcShopEntry(POTION_ID, "Potion de soin", 50));
-        assertThat(seller.resolveEntry("2")).contains(new NpcShopEntry(SWORD_ID, "Epée courte", 10));
+        assertThat(seller.resolveEntry("1")).contains(new NpcShopEntry(POTION_ID, "Potion de soin", Rarity.COMMON, 50));
+        assertThat(seller.resolveEntry("2")).contains(new NpcShopEntry(SWORD_ID, "Epée courte", Rarity.COMMON, 10));
     }
 
     @Test
@@ -37,8 +38,10 @@ class GameNpcSellerTest {
     void resolveEntryByExactNameIsCaseInsensitive() {
         GameNpcSeller seller = seller();
 
-        assertThat(seller.resolveEntry("epée courte")).contains(new NpcShopEntry(SWORD_ID, "Epée courte", 10));
-        assertThat(seller.resolveEntry("POTION DE SOIN")).contains(new NpcShopEntry(POTION_ID, "Potion de soin", 50));
+        assertThat(seller.resolveEntry("epée courte"))
+                .contains(new NpcShopEntry(SWORD_ID, "Epée courte", Rarity.COMMON, 10));
+        assertThat(seller.resolveEntry("POTION DE SOIN"))
+                .contains(new NpcShopEntry(POTION_ID, "Potion de soin", Rarity.COMMON, 50));
     }
 
     @Test
@@ -78,8 +81,8 @@ class GameNpcSellerTest {
     }
 
     private GameNpcSeller seller() {
-        NpcShop shop = new NpcShop(List.of(new NpcShopEntry(POTION_ID, "Potion de soin", 50),
-                new NpcShopEntry(SWORD_ID, "Epée courte", 10)));
+        NpcShop shop = new NpcShop(List.of(new NpcShopEntry(POTION_ID, "Potion de soin", Rarity.COMMON, 50),
+                new NpcShopEntry(SWORD_ID, "Epée courte", Rarity.COMMON, 10)));
         NpcDialogue dialogue = new NpcDialogue("Bienvenue !", List.of());
         return new GameNpcSeller(UUID.randomUUID(), "Aubergiste", UUID.randomUUID(), "Un aubergiste jovial.", dialogue,
                 shop);

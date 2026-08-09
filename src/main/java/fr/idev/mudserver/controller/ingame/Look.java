@@ -6,7 +6,6 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.actor.GameCharacter;
 import fr.idev.mudserver.domain.actor.GameMonster;
@@ -56,12 +55,13 @@ public class Look implements ControllerHandler {
                 .map(portal -> portal.direction() + ": " + portal.targetRoom().getName()).toList();
         List<String> characterNames = nearby.stream().filter(GamePlayer.class::isInstance)
                 .filter(other -> !other.getId().equals(character.getId())).map(GameCharacter::getName).toList();
-        List<String> itemNames = room.getItems().stream().map(Item::getName).toList();
+        List<RoomDescription.ItemSummary> items = room.getItems().stream()
+                .map(item -> new RoomDescription.ItemSummary(item.getName(), item.getRarity())).toList();
         List<String> monsterNames = nearby.stream().filter(GameMonster.class::isInstance).map(GameCharacter::getName)
                 .toList();
         List<String> npcNames = nearby.stream().filter(GameNpc.class::isInstance).map(GameCharacter::getName).toList();
 
         return new RoomDescription(room.getName(), room.getDescription(), gridLines, HexGridRenderer.LEGEND,
-                portalSummaries, characterNames, itemNames, monsterNames, npcNames);
+                portalSummaries, characterNames, items, monsterNames, npcNames);
     }
 }

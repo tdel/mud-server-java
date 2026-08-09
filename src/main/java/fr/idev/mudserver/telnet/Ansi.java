@@ -3,6 +3,8 @@ package fr.idev.mudserver.telnet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import fr.idev.mudserver.domain.Rarity;
+
 /**
  * Point unique de coloration ANSI des messages sortants : chaque catégorie
  * d'élément important en DnD5e (monstre, PNJ, dégâts, or, XP...) a sa propre
@@ -32,8 +34,15 @@ public final class Ansi {
         return wrap(name, AnsiColor.BOLD, AnsiColor.YELLOW);
     }
 
-    public static String item(String name) {
-        return wrap(name, AnsiColor.BOLD, AnsiColor.GREEN);
+    public static String item(String name, Rarity rarity) {
+        return switch (rarity) {
+            case COMMON -> wrap(name, AnsiColor.WHITE);
+            case UNCOMMON -> wrap(name, AnsiColor.BOLD, AnsiColor.GREEN);
+            case RARE -> wrap(name, AnsiColor.BOLD, AnsiColor.BLUE);
+            case VERY_RARE -> wrap(name, AnsiColor.BOLD, AnsiColor.MAGENTA);
+            case LEGENDARY -> wrap(name, AnsiColor.BOLD, AnsiColor.YELLOW);
+            case ARTIFACT -> wrap(name, AnsiColor.BOLD, AnsiColor.RED);
+        };
     }
 
     public static String room(String name) {

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import fr.idev.mudserver.domain.actor.GameNpc;
 import fr.idev.mudserver.domain.actor.GameNpc.NpcDialogueOptionType;
 import fr.idev.mudserver.domain.actor.GameNpcSeller;
+import fr.idev.mudserver.domain.Rarity;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.game.actor.NpcService.DialogueDefinition;
@@ -30,10 +31,10 @@ class NpcServiceTest {
      * synchronisée avec {@code data/items.json} sans dépendre d'un contexte Spring
      * dans ce test unitaire pur.
      */
-    private static Map<UUID, String> realItemTemplateNamesById() {
+    private static Map<UUID, ItemService.ItemSummary> realItemTemplateSummariesById() {
         ItemService itemService = new ItemService(null, new ObjectMapper());
         itemService.warmItemTemplates();
-        return itemService.templateNamesById();
+        return itemService.templateSummariesById();
     }
 
     @Test
@@ -42,7 +43,7 @@ class NpcServiceTest {
         Room tavern = new Room(TAVERN_ID, "Taverne du Sanglier Roux", "...", null);
         Room villageSquare = new Room(VILLAGE_SQUARE_ID, "Place du village", "...", null);
 
-        npcService.warmNpcs(List.of(tavern, villageSquare), realItemTemplateNamesById());
+        npcService.warmNpcs(List.of(tavern, villageSquare), realItemTemplateSummariesById());
 
         assertThat(tavern.getNpcs()).hasSize(1);
         GameNpc innkeeper = tavern.getNpcs().get(0);
@@ -111,7 +112,8 @@ class NpcServiceTest {
         List<NpcService.NpcDefinition> definitions = List.of(new NpcService.NpcDefinition(UUID.randomUUID(), "Test",
                 room.getId(), new NpcService.CellDefinition(0, 0), "...", dialogue));
 
-        assertThatThrownBy(() -> isolated.loadNpcs(definitions, List.of(room), Map.of(itemTemplateId, "Potion")))
+        assertThatThrownBy(() -> isolated.loadNpcs(definitions, List.of(room),
+                Map.of(itemTemplateId, new ItemService.ItemSummary("Potion", Rarity.COMMON))))
                 .isInstanceOf(IllegalStateException.class);
     }
 }

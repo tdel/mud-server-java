@@ -5,7 +5,8 @@
         "type": "POTION",
         "weight": 1,
         "baseAc": 0,
-        "price": 50
+        "price": 50,
+        "rarity": "COMMON"
     },
     {
         "id": "019fa0a5-80c0-7035-9c2d-113b09a275df",
@@ -14,7 +15,8 @@
         "weight": 1,
         "baseAc": 0,
         "damageDice": "1d6",
-        "price": 10
+        "price": 10,
+        "rarity": "COMMON"
     },
     {
         "id": "019faec6-116d-723d-b04c-76d51a2a2cb7",
@@ -22,7 +24,8 @@
         "type": "HELMET",
         "weight": 2,
         "baseAc": 0,
-        "price": 10
+        "price": 10,
+        "rarity": "COMMON"
     },
     {
         "id": "019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518",
@@ -31,7 +34,8 @@
         "weight": 5,
         "armorCategory": "LIGHT",
         "baseAc": 11,
-        "price": 10
+        "price": 10,
+        "rarity": "COMMON"
     },
     {
         "id": "019fcf0d-1f8c-7d43-9e98-a9944b4ccefe",
@@ -40,7 +44,8 @@
         "weight": 10,
         "armorCategory": "MEDIUM",
         "baseAc": 13,
-        "price": 50
+        "price": 50,
+        "rarity": "COMMON"
     },
     {
         "id": "019fcf0d-1f8d-7c4c-9275-33c4af4410a8",
@@ -49,7 +54,8 @@
         "weight": 30,
         "armorCategory": "HEAVY",
         "baseAc": 18,
-        "price": 1500
+        "price": 1500,
+        "rarity": "UNCOMMON"
     },
     {
         "id": "019fcf0d-1f8f-7d01-8e4f-fd592812a1a7",
@@ -57,6 +63,7 @@
         "type": "SHIELD",
         "weight": 3,
         "baseAc": 2,
-        "price": 10
+        "price": 10,
+        "rarity": "COMMON"
     }
 ]

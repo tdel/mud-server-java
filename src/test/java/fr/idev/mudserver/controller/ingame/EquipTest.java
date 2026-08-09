@@ -11,6 +11,7 @@ import fr.idev.mudserver.controller.RecordingConnection;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
+import fr.idev.mudserver.domain.Rarity;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
@@ -98,7 +99,8 @@ class EquipTest extends AbstractIntegrationTest {
 
         equip.onReceive(connection, "Epée courte");
 
-        assertThat(connection.received).containsExactly(new ItemEquipped("Epée courte", EquipmentSlot.WEAPON));
+        assertThat(connection.received)
+                .containsExactly(new ItemEquipped("Epée courte", Rarity.COMMON, EquipmentSlot.WEAPON));
     }
 
     private void addToInventory(GamePlayer character, UUID templateId) {

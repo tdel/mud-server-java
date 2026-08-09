@@ -16,6 +16,7 @@ import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.ItemType;
+import fr.idev.mudserver.domain.Rarity;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.actor.TestAttributes;
@@ -55,7 +56,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void equippingANewWeaponUnequipsThePreviousOneInTheSameTransaction() {
         ItemTemplate weaponTemplate = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3, null, 0,
-                null, 0);
+                null, 0, Rarity.COMMON);
 
         Account account = new Account(UUID.randomUUID(), "erin", "hashed-password", null);
         accountDao.insert(account);
@@ -86,7 +87,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void loadInventoryStillReturnsAnEquippedItemOnAFreshLoad() {
         ItemTemplate weaponTemplate = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3, null, 0,
-                null, 0);
+                null, 0, Rarity.COMMON);
         itemService.registerTemplate(weaponTemplate);
 
         Account account = new Account(UUID.randomUUID(), "gwen", "hashed-password", null);
@@ -116,7 +117,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void loadInventoryAttachesTemplatesAndFeedsTheCharacterCache() {
         ItemTemplate potionTemplate = new ItemTemplate(UUID.randomUUID(), "Potion de soin", null, ItemType.POTION, 1,
-                null, 0, null, 0);
+                null, 0, null, 0, Rarity.COMMON);
         itemService.registerTemplate(potionTemplate);
 
         Account account = new Account(UUID.randomUUID(), "fay", "hashed-password", null);
@@ -139,7 +140,8 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
     @Test
     void addAndRemoveItemFromInventoryKeepTheCharacterAndRoomCachesInSync() {
-        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Torche", null, ItemType.MISC, 1, null, 0, null, 0);
+        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Torche", null, ItemType.MISC, 1, null, 0, null, 0,
+                Rarity.COMMON);
         itemService.registerTemplate(template);
 
         roomService.warmRooms();
@@ -170,7 +172,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void warmRoomItemsAttachesTemplatesToItemsOnTheGround() {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Bouclier", null, ItemType.ARMOR, 4, null, 0, null,
-                0);
+                0, Rarity.COMMON);
         itemService.registerTemplate(template);
 
         roomService.warmRooms();
@@ -187,7 +189,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void buyItemSpendsGoldAndPersistsTheNewItem() {
         ItemTemplate potionTemplate = new ItemTemplate(UUID.randomUUID(), "Potion de soin", null, ItemType.POTION, 1,
-                null, 0, null, 50);
+                null, 0, null, 50, Rarity.COMMON);
         itemService.registerTemplate(potionTemplate);
 
         Account account = new Account(UUID.randomUUID(), "mika", "hashed-password", null);
@@ -212,7 +214,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Test
     void buyItemFailsAndChangesNothingWhenGoldIsInsufficient() {
         ItemTemplate potionTemplate = new ItemTemplate(UUID.randomUUID(), "Potion de soin", null, ItemType.POTION, 1,
-                null, 0, null, 50);
+                null, 0, null, 50, Rarity.COMMON);
         itemService.registerTemplate(potionTemplate);
 
         Account account = new Account(UUID.randomUUID(), "nao", "hashed-password", null);
@@ -243,14 +245,19 @@ class ItemServiceTest extends AbstractIntegrationTest {
                 new Item(UUID.randomUUID(), UUID.fromString("019fa0a5-80c0-7035-9c2d-113b09a275df"), null, null, null));
         Item helmet = itemService.attachTemplate(
                 new Item(UUID.randomUUID(), UUID.fromString("019faec6-116d-723d-b04c-76d51a2a2cb7"), null, null, null));
+        Item plateArmor = itemService.attachTemplate(
+                new Item(UUID.randomUUID(), UUID.fromString("019fcf0d-1f8d-7c4c-9275-33c4af4410a8"), null, null, null));
 
         assertThat(potion.getName()).isEqualTo("Potion de soin");
         assertThat(potion.getType()).isEqualTo(ItemType.POTION);
+        assertThat(potion.getRarity()).isEqualTo(Rarity.COMMON);
         assertThat(sword.getName()).isEqualTo("Epée courte");
         assertThat(sword.getType()).isEqualTo(ItemType.WEAPON);
         assertThat(sword.getDamageDice()).isEqualTo("1d6");
         assertThat(helmet.getName()).isEqualTo("Casque de fer");
         assertThat(helmet.getType()).isEqualTo(ItemType.HELMET);
+        assertThat(plateArmor.getName()).isEqualTo("Armure de plates");
+        assertThat(plateArmor.getRarity()).isEqualTo(Rarity.UNCOMMON);
     }
 
     private Room room(UUID roomId) {

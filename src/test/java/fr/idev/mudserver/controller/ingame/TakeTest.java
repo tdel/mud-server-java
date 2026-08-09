@@ -10,6 +10,7 @@ import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.controller.RecordingConnection;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Item;
+import fr.idev.mudserver.domain.Rarity;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
@@ -88,7 +89,7 @@ class TakeTest extends AbstractIntegrationTest {
 
         take.onReceive(connection, "Potion de soin");
 
-        assertThat(connection.received).containsExactly(new ItemTaken("Potion de soin"));
+        assertThat(connection.received).containsExactly(new ItemTaken("Potion de soin", Rarity.COMMON));
         assertThat(character.getInventory().getItems()).contains(itemInRoom);
         assertThat(room.getItems()).doesNotContain(itemInRoom);
     }

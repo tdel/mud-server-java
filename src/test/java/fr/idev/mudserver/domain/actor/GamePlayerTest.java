@@ -9,6 +9,7 @@ import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.ItemType;
+import fr.idev.mudserver.domain.Rarity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -84,7 +85,7 @@ class GamePlayerTest {
 
     private Item armor(String name, ArmorCategory category, int baseAc) {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), name, null, ItemType.ARMOR, 5, category, baseAc,
-                null, 0);
+                null, 0, Rarity.COMMON);
         Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.CHEST);
         item.attachTemplate(template);
         return item;
@@ -92,7 +93,7 @@ class GamePlayerTest {
 
     private Item shield() {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Bouclier", null, ItemType.SHIELD, 3, null, 2, null,
-                0);
+                0, Rarity.COMMON);
         Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.OFF_HAND);
         item.attachTemplate(template);
         return item;

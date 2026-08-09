@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.Item;
+import fr.idev.mudserver.domain.Rarity;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -59,8 +60,9 @@ public class Unequip implements ControllerHandler {
             return;
         }
 
+        Rarity templateRarity = item.get().getRarity();
         character.unequipItem(item.get());
 
-        connection.send(new ItemUnequipped(templateName));
+        connection.send(new ItemUnequipped(templateName, templateRarity));
     }
 }

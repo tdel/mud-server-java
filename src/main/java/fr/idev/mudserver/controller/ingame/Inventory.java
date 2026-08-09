@@ -36,9 +36,11 @@ public class Inventory implements ControllerHandler {
         GamePlayer character = gameWorld.character(connection);
 
         List<Item> items = character.getInventory().getItems();
-        List<String> names = items.stream().map(Item::getName).toList();
+        List<fr.idev.mudserver.network.message.ingame.Inventory.Entry> entries = items.stream().map(
+                item -> new fr.idev.mudserver.network.message.ingame.Inventory.Entry(item.getName(), item.getRarity()))
+                .toList();
 
         connection.send(
-                new fr.idev.mudserver.network.message.ingame.Inventory(names, character.getInventory().getGold()));
+                new fr.idev.mudserver.network.message.ingame.Inventory(entries, character.getInventory().getGold()));
     }
 }

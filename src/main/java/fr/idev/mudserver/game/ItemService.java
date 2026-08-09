@@ -20,6 +20,7 @@ import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.ItemType;
+import fr.idev.mudserver.domain.Rarity;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDroppedItem;
@@ -76,7 +77,7 @@ public class ItemService {
             for (ItemTemplateDefinition definition : definitions) {
                 registerTemplate(new ItemTemplate(definition.id(), definition.name(), definition.description(),
                         definition.type(), definition.weight(), definition.armorCategory(), definition.baseAc(),
-                        definition.damageDice(), definition.price()));
+                        definition.damageDice(), definition.price(), definition.rarity()));
             }
             log.info("item.templates_loaded count={}", templates.size());
         } catch (IOException | JacksonException e) {
@@ -101,15 +102,19 @@ public class ItemService {
     }
 
     /**
-     * Utilisé par {@code NpcService.warmNpcs} pour dénormaliser le nom d'article
-     * sur chaque {@code GameNpcSeller.NpcShopEntry} au chargement, sur le même
-     * principe que {@link #templateIds()} — juste assez de donnée pour ne pas
+     * Utilisé par {@code NpcService.warmNpcs} pour dénormaliser le nom d'article et
+     * sa rareté sur chaque {@code GameNpcSeller.NpcShopEntry} au chargement, sur le
+     * même principe que {@link #templateIds()} — juste assez de donnée pour ne pas
      * forcer une vraie dépendance à {@code ItemService}/{@code ItemDao}.
      */
-    public Map<UUID, String> templateNamesById() {
-        Map<UUID, String> names = new ConcurrentHashMap<>();
-        templates.forEach((id, template) -> names.put(id, template.getName()));
-        return names;
+    public Map<UUID, ItemSummary> templateSummariesById() {
+        Map<UUID, ItemSummary> summaries = new ConcurrentHashMap<>();
+        templates.forEach(
+                (id, template) -> summaries.put(id, new ItemSummary(template.getName(), template.getRarity())));
+        return summaries;
+    }
+
+    public record ItemSummary(String name, Rarity rarity) {
     }
 
     public List<Item> loadInventory(GamePlayer character) {
@@ -201,7 +206,7 @@ public class ItemService {
     void onCharacterLootedItem(CharacterLootedItem event) {
         attachTemplate(event.item());
         itemDao.insert(event.item());
-        event.character().send(new EquipmentLooted(event.item().getName()));
+        event.character().send(new EquipmentLooted(event.item().getName(), event.item().getRarity()));
         log.info("item.looted item={} character={}", event.item().getName(), event.character().getName());
     }
 
@@ -215,12 +220,12 @@ public class ItemService {
     void onItemPurchased(ItemPurchased event) {
         attachTemplate(event.item());
         itemDao.insert(event.item());
-        event.character().send(new ItemBought(event.item().getName(), event.price()));
+        event.character().send(new ItemBought(event.item().getName(), event.item().getRarity(), event.price()));
         log.info("item.purchased item={} character={} price={}", event.item().getName(), event.character().getName(),
                 event.price());
     }
 
     private record ItemTemplateDefinition(UUID id, String name, String description, ItemType type, int weight,
-            ArmorCategory armorCategory, int baseAc, String damageDice, int price) {
+            ArmorCategory armorCategory, int baseAc, String damageDice, int price, Rarity rarity) {
     }
 }

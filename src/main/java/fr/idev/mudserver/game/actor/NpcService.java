@@ -18,6 +18,7 @@ import fr.idev.mudserver.domain.actor.GameNpc.NpcDialogueOptionType;
 import fr.idev.mudserver.domain.actor.GameNpcSeller;
 import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.game.ItemService;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -30,14 +31,14 @@ import tools.jackson.databind.ObjectMapper;
  * déjà une instance placée, comme {@code data/rooms.json}.
  *
  * <p>
- * {@code itemNamesById} (paramètre de {@link #warmNpcs}, transmis par
+ * {@code itemSummariesById} (paramètre de {@link #warmNpcs}, transmis par
  * {@code ServerApplication.warmupRunner} après {@code itemService
  * .warmItemTemplates()}) sert à valider au démarrage, fail-fast, le catalogue
  * boutique d'un PNJ marchand — même principe que
  * {@code MonsterService.loadMonsters} pour les tables de butin — et à
- * dénormaliser le nom de chaque article sur {@code GameNpcSeller.NpcShopEntry},
- * pour qu'il n'ait plus besoin d'une dépendance à {@code ItemService} à
- * l'exécution.
+ * dénormaliser le nom et la rareté de chaque article sur
+ * {@code GameNpcSeller.NpcShopEntry}, pour qu'il n'ait plus besoin d'une
+ * dépendance à {@code ItemService} à l'exécution.
  */
 @Service
 public class NpcService {
@@ -52,17 +53,18 @@ public class NpcService {
         this.objectMapper = objectMapper;
     }
 
-    public void warmNpcs(Collection<Room> rooms, Map<UUID, String> itemNamesById) {
+    public void warmNpcs(Collection<Room> rooms, Map<UUID, ItemService.ItemSummary> itemSummariesById) {
         try (InputStream in = getClass().getResourceAsStream(NPCS_RESOURCE)) {
             List<NpcDefinition> definitions = objectMapper.readValue(in, new TypeReference<List<NpcDefinition>>() {
             });
-            loadNpcs(definitions, rooms, itemNamesById);
+            loadNpcs(definitions, rooms, itemSummariesById);
         } catch (IOException | JacksonException e) {
             throw new IllegalStateException("Impossible de charger " + NPCS_RESOURCE, e);
         }
     }
 
-    void loadNpcs(List<NpcDefinition> definitions, Collection<Room> rooms, Map<UUID, String> itemNamesById) {
+    void loadNpcs(List<NpcDefinition> definitions, Collection<Room> rooms,
+            Map<UUID, ItemService.ItemSummary> itemSummariesById) {
         Map<UUID, Room> roomsById = new ConcurrentHashMap<>();
         for (Room room : rooms) {
             roomsById.put(room.getId(), room);
@@ -76,7 +78,7 @@ public class NpcService {
             }
 
             GameNpc.NpcDialogue dialogue = toDialogue(definition);
-            GameNpcSeller.NpcShop shop = toShop(definition, itemNamesById);
+            GameNpcSeller.NpcShop shop = toShop(definition, itemSummariesById);
 
             GameNpc npc = shop != null
                     ? new GameNpcSeller(definition.id(), definition.name(), room.getId(), definition.description(),
@@ -100,7 +102,8 @@ public class NpcService {
         return new GameNpc.NpcDialogue(dialogueDef.greeting(), options);
     }
 
-    private GameNpcSeller.NpcShop toShop(NpcDefinition definition, Map<UUID, String> itemNamesById) {
+    private GameNpcSeller.NpcShop toShop(NpcDefinition definition,
+            Map<UUID, ItemService.ItemSummary> itemSummariesById) {
         DialogueDefinition dialogueDef = definition.dialogue();
         if (dialogueDef == null) {
             return null;
@@ -119,8 +122,8 @@ public class NpcService {
 
         List<GameNpcSeller.NpcShopEntry> entries = new ArrayList<>();
         for (ShopEntryDefinition entry : shopDef.items()) {
-            String itemName = itemNamesById.get(entry.itemTemplateId());
-            if (itemName == null) {
+            ItemService.ItemSummary summary = itemSummariesById.get(entry.itemTemplateId());
+            if (summary == null) {
                 throw new IllegalStateException("NPC " + definition.id() + " vend l'item " + entry.itemTemplateId()
                         + ", absent de data/items.json");
             }
@@ -128,7 +131,8 @@ public class NpcService {
                 throw new IllegalStateException("NPC " + definition.id() + " vend l'item " + entry.itemTemplateId()
                         + " à un prix invalide (" + entry.price() + ")");
             }
-            entries.add(new GameNpcSeller.NpcShopEntry(entry.itemTemplateId(), itemName, entry.price()));
+            entries.add(new GameNpcSeller.NpcShopEntry(entry.itemTemplateId(), summary.name(), summary.rarity(),
+                    entry.price()));
         }
         return new GameNpcSeller.NpcShop(entries);
     }

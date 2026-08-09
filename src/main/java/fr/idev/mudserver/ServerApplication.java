@@ -35,8 +35,8 @@ import fr.idev.mudserver.game.RoomService;
  * des identifiants d'{@code ItemTemplate}, validés au chargement contre
  * {@link ItemService#templateIds()} pour échouer tôt sur un UUID invalide
  * plutôt qu'au premier drop en jeu. {@code npcService.warmNpcs} reçoit
- * désormais lui aussi {@link ItemService#templateNamesById()}, pour la même
- * raison — et pour dénormaliser le nom de chaque article vendu sur
+ * désormais lui aussi {@link ItemService#templateSummariesById()}, pour la même
+ * raison — et pour dénormaliser le nom et la rareté de chaque article vendu sur
  * {@code GameNpcSeller.NpcShopEntry} : le catalogue boutique d'un PNJ marchand
  * (voir {@code data/npcs.json}) est validé au démarrage plutôt qu'au premier
  * achat en jeu.
@@ -77,7 +77,7 @@ public class ServerApplication {
             roomService.warmRooms();
             itemService.warmItemTemplates();
             monsterService.warmMonsters(roomService.allRooms(), itemService.templateIds());
-            npcService.warmNpcs(roomService.allRooms(), itemService.templateNamesById());
+            npcService.warmNpcs(roomService.allRooms(), itemService.templateSummariesById());
             itemService.warmRoomItems(roomService.allRooms());
             raceService.warmRaceBonuses();
             classService.warmClassDefinitions();

@@ -14,6 +14,7 @@ import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.ItemType;
+import fr.idev.mudserver.domain.Rarity;
 import fr.idev.mudserver.domain.actor.MonsterTemplate;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.Room;
@@ -176,7 +177,7 @@ class CombatServiceTest {
 
     private void equipWeapon(GamePlayer character, String damageDice) {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3, null, 0,
-                damageDice, 0);
+                damageDice, 0, Rarity.COMMON);
         Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.WEAPON);
         item.attachTemplate(template);
         character.getInventory().addItem(item);
@@ -184,7 +185,7 @@ class CombatServiceTest {
 
     private void equipArmor(GamePlayer character, int baseAc) {
         ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Armure", null, ItemType.ARMOR, 10,
-                ArmorCategory.HEAVY, baseAc, null, 0);
+                ArmorCategory.HEAVY, baseAc, null, 0, Rarity.COMMON);
         Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.CHEST);
         item.attachTemplate(template);
         character.getInventory().addItem(item);

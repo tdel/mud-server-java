@@ -62,6 +62,6 @@ public class Take implements ControllerHandler {
             return;
         }
 
-        connection.send(new ItemTaken(item.get().getName()));
+        connection.send(new ItemTaken(item.get().getName(), item.get().getRarity()));
     }
 }

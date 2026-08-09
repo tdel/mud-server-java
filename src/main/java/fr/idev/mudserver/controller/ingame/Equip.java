@@ -9,6 +9,7 @@ import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
+import fr.idev.mudserver.domain.Rarity;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -54,6 +55,7 @@ public class Equip implements ControllerHandler {
         }
 
         String templateName = item.get().getName();
+        Rarity templateRarity = item.get().getRarity();
         Optional<EquipmentSlot> slot = character.equipItem(item.get());
 
         if (slot.isEmpty()) {
@@ -61,6 +63,6 @@ public class Equip implements ControllerHandler {
             return;
         }
 
-        connection.send(new ItemEquipped(templateName, slot.get()));
+        connection.send(new ItemEquipped(templateName, templateRarity, slot.get()));
     }
 }

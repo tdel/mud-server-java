@@ -1,9 +1,13 @@
 package fr.idev.mudserver.telnet;
 
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
+import fr.idev.mudserver.domain.Rarity;
 import fr.idev.mudserver.game.HexGridRenderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,6 +19,21 @@ class AnsiTest {
     @Test
     void selfHasADistinctColorFromOtherPlayers() {
         assertThat(Ansi.self("@")).isNotEqualTo(Ansi.player("@"));
+    }
+
+    @Test
+    void itemColorDependsOnRarityAndContentSurvivesStripping() {
+        Set<String> colored = EnumSet.allOf(Rarity.class).stream().map(rarity -> Ansi.item("Sword", rarity))
+                .collect(Collectors.toSet());
+
+        assertThat(colored).hasSize(Rarity.values().length);
+        colored.forEach(value -> assertThat(stripAnsi(value)).isEqualTo("Sword"));
+    }
+
+    @Test
+    void itemUncommonMatchesTheHistoricalDefaultItemColor() {
+        assertThat(Ansi.item("Sword", Rarity.UNCOMMON))
+                .isEqualTo(AnsiColor.BOLD.code() + AnsiColor.GREEN.code() + "Sword" + AnsiColor.RESET.code());
     }
 
     @Test

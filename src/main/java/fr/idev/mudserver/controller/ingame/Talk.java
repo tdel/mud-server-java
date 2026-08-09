@@ -118,7 +118,7 @@ public class Talk implements ControllerHandler {
     private void promptShop(Connection connection, GamePlayer character, GameNpcSeller npc,
             GameNpc.NpcDialogue dialogue) {
         List<ShopCatalog.Entry> entries = npc.shop().items().stream()
-                .map(entry -> new ShopCatalog.Entry(entry.itemName(), entry.price())).toList();
+                .map(entry -> new ShopCatalog.Entry(entry.itemName(), entry.rarity(), entry.price())).toList();
 
         connection.requestBlocking(new ShopCatalog(npc.getName(), entries, character.getInventory().getGold()),
                 line -> {
