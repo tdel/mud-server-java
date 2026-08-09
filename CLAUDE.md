@@ -5,6 +5,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project
 This project is a game. It is built around DnD5e (Dungeon and Dragon 5th edition). Every system in this game must be compliant with DnD5e.
 
+## DnD5e rules reference
+
+`docs/dnd5e/` holds a scoped, per-system summary of the DnD5e SRD rules (sourced from the official CC-BY-licensed SRD 5.1), each file ending with a "Notes for this project" section tying the rule to the current implementation. Load only the file(s) relevant to the system being touched — don't read the whole directory speculatively. Start from `docs/dnd5e/README.md` for the full index; direct links to the most commonly relevant files:
+
+- [Ability scores, checks & saves](docs/dnd5e/ability-scores.md)
+- [Races](docs/dnd5e/races.md) / [Classes](docs/dnd5e/classes.md) / [Backgrounds & alignment](docs/dnd5e/backgrounds-alignment.md)
+- [Leveling & XP](docs/dnd5e/leveling-xp.md)
+- [Combat](docs/dnd5e/combat.md) / [Conditions](docs/dnd5e/conditions.md) / [Damage, healing & death](docs/dnd5e/damage-healing-death.md)
+- [Resting](docs/dnd5e/resting.md) / [Movement & environment](docs/dnd5e/movement-environment.md)
+- [Equipment](docs/dnd5e/equipment.md) / [Magic items](docs/dnd5e/magic-items.md) (rarity + bonus system already implemented — see notes there)
+- [Spellcasting](docs/dnd5e/spellcasting.md) (not yet implemented) / [Feats](docs/dnd5e/feats.md) (not yet implemented)
+- [Monsters & NPCs](docs/dnd5e/monsters-npcs.md)
+
 ## Build, test, run
 
 Neither Java nor Maven is installed on the host — Maven runs through Docker instead, using the locally-pulled `maven:3.9.16-eclipse-temurin-25` image:
