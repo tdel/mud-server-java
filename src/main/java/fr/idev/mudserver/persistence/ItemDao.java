@@ -55,6 +55,10 @@ public class ItemDao {
         dsl.update(ITEM).set(ITEM.SLOT, slot == null ? null : slot.name()).where(ITEM.ID.eq(itemId)).execute();
     }
 
+    public void delete(UUID itemId) {
+        dsl.deleteFrom(ITEM).where(ITEM.ID.eq(itemId)).execute();
+    }
+
     private static Item toDomain(ItemRecord record) {
         String slot = record.getSlot();
         return new Item(record.getId(), record.getTemplateId(), record.getRoomId(), record.getCharacterId(),

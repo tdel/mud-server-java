@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.domain.ArmorCategory;
+import fr.idev.mudserver.domain.ConsumableEffect;
+import fr.idev.mudserver.domain.ConsumableItem;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
@@ -26,8 +28,10 @@ import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDroppedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEquippedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUnequippedItem;
+import fr.idev.mudserver.domain.actor.event.GamePlayerUsedPotion;
 import fr.idev.mudserver.domain.actor.event.ItemPickedUp;
 import fr.idev.mudserver.domain.actor.event.ItemPurchased;
+import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.message.ingame.EquipmentLooted;
 import fr.idev.mudserver.network.message.ingame.ItemBought;
 import fr.idev.mudserver.persistence.ItemDao;
@@ -63,10 +67,12 @@ public class ItemService {
 
     private final ItemDao itemDao;
     private final ObjectMapper objectMapper;
+    private final DiceRoller diceRoller;
 
-    public ItemService(ItemDao itemDao, ObjectMapper objectMapper) {
+    public ItemService(ItemDao itemDao, ObjectMapper objectMapper, DiceRoller diceRoller) {
         this.itemDao = itemDao;
         this.objectMapper = objectMapper;
+        this.diceRoller = diceRoller;
     }
 
     public void warmItemTemplates() {
@@ -75,14 +81,24 @@ public class ItemService {
                     new TypeReference<List<ItemTemplateDefinition>>() {
                     });
             for (ItemTemplateDefinition definition : definitions) {
-                registerTemplate(new ItemTemplate(definition.id(), definition.name(), definition.description(),
-                        definition.type(), definition.weight(), definition.armorCategory(), definition.baseAc(),
-                        definition.damageDice(), definition.price(), definition.rarity(), definition.bonus()));
+                registerTemplate(toTemplate(definition));
             }
             log.info("item.templates_loaded count={}", templates.size());
         } catch (IOException | JacksonException e) {
             throw new IllegalStateException("Impossible de charger " + ITEM_TEMPLATE_RESOURCE, e);
         }
+    }
+
+    private ItemTemplate toTemplate(ItemTemplateDefinition definition) {
+        if (definition.consumableEffect() != null) {
+            return new ConsumableItem(definition.id(), definition.name(), definition.description(), definition.type(),
+                    definition.weight(), definition.armorCategory(), definition.baseAc(), definition.damageDice(),
+                    definition.price(), definition.rarity(), definition.bonus(), definition.consumableEffect(),
+                    definition.effectDice(), diceRoller);
+        }
+        return new ItemTemplate(definition.id(), definition.name(), definition.description(), definition.type(),
+                definition.weight(), definition.armorCategory(), definition.baseAc(), definition.damageDice(),
+                definition.price(), definition.rarity(), definition.bonus());
     }
 
     void registerTemplate(ItemTemplate template) {
@@ -225,7 +241,21 @@ public class ItemService {
                 event.price());
     }
 
+    /**
+     * L'objet consommé n'a plus lieu d'exister en base une fois utilisé — {@code
+     * ConsumableItem#consume} l'a déjà retiré de l'inventaire en mémoire, ce
+     * listener supprime sa ligne DB, symétrique de {@link #onCharacterLootedItem}/
+     * {@link #onItemPurchased} qui en insèrent une.
+     */
+    @EventListener
+    void onGamePlayerUsedPotion(GamePlayerUsedPotion event) {
+        itemDao.delete(event.item().getId());
+        log.info("item.consumed item={} character={} healedAmount={}", event.item().getId(),
+                event.character().getName(), event.healedAmount());
+    }
+
     private record ItemTemplateDefinition(UUID id, String name, String description, ItemType type, int weight,
-            ArmorCategory armorCategory, int baseAc, String damageDice, int price, Rarity rarity, int bonus) {
+            ArmorCategory armorCategory, int baseAc, String damageDice, int price, Rarity rarity, int bonus,
+            ConsumableEffect consumableEffect, String effectDice) {
     }
 }

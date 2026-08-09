@@ -7,7 +7,45 @@
         "baseAc": 0,
         "price": 50,
         "rarity": "COMMON",
-        "bonus": 0
+        "bonus": 0,
+        "consumableEffect": "HEALING",
+        "effectDice": "2d4+2"
+    },
+    {
+        "id": "6aeb7483-2694-4388-8c6b-f841fd5e48b4",
+        "name": "Potion de soin supérieure",
+        "type": "POTION",
+        "weight": 1,
+        "baseAc": 0,
+        "price": 150,
+        "rarity": "UNCOMMON",
+        "bonus": 0,
+        "consumableEffect": "HEALING",
+        "effectDice": "4d4+4"
+    },
+    {
+        "id": "f9083584-d5af-458c-bb9b-3ee7714452e3",
+        "name": "Potion de soin majeure",
+        "type": "POTION",
+        "weight": 1,
+        "baseAc": 0,
+        "price": 700,
+        "rarity": "RARE",
+        "bonus": 0,
+        "consumableEffect": "HEALING",
+        "effectDice": "8d4+8"
+    },
+    {
+        "id": "58373f5a-2f2a-4039-8a52-05ac333dd57f",
+        "name": "Potion de soin suprême",
+        "type": "POTION",
+        "weight": 1,
+        "baseAc": 0,
+        "price": 2700,
+        "rarity": "VERY_RARE",
+        "bonus": 0,
+        "consumableEffect": "HEALING",
+        "effectDice": "10d4+20"
     },
     {
         "id": "019fa0a5-80c0-7035-9c2d-113b09a275df",

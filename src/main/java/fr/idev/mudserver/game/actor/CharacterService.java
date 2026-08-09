@@ -13,10 +13,12 @@ import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
 import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
 import fr.idev.mudserver.domain.actor.event.CharacterSpentGold;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
+import fr.idev.mudserver.domain.actor.event.GamePlayerUsedPotion;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.message.ingame.GoldLooted;
 import fr.idev.mudserver.network.message.ingame.GoldSpent;
+import fr.idev.mudserver.network.message.ingame.ItemUsed;
 import fr.idev.mudserver.network.message.ingame.PlayerLeveledUp;
 import fr.idev.mudserver.network.message.ingame.PlayerRespawned;
 import fr.idev.mudserver.network.message.ingame.XpGained;
@@ -147,5 +149,20 @@ public class CharacterService {
 
         character.send(new PlayerRespawned(startingRoom.getName()));
         log.info("character.respawned character={} room={}", character.getName(), startingRoom.getName());
+    }
+
+    /**
+     * {@code ConsumableItem#consume} a déjà mis à jour les PV en mémoire et retiré
+     * la potion de l'inventaire — persiste et confirme au joueur, même mécanisme
+     * que {@link #onCharacterReceivedGold}.
+     */
+    @EventListener
+    void onGamePlayerUsedPotion(GamePlayerUsedPotion event) {
+        GamePlayer character = event.character();
+        characterDao.update(character);
+        character.send(new ItemUsed(event.item().getName(), event.item().getRarity(), event.healedAmount(),
+                character.getCurrentHealth(), character.getMaxHealth()));
+        log.info("character.used_potion character={} item={} healedAmount={}", character.getName(),
+                event.item().getName(), event.healedAmount());
     }
 }

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import fr.idev.mudserver.domain.ConsumableItem;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.actor.CombatEncounter;
 import fr.idev.mudserver.domain.actor.GameCharacter;
@@ -22,8 +23,7 @@ import fr.idev.mudserver.network.message.ingame.AlreadyInAnotherEncounter;
 import fr.idev.mudserver.network.message.ingame.AttackResult;
 import fr.idev.mudserver.network.message.ingame.CombatantJoined;
 import fr.idev.mudserver.network.message.ingame.EncounterEnded;
-import fr.idev.mudserver.network.message.ingame.ItemUseNotImplemented;
-import fr.idev.mudserver.network.message.ingame.ItemUseRequiresCombat;
+import fr.idev.mudserver.network.message.ingame.ItemNotUsable;
 import fr.idev.mudserver.network.message.ingame.MonsterAggroBroadcast;
 import fr.idev.mudserver.network.message.ingame.MonsterAggroTriggered;
 import fr.idev.mudserver.network.message.ingame.MonsterAttackBroadcast;
@@ -100,9 +100,14 @@ public class CombatEngine {
     }
 
     public void useItem(GamePlayer user, Item item) {
+        if (!(item.getTemplate() instanceof ConsumableItem consumable)) {
+            user.send(new ItemNotUsable(item.getName()));
+            return;
+        }
+
         CombatEncounter encounter = user.getEncounter();
         if (encounter == null) {
-            user.send(new ItemUseRequiresCombat());
+            consumable.consume(user, item);
             return;
         }
 
@@ -110,7 +115,7 @@ public class CombatEngine {
             if (encounter.currentParticipant() != user) {
                 user.send(new NotYourTurn());
             } else {
-                user.send(new ItemUseNotImplemented(item.getName()));
+                consumable.consume(user, item);
                 cascade(encounter);
             }
         }
