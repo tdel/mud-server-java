@@ -171,6 +171,59 @@ class CombatEngineTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void multipleActionsPerTurnLetThePlayerActAgainBeforeTheTurnAdvances() {
+        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        // DEX 100 => l'attaquant gagne quasi systématiquement l'initiative face au
+        // monstre (DEX 10), même convention que les autres tests de cette classe.
+        GamePlayer attacker = player("Attaquant", 10, 100, room);
+        GameMonster monster = monster(room, 1000, -1000, 10, 10, "1d4");
+        attacker.getActionEconomy().setActionsMax(2);
+        RecordingConnection attackerConnection = new RecordingConnection();
+        attacker.setConnection(attackerConnection);
+
+        // Coup d'ouverture : établit l'initiative, et resolveFromCurrentTurn
+        // réinitialise le budget de l'attaquant s'il gagne l'initiative, prenant en
+        // compte le setActionsMax(2) fait ci-dessus.
+        combatEngine.attack(attacker, monster);
+        assertThat(attacker.getEncounter().currentParticipant()).isEqualTo(attacker);
+        assertThat(attacker.getActionEconomy().getActionsRemaining()).isEqualTo(2);
+
+        attackerConnection.received.clear();
+        combatEngine.attack(attacker, monster); // consomme la 1ère des 2 actions
+        assertThat(attacker.getEncounter().currentParticipant())
+                .as("le tour ne doit pas avancer tant qu'il reste une action").isEqualTo(attacker);
+        assertThat(attackerConnection.received).noneMatch(MonsterAttackResult.class::isInstance);
+
+        combatEngine.attack(attacker, monster); // consomme la dernière action, épuise le budget : cascade
+        assertThat(attackerConnection.received).as("épuiser le budget doit déclencher la riposte du monstre")
+                .anyMatch(MonsterAttackResult.class::isInstance);
+    }
+
+    @Test
+    void monsterTurnResetsItsBudgetButStillResolvesExactlyOneAttackRegardlessOfPoolSize() {
+        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        GamePlayer attacker = player("Attaquant", 10, 100, room);
+        GameMonster monster = monster(room, 1000, -1000, 10, 10, "1d4");
+        monster.getActionEconomy().setActionsMax(3);
+        RecordingConnection attackerConnection = new RecordingConnection();
+        attacker.setConnection(attackerConnection);
+
+        combatEngine.attack(attacker, monster); // coup d'ouverture, établit l'initiative
+        assertThat(attacker.getEncounter().currentParticipant()).isEqualTo(attacker);
+
+        attackerConnection.received.clear();
+        combatEngine.attack(attacker, monster); // épuise l'unique action du joueur : cascade dans le tour du monstre
+
+        assertThat(monster.getActionEconomy().getActionsRemaining())
+                .as("le reset de début de tour s'applique aussi aux monstres").isEqualTo(3);
+        long monsterAttacksReceived = attackerConnection.received.stream().filter(MonsterAttackResult.class::isInstance)
+                .count();
+        assertThat(monsterAttacksReceived)
+                .as("un monstre ne résout qu'une seule attaque par tour pour l'instant, quelle que soit sa réserve")
+                .isEqualTo(1);
+    }
+
+    @Test
     void cascadeResolvesEveryMonsterTurnBeforeReturningControlToTheLoneSurvivingPlayer() {
         Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
         // DEX 100 => le joueur agit systématiquement en premier ; les deux monstres

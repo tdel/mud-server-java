@@ -10,10 +10,12 @@ import fr.idev.mudserver.telnet.TelnetOutput;
  * (après une riposte de monstre déclenchée par l'action d'un autre joueur, sur
  * le thread de ce dernier) n'aurait aucun signal qu'il doit agir.
  */
-public record YourTurn() implements OutputTelnetMessage {
+public record YourTurn(int actionsRemaining, int extraActionsRemaining) implements OutputTelnetMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        output.write("It's your turn! attack <target> or use <item>.\n");
+        String extra = extraActionsRemaining > 0 ? " and " + extraActionsRemaining + " extra action(s)" : "";
+        output.write("It's your turn! You have " + actionsRemaining + " action(s)" + extra
+                + ". attack <target> or use <item>.\n");
     }
 }

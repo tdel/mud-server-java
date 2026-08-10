@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.ConsumableItem;
 import fr.idev.mudserver.domain.Item;
+import fr.idev.mudserver.domain.actor.ActionEconomy;
 import fr.idev.mudserver.domain.actor.CombatEncounter;
 import fr.idev.mudserver.domain.actor.GameCharacter;
 import fr.idev.mudserver.domain.actor.GameMonster;
@@ -19,6 +20,7 @@ import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEnteredCell;
 import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoller;
+import fr.idev.mudserver.network.message.ingame.ActionsRemaining;
 import fr.idev.mudserver.network.message.ingame.AlreadyInAnotherEncounter;
 import fr.idev.mudserver.network.message.ingame.AttackResult;
 import fr.idev.mudserver.network.message.ingame.CombatantJoined;
@@ -105,11 +107,11 @@ public class CombatEngine {
         }
 
         synchronized (encounter) {
-            if (encounter.currentParticipant() != user) {
+            if (encounter.currentParticipant() != user || !user.getActionEconomy().trySpendAction()) {
                 user.send(new NotYourTurn());
             } else {
                 consumable.consume(user, item);
-                cascade(encounter);
+                continueOrEndTurn(encounter, user);
             }
         }
     }
@@ -237,7 +239,7 @@ public class CombatEngine {
 
     private void performTurnAttack(CombatEncounter encounter, GamePlayer attacker, GameMonster target) {
         synchronized (encounter) {
-            if (encounter.currentParticipant() != attacker) {
+            if (encounter.currentParticipant() != attacker || !attacker.getActionEconomy().trySpendAction()) {
                 attacker.send(new NotYourTurn());
                 return;
             }
@@ -249,6 +251,23 @@ public class CombatEngine {
             if (result.hit()) {
                 target.takeDamage(result.damage(), attacker);
             }
+            continueOrEndTurn(encounter, attacker);
+        }
+    }
+
+    /**
+     * PRÉCONDITION : appelant détient déjà synchronized(encounter), et vient de
+     * consommer une action de {@code actor}. Ne fait avancer le tour (cascade) que
+     * si le budget est désormais épuisé ; sinon signale à {@code actor} son solde
+     * restant sans toucher au pointeur — une seconde commande attack/use dans le
+     * même tour retombe alors sur la même branche performTurnAttack/useItem,
+     * puisque {@code currentParticipant()} n'a pas changé.
+     */
+    private void continueOrEndTurn(CombatEncounter encounter, GamePlayer actor) {
+        ActionEconomy economy = actor.getActionEconomy();
+        if (economy.hasActionRemaining()) {
+            actor.send(new ActionsRemaining(economy.getActionsRemaining(), economy.getExtraActionsRemaining()));
+        } else {
             cascade(encounter);
         }
     }
@@ -302,6 +321,7 @@ public class CombatEngine {
      */
     private void resolveFromCurrentTurn(CombatEncounter encounter) {
         while (!encounter.isOver() && encounter.currentParticipant() instanceof GameMonster monster) {
+            monster.getActionEconomy().resetForTurn();
             List<GamePlayer> livingPlayers = encounter.livingPlayers();
             if (livingPlayers.isEmpty()) {
                 break;
@@ -329,7 +349,9 @@ public class CombatEngine {
             encounter.getRoom().broadcast(new EncounterEnded(playersWon), null);
             log.info("combat.encounter_ended room={} playersWon={}", encounter.getRoom().getName(), playersWon);
         } else if (encounter.currentParticipant() instanceof GamePlayer nextPlayer) {
-            nextPlayer.send(new YourTurn());
+            nextPlayer.getActionEconomy().resetForTurn();
+            ActionEconomy economy = nextPlayer.getActionEconomy();
+            nextPlayer.send(new YourTurn(economy.getActionsRemaining(), economy.getExtraActionsRemaining()));
         }
     }
 

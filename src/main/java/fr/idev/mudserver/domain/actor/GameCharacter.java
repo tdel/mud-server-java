@@ -61,6 +61,16 @@ import fr.idev.mudserver.game.dice.DiceRoller;
  * par sous-type, via le point d'extension {@link #crossPortal} : la base ne
  * fait rien (un monstre/PNJ s'arrête sur la case-portail sans changer de room),
  * {@link GamePlayer} redéfinit pour réellement traverser vers la room liée.
+ *
+ * <p>
+ * {@code actionEconomy} suit la même convention « état vivant du process,
+ * jamais persisté » que {@code currentRoom}/{@code position}/{@code speed}
+ * ci-dessus : aucune fonctionnalité n'accorde encore d'action permanente
+ * supplémentaire, donc rien ne justifie une colonne DB pour l'instant — le jour
+ * où une telle fonctionnalité (feat, feature de classe) existera, elle devra
+ * réappliquer son bonus au chargement du personnage plutôt que persister un
+ * compteur brut, sur le même principe que la CA qui n'est jamais stockée
+ * précalculée à partir de l'équipement.
  */
 public abstract sealed class GameCharacter extends GameObject permits GamePlayer, GameMonster, GameNpc {
 
@@ -74,6 +84,7 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
     private HexCoordinate position;
     protected int speed = DEFAULT_SPEED;
     private volatile CombatEncounter encounter;
+    private final ActionEconomy actionEconomy = new ActionEconomy();
 
     protected GameCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
             int maxHealth) {
@@ -149,6 +160,10 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
 
     public void setEncounter(CombatEncounter encounter) {
         this.encounter = encounter;
+    }
+
+    public ActionEconomy getActionEconomy() {
+        return actionEconomy;
     }
 
     /**
