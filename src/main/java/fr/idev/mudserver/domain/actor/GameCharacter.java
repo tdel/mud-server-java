@@ -126,6 +126,21 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
         this.maxHealth = maxHealth;
     }
 
+    /**
+     * Point d'entrée commun pour tout soin borné aux PV max — potion
+     * ({@link fr.idev.mudserver.domain.ConsumableItem#consume}), repos court/long
+     * ({@code game.actor.RestService}). Clamp silencieusement plutôt que de lever
+     * une exception si {@code amount} dépasse les PV manquants, même esprit que
+     * {@link GamePlayer#takeDamage} qui clamp côté dégâts.
+     *
+     * @return le montant réellement soigné, jamais plus que les PV manquants
+     */
+    public int heal(int amount) {
+        int healed = Math.min(amount, maxHealth - currentHealth);
+        currentHealth += healed;
+        return healed;
+    }
+
     public Room getCurrentRoom() {
         return currentRoom;
     }

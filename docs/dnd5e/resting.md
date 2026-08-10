@@ -19,4 +19,9 @@ Source: [D&D 5e SRD 5.1](https://5thsrd.org/adventuring/resting/) (CC-BY-4.0, Wi
 
 ## Notes for this project
 
-No rest/downtime system exists yet — healing is currently via potions and (presumably) other in-combat or explicit means. If a rest command is ever added, short-rest Hit Dice spending is the natural fit for a "text-command" MUD action; long-rest exhaustion recovery only matters once [conditions.md](conditions.md) exhaustion tracking exists.
+Implemented as `rest short`/`rest long` (`controller.ingame.Rest`, `game.actor.RestService`), as a deliberately simplified house rule rather than the RAW mechanic above — several assumed deviations:
+
+- **No Hit Dice pool.** A short rest restores a flat `hitDie/2 + 1 + CON modifier` (minimum 1) per character — the same "average hit die" formula already used for HP-on-level-up (`CharacterService.onCharacterGainedXp`), rather than letting the player spend a variable number of real Hit Dice one roll at a time. A house-rule cap of `GamePlayer.MAX_SHORT_RESTS_BEFORE_LONG_REST` (2) short rests applies before a long rest becomes mandatory to reset the counter — not an SRD rule.
+- **Global scope, not per-character.** A short or long rest affects every `GamePlayer` currently online (`GameWorld.onlineCharacters()`), not just the initiator — a deliberate simplification for a MUD without a party/grouping concept, rather than SRD's "each creature decides individually."
+- **Food cost instead of time/exhaustion.** A long rest has no in-game time cost and doesn't reduce exhaustion (no exhaustion tracking exists yet, see [conditions.md](conditions.md)); instead it requires the initiator to select `FOOD`-type items (`domain.FoodItem`, sold by the Aubergiste) from their inventory summing to at least `RestService.LONG_REST_PROVISION_THRESHOLD` (20) nutrition value, all of which are consumed regardless of any excess over the threshold. No max-one-per-24h restriction is enforced.
+- Restores all missing HP (RAW-accurate) and resets the short-rest counter for every online player, mirroring the RAW "restores spent Hit Dice" effect without tracking Hit Dice at all.

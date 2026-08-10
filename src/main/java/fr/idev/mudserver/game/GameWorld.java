@@ -80,6 +80,15 @@ public class GameWorld {
         return characters.get(connection);
     }
 
+    /**
+     * Tous les joueurs actuellement en jeu, consommé par
+     * {@code game.actor.RestService} : un repos court/long affecte l'ensemble des
+     * joueurs en ligne, pas seulement celui qui l'initie (voir sa Javadoc).
+     */
+    public Collection<GamePlayer> onlineCharacters() {
+        return List.copyOf(characters.values());
+    }
+
     public boolean isCharacterInGame(UUID characterId) {
         return characters.values().stream().anyMatch(character -> character.getId().equals(characterId));
     }

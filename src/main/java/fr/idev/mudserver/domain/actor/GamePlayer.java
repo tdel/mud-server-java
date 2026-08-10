@@ -58,10 +58,32 @@ public final class GamePlayer extends GameCharacter {
     private final PlayerInventory inventory;
     private GameMonster target;
     private int xp;
+    private int shortRestCount;
+
+    /**
+     * Nombre maximum de repos courts qu'un personnage peut prendre avant qu'un
+     * repos long ne redevienne obligatoire pour réinitialiser
+     * {@link #shortRestCount} (voir {@code game.actor.RestService}).
+     */
+    public static final int MAX_SHORT_RESTS_BEFORE_LONG_REST = 2;
 
     public GamePlayer(UUID id, UUID accountId, String name, UUID currentRoomId, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold) {
+        this(id, accountId, name, currentRoomId, gender, race, characterClass, level, currentHealth, maxHealth,
+                attributes, xp, gold, 0);
+    }
+
+    /**
+     * Variante complète utilisée par {@code CharacterDao#toDomain} lors du
+     * rechargement d'un personnage existant, où {@code shortRestCount} doit
+     * refléter l'état persisté plutôt que redémarrer à 0 — un personnage
+     * fraîchement créé ({@code GameWorld.createCharacter}) ou construit en test
+     * passe par le constructeur court ci-dessus, qui délègue ici avec 0.
+     */
+    public GamePlayer(UUID id, UUID accountId, String name, UUID currentRoomId, Gender gender, Race race,
+            CharacterClass characterClass, int level, int currentHealth, int maxHealth,
+            Map<Attribute, Integer> attributes, int xp, int gold, int shortRestCount) {
         super(id, name, attributes, currentHealth, maxHealth);
         this.accountId = accountId;
         this.currentRoomId = currentRoomId;
@@ -72,6 +94,7 @@ public final class GamePlayer extends GameCharacter {
         this.level = level;
         this.xp = xp;
         this.inventory = new PlayerInventory(gold);
+        this.shortRestCount = shortRestCount;
     }
 
     public UUID getAccountId() {
@@ -301,6 +324,27 @@ public final class GamePlayer extends GameCharacter {
     public void gainXp(int amount) {
         this.xp += amount;
         DomainEventPublisher.publish(new CharacterGainedXp(this, amount));
+    }
+
+    public int getShortRestCount() {
+        return shortRestCount;
+    }
+
+    /**
+     * Faux une fois {@link #MAX_SHORT_RESTS_BEFORE_LONG_REST} repos courts pris
+     * depuis le dernier repos long — seul {@code game.actor.RestService} lit ce
+     * garde avant d'appliquer un repos court à l'ensemble des joueurs en ligne.
+     */
+    public boolean canTakeShortRest() {
+        return shortRestCount < MAX_SHORT_RESTS_BEFORE_LONG_REST;
+    }
+
+    public void incrementShortRestCount() {
+        shortRestCount++;
+    }
+
+    public void resetShortRestCount() {
+        shortRestCount = 0;
     }
 
     /**
@@ -567,16 +611,16 @@ public final class GamePlayer extends GameCharacter {
         }
         return level == other.level && xp == other.xp && inventory.getGold() == other.inventory.getGold()
                 && getCurrentHealth() == other.getCurrentHealth() && getMaxHealth() == other.getMaxHealth()
-                && Objects.equals(getId(), other.getId()) && Objects.equals(accountId, other.accountId)
-                && Objects.equals(getName(), other.getName()) && Objects.equals(currentRoomId, other.currentRoomId)
-                && gender == other.gender && race == other.race && characterClass == other.characterClass
-                && Objects.equals(getAttributes(), other.getAttributes());
+                && shortRestCount == other.shortRestCount && Objects.equals(getId(), other.getId())
+                && Objects.equals(accountId, other.accountId) && Objects.equals(getName(), other.getName())
+                && Objects.equals(currentRoomId, other.currentRoomId) && gender == other.gender && race == other.race
+                && characterClass == other.characterClass && Objects.equals(getAttributes(), other.getAttributes());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getId(), accountId, getName(), currentRoomId, gender, race, characterClass, level, xp,
-                inventory.getGold(), getCurrentHealth(), getMaxHealth(), getAttributes());
+                inventory.getGold(), getCurrentHealth(), getMaxHealth(), shortRestCount, getAttributes());
     }
 
     @Override
@@ -584,6 +628,7 @@ public final class GamePlayer extends GameCharacter {
         return "GamePlayer[id=" + getId() + ", accountId=" + accountId + ", name=" + getName() + ", currentRoomId="
                 + currentRoomId + ", gender=" + gender + ", race=" + race + ", characterClass=" + characterClass
                 + ", level=" + level + ", xp=" + xp + ", gold=" + inventory.getGold() + ", currentHealth="
-                + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + ", attributes=" + getAttributes() + "]";
+                + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + ", shortRestCount=" + shortRestCount
+                + ", attributes=" + getAttributes() + "]";
     }
 }

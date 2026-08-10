@@ -189,5 +189,49 @@
         "price": 60000,
         "rarity": "LEGENDARY",
         "bonus": 3
+    },
+    {
+        "id": "b4b5f22f-0fd1-43a6-b1f0-7ac0103478d6",
+        "name": "Pomme",
+        "type": "FOOD",
+        "weight": 1,
+        "baseAc": 0,
+        "price": 1,
+        "rarity": "COMMON",
+        "bonus": 0,
+        "nutritionValue": 5
+    },
+    {
+        "id": "db14f158-a073-4ef4-9dcd-94fea003e416",
+        "name": "Petit morceau de pain",
+        "type": "FOOD",
+        "weight": 1,
+        "baseAc": 0,
+        "price": 1,
+        "rarity": "COMMON",
+        "bonus": 0,
+        "nutritionValue": 5
+    },
+    {
+        "id": "507c6d42-1a10-4195-bc99-753be8bc4902",
+        "name": "Gros morceau de pain",
+        "type": "FOOD",
+        "weight": 2,
+        "baseAc": 0,
+        "price": 2,
+        "rarity": "COMMON",
+        "bonus": 0,
+        "nutritionValue": 10
+    },
+    {
+        "id": "95c33240-6454-408f-9584-cfb45427db84",
+        "name": "Oeufs",
+        "type": "FOOD",
+        "weight": 1,
+        "baseAc": 0,
+        "price": 3,
+        "rarity": "COMMON",
+        "bonus": 0,
+        "nutritionValue": 15
     }
 ]

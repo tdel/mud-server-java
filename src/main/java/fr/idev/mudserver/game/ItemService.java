@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.idev.mudserver.domain.ArmorCategory;
 import fr.idev.mudserver.domain.ConsumableEffect;
 import fr.idev.mudserver.domain.ConsumableItem;
+import fr.idev.mudserver.domain.FoodItem;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
@@ -32,6 +33,7 @@ import fr.idev.mudserver.domain.actor.event.GamePlayerUnequippedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUsedPotion;
 import fr.idev.mudserver.domain.actor.event.ItemPickedUp;
 import fr.idev.mudserver.domain.actor.event.ItemPurchased;
+import fr.idev.mudserver.domain.actor.event.LongRestTaken;
 import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.message.ingame.EquipmentLooted;
 import fr.idev.mudserver.network.message.ingame.ItemBought;
@@ -94,6 +96,12 @@ public class ItemService {
                     definition.weight(), definition.armorCategory(), definition.baseAc(), definition.damageDice(),
                     definition.weaponCategory(), definition.price(), definition.rarity(), definition.bonus(),
                     definition.consumableEffect(), definition.effectDice());
+        }
+        if (definition.nutritionValue() != null) {
+            return new FoodItem(definition.id(), definition.name(), definition.description(), definition.type(),
+                    definition.weight(), definition.armorCategory(), definition.baseAc(), definition.damageDice(),
+                    definition.weaponCategory(), definition.price(), definition.rarity(), definition.bonus(),
+                    definition.nutritionValue());
         }
         return new ItemTemplate(definition.id(), definition.name(), definition.description(), definition.type(),
                 definition.weight(), definition.armorCategory(), definition.baseAc(), definition.damageDice(),
@@ -253,8 +261,22 @@ public class ItemService {
                 event.character().getName(), event.healedAmount());
     }
 
+    /**
+     * {@code RestService#longRest} a déjà retiré les provisions sélectionnées de
+     * l'inventaire de l'initiateur en mémoire — supprime leur ligne DB, même
+     * raisonnement que {@link #onGamePlayerUsedPotion} pour une potion consommée.
+     */
+    @EventListener
+    void onLongRestTaken(LongRestTaken event) {
+        for (Item food : event.consumedFood()) {
+            itemDao.delete(food.getId());
+        }
+        log.info("item.provisions_consumed initiator={} count={}", event.initiator().getName(),
+                event.consumedFood().size());
+    }
+
     private record ItemTemplateDefinition(UUID id, String name, String description, ItemType type, int weight,
             ArmorCategory armorCategory, int baseAc, String damageDice, WeaponCategory weaponCategory, int price,
-            Rarity rarity, int bonus, ConsumableEffect consumableEffect, String effectDice) {
+            Rarity rarity, int bonus, ConsumableEffect consumableEffect, String effectDice, Integer nutritionValue) {
     }
 }

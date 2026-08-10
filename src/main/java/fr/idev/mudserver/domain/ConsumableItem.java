@@ -36,8 +36,7 @@ public class ConsumableItem extends ItemTemplate {
 
     private void heal(GamePlayer character, Item item) {
         int amount = DiceRoller.roll(effectDice).total();
-        int healed = Math.min(amount, character.getMaxHealth() - character.getCurrentHealth());
-        character.setCurrentHealth(character.getCurrentHealth() + healed);
+        int healed = character.heal(amount);
         character.getInventory().removeItem(item);
         DomainEventPublisher.publish(new GamePlayerUsedPotion(character, item, healed));
     }

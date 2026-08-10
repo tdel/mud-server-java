@@ -31,14 +31,15 @@ public class CharacterDao {
         dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_ROOM_ID,
                 CHARACTER.GENDER, CHARACTER.RACE, CHARACTER.CHARACTER_CLASS, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH,
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
-                CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA, CHARACTER.XP, CHARACTER.GOLD)
+                CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA, CHARACTER.XP, CHARACTER.GOLD,
+                CHARACTER.SHORT_REST_COUNT)
                 .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentRoomId(),
                         character.getGender().name(), character.getRace().name(), character.getCharacterClass().name(),
                         character.getLevel(), character.getCurrentHealth(), character.getMaxHealth(),
                         character.getAttribute(Attribute.STRENGTH), character.getAttribute(Attribute.DEXTERITY),
                         character.getAttribute(Attribute.CONSTITUTION), character.getAttribute(Attribute.INTELLIGENCE),
                         character.getAttribute(Attribute.WISDOM), character.getAttribute(Attribute.CHARISMA),
-                        character.getXp(), character.getInventory().getGold())
+                        character.getXp(), character.getInventory().getGold(), character.getShortRestCount())
                 .execute();
     }
 
@@ -61,15 +62,16 @@ public class CharacterDao {
 
     /**
      * Ne persiste que les champs qui évoluent réellement en jeu (position, santé,
-     * XP, niveau, or) ; race/stats/nom restent figés à la création, pas besoin de
-     * les réécrire.
+     * XP, niveau, or, repos courts pris) ; race/stats/nom restent figés à la
+     * création, pas besoin de les réécrire.
      */
     public void update(GamePlayer character) {
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_ROOM_ID, character.getCurrentRoomId())
                 .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).set(CHARACTER.XP, character.getXp())
                 .set(CHARACTER.LEVEL, character.getLevel()).set(CHARACTER.MAX_HEALTH, character.getMaxHealth())
-                .set(CHARACTER.GOLD, character.getInventory().getGold()).where(CHARACTER.ID.eq(character.getId()))
-                .execute();
+                .set(CHARACTER.GOLD, character.getInventory().getGold())
+                .set(CHARACTER.SHORT_REST_COUNT, character.getShortRestCount())
+                .where(CHARACTER.ID.eq(character.getId())).execute();
     }
 
     public void deleteById(UUID characterId) {
@@ -90,6 +92,6 @@ public class CharacterDao {
 
         return new GamePlayer(record.getId(), record.getAccountId(), record.getName(), record.getCurrentRoomId(),
                 Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
-                record.getMaxHealth(), attributes, record.getXp(), record.getGold());
+                record.getMaxHealth(), attributes, record.getXp(), record.getGold(), record.getShortRestCount());
     }
 }

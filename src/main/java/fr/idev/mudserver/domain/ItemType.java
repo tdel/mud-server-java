@@ -3,7 +3,7 @@ package fr.idev.mudserver.domain;
 import java.util.Optional;
 
 public enum ItemType {
-    WEAPON, HELMET, ARMOR, PANTS, BOOTS, GLOVES, SHIELD, POTION, KEY, TOOL, MISC;
+    WEAPON, HELMET, ARMOR, PANTS, BOOTS, GLOVES, SHIELD, POTION, KEY, TOOL, MISC, FOOD;
 
     public Optional<EquipmentSlot> equipmentSlot() {
         return switch (this) {
