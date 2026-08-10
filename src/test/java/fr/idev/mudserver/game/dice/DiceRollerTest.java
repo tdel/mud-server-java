@@ -46,4 +46,20 @@ class DiceRollerTest {
 
         assertThat(withDisadvantageAverage).isLessThan(withoutDisadvantageAverage - 2);
     }
+
+    @Test
+    void resolveHitAlwaysMissesOnNaturalOneRegardlessOfTotal() {
+        assertThat(DiceRoller.resolveHit(1, 999, 5)).isFalse();
+    }
+
+    @Test
+    void resolveHitAlwaysHitsOnNaturalTwentyRegardlessOfTotal() {
+        assertThat(DiceRoller.resolveHit(20, -50, 999)).isTrue();
+    }
+
+    @Test
+    void resolveHitComparesTotalToArmorClassOtherwise() {
+        assertThat(DiceRoller.resolveHit(10, 15, 15)).isTrue();
+        assertThat(DiceRoller.resolveHit(10, 14, 15)).isFalse();
+    }
 }

@@ -6,6 +6,10 @@ import java.util.UUID;
 
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
+import fr.idev.mudserver.game.CombatResult;
+import fr.idev.mudserver.game.dice.DiceExpression;
+import fr.idev.mudserver.game.dice.DiceRoll;
+import fr.idev.mudserver.game.dice.DiceRoller;
 
 /**
  * Contrairement à {@link Item}, qui délègue {@code getName()}/{@code getType()}
@@ -48,7 +52,7 @@ public final class GameMonster extends GameCharacter {
      * {@code synchronized}, même principe que {@code GamePlayer#pickUpItem}
      * (trancher sous verrou, publier après) : c'est cette méthode, plutôt que
      * l'appelant, qui garantit qu'un événement part dès que ce monstre meurt, quel
-     * que soit le code qui a déclenché le coup ({@code CombatService.tryAttack} ne
+     * que soit le code qui a déclenché le coup ({@link GamePlayer#tryAttack} ne
      * fait qu'exposer les dégâts à appliquer, voir sa Javadoc).
      *
      * @return true si ce coup est celui qui a fait passer les PV à 0 ou moins
@@ -66,6 +70,36 @@ public final class GameMonster extends GameCharacter {
             DomainEventPublisher.publish(new CharacterDied(this, attacker));
         }
         return defeated;
+    }
+
+    /**
+     * Pendant de {@link GamePlayer#tryAttack} pour la riposte du monstre. +2 fixe
+     * en guise de bonus de maîtrise : équivalent d'un joueur niveau 1, choisi
+     * plutôt que d'ajouter un champ CR/maîtrise à {@link MonsterTemplate} pour
+     * cette itération — les monstres n'ont pas de progression de niveau modélisée.
+     */
+    public CombatResult tryAttack(GamePlayer target) {
+        int strengthModifier = getModifier(Attribute.STRENGTH);
+        int attackBonus = strengthModifier + 2;
+
+        DiceRoll attackRoll = DiceRoller.roll(new DiceExpression(1, 20, attackBonus));
+        int naturalRoll = attackRoll.rolls()[0];
+        boolean criticalHit = naturalRoll == 20;
+        int armorClass = target.getArmorClass();
+        boolean hit = DiceRoller.resolveHit(naturalRoll, attackRoll.total(), armorClass);
+
+        if (!hit) {
+            return new CombatResult(target.getName(), false, false, attackRoll.total(), armorClass, 0, false);
+        }
+
+        int damage = rollDamage(strengthModifier, criticalHit);
+        return new CombatResult(target.getName(), true, criticalHit, attackRoll.total(), armorClass, damage, false);
+    }
+
+    private int rollDamage(int strengthModifier, boolean criticalHit) {
+        DiceExpression base = DiceExpression.parse(getNaturalDamageDice());
+        int diceCount = criticalHit ? base.count() * 2 : base.count();
+        return Math.max(0, DiceRoller.roll(new DiceExpression(diceCount, base.sides(), strengthModifier)).total());
     }
 
     public void attachTemplate(MonsterTemplate template) {

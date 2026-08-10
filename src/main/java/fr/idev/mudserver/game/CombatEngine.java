@@ -35,11 +35,12 @@ import fr.idev.mudserver.network.message.ingame.YourTurn;
 
 /**
  * Orchestre le combat au tour par tour au-dessus du calcul pur de
- * {@link CombatService} : décision rejoindre/fusionner/nouvel affrontement,
- * verrouillage, et la cascade qui résout automatiquement les tours de monstres
- * consécutifs (le projet n'a aucune tâche planifiée — voir CLAUDE.md — donc le
- * tour d'un monstre doit être résolu de façon synchrone, dans le même appel que
- * la commande du joueur qui vient de faire avancer le tour).
+ * {@link GamePlayer#tryAttack}/{@link GameMonster#tryAttack} : décision
+ * rejoindre/fusionner/nouvel affrontement, verrouillage, et la cascade qui
+ * résout automatiquement les tours de monstres consécutifs (le projet n'a
+ * aucune tâche planifiée — voir CLAUDE.md — donc le tour d'un monstre doit être
+ * résolu de façon synchrone, dans le même appel que la commande du joueur qui
+ * vient de faire avancer le tour).
  *
  * <p>
  * Schéma de verrouillage détaillé dans la Javadoc de {@link CombatEncounter} («
@@ -65,12 +66,6 @@ import fr.idev.mudserver.network.message.ingame.YourTurn;
 public class CombatEngine {
 
     private static final Logger log = LoggerFactory.getLogger(CombatEngine.class);
-
-    private final CombatService combatService;
-
-    public CombatEngine(CombatService combatService) {
-        this.combatService = combatService;
-    }
 
     public void attack(GamePlayer attacker, GameMonster target) {
         CombatEncounter attackerEncounter = attacker.getEncounter();
@@ -163,7 +158,7 @@ public class CombatEngine {
             encounter.joinBeforeInitiative(attacker);
         }
 
-        CombatResult result = combatService.tryAttack(attacker, target);
+        CombatResult result = attacker.tryAttack(target);
         attacker.send(new AttackResult(result));
         target.getCurrentRoom().broadcast(new PlayerAttackBroadcast(attacker.getName(), result), attacker);
         log.info("combat.attack_resolved attacker={} target={} hit={} critical={} damage={}", attacker.getName(),
@@ -185,7 +180,7 @@ public class CombatEngine {
             // Relit pendingJoiners à l'intérieur du verrou, pour inclure tout rejoignant
             // concurrent arrivé pendant la fenêtre du coup d'ouverture (voir Javadoc de
             // CombatEncounter#establishInitiativeOrder).
-            encounter.establishInitiativeOrder(combatService::rollInitiative);
+            encounter.establishInitiativeOrder(GameCharacter::rollInitiative);
             // Pas d'avanceTurn() ici : le coup d'ouverture est hors ordre d'initiative,
             // donc
             // le participant à l'index 0 n'a encore rien joué dans l'ordre lui-même.
@@ -234,7 +229,7 @@ public class CombatEngine {
             encounter.joinBeforeInitiative(victim);
             victim.send(new MonsterAggroTriggered(founder.getName()));
             encounter.getRoom().broadcast(new MonsterAggroBroadcast(victim.getName(), founder.getName()), victim);
-            encounter.establishInitiativeOrder(combatService::rollInitiative);
+            encounter.establishInitiativeOrder(GameCharacter::rollInitiative);
             resolveFromCurrentTurn(encounter);
         }
         return encounter;
@@ -246,7 +241,7 @@ public class CombatEngine {
                 attacker.send(new NotYourTurn());
                 return;
             }
-            CombatResult result = combatService.tryAttack(attacker, target);
+            CombatResult result = attacker.tryAttack(target);
             attacker.send(new AttackResult(result));
             encounter.getRoom().broadcast(new PlayerAttackBroadcast(attacker.getName(), result), attacker);
             log.info("combat.attack_resolved attacker={} target={} hit={} critical={} damage={}", attacker.getName(),
@@ -283,7 +278,7 @@ public class CombatEngine {
     /** PRÉCONDITION : appelant détient déjà synchronized(encounter). */
     private void insertOrQueue(CombatEncounter encounter, GameCharacter character) {
         if (encounter.isInitiativeRolled()) {
-            int initiative = combatService.rollInitiative(character);
+            int initiative = character.rollInitiative();
             encounter.insertLatecomer(character, initiative);
         } else {
             encounter.joinBeforeInitiative(character);
@@ -315,7 +310,7 @@ public class CombatEngine {
                     ? livingPlayers.get(0)
                     : livingPlayers.get(DiceRoller.roll(new DiceExpression(1, livingPlayers.size(), 0)).total() - 1);
 
-            CombatResult result = combatService.tryMonsterAttack(monster, victim);
+            CombatResult result = monster.tryAttack(victim);
             victim.send(new MonsterAttackResult(monster.getName(), result));
             encounter.getRoom().broadcast(new MonsterAttackBroadcast(monster.getName(), result), victim);
             log.info("combat.monster_attack_resolved monster={} victim={} hit={} damage={}", monster.getName(),

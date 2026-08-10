@@ -174,6 +174,25 @@ class GameCharacterTest extends AbstractIntegrationTest {
         assertThat(spider.getEncounter()).isSameAs(encounter);
     }
 
+    @Test
+    void rollInitiativeIsWithinTheExpectedRangeForTheDexterityModifier() {
+        GamePlayer character = characterWithDexterity(18); // DEX 18 => modificateur +4
+
+        for (int i = 0; i < 50; i++) {
+            assertThat(character.rollInitiative()).isBetween(1 + 4, 20 + 4);
+        }
+    }
+
+    private GamePlayer characterWithDexterity(int dexterity) {
+        return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Test", UUID.randomUUID(), Gender.MAN, Race.HUMAN,
+                CharacterClass.FIGHTER, TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
+                TestProficiencies.savingThrows(CharacterClass.FIGHTER),
+                TestProficiencies.skills(CharacterClass.FIGHTER),
+                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
+                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, 10, 10,
+                TestAttributes.of(10, dexterity, 10, 10, 10, 10), 0, 0);
+    }
+
     private Room warmVillage() {
         roomService.warmRooms();
         classService.warmClassDefinitions();

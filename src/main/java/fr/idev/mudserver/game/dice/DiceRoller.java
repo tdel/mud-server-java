@@ -45,11 +45,26 @@ public final class DiceRoller {
      * d20 finalement retenu) : {@link DiceRoll#total()} ne double donc jamais le
      * résultat même quand deux d20 sont physiquement lancés en interne, et les
      * appelants qui lisent {@code rolls()[0]} comme jet naturel (règle du 1/20
-     * naturel côté {@code game.CombatService}) restent valides sans changement.
+     * naturel, voir {@link #resolveHit}) restent valides sans changement.
      */
     public static DiceRoll rollD20(int modifier, boolean disadvantage) {
         int kept = disadvantage ? Math.min(rollDie(20), rollDie(20)) : rollDie(20);
         return new DiceRoll(new int[]{kept}, modifier);
+    }
+
+    /**
+     * Règle DnD5e du jet d'attaque, extraite en méthode pure pour être testable
+     * sans dépendre du RNG réel : un 1 naturel est toujours un échec, un 20 naturel
+     * toujours une réussite, sinon on compare le total à la CA.
+     */
+    public static boolean resolveHit(int naturalRoll, int totalRoll, int armorClass) {
+        if (naturalRoll == 1) {
+            return false;
+        }
+        if (naturalRoll == 20) {
+            return true;
+        }
+        return totalRoll >= armorClass;
     }
 
     private static int rollDie(int sides) {

@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * le fait pour {@code CharacterDied}. Les entrées de table de butin utilisent
  * des probabilités limites (0.0/1.0) pour rester déterministes sans mocker
  * {@code DiceRoller} (même convention que
- * {@code CombatServiceTest}/{@code CombatEngineTest}) : {@code
+ * {@code GamePlayerTest}/{@code CombatEngineTest}) : {@code
  * Random#nextDouble()} ne retourne jamais exactement 1.0, donc {@code
  * dropChance = 1.0} réussit toujours et {@code dropChance = 0.0} échoue
  * toujours.

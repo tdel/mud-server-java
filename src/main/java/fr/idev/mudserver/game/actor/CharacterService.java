@@ -36,9 +36,10 @@ import fr.idev.mudserver.persistence.CharacterDao;
  *
  * <p>
  * Réagit aussi à {@link CharacterDied} : c'est ici, plutôt que dans
- * {@code CombatService}, que le tueur est crédité de l'XP du monstre et que sa
- * cible est vidée — deux effets qui concernent l'état du personnage joueur, pas
- * la room (voir {@code RoomService#onCharacterDied} pour le pendant « room »).
+ * {@code GameMonster#takeDamage}, que le tueur est crédité de l'XP du monstre
+ * et que sa cible est vidée — deux effets qui concernent l'état du personnage
+ * joueur, pas la room (voir {@code RoomService#onCharacterDied} pour le pendant
+ * « room »).
  */
 @Service
 public class CharacterService {

@@ -9,6 +9,8 @@ import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.HexDirection;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomPortal;
+import fr.idev.mudserver.game.dice.DiceExpression;
+import fr.idev.mudserver.game.dice.DiceRoller;
 
 /**
  * Racine commune à tout ce qui porte des caractéristiques DnD5e et une santé,
@@ -147,6 +149,16 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
 
     public void setEncounter(CombatEncounter encounter) {
         this.encounter = encounter;
+    }
+
+    /**
+     * Jet d'initiative DnD5e standard (1d20 + modificateur de DEX), commun aux
+     * joueurs et aux monstres puisque tous deux sont des {@link GameCharacter}.
+     * Consommé par
+     * {@code game.CombatEngine}/{@link CombatEncounter#establishInitiativeOrder}.
+     */
+    public int rollInitiative() {
+        return DiceRoller.roll(new DiceExpression(1, 20, getModifier(Attribute.DEXTERITY))).total();
     }
 
     /**

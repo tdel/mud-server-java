@@ -53,10 +53,10 @@ import tools.jackson.databind.ObjectMapper;
  * répercutent à chaque déplacement. {@link #onCharacterDied} retire le monstre
  * mort de sa room et diffuse {@code MonsterDefeated} — la mort elle-même
  * (détection du coup fatal, crédit d'XP) reste hors du périmètre de cette
- * classe, voir {@code CombatService}/{@code CharacterService}. Pas d'accesseur
- * générique {@code room(UUID)} : en dehors du warm-up/des tests, tout code
- * applicatif doit passer par une méthode qui exprime une intention métier
- * ({@link #spawnCharacter}), jamais par une résolution d'UUID brute.
+ * classe, voir {@code GameMonster#takeDamage}/{@code CharacterService}. Pas
+ * d'accesseur générique {@code room(UUID)} : en dehors du warm-up/des tests,
+ * tout code applicatif doit passer par une méthode qui exprime une intention
+ * métier ({@link #spawnCharacter}), jamais par une résolution d'UUID brute.
  */
 @Service
 public class RoomService {

@@ -1,5 +1,6 @@
 package fr.idev.mudserver.domain.actor;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,9 @@ import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.ItemType;
 import fr.idev.mudserver.domain.Rarity;
+import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.WeaponCategory;
+import fr.idev.mudserver.game.CombatResult;
 import fr.idev.mudserver.game.dice.CheckResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -215,6 +219,171 @@ class GamePlayerTest {
 
         double average = averageSaveTotal(wizard, Attribute.DEXTERITY, 2000);
         assertThat(average).isBetween(5.8, 7.9);
+    }
+
+    /**
+     * Un 1 naturel rate toujours (même contre une CA ridiculement basse) et un 20
+     * naturel touche toujours (même contre une CA ridiculement haute) — les tests
+     * "coup garanti"/"raté garanti" ci-dessous ne peuvent donc pas être rendus
+     * déterministes par la seule CA : ils retentent quelques fois (RNG réel, pas de
+     * mock) jusqu'à obtenir le résultat attendu. Probabilité d'échec du test après
+     * 20 tentatives : (1/20)^20, négligeable.
+     */
+    @Test
+    void attackWithAnEquippedWeaponDealsWeaponDiceDamage() {
+        GamePlayer attacker = character(16, 10, 10, 10, 10, 10, 1);
+        equip(attacker, weapon("1d6"));
+        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        attacker.setCurrentRoom(room);
+        GameMonster monster = monster(room, 100, -100);
+
+        CombatResult result = attackUntilHit(attacker, monster);
+
+        // 1d6 (1-6) + modificateur de FOR (+3) : entre 4 et 9.
+        assertThat(result.damage()).isBetween(4, 9);
+    }
+
+    @Test
+    void attackWithAMagicWeaponAddsItsBonusToDamage() {
+        GamePlayer attacker = character(16, 10, 10, 10, 10, 10, 1);
+        equip(attacker, weapon("1d6", 2));
+        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        attacker.setCurrentRoom(room);
+        GameMonster monster = monster(room, 100, -100);
+
+        CombatResult result = attackUntilHit(attacker, monster);
+
+        // 1d6 (1-6) + modificateur de FOR (+3) + bonus d'arme (+2) : entre 6 et 11.
+        assertThat(result.damage()).isBetween(6, 11);
+    }
+
+    @Test
+    void attackWithoutAWeaponDealsUnarmedDamage() {
+        GamePlayer attacker = character(14, 10, 10, 10, 10, 10, 1);
+        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        attacker.setCurrentRoom(room);
+        GameMonster monster = monster(room, 100, -100);
+
+        CombatResult result = attackUntilHit(attacker, monster);
+
+        // 1 + modificateur de FOR (+2), pas de dé à mains nues.
+        assertThat(result.damage()).isEqualTo(3);
+    }
+
+    @Test
+    void aMissDealsNoDamageAndLeavesTheMonsterUntouched() {
+        GamePlayer attacker = character(10, 10, 10, 10, 10, 10, 1);
+        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        attacker.setCurrentRoom(room);
+
+        // Un monstre neuf à chaque tentative : un coup accidentel (nat 20 malgré
+        // l'énorme CA) sur une tentative précédente ne doit pas fausser l'assertion
+        // "PV inchangés" de la tentative qui rate enfin.
+        for (int i = 0; i < 20; i++) {
+            GameMonster monster = monster(room, 100, 9999);
+            CombatResult result = attacker.tryAttack(monster);
+            if (!result.hit()) {
+                assertThat(result.damage()).isZero();
+                assertThat(monster.getCurrentHealth()).isEqualTo(100);
+                assertThat(room.getMonsters()).contains(monster);
+                return;
+            }
+        }
+        throw new AssertionError("no miss happened in 20 attempts despite an impossible armor class");
+    }
+
+    @Test
+    void attackBonusIncludesProficiencyWhenTheWeaponsCategoryMatchesTheClass() {
+        GamePlayer attacker = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.FIGHTER); // FIGHTER maîtrise
+                                                                                            // MARTIAL
+        equip(attacker, weapon("1d6", 0, WeaponCategory.MARTIAL));
+        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        attacker.setCurrentRoom(room);
+        GameMonster monster = monster(room, 100, 9999); // CA impossible : jamais touché, seul le jet compte
+
+        // FOR mod 0 + bonus de maîtrise niveau 1 (+2) : moyenne 1d20 (10.5) + 2 = 12.5.
+        double average = averageAttackRoll(attacker, monster, 2000);
+        assertThat(average).isBetween(11.5, 13.5);
+    }
+
+    @Test
+    void attackBonusExcludesProficiencyWhenTheWeaponsCategoryDoesNotMatchTheClass() {
+        GamePlayer attacker = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.WIZARD); // WIZARD ne maîtrise que
+                                                                                            // SIMPLE
+        equip(attacker, weapon("1d6", 0, WeaponCategory.MARTIAL));
+        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        attacker.setCurrentRoom(room);
+        GameMonster monster = monster(room, 100, 9999);
+
+        // FOR mod 0, pas de bonus de maîtrise : moyenne 1d20 (10.5) seule.
+        double average = averageAttackRoll(attacker, monster, 2000);
+        assertThat(average).isBetween(9.5, 11.5);
+    }
+
+    @Test
+    void attackRollUsesDisadvantageWhenWearingNonProficientArmor() {
+        GamePlayer attacker = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.WIZARD); // aucune maîtrise
+                                                                                            // d'armure
+        equip(attacker, armor("Armure", ArmorCategory.LIGHT, 10));
+        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        attacker.setCurrentRoom(room);
+        GameMonster monster = monster(room, 100, 9999);
+
+        // À mains nues (toujours "maîtrisé") : FOR mod 0 + bonus de maîtrise (+2), mais
+        // désavantage sur le jet de 1d20 (2d20 garde le plus bas, moyenne ≈ 6.86) :
+        // moyenne totale ≈ 8.86, nettement sous la moyenne sans désavantage (12.5).
+        double average = averageAttackRoll(attacker, monster, 2000);
+        assertThat(average).isBetween(7.5, 10.2);
+    }
+
+    private double averageAttackRoll(GamePlayer attacker, GameMonster monster, int iterations) {
+        long total = 0;
+        for (int i = 0; i < iterations; i++) {
+            total += attacker.tryAttack(monster).attackRoll();
+        }
+        return (double) total / iterations;
+    }
+
+    /**
+     * Exclut délibérément les critiques (double les dés de dégâts) : les tests
+     * appelants vérifient une plage de dégâts précise pour un coup normal, qu'un
+     * critique élargirait.
+     */
+    private CombatResult attackUntilHit(GamePlayer attacker, GameMonster monster) {
+        for (int i = 0; i < 20; i++) {
+            CombatResult result = attacker.tryAttack(monster);
+            if (result.hit() && !result.criticalHit()) {
+                return result;
+            }
+        }
+        throw new AssertionError("no non-critical hit landed in 20 attempts despite a trivial armor class");
+    }
+
+    private GameMonster monster(Room room, int maxHealth, Integer naturalArmorClass) {
+        MonsterTemplate template = new MonsterTemplate(UUID.randomUUID(), "Mannequin", "Un mannequin d'entraînement",
+                maxHealth, TestAttributes.of(10, 10, 10, 10, 10, 10), naturalArmorClass, 0, "1d6", 0, List.of(), 0);
+        GameMonster monster = new GameMonster(UUID.randomUUID(), template.getName(), template.getId(), room.getId(),
+                template.getAttributes(), maxHealth);
+        monster.attachTemplate(template);
+        monster.setCurrentRoom(room);
+        room.addMonster(monster);
+        return monster;
+    }
+
+    private Item weapon(String damageDice) {
+        return weapon(damageDice, 0, WeaponCategory.MARTIAL);
+    }
+
+    private Item weapon(String damageDice, int bonus) {
+        return weapon(damageDice, bonus, WeaponCategory.MARTIAL);
+    }
+
+    private Item weapon(String damageDice, int bonus, WeaponCategory category) {
+        ItemTemplate template = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3, null, 0,
+                damageDice, category, 0, Rarity.COMMON, bonus);
+        Item item = new Item(UUID.randomUUID(), template.getId(), null, null, EquipmentSlot.WEAPON);
+        item.attachTemplate(template);
+        return item;
     }
 
     private double averageCheckTotal(GamePlayer character, Skill skill, int iterations) {

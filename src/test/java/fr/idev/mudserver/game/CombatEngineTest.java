@@ -43,7 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * statique {@code DomainEventPublisher}, dont les listeners écrivent en DB —
  * ces écritures ne doivent pas partager la connexion/transaction du thread de
  * test. Les modificateurs d'attribut extrêmes utilisés ci-dessous (DEX/FOR très
- * hauts ou très bas) suivent la même convention que {@code CombatServiceTest} :
+ * hauts ou très bas) suivent la même convention que {@code GamePlayerTest} :
  * rendre un résultat déterministe sans mocker le RNG, plutôt que retenter
  * indéfiniment.
  */

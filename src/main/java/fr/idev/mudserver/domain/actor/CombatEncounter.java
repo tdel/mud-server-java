@@ -10,10 +10,11 @@ import fr.idev.mudserver.domain.Room;
  * Affrontement partagé par plusieurs {@link GamePlayer}/{@link GameMonster} —
  * un même combat peut regrouper N joueurs et N monstres, contrairement au
  * modèle 1v1 initial. POJO pur sans dépendance Spring/{@code DiceRoller} (voir
- * {@code game.CombatService}, qui reste seul responsable des jets de dés) :
- * toutes les méthodes ici reçoivent des valeurs déjà tirées, ou une fonction de
- * tirage à invoquer en interne (voir {@link #establishInitiativeOrder}) — ça
- * garde cette classe testable en unitaire pur, comme {@code CombatServiceTest}.
+ * {@link GamePlayer#tryAttack}/{@link GameMonster#tryAttack}, seuls
+ * responsables des jets de dés) : toutes les méthodes ici reçoivent des valeurs
+ * déjà tirées, ou une fonction de tirage à invoquer en interne (voir
+ * {@link #establishInitiativeOrder}) — ça garde cette classe testable en
+ * unitaire pur, comme {@code GamePlayerTest}/{@code GameMonsterTest}.
  *
  * <p>
  * Toutes les méthodes sont {@code synchronized} sur l'instance elle-même :

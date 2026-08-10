@@ -28,7 +28,9 @@ import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.RoomPortal;
 import fr.idev.mudserver.domain.WeaponCategory;
+import fr.idev.mudserver.game.CombatResult;
 import fr.idev.mudserver.game.dice.CheckResult;
+import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.Connection;
@@ -160,9 +162,9 @@ public final class GamePlayer extends GameCharacter {
      * gouvernante, + bonus de maîtrise si ce personnage est proficient sur cette
      * compétence (voir {@link #getSkillProficiencies()}, résolues une fois pour
      * toutes à la construction du personnage), comparé à une DC fournie par
-     * l'appelant. Contrairement à {@code game.CombatService#resolveHit}, aucune
-     * règle de critique sur 1/20 naturel : en DnD5e RAW cette règle est propre aux
-     * jets d'attaque, pas aux jets de compétence/sauvegarde génériques.
+     * l'appelant. Contrairement à {@link DiceRoller#resolveHit}, aucune règle de
+     * critique sur 1/20 naturel : en DnD5e RAW cette règle est propre aux jets
+     * d'attaque, pas aux jets de compétence/sauvegarde génériques.
      */
     public CheckResult check(Skill skill, int dc) {
         boolean proficient = getSkillProficiencies().contains(skill);
@@ -213,10 +215,9 @@ public final class GamePlayer extends GameCharacter {
      * désavantage", cohérente avec le fait que ce jeu modélise déjà l'armure en
      * plusieurs emplacements indépendants plutôt qu'une seule "armure portée" comme
      * en RAW strict. Consommé par {@link #checkOrSave} ci-dessus (jets de
-     * compétence/sauvegarde FOR/DEX) et par {@code game.CombatService} (jets
-     * d'attaque) pour appliquer le désavantage SRD, plutôt que de bloquer
-     * l'équipement lui-même — {@link #equipItem} ne fait aucune vérification de
-     * maîtrise.
+     * compétence/sauvegarde FOR/DEX) et par {@link #tryAttack} (jets d'attaque)
+     * pour appliquer le désavantage SRD, plutôt que de bloquer l'équipement
+     * lui-même — {@link #equipItem} ne fait aucune vérification de maîtrise.
      */
     public boolean isWearingNonProficientArmor() {
         return inventory.getEquippedItems().stream().map(this::requiredArmorProficiency)
@@ -229,6 +230,56 @@ public final class GamePlayer extends GameCharacter {
             case SHIELD -> Optional.of(ArmorProficiency.SHIELDS);
             default -> Optional.empty();
         };
+    }
+
+    /**
+     * Résout la phase « jet d'attaque + jet de dégâts » d'une attaque au
+     * corps-à-corps selon les règles DnD5e — 1d20 + modificateur de FOR + bonus de
+     * maîtrise si l'arme équipée fait partie de {@link #getWeaponProficiencies()},
+     * dégâts de l'arme équipée ou à mains nues. Ne touche pas aux PV de
+     * {@code target} — l'appelant ({@code game.CombatEngine}) applique lui-même les
+     * dégâts via {@link GameMonster#takeDamage}, qui gère seul la mutation
+     * concurrente des PV et la publication de {@code CharacterDied}. Cette
+     * séparation garde cette méthode pure et testable en unitaire, sans dépendre
+     * d'un contexte Spring.
+     */
+    public CombatResult tryAttack(GameMonster target) {
+        Optional<Item> weapon = inventory.getEquippedItems().stream()
+                .filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
+        int weaponBonus = weapon.map(Item::getBonus).orElse(0);
+        boolean weaponProficient = weapon.map(item -> weaponProficiencies.contains(item.getWeaponCategory()))
+                .orElse(true);
+
+        int strengthModifier = getModifier(Attribute.STRENGTH);
+        int attackBonus = strengthModifier + (weaponProficient ? getProficiencyBonus() : 0) + weaponBonus;
+        boolean disadvantage = isWearingNonProficientArmor();
+
+        DiceRoll attackRoll = DiceRoller.rollD20(attackBonus, disadvantage);
+        int naturalRoll = attackRoll.rolls()[0];
+        boolean criticalHit = naturalRoll == 20;
+        int armorClass = target.getArmorClass();
+        boolean hit = DiceRoller.resolveHit(naturalRoll, attackRoll.total(), armorClass);
+
+        if (!hit) {
+            return new CombatResult(target.getName(), false, false, attackRoll.total(), armorClass, 0, disadvantage);
+        }
+
+        int damage = rollDamage(weapon, strengthModifier, criticalHit);
+        return new CombatResult(target.getName(), true, criticalHit, attackRoll.total(), armorClass, damage,
+                disadvantage);
+    }
+
+    private int rollDamage(Optional<Item> weapon, int strengthModifier, boolean criticalHit) {
+        if (weapon.isEmpty()) {
+            // Attaque à mains nues (SRD) : 1 + modificateur de FOR, pas de dé donc rien à
+            // doubler en cas de critique.
+            return Math.max(0, 1 + strengthModifier);
+        }
+
+        DiceExpression base = DiceExpression.parse(weapon.get().getDamageDice());
+        int diceCount = criticalHit ? base.count() * 2 : base.count();
+        int modifier = strengthModifier + weapon.get().getBonus();
+        return Math.max(0, DiceRoller.roll(new DiceExpression(diceCount, base.sides(), modifier)).total());
     }
 
     public Connection getConnection() {

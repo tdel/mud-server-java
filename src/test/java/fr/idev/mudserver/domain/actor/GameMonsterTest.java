@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.game.CombatResult;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -238,6 +239,58 @@ class GameMonsterTest extends AbstractIntegrationTest {
                 .noneMatch(EquipmentLooted.class::isInstance);
     }
 
+    /**
+     * Un 1 naturel rate toujours et un 20 naturel touche toujours (voir
+     * {@code DiceRollerTest}) : les tests "coup garanti"/"raté garanti" ci-dessous
+     * retentent quelques fois (RNG réel, pas de mock) jusqu'à obtenir le résultat
+     * attendu plutôt que de dépendre uniquement de la CA.
+     */
+    @Test
+    void monsterAttackDealsNaturalDiceDamagePlusStrengthModifier() {
+        GameMonster attacker = monsterWithStrengthAndDamage(16, "1d6"); // STR 16 => mod +3
+        GamePlayer target = player("Cible", -100); // DEX ridicule => CA quasi nulle, coup quasi garanti
+
+        CombatResult result = monsterAttackUntilHit(attacker, target);
+
+        // 1d6 (1-6) + modificateur de FOR (+3) : entre 4 et 9.
+        assertThat(result.damage()).isBetween(4, 9);
+    }
+
+    @Test
+    void monsterAttackMissLeavesTheTargetUntouched() {
+        // Une cible neuve à chaque tentative : un coup accidentel (nat 20 malgré la CA
+        // énorme) sur une tentative précédente ne doit pas fausser l'assertion.
+        for (int i = 0; i < 20; i++) {
+            GamePlayer target = player("Cible", 9999); // CA quasi infinie
+            GameMonster attacker = monsterWithStrengthAndDamage(10, "1d6");
+            CombatResult result = attacker.tryAttack(target);
+            if (!result.hit()) {
+                assertThat(result.damage()).isZero();
+                return;
+            }
+        }
+        throw new AssertionError("no miss happened in 20 attempts despite an impossible armor class");
+    }
+
+    private CombatResult monsterAttackUntilHit(GameMonster attacker, GamePlayer target) {
+        for (int i = 0; i < 20; i++) {
+            CombatResult result = attacker.tryAttack(target);
+            if (result.hit() && !result.criticalHit()) {
+                return result;
+            }
+        }
+        throw new AssertionError("no hit landed in 20 attempts despite a trivial armor class");
+    }
+
+    private GameMonster monsterWithStrengthAndDamage(int strength, String naturalDamageDice) {
+        MonsterTemplate template = new MonsterTemplate(UUID.randomUUID(), "Mannequin", "Un mannequin d'entraînement",
+                10, TestAttributes.of(strength, 10, 10, 10, 10, 10), null, 0, naturalDamageDice, 0, List.of(), 0);
+        GameMonster monster = new GameMonster(UUID.randomUUID(), template.getName(), template.getId(),
+                UUID.randomUUID(), template.getAttributes(), template.getMaxHealth());
+        monster.attachTemplate(template);
+        return monster;
+    }
+
     private GameMonster monster(Map<Attribute, Integer> attributes, Integer naturalArmorClass) {
         return monster(attributes, naturalArmorClass, 0);
     }
@@ -260,13 +313,17 @@ class GameMonsterTest extends AbstractIntegrationTest {
     }
 
     private GamePlayer player(String name) {
+        return player(name, 10);
+    }
+
+    private GamePlayer player(String name, int dexterity) {
         return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), name, UUID.randomUUID(), Gender.MAN, Race.HUMAN,
                 CharacterClass.FIGHTER, TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
                 TestProficiencies.savingThrows(CharacterClass.FIGHTER),
                 TestProficiencies.skills(CharacterClass.FIGHTER),
                 TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
                 TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, 10, 10,
-                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+                TestAttributes.of(10, dexterity, 10, 10, 10, 10), 0, 0);
     }
 
     /**
