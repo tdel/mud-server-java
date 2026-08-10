@@ -67,6 +67,7 @@ public final class GamePlayer extends GameCharacter {
         this.currentRoomId = currentRoomId;
         this.gender = gender;
         this.race = race;
+        this.speed = race.speed();
         this.characterClass = characterClass;
         this.level = level;
         this.xp = xp;

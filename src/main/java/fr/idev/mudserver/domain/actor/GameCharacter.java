@@ -72,7 +72,7 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
 
     private Room currentRoom;
     private HexCoordinate position;
-    private int speed = DEFAULT_SPEED;
+    protected int speed = DEFAULT_SPEED;
     private volatile CombatEncounter encounter;
 
     protected GameCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,

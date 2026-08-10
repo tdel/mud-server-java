@@ -88,10 +88,8 @@ public class CharacterDao {
         CharacterClass characterClass = CharacterClass.valueOf(record.getCharacterClass());
         Race race = Race.valueOf(record.getRace());
 
-        GamePlayer character = new GamePlayer(record.getId(), record.getAccountId(), record.getName(),
-                record.getCurrentRoomId(), Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(),
-                record.getCurrentHealth(), record.getMaxHealth(), attributes, record.getXp(), record.getGold());
-        character.setSpeed(race.speed());
-        return character;
+        return new GamePlayer(record.getId(), record.getAccountId(), record.getName(), record.getCurrentRoomId(),
+                Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
+                record.getMaxHealth(), attributes, record.getXp(), record.getGold());
     }
 }

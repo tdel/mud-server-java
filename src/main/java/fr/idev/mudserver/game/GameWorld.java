@@ -111,7 +111,6 @@ public class GameWorld {
 
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), name, startingRoom.get().getId(),
                 gender, race, characterClass, 1, maxHealth, maxHealth, scores, 0, gold);
-        character.setSpeed(race.speed());
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));
         character.spawnToRoom(startingRoom.get());
