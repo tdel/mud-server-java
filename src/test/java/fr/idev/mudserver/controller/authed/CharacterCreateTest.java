@@ -14,12 +14,9 @@ import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
-import fr.idev.mudserver.domain.actor.TestProficiencies;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.RoomService;
-import fr.idev.mudserver.game.actor.ClassService;
-import fr.idev.mudserver.game.actor.RaceService;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.authed.CharacterAlreadyExists;
 import fr.idev.mudserver.network.message.authed.CharacterCreated;
@@ -56,12 +53,6 @@ class CharacterCreateTest extends AbstractIntegrationTest {
     private GameWorld gameWorld;
 
     @Autowired
-    private RaceService raceService;
-
-    @Autowired
-    private ClassService classService;
-
-    @Autowired
     private RoomService roomService;
 
     @Autowired
@@ -86,13 +77,8 @@ class CharacterCreateTest extends AbstractIntegrationTest {
         RecordingConnection connection = enterAuthed("p2");
         Account account = authWorld.account(connection);
         GamePlayer existing = new GamePlayer(UUID.randomUUID(), account.getId(), "Existing", UUID.randomUUID(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER,
-                TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
-                TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER),
-                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
-                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, 10, 10,
-                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
+                0);
         characterDao.insert(existing);
 
         characterCreate.onReceive(connection, "Existing");
@@ -169,8 +155,6 @@ class CharacterCreateTest extends AbstractIntegrationTest {
     }
 
     private RecordingConnection enterAuthed(String login) {
-        raceService.warmRaceBonuses();
-        classService.warmClassDefinitions();
         roomService.warmRooms();
         Account account = new Account(UUID.randomUUID(), login, "hashed-password", null);
         accountDao.insert(account);

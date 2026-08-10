@@ -18,7 +18,6 @@ import fr.idev.mudserver.domain.actor.MonsterTemplate;
 import fr.idev.mudserver.domain.actor.MonsterTemplate.LootTableEntry;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
-import fr.idev.mudserver.domain.actor.TestProficiencies;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.persistence.AccountDao;
@@ -53,9 +52,6 @@ class LootServiceTest extends AbstractIntegrationTest {
 
     @Autowired
     private ItemService itemService;
-
-    @Autowired
-    private ClassService classService;
 
     @Autowired
     private AccountDao accountDao;
@@ -150,22 +146,11 @@ class LootServiceTest extends AbstractIntegrationTest {
     }
 
     private GamePlayer killer() {
-        // CharacterDao#toDomain résout les proficiencies via le bean Spring
-        // ClassService, distinct de l'instance dédiée de TestProficiencies —
-        // nécessaire pour que characterDao.findById fonctionne, y compris quand ce
-        // test tourne seul (pas de garantie qu'un autre test ait déjà réchauffé ce
-        // cache partagé).
-        classService.warmClassDefinitions();
         Account account = new Account(UUID.randomUUID(), "chasseur-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Chasseur", UUID.randomUUID(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER,
-                TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
-                TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER),
-                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
-                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, 10, 10,
-                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
+                0);
         characterDao.insert(character);
         new Room(UUID.randomUUID(), "Clairière", "...", null).join(character);
         return character;

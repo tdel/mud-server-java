@@ -31,8 +31,7 @@ import fr.idev.mudserver.persistence.CharacterDao;
  * règle 5e « fixe » (alternative au jet de dé) : (dé de vie / 2 + 1) +
  * modificateur de CON, ajouté aux PV max et aux PV courants — pas de soin
  * complet. Cette logique ne peut pas vivre sur {@link GamePlayer} lui-même
- * (simple POJO) puisqu'elle dépend de
- * {@link LevelService}/{@link ClassService}, deux beans Spring.
+ * (simple POJO) puisqu'elle dépend de {@link LevelService}, un bean Spring.
  *
  * <p>
  * Réagit aussi à {@link CharacterDied} : c'est ici, plutôt que dans
@@ -48,14 +47,11 @@ public class CharacterService {
 
     private final CharacterDao characterDao;
     private final LevelService levelService;
-    private final ClassService classService;
     private final RoomService roomService;
 
-    public CharacterService(CharacterDao characterDao, LevelService levelService, ClassService classService,
-            RoomService roomService) {
+    public CharacterService(CharacterDao characterDao, LevelService levelService, RoomService roomService) {
         this.characterDao = characterDao;
         this.levelService = levelService;
-        this.classService = classService;
         this.roomService = roomService;
     }
 
@@ -67,7 +63,7 @@ public class CharacterService {
 
         while (character.getLevel() < levelService.maxLevel()
                 && character.getXp() >= levelService.xpRequiredForLevel(character.getLevel() + 1)) {
-            int hitDie = classService.hitDie(character.getCharacterClass());
+            int hitDie = character.getCharacterClass().hitDie();
             int constitutionModifier = character.getModifier(Attribute.CONSTITUTION);
             int hpGain = Math.max(1, hitDie / 2 + 1 + constitutionModifier);
 

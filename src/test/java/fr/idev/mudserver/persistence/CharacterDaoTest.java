@@ -13,9 +13,6 @@ import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
-import fr.idev.mudserver.domain.actor.TestProficiencies;
-import fr.idev.mudserver.game.actor.ClassService;
-import fr.idev.mudserver.game.actor.RaceService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,19 +25,11 @@ class CharacterDaoTest extends AbstractIntegrationTest {
     @Autowired
     private CharacterDao characterDao;
 
-    @Autowired
-    private ClassService classService;
-
-    @Autowired
-    private RaceService raceService;
-
     private Account account;
     private UUID roomA;
     private UUID roomB;
 
     private void seedAccountAndRooms() {
-        classService.warmClassDefinitions();
-        raceService.warmRaceBonuses();
         account = new Account(UUID.randomUUID(), "carol", "hashed-password", null);
         accountDao.insert(account);
         roomA = UUID.randomUUID();
@@ -49,12 +38,7 @@ class CharacterDaoTest extends AbstractIntegrationTest {
 
     private GamePlayer newBarbarian(UUID roomId) {
         return new GamePlayer(UUID.randomUUID(), account.getId(), "Carol le Demi-Orque", roomId, Gender.WOMAN,
-                Race.HALF_ORC, CharacterClass.BARBARIAN, TestProficiencies.primaryAbility(CharacterClass.BARBARIAN),
-                TestProficiencies.savingThrows(CharacterClass.BARBARIAN),
-                TestProficiencies.skills(CharacterClass.BARBARIAN),
-                TestProficiencies.weaponProficiencies(CharacterClass.BARBARIAN),
-                TestProficiencies.armorProficiencies(CharacterClass.BARBARIAN), 1, 14, 14,
-                TestAttributes.of(14, 11, 12, 10, 11, 10), 0, 0);
+                Race.HALF_ORC, CharacterClass.BARBARIAN, 1, 14, 14, TestAttributes.of(14, 11, 12, 10, 11, 10), 0, 0);
     }
 
     @Test

@@ -8,12 +8,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
-import fr.idev.mudserver.game.actor.ClassService;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.game.actor.LevelService;
 import fr.idev.mudserver.game.actor.MonsterService;
 import fr.idev.mudserver.game.actor.NpcService;
-import fr.idev.mudserver.game.actor.RaceService;
 import fr.idev.mudserver.game.RoomService;
 
 /**
@@ -39,7 +37,11 @@ import fr.idev.mudserver.game.RoomService;
  * raison — et pour dénormaliser le nom et la rareté de chaque article vendu sur
  * {@code GameNpcSeller.NpcShopEntry} : le catalogue boutique d'un PNJ marchand
  * (voir {@code data/npcs.json}) est validé au démarrage plutôt qu'au premier
- * achat en jeu.
+ * achat en jeu. Les bonus raciaux et les caractéristiques de classe ne sont
+ * plus réchauffés ici : {@code domain.actor.Race}/{@code CharacterClass} se
+ * chargent eux-mêmes depuis {@code data/race.json}/{@code data/class.json} dans
+ * un bloc {@code static}, au premier accès à ces enums plutôt que via ce
+ * runner.
  *
  * <p>
  * Le {@code @ConditionalOnProperty} ci-dessous est porté par la
@@ -68,9 +70,8 @@ public class ServerApplication {
 
     @Bean
     @ConditionalOnProperty(prefix = "app.telnet", name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ApplicationRunner warmupRunner(RoomService roomService, ItemService itemService, RaceService raceService,
-            ClassService classService, LevelService levelService, MonsterService monsterService,
-            NpcService npcService) {
+    public ApplicationRunner warmupRunner(RoomService roomService, ItemService itemService, LevelService levelService,
+            MonsterService monsterService, NpcService npcService) {
         return args -> {
             long start = System.currentTimeMillis();
             log.info("startup.warmup_started");
@@ -79,8 +80,6 @@ public class ServerApplication {
             monsterService.warmMonsters(roomService.allRooms(), itemService.templateIds());
             npcService.warmNpcs(roomService.allRooms(), itemService.templateSummariesById());
             itemService.warmRoomItems(roomService.allRooms());
-            raceService.warmRaceBonuses();
-            classService.warmClassDefinitions();
             levelService.warmXpThresholds();
             log.info("startup.warmup_completed durationMs={}", System.currentTimeMillis() - start);
         };

@@ -15,7 +15,6 @@ import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
-import fr.idev.mudserver.domain.actor.TestProficiencies;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.game.dice.CheckResult;
@@ -90,13 +89,8 @@ class CheckTest extends AbstractIntegrationTest {
         accountDao.insert(account);
         RecordingConnection connection = new RecordingConnection();
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Verificateur", startingRoom.getId(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER,
-                TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
-                TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER),
-                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
-                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, 10, 10,
-                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
+                0);
         characterDao.insert(character);
         gameWorld.enterWorld(connection, character);
         connection.received.clear();

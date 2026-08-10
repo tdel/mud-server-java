@@ -17,8 +17,6 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.NewGamePlayerCreated;
-import fr.idev.mudserver.game.actor.ClassService;
-import fr.idev.mudserver.game.actor.RaceService;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.Connection;
@@ -40,16 +38,11 @@ public class GameWorld {
     private final CharacterDao characterDao;
     private final RoomService roomService;
     private final ItemService itemService;
-    private final RaceService raceService;
-    private final ClassService classService;
 
-    public GameWorld(CharacterDao characterDao, RoomService roomService, ItemService itemService,
-            RaceService raceService, ClassService classService) {
+    public GameWorld(CharacterDao characterDao, RoomService roomService, ItemService itemService) {
         this.characterDao = characterDao;
         this.roomService = roomService;
         this.itemService = itemService;
-        this.raceService = raceService;
-        this.classService = classService;
     }
 
     /**
@@ -104,24 +97,21 @@ public class GameWorld {
         Optional<Room> startingRoom = roomService.startingRoom();
 
         Map<Attribute, Integer> scores = rollAttributeScores();
-        for (Map.Entry<Attribute, Integer> bonus : raceService.attributeScoreBonuses(race).entrySet()) {
+        for (Map.Entry<Attribute, Integer> bonus : race.attributeScoreBonuses().entrySet()) {
             scores.merge(bonus.getKey(), bonus.getValue(), Integer::sum);
         }
 
         // 5e niveau 1 : PV max = valeur MAXIMALE du dé de vie de la classe (pas un jet)
         // + modificateur de CON.
         int constitutionModifier = Math.floorDiv(scores.get(Attribute.CONSTITUTION) - 10, 2);
-        int maxHealth = Math.max(1, classService.hitDie(characterClass) + constitutionModifier);
+        int maxHealth = Math.max(1, characterClass.hitDie() + constitutionModifier);
 
-        ClassService.StartingGold startingGold = classService.startingGold(characterClass);
+        CharacterClass.StartingGold startingGold = characterClass.startingGold();
         int gold = DiceRoller.roll(startingGold.dice()).total() * startingGold.multiplier();
 
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), name, startingRoom.get().getId(),
-                gender, race, characterClass, classService.primaryAbility(characterClass),
-                classService.savingThrowProficiencies(characterClass), classService.skillProficiencies(characterClass),
-                classService.weaponProficiencies(characterClass), classService.armorProficiencies(characterClass), 1,
-                maxHealth, maxHealth, scores, 0, gold);
-        character.setSpeed(raceService.speed(race));
+                gender, race, characterClass, 1, maxHealth, maxHealth, scores, 0, gold);
+        character.setSpeed(race.speed());
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));
         character.spawnToRoom(startingRoom.get());

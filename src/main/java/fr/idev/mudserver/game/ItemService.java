@@ -50,12 +50,12 @@ import tools.jackson.databind.ObjectMapper;
  * événement de domaine après chaque mutation en mémoire ; les méthodes
  * {@code @EventListener} de cette classe répercutent chacune en base via
  * {@link ItemDao}. Précharge aussi l'ensemble des {@link ItemTemplate} en
- * mémoire ({@link #warmItemTemplates()}) depuis {@code data/items.json}, sur le
- * même principe que {@code RaceService.warmRaceBonuses()} : les templates sont
- * une donnée de règles statique, jamais mutée en jeu, donc jamais persistée en
- * DB. Attache le template correspondant à chaque {@code Item} avant de le
- * renvoyer à l'appelant — un {@code Item} sorti d'ici a donc toujours son
- * template, contrairement à un {@code Item} lu directement via {@link ItemDao}.
+ * mémoire ({@link #warmItemTemplates()}) depuis {@code data/items.json} : les
+ * templates sont une donnée de règles statique, jamais mutée en jeu, donc
+ * jamais persistée en DB. Attache le template correspondant à chaque
+ * {@code Item} avant de le renvoyer à l'appelant — un {@code Item} sorti d'ici
+ * a donc toujours son template, contrairement à un {@code Item} lu directement
+ * via {@link ItemDao}.
  */
 @Service
 public class ItemService {

@@ -17,9 +17,7 @@ import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.actor.ClassService;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.actor.RaceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -39,16 +37,11 @@ public class CharacterCreate implements ControllerHandler {
 
     private final CharacterList characterListAction;
     private final GameWorld gameWorld;
-    private final RaceService raceService;
-    private final ClassService classService;
     private final AuthWorld authWorld;
 
-    public CharacterCreate(CharacterList characterListAction, GameWorld gameWorld, RaceService raceService,
-            ClassService classService, AuthWorld authWorld) {
+    public CharacterCreate(CharacterList characterListAction, GameWorld gameWorld, AuthWorld authWorld) {
         this.characterListAction = characterListAction;
         this.gameWorld = gameWorld;
-        this.raceService = raceService;
-        this.classService = classService;
         this.authWorld = authWorld;
     }
 
@@ -109,7 +102,7 @@ public class CharacterCreate implements ControllerHandler {
     private void promptRace(Connection connection, Account account, String name, Gender gender) {
         Map<Race, Map<Attribute, Integer>> bonusesByRace = new LinkedHashMap<>();
         for (Race race : Race.values()) {
-            bonusesByRace.put(race, raceService.attributeScoreBonuses(race));
+            bonusesByRace.put(race, race.attributeScoreBonuses());
         }
 
         connection.requestBlocking(new ChooseRace(bonusesByRace), line -> {
@@ -138,8 +131,8 @@ public class CharacterCreate implements ControllerHandler {
         Map<CharacterClass, Integer> hitDiceByClass = new LinkedHashMap<>();
         Map<CharacterClass, Attribute> primaryAbilityByClass = new LinkedHashMap<>();
         for (CharacterClass characterClass : CharacterClass.values()) {
-            hitDiceByClass.put(characterClass, classService.hitDie(characterClass));
-            primaryAbilityByClass.put(characterClass, classService.primaryAbility(characterClass));
+            hitDiceByClass.put(characterClass, characterClass.hitDie());
+            primaryAbilityByClass.put(characterClass, characterClass.primaryAbility());
         }
 
         connection.requestBlocking(new ChooseClass(hitDiceByClass, primaryAbilityByClass), line -> {

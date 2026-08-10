@@ -52,11 +52,6 @@ public final class GamePlayer extends GameCharacter {
     private Gender gender;
     private Race race;
     private CharacterClass characterClass;
-    private Attribute primaryAbility;
-    private final Set<Attribute> savingThrowProficiencies;
-    private final Set<Skill> skillProficiencies;
-    private final Set<WeaponCategory> weaponProficiencies;
-    private final Set<ArmorProficiency> armorProficiencies;
     private int level;
 
     private Connection connection;
@@ -65,9 +60,7 @@ public final class GamePlayer extends GameCharacter {
     private int xp;
 
     public GamePlayer(UUID id, UUID accountId, String name, UUID currentRoomId, Gender gender, Race race,
-            CharacterClass characterClass, Attribute primaryAbility, Set<Attribute> savingThrowProficiencies,
-            Set<Skill> skillProficiencies, Set<WeaponCategory> weaponProficiencies,
-            Set<ArmorProficiency> armorProficiencies, int level, int currentHealth, int maxHealth,
+            CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold) {
         super(id, name, attributes, currentHealth, maxHealth);
         this.accountId = accountId;
@@ -75,11 +68,6 @@ public final class GamePlayer extends GameCharacter {
         this.gender = gender;
         this.race = race;
         this.characterClass = characterClass;
-        this.primaryAbility = primaryAbility;
-        this.savingThrowProficiencies = Set.copyOf(savingThrowProficiencies);
-        this.skillProficiencies = Set.copyOf(skillProficiencies);
-        this.weaponProficiencies = Set.copyOf(weaponProficiencies);
-        this.armorProficiencies = Set.copyOf(armorProficiencies);
         this.level = level;
         this.xp = xp;
         this.inventory = new PlayerInventory(gold);
@@ -126,23 +114,23 @@ public final class GamePlayer extends GameCharacter {
     }
 
     public Attribute getPrimaryAbility() {
-        return primaryAbility;
+        return characterClass.primaryAbility();
     }
 
     public Set<Attribute> getSavingThrowProficiencies() {
-        return savingThrowProficiencies;
+        return characterClass.savingThrowProficiencies();
     }
 
     public Set<Skill> getSkillProficiencies() {
-        return skillProficiencies;
+        return characterClass.skillProficiencies();
     }
 
     public Set<WeaponCategory> getWeaponProficiencies() {
-        return weaponProficiencies;
+        return characterClass.weaponProficiencies();
     }
 
     public Set<ArmorProficiency> getArmorProficiencies() {
-        return armorProficiencies;
+        return characterClass.armorProficiencies();
     }
 
     public int getLevel() {
@@ -221,7 +209,7 @@ public final class GamePlayer extends GameCharacter {
      */
     public boolean isWearingNonProficientArmor() {
         return inventory.getEquippedItems().stream().map(this::requiredArmorProficiency)
-                .anyMatch(required -> required.isPresent() && !armorProficiencies.contains(required.get()));
+                .anyMatch(required -> required.isPresent() && !getArmorProficiencies().contains(required.get()));
     }
 
     private Optional<ArmorProficiency> requiredArmorProficiency(Item item) {
@@ -247,7 +235,7 @@ public final class GamePlayer extends GameCharacter {
         Optional<Item> weapon = inventory.getEquippedItems().stream()
                 .filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
         int weaponBonus = weapon.map(Item::getBonus).orElse(0);
-        boolean weaponProficient = weapon.map(item -> weaponProficiencies.contains(item.getWeaponCategory()))
+        boolean weaponProficient = weapon.map(item -> getWeaponProficiencies().contains(item.getWeaponCategory()))
                 .orElse(true);
 
         int strengthModifier = getModifier(Attribute.STRENGTH);
@@ -307,8 +295,7 @@ public final class GamePlayer extends GameCharacter {
      * principe que {@link #pickUpItem}/{@link #equipItem} : la mutation publie
      * toujours {@link CharacterGainedXp}, dont le listener (voir
      * {@code game.actor.CharacterService}) décide d'un éventuel passage de niveau,
-     * hors de portée d'un simple POJO sans accès à {@code LevelService}/
-     * {@code ClassService}.
+     * hors de portée d'un simple POJO sans accès à {@code LevelService}.
      */
     public void gainXp(int amount) {
         this.xp += amount;

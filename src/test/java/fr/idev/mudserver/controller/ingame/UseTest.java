@@ -20,7 +20,6 @@ import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.MonsterTemplate;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
-import fr.idev.mudserver.domain.actor.TestProficiencies;
 import fr.idev.mudserver.game.CombatEngine;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.ItemService;
@@ -197,12 +196,7 @@ class UseTest extends AbstractIntegrationTest {
         accountDao.insert(account);
         RecordingConnection connection = new RecordingConnection();
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Buveur-" + UUID.randomUUID(),
-                room.getId(), Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER,
-                TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
-                TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER),
-                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
-                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, currentHealth, maxHealth,
+                room.getId(), Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, currentHealth, maxHealth,
                 TestAttributes.of(10, dexterity, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
         gameWorld.enterWorld(connection, character);

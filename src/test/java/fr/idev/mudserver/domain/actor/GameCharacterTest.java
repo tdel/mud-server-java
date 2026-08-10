@@ -14,8 +14,6 @@ import fr.idev.mudserver.domain.HexDirection;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.actor.GameCharacter.MovementOutcome;
 import fr.idev.mudserver.game.RoomService;
-import fr.idev.mudserver.game.actor.ClassService;
-import fr.idev.mudserver.game.actor.RaceService;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 
@@ -35,12 +33,6 @@ class GameCharacterTest extends AbstractIntegrationTest {
 
     @Autowired
     private CharacterDao characterDao;
-
-    @Autowired
-    private ClassService classService;
-
-    @Autowired
-    private RaceService raceService;
 
     @Test
     void singleStepMoveUpdatesPosition() {
@@ -185,18 +177,11 @@ class GameCharacterTest extends AbstractIntegrationTest {
 
     private GamePlayer characterWithDexterity(int dexterity) {
         return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Test", UUID.randomUUID(), Gender.MAN, Race.HUMAN,
-                CharacterClass.FIGHTER, TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
-                TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER),
-                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
-                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, 10, 10,
-                TestAttributes.of(10, dexterity, 10, 10, 10, 10), 0, 0);
+                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, dexterity, 10, 10, 10, 10), 0, 0);
     }
 
     private Room warmVillage() {
         roomService.warmRooms();
-        classService.warmClassDefinitions();
-        raceService.warmRaceBonuses();
         return roomService.allRooms().stream().filter(room -> room.getId().equals(VILLAGE_SQUARE_ID)).findFirst()
                 .orElseThrow();
     }
@@ -209,12 +194,7 @@ class GameCharacterTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "movement-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Mover", room.getId(), Gender.MAN,
-                Race.HUMAN, CharacterClass.FIGHTER, TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
-                TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER),
-                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
-                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, hp, hp,
-                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+                Race.HUMAN, CharacterClass.FIGHTER, 1, hp, hp, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
         room.join(character);
         return character;

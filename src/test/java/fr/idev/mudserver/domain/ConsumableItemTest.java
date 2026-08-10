@@ -11,7 +11,6 @@ import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
-import fr.idev.mudserver.domain.actor.TestProficiencies;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -65,11 +64,6 @@ class ConsumableItemTest extends AbstractIntegrationTest {
 
     private GamePlayer character(int currentHealth, int maxHealth) {
         return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Test", UUID.randomUUID(), Gender.MAN, Race.HUMAN,
-                CharacterClass.FIGHTER, TestProficiencies.primaryAbility(CharacterClass.FIGHTER),
-                TestProficiencies.savingThrows(CharacterClass.FIGHTER),
-                TestProficiencies.skills(CharacterClass.FIGHTER),
-                TestProficiencies.weaponProficiencies(CharacterClass.FIGHTER),
-                TestProficiencies.armorProficiencies(CharacterClass.FIGHTER), 1, currentHealth, maxHealth,
-                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+                CharacterClass.FIGHTER, 1, currentHealth, maxHealth, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
     }
 }
