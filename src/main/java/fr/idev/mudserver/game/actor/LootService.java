@@ -54,12 +54,6 @@ public class LootService {
 
     private static final Logger log = LoggerFactory.getLogger(LootService.class);
 
-    private final DiceRoller diceRoller;
-
-    public LootService(DiceRoller diceRoller) {
-        this.diceRoller = diceRoller;
-    }
-
     @EventListener
     @Order(3)
     @Transactional
@@ -73,7 +67,7 @@ public class LootService {
         }
 
         for (LootTableEntry entry : template.getLootTable()) {
-            if (diceRoller.rollChance(entry.dropChance())) {
+            if (DiceRoller.rollChance(entry.dropChance())) {
                 Item item = new Item(UUID.randomUUID(), entry.itemTemplateId(), null, killer.getId(), null);
                 killer.receiveLootItem(item);
                 log.info("loot.item_dropped killer={} item={}", killer.getName(), item.getName());

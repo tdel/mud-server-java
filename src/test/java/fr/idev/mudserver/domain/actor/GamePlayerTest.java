@@ -10,6 +10,7 @@ import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.ItemType;
 import fr.idev.mudserver.domain.Rarity;
+import fr.idev.mudserver.game.dice.CheckResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -118,6 +119,118 @@ class GamePlayerTest {
         equip(character, shield(0));
 
         assertThat(character.isWearingNonProficientArmor()).isTrue();
+    }
+
+    @Test
+    void checkAppliesProficiencyBonusWhenTheClassIsProficientInTheSkill() {
+        // FIGHTER est proficient en ATHLETICS (voir data/class.json) : mod FOR +3,
+        // bonus de maîtrise niveau 1 = +2.
+        GamePlayer fighter = character(16, 10, 10, 10, 10, 10, 1, CharacterClass.FIGHTER);
+
+        for (int i = 0; i < 50; i++) {
+            CheckResult result = fighter.check(Skill.ATHLETICS, 0);
+            assertThat(result.proficient()).isTrue();
+            assertThat(result.total()).isBetween(1 + 3 + 2, 20 + 3 + 2);
+        }
+    }
+
+    @Test
+    void checkDoesNotApplyProficiencyBonusWhenTheClassIsNotProficientInTheSkill() {
+        // FIGHTER n'est pas proficient en STEALTH.
+        GamePlayer fighter = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.FIGHTER);
+
+        for (int i = 0; i < 50; i++) {
+            CheckResult result = fighter.check(Skill.STEALTH, 0);
+            assertThat(result.proficient()).isFalse();
+            assertThat(result.total()).isBetween(1, 20);
+        }
+    }
+
+    @Test
+    void saveAppliesProficiencyBonusWhenTheClassIsProficientInTheSavingThrow() {
+        // FIGHTER est proficient en jets de sauvegarde de FOR.
+        GamePlayer fighter = character(16, 10, 10, 10, 10, 10, 1, CharacterClass.FIGHTER);
+
+        for (int i = 0; i < 50; i++) {
+            CheckResult result = fighter.save(Attribute.STRENGTH, 0);
+            assertThat(result.proficient()).isTrue();
+            assertThat(result.total()).isBetween(1 + 3 + 2, 20 + 3 + 2);
+        }
+    }
+
+    @Test
+    void saveDoesNotApplyProficiencyBonusWhenTheClassIsNotProficientInTheSavingThrow() {
+        // FIGHTER n'est pas proficient en jets de sauvegarde d'INT.
+        GamePlayer fighter = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.FIGHTER);
+
+        for (int i = 0; i < 50; i++) {
+            CheckResult result = fighter.save(Attribute.INTELLIGENCE, 0);
+            assertThat(result.proficient()).isFalse();
+            assertThat(result.total()).isBetween(1, 20);
+        }
+    }
+
+    @Test
+    void aTrivialDcAlwaysSucceeds() {
+        GamePlayer fighter = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.FIGHTER);
+
+        assertThat(fighter.check(Skill.ATHLETICS, -100).success()).isTrue();
+    }
+
+    @Test
+    void anImpossibleDcAlwaysFails() {
+        GamePlayer fighter = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.FIGHTER);
+
+        assertThat(fighter.check(Skill.ATHLETICS, 9999).success()).isFalse();
+    }
+
+    @Test
+    void checkAppliesDisadvantageOnADexterityBasedSkillWhenWearingNonProficientArmor() {
+        // WIZARD n'a aucune maîtrise d'armure ; DEX 10 => mod 0, pas de maîtrise sur
+        // STEALTH non plus.
+        GamePlayer wizard = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.WIZARD);
+        equip(wizard, armor("Armure", ArmorCategory.LIGHT, 11));
+
+        // Désavantage (2d20 garde le plus bas, moyenne ≈ 6.86) : nettement sous la
+        // moyenne sans désavantage (10.5).
+        double average = averageCheckTotal(wizard, Skill.STEALTH, 2000);
+        assertThat(average).isBetween(5.8, 7.9);
+    }
+
+    @Test
+    void checkDoesNotApplyDisadvantageOnAWisdomBasedSkillRegardlessOfArmor() {
+        // PERCEPTION est gouvernée par la SAGESSE, pas la DEX/FOR : le désavantage
+        // d'armure ne doit pas s'appliquer.
+        GamePlayer wizard = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.WIZARD);
+        equip(wizard, armor("Armure", ArmorCategory.LIGHT, 11));
+
+        double average = averageCheckTotal(wizard, Skill.PERCEPTION, 2000);
+        assertThat(average).isBetween(9.5, 11.5);
+    }
+
+    @Test
+    void saveAppliesDisadvantageOnADexteritySavingThrowWhenWearingNonProficientArmor() {
+        GamePlayer wizard = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.WIZARD);
+        equip(wizard, armor("Armure", ArmorCategory.LIGHT, 11));
+
+        double average = averageSaveTotal(wizard, Attribute.DEXTERITY, 2000);
+        assertThat(average).isBetween(5.8, 7.9);
+    }
+
+    private double averageCheckTotal(GamePlayer character, Skill skill, int iterations) {
+        long total = 0;
+        for (int i = 0; i < iterations; i++) {
+            total += character.check(skill, 0).total();
+        }
+        return (double) total / iterations;
+    }
+
+    private double averageSaveTotal(GamePlayer character, Attribute attribute, int iterations) {
+        long total = 0;
+        for (int i = 0; i < iterations; i++) {
+            total += character.save(attribute, 0).total();
+        }
+        return (double) total / iterations;
     }
 
     // N'appelle pas GamePlayer#equipItem : celui-ci publie un événement de domaine

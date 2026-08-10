@@ -10,7 +10,6 @@ import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -22,11 +21,9 @@ public class Save implements ControllerHandler {
     private static final String USAGE = "save <attribute> <dc>";
 
     private final GameWorld gameWorld;
-    private final DiceRoller diceRoller;
 
-    public Save(GameWorld gameWorld, DiceRoller diceRoller) {
+    public Save(GameWorld gameWorld) {
         this.gameWorld = gameWorld;
-        this.diceRoller = diceRoller;
     }
 
     @Override
@@ -57,7 +54,7 @@ public class Save implements ControllerHandler {
         }
 
         GamePlayer character = gameWorld.character(connection);
-        connection.send(new CheckOutcome(diceRoller.save(character, attribute, dc)));
+        connection.send(new CheckOutcome(character.save(attribute, dc)));
     }
 
     private Attribute parseAttribute(String input) {

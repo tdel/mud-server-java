@@ -14,7 +14,6 @@ import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.MonsterSpawn;
 import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.actor.TestAttributes;
-import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.game.RoomService;
 import tools.jackson.databind.ObjectMapper;
@@ -37,7 +36,7 @@ class MonsterServiceTest {
      * sans dépendre d'un contexte Spring dans ce test unitaire pur.
      */
     private static Set<UUID> realItemTemplateIds() {
-        ItemService itemService = new ItemService(null, new ObjectMapper(), new DiceRoller());
+        ItemService itemService = new ItemService(null, new ObjectMapper());
         itemService.warmItemTemplates();
         return itemService.templateIds();
     }

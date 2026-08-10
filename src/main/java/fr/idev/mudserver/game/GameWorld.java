@@ -42,16 +42,14 @@ public class GameWorld {
     private final ItemService itemService;
     private final RaceService raceService;
     private final ClassService classService;
-    private final DiceRoller diceRoller;
 
     public GameWorld(CharacterDao characterDao, RoomService roomService, ItemService itemService,
-            RaceService raceService, ClassService classService, DiceRoller diceRoller) {
+            RaceService raceService, ClassService classService) {
         this.characterDao = characterDao;
         this.roomService = roomService;
         this.itemService = itemService;
         this.raceService = raceService;
         this.classService = classService;
-        this.diceRoller = diceRoller;
     }
 
     /**
@@ -116,7 +114,7 @@ public class GameWorld {
         int maxHealth = Math.max(1, classService.hitDie(characterClass) + constitutionModifier);
 
         ClassService.StartingGold startingGold = classService.startingGold(characterClass);
-        int gold = diceRoller.roll(startingGold.dice()).total() * startingGold.multiplier();
+        int gold = DiceRoller.roll(startingGold.dice()).total() * startingGold.multiplier();
 
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), name, startingRoom.get().getId(),
                 gender, race, characterClass, classService.primaryAbility(characterClass),
@@ -143,7 +141,7 @@ public class GameWorld {
 
     private int rollAttributeScore() {
         // Official 5e method: roll 4d6, drop the lowest single die, sum the rest.
-        DiceRoll roll = diceRoller.roll("4d6");
+        DiceRoll roll = DiceRoller.roll("4d6");
         int[] dice = roll.rolls().clone();
         Arrays.sort(dice);
         int sum = 0;

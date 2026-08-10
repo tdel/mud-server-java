@@ -10,7 +10,6 @@ import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Skill;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -22,11 +21,9 @@ public class Check implements ControllerHandler {
     private static final String USAGE = "check <skill> <dc>";
 
     private final GameWorld gameWorld;
-    private final DiceRoller diceRoller;
 
-    public Check(GameWorld gameWorld, DiceRoller diceRoller) {
+    public Check(GameWorld gameWorld) {
         this.gameWorld = gameWorld;
-        this.diceRoller = diceRoller;
     }
 
     @Override
@@ -57,7 +54,7 @@ public class Check implements ControllerHandler {
         }
 
         GamePlayer character = gameWorld.character(connection);
-        connection.send(new CheckOutcome(diceRoller.check(character, skill, dc)));
+        connection.send(new CheckOutcome(character.check(skill, dc)));
     }
 
     private Skill parseSkill(String input) {

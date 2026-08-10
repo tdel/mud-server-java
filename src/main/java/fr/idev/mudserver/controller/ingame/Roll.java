@@ -15,12 +15,6 @@ import fr.idev.mudserver.network.message.ingame.DiceRolled;
 @Component
 public class Roll implements ControllerHandler {
 
-    private final DiceRoller diceRoller;
-
-    public Roll(DiceRoller diceRoller) {
-        this.diceRoller = diceRoller;
-    }
-
     @Override
     public String name() {
         return "roll";
@@ -48,6 +42,6 @@ public class Roll implements ControllerHandler {
             return;
         }
 
-        connection.send(new DiceRolled(expression, diceRoller.roll(expression)));
+        connection.send(new DiceRolled(expression, DiceRoller.roll(expression)));
     }
 }

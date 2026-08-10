@@ -202,7 +202,7 @@ class TelnetConnectionTest {
         private RuntimeException exitWorldException;
 
         RecordingGameWorld() {
-            super(null, null, null, null, null, null);
+            super(null, null, null, null, null);
         }
 
         @Override

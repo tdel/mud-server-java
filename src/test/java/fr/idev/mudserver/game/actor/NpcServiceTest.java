@@ -11,7 +11,6 @@ import fr.idev.mudserver.domain.actor.GameNpc.NpcDialogueOptionType;
 import fr.idev.mudserver.domain.actor.GameNpcSeller;
 import fr.idev.mudserver.domain.Rarity;
 import fr.idev.mudserver.domain.Room;
-import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.game.actor.NpcService.DialogueDefinition;
 import fr.idev.mudserver.game.actor.NpcService.DialogueOptionDefinition;
@@ -33,7 +32,7 @@ class NpcServiceTest {
      * dans ce test unitaire pur.
      */
     private static Map<UUID, ItemService.ItemSummary> realItemTemplateSummariesById() {
-        ItemService itemService = new ItemService(null, new ObjectMapper(), new DiceRoller());
+        ItemService itemService = new ItemService(null, new ObjectMapper());
         itemService.warmItemTemplates();
         return itemService.templateSummariesById();
     }

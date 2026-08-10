@@ -11,12 +11,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Aucune dépendance Spring/DB (contrairement aux autres {@code
- * ControllerHandler} : {@link Roll} ne dépend que de {@link DiceRoller},
- * instanciable directement.
+ * ControllerHandler} : {@link Roll} ne dépend que de {@link DiceRoller}, classe
+ * utilitaire statique, jamais un bean à injecter.
  */
 class RollTest {
 
-    private final Roll roll = new Roll(new DiceRoller());
+    private final Roll roll = new Roll();
     private final RecordingConnection connection = new RecordingConnection();
 
     @Test

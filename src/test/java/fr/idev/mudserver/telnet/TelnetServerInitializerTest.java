@@ -113,6 +113,6 @@ class TelnetServerInitializerTest {
     }
 
     private GameWorld noopGameWorld() {
-        return new GameWorld(null, null, null, null, null, null);
+        return new GameWorld(null, null, null, null, null);
     }
 }

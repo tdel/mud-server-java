@@ -3,20 +3,21 @@ package fr.idev.mudserver.game.dice;
 import java.security.SecureRandom;
 import java.util.Random;
 
-import org.springframework.stereotype.Component;
-
-import fr.idev.mudserver.domain.actor.Attribute;
-import fr.idev.mudserver.domain.actor.GamePlayer;
-import fr.idev.mudserver.domain.actor.Skill;
-
-@Component
-public class DiceRoller {
+/**
+ * Classe utilitaire statique — sans état d'instance (hors {@link #RANDOM},
+ * partagé et thread-safe), jamais un bean Spring : aucun appelant n'a besoin
+ * d'injection de dépendances pour de simples jets de dés.
+ */
+public final class DiceRoller {
 
     private static final int[] SIMULATED_SIDES = {2, 3};
 
-    private final Random random = new SecureRandom();
+    private static final Random RANDOM = new SecureRandom();
 
-    public DiceRoll roll(String expression) {
+    private DiceRoller() {
+    }
+
+    public static DiceRoll roll(String expression) {
         return roll(DiceExpression.parse(expression));
     }
 
@@ -25,11 +26,11 @@ public class DiceRoller {
      * ({@code game.actor.LootService}) plutôt qu'une notation de dés — réutilise le
      * même {@link Random} que {@link #roll}, pas de source d'aléa parallèle.
      */
-    public boolean rollChance(double probability) {
-        return random.nextDouble() < probability;
+    public static boolean rollChance(double probability) {
+        return RANDOM.nextDouble() < probability;
     }
 
-    public DiceRoll roll(DiceExpression expression) {
+    public static DiceRoll roll(DiceExpression expression) {
         int[] rolls = new int[expression.count()];
         for (int i = 0; i < expression.count(); i++) {
             rolls[i] = rollDie(expression.sides());
@@ -46,50 +47,12 @@ public class DiceRoller {
      * appelants qui lisent {@code rolls()[0]} comme jet naturel (règle du 1/20
      * naturel côté {@code game.CombatService}) restent valides sans changement.
      */
-    public DiceRoll rollD20(int modifier, boolean disadvantage) {
+    public static DiceRoll rollD20(int modifier, boolean disadvantage) {
         int kept = disadvantage ? Math.min(rollDie(20), rollDie(20)) : rollDie(20);
         return new DiceRoll(new int[]{kept}, modifier);
     }
 
-    /**
-     * Résout un jet de compétence DnD5e : 1d20 + modificateur de la caractéristique
-     * gouvernante, + bonus de maîtrise si le personnage est proficient sur cette
-     * compétence (voir {@link GamePlayer#getSkillProficiencies()}, résolues une
-     * fois pour toutes à la construction du personnage), comparé à une DC fournie
-     * par l'appelant. Contrairement à {@code game.CombatService#resolveHit}, aucune
-     * règle de critique sur 1/20 naturel : en DnD5e RAW cette règle est propre aux
-     * jets d'attaque, pas aux jets de compétence/sauvegarde génériques.
-     */
-    public CheckResult check(GamePlayer character, Skill skill, int dc) {
-        boolean proficient = character.getSkillProficiencies().contains(skill);
-        return checkOrSave(character, skill.getGoverningAttribute(), proficient, dc, skill.label());
-    }
-
-    /**
-     * Résout un jet de sauvegarde DnD5e — même mécanique que {@link #check}, mais
-     * la maîtrise vient de {@link GamePlayer#getSavingThrowProficiencies()} plutôt
-     * que des compétences.
-     */
-    public CheckResult save(GamePlayer character, Attribute attribute, int dc) {
-        boolean proficient = character.getSavingThrowProficiencies().contains(attribute);
-        return checkOrSave(character, attribute, proficient, dc, attribute.label());
-    }
-
-    private CheckResult checkOrSave(GamePlayer character, Attribute attribute, boolean proficient, int dc,
-            String label) {
-        int modifier = character.getModifier(attribute) + (proficient ? character.getProficiencyBonus() : 0);
-        boolean disadvantage = (attribute == Attribute.STRENGTH || attribute == Attribute.DEXTERITY)
-                && character.isWearingNonProficientArmor();
-        DiceRoll diceRoll = rollD20(modifier, disadvantage);
-        boolean success = resolveCheck(diceRoll.total(), dc);
-        return new CheckResult(label, diceRoll.total(), dc, proficient, disadvantage, success);
-    }
-
-    static boolean resolveCheck(int total, int dc) {
-        return total >= dc;
-    }
-
-    private int rollDie(int sides) {
+    private static int rollDie(int sides) {
         if (sides == 100) {
             return rollPercentile();
         }
@@ -105,7 +68,7 @@ public class DiceRoller {
         return randomInt(1, sides);
     }
 
-    private int rollPercentile() {
+    private static int rollPercentile() {
         // 2d10: one for the tens digit (0-9), one for the units (0-9) - not
         // a sum. Double 0 is 100, there is no 0 result on a d100.
         int tens = randomInt(0, 9);
@@ -114,7 +77,7 @@ public class DiceRoller {
         return result == 0 ? 100 : result;
     }
 
-    private int randomInt(int minInclusive, int maxInclusive) {
-        return minInclusive + random.nextInt(maxInclusive - minInclusive + 1);
+    private static int randomInt(int minInclusive, int maxInclusive) {
+        return minInclusive + RANDOM.nextInt(maxInclusive - minInclusive + 1);
     }
 }

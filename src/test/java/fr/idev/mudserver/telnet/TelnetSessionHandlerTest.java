@@ -185,7 +185,7 @@ class TelnetSessionHandlerTest {
         private boolean exitWorldCalled;
 
         RecordingGameWorld() {
-            super(null, null, null, null, null, null);
+            super(null, null, null, null, null);
         }
 
         @Override

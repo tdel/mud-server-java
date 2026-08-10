@@ -3,7 +3,6 @@ package fr.idev.mudserver.domain;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
@@ -13,7 +12,6 @@ import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.domain.actor.TestProficiencies;
-import fr.idev.mudserver.game.dice.DiceRoller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,9 +28,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @Transactional
 class ConsumableItemTest extends AbstractIntegrationTest {
-
-    @Autowired
-    private DiceRoller diceRoller;
 
     @Test
     void consumeHealsWithinTheEffectDiceRangeAndRemovesTheItem() {
@@ -62,7 +57,7 @@ class ConsumableItemTest extends AbstractIntegrationTest {
 
     private Item healingPotion(String effectDice) {
         ConsumableItem template = new ConsumableItem(UUID.randomUUID(), "Potion de soin", null, ItemType.POTION, 1,
-                null, 0, null, null, 50, Rarity.COMMON, 0, ConsumableEffect.HEALING, effectDice, diceRoller);
+                null, 0, null, null, 50, Rarity.COMMON, 0, ConsumableEffect.HEALING, effectDice);
         Item item = new Item(UUID.randomUUID(), template.getId(), null, null, null);
         item.attachTemplate(template);
         return item;

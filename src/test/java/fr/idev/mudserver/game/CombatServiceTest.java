@@ -21,7 +21,6 @@ import fr.idev.mudserver.domain.Room;
 import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.domain.actor.TestProficiencies;
 import fr.idev.mudserver.domain.WeaponCategory;
-import fr.idev.mudserver.game.dice.DiceRoller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,7 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class CombatServiceTest {
 
-    private final CombatService combatService = new CombatService(new DiceRoller());
+    private final CombatService combatService = new CombatService();
 
     @Test
     void resolveHitAlwaysMissesOnNaturalOneRegardlessOfTotal() {

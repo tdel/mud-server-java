@@ -68,12 +68,10 @@ public class ItemService {
 
     private final ItemDao itemDao;
     private final ObjectMapper objectMapper;
-    private final DiceRoller diceRoller;
 
-    public ItemService(ItemDao itemDao, ObjectMapper objectMapper, DiceRoller diceRoller) {
+    public ItemService(ItemDao itemDao, ObjectMapper objectMapper) {
         this.itemDao = itemDao;
         this.objectMapper = objectMapper;
-        this.diceRoller = diceRoller;
     }
 
     public void warmItemTemplates() {
@@ -95,7 +93,7 @@ public class ItemService {
             return new ConsumableItem(definition.id(), definition.name(), definition.description(), definition.type(),
                     definition.weight(), definition.armorCategory(), definition.baseAc(), definition.damageDice(),
                     definition.weaponCategory(), definition.price(), definition.rarity(), definition.bonus(),
-                    definition.consumableEffect(), definition.effectDice(), diceRoller);
+                    definition.consumableEffect(), definition.effectDice());
         }
         return new ItemTemplate(definition.id(), definition.name(), definition.description(), definition.type(),
                 definition.weight(), definition.armorCategory(), definition.baseAc(), definition.damageDice(),

@@ -67,11 +67,9 @@ public class CombatEngine {
     private static final Logger log = LoggerFactory.getLogger(CombatEngine.class);
 
     private final CombatService combatService;
-    private final DiceRoller diceRoller;
 
-    public CombatEngine(CombatService combatService, DiceRoller diceRoller) {
+    public CombatEngine(CombatService combatService) {
         this.combatService = combatService;
-        this.diceRoller = diceRoller;
     }
 
     public void attack(GamePlayer attacker, GameMonster target) {
@@ -315,7 +313,7 @@ public class CombatEngine {
             }
             GamePlayer victim = livingPlayers.size() == 1
                     ? livingPlayers.get(0)
-                    : livingPlayers.get(diceRoller.roll(new DiceExpression(1, livingPlayers.size(), 0)).total() - 1);
+                    : livingPlayers.get(DiceRoller.roll(new DiceExpression(1, livingPlayers.size(), 0)).total() - 1);
 
             CombatResult result = combatService.tryMonsterAttack(monster, victim);
             victim.send(new MonsterAttackResult(monster.getName(), result));

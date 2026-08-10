@@ -33,12 +33,6 @@ import fr.idev.mudserver.game.dice.DiceRoller;
 @Service
 public class CombatService {
 
-    private final DiceRoller diceRoller;
-
-    public CombatService(DiceRoller diceRoller) {
-        this.diceRoller = diceRoller;
-    }
-
     public CombatResult tryAttack(GamePlayer attacker, GameMonster target) {
         Optional<Item> weapon = attacker.getInventory().getEquippedItems().stream()
                 .filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
@@ -50,7 +44,7 @@ public class CombatService {
         int attackBonus = strengthModifier + (weaponProficient ? attacker.getProficiencyBonus() : 0) + weaponBonus;
         boolean disadvantage = attacker.isWearingNonProficientArmor();
 
-        DiceRoll attackRoll = diceRoller.rollD20(attackBonus, disadvantage);
+        DiceRoll attackRoll = DiceRoller.rollD20(attackBonus, disadvantage);
         int naturalRoll = attackRoll.rolls()[0];
         boolean criticalHit = naturalRoll == 20;
         int armorClass = target.getArmorClass();
@@ -75,7 +69,7 @@ public class CombatService {
         int strengthModifier = attacker.getModifier(Attribute.STRENGTH);
         int attackBonus = strengthModifier + 2;
 
-        DiceRoll attackRoll = diceRoller.roll(new DiceExpression(1, 20, attackBonus));
+        DiceRoll attackRoll = DiceRoller.roll(new DiceExpression(1, 20, attackBonus));
         int naturalRoll = attackRoll.rolls()[0];
         boolean criticalHit = naturalRoll == 20;
         int armorClass = target.getArmorClass();
@@ -97,7 +91,7 @@ public class CombatService {
      */
     public int rollInitiative(GameCharacter character) {
         int dexterityModifier = character.getModifier(Attribute.DEXTERITY);
-        return diceRoller.roll(new DiceExpression(1, 20, dexterityModifier)).total();
+        return DiceRoller.roll(new DiceExpression(1, 20, dexterityModifier)).total();
     }
 
     /**
@@ -125,12 +119,12 @@ public class CombatService {
         DiceExpression base = DiceExpression.parse(weapon.get().getDamageDice());
         int diceCount = criticalHit ? base.count() * 2 : base.count();
         int modifier = strengthModifier + weapon.get().getBonus();
-        return Math.max(0, diceRoller.roll(new DiceExpression(diceCount, base.sides(), modifier)).total());
+        return Math.max(0, DiceRoller.roll(new DiceExpression(diceCount, base.sides(), modifier)).total());
     }
 
     private int rollMonsterDamage(GameMonster attacker, int strengthModifier, boolean criticalHit) {
         DiceExpression base = DiceExpression.parse(attacker.getNaturalDamageDice());
         int diceCount = criticalHit ? base.count() * 2 : base.count();
-        return Math.max(0, diceRoller.roll(new DiceExpression(diceCount, base.sides(), strengthModifier)).total());
+        return Math.max(0, DiceRoller.roll(new DiceExpression(diceCount, base.sides(), strengthModifier)).total());
     }
 }

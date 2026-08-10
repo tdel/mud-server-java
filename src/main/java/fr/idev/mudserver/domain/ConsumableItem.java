@@ -13,32 +13,19 @@ import fr.idev.mudserver.game.dice.DiceRoller;
  * second type (poison, etc.) ajoutera sa propre branche sans toucher au reste
  * du pipeline (voir {@code ItemService.warmItemTemplates}, {@code
  * CombatEngine.useItem}).
- *
- * <p>
- * Contrairement à
- * {@link fr.idev.mudserver.domain.actor.GamePlayer}/{@link Item}/{@link Room},
- * ce type n'est jamais reconstruit depuis une ligne DB par un DAO — il n'existe
- * qu'une fois, construit par {@code
- * ItemService.warmItemTemplates()} (un {@code @Service}) au démarrage. Recevoir
- * un {@link DiceRoller} au constructeur n'est donc pas une entorse à la règle
- * "POJO sans bean" du domaine : {@code warmItemTemplates()} a déjà accès à
- * l'injection de dépendances normale, contrairement aux DAO qui construisent
- * {@code GamePlayer}/{@code Item}/{@code Room} hors de tout contexte Spring.
  */
 public class ConsumableItem extends ItemTemplate {
 
     private final ConsumableEffect effect;
     private final String effectDice;
-    private final DiceRoller diceRoller;
 
     public ConsumableItem(UUID id, String name, String description, ItemType type, int weight,
             ArmorCategory armorCategory, int baseAc, String damageDice, WeaponCategory weaponCategory, int price,
-            Rarity rarity, int bonus, ConsumableEffect effect, String effectDice, DiceRoller diceRoller) {
+            Rarity rarity, int bonus, ConsumableEffect effect, String effectDice) {
         super(id, name, description, type, weight, armorCategory, baseAc, damageDice, weaponCategory, price, rarity,
                 bonus);
         this.effect = effect;
         this.effectDice = effectDice;
-        this.diceRoller = diceRoller;
     }
 
     public void consume(GamePlayer character, Item item) {
@@ -48,7 +35,7 @@ public class ConsumableItem extends ItemTemplate {
     }
 
     private void heal(GamePlayer character, Item item) {
-        int amount = diceRoller.roll(effectDice).total();
+        int amount = DiceRoller.roll(effectDice).total();
         int healed = Math.min(amount, character.getMaxHealth() - character.getCurrentHealth());
         character.setCurrentHealth(character.getCurrentHealth() + healed);
         character.getInventory().removeItem(item);
