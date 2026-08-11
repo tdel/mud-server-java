@@ -1,11 +1,23 @@
 package fr.idev.mudserver.domain;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+
+import fr.idev.mudserver.domain.actor.Attribute;
+import fr.idev.mudserver.domain.actor.CharacterClass;
+import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.Gender;
+import fr.idev.mudserver.domain.actor.Race;
+import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
+import fr.idev.mudserver.domain.actor.event.NewGamePlayerCreated;
+import fr.idev.mudserver.game.dice.DiceRoll;
+import fr.idev.mudserver.game.dice.DiceRoller;
 
 /**
  * Playthrough concret d'un {@link WorldTemplate}, scopé à une party — chaque
@@ -98,6 +110,57 @@ public class WorldInstance {
 
     public Optional<RoomInstance> startingRoomInstance() {
         return roomInstances.values().stream().filter(room -> Boolean.TRUE.equals(room.isStartingRoom())).findFirst();
+    }
+
+    public GamePlayer createCharacter(Account account, String name, Gender gender, Race race,
+            CharacterClass characterClass) {
+        RoomInstance startingRoom = startingRoomInstance()
+                .orElseThrow(() -> new IllegalStateException("WorldInstance " + id + " n'a aucune room de départ"));
+
+        Map<Attribute, Integer> scores = rollAttributeScores();
+        for (Map.Entry<Attribute, Integer> bonus : race.attributeScoreBonuses().entrySet()) {
+            scores.merge(bonus.getKey(), bonus.getValue(), Integer::sum);
+        }
+
+        // 5e niveau 1 : PV max = valeur MAXIMALE du dé de vie de la classe (pas un jet)
+        // + modificateur de CON.
+        int constitutionModifier = Math.floorDiv(scores.get(Attribute.CONSTITUTION) - 10, 2);
+        int maxHealth = Math.max(1, characterClass.hitDie() + constitutionModifier);
+
+        CharacterClass.StartingGold startingGold = characterClass.startingGold();
+        int gold = DiceRoller.roll(startingGold.dice()).total() * startingGold.multiplier();
+
+        // getTemplateId(), pas getId() : current_room_id désigne toujours un id de
+        // RoomTemplate (indépendant de l'instance), jamais l'id déterministe de la
+        // RoomInstance elle-même — voir la Javadoc de RoomService.
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), name, startingRoom.getTemplateId(),
+                gender, race, characterClass, 1, maxHealth, maxHealth, scores, 0, gold);
+        character.setWorldInstance(this);
+
+        DomainEventPublisher.publish(new NewGamePlayerCreated(character));
+        character.spawnToRoom(startingRoom);
+
+        return character;
+    }
+
+    private Map<Attribute, Integer> rollAttributeScores() {
+        Map<Attribute, Integer> scores = new LinkedHashMap<>();
+        for (Attribute attribute : Attribute.values()) {
+            scores.put(attribute, rollAttributeScore());
+        }
+        return scores;
+    }
+
+    private int rollAttributeScore() {
+        // Official 5e method: roll 4d6, drop the lowest single die, sum the rest.
+        DiceRoll roll = DiceRoller.roll("4d6");
+        int[] dice = roll.rolls().clone();
+        Arrays.sort(dice);
+        int sum = 0;
+        for (int i = 1; i < dice.length; i++) {
+            sum += dice[i];
+        }
+        return sum;
     }
 
     @Override

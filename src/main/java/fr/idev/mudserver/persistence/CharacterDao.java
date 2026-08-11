@@ -32,7 +32,7 @@ public class CharacterDao {
      * .getWorldInstanceId()} est {@code null} : {@code GamePlayer} n'a pas gagné de
      * paramètre de constructeur pour ce champ (aurait fallu toucher tous les sites
      * de test qui le construisent directement) — seul
-     * {@code GameWorld.createCharacter} le renseigne explicitement aujourd'hui.
+     * {@code WorldInstance.createCharacter} le renseigne explicitement aujourd'hui.
      * Correct tant qu'une seule {@code WorldInstance} existe (avant le Lobby, à
      * venir) : tout personnage inséré sans instance explicite appartient de fait à
      * celle-là.

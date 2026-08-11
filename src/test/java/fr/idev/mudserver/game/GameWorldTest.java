@@ -21,10 +21,10 @@ import fr.idev.mudserver.persistence.CharacterDao;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Non-régression : GameWorld#createCharacter publie NewGamePlayerCreated, dont
- * le listener onNewGamePlayerCreated (dans cette même classe) fait le
- * characterDao.insert — ce test prouve que la persistance a bien lieu malgré
- * l'indirection par l'événement.
+ * Non-régression : WorldInstance#createCharacter publie NewGamePlayerCreated,
+ * dont le listener GameWorld#onNewGamePlayerCreated fait le characterDao.insert
+ * — ce test prouve que la persistance a bien lieu malgré l'indirection par
+ * l'événement.
  *
  * <p>
  * Pas besoin de {@code @DirtiesContext} : {@code RoomService.warmRooms()}
@@ -36,9 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @Transactional
 class GameWorldTest extends AbstractIntegrationTest {
-
-    @Autowired
-    private GameWorld gameWorld;
 
     @Autowired
     private AccountDao accountDao;
@@ -59,7 +56,7 @@ class GameWorldTest extends AbstractIntegrationTest {
         roomService.warmRooms();
         RoomInstance startingRoom = roomService.startingRoom().orElseThrow();
         WorldInstance instance = worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID);
-        GamePlayer character = gameWorld.createCharacter(account, instance, "Hilde", Gender.WOMAN, Race.HUMAN,
+        GamePlayer character = instance.createCharacter(account, "Hilde", Gender.WOMAN, Race.HUMAN,
                 CharacterClass.FIGHTER);
 
         assertThat(characterDao.findById(character.getId())).contains(character);

@@ -81,7 +81,7 @@ public final class GamePlayer extends GameCharacter {
      * Variante complète utilisée par {@code CharacterDao#toDomain} lors du
      * rechargement d'un personnage existant, où {@code shortRestCount} doit
      * refléter l'état persisté plutôt que redémarrer à 0 — un personnage
-     * fraîchement créé ({@code GameWorld.createCharacter}) ou construit en test
+     * fraîchement créé ({@code WorldInstance.createCharacter}) ou construit en test
      * passe par le constructeur court ci-dessus, qui délègue ici avec 0.
      */
     public GamePlayer(UUID id, UUID accountId, String name, UUID currentRoomId, Gender gender, Race race,
@@ -120,10 +120,10 @@ public final class GamePlayer extends GameCharacter {
      * Pas de paramètre de constructeur pour ce champ : aurait fallu toucher tous
      * les sites (production et tests) qui construisent un {@code GamePlayer}
      * directement. {@code CharacterDao.toDomain} le renseigne au rechargement,
-     * {@code GameWorld.createCharacter} à la création — {@code null} sinon (repli
-     * sur {@link WorldInstance#DEFAULT_ID} porté par {@code CharacterDao.insert},
-     * pas ici, pour ne pas faire dépendre le domaine d'une valeur par défaut
-     * applicative).
+     * {@code WorldInstance.createCharacter} à la création — {@code null} sinon
+     * (repli sur {@link WorldInstance#DEFAULT_ID} porté par
+     * {@code CharacterDao.insert}, pas ici, pour ne pas faire dépendre le domaine
+     * d'une valeur par défaut applicative).
      */
     public UUID getWorldInstanceId() {
         return worldInstanceId;
@@ -138,9 +138,9 @@ public final class GamePlayer extends GameCharacter {
      * principe que {@code currentRoom} sur {@link GameCharacter} vis-à-vis de
      * {@code currentRoomId}. Renseigné dès que l'instance est matérialisée pour ce
      * personnage ({@code WorldInstanceService.spawnCharacterIntoInstance},
-     * {@code GameWorld.createCharacter}), ce qui couvre tous les chemins d'entrée
-     * en jeu (login, création). {@code null} tant que le personnage n'a pas encore
-     * rejoint son instance — ne pas appeler avant l'état {@code INGAME}.
+     * {@code WorldInstance.createCharacter}), ce qui couvre tous les chemins
+     * d'entrée en jeu (login, création). {@code null} tant que le personnage n'a
+     * pas encore rejoint son instance — ne pas appeler avant l'état {@code INGAME}.
      */
     public WorldInstance getWorldInstance() {
         return worldInstance;

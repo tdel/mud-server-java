@@ -9,9 +9,10 @@ import fr.idev.mudserver.domain.Item;
 /**
  * Regroupe les items portés par un {@link GamePlayer} et son or — l'or initial
  * est roulé selon la classe à la création du personnage (voir
- * {@code GameWorld.createCharacter}), puis varie en jeu via {@link #addGold}
- * (butin, voir {@code game.actor.LootService}) ou {@link #trySpendGold} (achat
- * auprès d'un PNJ marchand, voir {@code controller.ingame.Talk}).
+ * {@code WorldInstance.createCharacter}), puis varie en jeu via
+ * {@link #addGold} (butin, voir {@code game.actor.LootService}) ou
+ * {@link #trySpendGold} (achat auprès d'un PNJ marchand, voir
+ * {@code controller.ingame.Talk}).
  */
 public final class PlayerInventory {
 

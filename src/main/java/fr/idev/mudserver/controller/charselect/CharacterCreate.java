@@ -17,7 +17,6 @@ import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.CharacterSelectionWorld;
-import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -34,15 +33,13 @@ import fr.idev.mudserver.persistence.CharacterDao;
 @Component
 public class CharacterCreate implements ControllerHandler {
 
-    private final GameWorld gameWorld;
     private final AuthWorld authWorld;
     private final CharacterSelectionWorld characterSelectionWorld;
     private final CharacterDao characterDao;
     private final CharSelectStatus charSelectStatus;
 
-    public CharacterCreate(GameWorld gameWorld, AuthWorld authWorld, CharacterSelectionWorld characterSelectionWorld,
+    public CharacterCreate(AuthWorld authWorld, CharacterSelectionWorld characterSelectionWorld,
             CharacterDao characterDao, CharSelectStatus charSelectStatus) {
-        this.gameWorld = gameWorld;
         this.authWorld = authWorld;
         this.characterSelectionWorld = characterSelectionWorld;
         this.characterDao = characterDao;
@@ -164,7 +161,7 @@ public class CharacterCreate implements ControllerHandler {
 
     private void createCharacter(Connection connection, Account account, WorldInstance instance, String name,
             Gender gender, Race race, CharacterClass characterClass) {
-        GamePlayer character = gameWorld.createCharacter(account, instance, name, gender, race, characterClass);
+        GamePlayer character = instance.createCharacter(account, name, gender, race, characterClass);
 
         connection.send(new CharacterCreated(name));
         connection.send(new GamePlayerStats(character));
