@@ -25,12 +25,13 @@ import tools.jackson.databind.ObjectMapper;
 
 /**
  * Précharge les templates de monstres depuis {@code data/monsters.json}, sur le
- * même principe que {@code ItemService}/{@code RoomService} : donnée de contenu
- * statique, jamais mutée en jeu, chargée depuis le classpath plutôt que la DB —
- * pas de table monstre dans {@code V1__init_schema.sql}. Les instances («
- * spawns ») ne vivent plus dans ce fichier : elles sont portées par chaque
- * {@code RoomInstance} (voir {@link RoomInstance#getMonsterSpawns()}, peuplé
- * par {@code RoomService.loadRooms} depuis {@code data/rooms.json}) — c'est
+ * même principe que {@code ItemService}/{@code WorldInstanceService} : donnée
+ * de contenu statique, jamais mutée en jeu, chargée depuis le classpath plutôt
+ * que la DB — pas de table monstre dans {@code V1__init_schema.sql}. Les
+ * instances (« spawns ») ne vivent plus dans ce fichier : elles sont portées
+ * par chaque {@code RoomInstance} (voir
+ * {@link RoomInstance#getMonsterSpawns()}, peuplé par
+ * {@code WorldTemplateService} depuis {@code rooms.json}) — c'est
  * {@link #loadMonsters} qui les consomme pour instancier et placer les
  * {@link GameMonster} correspondants, une fois les templates chargés.
  */

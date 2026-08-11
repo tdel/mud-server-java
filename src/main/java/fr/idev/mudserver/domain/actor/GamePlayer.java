@@ -549,10 +549,10 @@ public final class GamePlayer extends GameCharacter {
      * par le fait que tout personnage capable d'atteindre l'état {@code INGAME} a
      * déjà traversé {@link #spawnToRoom} (à la création ou à l'entrée en jeu).
      * Suppose aussi qu'il n'existe jamais qu'une seule instance JVM vivante de
-     * {@code item} (cache chaud de {@code RoomService}/ {@code ItemService}, jamais
-     * rechargé par requête) — sinon {@code synchronized(item)} ne synchroniserait
-     * rien entre deux appels concurrents portant sur des instances différentes du
-     * même item.
+     * {@code item} (cache chaud de {@code WorldInstanceService}/
+     * {@code ItemService}, jamais rechargé par requête) — sinon
+     * {@code synchronized(item)} ne synchroniserait rien entre deux appels
+     * concurrents portant sur des instances différentes du même item.
      *
      * <p>
      * Deux joueurs peuvent réellement se disputer un item non possédé sous les

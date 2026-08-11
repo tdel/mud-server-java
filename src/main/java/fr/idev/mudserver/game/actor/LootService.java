@@ -28,8 +28,9 @@ import fr.idev.mudserver.game.dice.DiceRoller;
  * {@code RoomInstance.broadcast} ici.
  *
  * <p>
- * {@code @Order(3)} : s'exécute après {@code RoomService#onCharacterDied}
- * (@Order(1), annonce {@code MonsterDefeated} à la room) et {@code
+ * {@code @Order(3)} : s'exécute après
+ * {@code WorldInstanceService#onCharacterDied} (@Order(1), annonce
+ * {@code MonsterDefeated} à la room) et {@code
  * CharacterService#onCharacterDied} (@Order(2), crédit d'XP), avant {@code
  * CombatEngine#onCharacterDied} (pas d'@Order, nettoyage de l'encounter) — le
  * joueur voit donc la mort du monstre, puis l'XP/niveau, puis son butin, dans

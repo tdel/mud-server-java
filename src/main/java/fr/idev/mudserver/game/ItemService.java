@@ -147,11 +147,11 @@ public class ItemService {
     }
 
     /**
-     * Précharge les items au sol de chaque room, une fois pour toute la durée du
-     * process — appelé depuis {@code ServerApplication.warmupRunner} juste après
-     * {@code RoomService.warmRooms()} et {@link #warmItemTemplates()}, sur le même
-     * principe : une {@code RoomInstance} n'est jamais rechargée par session,
-     * contrairement à un {@code GamePlayer}.
+     * Précharge les items au sol d'une {@code WorldInstance}, une fois pour toute
+     * sa durée de vie résidente — appelé depuis
+     * {@code WorldInstanceService.materialize()}, une fois par instance
+     * matérialisée plutôt que globalement au boot : une {@code RoomInstance} n'est
+     * jamais rechargée par session, contrairement à un {@code GamePlayer}.
      */
     public void warmRoomItems(Collection<RoomInstance> rooms) {
         int totalItems = 0;

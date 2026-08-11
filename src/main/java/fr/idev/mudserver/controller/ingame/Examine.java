@@ -11,7 +11,6 @@ import fr.idev.mudserver.domain.actor.GameCharacter;
 import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.GameNpc;
 import fr.idev.mudserver.domain.actor.GamePlayer;
-import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -22,12 +21,6 @@ import fr.idev.mudserver.network.message.ingame.TargetNotFound;
 
 @Component
 public class Examine implements ControllerHandler {
-
-    private final RoomService roomService;
-
-    public Examine(RoomService roomService) {
-        this.roomService = roomService;
-    }
 
     @Override
     public String name() {

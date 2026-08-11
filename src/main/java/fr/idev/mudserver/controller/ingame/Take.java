@@ -9,7 +9,6 @@ import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.RoomInstance;
-import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -18,12 +17,6 @@ import fr.idev.mudserver.network.message.ingame.ItemTaken;
 
 @Component
 public class Take implements ControllerHandler {
-
-    private final RoomService roomService;
-
-    public Take(RoomService roomService) {
-        this.roomService = roomService;
-    }
 
     @Override
     public String name() {

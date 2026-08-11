@@ -12,19 +12,12 @@ import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.GameNpc;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.HexGridRenderer;
-import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ingame.RoomDescription;
 
 @Component
 public class Look implements ControllerHandler {
-
-    private final RoomService roomService;
-
-    public Look(RoomService roomService) {
-        this.roomService = roomService;
-    }
 
     @Override
     public String name() {

@@ -20,7 +20,6 @@ import fr.idev.mudserver.domain.actor.event.LongRestTaken;
 import fr.idev.mudserver.domain.actor.event.NewGamePlayerCreated;
 import fr.idev.mudserver.domain.actor.event.ShortRestTaken;
 import fr.idev.mudserver.domain.RoomInstance;
-import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.message.ingame.GoldLooted;
 import fr.idev.mudserver.network.message.ingame.GoldSpent;
@@ -46,8 +45,8 @@ import fr.idev.mudserver.persistence.CharacterDao;
  * Réagit aussi à {@link CharacterDied} : c'est ici, plutôt que dans
  * {@code GameMonster#takeDamage}, que le tueur est crédité de l'XP du monstre
  * et que sa cible est vidée — deux effets qui concernent l'état du personnage
- * joueur, pas la room (voir {@code RoomService#onCharacterDied} pour le pendant
- * « room »).
+ * joueur, pas la room (voir {@code WorldInstanceService#onCharacterDied} pour
+ * le pendant « room »).
  */
 @Service
 public class CharacterService {
@@ -56,14 +55,12 @@ public class CharacterService {
 
     private final CharacterDao characterDao;
     private final LevelService levelService;
-    private final RoomService roomService;
     private final WorldInstanceService worldInstanceService;
 
-    public CharacterService(CharacterDao characterDao, LevelService levelService, RoomService roomService,
+    public CharacterService(CharacterDao characterDao, LevelService levelService,
             WorldInstanceService worldInstanceService) {
         this.characterDao = characterDao;
         this.levelService = levelService;
-        this.roomService = roomService;
         this.worldInstanceService = worldInstanceService;
     }
 
@@ -134,8 +131,8 @@ public class CharacterService {
 
     /**
      * {@code @Order(2)} : ce listener s'exécute après
-     * {@code RoomService#onCharacterDied} pour ce même événement, afin que le
-     * joueur voie la mort du monstre avant le message d'XP (et une éventuelle
+     * {@code WorldInstanceService#onCharacterDied} pour ce même événement, afin que
+     * le joueur voie la mort du monstre avant le message d'XP (et une éventuelle
      * montée de niveau) que déclenche {@link GamePlayer#gainXp}.
      */
     @EventListener
@@ -150,18 +147,18 @@ public class CharacterService {
     }
 
     /**
-     * {@code @Order(2)} : s'exécute après {@code RoomService#onGamePlayerDied}, qui
-     * a déjà diffusé l'annonce de la mort à la room d'origine avant que
-     * {@code moveToRoom} ne l'écrase. Restauration complète des PV, pas de pénalité
-     * (XP, niveau...) — non demandée. Le retrait de l'affrontement lui-même est
-     * géré par {@code CombatEngine#onGamePlayerDied}, indépendamment de cette
-     * méthode.
+     * {@code @Order(2)} : s'exécute après
+     * {@code WorldInstanceService#onGamePlayerDied}, qui a déjà diffusé l'annonce
+     * de la mort à la room d'origine avant que {@code moveToRoom} ne l'écrase.
+     * Restauration complète des PV, pas de pénalité (XP, niveau...) — non demandée.
+     * Le retrait de l'affrontement lui-même est géré par
+     * {@code CombatEngine#onGamePlayerDied}, indépendamment de cette méthode.
      */
     @EventListener
     @Order(2)
     void onGamePlayerDied(GamePlayerDied event) {
         GamePlayer character = event.character();
-        RoomInstance startingRoom = roomService.startingRoom()
+        RoomInstance startingRoom = character.getWorldInstance().startingRoomInstance()
                 .orElseThrow(() -> new IllegalStateException("Aucune starting room configurée"));
 
         character.setCurrentHealth(character.getMaxHealth());

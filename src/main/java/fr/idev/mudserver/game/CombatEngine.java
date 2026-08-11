@@ -58,11 +58,12 @@ import fr.idev.mudserver.network.message.ingame.YourTurn;
  * nécessaire pour l'ordre perçu par le joueur, {@link GameMonster#takeDamage}/
  * {@link GamePlayer#takeDamage} publiant {@code CharacterDied}/
  * {@code GamePlayerDied} de façon synchrone, dont les listeners
- * ({@code RoomService}/{@code CharacterService}) envoient déjà leurs propres
- * messages immédiatement : différer les messages de cette classe dans une file
- * vidée après coup les ferait arriver <em>après</em> ceux de la mort/mise à
- * terre qu'ils précèdent pourtant chronologiquement (essai manuel : « The
- * Bandit collapses » apparaissait avant « You attack the Bandit... HIT! »).
+ * ({@code WorldInstanceService}/{@code CharacterService}) envoient déjà leurs
+ * propres messages immédiatement : différer les messages de cette classe dans
+ * une file vidée après coup les ferait arriver <em>après</em> ceux de la
+ * mort/mise à terre qu'ils précèdent pourtant chronologiquement (essai manuel :
+ * « The Bandit collapses » apparaissait avant « You attack the Bandit... HIT!
+ * »).
  */
 @Service
 public class CombatEngine {
