@@ -1,6 +1,7 @@
 package fr.idev.mudserver.game;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -37,7 +38,7 @@ public class AuthWorld {
 
     public void enterWorld(Connection connection, Account account) {
         connections.put(connection, account);
-        connection.setState(ConnectionState.AUTHED);
+        connection.setState(ConnectionState.LOBBY);
         MDC.put("account", account.getLogin());
     }
 
@@ -62,5 +63,26 @@ public class AuthWorld {
 
     public boolean isAlreadyConnected(UUID accountId) {
         return connections.values().stream().anyMatch(account -> account.getId().equals(accountId));
+    }
+
+    /**
+     * Résout un login vers sa connexion vivante actuelle (LOBBY ou CHARSELECT, voir
+     * la Javadoc de classe) — utilisé par {@code controller.lobby.PartyInvite} pour
+     * vérifier qu'une cible est bien joignable avant de lui envoyer une invitation.
+     */
+    public Optional<Connection> findConnectionByLogin(String login) {
+        return connections.entrySet().stream().filter(entry -> entry.getValue().getLogin().equalsIgnoreCase(login))
+                .map(Map.Entry::getKey).findFirst();
+    }
+
+    /**
+     * Même principe que {@link #findConnectionByLogin}, mais par id de compte —
+     * c'est la seule donnée que retient {@code domain.PartyMember}, utilisé par
+     * {@code controller.lobby.WorldEnter} pour résoudre chaque membre d'une party
+     * vers sa connexion courante au moment du lancement.
+     */
+    public Optional<Connection> findConnectionByAccountId(UUID accountId) {
+        return connections.entrySet().stream().filter(entry -> entry.getValue().getId().equals(accountId))
+                .map(Map.Entry::getKey).findFirst();
     }
 }

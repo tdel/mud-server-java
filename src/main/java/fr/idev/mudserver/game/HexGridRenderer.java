@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import fr.idev.mudserver.domain.HexCoordinate;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.actor.GameCharacter;
 import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.GameNpc;
@@ -29,11 +29,11 @@ public final class HexGridRenderer {
     private HexGridRenderer() {
     }
 
-    public static List<String> render(Room room, GamePlayer viewer) {
+    public static List<String> render(RoomInstance room, GamePlayer viewer) {
         return render(room, viewer, VIEWPORT_RADIUS);
     }
 
-    static List<String> render(Room room, GamePlayer viewer, int radius) {
+    static List<String> render(RoomInstance room, GamePlayer viewer, int radius) {
         HexCoordinate center = viewer.getPosition();
         List<String> lines = new ArrayList<>();
 
@@ -58,7 +58,7 @@ public final class HexGridRenderer {
         return lines;
     }
 
-    private static char glyphFor(Room room, GamePlayer viewer, HexCoordinate cell) {
+    private static char glyphFor(RoomInstance room, GamePlayer viewer, HexCoordinate cell) {
         if (cell.equals(viewer.getPosition())) {
             return '@';
         }

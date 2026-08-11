@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.controller.RecordingConnection;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.GamePlayer;
@@ -72,7 +72,7 @@ class AttackTest extends AbstractIntegrationTest {
     void noArgumentWithStaleTargetThatLeftTheRoomSendsTargetNotFoundAndClearsTheTarget() {
         RecordingConnection connection = enterGame();
         GamePlayer character = gameWorld.character(connection);
-        Room elsewhere = new Room(UUID.randomUUID(), "Ailleurs", "...", null);
+        RoomInstance elsewhere = new RoomInstance(UUID.randomUUID(), "Ailleurs", "...", null);
         GameMonster monster = monster(elsewhere);
         character.setTarget(monster);
 
@@ -105,7 +105,7 @@ class AttackTest extends AbstractIntegrationTest {
 
     private RecordingConnection enterGame() {
         roomService.warmRooms();
-        Room startingRoom = roomService.startingRoom().orElseThrow();
+        RoomInstance startingRoom = roomService.startingRoom().orElseThrow();
         RecordingConnection connection = new RecordingConnection();
         GamePlayer character = new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Attaquant", startingRoom.getId(),
                 Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 1000, 1000,
@@ -115,7 +115,7 @@ class AttackTest extends AbstractIntegrationTest {
         return connection;
     }
 
-    private GameMonster monster(Room room) {
+    private GameMonster monster(RoomInstance room) {
         MonsterTemplate template = new MonsterTemplate(UUID.randomUUID(), "Mannequin " + UUID.randomUUID(),
                 "Un mannequin d'entraînement", 1000, TestAttributes.of(10, 10, 10, 10, 10, 10), 10, 0, "1d6", 0,
                 List.of(), 0);

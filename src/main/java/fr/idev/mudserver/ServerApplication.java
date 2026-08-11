@@ -11,37 +11,34 @@ import org.springframework.context.annotation.Bean;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.game.actor.LevelService;
 import fr.idev.mudserver.game.actor.MonsterService;
-import fr.idev.mudserver.game.actor.NpcService;
-import fr.idev.mudserver.game.RoomService;
+import fr.idev.mudserver.game.WorldTemplateService;
 
 /**
  * Un {@link ApplicationRunner} s'exécute après le rafraîchissement du contexte
  * (DI complète) mais avant la publication de {@code ApplicationReadyEvent} —
  * donc mécaniquement avant {@code TelnetServer.start()}, qui écoute cet
  * événement. Cette garantie Spring Boot documentée évite d'avoir à coordonner
- * deux listeners du même événement via {@code @Order}. L'ordre des appels
- * ci-dessous est significatif : {@code warmRoomItems()} dépend du contenu déjà
- * chargé par {@code warmRooms()} (les rooms) et {@code warmItemTemplates()}
- * (les templates), voir {@link ItemService#warmRoomItems}. Même raison pour
- * {@code npcService.warmNpcs} : place ses instances dans les rooms déjà
- * chargées. {@code monsterService.warmMonsters} dépend lui aussi de
- * {@code warmRooms()} — les points de spawn eux-mêmes viennent maintenant de
- * {@code data/rooms.json} (voir {@code Room#getMonsterSpawns()}),
- * {@code data/monsters.json} ne portant plus que les templates — <em>et</em> de
- * {@code warmItemTemplates()}, appelé avant lui plutôt qu'après comme les
- * autres : ses tables de butin (voir {@code data/monsters.json}) référencent
- * des identifiants d'{@code ItemTemplate}, validés au chargement contre
+ * deux listeners du même événement via {@code @Order}. Ne charge plus ici que
+ * les catalogues globaux, jamais mutés en jeu et partagés entre tous les
+ * {@code WorldTemplate} : templates d'items ({@code data/items.json}),
+ * templates de {@code WorldTemplate} eux-mêmes ({@code data/worlds/*&#47;}) —
+ * catalogue léger, juste du parsing JSON en mémoire, nécessaire pour que
+ * {@code worlds-list}/{@code world-enter} résolvent un monde par son nom court
+ * avant même qu'un joueur y entre — templates de monstres
+ * ({@code data/monsters.json}, dont les tables de butin sont validées contre
  * {@link ItemService#templateIds()} pour échouer tôt sur un UUID invalide
- * plutôt qu'au premier drop en jeu. {@code npcService.warmNpcs} reçoit
- * désormais lui aussi {@link ItemService#templateSummariesById()}, pour la même
- * raison — et pour dénormaliser le nom et la rareté de chaque article vendu sur
- * {@code GameNpcSeller.NpcShopEntry} : le catalogue boutique d'un PNJ marchand
- * (voir {@code data/npcs.json}) est validé au démarrage plutôt qu'au premier
- * achat en jeu. Les bonus raciaux et les caractéristiques de classe ne sont
- * plus réchauffés ici : {@code domain.actor.Race}/{@code CharacterClass} se
- * chargent eux-mêmes depuis {@code data/race.json}/{@code data/class.json} dans
- * un bloc {@code static}, au premier accès à ces enums plutôt que via ce
- * runner.
+ * plutôt qu'au premier drop en jeu) et seuils XP ({@code data/levels.json}).
+ * Les bonus raciaux et les caractéristiques de classe ne sont pas réchauffés
+ * ici : {@code domain.actor.Race}/{@code CharacterClass} se chargent eux-mêmes
+ * depuis {@code data/race.json}/{@code data/class.json} dans un bloc
+ * {@code static}, au premier accès à ces enums plutôt que via ce runner.
+ *
+ * <p>
+ * Le contenu runtime d'un monde (graphe de {@code RoomInstance}, monstres/PNJ
+ * placés, items au sol depuis la DB) n'est plus chargé ici : il ne l'est qu'à
+ * la demande, la première fois qu'un joueur ou une party entre effectivement
+ * dans ce monde, via {@code WorldInstanceService.materialize} (voir sa Javadoc)
+ * — inutile de garder en mémoire le contenu de mondes que personne n'occupe.
  *
  * <p>
  * Le {@code @ConditionalOnProperty} ci-dessous est porté par la
@@ -70,16 +67,14 @@ public class ServerApplication {
 
     @Bean
     @ConditionalOnProperty(prefix = "app.telnet", name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ApplicationRunner warmupRunner(RoomService roomService, ItemService itemService, LevelService levelService,
-            MonsterService monsterService, NpcService npcService) {
+    public ApplicationRunner warmupRunner(ItemService itemService, LevelService levelService,
+            MonsterService monsterService, WorldTemplateService worldTemplateService) {
         return args -> {
             long start = System.currentTimeMillis();
             log.info("startup.warmup_started");
-            roomService.warmRooms();
             itemService.warmItemTemplates();
-            monsterService.warmMonsters(roomService.allRooms(), itemService.templateIds());
-            npcService.warmNpcs(roomService.allRooms(), itemService.templateSummariesById());
-            itemService.warmRoomItems(roomService.allRooms());
+            worldTemplateService.warmWorldTemplates(itemService.templateSummariesById());
+            monsterService.warmMonsterTemplates(itemService.templateIds());
             levelService.warmXpThresholds();
             log.info("startup.warmup_completed durationMs={}", System.currentTimeMillis() - start);
         };

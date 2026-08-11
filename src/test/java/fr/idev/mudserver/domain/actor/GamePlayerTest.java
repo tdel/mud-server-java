@@ -11,7 +11,7 @@ import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.ItemType;
 import fr.idev.mudserver.domain.Rarity;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.WeaponCategory;
 import fr.idev.mudserver.game.CombatResult;
 import fr.idev.mudserver.game.dice.CheckResult;
@@ -233,7 +233,7 @@ class GamePlayerTest {
     void attackWithAnEquippedWeaponDealsWeaponDiceDamage() {
         GamePlayer attacker = character(16, 10, 10, 10, 10, 10, 1);
         equip(attacker, weapon("1d6"));
-        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
         attacker.setCurrentRoom(room);
         GameMonster monster = monster(room, 100, -100);
 
@@ -247,7 +247,7 @@ class GamePlayerTest {
     void attackWithAMagicWeaponAddsItsBonusToDamage() {
         GamePlayer attacker = character(16, 10, 10, 10, 10, 10, 1);
         equip(attacker, weapon("1d6", 2));
-        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
         attacker.setCurrentRoom(room);
         GameMonster monster = monster(room, 100, -100);
 
@@ -260,7 +260,7 @@ class GamePlayerTest {
     @Test
     void attackWithoutAWeaponDealsUnarmedDamage() {
         GamePlayer attacker = character(14, 10, 10, 10, 10, 10, 1);
-        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
         attacker.setCurrentRoom(room);
         GameMonster monster = monster(room, 100, -100);
 
@@ -273,7 +273,7 @@ class GamePlayerTest {
     @Test
     void aMissDealsNoDamageAndLeavesTheMonsterUntouched() {
         GamePlayer attacker = character(10, 10, 10, 10, 10, 10, 1);
-        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
         attacker.setCurrentRoom(room);
 
         // Un monstre neuf à chaque tentative : un coup accidentel (nat 20 malgré
@@ -297,7 +297,7 @@ class GamePlayerTest {
         GamePlayer attacker = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.FIGHTER); // FIGHTER maîtrise
                                                                                             // MARTIAL
         equip(attacker, weapon("1d6", 0, WeaponCategory.MARTIAL));
-        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
         attacker.setCurrentRoom(room);
         GameMonster monster = monster(room, 100, 9999); // CA impossible : jamais touché, seul le jet compte
 
@@ -311,7 +311,7 @@ class GamePlayerTest {
         GamePlayer attacker = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.WIZARD); // WIZARD ne maîtrise que
                                                                                             // SIMPLE
         equip(attacker, weapon("1d6", 0, WeaponCategory.MARTIAL));
-        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
         attacker.setCurrentRoom(room);
         GameMonster monster = monster(room, 100, 9999);
 
@@ -325,7 +325,7 @@ class GamePlayerTest {
         GamePlayer attacker = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.WIZARD); // aucune maîtrise
                                                                                             // d'armure
         equip(attacker, armor("Armure", ArmorCategory.LIGHT, 10));
-        Room room = new Room(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
         attacker.setCurrentRoom(room);
         GameMonster monster = monster(room, 100, 9999);
 
@@ -359,7 +359,7 @@ class GamePlayerTest {
         throw new AssertionError("no non-critical hit landed in 20 attempts despite a trivial armor class");
     }
 
-    private GameMonster monster(Room room, int maxHealth, Integer naturalArmorClass) {
+    private GameMonster monster(RoomInstance room, int maxHealth, Integer naturalArmorClass) {
         MonsterTemplate template = new MonsterTemplate(UUID.randomUUID(), "Mannequin", "Un mannequin d'entraînement",
                 maxHealth, TestAttributes.of(10, 10, 10, 10, 10, 10), naturalArmorClass, 0, "1d6", 0, List.of(), 0);
         GameMonster monster = new GameMonster(UUID.randomUUID(), template.getName(), template.getId(), room.getId(),

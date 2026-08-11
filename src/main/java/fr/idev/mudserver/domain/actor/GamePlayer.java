@@ -25,7 +25,7 @@ import fr.idev.mudserver.domain.actor.event.ItemPurchased;
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.Item;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.RoomPortal;
 import fr.idev.mudserver.domain.WeaponCategory;
 import fr.idev.mudserver.game.CombatResult;
@@ -49,6 +49,7 @@ public final class GamePlayer extends GameCharacter {
 
     private UUID accountId;
     private UUID currentRoomId;
+    private UUID worldInstanceId;
     private Gender gender;
     private Race race;
     private CharacterClass characterClass;
@@ -111,6 +112,23 @@ public final class GamePlayer extends GameCharacter {
 
     public void setCurrentRoomId(UUID currentRoomId) {
         this.currentRoomId = currentRoomId;
+    }
+
+    /**
+     * Pas de paramètre de constructeur pour ce champ : aurait fallu toucher tous
+     * les sites (production et tests) qui construisent un {@code GamePlayer}
+     * directement. {@code CharacterDao.toDomain} le renseigne au rechargement,
+     * {@code GameWorld.createCharacter} à la création — {@code null} sinon (repli
+     * sur {@link fr.idev.mudserver.domain.WorldInstance#DEFAULT_ID} porté par
+     * {@code CharacterDao.insert}, pas ici, pour ne pas faire dépendre le domaine
+     * d'une valeur par défaut applicative).
+     */
+    public UUID getWorldInstanceId() {
+        return worldInstanceId;
+    }
+
+    public void setWorldInstanceId(UUID worldInstanceId) {
+        this.worldInstanceId = worldInstanceId;
     }
 
     public Gender getGender() {
@@ -442,7 +460,7 @@ public final class GamePlayer extends GameCharacter {
      * ({@code CharacterService#onGamePlayerDied}), où il n'y a pas de case cible de
      * portail à respecter.
      */
-    public void moveToRoom(Room destination) {
+    public void moveToRoom(RoomInstance destination) {
         moveToRoom(destination, destination.getSpawnCell());
     }
 
@@ -451,8 +469,8 @@ public final class GamePlayer extends GameCharacter {
      * case fait franchir un {@code RoomPortal} : {@code targetCell} est la case
      * cible du portail plutôt que la case de spawn de la room.
      */
-    public void moveToRoom(Room destination, HexCoordinate targetCell) {
-        Room previous = getCurrentRoom();
+    public void moveToRoom(RoomInstance destination, HexCoordinate targetCell) {
+        RoomInstance previous = getCurrentRoom();
         previous.leave(this);
         destination.join(this, targetCell);
         DomainEventPublisher.publish(new GamePlayerMovedToRoom(this, previous, destination));
@@ -488,20 +506,21 @@ public final class GamePlayer extends GameCharacter {
         return isInCombat();
     }
 
-    public void spawnToRoom(Room room) {
+    public void spawnToRoom(RoomInstance room) {
         room.join(this);
         DomainEventPublisher.publish(new GamePlayerSpawnedToRoom(this, room));
     }
 
     /**
      * Précondition : {@code item.getRoom()} désigne {@code currentRoom} — garanti
-     * par {@link Room#findOneByName}, seul point d'entrée du ramassage, et par le
-     * fait que tout personnage capable d'atteindre l'état {@code INGAME} a déjà
-     * traversé {@link #spawnToRoom} (à la création ou à l'entrée en jeu). Suppose
-     * aussi qu'il n'existe jamais qu'une seule instance JVM vivante de {@code item}
-     * (cache chaud de {@code RoomService}/ {@code ItemService}, jamais rechargé par
-     * requête) — sinon {@code synchronized(item)} ne synchroniserait rien entre
-     * deux appels concurrents portant sur des instances différentes du même item.
+     * par {@link RoomInstance#findOneByName}, seul point d'entrée du ramassage, et
+     * par le fait que tout personnage capable d'atteindre l'état {@code INGAME} a
+     * déjà traversé {@link #spawnToRoom} (à la création ou à l'entrée en jeu).
+     * Suppose aussi qu'il n'existe jamais qu'une seule instance JVM vivante de
+     * {@code item} (cache chaud de {@code RoomService}/ {@code ItemService}, jamais
+     * rechargé par requête) — sinon {@code synchronized(item)} ne synchroniserait
+     * rien entre deux appels concurrents portant sur des instances différentes du
+     * même item.
      *
      * <p>
      * Deux joueurs peuvent réellement se disputer un item non possédé sous les
@@ -584,7 +603,7 @@ public final class GamePlayer extends GameCharacter {
      * d'entrée du drop.
      */
     public void dropItem(Item item) {
-        Room currentRoom = getCurrentRoom();
+        RoomInstance currentRoom = getCurrentRoom();
         item.setRoom(currentRoom);
         inventory.removeItem(item);
         currentRoom.addItem(item);

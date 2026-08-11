@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.game.CombatResult;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.network.Connection;
@@ -119,7 +119,7 @@ class GameMonsterTest extends AbstractIntegrationTest {
     @Test
     void aKillingBlowRemovesTheMonsterFromItsRoomAndBroadcastsToEveryoneIncludingTheAttacker() {
         GameMonster monster = monster(TestAttributes.of(10, 10, 10, 10, 10, 10), null);
-        Room room = monster.getCurrentRoom();
+        RoomInstance room = monster.getCurrentRoom();
         GamePlayer attacker = player("Attaquant");
         GamePlayer bystander = player("Témoin");
         RecordingConnection attackerConnection = new RecordingConnection();
@@ -219,7 +219,7 @@ class GameMonsterTest extends AbstractIntegrationTest {
         itemService.warmItemTemplates();
         GameMonster monster = monster(TestAttributes.of(10, 10, 10, 10, 10, 10), null, 0, 25,
                 List.of(new MonsterTemplate.LootTableEntry(HEALING_POTION_TEMPLATE_ID, 1.0)));
-        Room room = monster.getCurrentRoom();
+        RoomInstance room = monster.getCurrentRoom();
         GamePlayer attacker = persistedPlayer("Attaquant");
         GamePlayer bystander = player("Témoin");
         RecordingConnection attackerConnection = new RecordingConnection();
@@ -306,7 +306,7 @@ class GameMonsterTest extends AbstractIntegrationTest {
         GameMonster monster = new GameMonster(UUID.randomUUID(), template.getName(), template.getId(),
                 UUID.randomUUID(), attributes, template.getMaxHealth());
         monster.attachTemplate(template);
-        Room room = new Room(UUID.randomUUID(), "Clairière", "...", null);
+        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Clairière", "...", null);
         monster.setCurrentRoom(room);
         room.addMonster(monster);
         return monster;

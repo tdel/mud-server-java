@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 import fr.idev.mudserver.domain.HexCoordinate;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.RoomPortal;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
@@ -22,7 +22,8 @@ class HexGridRendererTest {
 
     @Test
     void rendersEachOccupantTypeAtItsExpectedPosition() {
-        Room room = new Room(UUID.randomUUID(), "Testing Grounds", "...", null, 5, 5, new HexCoordinate(2, 2));
+        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Testing Grounds", "...", null, 5, 5,
+                new HexCoordinate(2, 2));
 
         GamePlayer viewer = player("Viewer");
         room.join(viewer, new HexCoordinate(2, 2));
@@ -37,7 +38,7 @@ class HexGridRendererTest {
         GameNpc npc = new GameNpc(UUID.randomUUID(), "Aubergiste", room.getId(), "...", null);
         room.placeNpc(npc, new HexCoordinate(1, 2));
 
-        Room target = new Room(UUID.randomUUID(), "Elsewhere", "...", null);
+        RoomInstance target = new RoomInstance(UUID.randomUUID(), "Elsewhere", "...", null);
         room.setPortals(List.of(new RoomPortal(new HexCoordinate(3, 1), "NE", room, target, new HexCoordinate(0, 0))));
 
         List<String> lines = HexGridRenderer.render(room, viewer, 1);
@@ -47,7 +48,8 @@ class HexGridRendererTest {
 
     @Test
     void selfIsAlwaysAtTheCenterAndOutOfRoomCellsRenderAsTilde() {
-        Room room = new Room(UUID.randomUUID(), "Corner Room", "...", null, 3, 3, new HexCoordinate(0, 0));
+        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Corner RoomInstance", "...", null, 3, 3,
+                new HexCoordinate(0, 0));
         GamePlayer viewer = player("Viewer");
         room.join(viewer, new HexCoordinate(0, 0));
 

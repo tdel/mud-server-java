@@ -3,7 +3,6 @@ package fr.idev.mudserver.persistence;
 import static fr.idev.mudserver.persistence.jooq.Tables.CHARACTER;
 
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,6 +15,7 @@ import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
+import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.persistence.jooq.tables.records.CharacterRecord;
 
 @Repository
@@ -27,19 +27,33 @@ public class CharacterDao {
         this.dsl = dsl;
     }
 
+    /**
+     * Replie sur {@link WorldInstance#DEFAULT_ID} quand {@code character
+     * .getWorldInstanceId()} est {@code null} : {@code GamePlayer} n'a pas gagné de
+     * paramètre de constructeur pour ce champ (aurait fallu toucher tous les sites
+     * de test qui le construisent directement) — seul
+     * {@code GameWorld.createCharacter} le renseigne explicitement aujourd'hui.
+     * Correct tant qu'une seule {@code WorldInstance} existe (avant le Lobby, à
+     * venir) : tout personnage inséré sans instance explicite appartient de fait à
+     * celle-là.
+     */
     public void insert(GamePlayer character) {
+        UUID worldInstanceId = character.getWorldInstanceId() != null
+                ? character.getWorldInstanceId()
+                : WorldInstance.DEFAULT_ID;
         dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_ROOM_ID,
                 CHARACTER.GENDER, CHARACTER.RACE, CHARACTER.CHARACTER_CLASS, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH,
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
                 CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA, CHARACTER.XP, CHARACTER.GOLD,
-                CHARACTER.SHORT_REST_COUNT)
+                CHARACTER.SHORT_REST_COUNT, CHARACTER.WORLD_INSTANCE_ID)
                 .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentRoomId(),
                         character.getGender().name(), character.getRace().name(), character.getCharacterClass().name(),
                         character.getLevel(), character.getCurrentHealth(), character.getMaxHealth(),
                         character.getAttribute(Attribute.STRENGTH), character.getAttribute(Attribute.DEXTERITY),
                         character.getAttribute(Attribute.CONSTITUTION), character.getAttribute(Attribute.INTELLIGENCE),
                         character.getAttribute(Attribute.WISDOM), character.getAttribute(Attribute.CHARISMA),
-                        character.getXp(), character.getInventory().getGold(), character.getShortRestCount())
+                        character.getXp(), character.getInventory().getGold(), character.getShortRestCount(),
+                        worldInstanceId)
                 .execute();
     }
 
@@ -47,12 +61,21 @@ public class CharacterDao {
         return dsl.selectFrom(CHARACTER).where(CHARACTER.ID.eq(id)).fetchOptional(this::toDomain);
     }
 
-    public List<GamePlayer> findByAccountId(UUID accountId) {
-        return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(accountId)).fetch(this::toDomain);
+    /**
+     * Renvoie {@code Optional}, pas une liste : au plus un personnage par
+     * {@code (account_id, world_instance_id)} (règle actée, voir
+     * {@code multi-world.md} Phase C) — remplace {@code findByAccountId}, dont le
+     * seul appelant ({@code controller.authed.CharacterList}, supprimé) reposait
+     * sur un vrai listing qui n'a plus lieu d'être une fois cette règle en place.
+     */
+    public Optional<GamePlayer> findByAccountIdAndWorldInstanceId(UUID accountId, UUID worldInstanceId) {
+        return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(accountId))
+                .and(CHARACTER.WORLD_INSTANCE_ID.eq(worldInstanceId)).fetchOptional(this::toDomain);
     }
 
-    public Optional<GamePlayer> findByAccountIdAndName(UUID accountId, String name) {
-        return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(accountId)).and(CHARACTER.NAME.eq(name))
+    public Optional<GamePlayer> findByAccountIdAndName(UUID accountId, UUID worldInstanceId, String name) {
+        return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(accountId))
+                .and(CHARACTER.WORLD_INSTANCE_ID.eq(worldInstanceId)).and(CHARACTER.NAME.eq(name))
                 .fetchOptional(this::toDomain);
     }
 
@@ -90,8 +113,11 @@ public class CharacterDao {
         CharacterClass characterClass = CharacterClass.valueOf(record.getCharacterClass());
         Race race = Race.valueOf(record.getRace());
 
-        return new GamePlayer(record.getId(), record.getAccountId(), record.getName(), record.getCurrentRoomId(),
-                Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
-                record.getMaxHealth(), attributes, record.getXp(), record.getGold(), record.getShortRestCount());
+        GamePlayer character = new GamePlayer(record.getId(), record.getAccountId(), record.getName(),
+                record.getCurrentRoomId(), Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(),
+                record.getCurrentHealth(), record.getMaxHealth(), attributes, record.getXp(), record.getGold(),
+                record.getShortRestCount());
+        character.setWorldInstanceId(record.getWorldInstanceId());
+        return character;
     }
 }

@@ -26,7 +26,7 @@ public class Item {
 
     private ItemTemplate template;
     private GamePlayer character;
-    private Room room;
+    private RoomInstance room;
 
     public Item(UUID id, UUID templateId, UUID roomId, UUID characterId, EquipmentSlot slot) {
         this.id = id;
@@ -48,7 +48,7 @@ public class Item {
         this.character = character;
     }
 
-    public void attachRoom(Room room) {
+    public void attachRoom(RoomInstance room) {
         this.room = room;
     }
 
@@ -56,7 +56,7 @@ public class Item {
         return character;
     }
 
-    public Room getRoom() {
+    public RoomInstance getRoom() {
         return room;
     }
 
@@ -115,7 +115,7 @@ public class Item {
         this.slot = null;
     }
 
-    public void setRoom(Room room) {
+    public void setRoom(RoomInstance room) {
         this.room = room;
         this.roomId = room.getId();
         this.character = null;

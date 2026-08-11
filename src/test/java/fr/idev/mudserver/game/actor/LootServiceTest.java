@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.GamePlayer;
@@ -152,11 +152,11 @@ class LootServiceTest extends AbstractIntegrationTest {
                 Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
                 0);
         characterDao.insert(character);
-        new Room(UUID.randomUUID(), "Clairière", "...", null).join(character);
+        new RoomInstance(UUID.randomUUID(), "Clairière", "...", null).join(character);
         return character;
     }
 
-    private GameMonster monster(Room room, int goldReward, List<LootTableEntry> lootTable) {
+    private GameMonster monster(RoomInstance room, int goldReward, List<LootTableEntry> lootTable) {
         MonsterTemplate template = new MonsterTemplate(UUID.randomUUID(), "Gobelin " + UUID.randomUUID(),
                 "Un gobelin hostile", 1, TestAttributes.of(10, 10, 10, 10, 10, 10), 10, 0, "1d6", goldReward, lootTable,
                 0);

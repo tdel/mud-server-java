@@ -18,7 +18,7 @@ class RoomTest {
     private static final int WIDTH = 5;
     private static final int HEIGHT = 4;
 
-    private final Room room = new Room(UUID.randomUUID(), "Testing Grounds", "...", null, WIDTH, HEIGHT,
+    private final RoomInstance room = new RoomInstance(UUID.randomUUID(), "Testing Grounds", "...", null, WIDTH, HEIGHT,
             new HexCoordinate(2, 2));
 
     @Test
@@ -41,7 +41,7 @@ class RoomTest {
 
     @Test
     void findPortalAtReturnsThePortalOnlyOnItsExactCell() {
-        Room target = new Room(UUID.randomUUID(), "Target", "...", null);
+        RoomInstance target = new RoomInstance(UUID.randomUUID(), "Target", "...", null);
         RoomPortal portal = new RoomPortal(new HexCoordinate(0, 0), "W", room, target, new HexCoordinate(4, 2));
         room.setPortals(java.util.List.of(portal));
 

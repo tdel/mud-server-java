@@ -12,7 +12,7 @@ import fr.idev.mudserver.controller.RecordingConnection;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.Rarity;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.Gender;
@@ -129,7 +129,7 @@ class UseTest extends AbstractIntegrationTest {
 
     @Test
     void duringCombatHealsAndConsumesTheTurn() {
-        Room room = startingRoom();
+        RoomInstance room = startingRoom();
         // DEX 100 vs DEX 10 : le joueur gagne quasi systématiquement l'initiative,
         // même convention que CombatEngineTest.
         RecordingConnection connection = enterGameInRoom(50, 1000, 100, room);
@@ -154,7 +154,7 @@ class UseTest extends AbstractIntegrationTest {
 
     @Test
     void duringCombatWhenNotYourTurnSendsNotYourTurnAndKeepsTheItem() {
-        Room room = startingRoom();
+        RoomInstance room = startingRoom();
         RecordingConnection aConnection = enterGameInRoom(1000, 1000, 100, room);
         GamePlayer a = gameWorld.character(aConnection);
         GameMonster monster = monster(room, 10, "1d4");
@@ -182,7 +182,7 @@ class UseTest extends AbstractIntegrationTest {
                 .orElseThrow();
     }
 
-    private Room startingRoom() {
+    private RoomInstance startingRoom() {
         roomService.warmRooms();
         return roomService.startingRoom().orElseThrow();
     }
@@ -191,7 +191,7 @@ class UseTest extends AbstractIntegrationTest {
         return enterGameInRoom(currentHealth, maxHealth, dexterity, startingRoom());
     }
 
-    private RecordingConnection enterGameInRoom(int currentHealth, int maxHealth, int dexterity, Room room) {
+    private RecordingConnection enterGameInRoom(int currentHealth, int maxHealth, int dexterity, RoomInstance room) {
         Account account = new Account(UUID.randomUUID(), "utilisateur-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
         RecordingConnection connection = new RecordingConnection();
@@ -204,7 +204,7 @@ class UseTest extends AbstractIntegrationTest {
         return connection;
     }
 
-    private GameMonster monster(Room room, int dexterity, String naturalDamageDice) {
+    private GameMonster monster(RoomInstance room, int dexterity, String naturalDamageDice) {
         MonsterTemplate template = new MonsterTemplate(UUID.randomUUID(), "Mannequin " + UUID.randomUUID(),
                 "Un mannequin d'entraînement", 1000, TestAttributes.of(10, dexterity, 10, 10, 10, 10), -1000, 0,
                 naturalDamageDice, 0, List.of(), 0);

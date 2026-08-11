@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 
 /**
  * Affrontement partagé par plusieurs {@link GamePlayer}/{@link GameMonster} —
@@ -41,7 +41,7 @@ import fr.idev.mudserver.domain.Room;
  */
 public final class CombatEncounter {
 
-    private final Room room;
+    private final RoomInstance room;
     private final List<GameCharacter> pendingJoiners = new ArrayList<>();
     private final List<InitiativeEntry> order = new ArrayList<>();
     private boolean initiativeRolled;
@@ -50,11 +50,11 @@ public final class CombatEncounter {
     private record InitiativeEntry(GameCharacter character, int initiative) {
     }
 
-    public CombatEncounter(Room room) {
+    public CombatEncounter(RoomInstance room) {
         this.room = room;
     }
 
-    public Room getRoom() {
+    public RoomInstance getRoom() {
         return room;
     }
 

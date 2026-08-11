@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.HexCoordinate;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.GamePlayer;
@@ -27,10 +27,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Analogue de {@code game.ItemRaceConditionTest} pour la réclamation de case :
  * deux virtual threads, synchronisés par un {@link CyclicBarrier}, appellent
- * {@link Room#tryClaimCell} sur la même case au plus près l'un de l'autre.
- * Objectif : prouver que {@code putIfAbsent} sur la {@code ConcurrentHashMap}
- * d'occupation sérialise réellement deux virtual threads concurrents — un seul
- * gagnant possible, jamais deux personnages sur la même case.
+ * {@link RoomInstance#tryClaimCell} sur la même case au plus près l'un de
+ * l'autre. Objectif : prouver que {@code putIfAbsent} sur la
+ * {@code ConcurrentHashMap} d'occupation sérialise réellement deux virtual
+ * threads concurrents — un seul gagnant possible, jamais deux personnages sur
+ * la même case.
  */
 class RoomCellRaceConditionTest extends AbstractIntegrationTest {
 
@@ -48,7 +49,7 @@ class RoomCellRaceConditionTest extends AbstractIntegrationTest {
     @Test
     void exactlyOneCharacterWinsTheCellClaim() throws Exception {
         roomService.warmRooms();
-        Room room = roomService.allRooms().iterator().next();
+        RoomInstance room = roomService.allRooms().iterator().next();
 
         GamePlayer alice = seedCharacter(room, "cell-race-alice-" + UUID.randomUUID());
         GamePlayer bob = seedCharacter(room, "cell-race-bob-" + UUID.randomUUID());
@@ -82,7 +83,7 @@ class RoomCellRaceConditionTest extends AbstractIntegrationTest {
         }
     }
 
-    private GamePlayer seedCharacter(Room room, String login) {
+    private GamePlayer seedCharacter(RoomInstance room, String login) {
         Account account = new Account(UUID.randomUUID(), login, "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), login, room.getId(), Gender.MAN,

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
+import fr.idev.mudserver.game.CharacterSelectionWorld;
 import fr.idev.mudserver.game.GameWorld;
 
 /**
@@ -46,14 +47,17 @@ public class TelnetServer {
     private final ExecutorService virtualThreadExecutor;
     private final ControllerDispatcher controllerDispatcher;
     private final AuthWorld authWorld;
+    private final CharacterSelectionWorld characterSelectionWorld;
     private final GameWorld gameWorld;
     private final int port;
 
     public TelnetServer(ExecutorService virtualThreadExecutor, ControllerDispatcher controllerDispatcher,
-            AuthWorld authWorld, GameWorld gameWorld, @Value("${app.telnet.port}") int port) {
+            AuthWorld authWorld, CharacterSelectionWorld characterSelectionWorld, GameWorld gameWorld,
+            @Value("${app.telnet.port}") int port) {
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.controllerDispatcher = controllerDispatcher;
         this.authWorld = authWorld;
+        this.characterSelectionWorld = characterSelectionWorld;
         this.gameWorld = gameWorld;
         this.port = port;
     }
@@ -64,8 +68,9 @@ public class TelnetServer {
         EventLoopGroup workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
         try {
             ServerBootstrap bootstrap = new ServerBootstrap().group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class).childHandler(new TelnetServerInitializer(
-                            virtualThreadExecutor, controllerDispatcher, authWorld, gameWorld));
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new TelnetServerInitializer(virtualThreadExecutor, controllerDispatcher, authWorld,
+                            characterSelectionWorld, gameWorld));
 
             Channel channel = bootstrap.bind(port).sync().channel();
             log.info("Serveur telnet démarré sur le port {}", port);

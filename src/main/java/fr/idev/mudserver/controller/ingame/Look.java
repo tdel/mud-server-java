@@ -6,7 +6,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.actor.GameCharacter;
 import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.GameNpc;
@@ -46,7 +46,7 @@ public class Look implements ControllerHandler {
     }
 
     private RoomDescription describeRoom(GamePlayer character) {
-        Room room = character.getCurrentRoom();
+        RoomInstance room = character.getCurrentRoom();
 
         List<String> gridLines = HexGridRenderer.render(room, character);
         List<GameCharacter> nearby = room.occupantsWithin(character.getPosition(), HexGridRenderer.VIEWPORT_RADIUS);

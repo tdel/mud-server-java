@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
+import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
@@ -49,8 +50,11 @@ class CharacterDaoTest extends AbstractIntegrationTest {
         characterDao.insert(character);
 
         assertThat(characterDao.findById(character.getId())).contains(character);
-        assertThat(characterDao.findByAccountId(account.getId())).containsExactly(character);
-        assertThat(characterDao.findByAccountIdAndName(account.getId(), "Carol le Demi-Orque")).contains(character);
+        assertThat(characterDao.findByAccountIdAndWorldInstanceId(account.getId(), WorldInstance.DEFAULT_ID))
+                .contains(character);
+        assertThat(
+                characterDao.findByAccountIdAndName(account.getId(), WorldInstance.DEFAULT_ID, "Carol le Demi-Orque"))
+                .contains(character);
     }
 
     @Test

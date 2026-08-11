@@ -11,7 +11,7 @@ import fr.idev.mudserver.controller.RecordingConnection;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.Rarity;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.GamePlayer;
@@ -80,7 +80,7 @@ class TakeTest extends AbstractIntegrationTest {
         itemService.warmItemTemplates();
         RecordingConnection connection = enterGame();
         GamePlayer character = gameWorld.character(connection);
-        Room room = character.getCurrentRoom();
+        RoomInstance room = character.getCurrentRoom();
         Item item = new Item(UUID.randomUUID(), POTION_TEMPLATE_ID, room.getId(), null, null);
         itemDao.insert(item);
         itemService.warmRoomItems(roomService.allRooms());
@@ -95,7 +95,7 @@ class TakeTest extends AbstractIntegrationTest {
 
     private RecordingConnection enterGame() {
         roomService.warmRooms();
-        Room startingRoom = roomService.startingRoom().orElseThrow();
+        RoomInstance startingRoom = roomService.startingRoom().orElseThrow();
         Account account = new Account(UUID.randomUUID(), "preneur-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
         RecordingConnection connection = new RecordingConnection();

@@ -17,7 +17,7 @@ import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.actor.Race;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
@@ -58,7 +58,7 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
     @Test
     void exactlyOneCharacterWinsTheRace() throws Exception {
         roomService.warmRooms();
-        Room room = roomService.allRooms().iterator().next();
+        RoomInstance room = roomService.allRooms().iterator().next();
 
         GamePlayer alice = seedCharacter(room, "race-alice-" + UUID.randomUUID());
         GamePlayer bob = seedCharacter(room, "race-bob-" + UUID.randomUUID());
@@ -96,7 +96,7 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
         }
     }
 
-    private GamePlayer seedCharacter(Room room, String login) {
+    private GamePlayer seedCharacter(RoomInstance room, String login) {
         Account account = new Account(UUID.randomUUID(), login, "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), login, room.getId(), Gender.MAN,
@@ -106,7 +106,7 @@ class ItemRaceConditionTest extends AbstractIntegrationTest {
         return character;
     }
 
-    private Room room(UUID roomId) {
+    private RoomInstance room(UUID roomId) {
         return roomService.allRooms().stream().filter(room -> room.getId().equals(roomId)).findFirst().orElseThrow();
     }
 }

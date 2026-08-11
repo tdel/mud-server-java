@@ -18,7 +18,7 @@ import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.ItemType;
 import fr.idev.mudserver.domain.Rarity;
 import fr.idev.mudserver.domain.actor.Race;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
@@ -138,7 +138,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
         itemService.registerTemplate(template);
 
         roomService.warmRooms();
-        Room warmedRoom = roomService.allRooms().iterator().next();
+        RoomInstance warmedRoom = roomService.allRooms().iterator().next();
         Account account = new Account(UUID.randomUUID(), "gus", "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Gus", warmedRoom.getId(), Gender.MAN,
@@ -167,7 +167,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
         itemService.registerTemplate(template);
 
         roomService.warmRooms();
-        Room room = roomService.allRooms().iterator().next();
+        RoomInstance room = roomService.allRooms().iterator().next();
 
         Item shield = new Item(UUID.randomUUID(), template.getId(), room.getId(), null, null);
         itemDao.insert(shield);
@@ -247,7 +247,7 @@ class ItemServiceTest extends AbstractIntegrationTest {
         assertThat(plateArmor.getRarity()).isEqualTo(Rarity.UNCOMMON);
     }
 
-    private Room room(UUID roomId) {
+    private RoomInstance room(UUID roomId) {
         return roomService.allRooms().stream().filter(room -> room.getId().equals(roomId)).findFirst().orElseThrow();
     }
 }

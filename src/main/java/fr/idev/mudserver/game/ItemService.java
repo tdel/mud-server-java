@@ -24,7 +24,7 @@ import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.ItemType;
 import fr.idev.mudserver.domain.Rarity;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.WeaponCategory;
 import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDroppedItem;
@@ -150,12 +150,12 @@ public class ItemService {
      * Précharge les items au sol de chaque room, une fois pour toute la durée du
      * process — appelé depuis {@code ServerApplication.warmupRunner} juste après
      * {@code RoomService.warmRooms()} et {@link #warmItemTemplates()}, sur le même
-     * principe : une {@code Room} n'est jamais rechargée par session, contrairement
-     * à un {@code GamePlayer}.
+     * principe : une {@code RoomInstance} n'est jamais rechargée par session,
+     * contrairement à un {@code GamePlayer}.
      */
-    public void warmRoomItems(Collection<Room> rooms) {
+    public void warmRoomItems(Collection<RoomInstance> rooms) {
         int totalItems = 0;
-        for (Room room : rooms) {
+        for (RoomInstance room : rooms) {
             List<Item> items = attachTemplates(itemDao.findByRoomId(room.getId()));
             items.forEach(item -> item.attachRoom(room));
             room.setItems(items);

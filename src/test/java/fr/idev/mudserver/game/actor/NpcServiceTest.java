@@ -5,17 +5,16 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
+import fr.idev.mudserver.domain.HexCoordinate;
+import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.WorldTemplate;
 import fr.idev.mudserver.domain.actor.GameNpc;
-import fr.idev.mudserver.domain.actor.GameNpc.NpcDialogueOptionType;
 import fr.idev.mudserver.domain.actor.GameNpcSeller;
-import fr.idev.mudserver.domain.Rarity;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.actor.NpcTemplate;
 import fr.idev.mudserver.game.ItemService;
-import fr.idev.mudserver.game.actor.NpcService.DialogueDefinition;
-import fr.idev.mudserver.game.actor.NpcService.DialogueOptionDefinition;
-import fr.idev.mudserver.game.actor.NpcService.ShopDefinition;
-import fr.idev.mudserver.game.actor.NpcService.ShopEntryDefinition;
+import fr.idev.mudserver.game.WorldTemplateService;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,13 +36,25 @@ class NpcServiceTest {
         return itemService.templateSummariesById();
     }
 
-    @Test
-    void warmNpcsLoadsTheRealCatalogFromJsonAndPlacesItInItsRoom() {
-        NpcService npcService = new NpcService(new ObjectMapper());
-        Room tavern = new Room(TAVERN_ID, "Taverne du Sanglier Roux", "...", null);
-        Room villageSquare = new Room(VILLAGE_SQUARE_ID, "Place du village", "...", null);
+    /**
+     * Le contenu statique (dialogue/boutique déjà résolus) vient désormais de
+     * {@link WorldTemplateService}, pas de {@code NpcService} lui-même — voir sa
+     * Javadoc.
+     */
+    private static WorldTemplate defaultWorldTemplate() {
+        WorldTemplateService service = new WorldTemplateService(new ObjectMapper(),
+                new PathMatchingResourcePatternResolver());
+        service.warmWorldTemplates(realItemTemplateSummariesById());
+        return service.findByShortName("default").orElseThrow();
+    }
 
-        npcService.warmNpcs(List.of(tavern, villageSquare), realItemTemplateSummariesById());
+    @Test
+    void warmNpcsPlacesEachNpcTemplateInItsRoom() {
+        WorldTemplate worldTemplate = defaultWorldTemplate();
+        RoomInstance tavern = new RoomInstance(TAVERN_ID, "Taverne du Sanglier Roux", "...", null);
+        RoomInstance villageSquare = new RoomInstance(VILLAGE_SQUARE_ID, "Place du village", "...", null);
+
+        new NpcService().warmNpcs(List.of(worldTemplate), List.of(tavern, villageSquare));
 
         assertThat(tavern.getNpcs()).hasSize(1);
         GameNpc innkeeper = tavern.getNpcs().get(0);
@@ -65,55 +76,14 @@ class NpcServiceTest {
     }
 
     @Test
-    void loadNpcsThrowsWhenAnNpcReferencesAnUnknownRoom() {
-        NpcService isolated = new NpcService(new ObjectMapper());
-        List<NpcService.NpcDefinition> definitions = List.of(new NpcService.NpcDefinition(UUID.randomUUID(), "Test",
-                UUID.randomUUID(), new NpcService.CellDefinition(0, 0), "...", null));
+    void warmNpcsThrowsWhenAnNpcTemplateReferencesARoomNotInTheSuppliedCollection() {
+        UUID roomTemplateId = UUID.randomUUID();
+        NpcTemplate npcTemplate = new NpcTemplate(UUID.randomUUID(), "Test", roomTemplateId, new HexCoordinate(0, 0),
+                "...", null, null);
+        WorldTemplate worldTemplate = new WorldTemplate(UUID.randomUUID(), "test", "Test", "...", 1, 1, Map.of(),
+                Map.of(npcTemplate.id(), npcTemplate));
 
-        assertThatThrownBy(() -> isolated.loadNpcs(definitions, List.of(), Map.of()))
-                .isInstanceOf(IllegalStateException.class);
-    }
-
-    @Test
-    void loadNpcsThrowsWhenAShopOptionHasNoShopCatalog() {
-        NpcService isolated = new NpcService(new ObjectMapper());
-        Room room = new Room(UUID.randomUUID(), "Test", "...", null);
-        DialogueDefinition dialogue = new DialogueDefinition("Salut",
-                List.of(new DialogueOptionDefinition("Voir la boutique", NpcDialogueOptionType.SHOP, null)), null);
-        List<NpcService.NpcDefinition> definitions = List.of(new NpcService.NpcDefinition(UUID.randomUUID(), "Test",
-                room.getId(), new NpcService.CellDefinition(0, 0), "...", dialogue));
-
-        assertThatThrownBy(() -> isolated.loadNpcs(definitions, List.of(room), Map.of()))
-                .isInstanceOf(IllegalStateException.class);
-    }
-
-    @Test
-    void loadNpcsThrowsWhenAShopEntryReferencesAnUnknownItemTemplate() {
-        NpcService isolated = new NpcService(new ObjectMapper());
-        Room room = new Room(UUID.randomUUID(), "Test", "...", null);
-        ShopDefinition shop = new ShopDefinition(List.of(new ShopEntryDefinition(UUID.randomUUID(), 10)));
-        DialogueDefinition dialogue = new DialogueDefinition("Salut",
-                List.of(new DialogueOptionDefinition("Voir la boutique", NpcDialogueOptionType.SHOP, null)), shop);
-        List<NpcService.NpcDefinition> definitions = List.of(new NpcService.NpcDefinition(UUID.randomUUID(), "Test",
-                room.getId(), new NpcService.CellDefinition(0, 0), "...", dialogue));
-
-        assertThatThrownBy(() -> isolated.loadNpcs(definitions, List.of(room), Map.of()))
-                .isInstanceOf(IllegalStateException.class);
-    }
-
-    @Test
-    void loadNpcsThrowsWhenAShopEntryHasAnInvalidPrice() {
-        NpcService isolated = new NpcService(new ObjectMapper());
-        Room room = new Room(UUID.randomUUID(), "Test", "...", null);
-        UUID itemTemplateId = UUID.randomUUID();
-        ShopDefinition shop = new ShopDefinition(List.of(new ShopEntryDefinition(itemTemplateId, 0)));
-        DialogueDefinition dialogue = new DialogueDefinition("Salut",
-                List.of(new DialogueOptionDefinition("Voir la boutique", NpcDialogueOptionType.SHOP, null)), shop);
-        List<NpcService.NpcDefinition> definitions = List.of(new NpcService.NpcDefinition(UUID.randomUUID(), "Test",
-                room.getId(), new NpcService.CellDefinition(0, 0), "...", dialogue));
-
-        assertThatThrownBy(() -> isolated.loadNpcs(definitions, List.of(room),
-                Map.of(itemTemplateId, new ItemService.ItemSummary("Potion", Rarity.COMMON))))
+        assertThatThrownBy(() -> new NpcService().warmNpcs(List.of(worldTemplate), List.of()))
                 .isInstanceOf(IllegalStateException.class);
     }
 }

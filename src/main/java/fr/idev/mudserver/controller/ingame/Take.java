@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.Item;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.Connection;

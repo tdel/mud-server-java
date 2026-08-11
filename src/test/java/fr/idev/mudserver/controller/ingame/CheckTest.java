@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.controller.RecordingConnection;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.GamePlayer;
@@ -84,7 +84,7 @@ class CheckTest extends AbstractIntegrationTest {
 
     private RecordingConnection enterGame() {
         roomService.warmRooms();
-        Room startingRoom = roomService.startingRoom().orElseThrow();
+        RoomInstance startingRoom = roomService.startingRoom().orElseThrow();
         Account account = new Account(UUID.randomUUID(), "verificateur-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
         RecordingConnection connection = new RecordingConnection();

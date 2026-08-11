@@ -69,7 +69,7 @@ public class GameWorld {
             return;
         }
 
-        Room room = character.getCurrentRoom();
+        RoomInstance room = character.getCurrentRoom();
         characterDao.update(character);
         character.getCurrentRoom().disconnect(character);
         log.info("character.session_ended character={} room={}", character.getName(), room.getName());
@@ -89,6 +89,17 @@ public class GameWorld {
         return List.copyOf(characters.values());
     }
 
+    /**
+     * Sous-ensemble de {@link #onlineCharacters()} scopé à une
+     * {@code WorldInstance} — consommé par {@code game.actor.RestService} : un
+     * repos court/long affecte tous les joueurs en ligne de l'instance de
+     * l'initiateur, plus le process entier (voir {@code multi-world.md} Phase E).
+     */
+    public Collection<GamePlayer> onlineCharactersInWorldInstance(UUID worldInstanceId) {
+        return characters.values().stream().filter(character -> worldInstanceId.equals(character.getWorldInstanceId()))
+                .toList();
+    }
+
     public boolean isCharacterInGame(UUID characterId) {
         return characters.values().stream().anyMatch(character -> character.getId().equals(characterId));
     }
@@ -97,13 +108,17 @@ public class GameWorld {
         return characters.values().stream().anyMatch(character -> character.getAccountId().equals(accountId));
     }
 
-    public boolean isCharacterNameTaken(UUID accountId, String name) {
-        return characterDao.findByAccountIdAndName(accountId, name).isPresent();
-    }
-
-    public GamePlayer createCharacter(Account account, String name, Gender gender, Race race,
+    /**
+     * Prend la {@link WorldInstance} cible en paramètre (résolue par
+     * {@code CharacterSelectionWorld}) plutôt que de passer par
+     * {@code roomService.startingRoom()} (scopée à {@link WorldInstance#DEFAULT_ID}
+     * uniquement) : ce dernier n'existe que comme délégation de bootstrap pour les
+     * tests, pas comme point de résolution générique une fois le Lobby en place.
+     */
+    public GamePlayer createCharacter(Account account, WorldInstance instance, String name, Gender gender, Race race,
             CharacterClass characterClass) {
-        Optional<Room> startingRoom = roomService.startingRoom();
+        RoomInstance startingRoom = instance.startingRoomInstance().orElseThrow(
+                () -> new IllegalStateException("WorldInstance " + instance.getId() + " n'a aucune room de départ"));
 
         Map<Attribute, Integer> scores = rollAttributeScores();
         for (Map.Entry<Attribute, Integer> bonus : race.attributeScoreBonuses().entrySet()) {
@@ -118,11 +133,15 @@ public class GameWorld {
         CharacterClass.StartingGold startingGold = characterClass.startingGold();
         int gold = DiceRoller.roll(startingGold.dice()).total() * startingGold.multiplier();
 
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), name, startingRoom.get().getId(),
+        // getTemplateId(), pas getId() : current_room_id désigne toujours un id de
+        // RoomTemplate (indépendant de l'instance), jamais l'id déterministe de la
+        // RoomInstance elle-même — voir la Javadoc de RoomService.
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), name, startingRoom.getTemplateId(),
                 gender, race, characterClass, 1, maxHealth, maxHealth, scores, 0, gold);
+        character.setWorldInstanceId(instance.getId());
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));
-        character.spawnToRoom(startingRoom.get());
+        character.spawnToRoom(startingRoom);
         log.info("character.created character={} account={} race={} class={}", character.getName(), account.getLogin(),
                 race, characterClass);
 

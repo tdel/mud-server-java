@@ -12,7 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.controller.authed.CharacterList;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.network.Connection;
@@ -37,14 +36,11 @@ public class Register implements ControllerHandler {
     private final AccountDao accountDao;
     private final AuthWorld authWorld;
     private final PasswordEncoder passwordEncoder;
-    private final CharacterList characterListAction;
 
-    public Register(AccountDao accountDao, AuthWorld authWorld, PasswordEncoder passwordEncoder,
-            CharacterList characterListAction) {
+    public Register(AccountDao accountDao, AuthWorld authWorld, PasswordEncoder passwordEncoder) {
         this.accountDao = accountDao;
         this.authWorld = authWorld;
         this.passwordEncoder = passwordEncoder;
-        this.characterListAction = characterListAction;
     }
 
     @Override
@@ -103,7 +99,6 @@ public class Register implements ControllerHandler {
         log.info("account.registered account={}", login);
 
         connection.send(new AccountCreated(login));
-        characterListAction.onReceive(connection, "");
     }
 
     private List<String> validatePassword(String password) {

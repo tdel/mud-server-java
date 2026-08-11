@@ -24,8 +24,8 @@ import fr.idev.mudserver.game.dice.DiceRoller;
  * publient chacun leur propre événement, dont {@code CharacterService}/
  * {@code ItemService} font la persistance et l'envoi du message au joueur (même
  * séparation que {@code CharacterService#onCharacterDied} pour l'XP). Le butin
- * ne va jamais qu'au tueur, jamais à la room — pas de {@code Room.broadcast}
- * ici.
+ * ne va jamais qu'au tueur, jamais à la room — pas de
+ * {@code RoomInstance.broadcast} ici.
  *
  * <p>
  * {@code @Order(3)} : s'exécute après {@code RoomService#onCharacterDied}

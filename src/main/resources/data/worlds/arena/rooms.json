@@ -1,0 +1,27 @@
+[
+    {
+        "id": "d4a90018-209e-4f15-bef6-d77b57cd46ba",
+        "name": "Fosse d'entraînement",
+        "description": "Une fosse de sable battu, cernée de gradins vides.",
+        "isStartingRoom": true,
+        "width": 4,
+        "height": 4,
+        "spawnCell": { "q": 1, "r": 1 },
+        "monsterSpawns": [],
+        "portals": [
+            { "cell": {"q":3,"r":1}, "direction": "E", "targetRoomId": "286d80cd-d37c-43b5-980b-2e7ae930d26f", "targetCell": {"q":0,"r":1} }
+        ]
+    },
+    {
+        "id": "286d80cd-d37c-43b5-980b-2e7ae930d26f",
+        "name": "Coulisses",
+        "description": "Un couloir étroit derrière la fosse, encombré de matériel d'entraînement.",
+        "width": 4,
+        "height": 4,
+        "spawnCell": { "q": 1, "r": 1 },
+        "monsterSpawns": [],
+        "portals": [
+            { "cell": {"q":0,"r":1}, "direction": "W", "targetRoomId": "d4a90018-209e-4f15-bef6-d77b57cd46ba", "targetCell": {"q":3,"r":1} }
+        ]
+    }
+]

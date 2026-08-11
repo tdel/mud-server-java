@@ -18,9 +18,10 @@ import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUsedPotion;
 import fr.idev.mudserver.domain.actor.event.LongRestTaken;
 import fr.idev.mudserver.domain.actor.event.ShortRestTaken;
-import fr.idev.mudserver.domain.Room;
-import fr.idev.mudserver.game.GameWorld;
+import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.game.RoomService;
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.message.ingame.GoldLooted;
 import fr.idev.mudserver.network.message.ingame.GoldSpent;
 import fr.idev.mudserver.network.message.ingame.HpRestored;
@@ -56,14 +57,14 @@ public class CharacterService {
     private final CharacterDao characterDao;
     private final LevelService levelService;
     private final RoomService roomService;
-    private final GameWorld gameWorld;
+    private final WorldInstanceService worldInstanceService;
 
     public CharacterService(CharacterDao characterDao, LevelService levelService, RoomService roomService,
-            GameWorld gameWorld) {
+            WorldInstanceService worldInstanceService) {
         this.characterDao = characterDao;
         this.levelService = levelService;
         this.roomService = roomService;
-        this.gameWorld = gameWorld;
+        this.worldInstanceService = worldInstanceService;
     }
 
     @EventListener
@@ -148,7 +149,7 @@ public class CharacterService {
     @Order(2)
     void onGamePlayerDied(GamePlayerDied event) {
         GamePlayer character = event.character();
-        Room startingRoom = roomService.startingRoom()
+        RoomInstance startingRoom = roomService.startingRoom()
                 .orElseThrow(() -> new IllegalStateException("Aucune starting room configurée"));
 
         character.setCurrentHealth(character.getMaxHealth());
@@ -175,11 +176,11 @@ public class CharacterService {
     }
 
     /**
-     * {@code RestService#shortRest} a déjà soigné chaque joueur en ligne en mémoire
-     * — persiste chacun et lui envoie sa confirmation privée, puis annonce le repos
-     * à tout le monde (portée globale, voir la Javadoc de {@code RestService}),
-     * même mécanisme que {@link #onGamePlayerUsedPotion} répété pour plusieurs
-     * joueurs.
+     * {@code RestService#shortRest} a déjà soigné chaque joueur en ligne de la
+     * {@code WorldInstance} de l'initiateur en mémoire — persiste chacun et lui
+     * envoie sa confirmation privée, puis annonce le repos à toute l'instance via
+     * {@link WorldInstanceService#broadcastToInstance}, même mécanisme que
+     * {@link #onGamePlayerUsedPotion} répété pour plusieurs joueurs.
      */
     @EventListener
     void onShortRestTaken(ShortRestTaken event) {
@@ -188,8 +189,8 @@ public class CharacterService {
             characterDao.update(character);
             character.send(new HpRestored(entry.getValue(), character.getCurrentHealth(), character.getMaxHealth()));
         }
-        gameWorld.onlineCharacters()
-                .forEach(character -> character.send(new ShortRestAnnounced(event.initiator().getName())));
+        WorldInstance instance = worldInstanceService.getOrMaterialize(event.initiator().getWorldInstanceId());
+        worldInstanceService.broadcastToInstance(instance, new ShortRestAnnounced(event.initiator().getName()), null);
         log.info("character.short_rest_taken initiator={} affected={}", event.initiator().getName(),
                 event.healedAmounts().size());
     }
@@ -207,8 +208,8 @@ public class CharacterService {
             characterDao.update(character);
             character.send(new HpRestored(entry.getValue(), character.getCurrentHealth(), character.getMaxHealth()));
         }
-        gameWorld.onlineCharacters()
-                .forEach(character -> character.send(new LongRestAnnounced(event.initiator().getName())));
+        WorldInstance instance = worldInstanceService.getOrMaterialize(event.initiator().getWorldInstanceId());
+        worldInstanceService.broadcastToInstance(instance, new LongRestAnnounced(event.initiator().getName()), null);
         log.info("character.long_rest_taken initiator={} affected={} provisionsConsumed={}",
                 event.initiator().getName(), event.healedAmounts().size(), event.consumedFood().size());
     }

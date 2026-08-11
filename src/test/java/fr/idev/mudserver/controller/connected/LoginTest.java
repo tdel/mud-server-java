@@ -61,16 +61,15 @@ class LoginTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void correctPasswordSendsWelcomeBackThenDelegatesToCharacterList() {
+    void correctPasswordSendsWelcomeBackAndLandsInLobby() {
         createAccount("Alice", "secret");
         RecordingConnection connection = new RecordingConnection();
         connection.queueAnswer("secret");
 
         login.onReceive(connection, "Alice");
 
-        assertThat(connection.received.get(0)).isEqualTo(new RequestPassword());
-        assertThat(connection.received).anyMatch(WelcomeBack.class::isInstance);
-        assertThat(connection.state()).isEqualTo(ConnectionState.AUTHED);
+        assertThat(connection.received).containsExactly(new RequestPassword(), new WelcomeBack("Alice"));
+        assertThat(connection.state()).isEqualTo(ConnectionState.LOBBY);
     }
 
     @Test

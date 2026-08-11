@@ -7,21 +7,22 @@ import java.util.UUID;
 
 import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.HexDirection;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.RoomPortal;
 import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoller;
 
 /**
  * Racine commune à tout ce qui porte des caractéristiques DnD5e et une santé,
- * et peut occuper une {@link Room} : {@link GamePlayer}, {@link GameMonster} et
- * {@link GameNpc}. {@code currentRoom} n'est jamais persisté ni pris en compte
- * par les {@code equals}/{@code hashCode} des sous-classes concrètes — il ne
- * représente que l'état vivant du process, sur le même principe que
- * {@code GamePlayer.connection} (voir sa Javadoc). {@code permits} scelle la
- * hiérarchie à ces trois sous-types : {@code Room.findOccupantByName} peut
- * ainsi retourner un {@code Optional<GameCharacter>} traité par un
- * {@code switch} exhaustif dans {@code Examine}, sans clause {@code default}.
+ * et peut occuper une {@link RoomInstance} : {@link GamePlayer},
+ * {@link GameMonster} et {@link GameNpc}. {@code currentRoom} n'est jamais
+ * persisté ni pris en compte par les {@code equals}/{@code hashCode} des
+ * sous-classes concrètes — il ne représente que l'état vivant du process, sur
+ * le même principe que {@code GamePlayer.connection} (voir sa Javadoc).
+ * {@code permits} scelle la hiérarchie à ces trois sous-types :
+ * {@code RoomInstance.findOccupantByName} peut ainsi retourner un
+ * {@code Optional<GameCharacter>} traité par un {@code switch} exhaustif dans
+ * {@code Examine}, sans clause {@code default}.
  *
  * <p>
  * {@code GameNpc} hérite {@code attributes}/{@code currentHealth}/
@@ -44,19 +45,20 @@ import fr.idev.mudserver.game.dice.DiceRoller;
  * <p>
  * {@code position}/{@code speed} suivent la même convention "état vivant du
  * process, jamais persisté" que {@code currentRoom} : la case exacte occupée
- * dans la grille hexagonale de {@code currentRoom} (voir {@code Room.width}/
- * {@code Room.height}) ne survit ni à une déconnexion ni à un redémarrage — le
- * personnage réapparaît sur la case de spawn de la room (ou la case cible d'un
- * portail) à chaque {@code join}. {@code speed} borne le nombre de cases
- * franchissables par une commande {@code go} (voir {@link #moveToCell}) ; la
- * valeur par défaut (6) reprend par analogie la vitesse de marche 5e standard
- * (30 ft ≈ 6 cases de 5 ft), cohérente avec le reste du projet qui émule les
- * règles 5e ailleurs (initiative, jets de sauvegarde).
+ * dans la grille hexagonale de {@code currentRoom} (voir
+ * {@code RoomInstance.width}/ {@code RoomInstance.height}) ne survit ni à une
+ * déconnexion ni à un redémarrage — le personnage réapparaît sur la case de
+ * spawn de la room (ou la case cible d'un portail) à chaque {@code join}.
+ * {@code speed} borne le nombre de cases franchissables par une commande
+ * {@code go} (voir {@link #moveToCell}) ; la valeur par défaut (6) reprend par
+ * analogie la vitesse de marche 5e standard (30 ft ≈ 6 cases de 5 ft),
+ * cohérente avec le reste du projet qui émule les règles 5e ailleurs
+ * (initiative, jets de sauvegarde).
  *
  * <p>
  * {@link #moveToCell} est partagé par les trois sous-types : bornage par
  * vitesse, avance case par case et réclamation/libération atomique de case
- * (voir {@link Room#tryClaimCell}) ne dépendent d'aucun champ propre à
+ * (voir {@link RoomInstance#tryClaimCell}) ne dépendent d'aucun champ propre à
  * {@link GamePlayer}. Seul le franchissement d'un {@link RoomPortal} diffère
  * par sous-type, via le point d'extension {@link #crossPortal} : la base ne
  * fait rien (un monstre/PNJ s'arrête sur la case-portail sans changer de room),
@@ -80,7 +82,7 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
     private int currentHealth;
     private int maxHealth;
 
-    private Room currentRoom;
+    private RoomInstance currentRoom;
     private HexCoordinate position;
     protected int speed = DEFAULT_SPEED;
     private volatile CombatEncounter encounter;
@@ -141,11 +143,11 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
         return healed;
     }
 
-    public Room getCurrentRoom() {
+    public RoomInstance getCurrentRoom() {
         return currentRoom;
     }
 
-    public void setCurrentRoom(Room currentRoom) {
+    public void setCurrentRoom(RoomInstance currentRoom) {
         this.currentRoom = currentRoom;
     }
 
@@ -194,17 +196,17 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
     /**
      * Avance d'une case à la fois vers {@code direction}, jusqu'à
      * {@code min(requestedCells, getSpeed())} : chaque pas réclame la case suivante
-     * ({@link Room#tryClaimCell}) avant de libérer l'ancienne, jamais l'inverse —
-     * un personnage ne perd ainsi jamais son propre pied d'appui face à un
-     * concurrent visant la même case. Le déplacement intra-room ne touche jamais la
-     * DB ni ne publie d'événement ; seul {@link #crossPortal} peut le faire pour le
-     * sous-type qui le redéfinit. Atterrir sur un portail consomme le reste du
+     * ({@link RoomInstance#tryClaimCell}) avant de libérer l'ancienne, jamais
+     * l'inverse — un personnage ne perd ainsi jamais son propre pied d'appui face à
+     * un concurrent visant la même case. Le déplacement intra-room ne touche jamais
+     * la DB ni ne publie d'événement ; seul {@link #crossPortal} peut le faire pour
+     * le sous-type qui le redéfinit. Atterrir sur un portail consomme le reste du
      * budget de déplacement : pas d'enchaînement dans la nouvelle room en une seule
      * commande {@code go} (simplification assumée).
      */
     public MovementOutcome moveToCell(HexDirection direction, int requestedCells) {
         int budget = Math.min(requestedCells, getSpeed());
-        Room room = getCurrentRoom();
+        RoomInstance room = getCurrentRoom();
         HexCoordinate current = getPosition();
 
         int cellsMoved = 0;

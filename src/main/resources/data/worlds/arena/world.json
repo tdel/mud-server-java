@@ -1,0 +1,7 @@
+{
+    "id": "d1986f26-0af2-4f85-806a-27c83caa3cff",
+    "name": "Arène de test",
+    "description": "Monde minimal (2 rooms) utilisé pour prouver l'isolation entre deux WorldInstance d'un même WorldTemplate lancées par deux parties différentes (voir multi-world.md Phase D).",
+    "minPlayers": 2,
+    "maxPlayers": 4
+}

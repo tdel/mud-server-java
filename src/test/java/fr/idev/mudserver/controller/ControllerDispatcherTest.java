@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.CombatEncounter;
 import fr.idev.mudserver.domain.actor.GameMonster;
@@ -76,7 +76,7 @@ class ControllerDispatcherTest extends AbstractIntegrationTest {
 
     private RecordingConnection enterGameInCombat() {
         roomService.warmRooms();
-        Room startingRoom = roomService.startingRoom().orElseThrow();
+        RoomInstance startingRoom = roomService.startingRoom().orElseThrow();
         RecordingConnection connection = new RecordingConnection();
         GamePlayer character = new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Combattant", startingRoom.getId(),
                 Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,

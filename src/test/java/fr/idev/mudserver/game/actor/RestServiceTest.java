@@ -11,7 +11,8 @@ import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.controller.RecordingConnection;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Item;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.Gender;
@@ -96,7 +97,7 @@ class RestServiceTest extends AbstractIntegrationTest {
 
     @Test
     void shortRestIsRefusedInCombatAndNothingChanges() {
-        Room room = startingRoom();
+        RoomInstance room = startingRoom();
         RecordingConnection connection = enterGameInRoom(1, 100, CharacterClass.FIGHTER, room);
         GamePlayer character = gameWorld.character(connection);
         GameMonster monster = monster(room);
@@ -148,7 +149,7 @@ class RestServiceTest extends AbstractIntegrationTest {
 
     @Test
     void longRestIsRefusedInCombatAndConsumesNothing() {
-        Room room = startingRoom();
+        RoomInstance room = startingRoom();
         RecordingConnection connection = enterGameInRoom(1, 100, CharacterClass.FIGHTER, room);
         GamePlayer character = gameWorld.character(connection);
         GameMonster monster = monster(room);
@@ -171,7 +172,7 @@ class RestServiceTest extends AbstractIntegrationTest {
                 .orElseThrow();
     }
 
-    private Room startingRoom() {
+    private RoomInstance startingRoom() {
         roomService.warmRooms();
         return roomService.startingRoom().orElseThrow();
     }
@@ -181,22 +182,31 @@ class RestServiceTest extends AbstractIntegrationTest {
     }
 
     private RecordingConnection enterGameInRoom(int currentHealth, int maxHealth, CharacterClass characterClass,
-            Room room) {
+            RoomInstance room) {
         Account account = new Account(UUID.randomUUID(), "utilisateur-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
         RecordingConnection connection = new RecordingConnection();
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Repos-" + UUID.randomUUID(),
                 room.getId(), Gender.MAN, Race.HUMAN, characterClass, 1, currentHealth, maxHealth,
                 TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+        character.setWorldInstanceId(WorldInstance.DEFAULT_ID);
         characterDao.insert(character);
         gameWorld.enterWorld(connection, character);
         connection.received.clear();
         return connection;
     }
 
-    private GameMonster monster(Room room) {
+    private GameMonster monster(RoomInstance room) {
+        // FORCE -10 (modificateur -10) : un 20 naturel touche toujours quelle que
+        // soit la CA (règle 5e, voir DiceRoller#resolveHit), donc l'AC à -1000
+        // ci-dessous ne suffit pas à garantir que le mannequin ne touche jamais en
+        // retour lors de la riposte déclenchée par CombatEngine#cascade — sans ce
+        // modificateur, ~1 attaque sur 20 blesse le personnage à 1 PV et fait
+        // échouer les assertions "rien n'a changé" (flaky, voir multi-world.md).
+        // Même avec un coup critique (dégâts doublés), le plancher Math.max(0, ...)
+        // de GameMonster#rollDamage garantit 0 dégât : 2d4 (max 8) - 10 < 0.
         MonsterTemplate template = new MonsterTemplate(UUID.randomUUID(), "Mannequin " + UUID.randomUUID(),
-                "Un mannequin d'entraînement", 1000, TestAttributes.of(10, 10, 10, 10, 10, 10), -1000, 0, "1d4", 0,
+                "Un mannequin d'entraînement", 1000, TestAttributes.of(-10, 10, 10, 10, 10, 10), -1000, 0, "1d4", 0,
                 List.of(), 0);
         GameMonster monster = new GameMonster(UUID.randomUUID(), template.getName(), template.getId(), room.getId(),
                 template.getAttributes(), 1000);

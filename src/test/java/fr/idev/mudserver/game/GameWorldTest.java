@@ -8,12 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
+import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 
@@ -48,13 +49,17 @@ class GameWorldTest extends AbstractIntegrationTest {
     @Autowired
     private CharacterDao characterDao;
 
+    @Autowired
+    private WorldInstanceService worldInstanceService;
+
     @Test
     void createCharacterRollsScoresAppliesRaceBonusesPersistsAndSpawnsToTheStartingRoom() {
         Account account = new Account(UUID.randomUUID(), "hilde", "hashed-password", null);
         accountDao.insert(account);
         roomService.warmRooms();
-        Room startingRoom = roomService.startingRoom().orElseThrow();
-        GamePlayer character = gameWorld.createCharacter(account, "Hilde", Gender.WOMAN, Race.HUMAN,
+        RoomInstance startingRoom = roomService.startingRoom().orElseThrow();
+        WorldInstance instance = worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID);
+        GamePlayer character = gameWorld.createCharacter(account, instance, "Hilde", Gender.WOMAN, Race.HUMAN,
                 CharacterClass.FIGHTER);
 
         assertThat(characterDao.findById(character.getId())).contains(character);

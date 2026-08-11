@@ -5,8 +5,8 @@ import java.util.List;
 
 /**
  * Coordonnée axiale (q, r) d'une case hexagonale pointy-top. La grille d'une
- * {@link Room} n'utilise pas de coordonnées offset (rangée/colonne) séparées de
- * la représentation de stockage : {@code q}/{@code r} bornés par
+ * {@link RoomInstance} n'utilise pas de coordonnées offset (rangée/colonne)
+ * séparées de la représentation de stockage : {@code q}/{@code r} bornés par
  * {@code width}/{@code height} servent à la fois de clé de stockage et de base
  * aux calculs de voisinage/distance, au prix d'une grille en parallélogramme
  * plutôt qu'un rectangle offset parfait — invisible en rendu texte telnet

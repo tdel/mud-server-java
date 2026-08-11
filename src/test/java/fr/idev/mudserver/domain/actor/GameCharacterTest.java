@@ -11,7 +11,7 @@ import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.HexDirection;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.actor.GameCharacter.MovementOutcome;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.persistence.AccountDao;
@@ -36,7 +36,7 @@ class GameCharacterTest extends AbstractIntegrationTest {
 
     @Test
     void singleStepMoveUpdatesPosition() {
-        Room village = warmVillage();
+        RoomInstance village = warmVillage();
         GamePlayer character = seedCharacter(village);
 
         MovementOutcome outcome = character.moveToCell(HexDirection.E, 1);
@@ -47,7 +47,7 @@ class GameCharacterTest extends AbstractIntegrationTest {
 
     @Test
     void requestedCellsAreCappedBySpeed() {
-        Room village = warmVillage();
+        RoomInstance village = warmVillage();
         GamePlayer character = seedCharacter(village);
 
         MovementOutcome outcome = character.moveToCell(HexDirection.E, 99);
@@ -59,7 +59,7 @@ class GameCharacterTest extends AbstractIntegrationTest {
 
     @Test
     void movementIsBlockedAtTheGridEdge() {
-        Room village = warmVillage();
+        RoomInstance village = warmVillage();
         GamePlayer character = seedCharacter(village);
         village.leave(character);
         village.join(character, new HexCoordinate(1, 0));
@@ -73,9 +73,9 @@ class GameCharacterTest extends AbstractIntegrationTest {
 
     @Test
     void landingOnAPortalCrossesToTheLinkedRoomAndPersistsCurrentRoomId() {
-        Room village = warmVillage();
-        Room tavern = roomService.allRooms().stream().filter(room -> room.getId().equals(TAVERN_ID)).findFirst()
-                .orElseThrow();
+        RoomInstance village = warmVillage();
+        RoomInstance tavern = roomService.allRooms().stream().filter(room -> room.getTemplateId().equals(TAVERN_ID))
+                .findFirst().orElseThrow();
         GamePlayer character = seedCharacter(village);
         village.leave(character);
         village.join(character, new HexCoordinate(14, 4));
@@ -90,7 +90,7 @@ class GameCharacterTest extends AbstractIntegrationTest {
 
     @Test
     void aMonsterReachingAPortalCellStopsThereWithoutCrossingToTheLinkedRoom() {
-        Room village = warmVillage();
+        RoomInstance village = warmVillage();
         GameMonster monster = seedMonster(village, new HexCoordinate(14, 4));
 
         MovementOutcome outcome = monster.moveToCell(HexDirection.E, 2);
@@ -103,7 +103,7 @@ class GameCharacterTest extends AbstractIntegrationTest {
 
     @Test
     void movingIntoAMonstersPresenceRadiusStartsCombat() {
-        Room village = warmVillage();
+        RoomInstance village = warmVillage();
         GamePlayer character = seedCharacter(village, 100);
         GameMonster wolf = seedMonsterWithPresence(village, new HexCoordinate(12, 4), 2);
 
@@ -119,7 +119,7 @@ class GameCharacterTest extends AbstractIntegrationTest {
 
     @Test
     void movingOutsideAnyMonstersRadiusDoesNotStartCombat() {
-        Room village = warmVillage();
+        RoomInstance village = warmVillage();
         GamePlayer character = seedCharacter(village, 100);
         GameMonster wolf = seedMonsterWithPresence(village, new HexCoordinate(12, 4), 1);
 
@@ -132,7 +132,7 @@ class GameCharacterTest extends AbstractIntegrationTest {
 
     @Test
     void remainingInAMonstersRadiusAcrossMultipleMovesDoesNotRetriggerAmbush() {
-        Room village = warmVillage();
+        RoomInstance village = warmVillage();
         GamePlayer character = seedCharacter(village, 100);
         GameMonster wolf = seedMonsterWithPresence(village, new HexCoordinate(12, 4), 2);
 
@@ -149,7 +149,7 @@ class GameCharacterTest extends AbstractIntegrationTest {
 
     @Test
     void secondMonsterInRangeSimultaneouslyJoinsTheSameEncounter() {
-        Room village = warmVillage();
+        RoomInstance village = warmVillage();
         GamePlayer character = seedCharacter(village, 100);
         GameMonster wolf = seedMonsterWithPresence(village, new HexCoordinate(11, 4), 1);
         GameMonster spider = seedMonsterWithPresence(village, new HexCoordinate(12, 4), 2);
@@ -180,27 +180,28 @@ class GameCharacterTest extends AbstractIntegrationTest {
                 CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, dexterity, 10, 10, 10, 10), 0, 0);
     }
 
-    private Room warmVillage() {
+    private RoomInstance warmVillage() {
         roomService.warmRooms();
-        return roomService.allRooms().stream().filter(room -> room.getId().equals(VILLAGE_SQUARE_ID)).findFirst()
-                .orElseThrow();
+        return roomService.allRooms().stream().filter(room -> room.getTemplateId().equals(VILLAGE_SQUARE_ID))
+                .findFirst().orElseThrow();
     }
 
-    private GamePlayer seedCharacter(Room room) {
+    private GamePlayer seedCharacter(RoomInstance room) {
         return seedCharacter(room, 10);
     }
 
-    private GamePlayer seedCharacter(Room room, int hp) {
+    private GamePlayer seedCharacter(RoomInstance room, int hp) {
         Account account = new Account(UUID.randomUUID(), "movement-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Mover", room.getId(), Gender.MAN,
-                Race.HUMAN, CharacterClass.FIGHTER, 1, hp, hp, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Mover", room.getTemplateId(),
+                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, hp, hp, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
+                0);
         characterDao.insert(character);
         room.join(character);
         return character;
     }
 
-    private GameMonster seedMonster(Room room, HexCoordinate cell) {
+    private GameMonster seedMonster(RoomInstance room, HexCoordinate cell) {
         GameMonster monster = new GameMonster(UUID.randomUUID(), "Loup", UUID.randomUUID(), room.getId(),
                 TestAttributes.of(10, 10, 10, 10, 10, 10), 10);
         monster.setCurrentRoom(room);
@@ -216,7 +217,7 @@ class GameCharacterTest extends AbstractIntegrationTest {
      * que le joueur (100 PV dans ces tests) survive à coup sûr au coup d'ouverture
      * si le monstre gagne l'initiative.
      */
-    private GameMonster seedMonsterWithPresence(Room room, HexCoordinate cell, int presenceRadius) {
+    private GameMonster seedMonsterWithPresence(RoomInstance room, HexCoordinate cell, int presenceRadius) {
         MonsterTemplate template = new MonsterTemplate(UUID.randomUUID(), "Loup", "Un loup gris.", 10,
                 TestAttributes.of(10, 10, 10, 10, 10, 10), 10, 0, "1d2", 0, List.of(), presenceRadius);
         GameMonster monster = new GameMonster(UUID.randomUUID(), template.getName(), template.getId(), room.getId(),

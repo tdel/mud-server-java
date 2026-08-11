@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.Room;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -83,7 +83,7 @@ class GamePlayerDeathTest extends AbstractIntegrationTest {
     @Test
     void theKillingBlowRestoresFullHealthTeleportsToTheStartingRoomAndPersists() {
         roomService.warmRooms();
-        Room startingRoom = roomService.startingRoom().orElseThrow();
+        RoomInstance startingRoom = roomService.startingRoom().orElseThrow();
         GamePlayer character = seedCharacter(deathRoom());
         GameMonster attacker = monster();
 
@@ -94,13 +94,13 @@ class GamePlayerDeathTest extends AbstractIntegrationTest {
 
         GamePlayer persisted = characterDao.findById(character.getId()).orElseThrow();
         assertThat(persisted.getCurrentHealth()).isEqualTo(character.getMaxHealth());
-        assertThat(persisted.getCurrentRoomId()).isEqualTo(startingRoom.getId());
+        assertThat(persisted.getCurrentRoomId()).isEqualTo(startingRoom.getTemplateId());
     }
 
     @Test
     void theKillingBlowBroadcastsToTheDeathRoomExcludingTheVictimAndTheVictimReceivesItsOwnRespawnMessage() {
         roomService.warmRooms();
-        Room deathRoom = deathRoom();
+        RoomInstance deathRoom = deathRoom();
         GamePlayer victim = seedCharacter(deathRoom);
         GamePlayer bystander = seedCharacter(deathRoom);
         RecordingConnection victimConnection = new RecordingConnection();
@@ -116,11 +116,11 @@ class GamePlayerDeathTest extends AbstractIntegrationTest {
         assertThat(victimConnection.received).anyMatch(PlayerRespawned.class::isInstance);
     }
 
-    private Room deathRoom() {
-        return new Room(UUID.randomUUID(), "Fosse aux ours", "...", null);
+    private RoomInstance deathRoom() {
+        return new RoomInstance(UUID.randomUUID(), "Fosse aux ours", "...", null);
     }
 
-    private GamePlayer seedCharacter(Room room) {
+    private GamePlayer seedCharacter(RoomInstance room) {
         Account account = new Account(UUID.randomUUID(), "death-test-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), account.getLogin(), room.getId(),

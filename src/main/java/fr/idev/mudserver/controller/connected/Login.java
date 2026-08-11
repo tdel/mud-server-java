@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.controller.authed.CharacterList;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.GameWorld;
@@ -32,15 +31,12 @@ public class Login implements ControllerHandler {
     private final AuthWorld authWorld;
     private final GameWorld gameWorld;
     private final PasswordEncoder passwordEncoder;
-    private final CharacterList characterListAction;
 
-    public Login(AccountDao accountDao, AuthWorld authWorld, GameWorld gameWorld, PasswordEncoder passwordEncoder,
-            CharacterList characterListAction) {
+    public Login(AccountDao accountDao, AuthWorld authWorld, GameWorld gameWorld, PasswordEncoder passwordEncoder) {
         this.accountDao = accountDao;
         this.authWorld = authWorld;
         this.gameWorld = gameWorld;
         this.passwordEncoder = passwordEncoder;
-        this.characterListAction = characterListAction;
     }
 
     @Override
@@ -98,6 +94,5 @@ public class Login implements ControllerHandler {
         log.info("auth.login_succeeded account={}", login);
 
         connection.send(new WelcomeBack(login));
-        characterListAction.onReceive(connection, "");
     }
 }
