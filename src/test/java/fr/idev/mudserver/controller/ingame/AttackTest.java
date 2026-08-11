@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.controller.RecordingConnection;
 import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.GamePlayer;
@@ -19,6 +20,7 @@ import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.RoomService;
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.message.ingame.NoTargetSelected;
 import fr.idev.mudserver.network.message.ingame.TargetNotFound;
 
@@ -41,6 +43,9 @@ class AttackTest extends AbstractIntegrationTest {
 
     @Autowired
     private AuthWorld authWorld;
+
+    @Autowired
+    private WorldInstanceService worldInstanceService;
 
     @Autowired
     private RoomService roomService;
@@ -110,7 +115,9 @@ class AttackTest extends AbstractIntegrationTest {
         GamePlayer character = new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Attaquant", startingRoom.getId(),
                 Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 1000, 1000,
                 TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
-        authWorld.enterGameWorld(connection, character);
+        worldInstanceService.enterCharSelect(connection,
+                worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
+        worldInstanceService.enterGame(connection, character);
         connection.received.clear();
         return connection;
     }

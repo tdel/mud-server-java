@@ -9,11 +9,11 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.WorldTemplate;
 import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.game.WorldTemplateService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.message.charselect.ExistingCharacterInWorld;
 import fr.idev.mudserver.network.message.charselect.NoCharacterInWorld;
-import fr.idev.mudserver.persistence.CharacterDao;
 
 /**
  * Remplace le "relist" que {@code CharacterList}/{@code characters-list}
@@ -27,18 +27,17 @@ import fr.idev.mudserver.persistence.CharacterDao;
 @Component
 public class CharSelectStatus {
 
-    private final CharacterDao characterDao;
+    private final WorldInstanceService worldInstanceService;
     private final WorldTemplateService worldTemplateService;
 
-    public CharSelectStatus(CharacterDao characterDao, WorldTemplateService worldTemplateService) {
-        this.characterDao = characterDao;
+    public CharSelectStatus(WorldInstanceService worldInstanceService, WorldTemplateService worldTemplateService) {
+        this.worldInstanceService = worldInstanceService;
         this.worldTemplateService = worldTemplateService;
     }
 
     public void show(Connection connection, Account account, WorldInstance instance) {
         String worldName = worldName(instance.getWorldTemplateId());
-        Optional<GamePlayer> character = characterDao.findByAccountIdAndWorldInstanceId(account.getId(),
-                instance.getId());
+        Optional<GamePlayer> character = worldInstanceService.findCharacterFor(account, instance);
 
         if (character.isEmpty()) {
             connection.send(new NoCharacterInWorld(worldName));

@@ -13,6 +13,7 @@ import io.netty.util.CharsetUtil;
 
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
+import fr.idev.mudserver.game.WorldInstanceService;
 
 public class TelnetServerInitializer extends ChannelInitializer<SocketChannel> {
 
@@ -21,12 +22,14 @@ public class TelnetServerInitializer extends ChannelInitializer<SocketChannel> {
     private final ExecutorService virtualThreadExecutor;
     private final ControllerDispatcher controllerDispatcher;
     private final AuthWorld authWorld;
+    private final WorldInstanceService worldInstanceService;
 
     public TelnetServerInitializer(ExecutorService virtualThreadExecutor, ControllerDispatcher controllerDispatcher,
-            AuthWorld authWorld) {
+            AuthWorld authWorld, WorldInstanceService worldInstanceService) {
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.controllerDispatcher = controllerDispatcher;
         this.authWorld = authWorld;
+        this.worldInstanceService = worldInstanceService;
     }
 
     @Override
@@ -36,6 +39,7 @@ public class TelnetServerInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(new DelimiterBasedFrameDecoder(MAX_LINE_LENGTH, true, true, Delimiters.lineDelimiter()));
         pipeline.addLast(new StringDecoder(CharsetUtil.UTF_8));
         pipeline.addLast(new StringEncoder(CharsetUtil.UTF_8));
-        pipeline.addLast(new TelnetSessionHandler(virtualThreadExecutor, controllerDispatcher, authWorld));
+        pipeline.addLast(
+                new TelnetSessionHandler(virtualThreadExecutor, controllerDispatcher, authWorld, worldInstanceService));
     }
 }

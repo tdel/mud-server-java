@@ -49,7 +49,7 @@ class LogoutTest extends AbstractIntegrationTest {
     private CharacterDao characterDao;
 
     @Test
-    void fromIngameReturnsToCharselectOfTheSameWorldInstanceKeepingTheAccountRegistered() {
+    void fromIngameReturnsDirectlyToLobbyKeepingTheAccountRegistered() {
         roomService.warmRooms();
         Account account = new Account(UUID.randomUUID(), "p1", "hashed-password", null);
         accountDao.insert(account);
@@ -62,15 +62,16 @@ class LogoutTest extends AbstractIntegrationTest {
         // INGAME (voir sa Javadoc) — Logout s'appuie dessus plutôt que de recharger le
         // compte via AccountDao.
         authWorld.enterWorld(connection, account);
-        connection.setState(ConnectionState.INGAME);
-        authWorld.enterGameWorld(connection, character);
+        worldInstanceService.enterCharSelect(connection,
+                worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
+        worldInstanceService.enterGame(connection, character);
 
         logout.onReceive(connection, "");
 
-        assertThat(connection.state()).isEqualTo(ConnectionState.CHARSELECT);
-        assertThat(connection.received).anyMatch(message -> message.equals(new StoppedPlaying("Hero")));
+        assertThat(connection.state()).isEqualTo(ConnectionState.LOBBY);
+        assertThat(connection.received).contains(new StoppedPlaying("Hero"), new BackInLobby());
         assertThat(authWorld.account(connection).getId()).isEqualTo(account.getId());
-        assertThat(authWorld.worldInstance(connection).getId()).isEqualTo(WorldInstance.DEFAULT_ID);
+        assertThat(worldInstanceService.worldInstanceOf(connection)).isNull();
         assertThatThrownBy(connection::character).isInstanceOf(IllegalStateException.class);
     }
 
@@ -81,14 +82,15 @@ class LogoutTest extends AbstractIntegrationTest {
         accountDao.insert(account);
         RecordingConnection connection = new RecordingConnection();
         authWorld.enterWorld(connection, account);
-        authWorld.enterWorldInstance(connection, worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
+        worldInstanceService.enterCharSelect(connection,
+                worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
         connection.received.clear();
 
         logout.onReceive(connection, "");
 
         assertThat(connection.state()).isEqualTo(ConnectionState.LOBBY);
         assertThat(connection.received).containsExactly(new BackInLobby());
-        assertThat(authWorld.worldInstance(connection)).isNull();
+        assertThat(worldInstanceService.worldInstanceOf(connection)).isNull();
     }
 
     @Test

@@ -160,7 +160,7 @@ class CharacterCreateTest extends AbstractIntegrationTest {
         RecordingConnection connection = new RecordingConnection();
         authWorld.enterWorld(connection, account);
         WorldInstance instance = worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID);
-        authWorld.enterWorldInstance(connection, instance);
+        worldInstanceService.enterCharSelect(connection, instance);
         connection.received.clear();
         return connection;
     }

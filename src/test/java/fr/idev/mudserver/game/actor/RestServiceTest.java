@@ -24,6 +24,7 @@ import fr.idev.mudserver.game.CombatEngine;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.game.RoomService;
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 import fr.idev.mudserver.persistence.ItemDao;
@@ -43,6 +44,9 @@ class RestServiceTest extends AbstractIntegrationTest {
 
     @Autowired
     private AuthWorld authWorld;
+
+    @Autowired
+    private WorldInstanceService worldInstanceService;
 
     @Autowired
     private RoomService roomService;
@@ -198,7 +202,9 @@ class RestServiceTest extends AbstractIntegrationTest {
                 TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         character.setWorldInstanceId(WorldInstance.DEFAULT_ID);
         characterDao.insert(character);
-        authWorld.enterGameWorld(connection, character);
+        worldInstanceService.enterCharSelect(connection,
+                worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
+        worldInstanceService.enterGame(connection, character);
         connection.received.clear();
         return connection;
     }

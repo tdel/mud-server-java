@@ -76,7 +76,10 @@ class CharacterDeleteTest extends AbstractIntegrationTest {
                 Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         character.setWorldInstanceId(WorldInstance.DEFAULT_ID);
         characterDao.insert(character);
-        authWorld.enterGameWorld(new RecordingConnection(), character);
+        RecordingConnection observerConnection = new RecordingConnection();
+        worldInstanceService.enterCharSelect(observerConnection,
+                worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
+        worldInstanceService.enterGame(observerConnection, character);
 
         characterDelete.onReceive(connection, "Hero");
 
@@ -107,7 +110,8 @@ class CharacterDeleteTest extends AbstractIntegrationTest {
         accountDao.insert(account);
         RecordingConnection connection = new RecordingConnection();
         authWorld.enterWorld(connection, account);
-        authWorld.enterWorldInstance(connection, worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
+        worldInstanceService.enterCharSelect(connection,
+                worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
         connection.received.clear();
         return connection;
     }

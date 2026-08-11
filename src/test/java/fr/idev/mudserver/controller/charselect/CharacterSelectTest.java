@@ -97,10 +97,8 @@ class CharacterSelectTest extends AbstractIntegrationTest {
      * correction, cette méthode matérialisait toujours
      * {@link WorldInstance#DEFAULT_ID} en dur au login, quelle que soit l'instance
      * réelle du personnage — un personnage de l'instance "arena" (créée en lançant
-     * une party via {@link WorldEnter}, seul chemin qui matérialise une instance
-     * non-default — un lancement solo replie sur {@link WorldInstance#DEFAULT_ID},
-     * voir {@code WorldEnter#enterSolo}) se serait retrouvé spawné dans les rooms
-     * de l'instance par défaut.
+     * une party via {@link WorldEnter}) se serait retrouvé spawné dans les rooms de
+     * l'instance par défaut.
      */
     @Test
     void existingCharacterInANonDefaultInstanceSpawnsIntoThatInstanceNotTheDefaultOne() {
@@ -113,7 +111,7 @@ class CharacterSelectTest extends AbstractIntegrationTest {
         Account account = authWorld.account(leader);
 
         worldEnter.onReceive(leader, "arena");
-        WorldInstance arenaInstance = authWorld.worldInstance(leader);
+        WorldInstance arenaInstance = worldInstanceService.worldInstanceOf(leader);
         assertThat(arenaInstance.getId()).isNotEqualTo(WorldInstance.DEFAULT_ID);
 
         RoomInstance arenaStartingRoom = arenaInstance.startingRoomInstance().orElseThrow();
@@ -151,7 +149,8 @@ class CharacterSelectTest extends AbstractIntegrationTest {
         accountDao.insert(account);
         RecordingConnection connection = new RecordingConnection();
         authWorld.enterWorld(connection, account);
-        authWorld.enterWorldInstance(connection, worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
+        worldInstanceService.enterCharSelect(connection,
+                worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
         connection.received.clear();
         return connection;
     }

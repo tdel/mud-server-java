@@ -1,14 +1,9 @@
 package fr.idev.mudserver.controller.connected;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
@@ -23,24 +18,14 @@ import fr.idev.mudserver.network.message.connected.InvalidPassword;
 import fr.idev.mudserver.network.message.connected.LoginAlreadyTaken;
 import fr.idev.mudserver.network.message.connected.PasswordMismatch;
 import fr.idev.mudserver.network.message.connected.RequestPassword;
-import fr.idev.mudserver.persistence.AccountDao;
 
 @Component
 public class Register implements ControllerHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(Register.class);
-
-    private static final int MIN_PASSWORD_LENGTH = 8;
-    private static final int MAX_PASSWORD_LENGTH = 128;
-
-    private final AccountDao accountDao;
     private final AuthWorld authWorld;
-    private final PasswordEncoder passwordEncoder;
 
-    public Register(AccountDao accountDao, AuthWorld authWorld, PasswordEncoder passwordEncoder) {
-        this.accountDao = accountDao;
+    public Register(AuthWorld authWorld) {
         this.authWorld = authWorld;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -61,7 +46,7 @@ public class Register implements ControllerHandler {
             return;
         }
 
-        if (accountDao.findByLogin(login).isPresent()) {
+        if (authWorld.findOneAccountByLogin(login).isPresent()) {
             connection.send(new LoginAlreadyTaken(login));
             return;
         }
@@ -70,7 +55,7 @@ public class Register implements ControllerHandler {
     }
 
     private void onPasswordEntered(Connection connection, String login, String password) {
-        List<String> reasons = validatePassword(password);
+        List<String> reasons = authWorld.validatePassword(password);
         if (!reasons.isEmpty()) {
             connection.send(new InvalidPassword(reasons));
             return;
@@ -86,31 +71,14 @@ public class Register implements ControllerHandler {
             return;
         }
 
-        Account account = new Account(UUID.randomUUID(), login, passwordEncoder.encode(password), null);
+        Account account;
         try {
-            accountDao.insert(account);
+            account = authWorld.registerAccount(connection, login, password);
         } catch (DuplicateKeyException e) {
-            log.warn("account.register_conflict account={}", login);
             connection.send(new LoginAlreadyTaken(login));
             return;
         }
 
-        authWorld.enterWorld(connection, account);
-        log.info("account.registered account={}", login);
-
-        connection.send(new AccountCreated(login));
-    }
-
-    private List<String> validatePassword(String password) {
-        List<String> reasons = new ArrayList<>();
-        if (password.isEmpty()) {
-            reasons.add("This value should not be blank.");
-        }
-        if (password.length() < MIN_PASSWORD_LENGTH) {
-            reasons.add("This value is too short. It should have " + MIN_PASSWORD_LENGTH + " characters or more.");
-        } else if (password.length() > MAX_PASSWORD_LENGTH) {
-            reasons.add("This value is too long. It should have " + MAX_PASSWORD_LENGTH + " characters or less.");
-        }
-        return reasons;
+        connection.send(new AccountCreated(account.getLogin()));
     }
 }

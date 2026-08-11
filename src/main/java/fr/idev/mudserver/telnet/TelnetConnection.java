@@ -12,6 +12,7 @@ import io.netty.channel.Channel;
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.AuthWorld;
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.OutputMessage;
@@ -31,6 +32,7 @@ public class TelnetConnection implements Connection, TelnetOutput {
     private final Channel channel;
     private final ControllerDispatcher controllerDispatcher;
     private final AuthWorld authWorld;
+    private final WorldInstanceService worldInstanceService;
 
     private ConnectionState state = ConnectionState.CONNECTED;
     private GamePlayer character;
@@ -38,11 +40,12 @@ public class TelnetConnection implements Connection, TelnetOutput {
     private boolean pendingLineSecure;
 
     public TelnetConnection(String connectionId, Channel channel, ControllerDispatcher controllerDispatcher,
-            AuthWorld authWorld) {
+            AuthWorld authWorld, WorldInstanceService worldInstanceService) {
         this.connectionId = connectionId;
         this.channel = channel;
         this.controllerDispatcher = controllerDispatcher;
         this.authWorld = authWorld;
+        this.worldInstanceService = worldInstanceService;
     }
 
     /**
@@ -82,12 +85,12 @@ public class TelnetConnection implements Connection, TelnetOutput {
 
     public void handleClose() {
         try {
-            authWorld.exitGameWorld(this);
+            worldInstanceService.exitGame(this);
         } catch (Exception e) {
             log.error("telnet.disconnect_cleanup_failed stage=game", e);
         }
         try {
-            authWorld.exitWorldInstance(this);
+            worldInstanceService.exitCharSelect(this);
         } catch (Exception e) {
             log.error("telnet.disconnect_cleanup_failed stage=charselect", e);
         }

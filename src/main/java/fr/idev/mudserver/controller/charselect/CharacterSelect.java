@@ -11,10 +11,10 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.AuthWorld;
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.charselect.NowPlaying;
-import fr.idev.mudserver.persistence.CharacterDao;
 
 /**
  * Pas d'argument {@code <name>} : au plus un personnage par
@@ -24,15 +24,15 @@ import fr.idev.mudserver.persistence.CharacterDao;
 @Component
 public class CharacterSelect implements ControllerHandler {
 
-    private final CharacterDao characterDao;
     private final AuthWorld authWorld;
+    private final WorldInstanceService worldInstanceService;
     private final CharSelectStatus charSelectStatus;
     private final Look lookAction;
 
-    public CharacterSelect(CharacterDao characterDao, AuthWorld authWorld, CharSelectStatus charSelectStatus,
-            Look lookAction) {
-        this.characterDao = characterDao;
+    public CharacterSelect(AuthWorld authWorld, WorldInstanceService worldInstanceService,
+            CharSelectStatus charSelectStatus, Look lookAction) {
         this.authWorld = authWorld;
+        this.worldInstanceService = worldInstanceService;
         this.charSelectStatus = charSelectStatus;
         this.lookAction = lookAction;
     }
@@ -50,16 +50,15 @@ public class CharacterSelect implements ControllerHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         Account account = authWorld.account(connection);
-        WorldInstance instance = authWorld.worldInstance(connection);
+        WorldInstance instance = worldInstanceService.worldInstanceOf(connection);
 
-        Optional<GamePlayer> character = characterDao.findByAccountIdAndWorldInstanceId(account.getId(),
-                instance.getId());
+        Optional<GamePlayer> character = worldInstanceService.findCharacterFor(account, instance);
         if (character.isEmpty()) {
             charSelectStatus.show(connection, account, instance);
             return;
         }
 
-        authWorld.moveToGameWorld(connection, character.get());
+        worldInstanceService.enterGame(connection, character.get());
 
         connection.send(new NowPlaying(character.get().getName()));
         lookAction.onReceive(connection, "");

@@ -17,6 +17,7 @@ import io.netty.channel.embedded.EmbeddedChannel;
 
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,6 +34,7 @@ class TelnetSessionHandlerTest {
 
     private final RecordingDispatcher dispatcher = new RecordingDispatcher();
     private final RecordingAuthWorld authWorld = new RecordingAuthWorld();
+    private final RecordingWorldInstanceService worldInstanceService = new RecordingWorldInstanceService();
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
     @AfterEach
@@ -73,7 +75,7 @@ class TelnetSessionHandlerTest {
         channel.close();
         await(authWorld.exitWorldLatch);
 
-        assertThat(authWorld.exitGameWorldCalled).isTrue();
+        assertThat(worldInstanceService.exitGameCalled).isTrue();
         assertThat(authWorld.exitWorldCalled).isTrue();
     }
 
@@ -104,7 +106,7 @@ class TelnetSessionHandlerTest {
     }
 
     private EmbeddedChannel openChannel() {
-        return new EmbeddedChannel(new TelnetSessionHandler(executor, dispatcher, authWorld));
+        return new EmbeddedChannel(new TelnetSessionHandler(executor, dispatcher, authWorld, worldInstanceService));
     }
 
     private void await(CountDownLatch latch) {
@@ -166,10 +168,9 @@ class TelnetSessionHandlerTest {
 
         private final CountDownLatch exitWorldLatch = new CountDownLatch(1);
         private boolean exitWorldCalled;
-        private boolean exitGameWorldCalled;
 
         RecordingAuthWorld() {
-            super(null, null, null, null);
+            super(null, null);
         }
 
         @Override
@@ -177,10 +178,19 @@ class TelnetSessionHandlerTest {
             exitWorldCalled = true;
             exitWorldLatch.countDown();
         }
+    }
+
+    private static final class RecordingWorldInstanceService extends WorldInstanceService {
+
+        private boolean exitGameCalled;
+
+        RecordingWorldInstanceService() {
+            super(null, null, null, null, null, null, null);
+        }
 
         @Override
-        public void exitGameWorld(Connection connection) {
-            exitGameWorldCalled = true;
+        public void exitGame(Connection connection) {
+            exitGameCalled = true;
         }
     }
 }

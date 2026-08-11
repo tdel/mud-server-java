@@ -13,10 +13,10 @@ import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.WorldTemplate;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.AuthWorld;
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.game.WorldTemplateService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
-import fr.idev.mudserver.persistence.CharacterDao;
 import fr.idev.mudserver.persistence.WorldInstanceDao;
 
 @Component
@@ -24,14 +24,14 @@ public class WorldsList implements ControllerHandler {
 
     private final WorldTemplateService worldTemplateService;
     private final WorldInstanceDao worldInstanceDao;
-    private final CharacterDao characterDao;
+    private final WorldInstanceService worldInstanceService;
     private final AuthWorld authWorld;
 
     public WorldsList(WorldTemplateService worldTemplateService, WorldInstanceDao worldInstanceDao,
-            CharacterDao characterDao, AuthWorld authWorld) {
+            WorldInstanceService worldInstanceService, AuthWorld authWorld) {
         this.worldTemplateService = worldTemplateService;
         this.worldInstanceDao = worldInstanceDao;
-        this.characterDao = characterDao;
+        this.worldInstanceService = worldInstanceService;
         this.authWorld = authWorld;
     }
 
@@ -53,8 +53,7 @@ public class WorldsList implements ControllerHandler {
         for (WorldTemplate template : worldTemplateService.allTemplates()) {
             Optional<GamePlayer> existingCharacter = worldInstanceDao
                     .findByAccountIdAndWorldTemplateId(account.getId(), template.getId())
-                    .flatMap(instance -> characterDao.findByAccountIdAndWorldInstanceId(account.getId(),
-                            instance.getId()));
+                    .flatMap(instance -> worldInstanceService.findCharacterFor(account, instance));
 
             entries.add(new fr.idev.mudserver.network.message.lobby.WorldsList.Entry(template.getShortName(),
                     template.getName(), template.getDescription(), template.getMinPlayers(), template.getMaxPlayers(),

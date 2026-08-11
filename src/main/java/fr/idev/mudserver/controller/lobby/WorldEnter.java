@@ -32,14 +32,16 @@ import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.WorldInstanceDao;
 
 /**
- * Deux chemins (voir {@code multi-world.md} Phase D). Sans party (repli Phase
- * C, inchangé) : rejoint directement l'instance déjà connue de ce compte pour
- * ce template, ou l'instance par défaut à défaut. En party : la connexion doit
- * être leader, chaque membre doit résoudre vers une connexion active en LOBBY
- * (sinon rejet explicite invitant à {@code party-kick} l'absent), une
- * {@link WorldInstance} neuve est systématiquement matérialisée pour le groupe
- * via {@code worldInstanceService.createInstance} — jamais de réutilisation
- * d'une instance existante en party, contrairement au repli solo.
+ * Deux chemins. Sans party : rejoint l'instance déjà connue de ce compte pour
+ * ce template si elle existe, sinon en crée une nouvelle dédiée à ce seul
+ * compte via {@code worldInstanceService.createInstance} — il n'existe plus
+ * d'instance par défaut partagée entre comptes non liés par une party (voir
+ * {@code WorldInstanceService.exitGame}, qui détruit toute instance dont le
+ * dernier joueur vient de partir). En party : la connexion doit être leader,
+ * chaque membre doit résoudre vers une connexion active en LOBBY (sinon rejet
+ * explicite invitant à {@code party-kick} l'absent), une {@link WorldInstance}
+ * neuve est systématiquement matérialisée pour le groupe — jamais de
+ * réutilisation d'une instance existante en party, contrairement au repli solo.
  */
 @Component
 public class WorldEnter implements ControllerHandler {
@@ -103,10 +105,10 @@ public class WorldEnter implements ControllerHandler {
 
     private void enterSolo(Connection connection, Account account, WorldTemplate template) {
         WorldInstance instance = worldInstanceDao.findByAccountIdAndWorldTemplateId(account.getId(), template.getId())
-                .map(existing -> worldInstanceService.getOrMaterialize(existing.getId()))
-                .orElseGet(() -> worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
+                .map(existing -> worldInstanceService.getOrMaterialize(existing.getId())).orElseGet(
+                        () -> worldInstanceService.createInstance(template, Set.of(account.getId()), account.getId()));
 
-        authWorld.enterWorldInstance(connection, instance);
+        worldInstanceService.enterCharSelect(connection, instance);
         charSelectStatus.show(connection, account, instance);
     }
 
@@ -143,7 +145,7 @@ public class WorldEnter implements ControllerHandler {
 
         for (Connection memberConnection : memberConnections) {
             Account memberAccount = authWorld.account(memberConnection);
-            authWorld.enterWorldInstance(memberConnection, instance);
+            worldInstanceService.enterCharSelect(memberConnection, instance);
             charSelectStatus.show(memberConnection, memberAccount, instance);
         }
 

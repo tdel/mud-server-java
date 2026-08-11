@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
@@ -19,21 +18,16 @@ import fr.idev.mudserver.network.message.connected.AccountNotFound;
 import fr.idev.mudserver.network.message.connected.IncorrectPassword;
 import fr.idev.mudserver.network.message.connected.RequestPassword;
 import fr.idev.mudserver.network.message.connected.WelcomeBack;
-import fr.idev.mudserver.persistence.AccountDao;
 
 @Component
 public class Login implements ControllerHandler {
 
     private static final Logger log = LoggerFactory.getLogger(Login.class);
 
-    private final AccountDao accountDao;
     private final AuthWorld authWorld;
-    private final PasswordEncoder passwordEncoder;
 
-    public Login(AccountDao accountDao, AuthWorld authWorld, PasswordEncoder passwordEncoder) {
-        this.accountDao = accountDao;
+    public Login(AuthWorld authWorld) {
         this.authWorld = authWorld;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -54,7 +48,7 @@ public class Login implements ControllerHandler {
             return;
         }
 
-        Optional<Account> account = accountDao.findByLogin(login);
+        Optional<Account> account = authWorld.findOneAccountByLogin(login);
         if (account.isEmpty()) {
             log.warn("auth.login_failed account={} reason=unknown_account", login);
             connection.send(new AccountNotFound(login));
@@ -66,7 +60,7 @@ public class Login implements ControllerHandler {
     }
 
     private void onPasswordEntered(Connection connection, Account account, String login, String password) {
-        if (!passwordEncoder.matches(password, account.getPassword())) {
+        if (!authWorld.checkPassword(account, password)) {
             log.warn("auth.login_failed account={} reason=bad_password", login);
             connection.send(new IncorrectPassword());
             return;

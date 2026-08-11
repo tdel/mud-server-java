@@ -16,6 +16,7 @@ import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.game.AuthWorld;
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -27,18 +28,18 @@ import fr.idev.mudserver.network.message.charselect.InvalidClass;
 import fr.idev.mudserver.network.message.charselect.InvalidGender;
 import fr.idev.mudserver.network.message.charselect.InvalidRace;
 import fr.idev.mudserver.network.message.ingame.GamePlayerStats;
-import fr.idev.mudserver.persistence.CharacterDao;
 
 @Component
 public class CharacterCreate implements ControllerHandler {
 
     private final AuthWorld authWorld;
-    private final CharacterDao characterDao;
+    private final WorldInstanceService worldInstanceService;
     private final CharSelectStatus charSelectStatus;
 
-    public CharacterCreate(AuthWorld authWorld, CharacterDao characterDao, CharSelectStatus charSelectStatus) {
+    public CharacterCreate(AuthWorld authWorld, WorldInstanceService worldInstanceService,
+            CharSelectStatus charSelectStatus) {
         this.authWorld = authWorld;
-        this.characterDao = characterDao;
+        this.worldInstanceService = worldInstanceService;
         this.charSelectStatus = charSelectStatus;
     }
 
@@ -62,9 +63,9 @@ public class CharacterCreate implements ControllerHandler {
         }
 
         Account account = authWorld.account(connection);
-        WorldInstance instance = authWorld.worldInstance(connection);
+        WorldInstance instance = worldInstanceService.worldInstanceOf(connection);
 
-        if (characterDao.findByAccountIdAndWorldInstanceId(account.getId(), instance.getId()).isPresent()) {
+        if (worldInstanceService.findCharacterFor(account, instance).isPresent()) {
             charSelectStatus.show(connection, account, instance);
             return;
         }

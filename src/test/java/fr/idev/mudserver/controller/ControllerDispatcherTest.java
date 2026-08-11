@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.CombatEncounter;
 import fr.idev.mudserver.domain.actor.GameMonster;
@@ -14,8 +15,8 @@ import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
-import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.RoomService;
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ActionNotFound;
 import fr.idev.mudserver.network.message.ingame.CombatActionRequired;
@@ -25,8 +26,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Contexte Spring requis : exerce le vrai
- * {@link AuthWorld}/{@link ControllerRegistry}, seul moyen fiable de reproduire
- * l'état "connexion en jeu" que le verrouillage de combat de
+ * {@link WorldInstanceService}/{@link ControllerRegistry}, seul moyen fiable de
+ * reproduire l'état "connexion en jeu" que le verrouillage de combat de
  * {@link ControllerDispatcher} vérifie. Aucune couverture n'existait au niveau
  * {@code controller/**} avant ce test — la logique de verrouillage est neuve et
  * facile à inverser par erreur (whitelist vs blacklist), d'où ce test dédié
@@ -38,7 +39,7 @@ class ControllerDispatcherTest extends AbstractIntegrationTest {
     private ControllerDispatcher dispatcher;
 
     @Autowired
-    private AuthWorld authWorld;
+    private WorldInstanceService worldInstanceService;
 
     @Autowired
     private RoomService roomService;
@@ -81,7 +82,9 @@ class ControllerDispatcherTest extends AbstractIntegrationTest {
         GamePlayer character = new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Combattant", startingRoom.getId(),
                 Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
                 0);
-        authWorld.enterGameWorld(connection, character);
+        worldInstanceService.enterCharSelect(connection,
+                worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
+        worldInstanceService.enterGame(connection, character);
 
         GameMonster monster = new GameMonster(UUID.randomUUID(), "Mannequin", UUID.randomUUID(), startingRoom.getId(),
                 TestAttributes.of(10, 10, 10, 10, 10, 10), 1000);

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.AuthWorld;
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.LoggedOut;
@@ -17,10 +18,10 @@ import fr.idev.mudserver.network.message.lobby.BackInLobby;
 
 /**
  * Utilisable depuis les états "ingame", "charselect" et "lobby". Depuis
- * "ingame", se déloguer ne fait que lâcher le personnage et revenir à la
- * sélection de personnage de la même {@code WorldInstance} ("charselect").
- * Depuis "charselect", on revient au Lobby. Depuis "lobby", se déloguer repasse
- * entièrement à "connected".
+ * "ingame", se déloguer lâche le personnage et ramène directement au Lobby
+ * (plus d'étape intermédiaire par "charselect" — pour rejouer, il faut refaire
+ * {@code world-enter}). Depuis "charselect", on revient aussi au Lobby. Depuis
+ * "lobby", se déloguer repasse entièrement à "connected".
  */
 @Component
 public class Logout implements ControllerHandler {
@@ -28,9 +29,11 @@ public class Logout implements ControllerHandler {
     private static final Logger log = LoggerFactory.getLogger(Logout.class);
 
     private final AuthWorld authWorld;
+    private final WorldInstanceService worldInstanceService;
 
-    public Logout(AuthWorld authWorld) {
+    public Logout(AuthWorld authWorld, WorldInstanceService worldInstanceService) {
         this.authWorld = authWorld;
+        this.worldInstanceService = worldInstanceService;
     }
 
     @Override
@@ -48,15 +51,16 @@ public class Logout implements ControllerHandler {
         if (connection.state() == ConnectionState.INGAME) {
             GamePlayer character = connection.character();
 
-            authWorld.exitGameWorld(connection);
-            authWorld.enterWorldInstance(connection, character.getWorldInstance());
+            worldInstanceService.exitGame(connection);
+            worldInstanceService.exitCharSelect(connection);
 
             connection.send(new StoppedPlaying(character.getName()));
+            connection.send(new BackInLobby());
             return;
         }
 
         if (connection.state() == ConnectionState.CHARSELECT) {
-            authWorld.exitWorldInstance(connection);
+            worldInstanceService.exitCharSelect(connection);
             connection.send(new BackInLobby());
             return;
         }

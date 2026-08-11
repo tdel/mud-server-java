@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
+import fr.idev.mudserver.game.WorldInstanceService;
 
 /**
  * Démarré sur {@link ApplicationReadyEvent} plutôt qu'en tant que commande
@@ -45,13 +46,15 @@ public class TelnetServer {
     private final ExecutorService virtualThreadExecutor;
     private final ControllerDispatcher controllerDispatcher;
     private final AuthWorld authWorld;
+    private final WorldInstanceService worldInstanceService;
     private final int port;
 
     public TelnetServer(ExecutorService virtualThreadExecutor, ControllerDispatcher controllerDispatcher,
-            AuthWorld authWorld, @Value("${app.telnet.port}") int port) {
+            AuthWorld authWorld, WorldInstanceService worldInstanceService, @Value("${app.telnet.port}") int port) {
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.controllerDispatcher = controllerDispatcher;
         this.authWorld = authWorld;
+        this.worldInstanceService = worldInstanceService;
         this.port = port;
     }
 
@@ -61,8 +64,8 @@ public class TelnetServer {
         EventLoopGroup workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
         try {
             ServerBootstrap bootstrap = new ServerBootstrap().group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .childHandler(new TelnetServerInitializer(virtualThreadExecutor, controllerDispatcher, authWorld));
+                    .channel(NioServerSocketChannel.class).childHandler(new TelnetServerInitializer(
+                            virtualThreadExecutor, controllerDispatcher, authWorld, worldInstanceService));
 
             Channel channel = bootstrap.bind(port).sync().channel();
             log.info("Serveur telnet démarré sur le port {}", port);

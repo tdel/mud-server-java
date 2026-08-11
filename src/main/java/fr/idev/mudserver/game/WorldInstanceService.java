@@ -4,15 +4,18 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.RoomPortal;
 import fr.idev.mudserver.domain.RoomTemplate;
@@ -24,7 +27,11 @@ import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.WorldInstanceCreated;
 import fr.idev.mudserver.game.actor.MonsterService;
 import fr.idev.mudserver.game.actor.NpcService;
+import fr.idev.mudserver.network.Connection;
+import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.OutputMessage;
+import fr.idev.mudserver.persistence.AccountDao;
+import fr.idev.mudserver.persistence.CharacterDao;
 import fr.idev.mudserver.persistence.WorldInstanceDao;
 
 /**
@@ -37,9 +44,9 @@ import fr.idev.mudserver.persistence.WorldInstanceDao;
  * contenu runtime d'une instance donnée (cette classe) n'est matérialisé que la
  * première fois qu'un joueur y entre réellement, via {@link #getOrMaterialize}
  * ({@code WorldEnter}, repli solo) ou {@link #createInstance}
- * ({@code WorldEnter}, lancement de party) — {@code warmDefaultInstance()}
- * reste le point d'entrée utilisé par les tests comme bootstrap unique pour
- * l'instance par défaut.
+ * ({@code WorldEnter}, lancement de party ou solo) —
+ * {@code warmDefaultInstance()} reste le point d'entrée utilisé par les tests
+ * comme bootstrap unique pour l'instance par défaut.
  *
  * <p>
  * {@link RoomInstance#deterministicId} donne à chaque {@link RoomInstance} un
@@ -48,6 +55,19 @@ import fr.idev.mudserver.persistence.WorldInstanceDao;
  * (indépendant de l'instance, voir {@code RoomService}) tout en retrouvant
  * toujours la même {@link RoomInstance} en mémoire après une
  * (re)matérialisation.
+ *
+ * <p>
+ * Porte aussi désormais le suivi {@code CHARSELECT}/{@code INGAME} d'une
+ * connexion — quelle {@link WorldInstance} elle est en train de parcourir
+ * ({@link #charSelectInstances}), la sélection/le listing du personnage
+ * ({@link #findCharacterFor}), et le cycle de vie du {@link GamePlayer} vivant
+ * en jeu ({@link #enterGame}/{@link #exitGame}), déplacés depuis l'ancien
+ * {@code AuthWorld} qui n'est plus responsable que du compte. {@link #exitGame}
+ * détruit (évince de {@link #residentInstances}) toute {@link WorldInstance}
+ * dont le dernier joueur vient de partir — aucune instance n'est plus jamais
+ * partagée entre comptes non liés par une party (voir {@code WorldEnter}, qui
+ * ne retombe plus sur une instance par défaut), donc cette règle s'applique
+ * uniformément, sans cas particulier à exempter.
  */
 @Service
 public class WorldInstanceService {
@@ -55,20 +75,26 @@ public class WorldInstanceService {
     private static final Logger log = LoggerFactory.getLogger(WorldInstanceService.class);
 
     private final Map<UUID, WorldInstance> residentInstances = new ConcurrentHashMap<>();
+    private final Map<Connection, WorldInstance> charSelectInstances = new ConcurrentHashMap<>();
 
     private final WorldTemplateService worldTemplateService;
     private final WorldInstanceDao worldInstanceDao;
     private final MonsterService monsterService;
     private final NpcService npcService;
     private final ItemService itemService;
+    private final AccountDao accountDao;
+    private final CharacterDao characterDao;
 
     public WorldInstanceService(WorldTemplateService worldTemplateService, WorldInstanceDao worldInstanceDao,
-            MonsterService monsterService, NpcService npcService, ItemService itemService) {
+            MonsterService monsterService, NpcService npcService, ItemService itemService, AccountDao accountDao,
+            CharacterDao characterDao) {
         this.worldTemplateService = worldTemplateService;
         this.worldInstanceDao = worldInstanceDao;
         this.monsterService = monsterService;
         this.npcService = npcService;
         this.itemService = itemService;
+        this.accountDao = accountDao;
+        this.characterDao = characterDao;
     }
 
     /**
@@ -155,11 +181,13 @@ public class WorldInstanceService {
 
     /**
      * Construit une {@link WorldInstance} neuve pour une party qui lance
-     * {@code template} (voir {@code multi-world.md} Phase D), la matérialise tout
-     * de suite — contrairement à {@link #getOrMaterialize}, {@code WorldEnter} a
-     * besoin du graphe de {@link RoomInstance} immédiatement pour y faire spawn
-     * chaque membre — puis publie l'événement de persistance, même ordre "mémoire
-     * d'abord, événement ensuite" que le reste du domaine.
+     * {@code template} (voir {@code multi-world.md} Phase D), ou pour un compte
+     * seul qui n'a pas encore d'instance pour ce template (repli solo de
+     * {@code WorldEnter}, {@code memberAccountIds} réduit à ce seul compte) — la
+     * matérialise tout de suite, contrairement à {@link #getOrMaterialize},
+     * {@code WorldEnter} a besoin du graphe de {@link RoomInstance} immédiatement
+     * pour y faire spawn chaque membre — puis publie l'événement de persistance,
+     * même ordre "mémoire d'abord, événement ensuite" que le reste du domaine.
      */
     public WorldInstance createInstance(WorldTemplate template, Set<UUID> memberAccountIds, UUID leaderAccountId) {
         WorldInstance instance = new WorldInstance(UUID.randomUUID(), template.getId(), Instant.now(), leaderAccountId,
@@ -205,6 +233,89 @@ public class WorldInstanceService {
     public void broadcastToInstance(WorldInstance instance, OutputMessage message, GamePlayer exclude) {
         for (RoomInstance room : instance.roomInstances()) {
             room.broadcast(message, exclude);
+        }
+    }
+
+    /**
+     * Enregistre la connexion dans {@code instance} et la fait passer en
+     * {@code CHARSELECT} — remplace l'ancien {@code AuthWorld.enterWorldInstance}.
+     */
+    public void enterCharSelect(Connection connection, WorldInstance instance) {
+        charSelectInstances.put(connection, instance);
+        connection.setState(ConnectionState.CHARSELECT);
+    }
+
+    /**
+     * Retire la connexion et la fait repasser en {@code LOBBY} — remplace l'ancien
+     * {@code AuthWorld.exitWorldInstance}.
+     */
+    public void exitCharSelect(Connection connection) {
+        charSelectInstances.remove(connection);
+        connection.setState(ConnectionState.LOBBY);
+    }
+
+    public WorldInstance worldInstanceOf(Connection connection) {
+        return charSelectInstances.get(connection);
+    }
+
+    /**
+     * Résout le personnage (au plus un) que {@code account} possède dans
+     * {@code instance} — le "listing" centralisé ici plutôt que dispersé en appels
+     * directs à {@code CharacterDao} dans chaque contrôleur CHARSELECT/LOBBY.
+     */
+    public Optional<GamePlayer> findCharacterFor(Account account, WorldInstance instance) {
+        return characterDao.findByAccountIdAndWorldInstanceId(account.getId(), instance.getId());
+    }
+
+    /**
+     * Câble la connexion et le personnage l'un à l'autre, charge son inventaire, le
+     * fait spawn dans la {@link WorldInstance} déjà résolue via
+     * {@link #enterCharSelect}, l'enregistre comme joueur en jeu de cette instance,
+     * persiste le personnage courant du compte et fait passer la connexion en
+     * {@code INGAME}. Remplace {@code AuthWorld.moveToGameWorld} +
+     * {@code AuthWorld.enterGameWorld} fusionnés.
+     */
+    public void enterGame(Connection connection, GamePlayer character) {
+        WorldInstance instance = charSelectInstances.get(connection);
+
+        connection.setCharacter(character);
+        character.setConnection(connection);
+        character.getInventory().replaceItems(itemService.loadInventory(character));
+        spawnCharacterIntoInstance(character, instance);
+        instance.addPlayer(character);
+        accountDao.updateCurrentCharacter(character.getAccountId(), character.getId());
+
+        connection.setState(ConnectionState.INGAME);
+        MDC.put("character", character.getName());
+    }
+
+    /**
+     * Symétrique de {@link #enterGame} : persiste le personnage, le déconnecte de
+     * sa room et le retire de sa {@link WorldInstance} ; si c'était le dernier
+     * joueur en jeu de cette instance, l'évince de {@link #residentInstances} (pure
+     * éviction mémoire, aucune suppression en base). Remplace
+     * {@code AuthWorld.exitGameWorld} ; no-op hors état {@code INGAME}, appelée
+     * inconditionnellement par {@code TelnetConnection.handleClose}.
+     */
+    public void exitGame(Connection connection) {
+        if (connection.state() != ConnectionState.INGAME) {
+            return;
+        }
+
+        GamePlayer character = connection.character();
+        RoomInstance room = character.getCurrentRoom();
+        WorldInstance instance = character.getWorldInstance();
+
+        characterDao.update(character);
+        room.disconnect(character);
+        instance.removePlayer(character);
+        log.info("character.session_ended character={} room={}", character.getName(), room.getName());
+        MDC.remove("character");
+
+        if (instance.onlineCharacters().isEmpty()) {
+            residentInstances.remove(instance.getId());
+            log.info("world_instance.evicted id={} worldTemplateId={}", instance.getId(),
+                    instance.getWorldTemplateId());
         }
     }
 }

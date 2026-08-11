@@ -13,6 +13,7 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.Rarity;
 import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.Gender;
@@ -24,6 +25,7 @@ import fr.idev.mudserver.game.CombatEngine;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.game.RoomService;
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.ingame.ItemNotCarried;
 import fr.idev.mudserver.network.message.ingame.ItemNotUsable;
@@ -49,6 +51,9 @@ class UseTest extends AbstractIntegrationTest {
 
     @Autowired
     private AuthWorld authWorld;
+
+    @Autowired
+    private WorldInstanceService worldInstanceService;
 
     @Autowired
     private RoomService roomService;
@@ -199,7 +204,9 @@ class UseTest extends AbstractIntegrationTest {
                 room.getId(), Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, currentHealth, maxHealth,
                 TestAttributes.of(10, dexterity, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
-        authWorld.enterGameWorld(connection, character);
+        worldInstanceService.enterCharSelect(connection,
+                worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
+        worldInstanceService.enterGame(connection, character);
         connection.received.clear();
         return connection;
     }
