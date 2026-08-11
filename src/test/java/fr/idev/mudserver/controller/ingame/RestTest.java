@@ -83,7 +83,7 @@ class RestTest extends AbstractIntegrationTest {
     @Test
     void shortRestHealsAndAnnouncesToEveryoneOnline() {
         RecordingConnection connection = enterGame(1, 100);
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
 
         rest.onReceive(connection, "short");
 
@@ -108,7 +108,7 @@ class RestTest extends AbstractIntegrationTest {
     void shortRestInCombatIsRefused() {
         RoomInstance room = startingRoom();
         RecordingConnection connection = enterGameInRoom(1, 100, room);
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         GameMonster monster = monster(room);
         combatEngine.attack(character, monster);
         connection.received.clear();
@@ -130,7 +130,7 @@ class RestTest extends AbstractIntegrationTest {
     @Test
     void longRestWithEnoughSelectedProvisionsFullyHealsAndConsumesThem() {
         RecordingConnection connection = enterGame(1, 100);
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         Item eggs = addToInventory(character, EGGS_TEMPLATE_ID); // 15
         Item apple = addToInventory(character, APPLE_TEMPLATE_ID); // 5, total 20
         connection.queueAnswer("Oeufs");
@@ -150,7 +150,7 @@ class RestTest extends AbstractIntegrationTest {
     @Test
     void longRestWithNotEnoughSelectedProvisionsConsumesNothing() {
         RecordingConnection connection = enterGame(1, 100);
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         Item apple = addToInventory(character, APPLE_TEMPLATE_ID); // 5 < 20
         connection.queueAnswer("Pomme");
         connection.queueAnswer("done");
@@ -166,7 +166,7 @@ class RestTest extends AbstractIntegrationTest {
     @Test
     void longRestCanBeCancelledWithoutConsumingAnything() {
         RecordingConnection connection = enterGame(1, 100);
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         Item eggs = addToInventory(character, EGGS_TEMPLATE_ID);
         connection.queueAnswer("Oeufs");
         connection.queueAnswer("cancel");

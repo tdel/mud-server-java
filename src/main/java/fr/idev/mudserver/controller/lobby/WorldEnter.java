@@ -17,7 +17,6 @@ import fr.idev.mudserver.domain.PartyMember;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.WorldTemplate;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.CharacterSelectionWorld;
 import fr.idev.mudserver.game.PartyService;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.game.WorldTemplateService;
@@ -49,20 +48,17 @@ public class WorldEnter implements ControllerHandler {
     private final WorldInstanceDao worldInstanceDao;
     private final WorldInstanceService worldInstanceService;
     private final AuthWorld authWorld;
-    private final CharacterSelectionWorld characterSelectionWorld;
     private final CharSelectStatus charSelectStatus;
     private final PartyService partyService;
     private final AccountDao accountDao;
 
     public WorldEnter(WorldTemplateService worldTemplateService, WorldInstanceDao worldInstanceDao,
-            WorldInstanceService worldInstanceService, AuthWorld authWorld,
-            CharacterSelectionWorld characterSelectionWorld, CharSelectStatus charSelectStatus,
+            WorldInstanceService worldInstanceService, AuthWorld authWorld, CharSelectStatus charSelectStatus,
             PartyService partyService, AccountDao accountDao) {
         this.worldTemplateService = worldTemplateService;
         this.worldInstanceDao = worldInstanceDao;
         this.worldInstanceService = worldInstanceService;
         this.authWorld = authWorld;
-        this.characterSelectionWorld = characterSelectionWorld;
         this.charSelectStatus = charSelectStatus;
         this.partyService = partyService;
         this.accountDao = accountDao;
@@ -110,7 +106,7 @@ public class WorldEnter implements ControllerHandler {
                 .map(existing -> worldInstanceService.getOrMaterialize(existing.getId()))
                 .orElseGet(() -> worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
 
-        characterSelectionWorld.enterWorld(connection, instance);
+        authWorld.enterWorldInstance(connection, instance);
         charSelectStatus.show(connection, account, instance);
     }
 
@@ -147,7 +143,7 @@ public class WorldEnter implements ControllerHandler {
 
         for (Connection memberConnection : memberConnections) {
             Account memberAccount = authWorld.account(memberConnection);
-            characterSelectionWorld.enterWorld(memberConnection, instance);
+            authWorld.enterWorldInstance(memberConnection, instance);
             charSelectStatus.show(memberConnection, memberAccount, instance);
         }
 

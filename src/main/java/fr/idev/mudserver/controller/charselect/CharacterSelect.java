@@ -11,7 +11,6 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.CharacterSelectionWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.charselect.NowPlaying;
@@ -27,15 +26,13 @@ public class CharacterSelect implements ControllerHandler {
 
     private final CharacterDao characterDao;
     private final AuthWorld authWorld;
-    private final CharacterSelectionWorld characterSelectionWorld;
     private final CharSelectStatus charSelectStatus;
     private final Look lookAction;
 
-    public CharacterSelect(CharacterDao characterDao, AuthWorld authWorld,
-            CharacterSelectionWorld characterSelectionWorld, CharSelectStatus charSelectStatus, Look lookAction) {
+    public CharacterSelect(CharacterDao characterDao, AuthWorld authWorld, CharSelectStatus charSelectStatus,
+            Look lookAction) {
         this.characterDao = characterDao;
         this.authWorld = authWorld;
-        this.characterSelectionWorld = characterSelectionWorld;
         this.charSelectStatus = charSelectStatus;
         this.lookAction = lookAction;
     }
@@ -53,7 +50,7 @@ public class CharacterSelect implements ControllerHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         Account account = authWorld.account(connection);
-        WorldInstance instance = characterSelectionWorld.worldInstance(connection);
+        WorldInstance instance = authWorld.worldInstance(connection);
 
         Optional<GamePlayer> character = characterDao.findByAccountIdAndWorldInstanceId(account.getId(),
                 instance.getId());

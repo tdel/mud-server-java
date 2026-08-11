@@ -57,7 +57,7 @@ class AttackTest extends AbstractIntegrationTest {
     @Test
     void noArgumentWithExistingTargetReusesTargetAndDelegatesToCombatEngine() {
         RecordingConnection connection = enterGame();
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         GameMonster monster = monster(character.getCurrentRoom());
         character.setTarget(monster);
 
@@ -71,7 +71,7 @@ class AttackTest extends AbstractIntegrationTest {
     @Test
     void noArgumentWithStaleTargetThatLeftTheRoomSendsTargetNotFoundAndClearsTheTarget() {
         RecordingConnection connection = enterGame();
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         RoomInstance elsewhere = new RoomInstance(UUID.randomUUID(), "Ailleurs", "...", null);
         GameMonster monster = monster(elsewhere);
         character.setTarget(monster);
@@ -85,7 +85,7 @@ class AttackTest extends AbstractIntegrationTest {
     @Test
     void withArgumentMatchingMonsterInRoomSetsTargetAndDelegatesToCombatEngine() {
         RecordingConnection connection = enterGame();
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         GameMonster monster = monster(character.getCurrentRoom());
 
         attack.onReceive(connection, monster.getName());

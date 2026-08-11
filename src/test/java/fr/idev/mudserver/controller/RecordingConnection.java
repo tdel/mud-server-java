@@ -6,6 +6,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.function.Consumer;
 
+import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.OutputMessage;
@@ -24,6 +25,7 @@ public class RecordingConnection implements Connection {
     public final List<OutputMessage> received = new ArrayList<>();
     private final Deque<String> queuedAnswers = new ArrayDeque<>();
     private ConnectionState state = ConnectionState.INGAME;
+    private GamePlayer character;
 
     public void queueAnswer(String answer) {
         queuedAnswers.add(answer);
@@ -55,5 +57,18 @@ public class RecordingConnection implements Connection {
     @Override
     public void close() {
         // non utilisé par ces tests
+    }
+
+    @Override
+    public void setCharacter(GamePlayer character) {
+        this.character = character;
+    }
+
+    @Override
+    public GamePlayer character() {
+        if (state != ConnectionState.INGAME) {
+            throw new IllegalStateException("RecordingConnection n'est pas en état INGAME (" + state + ")");
+        }
+        return character;
     }
 }

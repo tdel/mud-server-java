@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -29,13 +28,11 @@ public class Login implements ControllerHandler {
 
     private final AccountDao accountDao;
     private final AuthWorld authWorld;
-    private final GameWorld gameWorld;
     private final PasswordEncoder passwordEncoder;
 
-    public Login(AccountDao accountDao, AuthWorld authWorld, GameWorld gameWorld, PasswordEncoder passwordEncoder) {
+    public Login(AccountDao accountDao, AuthWorld authWorld, PasswordEncoder passwordEncoder) {
         this.accountDao = accountDao;
         this.authWorld = authWorld;
-        this.gameWorld = gameWorld;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -83,8 +80,8 @@ public class Login implements ControllerHandler {
         // GamePlayer.pickUpItem/equipItem/unequipItem) sans que rien ne les protège
         // vraiment aujourd'hui si ce compte est doublé. À corriger en rendant cet
         // enregistrement atomique (ex. ConcurrentHashMap.putIfAbsent par accountId
-        // dans AuthWorld/GameWorld) plutôt qu'un scan puis un put séparé.
-        if (authWorld.isAlreadyConnected(account.getId()) || gameWorld.isAlreadyConnected(account.getId())) {
+        // dans AuthWorld) plutôt qu'un scan puis un put séparé.
+        if (authWorld.isAlreadyConnected(account.getId())) {
             log.warn("auth.login_failed account={} reason=already_connected", login);
             connection.send(new AccountAlreadyConnected(login));
             return;

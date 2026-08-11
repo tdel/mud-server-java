@@ -11,7 +11,6 @@ import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.HexDirection;
 import fr.idev.mudserver.domain.actor.GameCharacter.MovementOutcome;
 import fr.idev.mudserver.domain.actor.GamePlayer;
-import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -34,11 +33,9 @@ public class Go implements ControllerHandler {
 
     private static final int DEFAULT_STEP_COUNT = 1;
 
-    private final GameWorld gameWorld;
     private final Look lookAction;
 
-    public Go(GameWorld gameWorld, Look lookAction) {
-        this.gameWorld = gameWorld;
+    public Go(Look lookAction) {
         this.lookAction = lookAction;
     }
 
@@ -54,7 +51,7 @@ public class Go implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         String[] tokens = argument.trim().split("\\s+");
 
         if (argument.isBlank()) {

@@ -79,7 +79,7 @@ class TakeTest extends AbstractIntegrationTest {
     void successfulTakeSendsItemTakenAndMovesTheItemFromRoomToInventory() {
         itemService.warmItemTemplates();
         RecordingConnection connection = enterGame();
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         RoomInstance room = character.getCurrentRoom();
         Item item = new Item(UUID.randomUUID(), POTION_TEMPLATE_ID, room.getId(), null, null);
         itemDao.insert(item);

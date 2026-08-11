@@ -82,7 +82,7 @@ class EquipTest extends AbstractIntegrationTest {
     @Test
     void itemNotEquippableSendsItemNotEquippable() {
         RecordingConnection connection = enterGame();
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         addToInventory(character, POTION_TEMPLATE_ID);
 
         equip.onReceive(connection, "Potion de soin");
@@ -93,7 +93,7 @@ class EquipTest extends AbstractIntegrationTest {
     @Test
     void successfulEquipSendsItemEquippedWithTheResolvedSlot() {
         RecordingConnection connection = enterGame();
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         addToInventory(character, SWORD_TEMPLATE_ID);
 
         equip.onReceive(connection, "Epée courte");

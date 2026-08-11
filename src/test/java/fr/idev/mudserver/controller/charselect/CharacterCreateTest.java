@@ -16,7 +16,6 @@ import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.CharacterSelectionWorld;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.message.Usage;
@@ -50,9 +49,6 @@ class CharacterCreateTest extends AbstractIntegrationTest {
 
     @Autowired
     private AuthWorld authWorld;
-
-    @Autowired
-    private CharacterSelectionWorld characterSelectionWorld;
 
     @Autowired
     private WorldInstanceService worldInstanceService;
@@ -164,7 +160,7 @@ class CharacterCreateTest extends AbstractIntegrationTest {
         RecordingConnection connection = new RecordingConnection();
         authWorld.enterWorld(connection, account);
         WorldInstance instance = worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID);
-        characterSelectionWorld.enterWorld(connection, instance);
+        authWorld.enterWorldInstance(connection, instance);
         connection.received.clear();
         return connection;
     }

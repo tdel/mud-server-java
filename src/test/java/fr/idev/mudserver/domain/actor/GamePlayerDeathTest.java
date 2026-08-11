@@ -139,6 +139,7 @@ class GamePlayerDeathTest extends AbstractIntegrationTest {
     private static final class RecordingConnection implements Connection {
 
         private final List<OutputMessage> received = new ArrayList<>();
+        private GamePlayer character;
 
         @Override
         public void requestBlocking(OutputMessage message, Consumer<String> handler) {
@@ -163,6 +164,16 @@ class GamePlayerDeathTest extends AbstractIntegrationTest {
         @Override
         public void close() {
             // non utilisé par ces tests
+        }
+
+        @Override
+        public void setCharacter(GamePlayer character) {
+            this.character = character;
+        }
+
+        @Override
+        public GamePlayer character() {
+            return character;
         }
     }
 }

@@ -4,10 +4,12 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.CharacterClass;
@@ -63,6 +65,19 @@ public class WorldInstance {
 
     private Map<UUID, RoomInstance> roomInstances = Map.of();
 
+    /**
+     * Joueurs actuellement en jeu dans cette instance — même principe que
+     * {@link RoomInstance#clients} à l'échelle de l'instance entière plutôt que
+     * d'une seule room. Peuplé par {@code GameWorld.enterWorld}/{@code exitWorld}
+     * (le seul point d'entrée/sortie du jeu), jamais directement par un contrôleur.
+     * Remplace l'ancien registre centralisé {@code GameWorld} (une seule
+     * {@code Map<Connection, GamePlayer>} pour tout le process) : une
+     * {@code WorldInstance} est déjà une frontière d'isolation forte (ses propres
+     * {@link RoomInstance}s, monstres, PNJ, items), il n'y avait pas de raison de
+     * suivre ses joueurs ailleurs qu'ici.
+     */
+    private final Map<UUID, GamePlayer> players = new ConcurrentHashMap<>();
+
     public WorldInstance(UUID id, UUID worldTemplateId, Instant createdAt, UUID partyLeaderAccountId,
             Set<UUID> memberAccountIds) {
         this.id = id;
@@ -110,6 +125,22 @@ public class WorldInstance {
 
     public Optional<RoomInstance> startingRoomInstance() {
         return roomInstances.values().stream().filter(room -> Boolean.TRUE.equals(room.isStartingRoom())).findFirst();
+    }
+
+    public void addPlayer(GamePlayer character) {
+        players.put(character.getId(), character);
+    }
+
+    public void removePlayer(GamePlayer character) {
+        players.remove(character.getId());
+    }
+
+    public Collection<GamePlayer> onlineCharacters() {
+        return List.copyOf(players.values());
+    }
+
+    public boolean isCharacterInGame(UUID characterId) {
+        return players.containsKey(characterId);
     }
 
     public GamePlayer createCharacter(Account account, String name, Gender gender, Race race,

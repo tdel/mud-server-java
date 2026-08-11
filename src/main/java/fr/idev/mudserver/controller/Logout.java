@@ -9,14 +9,12 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.CharacterSelectionWorld;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.LoggedOut;
 import fr.idev.mudserver.network.message.charselect.StoppedPlaying;
 import fr.idev.mudserver.network.message.lobby.BackInLobby;
-import fr.idev.mudserver.persistence.AccountDao;
 
 /**
  * Utilisable depuis les états "ingame", "charselect" et "lobby". Depuis
@@ -32,15 +30,10 @@ public class Logout implements ControllerHandler {
 
     private final GameWorld gameWorld;
     private final AuthWorld authWorld;
-    private final CharacterSelectionWorld characterSelectionWorld;
-    private final AccountDao accountDao;
 
-    public Logout(GameWorld gameWorld, AuthWorld authWorld, CharacterSelectionWorld characterSelectionWorld,
-            AccountDao accountDao) {
+    public Logout(GameWorld gameWorld, AuthWorld authWorld) {
         this.gameWorld = gameWorld;
         this.authWorld = authWorld;
-        this.characterSelectionWorld = characterSelectionWorld;
-        this.accountDao = accountDao;
     }
 
     @Override
@@ -56,19 +49,17 @@ public class Logout implements ControllerHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         if (connection.state() == ConnectionState.INGAME) {
-            GamePlayer character = gameWorld.character(connection);
+            GamePlayer character = connection.character();
 
             gameWorld.exitWorld(connection);
-            Account account = accountDao.findById(character.getAccountId()).orElseThrow();
-            authWorld.enterWorld(connection, account);
-            characterSelectionWorld.enterWorld(connection, character.getWorldInstance());
+            authWorld.enterWorldInstance(connection, character.getWorldInstance());
 
             connection.send(new StoppedPlaying(character.getName()));
             return;
         }
 
         if (connection.state() == ConnectionState.CHARSELECT) {
-            characterSelectionWorld.exitWorld(connection);
+            authWorld.exitWorldInstance(connection);
             connection.send(new BackInLobby());
             return;
         }

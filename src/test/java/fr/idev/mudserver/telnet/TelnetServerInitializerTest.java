@@ -23,7 +23,6 @@ import io.netty.util.CharsetUtil;
 
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.CharacterSelectionWorld;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 
@@ -56,8 +55,8 @@ class TelnetServerInitializerTest {
         EventLoopGroup group = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
         try {
             NioSocketChannel channel = new NioSocketChannel();
-            channel.pipeline().addLast(new TelnetServerInitializer(executor, noopDispatcher(), noopAuthWorld(),
-                    new CharacterSelectionWorld(), noopGameWorld()));
+            channel.pipeline()
+                    .addLast(new TelnetServerInitializer(executor, noopDispatcher(), noopAuthWorld(), noopGameWorld()));
             group.register(channel).syncUninterruptibly();
 
             ChannelPipeline pipeline = channel.pipeline();
@@ -100,7 +99,7 @@ class TelnetServerInitializerTest {
     }
 
     private ControllerDispatcher noopDispatcher() {
-        return new ControllerDispatcher(null, null) {
+        return new ControllerDispatcher(null) {
             @Override
             public void dispatch(Connection connection, String actionName, String argument) {
                 // inutilisé : ce test vérifie la forme du pipeline, pas le traitement des

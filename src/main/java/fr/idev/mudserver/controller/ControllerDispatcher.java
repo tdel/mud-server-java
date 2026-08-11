@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.actor.GamePlayer;
-import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ActionNotFound;
@@ -32,16 +31,14 @@ public class ControllerDispatcher {
             "stats");
 
     private final ControllerRegistry registry;
-    private final GameWorld gameWorld;
 
-    public ControllerDispatcher(ControllerRegistry registry, GameWorld gameWorld) {
+    public ControllerDispatcher(ControllerRegistry registry) {
         this.registry = registry;
-        this.gameWorld = gameWorld;
     }
 
     public void dispatch(Connection connection, String actionName, String argument) {
         if (connection.state() == ConnectionState.INGAME) {
-            GamePlayer character = gameWorld.character(connection);
+            GamePlayer character = connection.character();
             if (character != null && character.isInCombat() && !COMBAT_ALLOWED_VERBS.contains(actionName)) {
                 log.debug("combat.action_blocked verb={} character={}", actionName, character.getName());
                 connection.send(new CombatActionRequired());

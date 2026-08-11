@@ -17,7 +17,6 @@ import io.netty.channel.embedded.EmbeddedChannel;
 
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.CharacterSelectionWorld;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 
@@ -107,8 +106,7 @@ class TelnetSessionHandlerTest {
     }
 
     private EmbeddedChannel openChannel() {
-        return new EmbeddedChannel(
-                new TelnetSessionHandler(executor, dispatcher, authWorld, new CharacterSelectionWorld(), gameWorld));
+        return new EmbeddedChannel(new TelnetSessionHandler(executor, dispatcher, authWorld, gameWorld));
     }
 
     private void await(CountDownLatch latch) {
@@ -149,7 +147,7 @@ class TelnetSessionHandlerTest {
         private volatile String observedConnectionIdWhenCalled;
 
         RecordingDispatcher() {
-            super(null, null);
+            super(null);
         }
 
         @Override

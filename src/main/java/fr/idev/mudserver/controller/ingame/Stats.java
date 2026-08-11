@@ -5,19 +5,12 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ingame.GamePlayerStats;
 
 @Component
 public class Stats implements ControllerHandler {
-
-    private final GameWorld gameWorld;
-
-    public Stats(GameWorld gameWorld) {
-        this.gameWorld = gameWorld;
-    }
 
     @Override
     public String name() {
@@ -31,6 +24,6 @@ public class Stats implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        connection.send(new GamePlayerStats(gameWorld.character(connection)));
+        connection.send(new GamePlayerStats(connection.character()));
     }
 }

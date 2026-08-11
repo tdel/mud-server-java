@@ -9,7 +9,6 @@ import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.game.CombatEngine;
-import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -23,11 +22,9 @@ import fr.idev.mudserver.network.message.ingame.ItemNotCarried;
 @Component
 public class Use implements ControllerHandler {
 
-    private final GameWorld gameWorld;
     private final CombatEngine combatEngine;
 
-    public Use(GameWorld gameWorld, CombatEngine combatEngine) {
-        this.gameWorld = gameWorld;
+    public Use(CombatEngine combatEngine) {
         this.combatEngine = combatEngine;
     }
 
@@ -43,7 +40,7 @@ public class Use implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         String name = argument.trim();
 
         if (name.isEmpty()) {

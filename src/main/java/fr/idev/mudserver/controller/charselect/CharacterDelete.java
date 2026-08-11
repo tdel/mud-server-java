@@ -13,8 +13,6 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.CharacterSelectionWorld;
-import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -32,17 +30,13 @@ public class CharacterDelete implements ControllerHandler {
     private final CharacterDao characterDao;
     private final AccountDao accountDao;
     private final AuthWorld authWorld;
-    private final CharacterSelectionWorld characterSelectionWorld;
-    private final GameWorld gameWorld;
     private final CharSelectStatus charSelectStatus;
 
     public CharacterDelete(CharacterDao characterDao, AccountDao accountDao, AuthWorld authWorld,
-            CharacterSelectionWorld characterSelectionWorld, GameWorld gameWorld, CharSelectStatus charSelectStatus) {
+            CharSelectStatus charSelectStatus) {
         this.characterDao = characterDao;
         this.accountDao = accountDao;
         this.authWorld = authWorld;
-        this.characterSelectionWorld = characterSelectionWorld;
-        this.gameWorld = gameWorld;
         this.charSelectStatus = charSelectStatus;
     }
 
@@ -66,7 +60,7 @@ public class CharacterDelete implements ControllerHandler {
         }
 
         Account account = authWorld.account(connection);
-        WorldInstance instance = characterSelectionWorld.worldInstance(connection);
+        WorldInstance instance = authWorld.worldInstance(connection);
 
         Optional<GamePlayer> character = characterDao.findByAccountIdAndName(account.getId(), instance.getId(), name);
         if (character.isEmpty()) {
@@ -77,7 +71,7 @@ public class CharacterDelete implements ControllerHandler {
 
         UUID characterId = character.get().getId();
 
-        if (gameWorld.isCharacterInGame(characterId)) {
+        if (instance.isCharacterInGame(characterId)) {
             connection.send(new CharacterCurrentlyInGame(name));
             charSelectStatus.show(connection, account, instance);
             return;

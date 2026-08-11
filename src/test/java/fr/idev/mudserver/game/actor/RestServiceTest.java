@@ -66,10 +66,14 @@ class RestServiceTest extends AbstractIntegrationTest {
     void shortRestHealsEveryOnlinePlayerWithTheirOwnFormula() {
         // FIGHTER (hitDie 10) et WIZARD (hitDie 6), CON 10 (modificateur nul) :
         // hpGain = hitDie/2 + 1 = 6 et 4 respectivement.
-        RecordingConnection aConnection = enterGame(1, 100, CharacterClass.FIGHTER);
-        GamePlayer a = gameWorld.character(aConnection);
-        RecordingConnection bConnection = enterGame(1, 100, CharacterClass.WIZARD);
-        GamePlayer b = gameWorld.character(bConnection);
+        // Même RoomInstance résolue une seule fois pour les deux joueurs : un second
+        // appel à startingRoom()/warmRooms() rematérialiserait une toute nouvelle
+        // WorldInstance (voir sa Javadoc), orpheline du joueur déjà enregistré dessus.
+        RoomInstance room = startingRoom();
+        RecordingConnection aConnection = enterGameInRoom(1, 100, CharacterClass.FIGHTER, room);
+        GamePlayer a = aConnection.character();
+        RecordingConnection bConnection = enterGameInRoom(1, 100, CharacterClass.WIZARD, room);
+        GamePlayer b = bConnection.character();
 
         RestService.RestOutcome outcome = restService.shortRest(a);
 
@@ -83,7 +87,7 @@ class RestServiceTest extends AbstractIntegrationTest {
     @Test
     void shortRestIsRefusedPastTheCapAndNothingChanges() {
         RecordingConnection connection = enterGame(1, 100, CharacterClass.FIGHTER);
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         restService.shortRest(character);
         restService.shortRest(character);
         int healthAfterTwoRests = character.getCurrentHealth();
@@ -99,7 +103,7 @@ class RestServiceTest extends AbstractIntegrationTest {
     void shortRestIsRefusedInCombatAndNothingChanges() {
         RoomInstance room = startingRoom();
         RecordingConnection connection = enterGameInRoom(1, 100, CharacterClass.FIGHTER, room);
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         GameMonster monster = monster(room);
         combatEngine.attack(character, monster);
 
@@ -113,7 +117,7 @@ class RestServiceTest extends AbstractIntegrationTest {
     @Test
     void longRestFailsUnderTheProvisionThresholdAndConsumesNothing() {
         RecordingConnection connection = enterGame(1, 100, CharacterClass.FIGHTER);
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         Item apple = addToInventory(character, APPLE_TEMPLATE_ID);
 
         RestService.RestOutcome outcome = restService.longRest(character, List.of(apple));
@@ -126,10 +130,13 @@ class RestServiceTest extends AbstractIntegrationTest {
 
     @Test
     void longRestFullyHealsEveryoneOnlineResetsTheCounterAndConsumesTheFood() {
-        RecordingConnection aConnection = enterGame(1, 100, CharacterClass.FIGHTER);
-        GamePlayer a = gameWorld.character(aConnection);
-        RecordingConnection bConnection = enterGame(1, 50, CharacterClass.WIZARD);
-        GamePlayer b = gameWorld.character(bConnection);
+        // Même RoomInstance résolue une seule fois pour les deux joueurs, voir le
+        // commentaire équivalent de shortRestHealsEveryOnlinePlayerWithTheirOwnFormula.
+        RoomInstance room = startingRoom();
+        RecordingConnection aConnection = enterGameInRoom(1, 100, CharacterClass.FIGHTER, room);
+        GamePlayer a = aConnection.character();
+        RecordingConnection bConnection = enterGameInRoom(1, 50, CharacterClass.WIZARD, room);
+        GamePlayer b = bConnection.character();
         restService.shortRest(a); // fait monter les deux compteurs à 1, pour prouver le reset
 
         Item eggs = addToInventory(a, EGGS_TEMPLATE_ID); // 15
@@ -151,7 +158,7 @@ class RestServiceTest extends AbstractIntegrationTest {
     void longRestIsRefusedInCombatAndConsumesNothing() {
         RoomInstance room = startingRoom();
         RecordingConnection connection = enterGameInRoom(1, 100, CharacterClass.FIGHTER, room);
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         GameMonster monster = monster(room);
         combatEngine.attack(character, monster);
         Item eggs = addToInventory(character, EGGS_TEMPLATE_ID);

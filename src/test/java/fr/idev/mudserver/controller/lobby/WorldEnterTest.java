@@ -12,7 +12,6 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.CharacterSelectionWorld;
 import fr.idev.mudserver.game.PartyService;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.game.WorldInstanceService;
@@ -48,9 +47,6 @@ class WorldEnterTest extends AbstractIntegrationTest {
 
     @Autowired
     private AuthWorld authWorld;
-
-    @Autowired
-    private CharacterSelectionWorld characterSelectionWorld;
 
     @Autowired
     private WorldInstanceService worldInstanceService;
@@ -91,7 +87,7 @@ class WorldEnterTest extends AbstractIntegrationTest {
 
         assertThat(connection.state()).isEqualTo(ConnectionState.CHARSELECT);
         assertThat(connection.received).anyMatch(NoCharacterInWorld.class::isInstance);
-        assertThat(characterSelectionWorld.worldInstance(connection)).isNotNull();
+        assertThat(authWorld.worldInstance(connection)).isNotNull();
     }
 
     @Test
@@ -147,8 +143,8 @@ class WorldEnterTest extends AbstractIntegrationTest {
 
         assertThat(leader.state()).isEqualTo(ConnectionState.CHARSELECT);
         assertThat(member.state()).isEqualTo(ConnectionState.CHARSELECT);
-        WorldInstance leaderInstance = characterSelectionWorld.worldInstance(leader);
-        WorldInstance memberInstance = characterSelectionWorld.worldInstance(member);
+        WorldInstance leaderInstance = authWorld.worldInstance(leader);
+        WorldInstance memberInstance = authWorld.worldInstance(member);
         assertThat(leaderInstance.getId()).isEqualTo(memberInstance.getId());
         assertThat(worldInstanceDao.findById(leaderInstance.getId())).isPresent();
         assertThat(partyService.partyOf(leaderAccount.getId())).isEmpty();
@@ -170,8 +166,8 @@ class WorldEnterTest extends AbstractIntegrationTest {
         partyAccept.onReceive(memberB, "");
         worldEnter.onReceive(leaderB, "arena");
 
-        WorldInstance instanceA = characterSelectionWorld.worldInstance(leaderA);
-        WorldInstance instanceB = characterSelectionWorld.worldInstance(leaderB);
+        WorldInstance instanceA = authWorld.worldInstance(leaderA);
+        WorldInstance instanceB = authWorld.worldInstance(leaderB);
         assertThat(instanceA.getId()).isNotEqualTo(instanceB.getId());
 
         RoomInstance startingRoomA = instanceA.startingRoomInstance().orElseThrow();

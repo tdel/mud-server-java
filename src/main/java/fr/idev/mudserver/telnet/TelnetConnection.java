@@ -10,8 +10,8 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 
 import fr.idev.mudserver.controller.ControllerDispatcher;
+import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.CharacterSelectionWorld;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -32,20 +32,19 @@ public class TelnetConnection implements Connection, TelnetOutput {
     private final Channel channel;
     private final ControllerDispatcher controllerDispatcher;
     private final AuthWorld authWorld;
-    private final CharacterSelectionWorld characterSelectionWorld;
     private final GameWorld gameWorld;
 
     private ConnectionState state = ConnectionState.CONNECTED;
+    private GamePlayer character;
     private Consumer<String> pendingLine;
     private boolean pendingLineSecure;
 
     public TelnetConnection(String connectionId, Channel channel, ControllerDispatcher controllerDispatcher,
-            AuthWorld authWorld, CharacterSelectionWorld characterSelectionWorld, GameWorld gameWorld) {
+            AuthWorld authWorld, GameWorld gameWorld) {
         this.connectionId = connectionId;
         this.channel = channel;
         this.controllerDispatcher = controllerDispatcher;
         this.authWorld = authWorld;
-        this.characterSelectionWorld = characterSelectionWorld;
         this.gameWorld = gameWorld;
     }
 
@@ -91,7 +90,7 @@ public class TelnetConnection implements Connection, TelnetOutput {
             log.error("telnet.disconnect_cleanup_failed stage=game", e);
         }
         try {
-            characterSelectionWorld.exitWorld(this);
+            authWorld.exitWorldInstance(this);
         } catch (Exception e) {
             log.error("telnet.disconnect_cleanup_failed stage=charselect", e);
         }
@@ -158,5 +157,18 @@ public class TelnetConnection implements Connection, TelnetOutput {
     @Override
     public void setState(ConnectionState state) {
         this.state = state;
+    }
+
+    @Override
+    public void setCharacter(GamePlayer character) {
+        this.character = character;
+    }
+
+    @Override
+    public GamePlayer character() {
+        if (state != ConnectionState.INGAME) {
+            throw new IllegalStateException("Connection " + connectionId + " n'est pas en état INGAME (" + state + ")");
+        }
+        return character;
     }
 }

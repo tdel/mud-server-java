@@ -11,7 +11,6 @@ import io.netty.channel.embedded.EmbeddedChannel;
 
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.CharacterSelectionWorld;
 import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.OutputMessage;
@@ -37,10 +36,9 @@ class TelnetConnectionTest {
     private final EmbeddedChannel channel = new EmbeddedChannel();
     private final RecordingDispatcher dispatcher = new RecordingDispatcher();
     private final RecordingAuthWorld authWorld = new RecordingAuthWorld();
-    private final RecordingCharacterSelectionWorld characterSelectionWorld = new RecordingCharacterSelectionWorld();
     private final RecordingGameWorld gameWorld = new RecordingGameWorld();
     private final TelnetConnection connection = new TelnetConnection("conn-1", channel, dispatcher, authWorld,
-            characterSelectionWorld, gameWorld);
+            gameWorld);
 
     @Test
     void handleLineWithNoPendingPromptSplitsVerbAndArgumentAndDispatches() {
@@ -84,7 +82,7 @@ class TelnetConnectionTest {
         connection.handleClose();
 
         assertThat(gameWorld.exitWorldCalled).isTrue();
-        assertThat(characterSelectionWorld.exitWorldCalled).isTrue();
+        assertThat(authWorld.exitWorldInstanceCalled).isTrue();
         assertThat(authWorld.exitWorldCalled).isTrue();
     }
 
@@ -93,7 +91,7 @@ class TelnetConnectionTest {
         connection.handleClose();
 
         assertThat(gameWorld.exitWorldCalled).isTrue();
-        assertThat(characterSelectionWorld.exitWorldCalled).isTrue();
+        assertThat(authWorld.exitWorldInstanceCalled).isTrue();
         assertThat(authWorld.exitWorldCalled).isTrue();
     }
 
@@ -174,7 +172,7 @@ class TelnetConnectionTest {
         private RuntimeException exceptionToThrow;
 
         RecordingDispatcher() {
-            super(null, null);
+            super(null);
         }
 
         @Override
@@ -189,6 +187,7 @@ class TelnetConnectionTest {
     private static final class RecordingAuthWorld extends AuthWorld {
 
         private boolean exitWorldCalled;
+        private boolean exitWorldInstanceCalled;
 
         RecordingAuthWorld() {
             super(null, null);
@@ -198,15 +197,10 @@ class TelnetConnectionTest {
         public void exitWorld(Connection connection) {
             exitWorldCalled = true;
         }
-    }
-
-    private static final class RecordingCharacterSelectionWorld extends CharacterSelectionWorld {
-
-        private boolean exitWorldCalled;
 
         @Override
-        public void exitWorld(Connection connection) {
-            exitWorldCalled = true;
+        public void exitWorldInstance(Connection connection) {
+            exitWorldInstanceCalled = true;
         }
     }
 

@@ -15,14 +15,13 @@ import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.LongRestTaken;
 import fr.idev.mudserver.domain.actor.event.ShortRestTaken;
-import fr.idev.mudserver.game.GameWorld;
 
 /**
  * Orchestre un repos court/long — contrairement aux mutations habituelles
  * portées par une seule méthode {@link GamePlayer}, un repos affecte
  * simultanément tous les joueurs actuellement en ligne dans la même
  * {@code WorldInstance} que l'initiateur
- * ({@link GameWorld#onlineCharactersInWorldInstance(java.util.UUID)}), donc
+ * ({@link fr.idev.mudserver.domain.WorldInstance#onlineCharacters()}), donc
  * aucun objet de domaine unique ne peut porter cette logique.
  * {@code game.CombatEngine} est le précédent dans ce projet pour un
  * {@code @Service} qui mute directement plusieurs {@code GameCharacter} avant
@@ -48,12 +47,6 @@ public class RestService {
      * consommé (voir {@code controller.ingame.Rest}).
      */
     public static final int LONG_REST_PROVISION_THRESHOLD = 20;
-
-    private final GameWorld gameWorld;
-
-    public RestService(GameWorld gameWorld) {
-        this.gameWorld = gameWorld;
-    }
 
     public sealed interface RestOutcome {
 
@@ -88,7 +81,7 @@ public class RestService {
         }
 
         Map<GamePlayer, Integer> healedAmounts = new LinkedHashMap<>();
-        for (GamePlayer character : gameWorld.onlineCharactersInWorldInstance(initiator.getWorldInstanceId())) {
+        for (GamePlayer character : initiator.getWorldInstance().onlineCharacters()) {
             int hitDie = character.getCharacterClass().hitDie();
             int constitutionModifier = character.getModifier(Attribute.CONSTITUTION);
             int amount = Math.max(1, hitDie / 2 + 1 + constitutionModifier);
@@ -126,7 +119,7 @@ public class RestService {
         }
 
         Map<GamePlayer, Integer> healedAmounts = new LinkedHashMap<>();
-        for (GamePlayer character : gameWorld.onlineCharactersInWorldInstance(initiator.getWorldInstanceId())) {
+        for (GamePlayer character : initiator.getWorldInstance().onlineCharacters()) {
             healedAmounts.put(character, character.heal(character.getMaxHealth()));
             character.resetShortRestCount();
         }

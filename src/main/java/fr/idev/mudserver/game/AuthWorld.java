@@ -11,23 +11,43 @@ import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.Account;
+import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.OutputMessage;
 
 /**
- * Suit tous les clients authentifiés mais pas encore en train de jouer, et le
- * compte associé à chacun — remplace le {@code SplObjectStorage} PHP par un
- * {@link ConcurrentHashMap}, dont l'itérateur (voir
- * {@link #isAlreadyConnected}) tolère un ajout/retrait concurrent sans copie
- * défensive préalable, contrairement à l'original. Le compte vit ici plutôt que
- * sur la session elle-même : {@code Connection} n'a donc pas besoin d'exposer
- * d'accesseur de compte.
+ * Suit tous les clients authentifiés — compte et, une fois choisie, la
+ * {@link WorldInstance} en cours — pour l'ensemble des états {@code LOBBY},
+ * {@code CHARSELECT} et {@code INGAME}, jusqu'au logout ou à la déconnexion.
+ * Fusionne ce qui était auparavant deux registres parallèles ({@code AuthWorld}
+ * pour le compte, {@code CharacterSelectionWorld} pour l'instance) qui
+ * divergeaient silencieusement l'un de l'autre : l'ancien {@code AuthWorld}
+ * retirait la connexion de sa map au passage en {@code INGAME}
+ * ({@code moveToGameWorld}), alors que {@code CharacterSelectionWorld} ne la
+ * retirait jamais — {@code authWorld.account(connection)} devenait donc
+ * injoignable en jeu alors que {@code characterSelectionWorld.worldInstance
+ * (connection)} restait valide. En ne retirant plus rien avant le retour à
+ * {@code CONNECTED}, {@code AuthWorld} devient la seule source de vérité "quel
+ * compte / quelle instance pour cette connexion", quel que soit l'état — ce qui
+ * simplifie au passage {@code controller.Logout} (plus besoin de recharger le
+ * compte via {@code AccountDao} ni de le ré-enregistrer au retour en
+ * {@code CHARSELECT}, {@code Connection} n'a donc pas besoin d'exposer
+ * d'accesseur de compte). Le compte vit ici plutôt que sur la session
+ * elle-même, sur le même principe pour l'instance : {@code Connection} n'a
+ * besoin que de porter son propre personnage (voir {@code character()}), pas ce
+ * qui l'entoure.
+ *
+ * <p>
+ * Remplace le {@code SplObjectStorage} PHP par un {@link ConcurrentHashMap},
+ * dont l'itérateur (voir {@link #isAlreadyConnected}) tolère un ajout/retrait
+ * concurrent sans copie défensive préalable, contrairement à l'original.
  */
 @Component
 public class AuthWorld {
 
-    private final Map<Connection, Account> connections = new ConcurrentHashMap<>();
+    private final Map<Connection, Account> accounts = new ConcurrentHashMap<>();
+    private final Map<Connection, WorldInstance> worldInstances = new ConcurrentHashMap<>();
 
     private final GameWorld gameWorld;
     private final AccountDao accountDao;
@@ -38,19 +58,47 @@ public class AuthWorld {
     }
 
     public void enterWorld(Connection connection, Account account) {
-        connections.put(connection, account);
+        accounts.put(connection, account);
         connection.setState(ConnectionState.LOBBY);
         MDC.put("account", account.getLogin());
     }
 
     public void exitWorld(Connection connection) {
-        connections.remove(connection);
+        accounts.remove(connection);
+        worldInstances.remove(connection);
         connection.setState(ConnectionState.CONNECTED);
         MDC.remove("account");
     }
 
+    /**
+     * Remplace {@code CharacterSelectionWorld.enterWorld} : la connexion reste par
+     * ailleurs enregistrée dans {@link #accounts} tout du long (jamais retirée par
+     * cette méthode), donc {@code CharacterCreate}/{@code CharacterSelect}/
+     * {@code CharacterDelete} ont simultanément accès au compte via
+     * {@link #account} et à l'instance courante via {@link #worldInstance}.
+     */
+    public void enterWorldInstance(Connection connection, WorldInstance instance) {
+        worldInstances.put(connection, instance);
+        connection.setState(ConnectionState.CHARSELECT);
+    }
+
+    /**
+     * Remplace {@code CharacterSelectionWorld.exitWorld}.
+     */
+    public void exitWorldInstance(Connection connection) {
+        worldInstances.remove(connection);
+        connection.setState(ConnectionState.LOBBY);
+    }
+
+    /**
+     * Ne retire plus la connexion d'{@link #accounts} (contrairement au
+     * comportement d'origine) : {@link #account} reste résolvable pendant tout
+     * l'état {@code INGAME}, voir la Javadoc de classe. {@link #worldInstances}
+     * n'est pas non plus touché ici : l'instance choisie reste celle dans laquelle
+     * le personnage vient d'entrer.
+     */
     public void moveToGameWorld(Connection connection, GamePlayer character) {
-        Account account = connections.remove(connection);
+        Account account = accounts.get(connection);
 
         accountDao.updateCurrentCharacter(account.getId(), character.getId());
 
@@ -59,17 +107,21 @@ public class AuthWorld {
     }
 
     public Account account(Connection connection) {
-        return connections.get(connection);
+        return accounts.get(connection);
+    }
+
+    public WorldInstance worldInstance(Connection connection) {
+        return worldInstances.get(connection);
     }
 
     /**
      * Diffuse {@code message} à toute connexion actuellement en {@code LOBBY} —
-     * exclut volontairement {@code CHARSELECT}, bien que {@link #connections} suive
-     * les deux états (voir la Javadoc de {@link #findConnectionByLogin}).
+     * exclut volontairement {@code CHARSELECT}, bien que {@link #accounts} suive
+     * aussi cet état (voir la Javadoc de {@link #findConnectionByLogin}).
      * Symétrique de {@code WorldInstanceService#broadcastToInstance} côté lobby.
      */
     public void broadcastToLobby(OutputMessage message, Connection exclude) {
-        for (Connection connection : connections.keySet()) {
+        for (Connection connection : accounts.keySet()) {
             if (connection == exclude || connection.state() != ConnectionState.LOBBY)
                 continue;
             connection.send(message);
@@ -77,16 +129,17 @@ public class AuthWorld {
     }
 
     public boolean isAlreadyConnected(UUID accountId) {
-        return connections.values().stream().anyMatch(account -> account.getId().equals(accountId));
+        return accounts.values().stream().anyMatch(account -> account.getId().equals(accountId));
     }
 
     /**
-     * Résout un login vers sa connexion vivante actuelle (LOBBY ou CHARSELECT, voir
-     * la Javadoc de classe) — utilisé par {@code controller.lobby.PartyInvite} pour
-     * vérifier qu'une cible est bien joignable avant de lui envoyer une invitation.
+     * Résout un login vers sa connexion vivante actuelle (LOBBY, CHARSELECT ou
+     * désormais aussi INGAME, voir la Javadoc de classe) — utilisé par
+     * {@code controller.lobby.PartyInvite} pour vérifier qu'une cible est bien
+     * joignable avant de lui envoyer une invitation.
      */
     public Optional<Connection> findConnectionByLogin(String login) {
-        return connections.entrySet().stream().filter(entry -> entry.getValue().getLogin().equalsIgnoreCase(login))
+        return accounts.entrySet().stream().filter(entry -> entry.getValue().getLogin().equalsIgnoreCase(login))
                 .map(Map.Entry::getKey).findFirst();
     }
 
@@ -97,7 +150,7 @@ public class AuthWorld {
      * vers sa connexion courante au moment du lancement.
      */
     public Optional<Connection> findConnectionByAccountId(UUID accountId) {
-        return connections.entrySet().stream().filter(entry -> entry.getValue().getId().equals(accountId))
+        return accounts.entrySet().stream().filter(entry -> entry.getValue().getId().equals(accountId))
                 .map(Map.Entry::getKey).findFirst();
     }
 }

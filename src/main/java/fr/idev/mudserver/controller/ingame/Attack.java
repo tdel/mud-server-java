@@ -9,7 +9,6 @@ import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.CombatEngine;
-import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ingame.NoTargetSelected;
@@ -28,11 +27,9 @@ import fr.idev.mudserver.network.message.ingame.TargetNotFound;
 @Component
 public class Attack implements ControllerHandler {
 
-    private final GameWorld gameWorld;
     private final CombatEngine combatEngine;
 
-    public Attack(GameWorld gameWorld, CombatEngine combatEngine) {
-        this.gameWorld = gameWorld;
+    public Attack(CombatEngine combatEngine) {
         this.combatEngine = combatEngine;
     }
 
@@ -48,7 +45,7 @@ public class Attack implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         String name = argument.trim();
 
         GameMonster target;

@@ -89,7 +89,7 @@ class UseTest extends AbstractIntegrationTest {
     @Test
     void nonConsumableItemSendsItemNotUsable() {
         RecordingConnection connection = enterGame(10, 10, 10);
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         Item sword = addToInventory(character, SWORD_TEMPLATE_ID);
 
         use.onReceive(connection, "Epée courte");
@@ -101,7 +101,7 @@ class UseTest extends AbstractIntegrationTest {
     @Test
     void outOfCombatHealsTheCharacterAndConsumesThePotion() {
         RecordingConnection connection = enterGame(5, 50, 10);
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         Item potion = addToInventory(character, POTION_TEMPLATE_ID);
 
         use.onReceive(connection, "Potion de soin");
@@ -117,7 +117,7 @@ class UseTest extends AbstractIntegrationTest {
     @Test
     void outOfCombatAtFullHealthStillConsumesThePotionWithoutOverhealing() {
         RecordingConnection connection = enterGame(1000, 1000, 10);
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         addToInventory(character, POTION_TEMPLATE_ID);
 
         use.onReceive(connection, "Potion de soin");
@@ -133,7 +133,7 @@ class UseTest extends AbstractIntegrationTest {
         // DEX 100 vs DEX 10 : le joueur gagne quasi systématiquement l'initiative,
         // même convention que CombatEngineTest.
         RecordingConnection connection = enterGameInRoom(50, 1000, 100, room);
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         GameMonster monster = monster(room, 10, "1d4");
         Item potion = addToInventory(character, POTION_TEMPLATE_ID);
 
@@ -156,13 +156,13 @@ class UseTest extends AbstractIntegrationTest {
     void duringCombatWhenNotYourTurnSendsNotYourTurnAndKeepsTheItem() {
         RoomInstance room = startingRoom();
         RecordingConnection aConnection = enterGameInRoom(1000, 1000, 100, room);
-        GamePlayer a = gameWorld.character(aConnection);
+        GamePlayer a = aConnection.character();
         GameMonster monster = monster(room, 10, "1d4");
         combatEngine.attack(a, monster);
         assertThat(a.getEncounter().currentParticipant()).isEqualTo(a);
 
         RecordingConnection bConnection = enterGameInRoom(1000, 1000, 10, room);
-        GamePlayer b = gameWorld.character(bConnection);
+        GamePlayer b = bConnection.character();
         Item potion = addToInventory(b, POTION_TEMPLATE_ID);
         combatEngine.attack(b, monster); // rejoint l'affrontement, n'agit pas encore
         bConnection.received.clear();

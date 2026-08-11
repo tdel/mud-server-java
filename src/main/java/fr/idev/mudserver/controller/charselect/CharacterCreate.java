@@ -16,7 +16,6 @@ import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.CharacterSelectionWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -34,14 +33,11 @@ import fr.idev.mudserver.persistence.CharacterDao;
 public class CharacterCreate implements ControllerHandler {
 
     private final AuthWorld authWorld;
-    private final CharacterSelectionWorld characterSelectionWorld;
     private final CharacterDao characterDao;
     private final CharSelectStatus charSelectStatus;
 
-    public CharacterCreate(AuthWorld authWorld, CharacterSelectionWorld characterSelectionWorld,
-            CharacterDao characterDao, CharSelectStatus charSelectStatus) {
+    public CharacterCreate(AuthWorld authWorld, CharacterDao characterDao, CharSelectStatus charSelectStatus) {
         this.authWorld = authWorld;
-        this.characterSelectionWorld = characterSelectionWorld;
         this.characterDao = characterDao;
         this.charSelectStatus = charSelectStatus;
     }
@@ -66,7 +62,7 @@ public class CharacterCreate implements ControllerHandler {
         }
 
         Account account = authWorld.account(connection);
-        WorldInstance instance = characterSelectionWorld.worldInstance(connection);
+        WorldInstance instance = authWorld.worldInstance(connection);
 
         if (characterDao.findByAccountIdAndWorldInstanceId(account.getId(), instance.getId()).isPresent()) {
             charSelectStatus.show(connection, account, instance);

@@ -12,7 +12,6 @@ import fr.idev.mudserver.domain.FoodItem;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemType;
 import fr.idev.mudserver.domain.actor.GamePlayer;
-import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.actor.RestService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -42,11 +41,9 @@ import fr.idev.mudserver.network.message.ingame.ProvisionSelection;
 @Component
 public class Rest implements ControllerHandler {
 
-    private final GameWorld gameWorld;
     private final RestService restService;
 
-    public Rest(GameWorld gameWorld, RestService restService) {
-        this.gameWorld = gameWorld;
+    public Rest(RestService restService) {
         this.restService = restService;
     }
 
@@ -62,7 +59,7 @@ public class Rest implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         String choice = argument.trim();
 
         switch (choice.toLowerCase()) {

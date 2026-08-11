@@ -10,7 +10,6 @@ import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.Rarity;
-import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -20,12 +19,6 @@ import fr.idev.mudserver.network.message.ingame.ItemNotEquippable;
 
 @Component
 public class Equip implements ControllerHandler {
-
-    private final GameWorld gameWorld;
-
-    public Equip(GameWorld gameWorld) {
-        this.gameWorld = gameWorld;
-    }
 
     @Override
     public String name() {
@@ -39,7 +32,7 @@ public class Equip implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         String name = argument.trim();
 
         if (name.isEmpty()) {

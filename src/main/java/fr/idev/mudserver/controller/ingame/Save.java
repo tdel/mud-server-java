@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.GamePlayer;
-import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -19,12 +18,6 @@ import fr.idev.mudserver.network.message.ingame.CheckOutcome;
 public class Save implements ControllerHandler {
 
     private static final String USAGE = "save <attribute> <dc>";
-
-    private final GameWorld gameWorld;
-
-    public Save(GameWorld gameWorld) {
-        this.gameWorld = gameWorld;
-    }
 
     @Override
     public String name() {
@@ -53,7 +46,7 @@ public class Save implements ControllerHandler {
             return;
         }
 
-        GamePlayer character = gameWorld.character(connection);
+        GamePlayer character = connection.character();
         connection.send(new CheckOutcome(character.save(attribute, dc)));
     }
 

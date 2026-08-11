@@ -15,7 +15,6 @@ import io.netty.util.AttributeKey;
 
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.CharacterSelectionWorld;
 import fr.idev.mudserver.game.GameWorld;
 
 /**
@@ -50,15 +49,13 @@ public class TelnetSessionHandler extends SimpleChannelInboundHandler<String> {
     private final ExecutorService virtualThreadExecutor;
     private final ControllerDispatcher controllerDispatcher;
     private final AuthWorld authWorld;
-    private final CharacterSelectionWorld characterSelectionWorld;
     private final GameWorld gameWorld;
 
     public TelnetSessionHandler(ExecutorService virtualThreadExecutor, ControllerDispatcher controllerDispatcher,
-            AuthWorld authWorld, CharacterSelectionWorld characterSelectionWorld, GameWorld gameWorld) {
+            AuthWorld authWorld, GameWorld gameWorld) {
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.controllerDispatcher = controllerDispatcher;
         this.authWorld = authWorld;
-        this.characterSelectionWorld = characterSelectionWorld;
         this.gameWorld = gameWorld;
     }
 
@@ -67,7 +64,7 @@ public class TelnetSessionHandler extends SimpleChannelInboundHandler<String> {
         String connectionId = "conn-" + CONNECTION_SEQUENCE.incrementAndGet();
         log.info("telnet.connection_opened remote={} connectionId={}", ctx.channel().remoteAddress(), connectionId);
         TelnetConnection connection = new TelnetConnection(connectionId, ctx.channel(), controllerDispatcher, authWorld,
-                characterSelectionWorld, gameWorld);
+                gameWorld);
         BlockingQueue<String> inbox = new LinkedBlockingQueue<>();
         ctx.channel().attr(CONNECTION_KEY).set(connection);
         ctx.channel().attr(INBOX_KEY).set(inbox);

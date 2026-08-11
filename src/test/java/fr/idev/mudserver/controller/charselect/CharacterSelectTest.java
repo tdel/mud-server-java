@@ -21,8 +21,6 @@ import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.CharacterSelectionWorld;
-import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.ConnectionState;
@@ -56,13 +54,7 @@ class CharacterSelectTest extends AbstractIntegrationTest {
     private AuthWorld authWorld;
 
     @Autowired
-    private CharacterSelectionWorld characterSelectionWorld;
-
-    @Autowired
     private WorldInstanceService worldInstanceService;
-
-    @Autowired
-    private GameWorld gameWorld;
 
     @Autowired
     private RoomService roomService;
@@ -97,7 +89,7 @@ class CharacterSelectTest extends AbstractIntegrationTest {
         assertThat(connection.state()).isEqualTo(ConnectionState.INGAME);
         assertThat(connection.received).anyMatch(message -> message.equals(new NowPlaying("Hero")));
         assertThat(connection.received).anyMatch(RoomDescription.class::isInstance);
-        assertThat(gameWorld.character(connection).getName()).isEqualTo("Hero");
+        assertThat(connection.character().getName()).isEqualTo("Hero");
     }
 
     /**
@@ -121,7 +113,7 @@ class CharacterSelectTest extends AbstractIntegrationTest {
         Account account = authWorld.account(leader);
 
         worldEnter.onReceive(leader, "arena");
-        WorldInstance arenaInstance = characterSelectionWorld.worldInstance(leader);
+        WorldInstance arenaInstance = authWorld.worldInstance(leader);
         assertThat(arenaInstance.getId()).isNotEqualTo(WorldInstance.DEFAULT_ID);
 
         RoomInstance arenaStartingRoom = arenaInstance.startingRoomInstance().orElseThrow();
@@ -135,7 +127,7 @@ class CharacterSelectTest extends AbstractIntegrationTest {
         characterSelect.onReceive(leader, "");
 
         assertThat(leader.state()).isEqualTo(ConnectionState.INGAME);
-        GamePlayer loaded = gameWorld.character(leader);
+        GamePlayer loaded = leader.character();
         assertThat(loaded.getWorldInstance().getId()).isEqualTo(arenaInstance.getId());
         assertThat(loaded.getCurrentRoom().getWorldInstanceId()).isEqualTo(arenaInstance.getId());
 
@@ -159,7 +151,7 @@ class CharacterSelectTest extends AbstractIntegrationTest {
         accountDao.insert(account);
         RecordingConnection connection = new RecordingConnection();
         authWorld.enterWorld(connection, account);
-        characterSelectionWorld.enterWorld(connection, worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
+        authWorld.enterWorldInstance(connection, worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
         connection.received.clear();
         return connection;
     }
