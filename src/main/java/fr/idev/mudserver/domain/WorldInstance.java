@@ -68,13 +68,13 @@ public class WorldInstance {
     /**
      * Joueurs actuellement en jeu dans cette instance — même principe que
      * {@link RoomInstance#clients} à l'échelle de l'instance entière plutôt que
-     * d'une seule room. Peuplé par {@code GameWorld.enterWorld}/{@code exitWorld}
-     * (le seul point d'entrée/sortie du jeu), jamais directement par un contrôleur.
-     * Remplace l'ancien registre centralisé {@code GameWorld} (une seule
-     * {@code Map<Connection, GamePlayer>} pour tout le process) : une
-     * {@code WorldInstance} est déjà une frontière d'isolation forte (ses propres
-     * {@link RoomInstance}s, monstres, PNJ, items), il n'y avait pas de raison de
-     * suivre ses joueurs ailleurs qu'ici.
+     * d'une seule room. Peuplé par {@code AuthWorld.enterGameWorld}/
+     * {@code exitGameWorld} (le seul point d'entrée/sortie du jeu), jamais
+     * directement par un contrôleur. Remplace l'ancien registre centralisé
+     * {@code GameWorld} (une seule {@code Map<Connection, GamePlayer>} pour tout le
+     * process) : une {@code WorldInstance} est déjà une frontière d'isolation forte
+     * (ses propres {@link RoomInstance}s, monstres, PNJ, items), il n'y avait pas
+     * de raison de suivre ses joueurs ailleurs qu'ici.
      */
     private final Map<UUID, GamePlayer> players = new ConcurrentHashMap<>();
 

@@ -22,9 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Non-régression : WorldInstance#createCharacter publie NewGamePlayerCreated,
- * dont le listener GameWorld#onNewGamePlayerCreated fait le characterDao.insert
- * — ce test prouve que la persistance a bien lieu malgré l'indirection par
- * l'événement.
+ * dont le listener CharacterService#onNewGamePlayerCreated fait le
+ * characterDao.insert — ce test prouve que la persistance a bien lieu malgré
+ * l'indirection par l'événement.
  *
  * <p>
  * Pas besoin de {@code @DirtiesContext} : {@code RoomService.warmRooms()}
@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * classes de test suivantes.
  */
 @Transactional
-class GameWorldTest extends AbstractIntegrationTest {
+class WorldInstanceCreateCharacterTest extends AbstractIntegrationTest {
 
     @Autowired
     private AccountDao accountDao;

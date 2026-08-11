@@ -15,7 +15,6 @@ import io.netty.util.AttributeKey;
 
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.GameWorld;
 
 /**
  * Frontière Netty <-> logique métier. Chaque connexion obtient exactement un
@@ -49,22 +48,20 @@ public class TelnetSessionHandler extends SimpleChannelInboundHandler<String> {
     private final ExecutorService virtualThreadExecutor;
     private final ControllerDispatcher controllerDispatcher;
     private final AuthWorld authWorld;
-    private final GameWorld gameWorld;
 
     public TelnetSessionHandler(ExecutorService virtualThreadExecutor, ControllerDispatcher controllerDispatcher,
-            AuthWorld authWorld, GameWorld gameWorld) {
+            AuthWorld authWorld) {
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.controllerDispatcher = controllerDispatcher;
         this.authWorld = authWorld;
-        this.gameWorld = gameWorld;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         String connectionId = "conn-" + CONNECTION_SEQUENCE.incrementAndGet();
         log.info("telnet.connection_opened remote={} connectionId={}", ctx.channel().remoteAddress(), connectionId);
-        TelnetConnection connection = new TelnetConnection(connectionId, ctx.channel(), controllerDispatcher, authWorld,
-                gameWorld);
+        TelnetConnection connection = new TelnetConnection(connectionId, ctx.channel(), controllerDispatcher,
+                authWorld);
         BlockingQueue<String> inbox = new LinkedBlockingQueue<>();
         ctx.channel().attr(CONNECTION_KEY).set(connection);
         ctx.channel().attr(INBOX_KEY).set(inbox);

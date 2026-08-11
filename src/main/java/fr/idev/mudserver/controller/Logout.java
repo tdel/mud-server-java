@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.LoggedOut;
@@ -28,11 +27,9 @@ public class Logout implements ControllerHandler {
 
     private static final Logger log = LoggerFactory.getLogger(Logout.class);
 
-    private final GameWorld gameWorld;
     private final AuthWorld authWorld;
 
-    public Logout(GameWorld gameWorld, AuthWorld authWorld) {
-        this.gameWorld = gameWorld;
+    public Logout(AuthWorld authWorld) {
         this.authWorld = authWorld;
     }
 
@@ -51,7 +48,7 @@ public class Logout implements ControllerHandler {
         if (connection.state() == ConnectionState.INGAME) {
             GamePlayer character = connection.character();
 
-            gameWorld.exitWorld(connection);
+            authWorld.exitGameWorld(connection);
             authWorld.enterWorldInstance(connection, character.getWorldInstance());
 
             connection.send(new StoppedPlaying(character.getName()));

@@ -17,6 +17,7 @@ import fr.idev.mudserver.domain.actor.event.CharacterSpentGold;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUsedPotion;
 import fr.idev.mudserver.domain.actor.event.LongRestTaken;
+import fr.idev.mudserver.domain.actor.event.NewGamePlayerCreated;
 import fr.idev.mudserver.domain.actor.event.ShortRestTaken;
 import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.game.RoomService;
@@ -64,6 +65,18 @@ public class CharacterService {
         this.levelService = levelService;
         this.roomService = roomService;
         this.worldInstanceService = worldInstanceService;
+    }
+
+    /**
+     * Persiste le personnage publié par
+     * {@link fr.idev.mudserver.domain.WorldInstance#createCharacter} — seul point
+     * où un {@link GamePlayer} nouvellement créé est écrit en base.
+     */
+    @EventListener
+    void onNewGamePlayerCreated(NewGamePlayerCreated event) {
+        characterDao.insert(event.character());
+        log.info("character.created character={} accountId={} race={} class={}", event.character().getName(),
+                event.character().getAccountId(), event.character().getRace(), event.character().getCharacterClass());
     }
 
     @EventListener

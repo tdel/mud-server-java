@@ -41,7 +41,7 @@ import fr.idev.mudserver.network.OutputMessage;
  * {@code connection} n'est jamais persisté ni pris en compte par
  * {@link #equals}/{@link #hashCode} : il ne représente rien en base, seulement
  * l'état vivant du personnage tant qu'il est en jeu (voir
- * {@code GameWorld.enterWorld}) — même convention pour {@code currentRoom},
+ * {@code AuthWorld.enterGameWorld}) — même convention pour {@code currentRoom},
  * porté par {@link GameCharacter}. Un personnage fraîchement chargé depuis
  * {@code CharacterDao} n'a ni connexion ni room courante tant qu'il n'a pas
  * rejoint le monde via {@link #spawnToRoom} ou {@link #moveToRoom}.

@@ -23,7 +23,6 @@ import io.netty.util.CharsetUtil;
 
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,8 +54,7 @@ class TelnetServerInitializerTest {
         EventLoopGroup group = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
         try {
             NioSocketChannel channel = new NioSocketChannel();
-            channel.pipeline()
-                    .addLast(new TelnetServerInitializer(executor, noopDispatcher(), noopAuthWorld(), noopGameWorld()));
+            channel.pipeline().addLast(new TelnetServerInitializer(executor, noopDispatcher(), noopAuthWorld()));
             group.register(channel).syncUninterruptibly();
 
             ChannelPipeline pipeline = channel.pipeline();
@@ -109,10 +107,6 @@ class TelnetServerInitializerTest {
     }
 
     private AuthWorld noopAuthWorld() {
-        return new AuthWorld(null, null);
-    }
-
-    private GameWorld noopGameWorld() {
-        return new GameWorld(null, null, null);
+        return new AuthWorld(null, null, null, null);
     }
 }

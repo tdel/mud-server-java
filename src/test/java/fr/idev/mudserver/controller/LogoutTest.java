@@ -15,7 +15,6 @@ import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.ConnectionState;
@@ -41,9 +40,6 @@ class LogoutTest extends AbstractIntegrationTest {
     private WorldInstanceService worldInstanceService;
 
     @Autowired
-    private GameWorld gameWorld;
-
-    @Autowired
     private RoomService roomService;
 
     @Autowired
@@ -67,7 +63,7 @@ class LogoutTest extends AbstractIntegrationTest {
         // compte via AccountDao.
         authWorld.enterWorld(connection, account);
         connection.setState(ConnectionState.INGAME);
-        gameWorld.enterWorld(connection, character);
+        authWorld.enterGameWorld(connection, character);
 
         logout.onReceive(connection, "");
 

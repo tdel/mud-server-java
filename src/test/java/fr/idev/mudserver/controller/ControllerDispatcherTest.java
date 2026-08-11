@@ -14,7 +14,7 @@ import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
-import fr.idev.mudserver.game.GameWorld;
+import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ActionNotFound;
@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Contexte Spring requis : exerce le vrai
- * {@link GameWorld}/{@link ControllerRegistry}, seul moyen fiable de reproduire
+ * {@link AuthWorld}/{@link ControllerRegistry}, seul moyen fiable de reproduire
  * l'état "connexion en jeu" que le verrouillage de combat de
  * {@link ControllerDispatcher} vérifie. Aucune couverture n'existait au niveau
  * {@code controller/**} avant ce test — la logique de verrouillage est neuve et
@@ -38,7 +38,7 @@ class ControllerDispatcherTest extends AbstractIntegrationTest {
     private ControllerDispatcher dispatcher;
 
     @Autowired
-    private GameWorld gameWorld;
+    private AuthWorld authWorld;
 
     @Autowired
     private RoomService roomService;
@@ -81,7 +81,7 @@ class ControllerDispatcherTest extends AbstractIntegrationTest {
         GamePlayer character = new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Combattant", startingRoom.getId(),
                 Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
                 0);
-        gameWorld.enterWorld(connection, character);
+        authWorld.enterGameWorld(connection, character);
 
         GameMonster monster = new GameMonster(UUID.randomUUID(), "Mannequin", UUID.randomUUID(), startingRoom.getId(),
                 TestAttributes.of(10, 10, 10, 10, 10, 10), 1000);

@@ -17,7 +17,7 @@ import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.MonsterTemplate;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
-import fr.idev.mudserver.game.GameWorld;
+import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.message.ingame.NoTargetSelected;
 import fr.idev.mudserver.network.message.ingame.TargetNotFound;
@@ -40,7 +40,7 @@ class AttackTest extends AbstractIntegrationTest {
     private Attack attack;
 
     @Autowired
-    private GameWorld gameWorld;
+    private AuthWorld authWorld;
 
     @Autowired
     private RoomService roomService;
@@ -110,7 +110,7 @@ class AttackTest extends AbstractIntegrationTest {
         GamePlayer character = new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Attaquant", startingRoom.getId(),
                 Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 1000, 1000,
                 TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
-        gameWorld.enterWorld(connection, character);
+        authWorld.enterGameWorld(connection, character);
         connection.received.clear();
         return connection;
     }

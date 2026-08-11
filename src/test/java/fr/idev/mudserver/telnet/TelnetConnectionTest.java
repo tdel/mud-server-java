@@ -11,7 +11,6 @@ import io.netty.channel.embedded.EmbeddedChannel;
 
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.OutputMessage;
 import fr.idev.mudserver.network.SecureOutputMessage;
@@ -23,9 +22,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Aucun mock (le projet n'utilise pas Mockito, voir CLAUDE.md) : {@code
- * ControllerDispatcher}/{@code AuthWorld}/{@code GameWorld} sont de simples
- * classes concrètes, doublées ici par sous-classement (constructeur appelé avec
- * des dépendances {@code null}, jamais touchées puisque la méthode utilisée par
+ * ControllerDispatcher}/{@code AuthWorld} sont de simples classes concrètes,
+ * doublées ici par sous-classement (constructeur appelé avec des dépendances
+ * {@code null}, jamais touchées puisque la méthode utilisée par
  * {@link TelnetConnection} est entièrement redéfinie) — même philosophie que le
  * {@code RecordingConnection} déjà utilisé ailleurs dans la suite de tests.
  * {@link EmbeddedChannel} sert de {@code Channel} réel (le double de test
@@ -36,9 +35,7 @@ class TelnetConnectionTest {
     private final EmbeddedChannel channel = new EmbeddedChannel();
     private final RecordingDispatcher dispatcher = new RecordingDispatcher();
     private final RecordingAuthWorld authWorld = new RecordingAuthWorld();
-    private final RecordingGameWorld gameWorld = new RecordingGameWorld();
-    private final TelnetConnection connection = new TelnetConnection("conn-1", channel, dispatcher, authWorld,
-            gameWorld);
+    private final TelnetConnection connection = new TelnetConnection("conn-1", channel, dispatcher, authWorld);
 
     @Test
     void handleLineWithNoPendingPromptSplitsVerbAndArgumentAndDispatches() {
@@ -76,12 +73,12 @@ class TelnetConnectionTest {
     }
 
     @Test
-    void handleCloseCallsGameWorldExitThenAuthWorldExitBothInvokedEvenIfGameWorldThrows() {
-        gameWorld.exitWorldException = new RuntimeException("db down");
+    void handleCloseCallsExitGameWorldThenAuthWorldExitBothInvokedEvenIfExitGameWorldThrows() {
+        authWorld.exitGameWorldException = new RuntimeException("db down");
 
         connection.handleClose();
 
-        assertThat(gameWorld.exitWorldCalled).isTrue();
+        assertThat(authWorld.exitGameWorldCalled).isTrue();
         assertThat(authWorld.exitWorldInstanceCalled).isTrue();
         assertThat(authWorld.exitWorldCalled).isTrue();
     }
@@ -90,7 +87,7 @@ class TelnetConnectionTest {
     void handleCloseBothExitCallsSucceedNoExceptionPropagates() {
         connection.handleClose();
 
-        assertThat(gameWorld.exitWorldCalled).isTrue();
+        assertThat(authWorld.exitGameWorldCalled).isTrue();
         assertThat(authWorld.exitWorldInstanceCalled).isTrue();
         assertThat(authWorld.exitWorldCalled).isTrue();
     }
@@ -188,9 +185,11 @@ class TelnetConnectionTest {
 
         private boolean exitWorldCalled;
         private boolean exitWorldInstanceCalled;
+        private boolean exitGameWorldCalled;
+        private RuntimeException exitGameWorldException;
 
         RecordingAuthWorld() {
-            super(null, null);
+            super(null, null, null, null);
         }
 
         @Override
@@ -202,22 +201,12 @@ class TelnetConnectionTest {
         public void exitWorldInstance(Connection connection) {
             exitWorldInstanceCalled = true;
         }
-    }
-
-    private static final class RecordingGameWorld extends GameWorld {
-
-        private boolean exitWorldCalled;
-        private RuntimeException exitWorldException;
-
-        RecordingGameWorld() {
-            super(null, null, null);
-        }
 
         @Override
-        public void exitWorld(Connection connection) {
-            exitWorldCalled = true;
-            if (exitWorldException != null) {
-                throw exitWorldException;
+        public void exitGameWorld(Connection connection) {
+            exitGameWorldCalled = true;
+            if (exitGameWorldException != null) {
+                throw exitGameWorldException;
             }
         }
     }

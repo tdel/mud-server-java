@@ -198,9 +198,9 @@ public class WorldInstanceService {
     /**
      * Envoie {@code message} à tous les occupants connectés de {@code instance},
      * toutes {@link RoomInstance} confondues — délègue à
-     * {@link RoomInstance#broadcast} room par room plutôt que de passer par
-     * {@code GameWorld}, qui ne connaît que les connexions, pas la répartition par
-     * room.
+     * {@link RoomInstance#broadcast} room par room plutôt que de passer par un
+     * registre centralisé, qui ne connaîtrait que les connexions, pas la
+     * répartition par room.
      */
     public void broadcastToInstance(WorldInstance instance, OutputMessage message, GamePlayer exclude) {
         for (RoomInstance room : instance.roomInstances()) {

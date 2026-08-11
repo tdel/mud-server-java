@@ -18,7 +18,7 @@ logging:
     root: INFO
   pattern:
     # %mdc affiche automatiquement connectionId/account/character quand connus
-    # (posés par TelnetSessionHandler/AuthWorld/GameWorld), vide sinon.
+    # (posés par TelnetSessionHandler/AuthWorld), vide sinon.
     console: "%d{HH:mm:ss.SSS} %-5level %logger{36} %mdc - %msg%n%wEx"
   file:
     name: logs/mud-server.log

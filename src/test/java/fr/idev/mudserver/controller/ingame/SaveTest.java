@@ -15,7 +15,7 @@ import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
-import fr.idev.mudserver.game.GameWorld;
+import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.game.dice.CheckResult;
 import fr.idev.mudserver.network.message.Usage;
@@ -37,7 +37,7 @@ class SaveTest extends AbstractIntegrationTest {
     private Save save;
 
     @Autowired
-    private GameWorld gameWorld;
+    private AuthWorld authWorld;
 
     @Autowired
     private RoomService roomService;
@@ -97,7 +97,7 @@ class SaveTest extends AbstractIntegrationTest {
                 Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
                 0);
         characterDao.insert(character);
-        gameWorld.enterWorld(connection, character);
+        authWorld.enterGameWorld(connection, character);
         connection.received.clear();
         return connection;
     }

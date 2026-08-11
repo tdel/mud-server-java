@@ -21,7 +21,7 @@ import fr.idev.mudserver.domain.actor.MonsterTemplate;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.game.CombatEngine;
-import fr.idev.mudserver.game.GameWorld;
+import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.message.Usage;
@@ -48,7 +48,7 @@ class UseTest extends AbstractIntegrationTest {
     private Use use;
 
     @Autowired
-    private GameWorld gameWorld;
+    private AuthWorld authWorld;
 
     @Autowired
     private RoomService roomService;
@@ -199,7 +199,7 @@ class UseTest extends AbstractIntegrationTest {
                 room.getId(), Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, currentHealth, maxHealth,
                 TestAttributes.of(10, dexterity, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
-        gameWorld.enterWorld(connection, character);
+        authWorld.enterGameWorld(connection, character);
         connection.received.clear();
         return connection;
     }

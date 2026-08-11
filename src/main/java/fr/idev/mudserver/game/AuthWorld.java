@@ -5,8 +5,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.persistence.AccountDao;
+import fr.idev.mudserver.persistence.CharacterDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
@@ -46,15 +50,22 @@ import fr.idev.mudserver.network.OutputMessage;
 @Component
 public class AuthWorld {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthWorld.class);
+
     private final Map<Connection, Account> accounts = new ConcurrentHashMap<>();
     private final Map<Connection, WorldInstance> worldInstances = new ConcurrentHashMap<>();
 
-    private final GameWorld gameWorld;
     private final AccountDao accountDao;
+    private final CharacterDao characterDao;
+    private final RoomService roomService;
+    private final ItemService itemService;
 
-    public AuthWorld(GameWorld gameWorld, AccountDao accountDao) {
-        this.gameWorld = gameWorld;
+    public AuthWorld(AccountDao accountDao, CharacterDao characterDao, RoomService roomService,
+            ItemService itemService) {
         this.accountDao = accountDao;
+        this.characterDao = characterDao;
+        this.roomService = roomService;
+        this.itemService = itemService;
     }
 
     public void enterWorld(Connection connection, Account account) {
@@ -103,7 +114,44 @@ public class AuthWorld {
         accountDao.updateCurrentCharacter(account.getId(), character.getId());
 
         connection.setState(ConnectionState.INGAME);
-        gameWorld.enterWorld(connection, character);
+        enterGameWorld(connection, character);
+    }
+
+    /**
+     * Câble la connexion et le personnage l'un à l'autre, charge son inventaire, le
+     * fait spawn et l'enregistre dans sa {@link WorldInstance} — le seul point
+     * d'entrée en jeu. Remplace {@code GameWorld.enterWorld} : ne touche ni
+     * {@link #accounts} ni {@link #worldInstances} ni l'état de la connexion (déjà
+     * géré par l'appelant, voir {@link #moveToGameWorld}), exactement comme
+     * l'ancienne méthode.
+     */
+    public void enterGameWorld(Connection connection, GamePlayer character) {
+        connection.setCharacter(character);
+        character.setConnection(connection);
+        character.getInventory().replaceItems(itemService.loadInventory(character));
+        roomService.spawnCharacter(character);
+        character.getWorldInstance().addPlayer(character);
+        MDC.put("character", character.getName());
+    }
+
+    /**
+     * Symétrique de {@link #enterGameWorld} : persiste le personnage, le déconnecte
+     * de sa room et le retire de sa {@link WorldInstance}. Remplace
+     * {@code GameWorld.exitWorld} ; no-op hors état {@code INGAME}, appelée
+     * inconditionnellement par {@code TelnetConnection.handleClose}.
+     */
+    public void exitGameWorld(Connection connection) {
+        if (connection.state() != ConnectionState.INGAME) {
+            return;
+        }
+
+        GamePlayer character = connection.character();
+        RoomInstance room = character.getCurrentRoom();
+        characterDao.update(character);
+        room.disconnect(character);
+        character.getWorldInstance().removePlayer(character);
+        log.info("character.session_ended character={} room={}", character.getName(), room.getName());
+        MDC.remove("character");
     }
 
     public Account account(Connection connection) {

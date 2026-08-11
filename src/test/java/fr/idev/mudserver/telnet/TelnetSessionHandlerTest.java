@@ -17,7 +17,6 @@ import io.netty.channel.embedded.EmbeddedChannel;
 
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.GameWorld;
 import fr.idev.mudserver.network.Connection;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,7 +33,6 @@ class TelnetSessionHandlerTest {
 
     private final RecordingDispatcher dispatcher = new RecordingDispatcher();
     private final RecordingAuthWorld authWorld = new RecordingAuthWorld();
-    private final RecordingGameWorld gameWorld = new RecordingGameWorld();
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
     @AfterEach
@@ -75,7 +73,7 @@ class TelnetSessionHandlerTest {
         channel.close();
         await(authWorld.exitWorldLatch);
 
-        assertThat(gameWorld.exitWorldCalled).isTrue();
+        assertThat(authWorld.exitGameWorldCalled).isTrue();
         assertThat(authWorld.exitWorldCalled).isTrue();
     }
 
@@ -106,7 +104,7 @@ class TelnetSessionHandlerTest {
     }
 
     private EmbeddedChannel openChannel() {
-        return new EmbeddedChannel(new TelnetSessionHandler(executor, dispatcher, authWorld, gameWorld));
+        return new EmbeddedChannel(new TelnetSessionHandler(executor, dispatcher, authWorld));
     }
 
     private void await(CountDownLatch latch) {
@@ -168,9 +166,10 @@ class TelnetSessionHandlerTest {
 
         private final CountDownLatch exitWorldLatch = new CountDownLatch(1);
         private boolean exitWorldCalled;
+        private boolean exitGameWorldCalled;
 
         RecordingAuthWorld() {
-            super(null, null);
+            super(null, null, null, null);
         }
 
         @Override
@@ -178,19 +177,10 @@ class TelnetSessionHandlerTest {
             exitWorldCalled = true;
             exitWorldLatch.countDown();
         }
-    }
-
-    private static final class RecordingGameWorld extends GameWorld {
-
-        private boolean exitWorldCalled;
-
-        RecordingGameWorld() {
-            super(null, null, null);
-        }
 
         @Override
-        public void exitWorld(Connection connection) {
-            exitWorldCalled = true;
+        public void exitGameWorld(Connection connection) {
+            exitGameWorldCalled = true;
         }
     }
 }
