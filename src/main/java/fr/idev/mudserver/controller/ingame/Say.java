@@ -5,9 +5,10 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
+import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.RoomService;
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ingame.Chat;
@@ -18,11 +19,11 @@ import fr.idev.mudserver.network.message.ingame.YouSaid;
 public class Say implements ControllerHandler {
 
     private final GameWorld gameWorld;
-    private final RoomService roomService;
+    private final WorldInstanceService worldInstanceService;
 
-    public Say(GameWorld gameWorld, RoomService roomService) {
+    public Say(GameWorld gameWorld, WorldInstanceService worldInstanceService) {
         this.gameWorld = gameWorld;
-        this.roomService = roomService;
+        this.worldInstanceService = worldInstanceService;
     }
 
     @Override
@@ -45,7 +46,8 @@ public class Say implements ControllerHandler {
             return;
         }
 
-        character.getCurrentRoom().broadcast(new Chat(character.getName(), message), character);
+        WorldInstance instance = worldInstanceService.getOrMaterialize(character.getWorldInstanceId());
+        worldInstanceService.broadcastToInstance(instance, new Chat(character.getName(), message), character);
 
         connection.send(new YouSaid(message));
     }

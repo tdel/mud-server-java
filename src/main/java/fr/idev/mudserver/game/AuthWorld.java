@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.Connection;
+import fr.idev.mudserver.network.OutputMessage;
 
 /**
  * Suit tous les clients authentifiés mais pas encore en train de jouer, et le
@@ -59,6 +60,20 @@ public class AuthWorld {
 
     public Account account(Connection connection) {
         return connections.get(connection);
+    }
+
+    /**
+     * Diffuse {@code message} à toute connexion actuellement en {@code LOBBY} —
+     * exclut volontairement {@code CHARSELECT}, bien que {@link #connections} suive
+     * les deux états (voir la Javadoc de {@link #findConnectionByLogin}).
+     * Symétrique de {@code WorldInstanceService#broadcastToInstance} côté lobby.
+     */
+    public void broadcastToLobby(OutputMessage message, Connection exclude) {
+        for (Connection connection : connections.keySet()) {
+            if (connection == exclude || connection.state() != ConnectionState.LOBBY)
+                continue;
+            connection.send(message);
+        }
     }
 
     public boolean isAlreadyConnected(UUID accountId) {
