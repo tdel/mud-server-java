@@ -125,6 +125,10 @@ public class RoomInstance {
         return template.getId();
     }
 
+    public WorldInstance getWorldInstance() {
+        return worldInstance;
+    }
+
     public UUID getWorldInstanceId() {
         return worldInstance.getId();
     }

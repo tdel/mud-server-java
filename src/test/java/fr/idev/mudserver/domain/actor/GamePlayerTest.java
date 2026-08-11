@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
+import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.ArmorCategory;
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
@@ -439,8 +440,9 @@ class GamePlayerTest {
 
     private GamePlayer character(int strength, int dexterity, int constitution, int intelligence, int wisdom,
             int charisma, int level, CharacterClass characterClass) {
-        return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Test", UUID.randomUUID(), Gender.MAN, Race.HUMAN,
-                characterClass, level, 10, 10,
-                TestAttributes.of(strength, dexterity, constitution, intelligence, wisdom, charisma), 0, 0);
+        Account account = new Account(UUID.randomUUID(), "player-" + UUID.randomUUID(), "hashed-password", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Test Room", "...");
+        return new GamePlayer(UUID.randomUUID(), account, "Test", room, Gender.MAN, Race.HUMAN, characterClass, level,
+                10, 10, TestAttributes.of(strength, dexterity, constitution, intelligence, wisdom, charisma), 0, 0);
     }
 }

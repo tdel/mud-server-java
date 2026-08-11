@@ -14,6 +14,7 @@ import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.TestRooms;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.game.RoomService;
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.OutputMessage;
@@ -42,6 +43,9 @@ class GamePlayerDeathTest extends AbstractIntegrationTest {
 
     @Autowired
     private CharacterDao characterDao;
+
+    @Autowired
+    private WorldInstanceService worldInstanceService;
 
     @Test
     void takeDamageReducesHealthWithoutGoingBelowZeroAndReportsTheKillingBlow() {
@@ -94,7 +98,9 @@ class GamePlayerDeathTest extends AbstractIntegrationTest {
         assertThat(character.getCurrentHealth()).isEqualTo(character.getMaxHealth());
         assertThat(character.getCurrentRoom()).isEqualTo(startingRoom);
 
-        GamePlayer persisted = characterDao.findById(character.getId()).orElseThrow();
+        WorldInstance instance = worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID);
+        GamePlayer persisted = characterDao.findByAccountAndWorldInstance(character.getAccount(), instance)
+                .orElseThrow();
         assertThat(persisted.getCurrentHealth()).isEqualTo(character.getMaxHealth());
         assertThat(persisted.getCurrentRoomId()).isEqualTo(startingRoom.getTemplateId());
     }
@@ -125,9 +131,8 @@ class GamePlayerDeathTest extends AbstractIntegrationTest {
     private GamePlayer seedCharacter(RoomInstance room) {
         Account account = new Account(UUID.randomUUID(), "death-test-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), account.getLogin(), room.getId(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
-                0);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, account.getLogin(), room, Gender.MAN,
+                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
         room.join(character);
         return character;

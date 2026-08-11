@@ -350,9 +350,9 @@ class CombatEngineTest extends AbstractIntegrationTest {
     }
 
     private GamePlayer player(String name, int strength, int dexterity, RoomInstance room, int hp) {
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), name, room.getId(), Gender.MAN,
-                Race.HUMAN, CharacterClass.FIGHTER, 1, hp, hp, TestAttributes.of(strength, dexterity, 10, 10, 10, 10),
-                0, 0);
+        Account account = new Account(UUID.randomUUID(), name + "-" + UUID.randomUUID(), "hashed-password", null);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, name, room, Gender.MAN, Race.HUMAN,
+                CharacterClass.FIGHTER, 1, hp, hp, TestAttributes.of(strength, dexterity, 10, 10, 10, 10), 0, 0);
         room.join(character);
         return character;
     }
@@ -360,9 +360,8 @@ class CombatEngineTest extends AbstractIntegrationTest {
     private GamePlayer persistedPlayer(String name, int strength, int dexterity, RoomInstance room, int hp) {
         Account account = new Account(UUID.randomUUID(), name + "-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), name, room.getId(), Gender.MAN,
-                Race.HUMAN, CharacterClass.FIGHTER, 1, hp, hp, TestAttributes.of(strength, dexterity, 10, 10, 10, 10),
-                0, 0);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, name, room, Gender.MAN, Race.HUMAN,
+                CharacterClass.FIGHTER, 1, hp, hp, TestAttributes.of(strength, dexterity, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
         room.join(character);
         return character;

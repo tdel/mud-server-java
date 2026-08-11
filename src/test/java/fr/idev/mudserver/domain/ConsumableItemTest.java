@@ -63,7 +63,9 @@ class ConsumableItemTest extends AbstractIntegrationTest {
     }
 
     private GamePlayer character(int currentHealth, int maxHealth) {
-        return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Test", UUID.randomUUID(), Gender.MAN, Race.HUMAN,
-                CharacterClass.FIGHTER, 1, currentHealth, maxHealth, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+        Account account = new Account(UUID.randomUUID(), "consumable-" + UUID.randomUUID(), "hashed-password", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Test Room", "...");
+        return new GamePlayer(UUID.randomUUID(), account, "Test", room, Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER,
+                1, currentHealth, maxHealth, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
     }
 }

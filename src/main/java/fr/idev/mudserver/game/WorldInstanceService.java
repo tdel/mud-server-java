@@ -188,18 +188,15 @@ public class WorldInstanceService {
     }
 
     /**
-     * Résout {@code character.getCurrentRoomId()} (un id de {@code RoomTemplate},
-     * voir {@code RoomService}) contre cette instance, avec repli sur la room de
-     * départ pour un personnage tout juste créé (dont {@code currentRoomId} vaut
-     * déjà l'id de la room de départ — ce repli couvre surtout le cas d'un id
-     * orphelin, ex. contenu du monde modifié entre deux sessions).
+     * {@code character} porte déjà sa {@link RoomInstance} depuis sa construction
+     * ({@code CharacterDao.toDomain} ou {@code WorldInstance.createCharacter} l'ont
+     * résolue en amont — voir {@link GamePlayer#getCurrentRoom()}) : il ne reste
+     * qu'à déclencher l'action métier d'entrée (occupancy + broadcast), pas de
+     * lookup à refaire ici.
      */
     public void spawnCharacterIntoInstance(GamePlayer character, WorldInstance instance) {
-        RoomInstance room = instance.roomInstanceForTemplate(character.getCurrentRoomId())
-                .or(instance::startingRoomInstance).orElseThrow(() -> new IllegalStateException(
-                        "WorldInstance " + instance.getId() + " n'a aucune room de départ"));
         character.setWorldInstance(instance);
-        character.spawnToRoom(room);
+        character.spawnToRoom(character.getCurrentRoom());
     }
 
     /**
@@ -239,7 +236,7 @@ public class WorldInstanceService {
      * directs à {@code CharacterDao} dans chaque contrôleur CHARSELECT/LOBBY.
      */
     public Optional<GamePlayer> findCharacterFor(Account account, WorldInstance instance) {
-        return characterDao.findByAccountIdAndWorldInstanceId(account.getId(), instance.getId());
+        return characterDao.findByAccountAndWorldInstance(account, instance);
     }
 
     /**

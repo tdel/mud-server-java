@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
+import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
@@ -79,9 +80,9 @@ class ControllerDispatcherTest extends AbstractIntegrationTest {
         roomService.warmRooms();
         RoomInstance startingRoom = roomService.startingRoom().orElseThrow();
         RecordingConnection connection = new RecordingConnection();
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Combattant", startingRoom.getId(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
-                0);
+        Account account = new Account(UUID.randomUUID(), "combattant-" + UUID.randomUUID(), "hashed-password", null);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Combattant", startingRoom, Gender.MAN,
+                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         worldInstanceService.enterCharSelect(connection,
                 worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
         worldInstanceService.enterGame(connection, character);

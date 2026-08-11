@@ -14,6 +14,7 @@ import fr.idev.mudserver.controller.lobby.PartyInvite;
 import fr.idev.mudserver.controller.lobby.WorldEnter;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.TestRooms;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
@@ -79,8 +80,9 @@ class CharacterSelectTest extends AbstractIntegrationTest {
     void existingCharacterMovesToIngameAndSendsNowPlayingThenLook() {
         RecordingConnection connection = enterCharSelect("p2");
         Account account = connection.account();
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Hero", UUID.randomUUID(), Gender.MAN,
-                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Test Room", "...");
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Hero", room, Gender.MAN, Race.HUMAN,
+                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         character.setWorldInstanceId(WorldInstance.DEFAULT_ID);
         characterDao.insert(character);
 
@@ -115,9 +117,8 @@ class CharacterSelectTest extends AbstractIntegrationTest {
         assertThat(arenaInstance.getId()).isNotEqualTo(WorldInstance.DEFAULT_ID);
 
         RoomInstance arenaStartingRoom = arenaInstance.startingRoomInstance().orElseThrow();
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Gladiator",
-                arenaStartingRoom.getTemplateId(), Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10,
-                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Gladiator", arenaStartingRoom, Gender.MAN,
+                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         character.setWorldInstanceId(arenaInstance.getId());
         characterDao.insert(character);
         leader.received.clear();

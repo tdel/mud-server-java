@@ -10,11 +10,13 @@ import java.util.UUID;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
+import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.persistence.jooq.tables.records.CharacterRecord;
 
@@ -57,26 +59,29 @@ public class CharacterDao {
                 .execute();
     }
 
-    public Optional<GamePlayer> findById(UUID id) {
-        return dsl.selectFrom(CHARACTER).where(CHARACTER.ID.eq(id)).fetchOptional(this::toDomain);
-    }
-
     /**
      * Renvoie {@code Optional}, pas une liste : au plus un personnage par
      * {@code (account_id, world_instance_id)} (règle actée, voir
      * {@code multi-world.md} Phase C) — remplace {@code findByAccountId}, dont le
      * seul appelant ({@code controller.authed.CharacterList}, supprimé) reposait
      * sur un vrai listing qui n'a plus lieu d'être une fois cette règle en place.
+     * Prend {@code account}/{@code instance} déjà résolus (pas de simples id) :
+     * {@code GamePlayer} exige un {@link Account} et une {@link RoomInstance} dès
+     * sa construction (voir {@link #toDomain}), et l'appelant les a de toute façon
+     * déjà en main à ce point du flux (connexion authentifiée, instance
+     * matérialisée).
      */
-    public Optional<GamePlayer> findByAccountIdAndWorldInstanceId(UUID accountId, UUID worldInstanceId) {
-        return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(accountId))
-                .and(CHARACTER.WORLD_INSTANCE_ID.eq(worldInstanceId)).fetchOptional(this::toDomain);
+    public Optional<GamePlayer> findByAccountAndWorldInstance(Account account, WorldInstance instance) {
+        return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(account.getId()))
+                .and(CHARACTER.WORLD_INSTANCE_ID.eq(instance.getId()))
+                .fetchOptional(record -> toDomain(record, account, instance));
     }
 
-    public Optional<GamePlayer> findByAccountIdAndName(UUID accountId, UUID worldInstanceId, String name) {
-        return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(accountId))
-                .and(CHARACTER.WORLD_INSTANCE_ID.eq(worldInstanceId)).and(CHARACTER.NAME.eq(name))
-                .fetchOptional(this::toDomain);
+    public Optional<GamePlayer> findByAccountAndWorldInstanceAndName(Account account, WorldInstance instance,
+            String name) {
+        return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(account.getId()))
+                .and(CHARACTER.WORLD_INSTANCE_ID.eq(instance.getId())).and(CHARACTER.NAME.eq(name))
+                .fetchOptional(record -> toDomain(record, account, instance));
     }
 
     public void updateCurrentRoom(UUID characterId, UUID roomId) {
@@ -101,7 +106,16 @@ public class CharacterDao {
         dsl.deleteFrom(CHARACTER).where(CHARACTER.ID.eq(characterId)).execute();
     }
 
-    private GamePlayer toDomain(CharacterRecord record) {
+    /**
+     * Résout la {@link RoomInstance} du personnage contre {@code instance} avec le
+     * même repli que l'ancien
+     * {@code WorldInstanceService.spawnCharacterIntoInstance} (sur la room de
+     * départ, pour couvrir un {@code current_room_id} orphelin — contenu du monde
+     * modifié entre deux sessions) : {@code account}/{@code
+     * instance} sont exigés par le constructeur de {@link GamePlayer}, donc doivent
+     * être résolus ici plutôt qu'après coup par l'appelant.
+     */
+    private GamePlayer toDomain(CharacterRecord record, Account account, WorldInstance instance) {
         Map<Attribute, Integer> attributes = new EnumMap<>(Attribute.class);
         attributes.put(Attribute.STRENGTH, record.getStrength());
         attributes.put(Attribute.DEXTERITY, record.getDexterity());
@@ -113,11 +127,14 @@ public class CharacterDao {
         CharacterClass characterClass = CharacterClass.valueOf(record.getCharacterClass());
         Race race = Race.valueOf(record.getRace());
 
-        GamePlayer character = new GamePlayer(record.getId(), record.getAccountId(), record.getName(),
-                record.getCurrentRoomId(), Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(),
-                record.getCurrentHealth(), record.getMaxHealth(), attributes, record.getXp(), record.getGold(),
-                record.getShortRestCount());
-        character.setWorldInstanceId(record.getWorldInstanceId());
+        RoomInstance room = instance.roomInstanceForTemplate(record.getCurrentRoomId())
+                .or(instance::startingRoomInstance).orElseThrow(() -> new IllegalStateException(
+                        "WorldInstance " + instance.getId() + " n'a aucune room de départ"));
+
+        GamePlayer character = new GamePlayer(record.getId(), account, record.getName(), room,
+                Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
+                record.getMaxHealth(), attributes, record.getXp(), record.getGold(), record.getShortRestCount());
+        character.setWorldInstance(instance);
         return character;
     }
 }

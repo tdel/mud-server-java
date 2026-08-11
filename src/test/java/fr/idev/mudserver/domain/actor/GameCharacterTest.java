@@ -13,7 +13,10 @@ import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.HexDirection;
 import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.actor.GameCharacter.MovementOutcome;
+import fr.idev.mudserver.domain.TestRooms;
+import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.game.RoomService;
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 
@@ -33,6 +36,9 @@ class GameCharacterTest extends AbstractIntegrationTest {
 
     @Autowired
     private CharacterDao characterDao;
+
+    @Autowired
+    private WorldInstanceService worldInstanceService;
 
     @Test
     void singleStepMoveUpdatesPosition() {
@@ -85,7 +91,9 @@ class GameCharacterTest extends AbstractIntegrationTest {
         assertThat(outcome.crossedPortal()).isTrue();
         assertThat(character.getCurrentRoom()).isEqualTo(tavern);
         assertThat(character.getPosition()).isEqualTo(new HexCoordinate(0, 4));
-        assertThat(characterDao.findById(character.getId())).map(GamePlayer::getCurrentRoomId).contains(TAVERN_ID);
+        WorldInstance instance = worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID);
+        assertThat(characterDao.findByAccountAndWorldInstance(character.getAccount(), instance))
+                .map(GamePlayer::getCurrentRoomId).contains(TAVERN_ID);
     }
 
     @Test
@@ -176,8 +184,10 @@ class GameCharacterTest extends AbstractIntegrationTest {
     }
 
     private GamePlayer characterWithDexterity(int dexterity) {
-        return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Test", UUID.randomUUID(), Gender.MAN, Race.HUMAN,
-                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, dexterity, 10, 10, 10, 10), 0, 0);
+        Account account = new Account(UUID.randomUUID(), "dex-" + UUID.randomUUID(), "hashed-password", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Test Room", "...");
+        return new GamePlayer(UUID.randomUUID(), account, "Test", room, Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER,
+                1, 10, 10, TestAttributes.of(10, dexterity, 10, 10, 10, 10), 0, 0);
     }
 
     private RoomInstance warmVillage() {
@@ -193,9 +203,8 @@ class GameCharacterTest extends AbstractIntegrationTest {
     private GamePlayer seedCharacter(RoomInstance room, int hp) {
         Account account = new Account(UUID.randomUUID(), "movement-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Mover", room.getTemplateId(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, hp, hp, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
-                0);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Mover", room, Gender.MAN, Race.HUMAN,
+                CharacterClass.FIGHTER, 1, hp, hp, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
         room.join(character);
         return character;

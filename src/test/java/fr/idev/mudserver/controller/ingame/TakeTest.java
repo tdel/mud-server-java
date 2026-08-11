@@ -104,9 +104,8 @@ class TakeTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "preneur-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
         RecordingConnection connection = new RecordingConnection();
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Preneur", startingRoom.getId(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
-                0);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Preneur", startingRoom, Gender.MAN,
+                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
         worldInstanceService.enterCharSelect(connection,
                 worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));

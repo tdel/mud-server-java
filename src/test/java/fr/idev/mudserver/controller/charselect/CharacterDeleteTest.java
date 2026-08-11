@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.controller.RecordingConnection;
 import fr.idev.mudserver.domain.Account;
+import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.TestRooms;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
@@ -72,28 +74,29 @@ class CharacterDeleteTest extends AbstractIntegrationTest {
     void characterCurrentlyInGameRefusesDeletion() {
         RecordingConnection connection = enterCharSelect("p3");
         Account account = connection.account();
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Hero", UUID.randomUUID(), Gender.MAN,
-                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Test Room", "...");
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Hero", room, Gender.MAN, Race.HUMAN,
+                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         character.setWorldInstanceId(WorldInstance.DEFAULT_ID);
         characterDao.insert(character);
         RecordingConnection observerConnection = new RecordingConnection();
-        worldInstanceService.enterCharSelect(observerConnection,
-                worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
+        WorldInstance instance = worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID);
+        worldInstanceService.enterCharSelect(observerConnection, instance);
         worldInstanceService.enterGame(observerConnection, character);
 
         characterDelete.onReceive(connection, "Hero");
 
         assertThat(connection.received).anyMatch(message -> message.equals(new CharacterCurrentlyInGame("Hero")));
-        assertThat(characterDao.findByAccountIdAndWorldInstanceId(account.getId(), WorldInstance.DEFAULT_ID))
-                .isPresent();
+        assertThat(characterDao.findByAccountAndWorldInstance(account, instance)).isPresent();
     }
 
     @Test
     void successfulDeletionSendsCharacterDeletedAndStatus() {
         RecordingConnection connection = enterCharSelect("p4");
         Account account = connection.account();
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Hero", UUID.randomUUID(), Gender.MAN,
-                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Test Room", "...");
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Hero", room, Gender.MAN, Race.HUMAN,
+                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         character.setWorldInstanceId(WorldInstance.DEFAULT_ID);
         characterDao.insert(character);
 
@@ -101,7 +104,8 @@ class CharacterDeleteTest extends AbstractIntegrationTest {
 
         assertThat(connection.received).anyMatch(message -> message.equals(new CharacterDeleted("Hero")));
         assertThat(connection.received).anyMatch(NoCharacterInWorld.class::isInstance);
-        assertThat(characterDao.findByAccountIdAndWorldInstanceId(account.getId(), WorldInstance.DEFAULT_ID)).isEmpty();
+        WorldInstance instance = worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID);
+        assertThat(characterDao.findByAccountAndWorldInstance(account, instance)).isEmpty();
     }
 
     private RecordingConnection enterCharSelect(String login) {

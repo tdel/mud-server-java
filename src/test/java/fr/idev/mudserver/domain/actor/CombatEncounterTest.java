@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
+import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.TestRooms;
 
@@ -202,7 +203,8 @@ class CombatEncounterTest {
     }
 
     private GamePlayer player(int dexterity) {
-        return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Joueur", UUID.randomUUID(), Gender.MAN, Race.HUMAN,
+        Account account = new Account(UUID.randomUUID(), "player-" + UUID.randomUUID(), "hashed-password", null);
+        return new GamePlayer(UUID.randomUUID(), account, "Joueur", room, Gender.MAN, Race.HUMAN,
                 CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, dexterity, 10, 10, 10, 10), 0, 0);
     }
 

@@ -11,6 +11,7 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.RoomPortal;
+import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
@@ -40,6 +41,9 @@ class RoomServiceTest extends AbstractIntegrationTest {
 
     @Autowired
     private CharacterDao characterDao;
+
+    @Autowired
+    private WorldInstanceService worldInstanceService;
 
     @Test
     void warmRoomsLoadsTheRealCatalogFromJson() {
@@ -71,9 +75,8 @@ class RoomServiceTest extends AbstractIntegrationTest {
 
         Account account = new Account(UUID.randomUUID(), "erin", "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Erin", origin.getTemplateId(),
-                Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0, 0);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Erin", origin, Gender.WOMAN, Race.HUMAN,
+                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
         origin.join(character);
 
@@ -82,7 +85,8 @@ class RoomServiceTest extends AbstractIntegrationTest {
         assertThat(destination.characters()).extracting(GamePlayer::getId).contains(character.getId());
         assertThat(origin.characters()).extracting(GamePlayer::getId).doesNotContain(character.getId());
         assertThat(character.getPosition()).isEqualTo(destination.getSpawnCell());
-        assertThat(characterDao.findById(character.getId())).map(GamePlayer::getCurrentRoomId)
+        WorldInstance instance = worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID);
+        assertThat(characterDao.findByAccountAndWorldInstance(account, instance)).map(GamePlayer::getCurrentRoomId)
                 .contains(destination.getTemplateId());
     }
 
@@ -93,9 +97,8 @@ class RoomServiceTest extends AbstractIntegrationTest {
 
         Account account = new Account(UUID.randomUUID(), "finn", "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Finn", room.getTemplateId(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
-                0);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Finn", room, Gender.MAN, Race.HUMAN,
+                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
 
         roomService.spawnCharacter(character);

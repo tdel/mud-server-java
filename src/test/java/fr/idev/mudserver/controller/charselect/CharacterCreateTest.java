@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.controller.RecordingConnection;
 import fr.idev.mudserver.domain.Account;
+import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.TestRooms;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
@@ -75,9 +77,9 @@ class CharacterCreateTest extends AbstractIntegrationTest {
     void alreadyHasACharacterInThisWorldRefusesCreationAndShowsStatus() {
         RecordingConnection connection = enterCharSelect("p2");
         Account account = connection.account();
-        GamePlayer existing = new GamePlayer(UUID.randomUUID(), account.getId(), "Existing", UUID.randomUUID(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
-                0);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Test Room", "...");
+        GamePlayer existing = new GamePlayer(UUID.randomUUID(), account, "Existing", room, Gender.MAN, Race.HUMAN,
+                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(existing);
 
         characterCreate.onReceive(connection, "Another");
@@ -149,8 +151,8 @@ class CharacterCreateTest extends AbstractIntegrationTest {
 
         assertThat(connection.received).anyMatch(message -> message.equals(new CharacterCreated("Hero")));
         assertThat(connection.received).anyMatch(GamePlayerStats.class::isInstance);
-        assertThat(characterDao.findByAccountIdAndWorldInstanceId(account.getId(), WorldInstance.DEFAULT_ID))
-                .isPresent();
+        WorldInstance instance = worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID);
+        assertThat(characterDao.findByAccountAndWorldInstance(account, instance)).isPresent();
     }
 
     private RecordingConnection enterCharSelect(String login) {

@@ -59,7 +59,7 @@ class WorldInstanceCreateCharacterTest extends AbstractIntegrationTest {
         GamePlayer character = instance.createCharacter(account, "Hilde", Gender.WOMAN, Race.HUMAN,
                 CharacterClass.FIGHTER);
 
-        assertThat(characterDao.findById(character.getId())).contains(character);
+        assertThat(characterDao.findByAccountAndWorldInstance(account, instance)).contains(character);
         assertThat(character.getGender()).isEqualTo(Gender.WOMAN);
         assertThat(character.getLevel()).isEqualTo(1);
         int expectedConstitutionModifier = character.getModifier(Attribute.CONSTITUTION);

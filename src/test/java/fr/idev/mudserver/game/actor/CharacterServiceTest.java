@@ -24,6 +24,7 @@ import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.OutputMessage;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.game.ItemService;
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.message.ingame.GoldLooted;
 import fr.idev.mudserver.network.message.ingame.GoldSpent;
 import fr.idev.mudserver.network.message.ingame.PlayerLeveledUp;
@@ -54,18 +55,24 @@ class CharacterServiceTest extends AbstractIntegrationTest {
     @Autowired
     private ItemService itemService;
 
+    @Autowired
+    private WorldInstanceService worldInstanceService;
+
     private GamePlayer fighter(int level, int xp) {
         Account account = new Account(UUID.randomUUID(), "hero-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
+        // WorldInstance.DEFAULT_ID, pas une RoomInstance/WorldInstance jetable :
+        // characterDao.insert() persiste toujours account/world_instance_id avec une
+        // contrainte de clé étrangère vers "world_instance" — seule l'instance par
+        // défaut (pré-semée en migration) existe réellement en base ici.
+        WorldInstance instance = worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID);
+        RoomInstance room = instance.startingRoomInstance().orElseThrow();
         // FIGHTER, CON 10 (modificateur nul) : hpGain par niveau = hitDie/2+1+0 = 6.
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Héros", UUID.randomUUID(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, level, 10, 10,
-                TestAttributes.of(10, 10, 10, 10, 10, 10), xp, 0);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Héros", room, Gender.MAN, Race.HUMAN,
+                CharacterClass.FIGHTER, level, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), xp, 0);
+        character.setWorldInstance(instance);
         characterDao.insert(character);
-        // CharacterService diffuse toujours à character.getCurrentRoom() en cas de
-        // montée de niveau : il faut donc une room, même quand le test ne
-        // s'intéresse pas à la diffusion elle-même.
-        TestRooms.room(UUID.randomUUID(), "Place du village", "...").join(character);
+        room.join(character);
         return character;
     }
 
@@ -80,7 +87,8 @@ class CharacterServiceTest extends AbstractIntegrationTest {
         assertThat(character.getMaxHealth()).isEqualTo(16);
         assertThat(character.getCurrentHealth()).isEqualTo(16);
         assertThat(character.getXp()).isEqualTo(300);
-        assertThat(characterDao.findById(character.getId())).contains(character);
+        WorldInstance instance = character.getCurrentRoom().getWorldInstance();
+        assertThat(characterDao.findByAccountAndWorldInstance(character.getAccount(), instance)).contains(character);
     }
 
     @Test
@@ -106,7 +114,8 @@ class CharacterServiceTest extends AbstractIntegrationTest {
         assertThat(character.getLevel()).isEqualTo(1);
         assertThat(character.getMaxHealth()).isEqualTo(10);
         assertThat(character.getXp()).isEqualTo(50);
-        assertThat(characterDao.findById(character.getId())).contains(character);
+        WorldInstance instance = character.getCurrentRoom().getWorldInstance();
+        assertThat(characterDao.findByAccountAndWorldInstance(character.getAccount(), instance)).contains(character);
     }
 
     @Test
@@ -164,7 +173,8 @@ class CharacterServiceTest extends AbstractIntegrationTest {
 
         assertThat(character.getInventory().getGold()).isEqualTo(25);
         assertThat(connection.received).containsExactly(new GoldLooted(25));
-        assertThat(characterDao.findById(character.getId())).contains(character);
+        WorldInstance instance = character.getCurrentRoom().getWorldInstance();
+        assertThat(characterDao.findByAccountAndWorldInstance(character.getAccount(), instance)).contains(character);
     }
 
     @Test
@@ -182,7 +192,9 @@ class CharacterServiceTest extends AbstractIntegrationTest {
         assertThat(bought).isTrue();
         assertThat(character.getInventory().getGold()).isEqualTo(50);
         assertThat(connection.received).contains(new GoldSpent(50));
-        assertThat(characterDao.findById(character.getId()).map(c -> c.getInventory().getGold())).contains(50);
+        WorldInstance instance = character.getCurrentRoom().getWorldInstance();
+        assertThat(characterDao.findByAccountAndWorldInstance(character.getAccount(), instance)
+                .map(c -> c.getInventory().getGold())).contains(50);
     }
 
     @Test

@@ -20,6 +20,8 @@ import fr.idev.mudserver.domain.Rarity;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.actor.TestAttributes;
+import fr.idev.mudserver.domain.TestRooms;
+import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 import fr.idev.mudserver.persistence.ItemDao;
@@ -52,6 +54,9 @@ class ItemServiceTest extends AbstractIntegrationTest {
     @Autowired
     private RoomService roomService;
 
+    @Autowired
+    private WorldInstanceService worldInstanceService;
+
     @Test
     void equippingANewWeaponUnequipsThePreviousOneInTheSameTransaction() {
         ItemTemplate weaponTemplate = new ItemTemplate(UUID.randomUUID(), "Épée", null, ItemType.WEAPON, 3, null, 0,
@@ -59,9 +64,9 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
         Account account = new Account(UUID.randomUUID(), "erin", "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Erin", UUID.randomUUID(),
-                Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0, 0);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Test Room", "...");
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Erin", room, Gender.WOMAN, Race.HUMAN,
+                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
 
         Item firstSword = new Item(UUID.randomUUID(), weaponTemplate.getId(), null, character.getId(), null);
@@ -89,9 +94,9 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
         Account account = new Account(UUID.randomUUID(), "gwen", "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Gwen", UUID.randomUUID(),
-                Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0, 0);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Test Room", "...");
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Gwen", room, Gender.WOMAN, Race.HUMAN,
+                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
 
         Item sword = new Item(UUID.randomUUID(), weaponTemplate.getId(), null, character.getId(), null);
@@ -117,9 +122,9 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
         Account account = new Account(UUID.randomUUID(), "fay", "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Fay", UUID.randomUUID(),
-                Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0, 0);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Test Room", "...");
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Fay", room, Gender.WOMAN, Race.HUMAN,
+                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
 
         Item potion = new Item(UUID.randomUUID(), potionTemplate.getId(), null, character.getId(), null);
@@ -141,8 +146,8 @@ class ItemServiceTest extends AbstractIntegrationTest {
         RoomInstance warmedRoom = roomService.allRooms().iterator().next();
         Account account = new Account(UUID.randomUUID(), "gus", "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Gus", warmedRoom.getId(), Gender.MAN,
-                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Gus", warmedRoom, Gender.MAN, Race.HUMAN,
+                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
         warmedRoom.join(character);
 
@@ -185,9 +190,9 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
         Account account = new Account(UUID.randomUUID(), "mika", "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Mika", UUID.randomUUID(),
-                Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0, 100);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Test Room", "...");
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Mika", room, Gender.WOMAN, Race.HUMAN,
+                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 100);
         characterDao.insert(character);
 
         Item item = new Item(UUID.randomUUID(), potionTemplate.getId(), null, character.getId(), null);
@@ -196,7 +201,9 @@ class ItemServiceTest extends AbstractIntegrationTest {
         assertThat(bought).isTrue();
         assertThat(character.getInventory().getGold()).isEqualTo(50);
         assertThat(character.getInventory().getItems()).containsExactly(item);
-        assertThat(characterDao.findById(character.getId()).map(c -> c.getInventory().getGold())).contains(50);
+        WorldInstance instance = worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID);
+        assertThat(characterDao.findByAccountAndWorldInstance(account, instance).map(c -> c.getInventory().getGold()))
+                .contains(50);
         assertThat(itemDao.findById(item.getId())).map(Item::getTemplateId).contains(potionTemplate.getId());
     }
 
@@ -208,9 +215,9 @@ class ItemServiceTest extends AbstractIntegrationTest {
 
         Account account = new Account(UUID.randomUUID(), "nao", "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Nao", UUID.randomUUID(),
-                Gender.WOMAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10),
-                0, 10);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Test Room", "...");
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Nao", room, Gender.WOMAN, Race.HUMAN,
+                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 10);
         characterDao.insert(character);
 
         Item item = new Item(UUID.randomUUID(), potionTemplate.getId(), null, character.getId(), null);

@@ -98,9 +98,8 @@ class SaveTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "sauveur-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
         RecordingConnection connection = new RecordingConnection();
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Sauveur", startingRoom.getId(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
-                0);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Sauveur", startingRoom, Gender.MAN,
+                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
         worldInstanceService.enterCharSelect(connection,
                 worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));

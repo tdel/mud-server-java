@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.controller.RecordingConnection;
+import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.TestRooms;
 import fr.idev.mudserver.domain.WorldInstance;
@@ -113,9 +114,9 @@ class AttackTest extends AbstractIntegrationTest {
         roomService.warmRooms();
         RoomInstance startingRoom = roomService.startingRoom().orElseThrow();
         RecordingConnection connection = new RecordingConnection();
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Attaquant", startingRoom.getId(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 1000, 1000,
-                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+        Account account = new Account(UUID.randomUUID(), "attaquant-" + UUID.randomUUID(), "hashed-password", null);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Attaquant", startingRoom, Gender.MAN,
+                Race.HUMAN, CharacterClass.FIGHTER, 1, 1000, 1000, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         worldInstanceService.enterCharSelect(connection,
                 worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
         worldInstanceService.enterGame(connection, character);

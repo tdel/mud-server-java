@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
+import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.TestRooms;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
@@ -40,9 +42,9 @@ class AccountDaoTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "bob", "hashed-password", null);
         accountDao.insert(account);
 
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Bob le Nain", UUID.randomUUID(),
-                Gender.MAN, Race.DWARF, CharacterClass.FIGHTER, 1, 12, 12, TestAttributes.of(12, 10, 12, 10, 10, 10), 0,
-                0);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Test Room", "...");
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Bob le Nain", room, Gender.MAN, Race.DWARF,
+                CharacterClass.FIGHTER, 1, 12, 12, TestAttributes.of(12, 10, 12, 10, 10, 10), 0, 0);
         characterDao.insert(character);
 
         accountDao.updateCurrentCharacter(account.getId(), character.getId());
@@ -56,9 +58,9 @@ class AccountDaoTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "carol", "hashed-password", null);
         accountDao.insert(account);
 
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Carol", UUID.randomUUID(),
-                Gender.WOMAN, Race.DWARF, CharacterClass.FIGHTER, 1, 12, 12, TestAttributes.of(12, 10, 12, 10, 10, 10),
-                0, 0);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Test Room", "...");
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Carol", room, Gender.WOMAN, Race.DWARF,
+                CharacterClass.FIGHTER, 1, 12, 12, TestAttributes.of(12, 10, 12, 10, 10, 10), 0, 0);
         characterDao.insert(character);
         accountDao.updateCurrentCharacter(account.getId(), character.getId());
 

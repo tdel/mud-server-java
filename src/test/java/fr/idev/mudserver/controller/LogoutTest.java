@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
+import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.TestRooms;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
@@ -53,8 +55,9 @@ class LogoutTest extends AbstractIntegrationTest {
         roomService.warmRooms();
         Account account = new Account(UUID.randomUUID(), "p1", "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Hero", UUID.randomUUID(), Gender.MAN,
-                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Test Room", "...");
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Hero", room, Gender.MAN, Race.HUMAN,
+                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         character.setWorldInstanceId(WorldInstance.DEFAULT_ID);
         characterDao.insert(character);
         RecordingConnection connection = new RecordingConnection();

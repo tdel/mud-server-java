@@ -11,6 +11,7 @@ import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.TestRooms;
+import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.GamePlayer;
@@ -21,6 +22,7 @@ import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.TestAttributes;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.game.ItemService;
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 import fr.idev.mudserver.persistence.ItemDao;
@@ -63,6 +65,9 @@ class LootServiceTest extends AbstractIntegrationTest {
     @Autowired
     private ItemDao itemDao;
 
+    @Autowired
+    private WorldInstanceService worldInstanceService;
+
     @Test
     void killerReceivesGuaranteedGoldRewardRegardlessOfLootTable() {
         GamePlayer killer = killer();
@@ -71,7 +76,9 @@ class LootServiceTest extends AbstractIntegrationTest {
         monster.takeDamage(9999, killer);
 
         assertThat(killer.getInventory().getGold()).isEqualTo(5);
-        assertThat(characterDao.findById(killer.getId()).map(c -> c.getInventory().getGold())).contains(5);
+        WorldInstance instance = worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID);
+        assertThat(characterDao.findByAccountAndWorldInstance(killer.getAccount(), instance)
+                .map(c -> c.getInventory().getGold())).contains(5);
     }
 
     @Test
@@ -149,11 +156,11 @@ class LootServiceTest extends AbstractIntegrationTest {
     private GamePlayer killer() {
         Account account = new Account(UUID.randomUUID(), "chasseur-" + UUID.randomUUID(), "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Chasseur", UUID.randomUUID(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
-                0);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Clairière", "...");
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Chasseur", room, Gender.MAN, Race.HUMAN,
+                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
-        TestRooms.room(UUID.randomUUID(), "Clairière", "...").join(character);
+        room.join(character);
         return character;
     }
 

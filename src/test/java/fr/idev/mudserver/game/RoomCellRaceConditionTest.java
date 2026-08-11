@@ -86,8 +86,8 @@ class RoomCellRaceConditionTest extends AbstractIntegrationTest {
     private GamePlayer seedCharacter(RoomInstance room, String login) {
         Account account = new Account(UUID.randomUUID(), login, "hashed-password", null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), login, room.getId(), Gender.MAN,
-                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, login, room, Gender.MAN, Race.HUMAN,
+                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         characterDao.insert(character);
         return character;
     }

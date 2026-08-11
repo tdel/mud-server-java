@@ -161,11 +161,8 @@ public class WorldInstance {
         CharacterClass.StartingGold startingGold = characterClass.startingGold();
         int gold = DiceRoller.roll(startingGold.dice()).total() * startingGold.multiplier();
 
-        // getTemplateId(), pas getId() : current_room_id désigne toujours un id de
-        // RoomTemplate (indépendant de l'instance), jamais l'id déterministe de la
-        // RoomInstance elle-même — voir la Javadoc de RoomService.
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), name, startingRoom.getTemplateId(),
-                gender, race, characterClass, 1, maxHealth, maxHealth, scores, 0, gold);
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, name, startingRoom, gender, race,
+                characterClass, 1, maxHealth, maxHealth, scores, 0, gold);
         character.setWorldInstance(this);
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));

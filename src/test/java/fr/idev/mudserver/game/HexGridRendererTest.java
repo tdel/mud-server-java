@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
+import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.RoomTemplatePortal;
@@ -62,7 +63,9 @@ class HexGridRendererTest {
     }
 
     private GamePlayer player(String name) {
-        return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), name, UUID.randomUUID(), Gender.MAN, Race.HUMAN,
-                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+        Account account = new Account(UUID.randomUUID(), "player-" + UUID.randomUUID(), "hashed-password", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Test Room", "...");
+        return new GamePlayer(UUID.randomUUID(), account, name, room, Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1,
+                10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
     }
 }

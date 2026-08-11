@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
 import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
 import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
@@ -41,16 +42,17 @@ import fr.idev.mudserver.network.OutputMessage;
  * {@code connection} n'est jamais persisté ni pris en compte par
  * {@link #equals}/{@link #hashCode} : il ne représente rien en base, seulement
  * l'état vivant du personnage tant qu'il est en jeu (voir
- * {@code WorldInstanceService.enterGame}) — même convention pour
- * {@code currentRoom}, porté par {@link GameCharacter}. Un personnage
- * fraîchement chargé depuis {@code CharacterDao} n'a ni connexion ni room
- * courante tant qu'il n'a pas rejoint le monde via {@link #spawnToRoom} ou
- * {@link #moveToRoom}.
+ * {@code WorldInstanceService.enterGame}). {@code account} et
+ * {@code currentRoom} (porté par {@link GameCharacter}) sont, eux, obligatoires
+ * dès la construction — {@code CharacterDao.toDomain} et
+ * {@code WorldInstance.createCharacter} les résolvent avant d'appeler le
+ * constructeur, plutôt que de les renseigner après coup via un lookup.
+ * {@code connection} reste en revanche absent tant que le personnage n'a pas
+ * rejoint le monde via {@link #spawnToRoom} ou {@link #moveToRoom}.
  */
 public final class GamePlayer extends GameCharacter {
 
-    private UUID accountId;
-    private UUID currentRoomId;
+    private final Account account;
     private UUID worldInstanceId;
     private WorldInstance worldInstance;
     private Gender gender;
@@ -71,11 +73,11 @@ public final class GamePlayer extends GameCharacter {
      */
     public static final int MAX_SHORT_RESTS_BEFORE_LONG_REST = 2;
 
-    public GamePlayer(UUID id, UUID accountId, String name, UUID currentRoomId, Gender gender, Race race,
+    public GamePlayer(UUID id, Account account, String name, RoomInstance room, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold) {
-        this(id, accountId, name, currentRoomId, gender, race, characterClass, level, currentHealth, maxHealth,
-                attributes, xp, gold, 0);
+        this(id, account, name, room, gender, race, characterClass, level, currentHealth, maxHealth, attributes, xp,
+                gold, 0);
     }
 
     /**
@@ -85,12 +87,12 @@ public final class GamePlayer extends GameCharacter {
      * fraîchement créé ({@code WorldInstance.createCharacter}) ou construit en test
      * passe par le constructeur court ci-dessus, qui délègue ici avec 0.
      */
-    public GamePlayer(UUID id, UUID accountId, String name, UUID currentRoomId, Gender gender, Race race,
+    public GamePlayer(UUID id, Account account, String name, RoomInstance room, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold, int shortRestCount) {
         super(id, name, attributes, currentHealth, maxHealth);
-        this.accountId = accountId;
-        this.currentRoomId = currentRoomId;
+        this.account = account;
+        setCurrentRoom(room);
         this.gender = gender;
         this.race = race;
         this.speed = race.speed();
@@ -101,20 +103,22 @@ public final class GamePlayer extends GameCharacter {
         this.shortRestCount = shortRestCount;
     }
 
+    public Account getAccount() {
+        return account;
+    }
+
     public UUID getAccountId() {
-        return accountId;
+        return account.getId();
     }
 
-    public void setAccountId(UUID accountId) {
-        this.accountId = accountId;
-    }
-
+    /**
+     * Id de {@link fr.idev.mudserver.domain.RoomTemplate} (indépendant de
+     * l'instance), pas {@code getCurrentRoom().getId()} qui désigne la
+     * {@link RoomInstance} elle-même — deux espaces d'id différents, voir la
+     * Javadoc de {@link #setWorldInstance}.
+     */
     public UUID getCurrentRoomId() {
-        return currentRoomId;
-    }
-
-    public void setCurrentRoomId(UUID currentRoomId) {
-        this.currentRoomId = currentRoomId;
+        return getCurrentRoom().getTemplateId();
     }
 
     /**
@@ -659,21 +663,22 @@ public final class GamePlayer extends GameCharacter {
         return level == other.level && xp == other.xp && inventory.getGold() == other.inventory.getGold()
                 && getCurrentHealth() == other.getCurrentHealth() && getMaxHealth() == other.getMaxHealth()
                 && shortRestCount == other.shortRestCount && Objects.equals(getId(), other.getId())
-                && Objects.equals(accountId, other.accountId) && Objects.equals(getName(), other.getName())
-                && Objects.equals(currentRoomId, other.currentRoomId) && gender == other.gender && race == other.race
-                && characterClass == other.characterClass && Objects.equals(getAttributes(), other.getAttributes());
+                && Objects.equals(getAccountId(), other.getAccountId()) && Objects.equals(getName(), other.getName())
+                && Objects.equals(getCurrentRoomId(), other.getCurrentRoomId()) && gender == other.gender
+                && race == other.race && characterClass == other.characterClass
+                && Objects.equals(getAttributes(), other.getAttributes());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), accountId, getName(), currentRoomId, gender, race, characterClass, level, xp,
-                inventory.getGold(), getCurrentHealth(), getMaxHealth(), shortRestCount, getAttributes());
+        return Objects.hash(getId(), getAccountId(), getName(), getCurrentRoomId(), gender, race, characterClass, level,
+                xp, inventory.getGold(), getCurrentHealth(), getMaxHealth(), shortRestCount, getAttributes());
     }
 
     @Override
     public String toString() {
-        return "GamePlayer[id=" + getId() + ", accountId=" + accountId + ", name=" + getName() + ", currentRoomId="
-                + currentRoomId + ", gender=" + gender + ", race=" + race + ", characterClass=" + characterClass
+        return "GamePlayer[id=" + getId() + ", accountId=" + getAccountId() + ", name=" + getName() + ", currentRoomId="
+                + getCurrentRoomId() + ", gender=" + gender + ", race=" + race + ", characterClass=" + characterClass
                 + ", level=" + level + ", xp=" + xp + ", gold=" + inventory.getGold() + ", currentHealth="
                 + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + ", shortRestCount=" + shortRestCount
                 + ", attributes=" + getAttributes() + "]";

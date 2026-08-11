@@ -109,14 +109,12 @@ public class RoomService {
 
     @EventListener
     void onGamePlayerMovedToRoom(GamePlayerMovedToRoom event) {
-        event.character().setCurrentRoomId(event.to().getTemplateId());
         characterDao.updateCurrentRoom(event.character().getId(), event.to().getTemplateId());
         log.debug("room.player_moved character={} to={}", event.character().getName(), event.to().getName());
     }
 
     @EventListener
     void onGamePlayerSpawnedToRoom(GamePlayerSpawnedToRoom event) {
-        event.character().setCurrentRoomId(event.room().getTemplateId());
         characterDao.updateCurrentRoom(event.character().getId(), event.room().getTemplateId());
         log.info("room.player_spawned character={} room={}", event.character().getName(), event.room().getName());
     }

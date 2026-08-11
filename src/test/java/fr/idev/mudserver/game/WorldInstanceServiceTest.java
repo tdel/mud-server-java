@@ -59,7 +59,7 @@ class WorldInstanceServiceTest extends AbstractIntegrationTest {
                 account.getId());
         RoomInstance startingRoomBeforeEviction = instance.startingRoomInstance().orElseThrow();
 
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Solitaire", UUID.randomUUID(),
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "Solitaire", startingRoomBeforeEviction,
                 Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
                 0);
         character.setWorldInstanceId(instance.getId());
@@ -85,9 +85,9 @@ class WorldInstanceServiceTest extends AbstractIntegrationTest {
         Account account = new Account(UUID.randomUUID(), "wis-round-trip-" + UUID.randomUUID(), "hashed-password",
                 null);
         accountDao.insert(account);
-        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "AllerRetour", UUID.randomUUID(),
-                Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
-                0);
+        RoomInstance startingRoom = instance.startingRoomInstance().orElseThrow();
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account, "AllerRetour", startingRoom, Gender.MAN,
+                Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         character.setWorldInstanceId(instance.getId());
         characterDao.insert(character);
         RecordingConnection connection = new RecordingConnection();

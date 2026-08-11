@@ -9,7 +9,10 @@ import fr.idev.mudserver.domain.actor.GameNpc.NpcDialogue;
 import fr.idev.mudserver.domain.actor.GameNpcSeller.NpcShop;
 import fr.idev.mudserver.domain.actor.GameNpcSeller.NpcShopEntry;
 import fr.idev.mudserver.domain.actor.GameNpcSeller.PurchaseOutcome;
+import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Rarity;
+import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.TestRooms;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -89,7 +92,9 @@ class GameNpcSellerTest {
     }
 
     private GamePlayer buyer(int gold) {
-        return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), "Test", UUID.randomUUID(), Gender.MAN, Race.HUMAN,
-                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, gold);
+        Account account = new Account(UUID.randomUUID(), "buyer-" + UUID.randomUUID(), "hashed-password", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Test Room", "...");
+        return new GamePlayer(UUID.randomUUID(), account, "Test", room, Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER,
+                1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, gold);
     }
 }

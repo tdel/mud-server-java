@@ -58,7 +58,7 @@ public class CharacterDelete implements ControllerHandler {
         Account account = connection.account();
         WorldInstance instance = connection.worldInstance();
 
-        Optional<GamePlayer> character = characterDao.findByAccountIdAndName(account.getId(), instance.getId(), name);
+        Optional<GamePlayer> character = characterDao.findByAccountAndWorldInstanceAndName(account, instance, name);
         if (character.isEmpty()) {
             connection.send(new NoCharacterNamed(name));
             charSelectStatus.show(connection, account, instance);

@@ -104,7 +104,8 @@ class RoomTest {
     }
 
     private GamePlayer player(String name) {
-        return new GamePlayer(UUID.randomUUID(), UUID.randomUUID(), name, room.getId(), Gender.MAN, Race.HUMAN,
-                CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+        Account account = new Account(UUID.randomUUID(), "room-" + UUID.randomUUID(), "hashed-password", null);
+        return new GamePlayer(UUID.randomUUID(), account, name, room, Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1,
+                10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
     }
 }

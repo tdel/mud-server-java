@@ -48,8 +48,13 @@ public class WorldsList implements ControllerHandler {
 
         List<fr.idev.mudserver.network.message.lobby.WorldsList.Entry> entries = new ArrayList<>();
         for (WorldTemplate template : worldTemplateService.allTemplates()) {
+            // getOrMaterialize, pas l'instance brute renvoyée par le DAO : GamePlayer
+            // exige désormais une RoomInstance résolue dès sa construction (voir
+            // CharacterDao.toDomain), qui n'existe que sur une WorldInstance
+            // matérialisée (son roomInstances est sinon vide).
             Optional<GamePlayer> existingCharacter = worldInstanceDao
                     .findByAccountIdAndWorldTemplateId(account.getId(), template.getId())
+                    .map(instance -> worldInstanceService.getOrMaterialize(instance.getId()))
                     .flatMap(instance -> worldInstanceService.findCharacterFor(account, instance));
 
             entries.add(new fr.idev.mudserver.network.message.lobby.WorldsList.Entry(template.getShortName(),
