@@ -9,6 +9,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.TestRooms;
 import fr.idev.mudserver.domain.WorldTemplate;
 import fr.idev.mudserver.domain.actor.GameNpc;
 import fr.idev.mudserver.domain.actor.GameNpcSeller;
@@ -51,8 +52,8 @@ class NpcServiceTest {
     @Test
     void warmNpcsPlacesEachNpcTemplateInItsRoom() {
         WorldTemplate worldTemplate = defaultWorldTemplate();
-        RoomInstance tavern = new RoomInstance(TAVERN_ID, "Taverne du Sanglier Roux", "...", null);
-        RoomInstance villageSquare = new RoomInstance(VILLAGE_SQUARE_ID, "Place du village", "...", null);
+        RoomInstance tavern = TestRooms.room(TAVERN_ID, "Taverne du Sanglier Roux", "...");
+        RoomInstance villageSquare = TestRooms.room(VILLAGE_SQUARE_ID, "Place du village", "...");
 
         new NpcService().warmNpcs(List.of(worldTemplate), List.of(tavern, villageSquare));
 

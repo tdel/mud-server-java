@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.TestRooms;
 import fr.idev.mudserver.game.CombatResult;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.network.Connection;
@@ -306,7 +307,7 @@ class GameMonsterTest extends AbstractIntegrationTest {
         GameMonster monster = new GameMonster(UUID.randomUUID(), template.getName(), template.getId(),
                 UUID.randomUUID(), attributes, template.getMaxHealth());
         monster.attachTemplate(template);
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Clairière", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Clairière", "...");
         monster.setCurrentRoom(room);
         room.addMonster(monster);
         return monster;

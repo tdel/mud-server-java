@@ -18,7 +18,7 @@ class RoomTest {
     private static final int WIDTH = 5;
     private static final int HEIGHT = 4;
 
-    private final RoomInstance room = new RoomInstance(UUID.randomUUID(), "Testing Grounds", "...", null, WIDTH, HEIGHT,
+    private final RoomInstance room = TestRooms.room(UUID.randomUUID(), "Testing Grounds", "...", null, WIDTH, HEIGHT,
             new HexCoordinate(2, 2));
 
     @Test
@@ -41,12 +41,17 @@ class RoomTest {
 
     @Test
     void findPortalAtReturnsThePortalOnlyOnItsExactCell() {
-        RoomInstance target = new RoomInstance(UUID.randomUUID(), "Target", "...", null);
-        RoomPortal portal = new RoomPortal(new HexCoordinate(0, 0), "W", room, target, new HexCoordinate(4, 2));
-        room.setPortals(java.util.List.of(portal));
+        UUID targetId = UUID.randomUUID();
+        RoomTemplatePortal portalTemplate = new RoomTemplatePortal(new HexCoordinate(0, 0), "W", targetId,
+                new HexCoordinate(4, 2));
+        RoomInstance[] rooms = TestRooms.connectedByPortal(UUID.randomUUID(), "Testing Grounds", WIDTH, HEIGHT,
+                new HexCoordinate(2, 2), portalTemplate, targetId, "Target");
+        RoomInstance source = rooms[0];
+        RoomInstance target = rooms[1];
 
-        assertThat(room.findPortalAt(new HexCoordinate(0, 0))).contains(portal);
-        assertThat(room.findPortalAt(new HexCoordinate(1, 0))).isEmpty();
+        assertThat(source.findPortalAt(new HexCoordinate(0, 0)))
+                .hasValueSatisfying(portal -> assertThat(portal.targetRoom()).isEqualTo(target));
+        assertThat(source.findPortalAt(new HexCoordinate(1, 0))).isEmpty();
     }
 
     @Test

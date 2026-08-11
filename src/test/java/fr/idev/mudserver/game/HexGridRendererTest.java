@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test;
 
 import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.RoomInstance;
-import fr.idev.mudserver.domain.RoomPortal;
+import fr.idev.mudserver.domain.RoomTemplatePortal;
+import fr.idev.mudserver.domain.TestRooms;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.GameMonster;
@@ -22,8 +23,11 @@ class HexGridRendererTest {
 
     @Test
     void rendersEachOccupantTypeAtItsExpectedPosition() {
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Testing Grounds", "...", null, 5, 5,
-                new HexCoordinate(2, 2));
+        UUID targetId = UUID.randomUUID();
+        RoomTemplatePortal portalTemplate = new RoomTemplatePortal(new HexCoordinate(3, 1), "NE", targetId,
+                new HexCoordinate(0, 0));
+        RoomInstance room = TestRooms.connectedByPortal(UUID.randomUUID(), "Testing Grounds", 5, 5,
+                new HexCoordinate(2, 2), portalTemplate, targetId, "Elsewhere")[0];
 
         GamePlayer viewer = player("Viewer");
         room.join(viewer, new HexCoordinate(2, 2));
@@ -38,9 +42,6 @@ class HexGridRendererTest {
         GameNpc npc = new GameNpc(UUID.randomUUID(), "Aubergiste", room.getId(), "...", null);
         room.placeNpc(npc, new HexCoordinate(1, 2));
 
-        RoomInstance target = new RoomInstance(UUID.randomUUID(), "Elsewhere", "...", null);
-        room.setPortals(List.of(new RoomPortal(new HexCoordinate(3, 1), "NE", room, target, new HexCoordinate(0, 0))));
-
         List<String> lines = HexGridRenderer.render(room, viewer, 1);
 
         assertThat(lines).containsExactly(" p #", "n @ m", " . .");
@@ -48,7 +49,7 @@ class HexGridRendererTest {
 
     @Test
     void selfIsAlwaysAtTheCenterAndOutOfRoomCellsRenderAsTilde() {
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Corner RoomInstance", "...", null, 3, 3,
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Corner RoomInstance", "...", null, 3, 3,
                 new HexCoordinate(0, 0));
         GamePlayer viewer = player("Viewer");
         room.join(viewer, new HexCoordinate(0, 0));

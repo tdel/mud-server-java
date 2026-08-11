@@ -17,9 +17,7 @@ import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.RoomInstance;
-import fr.idev.mudserver.domain.RoomPortal;
 import fr.idev.mudserver.domain.RoomTemplate;
-import fr.idev.mudserver.domain.RoomTemplatePortal;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.WorldTemplate;
 import fr.idev.mudserver.domain.actor.GamePlayer;
@@ -125,16 +123,16 @@ public class WorldInstanceService {
     }
 
     /**
-     * Deux passes pour le graphe de rooms, comme l'ancien
-     * {@code RoomService.loadRooms} : la première construit toutes les
-     * {@link RoomInstance} (id déterministe, config statique copiée depuis leur
-     * {@link RoomTemplate}), la seconde résout les {@link RoomTemplatePortal} en
-     * références d'objet {@link RoomPortal} — les deux rooms d'un portail doivent
-     * déjà exister en mémoire avant de pouvoir se référencer l'une l'autre. Une
-     * fois le graphe construit, place aussi son contenu runtime (monstres, PNJ,
-     * items au sol depuis la DB) — cette instance n'est donc réellement prête pour
-     * des joueurs qu'à la sortie de cette méthode, jamais avant. Le garde de
-     * résidence ci-dessus garantit que ce placement ne tourne qu'une fois par
+     * Construit une {@link RoomInstance} par {@link RoomTemplate} (id
+     * déterministe), chacune composée directement de son {@code RoomTemplate} et de
+     * cette même {@code instance} — {@link RoomInstance#getPortals()} résout les
+     * rooms sœurs à la demande via {@code instance}, donc aucune passe de câblage
+     * séparée n'est nécessaire ici, même si {@link #setRoomInstances} n'est appelé
+     * qu'à la toute fin (voir la Javadoc de {@link RoomInstance}). Une fois le
+     * graphe construit, place aussi son contenu runtime (monstres, PNJ, items au
+     * sol depuis la DB) — cette instance n'est donc réellement prête pour des
+     * joueurs qu'à la sortie de cette méthode, jamais avant. Le garde de résidence
+     * ci-dessus garantit que ce placement ne tourne qu'une fois par
      * {@code WorldInstance}, jamais deux fois pour la même instance.
      */
     public WorldInstance materialize(WorldInstance instance) {
@@ -150,20 +148,7 @@ public class WorldInstanceService {
         Map<UUID, RoomInstance> roomInstances = new LinkedHashMap<>();
         for (RoomTemplate roomTemplate : template.getRoomTemplates().values()) {
             UUID roomInstanceId = RoomInstance.deterministicId(instance.getId(), roomTemplate.getId());
-            RoomInstance room = new RoomInstance(roomInstanceId, roomTemplate.getName(), roomTemplate.getDescription(),
-                    roomTemplate.isStartingRoom(), roomTemplate.getWidth(), roomTemplate.getHeight(),
-                    roomTemplate.getSpawnCell());
-            room.setTemplateId(roomTemplate.getId());
-            room.setWorldInstanceId(instance.getId());
-            room.setMonsterSpawns(roomTemplate.getMonsterSpawns());
-            roomInstances.put(roomTemplate.getId(), room);
-        }
-
-        for (RoomTemplate roomTemplate : template.getRoomTemplates().values()) {
-            RoomInstance source = roomInstances.get(roomTemplate.getId());
-            List<RoomPortal> portals = roomTemplate.getPortals().stream()
-                    .map(portal -> toRoomPortal(roomInstances, source, portal)).toList();
-            source.setPortals(portals);
+            roomInstances.put(roomTemplate.getId(), new RoomInstance(roomInstanceId, roomTemplate, instance));
         }
 
         long placementStart = System.currentTimeMillis();
@@ -200,12 +185,6 @@ public class WorldInstanceService {
     @EventListener
     void onWorldInstanceCreated(WorldInstanceCreated event) {
         worldInstanceDao.insert(event.instance());
-    }
-
-    private RoomPortal toRoomPortal(Map<UUID, RoomInstance> roomInstances, RoomInstance source,
-            RoomTemplatePortal portal) {
-        RoomInstance target = roomInstances.get(portal.targetRoomTemplateId());
-        return new RoomPortal(portal.cell(), portal.direction(), source, target, portal.targetCell());
     }
 
     /**

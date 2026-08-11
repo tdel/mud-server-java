@@ -16,6 +16,7 @@ import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.TestRooms;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.CombatEncounter;
 import fr.idev.mudserver.domain.actor.GameMonster;
@@ -62,7 +63,7 @@ class CombatEngineTest extends AbstractIntegrationTest {
 
     @Test
     void openingStrikeResolvesUnconditionallyAndEstablishesInitiativeWhenTheMonsterSurvives() {
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
         GamePlayer attacker = player("Attaquant", 10, 10, room);
         GameMonster monster = monster(room, 1000, -1000, 10, 10, "1d6");
 
@@ -78,7 +79,7 @@ class CombatEngineTest extends AbstractIntegrationTest {
     @Test
     void openingStrikeThatKillsTheMonsterLeavesNoEncounterBehind() {
         for (int i = 0; i < 20; i++) {
-            RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+            RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
             // FOR 20 => mod +5, dégâts à mains nues garantis (1+5=6, pas de dé) : létal
             // contre 1 PV. CA -1000 : touche sauf sur un 1 naturel (5% par essai).
             GamePlayer attacker = player("Attaquant", 20, 10, room);
@@ -98,7 +99,7 @@ class CombatEngineTest extends AbstractIntegrationTest {
     @Test
     void concurrentAttacksOnAFreshMonsterProduceExactlyOneSharedEncounter() throws Exception {
         int attackers = 20;
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
         GameMonster monster = monster(room, 100_000, -1000, 10, 10, "1d6");
         List<GamePlayer> players = new ArrayList<>();
         for (int i = 0; i < attackers; i++) {
@@ -131,7 +132,7 @@ class CombatEngineTest extends AbstractIntegrationTest {
 
     @Test
     void joiningAnOngoingEncounterInsertsWithoutAFreeAttack() {
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
         GamePlayer founder = player("Fondateur", 10, 10, room);
         GameMonster monster = monster(room, 1000, -1000, 10, 10, "1d6");
         combatEngine.attack(founder, monster);
@@ -149,7 +150,7 @@ class CombatEngineTest extends AbstractIntegrationTest {
 
     @Test
     void turnLockRejectsAnActionFromSomeoneWhoseTurnItIsNot() {
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
         // DEX 100 => A gagne quasi systématiquement l'initiative face au monstre (DEX
         // 10).
         GamePlayer a = player("A", 10, 100, room);
@@ -172,7 +173,7 @@ class CombatEngineTest extends AbstractIntegrationTest {
 
     @Test
     void multipleActionsPerTurnLetThePlayerActAgainBeforeTheTurnAdvances() {
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
         // DEX 100 => l'attaquant gagne quasi systématiquement l'initiative face au
         // monstre (DEX 10), même convention que les autres tests de cette classe.
         GamePlayer attacker = player("Attaquant", 10, 100, room);
@@ -201,7 +202,7 @@ class CombatEngineTest extends AbstractIntegrationTest {
 
     @Test
     void monsterTurnResetsItsBudgetButStillResolvesExactlyOneAttackRegardlessOfPoolSize() {
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
         GamePlayer attacker = player("Attaquant", 10, 100, room);
         GameMonster monster = monster(room, 1000, -1000, 10, 10, "1d4");
         monster.getActionEconomy().setActionsMax(3);
@@ -225,7 +226,7 @@ class CombatEngineTest extends AbstractIntegrationTest {
 
     @Test
     void cascadeResolvesEveryMonsterTurnBeforeReturningControlToTheLoneSurvivingPlayer() {
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
         // DEX 100 => le joueur agit systématiquement en premier ; les deux monstres
         // (DEX 10)
         // se partagent donc tout le reste de l'ordre, sans jamais redevenir "le joueur"
@@ -252,7 +253,7 @@ class CombatEngineTest extends AbstractIntegrationTest {
     @Test
     void playerDeathMidEncounterRespawnsWithoutEndingTheFightForTheSurvivor() {
         roomService.warmRooms();
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
         GameMonster monster = monster(room, 1000, 8, 10, 10, "1d4");
         GamePlayer victim = persistedPlayer("Victime", 10, 10, room, 10);
         GamePlayer survivor = persistedPlayer("Survivant", 10, 10, room, 10);
@@ -284,7 +285,7 @@ class CombatEngineTest extends AbstractIntegrationTest {
 
     @Test
     void aggroWithNoActiveEncounterStartsANewOneWithoutAFreeHit() {
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
         // DEX 100 => la victime gagne quasi systématiquement l'initiative face au
         // monstre (DEX 10) : si le monstre avait un coup d'ouverture hors ordre (comme
         // startNewEncounter), ses PV auraient déjà baissé ici — la décision de design
@@ -306,7 +307,7 @@ class CombatEngineTest extends AbstractIntegrationTest {
 
     @Test
     void aggroJoinsAnAlreadyFightingMonstersEncounter() {
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
         GamePlayer founder = player("Fondateur", 10, 10, room);
         GameMonster wolf = monster(room, 1000, -1000, 10, 10, "1d6", 5);
         combatEngine.attack(founder, wolf);
@@ -323,7 +324,7 @@ class CombatEngineTest extends AbstractIntegrationTest {
 
     @Test
     void aggroMergesASecondFreeMonsterInTheSameEncounter() {
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
         GamePlayer founder = player("Fondateur", 10, 10, room);
         GameMonster wolf = monster(room, 1000, -1000, 10, 10, "1d6", 5);
         combatEngine.attack(founder, wolf);

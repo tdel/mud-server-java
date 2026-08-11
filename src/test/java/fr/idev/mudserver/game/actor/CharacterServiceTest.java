@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.TestRooms;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.GamePlayer;
@@ -63,7 +64,7 @@ class CharacterServiceTest extends AbstractIntegrationTest {
         // CharacterService diffuse toujours à character.getCurrentRoom() en cas de
         // montée de niveau : il faut donc une room, même quand le test ne
         // s'intéresse pas à la diffusion elle-même.
-        new RoomInstance(UUID.randomUUID(), "Place du village", "...", null).join(character);
+        TestRooms.room(UUID.randomUUID(), "Place du village", "...").join(character);
         return character;
     }
 
@@ -133,8 +134,8 @@ class CharacterServiceTest extends AbstractIntegrationTest {
         bystander.setConnection(bystanderConnection);
         stranger.setConnection(strangerConnection);
 
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Place du village", "...", null);
-        RoomInstance otherRoom = new RoomInstance(UUID.randomUUID(), "Clairière", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Place du village", "...");
+        RoomInstance otherRoom = TestRooms.room(UUID.randomUUID(), "Clairière", "...");
         room.join(leveler);
         room.join(bystander);
         otherRoom.join(stranger);

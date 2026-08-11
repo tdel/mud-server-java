@@ -12,6 +12,7 @@ import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.ItemType;
 import fr.idev.mudserver.domain.Rarity;
 import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.TestRooms;
 import fr.idev.mudserver.domain.WeaponCategory;
 import fr.idev.mudserver.game.CombatResult;
 import fr.idev.mudserver.game.dice.CheckResult;
@@ -233,7 +234,7 @@ class GamePlayerTest {
     void attackWithAnEquippedWeaponDealsWeaponDiceDamage() {
         GamePlayer attacker = character(16, 10, 10, 10, 10, 10, 1);
         equip(attacker, weapon("1d6"));
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
         attacker.setCurrentRoom(room);
         GameMonster monster = monster(room, 100, -100);
 
@@ -247,7 +248,7 @@ class GamePlayerTest {
     void attackWithAMagicWeaponAddsItsBonusToDamage() {
         GamePlayer attacker = character(16, 10, 10, 10, 10, 10, 1);
         equip(attacker, weapon("1d6", 2));
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
         attacker.setCurrentRoom(room);
         GameMonster monster = monster(room, 100, -100);
 
@@ -260,7 +261,7 @@ class GamePlayerTest {
     @Test
     void attackWithoutAWeaponDealsUnarmedDamage() {
         GamePlayer attacker = character(14, 10, 10, 10, 10, 10, 1);
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
         attacker.setCurrentRoom(room);
         GameMonster monster = monster(room, 100, -100);
 
@@ -273,7 +274,7 @@ class GamePlayerTest {
     @Test
     void aMissDealsNoDamageAndLeavesTheMonsterUntouched() {
         GamePlayer attacker = character(10, 10, 10, 10, 10, 10, 1);
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
         attacker.setCurrentRoom(room);
 
         // Un monstre neuf à chaque tentative : un coup accidentel (nat 20 malgré
@@ -297,7 +298,7 @@ class GamePlayerTest {
         GamePlayer attacker = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.FIGHTER); // FIGHTER maîtrise
                                                                                             // MARTIAL
         equip(attacker, weapon("1d6", 0, WeaponCategory.MARTIAL));
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
         attacker.setCurrentRoom(room);
         GameMonster monster = monster(room, 100, 9999); // CA impossible : jamais touché, seul le jet compte
 
@@ -311,7 +312,7 @@ class GamePlayerTest {
         GamePlayer attacker = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.WIZARD); // WIZARD ne maîtrise que
                                                                                             // SIMPLE
         equip(attacker, weapon("1d6", 0, WeaponCategory.MARTIAL));
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
         attacker.setCurrentRoom(room);
         GameMonster monster = monster(room, 100, 9999);
 
@@ -325,7 +326,7 @@ class GamePlayerTest {
         GamePlayer attacker = character(10, 10, 10, 10, 10, 10, 1, CharacterClass.WIZARD); // aucune maîtrise
                                                                                             // d'armure
         equip(attacker, armor("Armure", ArmorCategory.LIGHT, 10));
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
         attacker.setCurrentRoom(room);
         GameMonster monster = monster(room, 100, 9999);
 

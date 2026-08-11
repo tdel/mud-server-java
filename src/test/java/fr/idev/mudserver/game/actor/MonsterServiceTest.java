@@ -10,6 +10,7 @@ import fr.idev.mudserver.domain.actor.MonsterTemplate.LootTableEntry;
 import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.MonsterSpawn;
 import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.TestRooms;
 import fr.idev.mudserver.domain.actor.TestAttributes;
 import tools.jackson.databind.ObjectMapper;
 
@@ -31,8 +32,8 @@ class MonsterServiceTest {
     @Test
     void loadMonstersThrowsWhenASpawnReferencesAnUnknownTemplate() {
         MonsterService isolated = new MonsterService(new ObjectMapper());
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), "Test", "...", null);
-        room.setMonsterSpawns(List.of(new MonsterSpawn(UUID.randomUUID(), UUID.randomUUID(), new HexCoordinate(0, 0))));
+        RoomInstance room = TestRooms.room(UUID.randomUUID(), "Test", "...",
+                List.of(new MonsterSpawn(UUID.randomUUID(), UUID.randomUUID(), new HexCoordinate(0, 0))));
 
         assertThatThrownBy(() -> isolated.loadMonsters(List.of(), List.of(room), Set.of()))
                 .isInstanceOf(IllegalStateException.class);

@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.controller.RecordingConnection;
 import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.TestRooms;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.GameMonster;
@@ -77,7 +78,7 @@ class AttackTest extends AbstractIntegrationTest {
     void noArgumentWithStaleTargetThatLeftTheRoomSendsTargetNotFoundAndClearsTheTarget() {
         RecordingConnection connection = enterGame();
         GamePlayer character = connection.character();
-        RoomInstance elsewhere = new RoomInstance(UUID.randomUUID(), "Ailleurs", "...", null);
+        RoomInstance elsewhere = TestRooms.room(UUID.randomUUID(), "Ailleurs", "...");
         GameMonster monster = monster(elsewhere);
         character.setTarget(monster);
 

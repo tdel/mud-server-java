@@ -30,14 +30,17 @@ import fr.idev.mudserver.network.message.ingame.GamePlayerLeftRoom;
  * unique index — it's validated at the application layer instead.
  *
  * <p>
- * {@code templateId}/{@code worldInstanceId} identify which
- * {@link RoomTemplate} this instance was materialized from and which
- * {@code WorldInstance} it belongs to — both default to {@code id} itself /
- * {@code null} in the plain constructors below, so ad-hoc rooms built directly
- * (tests, or any future standalone usage) stay self-consistent without callers
- * having to think about instance-scoping. {@code WorldInstanceService
- * .materialize} overrides both explicitly via the setters once it computes the
- * real deterministic instance id.
+ * Composition volontairement minimale : {@code id}, {@link #template} et
+ * {@link #worldInstance} sont les 3 seules propriétés de configuration —
+ * {@code name}/{@code description}/{@code isStartingRoom}/{@code width}/
+ * {@code height}/{@code spawnCell}/{@code monsterSpawns}/portails ne sont pas
+ * recopiés, chaque accesseur délègue directement à
+ * {@link RoomTemplate}/{@link WorldInstance}. {@code WorldInstanceService
+ * .materialize} passe la même référence {@code WorldInstance} à chaque
+ * {@link RoomInstance} qu'elle construit, avant même d'appeler
+ * {@link WorldInstance#setRoomInstances} — la résolution des portails (voir
+ * {@link #findPortalAt}) ne lit ce graphe que plus tard, à la demande, donc
+ * l'ordre de construction ne pose pas de problème.
  *
  * <p>
  * {@code clients} suit les joueurs actuellement présents dans la room, et sert
@@ -58,29 +61,28 @@ import fr.idev.mudserver.network.message.ingame.GamePlayerLeftRoom;
  * {@code NpcService.warmNpcs}) — contrairement à {@code clients}, ils ne
  * rejoignent/quittent jamais dynamiquement dans ce périmètre (pas d'IA, pas de
  * déplacement), donc pas de notification {@code broadcast} à leur
- * ajout/retrait. {@code monsterSpawns} n'est pas cette liste runtime, mais la
- * config statique portée par le {@code RoomTemplate} d'origine (voir
- * {@code WorldTemplateService}) qui sert à peupler {@code monsters} au
- * démarrage — {@code MonsterService.loadMonsters} en consomme le contenu, ne le
- * mute jamais.
+ * ajout/retrait. {@link #getMonsterSpawns()} n'est pas cette liste runtime,
+ * mais délègue directement à {@link RoomTemplate#getMonsterSpawns()} — la
+ * config statique qui sert à peupler {@code monsters} au démarrage,
+ * {@code MonsterService.loadMonsters} en consomme le contenu, ne le mute
+ * jamais.
  *
  * <p>
- * {@code width}/{@code height}/{@code spawnCell} définissent la grille
- * hexagonale (coordonnées axiales, cases {@code q ∈ [0,width)}/
- * {@code r ∈ [0,height)}) sur laquelle {@code occupants} place chaque
- * {@link GameCharacter} présent, et {@code portals} les cases de bord reliant
- * cette RoomInstance à une autre (voir {@link RoomPortal}). {@code occupants}
- * est volontairement clé sur la classe scellée {@link GameCharacter} (pas
- * seulement {@link GamePlayer}) pour que monstres/PNJ y participent aussi —
- * c'est le point d'accroche "interrogeable par coordonnée/rayon" pour une
- * future portée d'attaque/de ciblage, hors périmètre de cette phase. Comme
- * {@code clients}/{@code exits}, {@code occupants}/{@code portals} ne sont
- * jamais persistés ni pris en compte par {@link #equals}/{@link #hashCode}.
+ * {@code width}/{@code height}/{@code spawnCell} (délégués à {@link #template})
+ * définissent la grille hexagonale (coordonnées axiales, cases
+ * {@code q ∈ [0,width)}/{@code r ∈ [0,height)}) sur laquelle {@code occupants}
+ * place chaque {@link GameCharacter} présent. Les portails (cases de bord
+ * reliant cette RoomInstance à une autre, voir {@link RoomPortal}) sont résolus
+ * à la demande par {@link #findPortalAt}/{@link #getPortals}, pas stockés :
+ * voir leur Javadoc. {@code occupants} est volontairement clé sur la classe
+ * scellée {@link GameCharacter} (pas seulement {@link GamePlayer}) pour que
+ * monstres/PNJ y participent aussi — c'est le point d'accroche "interrogeable
+ * par coordonnée/rayon" pour une future portée d'attaque/de ciblage, hors
+ * périmètre de cette phase. Comme {@code clients}/{@code exits},
+ * {@code occupants} n'est jamais persisté ni pris en compte par
+ * {@link #equals}/{@link #hashCode}.
  */
 public class RoomInstance {
-
-    public static final int DEFAULT_WIDTH = 16;
-    public static final int DEFAULT_HEIGHT = 8;
 
     /**
      * Id déterministe (jamais aléatoire) d'une {@link RoomInstance} matérialisée
@@ -99,111 +101,68 @@ public class RoomInstance {
         return UUID.nameUUIDFromBytes((worldInstanceId + ":" + roomTemplateId).getBytes(StandardCharsets.UTF_8));
     }
 
-    private UUID id;
-    private UUID templateId;
-    private UUID worldInstanceId;
-    private String name;
-    private String description;
-    private Boolean isStartingRoom;
-    private int width;
-    private int height;
-    private HexCoordinate spawnCell;
+    private final UUID id;
+    private final RoomTemplate template;
+    private final WorldInstance worldInstance;
 
     private final Map<UUID, GamePlayer> clients = new ConcurrentHashMap<>();
     private final List<Item> items = new CopyOnWriteArrayList<>();
     private final List<GameMonster> monsters = new CopyOnWriteArrayList<>();
-    private final List<MonsterSpawn> monsterSpawns = new CopyOnWriteArrayList<>();
     private final List<GameNpc> npcs = new CopyOnWriteArrayList<>();
     private final Map<HexCoordinate, GameCharacter> occupants = new ConcurrentHashMap<>();
-    private final Map<HexCoordinate, RoomPortal> portals = new ConcurrentHashMap<>();
 
-    public RoomInstance(UUID id, String name, String description, Boolean isStartingRoom) {
-        this(id, name, description, isStartingRoom, DEFAULT_WIDTH, DEFAULT_HEIGHT,
-                new HexCoordinate(DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 2));
-    }
-
-    public RoomInstance(UUID id, String name, String description, Boolean isStartingRoom, int width, int height,
-            HexCoordinate spawnCell) {
+    public RoomInstance(UUID id, RoomTemplate template, WorldInstance worldInstance) {
         this.id = id;
-        this.templateId = id;
-        this.name = name;
-        this.description = description;
-        this.isStartingRoom = isStartingRoom;
-        this.width = width;
-        this.height = height;
-        this.spawnCell = spawnCell;
+        this.template = template;
+        this.worldInstance = worldInstance;
     }
 
     public UUID getId() {
         return id;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public UUID getTemplateId() {
-        return templateId;
-    }
-
-    public void setTemplateId(UUID templateId) {
-        this.templateId = templateId;
+        return template.getId();
     }
 
     public UUID getWorldInstanceId() {
-        return worldInstanceId;
-    }
-
-    public void setWorldInstanceId(UUID worldInstanceId) {
-        this.worldInstanceId = worldInstanceId;
+        return worldInstance.getId();
     }
 
     public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        return template.getName();
     }
 
     public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+        return template.getDescription();
     }
 
     public Boolean isStartingRoom() {
-        return isStartingRoom;
-    }
-
-    public void setStartingRoom(Boolean startingRoom) {
-        this.isStartingRoom = startingRoom;
+        return template.isStartingRoom();
     }
 
     public int getWidth() {
-        return width;
+        return template.getWidth();
     }
 
     public int getHeight() {
-        return height;
+        return template.getHeight();
     }
 
     public HexCoordinate getSpawnCell() {
-        return spawnCell;
+        return template.getSpawnCell();
     }
 
     public boolean isInBounds(HexCoordinate cell) {
-        return cell.q() >= 0 && cell.q() < width && cell.r() >= 0 && cell.r() < height;
+        return template.isInBounds(cell);
     }
 
     public boolean isBorderCell(HexCoordinate cell) {
-        return isInBounds(cell) && (cell.q() == 0 || cell.q() == width - 1 || cell.r() == 0 || cell.r() == height - 1);
+        return template.isBorderCell(cell);
     }
 
     public void join(GamePlayer character) {
-        join(character, spawnCell);
+        join(character, getSpawnCell());
     }
 
     public void join(GamePlayer character, HexCoordinate cell) {
@@ -269,19 +228,7 @@ public class RoomInstance {
     }
 
     public List<MonsterSpawn> getMonsterSpawns() {
-        return List.copyOf(monsterSpawns);
-    }
-
-    /**
-     * Point d'entrée utilisé par {@code WorldInstanceService.materialize} : config
-     * statique de placement copiée depuis le {@code RoomTemplate} d'origine
-     * (contrairement à {@link #monsters}, jamais mutée en jeu), lue par
-     * {@code MonsterService.loadMonsters} pour instancier les {@link GameMonster}
-     * de cette room au démarrage.
-     */
-    public void setMonsterSpawns(List<MonsterSpawn> monsterSpawns) {
-        this.monsterSpawns.clear();
-        this.monsterSpawns.addAll(monsterSpawns);
+        return template.getMonsterSpawns();
     }
 
     /**
@@ -342,19 +289,29 @@ public class RoomInstance {
         this.items.addAll(items);
     }
 
+    /**
+     * Résolus à la demande depuis {@link RoomTemplate#getPortals()} (les
+     * {@link RoomTemplatePortal}, cibles par id de {@code RoomTemplate}) plutôt que
+     * stockés : {@link #worldInstance} porte le graphe de {@link RoomInstance}
+     * sœurs (voir {@link WorldInstance#roomInstanceForTemplate}), déjà complet au
+     * moment où un joueur peut effectivement interroger un portail (voir la Javadoc
+     * de tête de classe sur l'ordre de construction de
+     * {@code WorldInstanceService.materialize}).
+     */
     public List<RoomPortal> getPortals() {
-        return List.copyOf(portals.values());
-    }
-
-    public void setPortals(List<RoomPortal> portalList) {
-        portals.clear();
-        for (RoomPortal portal : portalList) {
-            portals.put(portal.cell(), portal);
-        }
+        return template.getPortals().stream().map(this::toRoomPortal).toList();
     }
 
     public Optional<RoomPortal> findPortalAt(HexCoordinate cell) {
-        return Optional.ofNullable(portals.get(cell));
+        return template.getPortals().stream().filter(portal -> portal.cell().equals(cell)).findFirst()
+                .map(this::toRoomPortal);
+    }
+
+    private RoomPortal toRoomPortal(RoomTemplatePortal portal) {
+        RoomInstance target = worldInstance.roomInstanceForTemplate(portal.targetRoomTemplateId())
+                .orElseThrow(() -> new IllegalStateException("Portail de " + id + " vers "
+                        + portal.targetRoomTemplateId() + ", absente de " + worldInstance.getId()));
+        return new RoomPortal(portal.cell(), portal.direction(), this, target, portal.targetCell());
     }
 
     public Optional<GameCharacter> occupantAt(HexCoordinate cell) {
@@ -426,19 +383,17 @@ public class RoomInstance {
         if (!(o instanceof RoomInstance other)) {
             return false;
         }
-        return width == other.width && height == other.height && Objects.equals(id, other.id)
-                && Objects.equals(name, other.name) && Objects.equals(description, other.description)
-                && Objects.equals(isStartingRoom, other.isStartingRoom) && Objects.equals(spawnCell, other.spawnCell);
+        return Objects.equals(id, other.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, isStartingRoom, width, height, spawnCell);
+        return Objects.hashCode(id);
     }
 
     @Override
     public String toString() {
-        return "RoomInstance[id=" + id + ", name=" + name + ", description=" + description + ", isStartingRoom="
-                + isStartingRoom + ", width=" + width + ", height=" + height + ", spawnCell=" + spawnCell + "]";
+        return "RoomInstance[id=" + id + ", templateId=" + template.getId() + ", worldInstanceId="
+                + worldInstance.getId() + "]";
     }
 }

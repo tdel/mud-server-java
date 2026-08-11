@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.TestRooms;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
  */
 class CombatEncounterTest {
 
-    private final RoomInstance room = new RoomInstance(UUID.randomUUID(), "Arène", "...", null);
+    private final RoomInstance room = TestRooms.room(UUID.randomUUID(), "Arène", "...");
 
     @Test
     void establishInitiativeOrderSortsDescendingByRoll() {

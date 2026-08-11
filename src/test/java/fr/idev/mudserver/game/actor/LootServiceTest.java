@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.TestRooms;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.GamePlayer;
@@ -152,7 +153,7 @@ class LootServiceTest extends AbstractIntegrationTest {
                 Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
                 0);
         characterDao.insert(character);
-        new RoomInstance(UUID.randomUUID(), "Clairière", "...", null).join(character);
+        TestRooms.room(UUID.randomUUID(), "Clairière", "...").join(character);
         return character;
     }
 

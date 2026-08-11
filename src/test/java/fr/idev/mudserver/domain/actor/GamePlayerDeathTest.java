@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.TestRooms;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -117,7 +118,7 @@ class GamePlayerDeathTest extends AbstractIntegrationTest {
     }
 
     private RoomInstance deathRoom() {
-        return new RoomInstance(UUID.randomUUID(), "Fosse aux ours", "...", null);
+        return TestRooms.room(UUID.randomUUID(), "Fosse aux ours", "...");
     }
 
     private GamePlayer seedCharacter(RoomInstance room) {
