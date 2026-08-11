@@ -61,7 +61,7 @@ class PartyAcceptTest extends AbstractIntegrationTest {
 
         assertThat(invitee.received).containsExactly(new PartyJoined("pa-leader1", 2));
         assertThat(leader.received).containsExactly(new PartyMemberJoined("pa-invitee1"));
-        Account leaderAccount = authWorld.account(leader);
+        Account leaderAccount = leader.account();
         assertThat(partyService.partyOf(leaderAccount.getId()).get().size()).isEqualTo(2);
     }
 

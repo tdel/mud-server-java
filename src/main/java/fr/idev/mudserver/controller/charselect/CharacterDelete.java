@@ -12,8 +12,6 @@ import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.GamePlayer;
-import fr.idev.mudserver.game.AuthWorld;
-import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -30,16 +28,11 @@ public class CharacterDelete implements ControllerHandler {
 
     private final CharacterDao characterDao;
     private final AccountDao accountDao;
-    private final AuthWorld authWorld;
-    private final WorldInstanceService worldInstanceService;
     private final CharSelectStatus charSelectStatus;
 
-    public CharacterDelete(CharacterDao characterDao, AccountDao accountDao, AuthWorld authWorld,
-            WorldInstanceService worldInstanceService, CharSelectStatus charSelectStatus) {
+    public CharacterDelete(CharacterDao characterDao, AccountDao accountDao, CharSelectStatus charSelectStatus) {
         this.characterDao = characterDao;
         this.accountDao = accountDao;
-        this.authWorld = authWorld;
-        this.worldInstanceService = worldInstanceService;
         this.charSelectStatus = charSelectStatus;
     }
 
@@ -62,8 +55,8 @@ public class CharacterDelete implements ControllerHandler {
             return;
         }
 
-        Account account = authWorld.account(connection);
-        WorldInstance instance = worldInstanceService.worldInstanceOf(connection);
+        Account account = connection.account();
+        WorldInstance instance = connection.worldInstance();
 
         Optional<GamePlayer> character = characterDao.findByAccountIdAndName(account.getId(), instance.getId(), name);
         if (character.isEmpty()) {

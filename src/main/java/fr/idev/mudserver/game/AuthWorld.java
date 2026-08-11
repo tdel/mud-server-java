@@ -2,8 +2,8 @@ package fr.idev.mudserver.game;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,9 +38,14 @@ import fr.idev.mudserver.persistence.AccountDao;
  * pour le compte.
  *
  * <p>
- * Remplace le {@code SplObjectStorage} PHP par un {@link ConcurrentHashMap},
- * dont l'itérateur (voir {@link #isAlreadyConnected}) tolère un ajout/retrait
- * concurrent sans copie défensive préalable, contrairement à l'original.
+ * Remplace le {@code SplObjectStorage} PHP par un ensemble issu de
+ * {@link ConcurrentHashMap#newKeySet()}, dont l'itérateur (voir
+ * {@link #isAlreadyConnected}) tolère un ajout/retrait concurrent sans copie
+ * défensive préalable, contrairement à l'original. Le compte associé à chaque
+ * connexion n'est plus dupliqué ici : il vit directement sur la
+ * {@link Connection} elle-même (voir {@code Connection.account()}), ce registre
+ * ne sert plus qu'à énumérer les connexions authentifiées et à résoudre une
+ * connexion à partir d'un login/id de compte.
  */
 @Component
 public class AuthWorld {
@@ -50,7 +55,7 @@ public class AuthWorld {
     private static final int MIN_PASSWORD_LENGTH = 8;
     private static final int MAX_PASSWORD_LENGTH = 128;
 
-    private final Map<Connection, Account> accounts = new ConcurrentHashMap<>();
+    private final Set<Connection> connections = ConcurrentHashMap.newKeySet();
 
     private final AccountDao accountDao;
     private final PasswordEncoder passwordEncoder;
@@ -112,19 +117,17 @@ public class AuthWorld {
     }
 
     public void enterWorld(Connection connection, Account account) {
-        accounts.put(connection, account);
+        connection.setAccount(account);
+        connections.add(connection);
         connection.setState(ConnectionState.LOBBY);
         MDC.put("account", account.getLogin());
     }
 
     public void exitWorld(Connection connection) {
-        accounts.remove(connection);
+        connections.remove(connection);
+        connection.setAccount(null);
         connection.setState(ConnectionState.CONNECTED);
         MDC.remove("account");
-    }
-
-    public Account account(Connection connection) {
-        return accounts.get(connection);
     }
 
     /**
@@ -134,7 +137,7 @@ public class AuthWorld {
      * Symétrique de {@code WorldInstanceService#broadcastToInstance} côté lobby.
      */
     public void broadcastToLobby(OutputMessage message, Connection exclude) {
-        for (Connection connection : accounts.keySet()) {
+        for (Connection connection : connections) {
             if (connection == exclude || connection.state() != ConnectionState.LOBBY)
                 continue;
             connection.send(message);
@@ -142,7 +145,7 @@ public class AuthWorld {
     }
 
     public boolean isAlreadyConnected(UUID accountId) {
-        return accounts.values().stream().anyMatch(account -> account.getId().equals(accountId));
+        return connections.stream().anyMatch(connection -> connection.account().getId().equals(accountId));
     }
 
     /**
@@ -152,8 +155,8 @@ public class AuthWorld {
      * joignable avant de lui envoyer une invitation.
      */
     public Optional<Connection> findConnectionByLogin(String login) {
-        return accounts.entrySet().stream().filter(entry -> entry.getValue().getLogin().equalsIgnoreCase(login))
-                .map(Map.Entry::getKey).findFirst();
+        return connections.stream().filter(connection -> connection.account().getLogin().equalsIgnoreCase(login))
+                .findFirst();
     }
 
     /**
@@ -163,7 +166,6 @@ public class AuthWorld {
      * vers sa connexion courante au moment du lancement.
      */
     public Optional<Connection> findConnectionByAccountId(UUID accountId) {
-        return accounts.entrySet().stream().filter(entry -> entry.getValue().getId().equals(accountId))
-                .map(Map.Entry::getKey).findFirst();
+        return connections.stream().filter(connection -> connection.account().getId().equals(accountId)).findFirst();
     }
 }

@@ -60,7 +60,7 @@ class WorldsListTest extends AbstractIntegrationTest {
     @Test
     void listsTheDefaultWorldWithAnExistingCharacterHintWhenTheAccountIsAMember() {
         RecordingConnection connection = enterLobby("p2");
-        Account account = authWorld.account(connection);
+        Account account = connection.account();
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Hero", UUID.randomUUID(), Gender.MAN,
                 Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         character.setWorldInstanceId(WorldInstance.DEFAULT_ID);

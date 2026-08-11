@@ -44,7 +44,7 @@ public class PartyLeave implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        Account account = authWorld.account(connection);
+        Account account = connection.account();
 
         Optional<Party> partyOpt = partyService.partyOf(account.getId());
         if (partyOpt.isEmpty()) {

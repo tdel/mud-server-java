@@ -34,7 +34,7 @@ public class Say implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        Account account = authWorld.account(connection);
+        Account account = connection.account();
         String message = argument.trim();
 
         if (message.isEmpty()) {

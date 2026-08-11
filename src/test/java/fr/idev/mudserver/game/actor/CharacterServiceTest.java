@@ -13,6 +13,7 @@ import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.TestRooms;
+import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.GamePlayer;
@@ -200,6 +201,8 @@ class CharacterServiceTest extends AbstractIntegrationTest {
 
         private final List<OutputMessage> received = new ArrayList<>();
         private GamePlayer character;
+        private Account account;
+        private WorldInstance worldInstance;
 
         @Override
         public void requestBlocking(OutputMessage message, Consumer<String> handler) {
@@ -234,6 +237,26 @@ class CharacterServiceTest extends AbstractIntegrationTest {
         @Override
         public GamePlayer character() {
             return character;
+        }
+
+        @Override
+        public void setAccount(Account account) {
+            this.account = account;
+        }
+
+        @Override
+        public Account account() {
+            return account;
+        }
+
+        @Override
+        public void setWorldInstance(WorldInstance worldInstance) {
+            this.worldInstance = worldInstance;
+        }
+
+        @Override
+        public WorldInstance worldInstance() {
+            return worldInstance;
         }
     }
 }

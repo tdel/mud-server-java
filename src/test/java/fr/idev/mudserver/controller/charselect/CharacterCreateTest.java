@@ -74,7 +74,7 @@ class CharacterCreateTest extends AbstractIntegrationTest {
     @Test
     void alreadyHasACharacterInThisWorldRefusesCreationAndShowsStatus() {
         RecordingConnection connection = enterCharSelect("p2");
-        Account account = authWorld.account(connection);
+        Account account = connection.account();
         GamePlayer existing = new GamePlayer(UUID.randomUUID(), account.getId(), "Existing", UUID.randomUUID(),
                 Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0,
                 0);
@@ -140,7 +140,7 @@ class CharacterCreateTest extends AbstractIntegrationTest {
     @Test
     void fullHappyPathCreatesCharacterAndSendsCharacterCreatedAndStats() {
         RecordingConnection connection = enterCharSelect("p7");
-        Account account = authWorld.account(connection);
+        Account account = connection.account();
         connection.queueAnswer("woman");
         connection.queueAnswer("dwarf");
         connection.queueAnswer("wizard");

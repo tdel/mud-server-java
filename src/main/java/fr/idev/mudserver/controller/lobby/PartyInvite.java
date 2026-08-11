@@ -49,7 +49,7 @@ public class PartyInvite implements ControllerHandler {
             return;
         }
 
-        Account account = authWorld.account(connection);
+        Account account = connection.account();
 
         if (targetLogin.equalsIgnoreCase(account.getLogin())) {
             connection.send(new CannotInviteSelf());
@@ -68,7 +68,7 @@ public class PartyInvite implements ControllerHandler {
             connection.send(new PlayerNotOnline(targetLogin));
             return;
         }
-        Account targetAccount = authWorld.account(targetConnection.get());
+        Account targetAccount = targetConnection.get().account();
 
         if (partyService.partyOf(targetAccount.getId()).isPresent()) {
             connection.send(new AlreadyInAnotherParty(targetLogin));

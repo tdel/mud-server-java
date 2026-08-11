@@ -35,7 +35,7 @@ class PartyCreateTest extends AbstractIntegrationTest {
     @Test
     void createsAPartyWithCallerAsLeader() {
         RecordingConnection connection = enterLobby("pc-leader1");
-        Account account = authWorld.account(connection);
+        Account account = connection.account();
 
         partyCreate.onReceive(connection, "");
 

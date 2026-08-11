@@ -17,6 +17,7 @@ import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.TestRooms;
+import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.game.CombatResult;
 import fr.idev.mudserver.game.ItemService;
 import fr.idev.mudserver.network.Connection;
@@ -340,6 +341,8 @@ class GameMonsterTest extends AbstractIntegrationTest {
 
         private final List<OutputMessage> received = new ArrayList<>();
         private GamePlayer character;
+        private Account account;
+        private WorldInstance worldInstance;
 
         @Override
         public void requestBlocking(OutputMessage message, Consumer<String> handler) {
@@ -374,6 +377,26 @@ class GameMonsterTest extends AbstractIntegrationTest {
         @Override
         public GamePlayer character() {
             return character;
+        }
+
+        @Override
+        public void setAccount(Account account) {
+            this.account = account;
+        }
+
+        @Override
+        public Account account() {
+            return account;
+        }
+
+        @Override
+        public void setWorldInstance(WorldInstance worldInstance) {
+            this.worldInstance = worldInstance;
+        }
+
+        @Override
+        public WorldInstance worldInstance() {
+            return worldInstance;
         }
     }
 }

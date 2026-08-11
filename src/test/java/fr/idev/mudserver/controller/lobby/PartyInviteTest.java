@@ -102,13 +102,13 @@ class PartyInviteTest extends AbstractIntegrationTest {
         partyCreate.onReceive(leader, "");
         leader.received.clear();
         RecordingConnection target = enterLobby("pi-target5");
-        Account targetAccount = authWorld.account(target);
+        Account targetAccount = target.account();
 
         partyInvite.onReceive(leader, "pi-target5");
 
         assertThat(leader.received).containsExactly(new PartyInviteSent("pi-target5"));
         assertThat(target.received).containsExactly(new PartyInviteReceived("pi-leader5"));
-        Account leaderAccount = authWorld.account(leader);
+        Account leaderAccount = leader.account();
         assertThat(partyService.pendingInviteFor(targetAccount.getId())).isPresent();
         assertThat(partyService.pendingInviteFor(targetAccount.getId()).get().isLeader(leaderAccount.getId())).isTrue();
     }

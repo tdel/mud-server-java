@@ -78,7 +78,7 @@ class CharacterSelectTest extends AbstractIntegrationTest {
     @Test
     void existingCharacterMovesToIngameAndSendsNowPlayingThenLook() {
         RecordingConnection connection = enterCharSelect("p2");
-        Account account = authWorld.account(connection);
+        Account account = connection.account();
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Hero", UUID.randomUUID(), Gender.MAN,
                 Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10, TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
         character.setWorldInstanceId(WorldInstance.DEFAULT_ID);
@@ -108,10 +108,10 @@ class CharacterSelectTest extends AbstractIntegrationTest {
         RecordingConnection member = enterLobby("p-arena-member");
         partyInvite.onReceive(leader, "p-arena-member");
         partyAccept.onReceive(member, "");
-        Account account = authWorld.account(leader);
+        Account account = leader.account();
 
         worldEnter.onReceive(leader, "arena");
-        WorldInstance arenaInstance = worldInstanceService.worldInstanceOf(leader);
+        WorldInstance arenaInstance = leader.worldInstance();
         assertThat(arenaInstance.getId()).isNotEqualTo(WorldInstance.DEFAULT_ID);
 
         RoomInstance arenaStartingRoom = arenaInstance.startingRoomInstance().orElseThrow();

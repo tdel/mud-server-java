@@ -102,7 +102,7 @@ class PartyKickTest extends AbstractIntegrationTest {
 
         assertThat(leader.received).containsExactly(new PartyKicked("pk-member4"));
         assertThat(member.received).containsExactly(new PartyMemberKicked());
-        Account leaderAccount = authWorld.account(leader);
+        Account leaderAccount = leader.account();
         assertThat(partyService.partyOf(leaderAccount.getId()).get().size()).isEqualTo(1);
     }
 
@@ -111,7 +111,7 @@ class PartyKickTest extends AbstractIntegrationTest {
         RecordingConnection leader = enterLobby("pk-leader5");
         partyCreate.onReceive(leader, "");
         RecordingConnection member = enterLobby("pk-member5");
-        Account memberAccount = authWorld.account(member);
+        Account memberAccount = member.account();
         partyInvite.onReceive(leader, "pk-member5");
         partyAccept.onReceive(member, "");
         authWorld.exitWorld(member);
@@ -120,7 +120,7 @@ class PartyKickTest extends AbstractIntegrationTest {
         partyKick.onReceive(leader, "pk-member5");
 
         assertThat(leader.received).containsExactly(new PartyKicked("pk-member5"));
-        Account leaderAccount = authWorld.account(leader);
+        Account leaderAccount = leader.account();
         assertThat(partyService.partyOf(leaderAccount.getId()).get().isMember(memberAccount.getId())).isFalse();
     }
 

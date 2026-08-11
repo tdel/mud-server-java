@@ -10,7 +10,6 @@ import fr.idev.mudserver.controller.ingame.Look;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.GamePlayer;
-import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -24,14 +23,12 @@ import fr.idev.mudserver.network.message.charselect.NowPlaying;
 @Component
 public class CharacterSelect implements ControllerHandler {
 
-    private final AuthWorld authWorld;
     private final WorldInstanceService worldInstanceService;
     private final CharSelectStatus charSelectStatus;
     private final Look lookAction;
 
-    public CharacterSelect(AuthWorld authWorld, WorldInstanceService worldInstanceService,
-            CharSelectStatus charSelectStatus, Look lookAction) {
-        this.authWorld = authWorld;
+    public CharacterSelect(WorldInstanceService worldInstanceService, CharSelectStatus charSelectStatus,
+            Look lookAction) {
         this.worldInstanceService = worldInstanceService;
         this.charSelectStatus = charSelectStatus;
         this.lookAction = lookAction;
@@ -49,8 +46,8 @@ public class CharacterSelect implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        Account account = authWorld.account(connection);
-        WorldInstance instance = worldInstanceService.worldInstanceOf(connection);
+        Account account = connection.account();
+        WorldInstance instance = connection.worldInstance();
 
         Optional<GamePlayer> character = worldInstanceService.findCharacterFor(account, instance);
         if (character.isEmpty()) {

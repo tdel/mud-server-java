@@ -53,7 +53,7 @@ public class PartyKick implements ControllerHandler {
             return;
         }
 
-        Account account = authWorld.account(connection);
+        Account account = connection.account();
 
         if (targetLogin.equalsIgnoreCase(account.getLogin())) {
             connection.send(new CannotKickSelf());

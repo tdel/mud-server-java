@@ -10,6 +10,8 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 
 import fr.idev.mudserver.controller.ControllerDispatcher;
+import fr.idev.mudserver.domain.Account;
+import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.WorldInstanceService;
@@ -36,6 +38,8 @@ public class TelnetConnection implements Connection, TelnetOutput {
 
     private ConnectionState state = ConnectionState.CONNECTED;
     private GamePlayer character;
+    private Account account;
+    private WorldInstance worldInstance;
     private Consumer<String> pendingLine;
     private boolean pendingLineSecure;
 
@@ -170,5 +174,32 @@ public class TelnetConnection implements Connection, TelnetOutput {
             throw new IllegalStateException("Connection " + connectionId + " n'est pas en état INGAME (" + state + ")");
         }
         return character;
+    }
+
+    @Override
+    public void setAccount(Account account) {
+        this.account = account;
+    }
+
+    @Override
+    public Account account() {
+        if (state == ConnectionState.CONNECTED) {
+            throw new IllegalStateException("Connection " + connectionId + " n'est pas authentifiée (" + state + ")");
+        }
+        return account;
+    }
+
+    @Override
+    public void setWorldInstance(WorldInstance worldInstance) {
+        this.worldInstance = worldInstance;
+    }
+
+    @Override
+    public WorldInstance worldInstance() {
+        if (state == ConnectionState.CONNECTED || state == ConnectionState.LOBBY) {
+            throw new IllegalStateException(
+                    "Connection " + connectionId + " n'a pas de WorldInstance en état " + state);
+        }
+        return worldInstance;
     }
 }

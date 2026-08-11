@@ -87,7 +87,7 @@ class WorldEnterTest extends AbstractIntegrationTest {
 
         assertThat(connection.state()).isEqualTo(ConnectionState.CHARSELECT);
         assertThat(connection.received).anyMatch(NoCharacterInWorld.class::isInstance);
-        assertThat(worldInstanceService.worldInstanceOf(connection)).isNotNull();
+        assertThat(connection.worldInstance()).isNotNull();
     }
 
     @Test
@@ -95,11 +95,11 @@ class WorldEnterTest extends AbstractIntegrationTest {
         RecordingConnection connection = enterLobby("we-solo-reuse");
 
         worldEnter.onReceive(connection, "default");
-        WorldInstance firstInstance = worldInstanceService.worldInstanceOf(connection);
+        WorldInstance firstInstance = connection.worldInstance();
         worldInstanceService.exitCharSelect(connection);
 
         worldEnter.onReceive(connection, "default");
-        WorldInstance secondInstance = worldInstanceService.worldInstanceOf(connection);
+        WorldInstance secondInstance = connection.worldInstance();
 
         assertThat(secondInstance.getId()).isEqualTo(firstInstance.getId());
     }
@@ -112,8 +112,8 @@ class WorldEnterTest extends AbstractIntegrationTest {
         worldEnter.onReceive(alice, "default");
         worldEnter.onReceive(bob, "default");
 
-        WorldInstance aliceInstance = worldInstanceService.worldInstanceOf(alice);
-        WorldInstance bobInstance = worldInstanceService.worldInstanceOf(bob);
+        WorldInstance aliceInstance = alice.worldInstance();
+        WorldInstance bobInstance = bob.worldInstance();
 
         assertThat(aliceInstance.getId()).isNotEqualTo(bobInstance.getId());
     }
@@ -165,14 +165,14 @@ class WorldEnterTest extends AbstractIntegrationTest {
         RecordingConnection member = enterLobby("we-member4");
         partyInvite.onReceive(leader, "we-member4");
         partyAccept.onReceive(member, "");
-        Account leaderAccount = authWorld.account(leader);
+        Account leaderAccount = leader.account();
 
         worldEnter.onReceive(leader, "arena");
 
         assertThat(leader.state()).isEqualTo(ConnectionState.CHARSELECT);
         assertThat(member.state()).isEqualTo(ConnectionState.CHARSELECT);
-        WorldInstance leaderInstance = worldInstanceService.worldInstanceOf(leader);
-        WorldInstance memberInstance = worldInstanceService.worldInstanceOf(member);
+        WorldInstance leaderInstance = leader.worldInstance();
+        WorldInstance memberInstance = member.worldInstance();
         assertThat(leaderInstance.getId()).isEqualTo(memberInstance.getId());
         assertThat(worldInstanceDao.findById(leaderInstance.getId())).isPresent();
         assertThat(partyService.partyOf(leaderAccount.getId())).isEmpty();
@@ -194,8 +194,8 @@ class WorldEnterTest extends AbstractIntegrationTest {
         partyAccept.onReceive(memberB, "");
         worldEnter.onReceive(leaderB, "arena");
 
-        WorldInstance instanceA = worldInstanceService.worldInstanceOf(leaderA);
-        WorldInstance instanceB = worldInstanceService.worldInstanceOf(leaderB);
+        WorldInstance instanceA = leaderA.worldInstance();
+        WorldInstance instanceB = leaderB.worldInstance();
         assertThat(instanceA.getId()).isNotEqualTo(instanceB.getId());
 
         RoomInstance startingRoomA = instanceA.startingRoomInstance().orElseThrow();

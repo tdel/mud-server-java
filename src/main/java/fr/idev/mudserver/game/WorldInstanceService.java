@@ -57,15 +57,16 @@ import fr.idev.mudserver.persistence.WorldInstanceDao;
  * <p>
  * Porte aussi désormais le suivi {@code CHARSELECT}/{@code INGAME} d'une
  * connexion — quelle {@link WorldInstance} elle est en train de parcourir
- * ({@link #charSelectInstances}), la sélection/le listing du personnage
- * ({@link #findCharacterFor}), et le cycle de vie du {@link GamePlayer} vivant
- * en jeu ({@link #enterGame}/{@link #exitGame}), déplacés depuis l'ancien
- * {@code AuthWorld} qui n'est plus responsable que du compte. {@link #exitGame}
- * détruit (évince de {@link #residentInstances}) toute {@link WorldInstance}
- * dont le dernier joueur vient de partir — aucune instance n'est plus jamais
- * partagée entre comptes non liés par une party (voir {@code WorldEnter}, qui
- * ne retombe plus sur une instance par défaut), donc cette règle s'applique
- * uniformément, sans cas particulier à exempter.
+ * (portée directement par {@code Connection.worldInstance()}, voir
+ * {@link #enterCharSelect}/{@link #exitCharSelect}), la sélection/le listing du
+ * personnage ({@link #findCharacterFor}), et le cycle de vie du
+ * {@link GamePlayer} vivant en jeu ({@link #enterGame}/{@link #exitGame}),
+ * déplacés depuis l'ancien {@code AuthWorld} qui n'est plus responsable que du
+ * compte. {@link #exitGame} détruit (évince de {@link #residentInstances})
+ * toute {@link WorldInstance} dont le dernier joueur vient de partir — aucune
+ * instance n'est plus jamais partagée entre comptes non liés par une party
+ * (voir {@code WorldEnter}, qui ne retombe plus sur une instance par défaut),
+ * donc cette règle s'applique uniformément, sans cas particulier à exempter.
  */
 @Service
 public class WorldInstanceService {
@@ -73,7 +74,6 @@ public class WorldInstanceService {
     private static final Logger log = LoggerFactory.getLogger(WorldInstanceService.class);
 
     private final Map<UUID, WorldInstance> residentInstances = new ConcurrentHashMap<>();
-    private final Map<Connection, WorldInstance> charSelectInstances = new ConcurrentHashMap<>();
 
     private final WorldTemplateService worldTemplateService;
     private final WorldInstanceDao worldInstanceDao;
@@ -220,7 +220,7 @@ public class WorldInstanceService {
      * {@code CHARSELECT} — remplace l'ancien {@code AuthWorld.enterWorldInstance}.
      */
     public void enterCharSelect(Connection connection, WorldInstance instance) {
-        charSelectInstances.put(connection, instance);
+        connection.setWorldInstance(instance);
         connection.setState(ConnectionState.CHARSELECT);
     }
 
@@ -229,12 +229,8 @@ public class WorldInstanceService {
      * {@code AuthWorld.exitWorldInstance}.
      */
     public void exitCharSelect(Connection connection) {
-        charSelectInstances.remove(connection);
+        connection.setWorldInstance(null);
         connection.setState(ConnectionState.LOBBY);
-    }
-
-    public WorldInstance worldInstanceOf(Connection connection) {
-        return charSelectInstances.get(connection);
     }
 
     /**
@@ -255,7 +251,7 @@ public class WorldInstanceService {
      * {@code AuthWorld.enterGameWorld} fusionnés.
      */
     public void enterGame(Connection connection, GamePlayer character) {
-        WorldInstance instance = charSelectInstances.get(connection);
+        WorldInstance instance = connection.worldInstance();
 
         connection.setCharacter(character);
         character.setConnection(connection);

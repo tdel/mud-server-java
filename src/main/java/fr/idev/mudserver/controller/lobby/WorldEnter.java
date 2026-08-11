@@ -92,7 +92,7 @@ public class WorldEnter implements ControllerHandler {
         }
         WorldTemplate template = templateOpt.get();
 
-        Account account = authWorld.account(connection);
+        Account account = connection.account();
         Optional<Party> partyOpt = partyService.partyOf(account.getId());
 
         if (partyOpt.isEmpty()) {
@@ -144,7 +144,7 @@ public class WorldEnter implements ControllerHandler {
         WorldInstance instance = worldInstanceService.createInstance(template, memberAccountIds, account.getId());
 
         for (Connection memberConnection : memberConnections) {
-            Account memberAccount = authWorld.account(memberConnection);
+            Account memberAccount = memberConnection.account();
             worldInstanceService.enterCharSelect(memberConnection, instance);
             charSelectStatus.show(memberConnection, memberAccount, instance);
         }

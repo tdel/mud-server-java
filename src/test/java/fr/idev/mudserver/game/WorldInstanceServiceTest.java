@@ -23,6 +23,7 @@ import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Couvre spécifiquement le suivi CHARSELECT/INGAME et la règle de destruction
@@ -94,12 +95,12 @@ class WorldInstanceServiceTest extends AbstractIntegrationTest {
         worldInstanceService.enterCharSelect(connection, instance);
 
         assertThat(connection.state()).isEqualTo(ConnectionState.CHARSELECT);
-        assertThat(worldInstanceService.worldInstanceOf(connection)).isEqualTo(instance);
+        assertThat(connection.worldInstance()).isEqualTo(instance);
         assertThat(worldInstanceService.findCharacterFor(account, instance)).contains(character);
 
         worldInstanceService.exitCharSelect(connection);
 
         assertThat(connection.state()).isEqualTo(ConnectionState.LOBBY);
-        assertThat(worldInstanceService.worldInstanceOf(connection)).isNull();
+        assertThatThrownBy(connection::worldInstance).isInstanceOf(IllegalStateException.class);
     }
 }

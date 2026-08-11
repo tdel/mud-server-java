@@ -66,7 +66,7 @@ public class Logout implements ControllerHandler {
         }
 
         if (connection.state() == ConnectionState.LOBBY) {
-            Account account = authWorld.account(connection);
+            Account account = connection.account();
             authWorld.exitWorld(connection);
             log.info("auth.logged_out account={}", account.getLogin());
             connection.send(new LoggedOut());

@@ -15,7 +15,6 @@ import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
-import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -32,13 +31,10 @@ import fr.idev.mudserver.network.message.ingame.GamePlayerStats;
 @Component
 public class CharacterCreate implements ControllerHandler {
 
-    private final AuthWorld authWorld;
     private final WorldInstanceService worldInstanceService;
     private final CharSelectStatus charSelectStatus;
 
-    public CharacterCreate(AuthWorld authWorld, WorldInstanceService worldInstanceService,
-            CharSelectStatus charSelectStatus) {
-        this.authWorld = authWorld;
+    public CharacterCreate(WorldInstanceService worldInstanceService, CharSelectStatus charSelectStatus) {
         this.worldInstanceService = worldInstanceService;
         this.charSelectStatus = charSelectStatus;
     }
@@ -62,8 +58,8 @@ public class CharacterCreate implements ControllerHandler {
             return;
         }
 
-        Account account = authWorld.account(connection);
-        WorldInstance instance = worldInstanceService.worldInstanceOf(connection);
+        Account account = connection.account();
+        WorldInstance instance = connection.worldInstance();
 
         if (worldInstanceService.findCharacterFor(account, instance).isPresent()) {
             charSelectStatus.show(connection, account, instance);

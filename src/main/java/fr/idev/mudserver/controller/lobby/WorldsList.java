@@ -12,7 +12,6 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.WorldTemplate;
 import fr.idev.mudserver.domain.actor.GamePlayer;
-import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.game.WorldTemplateService;
 import fr.idev.mudserver.network.Connection;
@@ -25,14 +24,12 @@ public class WorldsList implements ControllerHandler {
     private final WorldTemplateService worldTemplateService;
     private final WorldInstanceDao worldInstanceDao;
     private final WorldInstanceService worldInstanceService;
-    private final AuthWorld authWorld;
 
     public WorldsList(WorldTemplateService worldTemplateService, WorldInstanceDao worldInstanceDao,
-            WorldInstanceService worldInstanceService, AuthWorld authWorld) {
+            WorldInstanceService worldInstanceService) {
         this.worldTemplateService = worldTemplateService;
         this.worldInstanceDao = worldInstanceDao;
         this.worldInstanceService = worldInstanceService;
-        this.authWorld = authWorld;
     }
 
     @Override
@@ -47,7 +44,7 @@ public class WorldsList implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        Account account = authWorld.account(connection);
+        Account account = connection.account();
 
         List<fr.idev.mudserver.network.message.lobby.WorldsList.Entry> entries = new ArrayList<>();
         for (WorldTemplate template : worldTemplateService.allTemplates()) {

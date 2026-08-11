@@ -70,8 +70,8 @@ class LogoutTest extends AbstractIntegrationTest {
 
         assertThat(connection.state()).isEqualTo(ConnectionState.LOBBY);
         assertThat(connection.received).contains(new StoppedPlaying("Hero"), new BackInLobby());
-        assertThat(authWorld.account(connection).getId()).isEqualTo(account.getId());
-        assertThat(worldInstanceService.worldInstanceOf(connection)).isNull();
+        assertThat(connection.account().getId()).isEqualTo(account.getId());
+        assertThatThrownBy(connection::worldInstance).isInstanceOf(IllegalStateException.class);
         assertThatThrownBy(connection::character).isInstanceOf(IllegalStateException.class);
     }
 
@@ -90,7 +90,7 @@ class LogoutTest extends AbstractIntegrationTest {
 
         assertThat(connection.state()).isEqualTo(ConnectionState.LOBBY);
         assertThat(connection.received).containsExactly(new BackInLobby());
-        assertThat(worldInstanceService.worldInstanceOf(connection)).isNull();
+        assertThatThrownBy(connection::worldInstance).isInstanceOf(IllegalStateException.class);
     }
 
     @Test
@@ -105,6 +105,6 @@ class LogoutTest extends AbstractIntegrationTest {
 
         assertThat(connection.state()).isEqualTo(ConnectionState.CONNECTED);
         assertThat(connection.received).containsExactly(new LoggedOut());
-        assertThat(authWorld.account(connection)).isNull();
+        assertThatThrownBy(connection::account).isInstanceOf(IllegalStateException.class);
     }
 }

@@ -78,7 +78,7 @@ class PartyLeaveTest extends AbstractIntegrationTest {
         partyAccept.onReceive(member, "");
         leader.received.clear();
         member.received.clear();
-        Account memberAccount = authWorld.account(member);
+        Account memberAccount = member.account();
 
         partyLeave.onReceive(leader, "");
 
@@ -90,7 +90,7 @@ class PartyLeaveTest extends AbstractIntegrationTest {
     void soleMemberLeavingDissolvesTheParty() {
         RecordingConnection leader = enterLobby("pl-leader3");
         partyCreate.onReceive(leader, "");
-        Account leaderAccount = authWorld.account(leader);
+        Account leaderAccount = leader.account();
 
         partyLeave.onReceive(leader, "");
 
