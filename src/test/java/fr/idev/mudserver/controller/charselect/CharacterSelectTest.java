@@ -8,7 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.AbstractIntegrationTest;
 import fr.idev.mudserver.controller.RecordingConnection;
+import fr.idev.mudserver.controller.lobby.PartyAccept;
+import fr.idev.mudserver.controller.lobby.PartyCreate;
+import fr.idev.mudserver.controller.lobby.PartyInvite;
+import fr.idev.mudserver.controller.lobby.WorldEnter;
 import fr.idev.mudserver.domain.Account;
+import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
@@ -34,6 +39,18 @@ class CharacterSelectTest extends AbstractIntegrationTest {
 
     @Autowired
     private CharacterSelect characterSelect;
+
+    @Autowired
+    private WorldEnter worldEnter;
+
+    @Autowired
+    private PartyCreate partyCreate;
+
+    @Autowired
+    private PartyInvite partyInvite;
+
+    @Autowired
+    private PartyAccept partyAccept;
 
     @Autowired
     private AuthWorld authWorld;
@@ -81,6 +98,59 @@ class CharacterSelectTest extends AbstractIntegrationTest {
         assertThat(connection.received).anyMatch(message -> message.equals(new NowPlaying("Hero")));
         assertThat(connection.received).anyMatch(RoomDescription.class::isInstance);
         assertThat(gameWorld.character(connection).getName()).isEqualTo("Hero");
+    }
+
+    /**
+     * Preuve de régression pour {@code RoomService.spawnCharacter} : avant
+     * correction, cette méthode matérialisait toujours
+     * {@link WorldInstance#DEFAULT_ID} en dur au login, quelle que soit l'instance
+     * réelle du personnage — un personnage de l'instance "arena" (créée en lançant
+     * une party via {@link WorldEnter}, seul chemin qui matérialise une instance
+     * non-default — un lancement solo replie sur {@link WorldInstance#DEFAULT_ID},
+     * voir {@code WorldEnter#enterSolo}) se serait retrouvé spawné dans les rooms
+     * de l'instance par défaut.
+     */
+    @Test
+    void existingCharacterInANonDefaultInstanceSpawnsIntoThatInstanceNotTheDefaultOne() {
+        roomService.warmRooms();
+        RecordingConnection leader = enterLobby("p-arena-leader");
+        partyCreate.onReceive(leader, "");
+        RecordingConnection member = enterLobby("p-arena-member");
+        partyInvite.onReceive(leader, "p-arena-member");
+        partyAccept.onReceive(member, "");
+        Account account = authWorld.account(leader);
+
+        worldEnter.onReceive(leader, "arena");
+        WorldInstance arenaInstance = characterSelectionWorld.worldInstance(leader);
+        assertThat(arenaInstance.getId()).isNotEqualTo(WorldInstance.DEFAULT_ID);
+
+        RoomInstance arenaStartingRoom = arenaInstance.startingRoomInstance().orElseThrow();
+        GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), "Gladiator",
+                arenaStartingRoom.getTemplateId(), Gender.MAN, Race.HUMAN, CharacterClass.FIGHTER, 1, 10, 10,
+                TestAttributes.of(10, 10, 10, 10, 10, 10), 0, 0);
+        character.setWorldInstanceId(arenaInstance.getId());
+        characterDao.insert(character);
+        leader.received.clear();
+
+        characterSelect.onReceive(leader, "");
+
+        assertThat(leader.state()).isEqualTo(ConnectionState.INGAME);
+        GamePlayer loaded = gameWorld.character(leader);
+        assertThat(loaded.getWorldInstance().getId()).isEqualTo(arenaInstance.getId());
+        assertThat(loaded.getCurrentRoom().getWorldInstanceId()).isEqualTo(arenaInstance.getId());
+
+        RoomInstance defaultStartingRoom = worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID)
+                .startingRoomInstance().orElseThrow();
+        assertThat(loaded.getCurrentRoom()).isNotEqualTo(defaultStartingRoom);
+    }
+
+    private RecordingConnection enterLobby(String login) {
+        Account account = new Account(UUID.randomUUID(), login, "hashed-password", null);
+        accountDao.insert(account);
+        RecordingConnection connection = new RecordingConnection();
+        authWorld.enterWorld(connection, account);
+        connection.received.clear();
+        return connection;
     }
 
     private RecordingConnection enterCharSelect(String login) {

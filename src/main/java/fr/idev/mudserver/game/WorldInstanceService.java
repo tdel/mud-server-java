@@ -191,6 +191,7 @@ public class WorldInstanceService {
         RoomInstance room = instance.roomInstanceForTemplate(character.getCurrentRoomId())
                 .or(instance::startingRoomInstance).orElseThrow(() -> new IllegalStateException(
                         "WorldInstance " + instance.getId() + " n'a aucune room de départ"));
+        character.setWorldInstance(instance);
         character.spawnToRoom(room);
     }
 

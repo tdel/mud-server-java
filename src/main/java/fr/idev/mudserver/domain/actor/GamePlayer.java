@@ -28,6 +28,7 @@ import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.RoomPortal;
 import fr.idev.mudserver.domain.WeaponCategory;
+import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.game.CombatResult;
 import fr.idev.mudserver.game.dice.CheckResult;
 import fr.idev.mudserver.game.dice.DiceExpression;
@@ -50,6 +51,7 @@ public final class GamePlayer extends GameCharacter {
     private UUID accountId;
     private UUID currentRoomId;
     private UUID worldInstanceId;
+    private WorldInstance worldInstance;
     private Gender gender;
     private Race race;
     private CharacterClass characterClass;
@@ -119,9 +121,9 @@ public final class GamePlayer extends GameCharacter {
      * les sites (production et tests) qui construisent un {@code GamePlayer}
      * directement. {@code CharacterDao.toDomain} le renseigne au rechargement,
      * {@code GameWorld.createCharacter} à la création — {@code null} sinon (repli
-     * sur {@link fr.idev.mudserver.domain.WorldInstance#DEFAULT_ID} porté par
-     * {@code CharacterDao.insert}, pas ici, pour ne pas faire dépendre le domaine
-     * d'une valeur par défaut applicative).
+     * sur {@link WorldInstance#DEFAULT_ID} porté par {@code CharacterDao.insert},
+     * pas ici, pour ne pas faire dépendre le domaine d'une valeur par défaut
+     * applicative).
      */
     public UUID getWorldInstanceId() {
         return worldInstanceId;
@@ -129,6 +131,31 @@ public final class GamePlayer extends GameCharacter {
 
     public void setWorldInstanceId(UUID worldInstanceId) {
         this.worldInstanceId = worldInstanceId;
+    }
+
+    /**
+     * Objet {@link WorldInstance} mis en cache en mémoire, jamais persisté — même
+     * principe que {@code currentRoom} sur {@link GameCharacter} vis-à-vis de
+     * {@code currentRoomId}. Renseigné dès que l'instance est matérialisée pour ce
+     * personnage ({@code WorldInstanceService.spawnCharacterIntoInstance},
+     * {@code GameWorld.createCharacter}), ce qui couvre tous les chemins d'entrée
+     * en jeu (login, création). {@code null} tant que le personnage n'a pas encore
+     * rejoint son instance — ne pas appeler avant l'état {@code INGAME}.
+     */
+    public WorldInstance getWorldInstance() {
+        return worldInstance;
+    }
+
+    /**
+     * Renseigne aussi {@link #worldInstanceId} : contrairement à
+     * {@code currentRoom}/{@code currentRoomId} (deux espaces d'id différents,
+     * template vs instance), {@code worldInstance.getId()} et
+     * {@code worldInstanceId} désignent la même chose — un seul appel suffit côté
+     * appelant.
+     */
+    public void setWorldInstance(WorldInstance worldInstance) {
+        this.worldInstance = worldInstance;
+        this.worldInstanceId = worldInstance.getId();
     }
 
     public Gender getGender() {

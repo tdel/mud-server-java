@@ -19,7 +19,6 @@ import fr.idev.mudserver.domain.actor.event.GamePlayerUsedPotion;
 import fr.idev.mudserver.domain.actor.event.LongRestTaken;
 import fr.idev.mudserver.domain.actor.event.ShortRestTaken;
 import fr.idev.mudserver.domain.RoomInstance;
-import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.game.RoomService;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.message.ingame.GoldLooted;
@@ -189,8 +188,8 @@ public class CharacterService {
             characterDao.update(character);
             character.send(new HpRestored(entry.getValue(), character.getCurrentHealth(), character.getMaxHealth()));
         }
-        WorldInstance instance = worldInstanceService.getOrMaterialize(event.initiator().getWorldInstanceId());
-        worldInstanceService.broadcastToInstance(instance, new ShortRestAnnounced(event.initiator().getName()), null);
+        worldInstanceService.broadcastToInstance(event.initiator().getWorldInstance(),
+                new ShortRestAnnounced(event.initiator().getName()), null);
         log.info("character.short_rest_taken initiator={} affected={}", event.initiator().getName(),
                 event.healedAmounts().size());
     }
@@ -208,8 +207,8 @@ public class CharacterService {
             characterDao.update(character);
             character.send(new HpRestored(entry.getValue(), character.getCurrentHealth(), character.getMaxHealth()));
         }
-        WorldInstance instance = worldInstanceService.getOrMaterialize(event.initiator().getWorldInstanceId());
-        worldInstanceService.broadcastToInstance(instance, new LongRestAnnounced(event.initiator().getName()), null);
+        worldInstanceService.broadcastToInstance(event.initiator().getWorldInstance(),
+                new LongRestAnnounced(event.initiator().getName()), null);
         log.info("character.long_rest_taken initiator={} affected={} provisionsConsumed={}",
                 event.initiator().getName(), event.healedAmounts().size(), event.consumedFood().size());
     }

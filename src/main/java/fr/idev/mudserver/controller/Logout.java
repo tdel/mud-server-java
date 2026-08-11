@@ -7,12 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.CharacterSelectionWorld;
 import fr.idev.mudserver.game.GameWorld;
-import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.LoggedOut;
@@ -35,15 +33,13 @@ public class Logout implements ControllerHandler {
     private final GameWorld gameWorld;
     private final AuthWorld authWorld;
     private final CharacterSelectionWorld characterSelectionWorld;
-    private final WorldInstanceService worldInstanceService;
     private final AccountDao accountDao;
 
     public Logout(GameWorld gameWorld, AuthWorld authWorld, CharacterSelectionWorld characterSelectionWorld,
-            WorldInstanceService worldInstanceService, AccountDao accountDao) {
+            AccountDao accountDao) {
         this.gameWorld = gameWorld;
         this.authWorld = authWorld;
         this.characterSelectionWorld = characterSelectionWorld;
-        this.worldInstanceService = worldInstanceService;
         this.accountDao = accountDao;
     }
 
@@ -65,8 +61,7 @@ public class Logout implements ControllerHandler {
             gameWorld.exitWorld(connection);
             Account account = accountDao.findById(character.getAccountId()).orElseThrow();
             authWorld.enterWorld(connection, account);
-            WorldInstance instance = worldInstanceService.getOrMaterialize(character.getWorldInstanceId());
-            characterSelectionWorld.enterWorld(connection, instance);
+            characterSelectionWorld.enterWorld(connection, character.getWorldInstance());
 
             connection.send(new StoppedPlaying(character.getName()));
             return;

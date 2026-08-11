@@ -138,7 +138,7 @@ public class GameWorld {
         // RoomInstance elle-même — voir la Javadoc de RoomService.
         GamePlayer character = new GamePlayer(UUID.randomUUID(), account.getId(), name, startingRoom.getTemplateId(),
                 gender, race, characterClass, 1, maxHealth, maxHealth, scores, 0, gold);
-        character.setWorldInstanceId(instance.getId());
+        character.setWorldInstance(instance);
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));
         character.spawnToRoom(startingRoom);

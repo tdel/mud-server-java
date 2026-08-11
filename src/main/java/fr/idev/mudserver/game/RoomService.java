@@ -2,6 +2,7 @@ package fr.idev.mudserver.game;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,8 +100,11 @@ public class RoomService {
     }
 
     public void spawnCharacter(GamePlayer character) {
+        UUID worldInstanceId = character.getWorldInstanceId() != null
+                ? character.getWorldInstanceId()
+                : WorldInstance.DEFAULT_ID;
         worldInstanceService.spawnCharacterIntoInstance(character,
-                worldInstanceService.getOrMaterialize(WorldInstance.DEFAULT_ID));
+                worldInstanceService.getOrMaterialize(worldInstanceId));
     }
 
     @EventListener
