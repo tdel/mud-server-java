@@ -20,23 +20,6 @@ import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.WorldInstanceService;
 
-/**
- * Démarré sur {@link ApplicationReadyEvent} plutôt qu'en tant que commande
- * séparée — c'est l'équivalent direct de {@code app:telnet:serve} côté PHP,
- * mais ici c'est le point d'entrée principal de l'application, pas une
- * sous-commande. Le listener bloque volontairement sur le thread appelant
- * jusqu'à l'arrêt du serveur (mêmes effets que le {@code Co\run()} bloquant du
- * bootstrap Swoole) — {@code ApplicationReadyEvent} est publié de façon
- * synchrone, donc ce blocage empêche {@code SpringApplication.run()} de jamais
- * retourner. Sans le flag {@code app.telnet.enabled=false} (voir
- * {@code src/test/resources/application.yml}), n'importe quel
- * {@code @SpringBootTest} resterait bloqué indéfiniment au démarrage du
- * contexte. Le peuplement des caches statiques (rooms, items, races, classes,
- * niveaux) ne se fait plus ici : c'est la responsabilité de
- * {@code ServerApplication.warmupRunner}, un {@code ApplicationRunner} garanti
- * de s'exécuter avant que {@code ApplicationReadyEvent} ne soit publié, donc
- * avant cette méthode.
- */
 @Component
 @ConditionalOnProperty(prefix = "app.telnet", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class TelnetServer {

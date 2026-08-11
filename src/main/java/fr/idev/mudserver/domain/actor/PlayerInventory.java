@@ -6,14 +6,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import fr.idev.mudserver.domain.Item;
 
-/**
- * Regroupe les items portés par un {@link GamePlayer} et son or — l'or initial
- * est roulé selon la classe à la création du personnage (voir
- * {@code WorldInstance.createCharacter}), puis varie en jeu via
- * {@link #addGold} (butin, voir {@code game.actor.LootService}) ou
- * {@link #trySpendGold} (achat auprès d'un PNJ marchand, voir
- * {@code controller.ingame.Talk}).
- */
 public final class PlayerInventory {
 
     private final List<Item> items = new CopyOnWriteArrayList<>();
@@ -31,12 +23,6 @@ public final class PlayerInventory {
         this.gold += amount;
     }
 
-    /**
-     * Retourne {@code false} sans rien muter si le solde est insuffisant, plutôt
-     * que de lever une exception : l'appelant ({@link GamePlayer#buyItem}) réagit
-     * ainsi normalement (message « pas assez d'or ») sans try/catch, même style que
-     * {@link GamePlayer#pickUpItem}.
-     */
     public boolean trySpendGold(int amount) {
         if (gold < amount) {
             return false;

@@ -4,10 +4,6 @@ import fr.idev.mudserver.telnet.Ansi;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
-/**
- * Envoyé à tous les joueurs en ligne — un repos affecte l'ensemble du monde,
- * pas seulement l'initiateur (voir {@code game.actor.RestService}).
- */
 public record ShortRestAnnounced(String initiatorName) implements OutputTelnetMessage {
 
     @Override

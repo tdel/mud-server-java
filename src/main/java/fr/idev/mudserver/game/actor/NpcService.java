@@ -15,15 +15,6 @@ import fr.idev.mudserver.domain.actor.GameNpc;
 import fr.idev.mudserver.domain.actor.GameNpcSeller;
 import fr.idev.mudserver.domain.actor.NpcTemplate;
 
-/**
- * Placement runtime des PNJ. Le contenu statique (nom, room, dialogue,
- * catalogue déjà résolu contre les templates d'items) vit désormais dans
- * {@link NpcTemplate}, chargé et validé une fois pour toutes par
- * {@code WorldTemplateService} depuis {@code data/worlds/{monde}/npcs.json} —
- * cette classe se contente d'instancier un {@link GameNpc}/
- * {@link GameNpcSeller} par {@link NpcTemplate} et de le placer dans la
- * {@link RoomInstance} correspondante.
- */
 @Service
 public class NpcService {
 

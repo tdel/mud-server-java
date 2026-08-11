@@ -6,14 +6,6 @@ import fr.idev.mudserver.telnet.Ansi;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
-/**
- * Boucle de sélection multiple pour {@code rest long}, même style numéroté que
- * {@link ShopCatalog} — sauf que chaque entrée est une instance d'inventoire
- * (pas un template) : sélectionner une entrée la retire de la liste affichée au
- * prochain tour (voir {@code controller.ingame.Rest}). {@code threshold} vient
- * de {@code RestService.LONG_REST_PROVISION_THRESHOLD}, passé par l'appelant
- * plutôt qu'importé ici pour ne pas coupler ce message à un bean Spring.
- */
 public record ProvisionSelection(List<Entry> entries, int selectedValue, int threshold) implements OutputTelnetMessage {
 
     public record Entry(String itemName, int nutritionValue) {

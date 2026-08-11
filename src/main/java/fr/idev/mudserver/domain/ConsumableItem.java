@@ -7,13 +7,6 @@ import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUsedPotion;
 import fr.idev.mudserver.game.dice.DiceRoller;
 
-/**
- * {@link ItemTemplate} dont on peut faire {@code use <nom>} — {@code consume}
- * teste le type d'effet et exécute le comportement correspondant ; un futur
- * second type (poison, etc.) ajoutera sa propre branche sans toucher au reste
- * du pipeline (voir {@code ItemService.warmItemTemplates}, {@code
- * CombatEngine.useItem}).
- */
 public class ConsumableItem extends ItemTemplate {
 
     private final ConsumableEffect effect;

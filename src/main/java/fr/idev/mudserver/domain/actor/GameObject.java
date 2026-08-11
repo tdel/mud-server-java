@@ -2,11 +2,6 @@ package fr.idev.mudserver.domain.actor;
 
 import java.util.UUID;
 
-/**
- * Racine de toute entité identifiable et nommée du monde du jeu (joueur,
- * monstre, PNJ — voir {@link GameCharacter}). Ne porte que l'identité, rien de
- * comportemental.
- */
 public abstract class GameObject {
 
     private UUID id;

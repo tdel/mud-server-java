@@ -14,11 +14,6 @@ import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.ingame.ItemNotCarried;
 
-/**
- * {@code use <item name>} — délègue entièrement à {@link CombatEngine#useItem},
- * qui gère aussi bien l'utilisation hors combat (immédiate) que pendant un
- * affrontement (coûte le tour, comme une attaque).
- */
 @Component
 public class Use implements ControllerHandler {
 

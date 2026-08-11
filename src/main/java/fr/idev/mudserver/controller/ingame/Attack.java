@@ -14,16 +14,6 @@ import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ingame.NoTargetSelected;
 import fr.idev.mudserver.network.message.ingame.TargetNotFound;
 
-/**
- * Accepte deux formes : {@code attack} seul réutilise la cible déjà choisie via
- * {@code select <monster name>} ({@link GamePlayer#getTarget()}) ; {@code
- * attack <character name>} force une sélection au moment même de l'attaque, en
- * résolvant le nom dans la room courante — même logique que {@link Select}. Le
- * champ {@code target} reste une simple commodité UX (« qui vise `attack` sans
- * argument »), indépendante de l'affrontement effectif
- * ({@link GamePlayer#getEncounter()}) — toute la logique de
- * rejoindre/fusionner/résoudre le tour est déléguée à {@link CombatEngine}.
- */
 @Component
 public class Attack implements ControllerHandler {
 

@@ -10,13 +10,6 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * Porte directement les bonus/malus raciaux DnD5e (attributs, vitesse), chargés
- * depuis {@code data/race.json} dans le bloc {@code static} ci-dessous — même
- * raisonnement que {@link CharacterClass}. Remplace l'ancien
- * {@code game.actor.RaceService} : voir l'historique git si besoin de retrouver
- * cette version.
- */
 public enum Race {
     DWARF, HUMAN, HIGH_ELF, HALF_ORC, DRAGONBORN, ELF, GNOME, ROCK_GNOME, HALF_ELF, HALFLING, LIGHTFOOT_HALFLING, TIEFLING, HILL_DWARF;
 

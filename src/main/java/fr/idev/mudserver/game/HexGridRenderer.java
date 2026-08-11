@@ -11,14 +11,6 @@ import fr.idev.mudserver.domain.actor.GameMonster;
 import fr.idev.mudserver.domain.actor.GameNpc;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 
-/**
- * Construit le viewport texte affiché par {@code controller.ingame.Look} : un
- * rayon fixe de cases (jamais la grille entière) centré sur la position du
- * personnage, pour que la sortie reste bornée quelle que soit la taille de la
- * room (16x8 comme 64x64). Priorité d'affichage en cas de cumul sur une case :
- * soi &gt; autre joueur &gt; monstre &gt; PNJ &gt; portail &gt; sol &gt;
- * hors-grille.
- */
 public final class HexGridRenderer {
 
     public static final int VIEWPORT_RADIUS = 5;

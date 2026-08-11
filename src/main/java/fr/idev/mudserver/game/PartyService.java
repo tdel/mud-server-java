@@ -10,15 +10,6 @@ import org.springframework.stereotype.Service;
 import fr.idev.mudserver.domain.Party;
 import fr.idev.mudserver.domain.PartyMember;
 
-/**
- * Matchmaking pré-jeu au Lobby, mémoire uniquement — une {@link Party} n'existe
- * que le temps de réunir un groupe avant un {@code world-enter}
- * ({@code controller.lobby.WorldEnter} appelle {@link #dissolve} juste après un
- * lancement réussi), jamais persistée (voir {@code multi-world.md} Phase D).
- * {@code partyIdByPendingInvite} s'auto-nettoie sans action explicite : une
- * fois une party dissoute/vidée, {@link #resolve} renvoie
- * {@code Optional#empty()} pour toute entrée qui pointait encore vers son id.
- */
 @Service
 public class PartyService {
 
@@ -72,10 +63,6 @@ public class PartyService {
         }
     }
 
-    /**
-     * Appelée juste après un {@code world-enter} réussi : une party ayant lancé sa
-     * partie ne doit pas rester joignable pour de nouveaux {@code party-invite}.
-     */
     public void dissolve(Party party) {
         for (PartyMember member : party.getMembers()) {
             partyIdByAccountId.remove(member.accountId());

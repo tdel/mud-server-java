@@ -15,15 +15,6 @@ import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.message.charselect.ExistingCharacterInWorld;
 import fr.idev.mudserver.network.message.charselect.NoCharacterInWorld;
 
-/**
- * Remplace le "relist" que {@code CharacterList}/{@code characters-list}
- * faisait avant sa suppression (voir {@code multi-world.md} Phase C) : au plus
- * un personnage par {@code (account_id, world_instance_id)}, donc un vrai
- * listing n'a plus de sens — un simple statut suffit, affiché après chaque
- * transition/action en CHARSELECT ({@code WorldEnter},
- * {@code CharacterCreate}/{@code CharacterDelete} en cas de refus ou de
- * succès).
- */
 @Component
 public class CharSelectStatus {
 

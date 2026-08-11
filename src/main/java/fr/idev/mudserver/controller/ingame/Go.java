@@ -18,14 +18,6 @@ import fr.idev.mudserver.network.message.ingame.MovementBlockedByBounds;
 import fr.idev.mudserver.network.message.ingame.MovementBlockedByOccupant;
 import fr.idev.mudserver.network.message.ingame.NoSuchDirection;
 
-/**
- * Ne téléporte plus d'une {@code RoomInstance} à l'autre : déplace le
- * personnage de 1 à N cases (N borné par sa vitesse) dans la grille hexagonale
- * de sa room actuelle — voir
- * {@link fr.idev.mudserver.domain.actor.GameCharacter#moveToCell}. Atterrir sur
- * une case-portail fait automatiquement traverser vers la room liée, à la case
- * cible correspondante.
- */
 @Component
 public class Go implements ControllerHandler {
 

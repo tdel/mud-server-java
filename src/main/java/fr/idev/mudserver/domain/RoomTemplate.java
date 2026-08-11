@@ -4,15 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Contenu statique d'une room, un par (WorldTemplate × room), chargé une fois
- * au démarrage depuis {@code data/worlds/{monde}/rooms.json} (voir
- * {@code WorldTemplateService}) et jamais muté ensuite. {@link RoomInstance}
- * est le conteneur runtime matérialisé à partir de ce template (une instance
- * par {@code WorldInstance}, voir {@code WorldInstanceService}) —
- * {@code isStartingRoom} garde le même sentinel nullable (NULL/TRUE, jamais
- * FALSE) que {@link RoomInstance}.
- */
 public class RoomTemplate {
 
     public static final int DEFAULT_WIDTH = 16;

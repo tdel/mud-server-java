@@ -24,20 +24,6 @@ import fr.idev.mudserver.network.message.ingame.NotEnoughProvisions;
 import fr.idev.mudserver.network.message.ingame.ProvisionItemNotFound;
 import fr.idev.mudserver.network.message.ingame.ProvisionSelection;
 
-/**
- * {@code rest short}/{@code rest long} — la validation et la mutation (soin de
- * tous les joueurs en ligne, compteur de repos courts, provisions consommées)
- * vivent sur {@link RestService}, ce contrôleur ne fait que résoudre l'entrée
- * du joueur et traduire le résultat en message, même style que
- * {@code controller.ingame.Talk} pour {@code GameNpcSeller}.
- *
- * <p>
- * La sélection multiple de provisions pour {@code rest long} reprend le motif
- * de boucle récursive {@code connection.requestBlocking} de
- * {@code Talk#promptShop}, mais résout chaque entrée sur une instance
- * d'inventaire plutôt qu'un template de boutique : sélectionner un item le
- * retire de la liste proposée au tour suivant (pas de stock infini).
- */
 @Component
 public class Rest implements ControllerHandler {
 

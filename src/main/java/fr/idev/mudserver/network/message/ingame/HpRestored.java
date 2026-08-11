@@ -4,7 +4,6 @@ import fr.idev.mudserver.telnet.Ansi;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
-/** Message privé envoyé à chaque joueur affecté par un repos court ou long. */
 public record HpRestored(int healedAmount, int currentHealth, int maxHealth) implements OutputTelnetMessage {
 
     @Override

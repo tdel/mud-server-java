@@ -191,14 +191,6 @@ public class WorldInstanceService {
         log.info("room.player_spawned character={} room={}", event.character().getName(), event.room().getName());
     }
 
-    /**
-     * {@code @Order(1)} : ce listener doit diffuser {@code MonsterDefeated} avant
-     * que {@code CharacterService#onCharacterDied} ne déclenche le crédit d'XP (et
-     * une éventuelle montée de niveau) sur ce même événement — l'ordre des messages
-     * reçus par le joueur (mort du monstre avant XP/niveau) en dépend. Diffusé à
-     * toute la room sans exclusion : le tueur reçoit lui-même ce message comme tout
-     * le monde.
-     */
     @EventListener
     @Order(1)
     void onCharacterDied(CharacterDied event) {
@@ -208,13 +200,6 @@ public class WorldInstanceService {
         log.info("combat.monster_removed_from_room monster={} room={}", event.character().getName(), room.getName());
     }
 
-    /**
-     * {@code @Order(1)} : doit s'exécuter avant que
-     * {@code CharacterService#onGamePlayerDied} ne téléporte le mourant hors de
-     * cette room — sinon {@code event.character().getCurrentRoom()} pointerait déjà
-     * vers la starting room. Le mourant est exclu du broadcast : il reçoit son
-     * propre message ({@code PlayerRespawned}) via {@code CharacterService}.
-     */
     @EventListener
     @Order(1)
     void onGamePlayerDied(GamePlayerDied event) {

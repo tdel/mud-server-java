@@ -31,18 +31,6 @@ import fr.idev.mudserver.network.message.lobby.TooManyPlayers;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.WorldInstanceDao;
 
-/**
- * Deux chemins. Sans party : rejoint l'instance déjà connue de ce compte pour
- * ce template si elle existe, sinon en crée une nouvelle dédiée à ce seul
- * compte via {@code worldInstanceService.createInstance} — il n'existe plus
- * d'instance par défaut partagée entre comptes non liés par une party (voir
- * {@code WorldInstanceService.exitGame}, qui détruit toute instance dont le
- * dernier joueur vient de partir). En party : la connexion doit être leader,
- * chaque membre doit résoudre vers une connexion active en LOBBY (sinon rejet
- * explicite invitant à {@code party-kick} l'absent), une {@link WorldInstance}
- * neuve est systématiquement matérialisée pour le groupe — jamais de
- * réutilisation d'une instance existante en party, contrairement au repli solo.
- */
 @Component
 public class WorldEnter implements ControllerHandler {
 

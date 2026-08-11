@@ -23,26 +23,6 @@ import fr.idev.mudserver.network.message.ingame.ShopCatalog;
 import fr.idev.mudserver.network.message.ingame.ShopItemNotFound;
 import fr.idev.mudserver.network.message.ingame.TargetNotFound;
 
-/**
- * Ouvre la conversation avec un PNJ de la room courante — soit une simple ligne
- * de saveur ({@link NpcDescription}, PNJ sans {@code GameNpc.NpcDialogue}),
- * soit une boîte de dialogue bloquante. Le blocage vient uniquement de
- * {@link Connection#requestBlocking} (voir sa Javadoc dans
- * {@code TelnetConnection}), pas d'un flag sur {@code GameCharacter} : tant
- * qu'un prompt de dialogue est en attente, la ligne suivante du joueur ne
- * repasse jamais par {@code ControllerDispatcher}. Suit le même style de
- * continuation récursive que {@code controller.authed.CharacterCreate} : chaque
- * étape (salutation, boutique) se re-invoque elle-même sur choix invalide ou
- * après une réponse canée, jusqu'à ce que le joueur choisisse {@code LEAVE}, où
- * l'on cesse simplement d'appeler {@code requestBlocking}.
- *
- * <p>
- * La résolution du choix de dialogue, la résolution d'une entrée de boutique et
- * l'achat lui-même vivent désormais sur {@code GameNpc.NpcDialogue}/
- * {@link GameNpcSeller} plutôt qu'ici — ce controller ne fait qu'appeler ces
- * méthodes de domaine et brancher sur leur résultat, même style que
- * {@code Take}/{@code Equip}.
- */
 @Component
 public class Talk implements ControllerHandler {
 

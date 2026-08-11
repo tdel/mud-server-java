@@ -17,22 +17,6 @@ import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.WorldInstanceService;
 
-/**
- * Frontière Netty <-> logique métier. Chaque connexion obtient exactement un
- * virtual thread, démarré à {@code channelActive} et vivant jusqu'à la
- * déconnexion : c'est lui, et lui seul, qui exécute
- * {@code connection.handleLine(...)}, en dépilant une file FIFO alimentée par
- * {@code channelRead0}. C'est le calque direct du "un coroutine par connexion"
- * de Swoole côté PHP (TelnetConnectionHandler::run()).
- *
- * <p>
- * Point important : {@code channelRead0} ne doit jamais soumettre
- * indépendamment chaque ligne au pool de virtual threads (un
- * {@code executor.execute()} par ligne) — deux lignes reçues dans le même
- * paquet TCP se traiteraient alors sur deux virtual threads distincts, sans
- * garantie d'ordre d'exécution entre eux. D'où la file : un seul virtual thread
- * consommateur par connexion.
- */
 public class TelnetSessionHandler extends SimpleChannelInboundHandler<String> {
 
     private static final Logger log = LoggerFactory.getLogger(TelnetSessionHandler.class);
@@ -85,15 +69,6 @@ public class TelnetSessionHandler extends SimpleChannelInboundHandler<String> {
         }
     }
 
-    /**
-     * Le MDC est posé ici, pas dans {@code channelActive}, car il vit dans un
-     * {@code ThreadLocal} : il doit être peuplé sur le virtual thread qui exécute
-     * réellement {@code handleLine}/les événements de domaine, pas sur le thread
-     * I/O Netty qui appelle {@code channelActive}. Comme ce virtual thread est
-     * dédié à cette connexion pour toute sa durée de vie (voir Javadoc de classe),
-     * {@code connectionId} reste correct sur toutes les lignes de log émises tant
-     * que la boucle tourne, sans propagation supplémentaire à gérer.
-     */
     private void runConnectionLoop(TelnetConnection connection, BlockingQueue<String> inbox) {
         MDC.put(MDC_CONNECTION_ID, connection.getConnectionId());
         connection.write(WELCOME);

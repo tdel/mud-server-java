@@ -20,12 +20,6 @@ import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.OutputMessage;
 import fr.idev.mudserver.network.SecureOutputMessage;
 
-/**
- * État par connexion, porté par un attribut de {@link Channel}. Netty garantit
- * qu'un seul virtual thread touche une connexion donnée à la fois (voir
- * GameCommandHandler) — aucune synchronisation supplémentaire n'est donc
- * nécessaire sur ces champs mutables.
- */
 public class TelnetConnection implements Connection, TelnetOutput {
 
     private static final Logger log = LoggerFactory.getLogger(TelnetConnection.class);
@@ -52,11 +46,6 @@ public class TelnetConnection implements Connection, TelnetOutput {
         this.worldInstanceService = worldInstanceService;
     }
 
-    /**
-     * Identifiant court et lisible, généré une fois par connexion par
-     * {@link TelnetSessionHandler#channelActive} — sert uniquement de clé de
-     * corrélation MDC pour les logs, aucune signification métier.
-     */
     public String getConnectionId() {
         return connectionId;
     }
@@ -105,14 +94,6 @@ public class TelnetConnection implements Connection, TelnetOutput {
         }
     }
 
-    /**
-     * Si {@code message} est un {@link SecureOutputMessage}, coupe l'echo local du
-     * client avant l'envoi et capture la ligne suivante en clair : l'echo est
-     * toujours rétabli juste avant que {@code handler} ne s'exécute. Le client
-     * n'ayant jamais renvoyé le retour chariot pendant que l'echo était coupé, on
-     * émet nous-même un saut de ligne pour que ce que {@code handler} écrit démarre
-     * sur une ligne neuve plutôt qu'accolé au prompt.
-     */
     @Override
     public void requestBlocking(OutputMessage message, Consumer<String> handler) {
         this.send(message);

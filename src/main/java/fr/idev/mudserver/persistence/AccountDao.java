@@ -34,11 +34,6 @@ public class AccountDao {
         return dsl.selectFrom(ACCOUNT).where(ACCOUNT.LOGIN.eq(login)).fetchOptional(AccountDao::toDomain);
     }
 
-    /**
-     * {@code characterId} peut être {@code null} (voir CharacterDelete) — jOOQ
-     * accepte nativement une valeur null dans {@code set}, contrairement à
-     * {@link java.util.Map#of} qui la refusait côté JDBC.
-     */
     public void updateCurrentCharacter(UUID accountId, UUID characterId) {
         dsl.update(ACCOUNT).set(ACCOUNT.CURRENT_CHARACTER_ID, characterId).where(ACCOUNT.ID.eq(accountId)).execute();
     }

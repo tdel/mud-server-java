@@ -7,14 +7,6 @@ import java.util.UUID;
 
 import fr.idev.mudserver.domain.actor.NpcTemplate;
 
-/**
- * Contenu statique d'un monde jouable : rooms (avec leurs points de spawn de
- * monstres) et PNJ, chargés depuis {@code data/worlds/{shortName}/} (voir
- * {@code WorldTemplateService}). Items/classes/races/levels restent globaux,
- * partagés entre tous les {@code WorldTemplate} — jamais référencés ici.
- * Immutable une fois construit : {@code WorldTemplateService} ne le publie
- * qu'une fois entièrement chargé et validé.
- */
 public class WorldTemplate {
 
     private final UUID id;

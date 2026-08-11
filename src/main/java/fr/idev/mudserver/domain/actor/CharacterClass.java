@@ -10,16 +10,6 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * Porte directement les caractéristiques de règles DnD5e de chaque classe (dé
- * de vie, or de départ, maîtrises...), chargées depuis {@code data/class.json}
- * dans le bloc {@code static} ci-dessous — donnée de règles statique, jamais
- * mutée en jeu, et fixée à la compilation au même titre que la liste des
- * classes elle-même, contrairement aux items/monstres/ PNJ (identifiés par un
- * id {@code String}, ceux-là nécessitent réellement un service+cache). Remplace
- * l'ancien {@code game.actor.ClassService} : voir l'historique git si besoin de
- * retrouver cette version.
- */
 public enum CharacterClass {
     BARBARIAN, BARD, CLERIC, DRUID, FIGHTER, MONK, PALADIN, RANGER, ROGUE, SORCERER, WARLOCK, WIZARD;
 
@@ -93,12 +83,6 @@ public enum CharacterClass {
             Set<ArmorProficiency> armorProficiencies) {
     }
 
-    /**
-     * Forme exacte de {@code class.json}, cible de désérialisation Jackson —
-     * distincte de {@link Definition} pour ne pas exposer {@code name} (déjà porté
-     * par la constante d'enum elle-même) ni les champs à plat
-     * {@code startingGoldDice}/{@code startingGoldMultiplier}.
-     */
     private record Json(CharacterClass name, int hitDie, String startingGoldDice, int startingGoldMultiplier,
             List<Attribute> savingThrows, List<Skill> skills, Attribute primaryAbility,
             List<WeaponCategory> weaponProficiencies, List<ArmorProficiency> armorProficiencies) {

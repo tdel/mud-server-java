@@ -30,29 +30,6 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * Point d'entrée unique pour le contenu statique d'un World : rooms (avec leurs
- * points de spawn de monstres) et PNJ, un {@link WorldTemplate} par dossier
- * sous {@code data/worlds/}. Chaque dossier {@code data/worlds/{shortName}/}
- * porte un {@code world.json} (métadonnées : id, nom, description, min/max
- * joueurs) plus son propre {@code rooms.json}/ {@code npcs.json} — même format
- * que les anciens {@code data/rooms.json}/ {@code data/npcs.json} qu'ils
- * remplacent, juste un jeu de fichiers par monde plutôt qu'un seul global.
- * {@code data/items.json}/
- * {@code data/monsters.json}/{@code data/race.json}/{@code data/class.json}/
- * {@code data/levels.json} restent globaux, partagés entre tous les
- * {@link WorldTemplate} — hors périmètre de cette classe.
- *
- * <p>
- * L'énumération des dossiers de {@code data/worlds/} passe par
- * {@link ResourcePatternResolver} plutôt que
- * {@code getClass().getResourceAsStream(...)} (utilisé partout ailleurs dans ce
- * codebase pour un fichier connu à l'avance) : lister le contenu d'un dossier
- * classpath ne fonctionne pas une fois l'application packagée en jar
- * exécutable, alors que résoudre un pattern avec wildcard (
- * {@code classpath*:data/worlds/*&#47;world.json}) fonctionne aussi bien depuis
- * un jar que depuis {@code target/classes} en dev/test.
- */
 @Service
 public class WorldTemplateService {
 
@@ -72,14 +49,6 @@ public class WorldTemplateService {
         this.resourcePatternResolver = resourcePatternResolver;
     }
 
-    /**
-     * Recharge intégralement l'ensemble des mondes à chaque appel (jamais un ajout
-     * incrémental) : comme {@code ItemService.warmItemTemplates()}, sûr à rappeler
-     * plusieurs fois (un contexte Spring de test est mis en cache et partagé entre
-     * classes de test, chacune pouvant déclencher son propre warmup) — la détection
-     * de doublon d'id ne porte donc que sur le lot chargé dans <em>cet</em> appel,
-     * pas sur un état accumulé entre appels.
-     */
     public void warmWorldTemplates(Map<UUID, ItemService.ItemSummary> itemSummariesById) {
         Resource[] manifests;
         try {

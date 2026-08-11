@@ -9,12 +9,6 @@ import fr.idev.mudserver.telnet.TelnetOutput;
 
 public record WorldsList(List<Entry> worlds) implements OutputTelnetMessage {
 
-    /**
-     * {@code existingCharacterName} vaut {@code null} quand ce compte n'a pas
-     * encore de personnage dans ce monde — pas de sous-type dédié : un seul champ
-     * optionnel suffit ici plutôt que deux records "un par issue", vu qu'une seule
-     * ligne du tableau varie.
-     */
     public record Entry(String shortName, String name, String description, int minPlayers, int maxPlayers,
             String existingCharacterName, CharacterClass existingCharacterClass, Integer existingCharacterLevel) {
     }

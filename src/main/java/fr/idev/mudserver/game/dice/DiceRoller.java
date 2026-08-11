@@ -3,11 +3,6 @@ package fr.idev.mudserver.game.dice;
 import java.security.SecureRandom;
 import java.util.Random;
 
-/**
- * Classe utilitaire statique — sans état d'instance (hors {@link #RANDOM},
- * partagé et thread-safe), jamais un bean Spring : aucun appelant n'a besoin
- * d'injection de dépendances pour de simples jets de dés.
- */
 public final class DiceRoller {
 
     private static final int[] SIMULATED_SIDES = {2, 3};
@@ -21,11 +16,6 @@ public final class DiceRoller {
         return roll(DiceExpression.parse(expression));
     }
 
-    /**
-     * Tirage de probabilité indépendant (0 à 1), utilisé pour les tables de butin
-     * ({@code game.actor.LootService}) plutôt qu'une notation de dés — réutilise le
-     * même {@link Random} que {@link #roll}, pas de source d'aléa parallèle.
-     */
     public static boolean rollChance(double probability) {
         return RANDOM.nextDouble() < probability;
     }
@@ -38,25 +28,11 @@ public final class DiceRoller {
         return new DiceRoll(rolls, expression.modifier());
     }
 
-    /**
-     * Jet de d20 unique DnD5e, avec ou sans désavantage (2d20, garde le plus bas —
-     * pas de variante avantage pour l'instant, aucun appelant n'en a besoin).
-     * Retourne toujours un {@link DiceRoll} à un seul dé dans {@code rolls()} (le
-     * d20 finalement retenu) : {@link DiceRoll#total()} ne double donc jamais le
-     * résultat même quand deux d20 sont physiquement lancés en interne, et les
-     * appelants qui lisent {@code rolls()[0]} comme jet naturel (règle du 1/20
-     * naturel, voir {@link #resolveHit}) restent valides sans changement.
-     */
     public static DiceRoll rollD20(int modifier, boolean disadvantage) {
         int kept = disadvantage ? Math.min(rollDie(20), rollDie(20)) : rollDie(20);
         return new DiceRoll(new int[]{kept}, modifier);
     }
 
-    /**
-     * Règle DnD5e du jet d'attaque, extraite en méthode pure pour être testable
-     * sans dépendre du RNG réel : un 1 naturel est toujours un échec, un 20 naturel
-     * toujours une réussite, sinon on compare le total à la CA.
-     */
     public static boolean resolveHit(int naturalRoll, int totalRoll, int armorClass) {
         if (naturalRoll == 1) {
             return false;

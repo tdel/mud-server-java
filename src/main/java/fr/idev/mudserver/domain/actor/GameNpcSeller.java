@@ -8,15 +8,6 @@ import java.util.UUID;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.Rarity;
 
-/**
- * Seul sous-type de {@link GameNpc} : un PNJ marchand, dès que sa
- * {@code NpcDialogue} contient une option {@code SHOP} (invariant posé par
- * {@code NpcService.loadNpcs}, qui choisit ce type plutôt que {@code GameNpc}
- * exactement dans ce cas). Porte lui-même la résolution du catalogue et
- * l'achat, sur le même principe que {@link GamePlayer#pickUpItem}/
- * {@link GamePlayer#equipItem} : le comportement vit sur l'objet de domaine
- * concerné plutôt que dans {@code controller.ingame.Talk}.
- */
 public final class GameNpcSeller extends GameNpc {
 
     private final NpcShop shop;
@@ -30,12 +21,6 @@ public final class GameNpcSeller extends GameNpc {
         return shop;
     }
 
-    /**
-     * Résout une entrée par index 1-based (position dans le catalogue) ou, à
-     * défaut, par nom d'article insensible à la casse — même règle que
-     * {@link NpcDialogue#resolveOption} pour un choix de dialogue, appliquée ici au
-     * catalogue plutôt qu'aux options.
-     */
     public Optional<NpcShopEntry> resolveEntry(String input) {
         String trimmed = input.trim();
         try {
@@ -49,13 +34,6 @@ public final class GameNpcSeller extends GameNpc {
         return shop.items().stream().filter(entry -> entry.itemName().equalsIgnoreCase(trimmed)).findFirst();
     }
 
-    /**
-     * Construit l'{@link Item} acheté exactement comme {@code game.actor
-     * .LootService} construit un item de butin, puis délègue le débit d'or et
-     * l'ajout à l'inventaire à {@link GamePlayer#buyItem} —
-     * {@code controller.ingame.Talk} n'a donc plus à connaître la forme d'un item
-     * acheté ni la logique de résolution du catalogue.
-     */
     public PurchaseOutcome sell(GamePlayer buyer, String input) {
         Optional<NpcShopEntry> entry = resolveEntry(input);
         if (entry.isEmpty()) {

@@ -154,13 +154,6 @@ public class MonsterTemplate {
                 + lootTable + ", presenceRadius=" + presenceRadius + "]";
     }
 
-    /**
-     * Une entrée de table de butin : {@code dropChance} est une probabilité
-     * indépendante entre 0 et 1 (0.001 = 0.1 %, 0.10 = 10 %) — chaque entrée est
-     * tirée séparément à la mort du monstre ({@code game.actor.LootService}), donc
-     * un même monstre peut faire tomber zéro, un ou plusieurs objets sur un seul
-     * kill.
-     */
     public record LootTableEntry(UUID itemTemplateId, double dropChance) {
     }
 }

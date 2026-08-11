@@ -15,11 +15,6 @@ import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.charselect.NowPlaying;
 
-/**
- * Pas d'argument {@code <name>} : au plus un personnage par
- * {@code (account_id, world_instance_id)} (voir {@code multi-world.md} Phase
- * C), donc rien à désambiguïser — tout argument fourni est ignoré.
- */
 @Component
 public class CharacterSelect implements ControllerHandler {
 

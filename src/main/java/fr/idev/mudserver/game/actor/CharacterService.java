@@ -32,22 +32,6 @@ import fr.idev.mudserver.network.message.ingame.ShortRestAnnounced;
 import fr.idev.mudserver.network.message.ingame.XpGained;
 import fr.idev.mudserver.persistence.CharacterDao;
 
-/**
- * Réagit à {@link CharacterGainedXp} : persiste l'XP, puis fait franchir à
- * {@code character} autant de paliers de niveau que son XP le permet (une seule
- * mise à mort peut en franchir plusieurs). Le gain de PV par niveau suit la
- * règle 5e « fixe » (alternative au jet de dé) : (dé de vie / 2 + 1) +
- * modificateur de CON, ajouté aux PV max et aux PV courants — pas de soin
- * complet. Cette logique ne peut pas vivre sur {@link GamePlayer} lui-même
- * (simple POJO) puisqu'elle dépend de {@link LevelService}, un bean Spring.
- *
- * <p>
- * Réagit aussi à {@link CharacterDied} : c'est ici, plutôt que dans
- * {@code GameMonster#takeDamage}, que le tueur est crédité de l'XP du monstre
- * et que sa cible est vidée — deux effets qui concernent l'état du personnage
- * joueur, pas la room (voir {@code WorldInstanceService#onCharacterDied} pour
- * le pendant « room »).
- */
 @Service
 public class CharacterService {
 
@@ -64,11 +48,6 @@ public class CharacterService {
         this.worldInstanceService = worldInstanceService;
     }
 
-    /**
-     * Persiste le personnage publié par
-     * {@link fr.idev.mudserver.domain.WorldInstance#createCharacter} — seul point
-     * où un {@link GamePlayer} nouvellement créé est écrit en base.
-     */
     @EventListener
     void onNewGamePlayerCreated(NewGamePlayerCreated event) {
         characterDao.insert(event.character());
@@ -103,11 +82,6 @@ public class CharacterService {
         }
     }
 
-    /**
-     * Persiste l'or gagné (butin, voir {@code game.actor.LootService}) et notifie
-     * le joueur seul — jamais de broadcast à la room, contrairement à {@code
-     * MonsterDefeated}/{@code PlayerLeveledUp}.
-     */
     @EventListener
     void onCharacterReceivedGold(CharacterReceivedGold event) {
         characterDao.update(event.character());
@@ -116,11 +90,6 @@ public class CharacterService {
                 event.amount(), event.character().getInventory().getGold());
     }
 
-    /**
-     * Symétrique de {@link #onCharacterReceivedGold} pour une dépense (boutique
-     * PNJ, voir {@link GamePlayer#buyItem}) : persiste le nouveau solde et confirme
-     * au joueur.
-     */
     @EventListener
     void onCharacterSpentGold(CharacterSpentGold event) {
         characterDao.update(event.character());
@@ -129,12 +98,6 @@ public class CharacterService {
                 event.character().getInventory().getGold());
     }
 
-    /**
-     * {@code @Order(2)} : ce listener s'exécute après
-     * {@code WorldInstanceService#onCharacterDied} pour ce même événement, afin que
-     * le joueur voie la mort du monstre avant le message d'XP (et une éventuelle
-     * montée de niveau) que déclenche {@link GamePlayer#gainXp}.
-     */
     @EventListener
     @Order(2)
     void onCharacterDied(CharacterDied event) {
@@ -146,14 +109,6 @@ public class CharacterService {
                 xpReward);
     }
 
-    /**
-     * {@code @Order(2)} : s'exécute après
-     * {@code WorldInstanceService#onGamePlayerDied}, qui a déjà diffusé l'annonce
-     * de la mort à la room d'origine avant que {@code moveToRoom} ne l'écrase.
-     * Restauration complète des PV, pas de pénalité (XP, niveau...) — non demandée.
-     * Le retrait de l'affrontement lui-même est géré par
-     * {@code CombatEngine#onGamePlayerDied}, indépendamment de cette méthode.
-     */
     @EventListener
     @Order(2)
     void onGamePlayerDied(GamePlayerDied event) {
@@ -169,11 +124,6 @@ public class CharacterService {
         log.info("character.respawned character={} room={}", character.getName(), startingRoom.getName());
     }
 
-    /**
-     * {@code ConsumableItem#consume} a déjà mis à jour les PV en mémoire et retiré
-     * la potion de l'inventaire — persiste et confirme au joueur, même mécanisme
-     * que {@link #onCharacterReceivedGold}.
-     */
     @EventListener
     void onGamePlayerUsedPotion(GamePlayerUsedPotion event) {
         GamePlayer character = event.character();
@@ -184,13 +134,6 @@ public class CharacterService {
                 event.item().getName(), event.healedAmount());
     }
 
-    /**
-     * {@code RestService#shortRest} a déjà soigné chaque joueur en ligne de la
-     * {@code WorldInstance} de l'initiateur en mémoire — persiste chacun et lui
-     * envoie sa confirmation privée, puis annonce le repos à toute l'instance via
-     * {@link WorldInstanceService#broadcastToInstance}, même mécanisme que
-     * {@link #onGamePlayerUsedPotion} répété pour plusieurs joueurs.
-     */
     @EventListener
     void onShortRestTaken(ShortRestTaken event) {
         for (Map.Entry<GamePlayer, Integer> entry : event.healedAmounts().entrySet()) {
@@ -204,12 +147,6 @@ public class CharacterService {
                 event.healedAmounts().size());
     }
 
-    /**
-     * Symétrique de {@link #onShortRestTaken} pour {@code RestService#longRest} :
-     * {@code ItemService#onLongRestTaken} s'occupe séparément de supprimer les
-     * provisions consommées, même séparation que {@link #onGamePlayerUsedPotion}/
-     * {@code ItemService#onGamePlayerUsedPotion} pour une potion.
-     */
     @EventListener
     void onLongRestTaken(LongRestTaken event) {
         for (Map.Entry<GamePlayer, Integer> entry : event.healedAmounts().entrySet()) {

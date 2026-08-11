@@ -4,10 +4,6 @@ import fr.idev.mudserver.telnet.Ansi;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
-/**
- * Envoyé à tous les joueurs en ligne — même portée globale que
- * {@link ShortRestAnnounced}.
- */
 public record LongRestAnnounced(String initiatorName) implements OutputTelnetMessage {
 
     @Override

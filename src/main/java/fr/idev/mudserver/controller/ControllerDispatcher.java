@@ -12,16 +12,6 @@ import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ActionNotFound;
 import fr.idev.mudserver.network.message.ingame.CombatActionRequired;
 
-/**
- * Point de passage unique de chaque commande, avant même la résolution par
- * {@link ControllerRegistry} — c'est ici qu'est appliqué le verrouillage des
- * commandes pendant un combat actif ({@link GamePlayer#isInCombat()}), plutôt
- * que dans chacun des {@code ControllerHandler} : un seul endroit à modifier,
- * aucun des handlers existants n'a besoin de connaître l'état de combat. Le
- * refus « ce n'est pas votre tour » reste en revanche porté par
- * {@code game.CombatEngine} (via {@code controller.ingame.Attack}/ {@code Use})
- * : ce dispatcher ne connaît que les verbes, pas l'état des tours.
- */
 @Component
 public class ControllerDispatcher {
 

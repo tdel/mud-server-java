@@ -2,14 +2,6 @@ package fr.idev.mudserver.domain;
 
 import java.util.UUID;
 
-/**
- * {@link ItemTemplate} de type {@link ItemType#FOOD} — une provision (pomme,
- * pain, oeufs...) dont {@code nutritionValue} contribue au seuil de repos long
- * (voir {@code game.actor.RestService}), distinct de {@code price} (coût en or
- * chez le marchand). Contrairement à {@link ConsumableItem}, une nourriture ne
- * se consomme jamais via {@code use <item>} : elle n'est sélectionnée et
- * détruite que par le flux de repos long ({@code controller.ingame.Rest}).
- */
 public class FoodItem extends ItemTemplate {
 
     private final int nutritionValue;

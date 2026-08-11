@@ -21,40 +21,8 @@ import fr.idev.mudserver.domain.actor.event.NewGamePlayerCreated;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 
-/**
- * Playthrough concret d'un {@link WorldTemplate}, scopé à une party — chaque
- * party qui lance un même {@code WorldTemplate} obtient sa propre
- * {@code WorldInstance}, avec son propre graphe de {@link RoomInstance}s, ses
- * propres monstres/PNJ/items, invisible aux autres instances. Conflate
- * volontairement métadonnées persistées et conteneur runtime, comme
- * {@link RoomInstance} le fait déjà pour {@link RoomTemplate} — pas de split
- * supplémentaire tant qu'aucun second besoin (éviction sous pression mémoire,
- * par exemple) ne le justifie.
- *
- * <p>
- * {@code roomInstances} est vide tant que {@code WorldInstanceService
- * .materialize} n'a pas tourné (voir {@link #isMaterialized()}) — une
- * {@code WorldInstance} peut exister en DB (créée par une party, puis tout le
- * monde déconnecté) sans être résidente en mémoire, et n'est matérialisée à
- * nouveau qu'à la demande. Keyé par id de {@link RoomTemplate} (pas par id de
- * {@link RoomInstance} lui-même) pour que
- * {@link #roomInstanceForTemplate(UUID)} — la résolution "quelle room du monde"
- * utilisée à la reconnexion d'un personnage — reste une simple consultation de
- * map.
- */
 public class WorldInstance {
 
-    /**
-     * Id fixe (pas généré à l'exécution) de la {@code WorldInstance} par défaut
-     * créée pour ne rien perdre des personnages déjà existants au moment de
-     * l'introduction des Worlds — doit rester synchronisé avec le littéral de
-     * {@code V8__add_character_world_instance.sql} et avec la migration Java
-     * {@code V9__RecomputeDefaultInstanceItemRoomIds}. Référencé par
-     * {@code CharacterDao.insert} (repli quand un {@code GamePlayer} construit à la
-     * main n'a jamais reçu d'autre instance explicite) et par
-     * {@code WorldInstanceService} (chargement/matérialisation au démarrage tant
-     * qu'aucun Lobby ne permet encore de choisir un autre monde).
-     */
     public static final UUID DEFAULT_ID = UUID.fromString("a8e98a8e-73c1-43dd-b36e-a2f67f00ff48");
 
     private final UUID id;
@@ -65,17 +33,6 @@ public class WorldInstance {
 
     private Map<UUID, RoomInstance> roomInstances = Map.of();
 
-    /**
-     * Joueurs actuellement en jeu dans cette instance — même principe que
-     * {@link RoomInstance#clients} à l'échelle de l'instance entière plutôt que
-     * d'une seule room. Peuplé par {@code WorldInstanceService.enterGame}/
-     * {@code exitGame} (le seul point d'entrée/sortie du jeu), jamais directement
-     * par un contrôleur. Remplace l'ancien registre centralisé {@code GameWorld}
-     * (une seule {@code Map<Connection, GamePlayer>} pour tout le process) : une
-     * {@code WorldInstance} est déjà une frontière d'isolation forte (ses propres
-     * {@link RoomInstance}s, monstres, PNJ, items), il n'y avait pas de raison de
-     * suivre ses joueurs ailleurs qu'ici.
-     */
     private final Map<UUID, GamePlayer> players = new ConcurrentHashMap<>();
 
     public WorldInstance(UUID id, UUID worldTemplateId, Instant createdAt, UUID partyLeaderAccountId,

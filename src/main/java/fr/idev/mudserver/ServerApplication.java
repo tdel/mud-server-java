@@ -13,49 +13,6 @@ import fr.idev.mudserver.game.actor.LevelService;
 import fr.idev.mudserver.game.actor.MonsterService;
 import fr.idev.mudserver.game.WorldTemplateService;
 
-/**
- * Un {@link ApplicationRunner} s'exécute après le rafraîchissement du contexte
- * (DI complète) mais avant la publication de {@code ApplicationReadyEvent} —
- * donc mécaniquement avant {@code TelnetServer.start()}, qui écoute cet
- * événement. Cette garantie Spring Boot documentée évite d'avoir à coordonner
- * deux listeners du même événement via {@code @Order}. Ne charge plus ici que
- * les catalogues globaux, jamais mutés en jeu et partagés entre tous les
- * {@code WorldTemplate} : templates d'items ({@code data/items.json}),
- * templates de {@code WorldTemplate} eux-mêmes ({@code data/worlds/*&#47;}) —
- * catalogue léger, juste du parsing JSON en mémoire, nécessaire pour que
- * {@code worlds-list}/{@code world-enter} résolvent un monde par son nom court
- * avant même qu'un joueur y entre — templates de monstres
- * ({@code data/monsters.json}, dont les tables de butin sont validées contre
- * {@link ItemService#templateIds()} pour échouer tôt sur un UUID invalide
- * plutôt qu'au premier drop en jeu) et seuils XP ({@code data/levels.json}).
- * Les bonus raciaux et les caractéristiques de classe ne sont pas réchauffés
- * ici : {@code domain.actor.Race}/{@code CharacterClass} se chargent eux-mêmes
- * depuis {@code data/race.json}/{@code data/class.json} dans un bloc
- * {@code static}, au premier accès à ces enums plutôt que via ce runner.
- *
- * <p>
- * Le contenu runtime d'un monde (graphe de {@code RoomInstance}, monstres/PNJ
- * placés, items au sol depuis la DB) n'est plus chargé ici : il ne l'est qu'à
- * la demande, la première fois qu'un joueur ou une party entre effectivement
- * dans ce monde, via {@code WorldInstanceService.materialize} (voir sa Javadoc)
- * — inutile de garder en mémoire le contenu de mondes que personne n'occupe.
- *
- * <p>
- * Le {@code @ConditionalOnProperty} ci-dessous est porté par la
- * <em>méthode</em> {@code @Bean}, jamais par la classe
- * {@code ServerApplication} elle-même. {@code ServerApplication} est la source
- * primaire passée à {@code SpringApplication.run()} : un {@code @Conditional}
- * au niveau classe y serait évalué avant même le
- * {@code @ComponentScan}/{@code @EnableAutoConfiguration} hérités de
- * {@code @SpringBootApplication}, donc si la condition échouait — ce qui arrive
- * dans tous les tests, {@code app.telnet.enabled=false} dans
- * {@code src/test/resources/application.yml} — aucun bean de l'application ne
- * serait enregistré et tous les {@code @SpringBootTest} casseraient avec un
- * contexte vide. Un {@code @Conditional} sur une méthode {@code @Bean} n'a pas
- * ce problème : il n'écarte que ce bean précis, une fois la classe de
- * configuration déjà acceptée par Spring — c'est pour ça qu'il reste ici plutôt
- * que sur {@code ServerApplication}.
- */
 @SpringBootApplication
 public class ServerApplication {
 

@@ -6,14 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Matchmaking pré-jeu au Lobby : jamais persistée (contrairement à
- * {@link WorldInstance}), vit uniquement en mémoire dans {@code PartyService}
- * le temps de réunir un groupe avant un {@code world-enter}. Le leader change
- * si celui-ci quitte via {@link #remove} : promotion du membre suivant par
- * ordre d'arrivée plutôt que dissolution, sauf si c'était le dernier membre
- * (voir {@code multi-world.md} Phase D).
- */
 public class Party {
 
     private final UUID id;
@@ -60,12 +52,6 @@ public class Party {
         members.add(new PartyMember(accountId));
     }
 
-    /**
-     * Retire un membre (départ volontaire ou {@code party-kick}) ; promeut le
-     * suivant par ordre d'arrivée si c'était le leader. Renvoie {@code true} si la
-     * party est maintenant vide, à dissoudre par l'appelant (voir
-     * {@code PartyService}).
-     */
     public boolean remove(UUID accountId) {
         members.removeIf(member -> member.accountId().equals(accountId));
         pendingInvites.remove(accountId);

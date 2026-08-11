@@ -11,16 +11,6 @@ import jakarta.annotation.PostConstruct;
 
 import fr.idev.mudserver.network.ConnectionState;
 
-/**
- * {@code List<ControllerHandler>} est injecté nativement par Spring avec tous
- * les beans implémentant l'interface — équivalent direct du
- * {@code #[AutowireIterator('app.action')]} PHP, sans tag YAML à maintenir en
- * synchronisation. La table est construite au démarrage
- * ({@code @PostConstruct}, donc à l'initialisation du contexte) plutôt que
- * paresseusement au premier appel comme côté PHP : une collision de nom entre
- * deux actions du même état échoue ainsi dès le démarrage de l'application, pas
- * au premier joueur qui tape la commande.
- */
 @Component
 public class ControllerRegistry {
 

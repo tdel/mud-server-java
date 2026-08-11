@@ -5,11 +5,6 @@ import java.util.UUID;
 
 import fr.idev.mudserver.domain.actor.GamePlayer;
 
-/**
- * Appartient à exactement une room OU un character, jamais les deux — invariant
- * appliqué par {@link #setCharacter}/{@link #setRoom}, qui se nettoient
- * mutuellement à chaque changement de possesseur.
- */
 public class Item {
 
     private UUID id;

@@ -35,36 +35,6 @@ import fr.idev.mudserver.network.message.ingame.PlayerAttackBroadcast;
 import fr.idev.mudserver.network.message.ingame.YouJoinedCombat;
 import fr.idev.mudserver.network.message.ingame.YourTurn;
 
-/**
- * Orchestre le combat au tour par tour au-dessus du calcul pur de
- * {@link GamePlayer#tryAttack}/{@link GameMonster#tryAttack} : décision
- * rejoindre/fusionner/nouvel affrontement, verrouillage, et la cascade qui
- * résout automatiquement les tours de monstres consécutifs (le projet n'a
- * aucune tâche planifiée — voir CLAUDE.md — donc le tour d'un monstre doit être
- * résolu de façon synchrone, dans le même appel que la commande du joueur qui
- * vient de faire avancer le tour).
- *
- * <p>
- * Schéma de verrouillage détaillé dans la Javadoc de {@link CombatEncounter} («
- * verrou B »). Le « verrou A » (moniteur d'un {@link GameMonster}, le même que
- * {@link GameMonster#takeDamage}) n'est jamais tenu ici en même temps que le
- * verrou B — chaque méthode qui a besoin des deux fait le verrou A
- * intégralement, le relâche, puis prend le verrou B.
- *
- * <p>
- * Les messages sont envoyés directement (pas de file d'attente vidée après
- * coup) : {@code Connection#send} (Netty {@code writeAndFlush}) est
- * non-bloquant, donc aucune E/S bloquante n'a lieu sous verrou — et c'est
- * nécessaire pour l'ordre perçu par le joueur, {@link GameMonster#takeDamage}/
- * {@link GamePlayer#takeDamage} publiant {@code CharacterDied}/
- * {@code GamePlayerDied} de façon synchrone, dont les listeners
- * ({@code WorldInstanceService}/{@code CharacterService}) envoient déjà leurs
- * propres messages immédiatement : différer les messages de cette classe dans
- * une file vidée après coup les ferait arriver <em>après</em> ceux de la
- * mort/mise à terre qu'ils précèdent pourtant chronologiquement (essai manuel :
- * « The Bandit collapses » apparaissait avant « You attack the Bandit... HIT!
- * »).
- */
 @Service
 public class CombatEngine {
 
@@ -117,22 +87,6 @@ public class CombatEngine {
         }
     }
 
-    /**
-     * Nouvel affrontement (joueur et monstre tous deux libres) — le verrou A
-     * ({@code synchronized(target)}) fait atomiquement le test-et-création, et est
-     * intégralement relâché avant toute acquisition du verrou B (
-     * {@code synchronized(encounter)}) : jamais imbriqué A-puis-B, même dans la
-     * branche de récupération de course ci-dessous (contrairement à une première
-     * version de cette méthode, qui appelait {@link #joinPlayerInto} — donc
-     * acquérait le verrou B — alors que le verrou A était encore tenu ; un thread
-     * concurrent dans {@link #joinPlayerInto} n'a lui-même jamais besoin du verrou
-     * A, donc ce sens d'imbrication n'a rien d'inévitable et ouvrait un
-     * interblocage possible avec {@link #mergeMonsterInto}, qui prend les deux
-     * verrous dans le même ordre). Le coup d'ouverture se résout ensuite <em>sans
-     * aucun verrou</em> : ce thread est seul propriétaire de cet affrontement tant
-     * qu'il n'a pas été rendu visible autrement, donc rien d'autre ne peut le lire
-     * concurremment à ce stade.
-     */
     private void startNewEncounter(GamePlayer attacker, GameMonster target) {
         CombatEncounter encounter;
         boolean foundedHere;
@@ -191,19 +145,6 @@ public class CombatEngine {
         }
     }
 
-    /**
-     * Contrepartie de {@link #startNewEncounter} pour un combat déclenché par une
-     * zone de présence plutôt que par la commande {@code attack} d'un joueur :
-     * contrairement à {@link #startNewEncounter}, pas de coup d'ouverture hors
-     * ordre — le monstre n'a pas d'avantage garanti sur le joueur simplement parce
-     * qu'il a déclenché l'affrontement (décision de design actée). L'initiative est
-     * donc tirée immédiatement pour {@code founder} et {@code victim}, et
-     * {@link #resolveFromCurrentTurn} gère seul la suite, y compris si le monstre
-     * gagne l'initiative et frappe en premier. Même récupération de course que
-     * {@link #startNewEncounter} (verrou A test-et-création, relâché avant le
-     * verrou B) : deux victimes distinctes peuvent entrer simultanément dans la
-     * zone de présence du même monstre, sur deux threads différents.
-     */
     private CombatEncounter startAggroEncounter(GameMonster founder, GamePlayer victim) {
         CombatEncounter encounter;
         boolean foundedHere;
@@ -256,14 +197,6 @@ public class CombatEngine {
         }
     }
 
-    /**
-     * PRÉCONDITION : appelant détient déjà synchronized(encounter), et vient de
-     * consommer une action de {@code actor}. Ne fait avancer le tour (cascade) que
-     * si le budget est désormais épuisé ; sinon signale à {@code actor} son solde
-     * restant sans toucher au pointeur — une seconde commande attack/use dans le
-     * même tour retombe alors sur la même branche performTurnAttack/useItem,
-     * puisque {@code currentParticipant()} n'a pas changé.
-     */
     private void continueOrEndTurn(CombatEncounter encounter, GamePlayer actor) {
         ActionEconomy economy = actor.getActionEconomy();
         if (economy.hasActionRemaining()) {
@@ -295,7 +228,6 @@ public class CombatEngine {
         encounter.getRoom().broadcast(new CombatantJoined(joiner.getName()), null);
     }
 
-    /** PRÉCONDITION : appelant détient déjà synchronized(encounter). */
     private void insertOrQueue(CombatEncounter encounter, GameCharacter character) {
         if (encounter.isInitiativeRolled()) {
             int initiative = character.rollInitiative();
@@ -305,21 +237,11 @@ public class CombatEngine {
         }
     }
 
-    /**
-     * PRÉCONDITION : appelant détient déjà synchronized(encounter) ; fait avancer
-     * le tour.
-     */
     private void cascade(CombatEncounter encounter) {
         encounter.advanceTurn();
         resolveFromCurrentTurn(encounter);
     }
 
-    /**
-     * PRÉCONDITION : appelant détient déjà synchronized(encounter) ; résout, à
-     * partir de la position <em>courante</em> du pointeur (sans avancer d'abord),
-     * tous les tours de monstres consécutifs jusqu'à retomber sur un joueur ou la
-     * fin de l'affrontement.
-     */
     private void resolveFromCurrentTurn(CombatEncounter encounter) {
         while (!encounter.isOver() && encounter.currentParticipant() instanceof GameMonster monster) {
             monster.getActionEconomy().resetForTurn();
@@ -380,15 +302,6 @@ public class CombatEngine {
         log.debug("combat.encounter_player_removed player={}", player.getName());
     }
 
-    /**
-     * Déclenché par {@link GamePlayer#onEnteredCell} à chaque case franchie —
-     * l'aggro se comporte comme une attaque de joueur ordinaire une fois
-     * l'affrontement identifié : rejoint un affrontement déjà en cours porté par
-     * l'un des monstres à portée ({@link #joinPlayerInto}), sinon en fonde un
-     * nouveau ({@link #startAggroEncounter}), puis fusionne tout autre monstre à
-     * portée resté libre ({@link #mergeMonsterInto}), même logique que plusieurs
-     * monstres rejoignant un combat déjà déclenché par {@code attack}.
-     */
     @EventListener
     void onGamePlayerEnteredCell(GamePlayerEnteredCell event) {
         GamePlayer victim = event.character();

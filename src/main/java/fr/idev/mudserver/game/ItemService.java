@@ -42,23 +42,6 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * Cache de lecture pour les items d'un personnage — le sac comme les
- * emplacements équipés — et ceux posés au sol dans une room, et point de
- * persistance réactif pour leurs mutations : ramassage, dépôt, équipement et
- * déséquipement vivent tous désormais sur {@code GamePlayer}
- * ({@link GamePlayer#pickUpItem}/{@link GamePlayer#dropItem}/
- * {@link GamePlayer#equipItem}/{@link GamePlayer#unequipItem}), qui publie un
- * événement de domaine après chaque mutation en mémoire ; les méthodes
- * {@code @EventListener} de cette classe répercutent chacune en base via
- * {@link ItemDao}. Précharge aussi l'ensemble des {@link ItemTemplate} en
- * mémoire ({@link #warmItemTemplates()}) depuis {@code data/items.json} : les
- * templates sont une donnée de règles statique, jamais mutée en jeu, donc
- * jamais persistée en DB. Attache le template correspondant à chaque
- * {@code Item} avant de le renvoyer à l'appelant — un {@code Item} sorti d'ici
- * a donc toujours son template, contrairement à un {@code Item} lu directement
- * via {@link ItemDao}.
- */
 @Service
 public class ItemService {
 
@@ -112,24 +95,10 @@ public class ItemService {
         templates.put(template.getId(), template);
     }
 
-    /**
-     * Exposé pour {@code MonsterService.loadMonsters}, qui valide au démarrage que
-     * chaque {@code itemTemplateId} référencé par une table de butin de
-     * {@code data/monsters.json} existe réellement — un simple {@code Set<UUID>}
-     * plutôt qu'une dépendance directe à {@code ItemService} pour ne pas forcer
-     * {@code MonsterServiceTest} (test JUnit pur, sans contexte Spring/DB) à
-     * dépendre d'un {@code ItemDao} réel.
-     */
     public Set<UUID> templateIds() {
         return Set.copyOf(templates.keySet());
     }
 
-    /**
-     * Utilisé par {@code NpcService.warmNpcs} pour dénormaliser le nom d'article et
-     * sa rareté sur chaque {@code GameNpcSeller.NpcShopEntry} au chargement, sur le
-     * même principe que {@link #templateIds()} — juste assez de donnée pour ne pas
-     * forcer une vraie dépendance à {@code ItemService}/{@code ItemDao}.
-     */
     public Map<UUID, ItemSummary> templateSummariesById() {
         Map<UUID, ItemSummary> summaries = new ConcurrentHashMap<>();
         templates.forEach(
@@ -146,13 +115,6 @@ public class ItemService {
         return items;
     }
 
-    /**
-     * Précharge les items au sol d'une {@code WorldInstance}, une fois pour toute
-     * sa durée de vie résidente — appelé depuis
-     * {@code WorldInstanceService.materialize()}, une fois par instance
-     * matérialisée plutôt que globalement au boot : une {@code RoomInstance} n'est
-     * jamais rechargée par session, contrairement à un {@code GamePlayer}.
-     */
     public void warmRoomItems(Collection<RoomInstance> rooms) {
         int totalItems = 0;
         for (RoomInstance room : rooms) {
@@ -193,15 +155,6 @@ public class ItemService {
                 event.room().getName());
     }
 
-    /**
-     * {@code @Transactional} pour de vrai ici : les deux {@code updateSlot}
-     * (déséquiper l'ancien occupant du slot, équiper le nouveau) doivent partager
-     * une transaction pour que la contrainte différée
-     * {@code uniq_character_slot DEFERRABLE INITIALLY DEFERRED} (voir
-     * V1__init_schema.sql) protège réellement le chevauchement transitoire entre
-     * les deux UPDATE — sans transaction commune, chaque UPDATE valide
-     * immédiatement en autocommit et la déférence de la contrainte ne sert à rien.
-     */
     @EventListener
     @Transactional
     void onGamePlayerEquippedItem(GamePlayerEquippedItem event) {
@@ -219,12 +172,6 @@ public class ItemService {
         log.info("item.unequipped item={} character={}", event.item().getName(), event.character().getName());
     }
 
-    /**
-     * Contrairement à {@link #onItemPickedUp} (simple réassignation d'une ligne
-     * déjà existante), l'item issu d'un butin n'a encore aucune ligne en base —
-     * {@code insert} plutôt qu'un {@code update}. Le template doit être attaché
-     * avant d'envoyer le message : {@code getName()} en dépend.
-     */
     @EventListener
     void onCharacterLootedItem(CharacterLootedItem event) {
         attachTemplate(event.item());
@@ -233,12 +180,6 @@ public class ItemService {
         log.info("item.looted item={} character={}", event.item().getName(), event.character().getName());
     }
 
-    /**
-     * Contrairement à {@link #onItemPickedUp}, l'item acheté n'a encore aucune
-     * ligne en base — {@code insert}, même raisonnement que
-     * {@link #onCharacterLootedItem}. Le template doit être attaché avant d'envoyer
-     * le message : {@code getName()} en dépend.
-     */
     @EventListener
     void onItemPurchased(ItemPurchased event) {
         attachTemplate(event.item());
@@ -248,12 +189,6 @@ public class ItemService {
                 event.price());
     }
 
-    /**
-     * L'objet consommé n'a plus lieu d'exister en base une fois utilisé — {@code
-     * ConsumableItem#consume} l'a déjà retiré de l'inventaire en mémoire, ce
-     * listener supprime sa ligne DB, symétrique de {@link #onCharacterLootedItem}/
-     * {@link #onItemPurchased} qui en insèrent une.
-     */
     @EventListener
     void onGamePlayerUsedPotion(GamePlayerUsedPotion event) {
         itemDao.delete(event.item().getId());
@@ -261,11 +196,6 @@ public class ItemService {
                 event.character().getName(), event.healedAmount());
     }
 
-    /**
-     * {@code RestService#longRest} a déjà retiré les provisions sélectionnées de
-     * l'inventaire de l'initiateur en mémoire — supprime leur ligne DB, même
-     * raisonnement que {@link #onGamePlayerUsedPotion} pour une potion consommée.
-     */
     @EventListener
     void onLongRestTaken(LongRestTaken event) {
         for (Item food : event.consumedFood()) {

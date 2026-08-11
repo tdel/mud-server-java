@@ -11,18 +11,6 @@ import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 
-/**
- * Contrairement à {@link Item}, qui délègue {@code getName()}/{@code getType()}
- * à son template en lecture à chaque appel, {@code GameMonster} copie au moment
- * de sa construction (voir {@code MonsterService.warmMonsters}) le nom, les
- * attributs et les PV max du {@link MonsterTemplate} résolu dans les champs
- * hérités de {@link GameCharacter} — ces champs sont la représentation partagée
- * unique utilisée par {@link GamePlayer}/{@link GameMonster}/ {@link GameNpc}
- * ({@code getModifier}/{@code getCurrentHealth} doivent fonctionner pareil pour
- * les trois, pas de délégation différente par sous-type). Le template reste
- * néanmoins attaché pour exposer {@link #getDescription()} par délégation, un
- * champ propre au flavor text qui n'a pas sa place sur {@code GameCharacter}.
- */
 public final class GameMonster extends GameCharacter {
 
     private final UUID templateId;
@@ -37,26 +25,6 @@ public final class GameMonster extends GameCharacter {
         this.roomId = roomId;
     }
 
-    /**
-     * Verrou sur l'instance vivante unique (monstres jamais rechargés, warmés une
-     * seule fois par {@code MonsterService}) — même pattern que
-     * {@code GamePlayer#pickUpItem}. Deux joueurs attaquant ce monstre en même
-     * temps se sérialisent ici ; celui dont l'appel fait passer les PV à 0 ou moins
-     * reçoit {@code true} (« coup fatal »), un seul gagnant possible : la garde sur
-     * un monstre déjà à 0 PV empêche un appel concurrent arrivé juste après de se
-     * croire lui aussi le coup fatal. {@code synchronized} ne pine plus les virtual
-     * threads sur leur carrier depuis JEP 491 (JDK 24+).
-     *
-     * <p>
-     * Sur le coup fatal, publie {@link CharacterDied} — hors du bloc
-     * {@code synchronized}, même principe que {@code GamePlayer#pickUpItem}
-     * (trancher sous verrou, publier après) : c'est cette méthode, plutôt que
-     * l'appelant, qui garantit qu'un événement part dès que ce monstre meurt, quel
-     * que soit le code qui a déclenché le coup ({@link GamePlayer#tryAttack} ne
-     * fait qu'exposer les dégâts à appliquer, voir sa Javadoc).
-     *
-     * @return true si ce coup est celui qui a fait passer les PV à 0 ou moins
-     */
     public boolean takeDamage(int amount, GamePlayer attacker) {
         boolean defeated;
         synchronized (this) {
@@ -72,12 +40,6 @@ public final class GameMonster extends GameCharacter {
         return defeated;
     }
 
-    /**
-     * Pendant de {@link GamePlayer#tryAttack} pour la riposte du monstre. +2 fixe
-     * en guise de bonus de maîtrise : équivalent d'un joueur niveau 1, choisi
-     * plutôt que d'ajouter un champ CR/maîtrise à {@link MonsterTemplate} pour
-     * cette itération — les monstres n'ont pas de progression de niveau modélisée.
-     */
     public CombatResult tryAttack(GamePlayer target) {
         int strengthModifier = getModifier(Attribute.STRENGTH);
         int attackBonus = strengthModifier + 2;

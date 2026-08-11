@@ -29,16 +29,6 @@ public class CharacterDao {
         this.dsl = dsl;
     }
 
-    /**
-     * Replie sur {@link WorldInstance#DEFAULT_ID} quand {@code character
-     * .getWorldInstanceId()} est {@code null} : {@code GamePlayer} n'a pas gagné de
-     * paramètre de constructeur pour ce champ (aurait fallu toucher tous les sites
-     * de test qui le construisent directement) — seul
-     * {@code WorldInstance.createCharacter} le renseigne explicitement aujourd'hui.
-     * Correct tant qu'une seule {@code WorldInstance} existe (avant le Lobby, à
-     * venir) : tout personnage inséré sans instance explicite appartient de fait à
-     * celle-là.
-     */
     public void insert(GamePlayer character) {
         UUID worldInstanceId = character.getWorldInstanceId() != null
                 ? character.getWorldInstanceId()
@@ -59,18 +49,6 @@ public class CharacterDao {
                 .execute();
     }
 
-    /**
-     * Renvoie {@code Optional}, pas une liste : au plus un personnage par
-     * {@code (account_id, world_instance_id)} (règle actée, voir
-     * {@code multi-world.md} Phase C) — remplace {@code findByAccountId}, dont le
-     * seul appelant ({@code controller.authed.CharacterList}, supprimé) reposait
-     * sur un vrai listing qui n'a plus lieu d'être une fois cette règle en place.
-     * Prend {@code account}/{@code instance} déjà résolus (pas de simples id) :
-     * {@code GamePlayer} exige un {@link Account} et une {@link RoomInstance} dès
-     * sa construction (voir {@link #toDomain}), et l'appelant les a de toute façon
-     * déjà en main à ce point du flux (connexion authentifiée, instance
-     * matérialisée).
-     */
     public Optional<GamePlayer> findByAccountAndWorldInstance(Account account, WorldInstance instance) {
         return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(account.getId()))
                 .and(CHARACTER.WORLD_INSTANCE_ID.eq(instance.getId()))
@@ -88,11 +66,6 @@ public class CharacterDao {
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_ROOM_ID, roomId).where(CHARACTER.ID.eq(characterId)).execute();
     }
 
-    /**
-     * Ne persiste que les champs qui évoluent réellement en jeu (position, santé,
-     * XP, niveau, or, repos courts pris) ; race/stats/nom restent figés à la
-     * création, pas besoin de les réécrire.
-     */
     public void update(GamePlayer character) {
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_ROOM_ID, character.getCurrentRoomId())
                 .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).set(CHARACTER.XP, character.getXp())
@@ -106,15 +79,6 @@ public class CharacterDao {
         dsl.deleteFrom(CHARACTER).where(CHARACTER.ID.eq(characterId)).execute();
     }
 
-    /**
-     * Résout la {@link RoomInstance} du personnage contre {@code instance} avec le
-     * même repli que l'ancien
-     * {@code WorldInstanceService.spawnCharacterIntoInstance} (sur la room de
-     * départ, pour couvrir un {@code current_room_id} orphelin — contenu du monde
-     * modifié entre deux sessions) : {@code account}/{@code
-     * instance} sont exigés par le constructeur de {@link GamePlayer}, donc doivent
-     * être résolus ici plutôt qu'après coup par l'appelant.
-     */
     private GamePlayer toDomain(CharacterRecord record, Account account, WorldInstance instance) {
         Map<Attribute, Integer> attributes = new EnumMap<>(Attribute.class);
         attributes.put(Attribute.STRENGTH, record.getStrength());

@@ -24,12 +24,6 @@ public class WorldInstanceDao {
         this.dsl = dsl;
     }
 
-    /**
-     * Insère la ligne {@code world_instance} puis une ligne
-     * {@code world_instance_member} par membre — composition figée à la création
-     * (voir la Javadoc de {@code WorldInstance}), donc pas de méthode de mise à
-     * jour des membres séparée.
-     */
     public void insert(WorldInstance instance) {
         dsl.insertInto(WORLD_INSTANCE, WORLD_INSTANCE.ID, WORLD_INSTANCE.WORLD_TEMPLATE_ID,
                 WORLD_INSTANCE.PARTY_LEADER_ACCOUNT_ID, WORLD_INSTANCE.CREATED_AT)
@@ -48,11 +42,6 @@ public class WorldInstanceDao {
                 .fetchOptional(record -> toDomain(record, membersOf(id)));
     }
 
-    /**
-     * {@code Optional}, pas une liste : un compte n'a qu'une {@code WorldInstance}
-     * active par {@code WorldTemplate} (voir {@code multi-world.md} Phase C —
-     * consommé par {@code controller.lobby.WorldsList}/{@code WorldEnter}).
-     */
     public Optional<WorldInstance> findByAccountIdAndWorldTemplateId(UUID accountId, UUID worldTemplateId) {
         return dsl.selectFrom(WORLD_INSTANCE).where(WORLD_INSTANCE.WORLD_TEMPLATE_ID.eq(worldTemplateId))
                 .and(WORLD_INSTANCE.ID.in(dsl.select(WORLD_INSTANCE_MEMBER.WORLD_INSTANCE_ID)

@@ -12,14 +12,6 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * Précharge la table officielle des points d'expérience requis par niveau
- * depuis {@code data/levels.json} (voir {@link #warmXpThresholds()}) : donnée
- * de règles statique, jamais mutée en jeu, chargée depuis le classpath plutôt
- * que la DB — {@code domain.actor.Race}/{@code CharacterClass} suivent le même
- * principe mais se chargent directement eux-mêmes dans un bloc {@code static},
- * n'ayant pas besoin d'un bean Spring dédié.
- */
 @Service
 public class LevelService {
 

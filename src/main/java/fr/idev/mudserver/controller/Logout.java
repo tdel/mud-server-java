@@ -16,13 +16,6 @@ import fr.idev.mudserver.network.message.LoggedOut;
 import fr.idev.mudserver.network.message.charselect.StoppedPlaying;
 import fr.idev.mudserver.network.message.lobby.BackInLobby;
 
-/**
- * Utilisable depuis les états "ingame", "charselect" et "lobby". Depuis
- * "ingame", se déloguer lâche le personnage et ramène directement au Lobby
- * (plus d'étape intermédiaire par "charselect" — pour rejouer, il faut refaire
- * {@code world-enter}). Depuis "charselect", on revient aussi au Lobby. Depuis
- * "lobby", se déloguer repasse entièrement à "connected".
- */
 @Component
 public class Logout implements ControllerHandler {
 
