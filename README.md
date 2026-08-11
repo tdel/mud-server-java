@@ -7,12 +7,14 @@ monstres avec butin et zones d'agressivité, PNJ marchands.
 
 ## Démo
 
-![Démo d'une session telnet : connexion, déplacement, boutique et combat](docs/demo/demo.svg)
+![Démo de deux sessions telnet en parallèle : deux joueurs qui discutent puis affrontent un monstre ensemble](docs/demo/demo.svg)
 
-Connexion, sélection d'un personnage, jet de compétence, déplacement sur la grille hexagonale,
-achat auprès d'un PNJ marchand, combat déclenché automatiquement à l'approche d'un monstre et
-butin récupéré à sa mort — une vraie session telnet enregistrée contre le serveur (voir
-[`docs/demo/`](docs/demo/) pour régénérer cette démo).
+Deux joueurs connectés simultanément (Aldric et Elowen, chacun dans son panneau tmux),
+déplacement sur la grille hexagonale, achat auprès d'un PNJ marchand, discussion entre les
+deux via `say`, combat déclenché automatiquement à l'approche d'un monstre puis rejoint par
+le second joueur en cours de route, et butin récupéré à sa mort — deux vraies sessions
+telnet enregistrées côte à côte contre le serveur (voir [`docs/demo/`](docs/demo/) pour
+régénérer cette démo).
 
 ## Commandes
 
