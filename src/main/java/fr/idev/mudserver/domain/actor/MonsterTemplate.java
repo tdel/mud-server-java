@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import fr.idev.mudserver.domain.ItemTemplate;
+
 public class MonsterTemplate {
 
     private UUID id;
@@ -154,6 +156,6 @@ public class MonsterTemplate {
                 + lootTable + ", presenceRadius=" + presenceRadius + "]";
     }
 
-    public record LootTableEntry(UUID itemTemplateId, double dropChance) {
+    public record LootTableEntry(ItemTemplate itemTemplate, double dropChance) {
     }
 }

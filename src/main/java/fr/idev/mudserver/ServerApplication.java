@@ -31,7 +31,7 @@ public class ServerApplication {
             log.info("startup.warmup_started");
             itemTemplateService.warmItemTemplates();
             worldTemplateService.warmWorldTemplates(itemTemplateService.templatesById());
-            monsterService.warmMonsterTemplates(itemTemplateService.templateIds());
+            monsterService.warmMonsterTemplates();
             levelService.warmXpThresholds();
             log.info("startup.warmup_completed durationMs={}", System.currentTimeMillis() - start);
         };

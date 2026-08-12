@@ -10,24 +10,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.domain.Item;
-import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.actor.MonsterTemplate;
 import fr.idev.mudserver.domain.actor.MonsterTemplate.LootTableEntry;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
-import fr.idev.mudserver.game.ItemTemplateService;
 import fr.idev.mudserver.game.dice.DiceRoller;
 
 @Service
 public class LootService {
 
     private static final Logger log = LoggerFactory.getLogger(LootService.class);
-
-    private final ItemTemplateService itemTemplateService;
-
-    public LootService(ItemTemplateService itemTemplateService) {
-        this.itemTemplateService = itemTemplateService;
-    }
 
     @EventListener
     @Order(3)
@@ -43,8 +35,7 @@ public class LootService {
 
         for (LootTableEntry entry : template.getLootTable()) {
             if (DiceRoller.rollChance(entry.dropChance())) {
-                ItemTemplate itemTemplate = itemTemplateService.getById(entry.itemTemplateId());
-                Item item = new Item(UUID.randomUUID(), itemTemplate, killer, null);
+                Item item = new Item(UUID.randomUUID(), entry.itemTemplate(), killer, null);
                 killer.receiveLootItem(item);
                 log.info("loot.item_dropped killer={} item={}", killer.getName(), item.getName());
             }

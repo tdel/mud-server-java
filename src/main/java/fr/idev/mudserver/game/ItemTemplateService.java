@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -70,10 +69,6 @@ public class ItemTemplateService {
         return new ItemTemplate(definition.id(), definition.name(), definition.description(), definition.type(),
                 definition.weight(), definition.armorCategory(), definition.baseAc(), definition.damageDice(),
                 definition.weaponCategory(), definition.price(), definition.rarity(), definition.bonus());
-    }
-
-    public Set<UUID> templateIds() {
-        return Set.copyOf(templates.keySet());
     }
 
     public Map<UUID, ItemTemplate> templatesById() {
