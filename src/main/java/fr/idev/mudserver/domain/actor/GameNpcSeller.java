@@ -41,7 +41,7 @@ public final class GameNpcSeller extends GameNpc {
             return new PurchaseOutcome.EntryNotFound();
         }
 
-        Item item = new Item(UUID.randomUUID(), entry.get().itemTemplate(), null, buyer, null);
+        Item item = new Item(UUID.randomUUID(), entry.get().itemTemplate(), buyer, null);
         boolean bought = buyer.buyItem(item, entry.get().price());
         return bought
                 ? new PurchaseOutcome.Purchased(item, entry.get().price())

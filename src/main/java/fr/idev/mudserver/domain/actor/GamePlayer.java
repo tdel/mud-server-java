@@ -15,13 +15,12 @@ import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
 import fr.idev.mudserver.domain.actor.event.CharacterSpentGold;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
-import fr.idev.mudserver.domain.actor.event.GamePlayerDroppedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEnteredCell;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEquippedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
 import fr.idev.mudserver.domain.actor.event.GamePlayerSpawnedToRoom;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUnequippedItem;
-import fr.idev.mudserver.domain.actor.event.ItemPickedUp;
+import fr.idev.mudserver.domain.actor.event.ItemDiscarded;
 import fr.idev.mudserver.domain.actor.event.ItemPurchased;
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.HexCoordinate;
@@ -360,19 +359,6 @@ public final class GamePlayer extends GameCharacter {
         DomainEventPublisher.publish(new GamePlayerSpawnedToRoom(this, room));
     }
 
-    public boolean pickUpItem(Item item) {
-        synchronized (item) {
-            if (item.getCharacter() != null) {
-                return false;
-            }
-            item.setCharacter(this);
-            getCurrentRoom().removeItem(item);
-        }
-        inventory.addItem(item);
-        DomainEventPublisher.publish(new ItemPickedUp(this, item));
-        return true;
-    }
-
     public Optional<EquipmentSlot> equipItem(Item item) {
         Optional<EquipmentSlot> slot = item.getType().equipmentSlot();
 
@@ -398,12 +384,9 @@ public final class GamePlayer extends GameCharacter {
         DomainEventPublisher.publish(new GamePlayerUnequippedItem(this, item));
     }
 
-    public void dropItem(Item item) {
-        RoomInstance currentRoom = getCurrentRoom();
-        item.setRoom(currentRoom);
+    public void discardItem(Item item) {
         inventory.removeItem(item);
-        currentRoom.addItem(item);
-        DomainEventPublisher.publish(new GamePlayerDroppedItem(this, item, currentRoom));
+        DomainEventPublisher.publish(new ItemDiscarded(this, item));
     }
 
     public PlayerInventory getInventory() {

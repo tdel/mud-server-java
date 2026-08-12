@@ -31,7 +31,6 @@ public class RoomInstance {
     private final WorldInstance worldInstance;
 
     private final Map<UUID, GamePlayer> clients = new ConcurrentHashMap<>();
-    private final List<Item> items = new CopyOnWriteArrayList<>();
     private final List<GameMonster> monsters = new CopyOnWriteArrayList<>();
     private final List<GameNpc> npcs = new CopyOnWriteArrayList<>();
     private final Map<HexCoordinate, GameCharacter> occupants = new ConcurrentHashMap<>();
@@ -178,27 +177,6 @@ public class RoomInstance {
 
     public Optional<GameNpc> findNpcByName(String name) {
         return npcs.stream().filter(npc -> npc.getName().equalsIgnoreCase(name)).findFirst();
-    }
-
-    public List<Item> getItems() {
-        return List.copyOf(items);
-    }
-
-    public Optional<Item> findOneByName(String name) {
-        return items.stream().filter(item -> item.getName().equalsIgnoreCase(name)).findFirst();
-    }
-
-    public void addItem(Item item) {
-        items.add(item);
-    }
-
-    public void removeItem(Item item) {
-        items.remove(item);
-    }
-
-    public void setItems(List<Item> items) {
-        this.items.clear();
-        this.items.addAll(items);
     }
 
     public List<RoomPortal> getPortals() {

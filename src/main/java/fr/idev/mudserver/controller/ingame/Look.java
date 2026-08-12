@@ -45,13 +45,11 @@ public class Look implements ControllerHandler {
                 .map(portal -> portal.direction() + ": " + portal.targetRoom().getName()).toList();
         List<String> characterNames = nearby.stream().filter(GamePlayer.class::isInstance)
                 .filter(other -> !other.getId().equals(character.getId())).map(GameCharacter::getName).toList();
-        List<RoomDescription.ItemSummary> items = room.getItems().stream()
-                .map(item -> new RoomDescription.ItemSummary(item.getName(), item.getRarity())).toList();
         List<String> monsterNames = nearby.stream().filter(GameMonster.class::isInstance).map(GameCharacter::getName)
                 .toList();
         List<String> npcNames = nearby.stream().filter(GameNpc.class::isInstance).map(GameCharacter::getName).toList();
 
         return new RoomDescription(room.getName(), room.getDescription(), gridLines, HexGridRenderer.LEGEND,
-                portalSummaries, characterNames, items, monsterNames, npcNames);
+                portalSummaries, characterNames, monsterNames, npcNames);
     }
 }

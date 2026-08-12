@@ -12,7 +12,7 @@ import fr.idev.mudserver.domain.Rarity;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
-import fr.idev.mudserver.network.message.ingame.ItemDropped;
+import fr.idev.mudserver.network.message.ingame.ItemDiscarded;
 import fr.idev.mudserver.network.message.ingame.ItemNotCarried;
 
 @Component
@@ -47,8 +47,8 @@ public class Drop implements ControllerHandler {
 
         String templateName = item.get().getName();
         Rarity templateRarity = item.get().getRarity();
-        character.dropItem(item.get());
+        character.discardItem(item.get());
 
-        connection.send(new ItemDropped(templateName, templateRarity));
+        connection.send(new ItemDiscarded(templateName, templateRarity));
     }
 }

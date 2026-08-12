@@ -10,14 +10,12 @@ public class Item {
     private final UUID id;
     private final ItemTemplate template;
 
-    private RoomInstance room;
     private GameCharacter character;
     private EquipmentSlot slot;
 
-    public Item(UUID id, ItemTemplate template, RoomInstance room, GameCharacter character, EquipmentSlot slot) {
+    public Item(UUID id, ItemTemplate template, GameCharacter character, EquipmentSlot slot) {
         this.id = id;
         this.template = Objects.requireNonNull(template);
-        this.room = room;
         this.character = character;
         this.slot = slot;
     }
@@ -28,10 +26,6 @@ public class Item {
 
     public GameCharacter getCharacter() {
         return character;
-    }
-
-    public RoomInstance getRoom() {
-        return room;
     }
 
     public String getName() {
@@ -76,13 +70,6 @@ public class Item {
 
     public void setCharacter(GameCharacter character) {
         this.character = character;
-        this.room = null;
-        this.slot = null;
-    }
-
-    public void setRoom(RoomInstance room) {
-        this.room = room;
-        this.character = null;
         this.slot = null;
     }
 
@@ -92,10 +79,6 @@ public class Item {
 
     public UUID getTemplateId() {
         return template.getId();
-    }
-
-    public UUID getRoomId() {
-        return room == null ? null : room.getId();
     }
 
     public UUID getCharacterId() {
@@ -119,18 +102,17 @@ public class Item {
             return false;
         }
         return Objects.equals(id, other.id) && Objects.equals(getTemplateId(), other.getTemplateId())
-                && Objects.equals(getRoomId(), other.getRoomId())
                 && Objects.equals(getCharacterId(), other.getCharacterId()) && slot == other.slot;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, getTemplateId(), getRoomId(), getCharacterId(), slot);
+        return Objects.hash(id, getTemplateId(), getCharacterId(), slot);
     }
 
     @Override
     public String toString() {
-        return "Item[id=" + id + ", templateId=" + getTemplateId() + ", roomId=" + getRoomId() + ", characterId="
-                + getCharacterId() + ", slot=" + slot + "]";
+        return "Item[id=" + id + ", templateId=" + getTemplateId() + ", characterId=" + getCharacterId() + ", slot="
+                + slot + "]";
     }
 }

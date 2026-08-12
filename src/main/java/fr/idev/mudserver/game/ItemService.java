@@ -1,6 +1,5 @@
 package fr.idev.mudserver.game;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -11,13 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.domain.Item;
-import fr.idev.mudserver.domain.RoomInstance;
 import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
-import fr.idev.mudserver.domain.actor.event.GamePlayerDroppedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEquippedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUnequippedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUsedPotion;
-import fr.idev.mudserver.domain.actor.event.ItemPickedUp;
+import fr.idev.mudserver.domain.actor.event.ItemDiscarded;
 import fr.idev.mudserver.domain.actor.event.ItemPurchased;
 import fr.idev.mudserver.domain.actor.event.LongRestTaken;
 import fr.idev.mudserver.network.message.ingame.EquipmentLooted;
@@ -39,28 +36,11 @@ public class ItemService {
         return itemDao.findByCharacter(character);
     }
 
-    public void warmRoomItems(Collection<RoomInstance> rooms) {
-        int totalItems = 0;
-        for (RoomInstance room : rooms) {
-            List<Item> items = itemDao.findByRoom(room);
-            room.setItems(items);
-            totalItems += items.size();
-        }
-        log.info("item.room_items_loaded count={} rooms={}", totalItems, rooms.size());
-    }
-
     @EventListener
-    void onItemPickedUp(ItemPickedUp event) {
-        itemDao.assignToCharacter(event.item().getId(), event.character().getId());
-        log.info("item.picked_up item={} template={} character={}", event.item().getId(), event.item().getTemplateId(),
+    void onItemDiscarded(ItemDiscarded event) {
+        itemDao.delete(event.item().getId());
+        log.info("item.discarded item={} template={} character={}", event.item().getId(), event.item().getTemplateId(),
                 event.character().getName());
-    }
-
-    @EventListener
-    void onGamePlayerDroppedItem(GamePlayerDroppedItem event) {
-        itemDao.assignToRoom(event.item().getId(), event.room().getId());
-        log.info("item.dropped item={} template={} room={}", event.item().getId(), event.item().getTemplateId(),
-                event.room().getName());
     }
 
     @EventListener

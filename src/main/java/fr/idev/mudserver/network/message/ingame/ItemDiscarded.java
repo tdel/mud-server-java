@@ -5,10 +5,10 @@ import fr.idev.mudserver.telnet.Ansi;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
-public record ItemTaken(String name, Rarity rarity) implements OutputTelnetMessage {
+public record ItemDiscarded(String name, Rarity rarity) implements OutputTelnetMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        output.write("You take the " + Ansi.item(name, rarity) + ".\n");
+        output.write("You discard the " + Ansi.item(name, rarity) + ".\n");
     }
 }

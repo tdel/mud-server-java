@@ -95,7 +95,6 @@ public class WorldInstanceService {
         long placementStart = System.currentTimeMillis();
         monsterService.placeMonsters(roomInstances.values());
         npcService.warmNpcs(List.of(template), roomInstances.values());
-        itemService.warmRoomItems(roomInstances.values());
         long placementDurationMs = System.currentTimeMillis() - placementStart;
 
         instance.setRoomInstances(roomInstances);

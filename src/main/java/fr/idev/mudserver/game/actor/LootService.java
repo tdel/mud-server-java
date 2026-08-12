@@ -44,7 +44,7 @@ public class LootService {
         for (LootTableEntry entry : template.getLootTable()) {
             if (DiceRoller.rollChance(entry.dropChance())) {
                 ItemTemplate itemTemplate = itemTemplateService.getById(entry.itemTemplateId());
-                Item item = new Item(UUID.randomUUID(), itemTemplate, null, killer, null);
+                Item item = new Item(UUID.randomUUID(), itemTemplate, killer, null);
                 killer.receiveLootItem(item);
                 log.info("loot.item_dropped killer={} item={}", killer.getName(), item.getName());
             }
