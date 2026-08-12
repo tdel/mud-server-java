@@ -49,7 +49,7 @@ public class WorldTemplateService {
         this.resourcePatternResolver = resourcePatternResolver;
     }
 
-    public void warmWorldTemplates(Map<UUID, ItemService.ItemSummary> itemSummariesById) {
+    public void warmWorldTemplates(Map<UUID, ItemTemplateService.ItemSummary> itemSummariesById) {
         Resource[] manifests;
         try {
             manifests = resourcePatternResolver.getResources(WORLDS_MANIFEST_PATTERN);
@@ -98,7 +98,8 @@ public class WorldTemplateService {
         return rest.substring(0, slashIndex);
     }
 
-    private WorldTemplate loadWorldTemplate(String shortName, Map<UUID, ItemService.ItemSummary> itemSummariesById) {
+    private WorldTemplate loadWorldTemplate(String shortName,
+            Map<UUID, ItemTemplateService.ItemSummary> itemSummariesById) {
         WorldManifestDefinition manifest = readJson(shortName, "world.json", WorldManifestDefinition.class);
         if (manifest.minPlayers() < 1) {
             throw new IllegalStateException(
@@ -201,7 +202,7 @@ public class WorldTemplateService {
     }
 
     Map<UUID, NpcTemplate> buildNpcTemplates(String shortName, List<NpcDefinition> definitions,
-            Map<UUID, RoomTemplate> roomTemplates, Map<UUID, ItemService.ItemSummary> itemSummariesById) {
+            Map<UUID, RoomTemplate> roomTemplates, Map<UUID, ItemTemplateService.ItemSummary> itemSummariesById) {
         Map<UUID, NpcTemplate> templates = new LinkedHashMap<>();
         for (NpcDefinition definition : definitions) {
             RoomTemplate room = roomTemplates.get(definition.roomId());
@@ -235,7 +236,7 @@ public class WorldTemplateService {
     }
 
     private GameNpcSeller.NpcShop toShop(String shortName, NpcDefinition definition,
-            Map<UUID, ItemService.ItemSummary> itemSummariesById) {
+            Map<UUID, ItemTemplateService.ItemSummary> itemSummariesById) {
         DialogueDefinition dialogueDef = definition.dialogue();
         if (dialogueDef == null) {
             return null;
@@ -254,7 +255,7 @@ public class WorldTemplateService {
 
         List<GameNpcSeller.NpcShopEntry> entries = new ArrayList<>();
         for (ShopEntryDefinition entry : shopDef.items()) {
-            ItemService.ItemSummary summary = itemSummariesById.get(entry.itemTemplateId());
+            ItemTemplateService.ItemSummary summary = itemSummariesById.get(entry.itemTemplateId());
             if (summary == null) {
                 throw new IllegalStateException("NPC " + definition.id() + " du monde " + shortName + " vend l'item "
                         + entry.itemTemplateId() + ", absent de data/items.json");

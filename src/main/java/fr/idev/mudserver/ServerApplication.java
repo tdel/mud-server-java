@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
-import fr.idev.mudserver.game.ItemService;
+import fr.idev.mudserver.game.ItemTemplateService;
 import fr.idev.mudserver.game.actor.LevelService;
 import fr.idev.mudserver.game.actor.MonsterService;
 import fr.idev.mudserver.game.WorldTemplateService;
@@ -24,14 +24,14 @@ public class ServerApplication {
 
     @Bean
     @ConditionalOnProperty(prefix = "app.telnet", name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ApplicationRunner warmupRunner(ItemService itemService, LevelService levelService,
+    public ApplicationRunner warmupRunner(ItemTemplateService itemTemplateService, LevelService levelService,
             MonsterService monsterService, WorldTemplateService worldTemplateService) {
         return args -> {
             long start = System.currentTimeMillis();
             log.info("startup.warmup_started");
-            itemService.warmItemTemplates();
-            worldTemplateService.warmWorldTemplates(itemService.templateSummariesById());
-            monsterService.warmMonsterTemplates(itemService.templateIds());
+            itemTemplateService.warmItemTemplates();
+            worldTemplateService.warmWorldTemplates(itemTemplateService.templateSummariesById());
+            monsterService.warmMonsterTemplates(itemTemplateService.templateIds());
             levelService.warmXpThresholds();
             log.info("startup.warmup_completed durationMs={}", System.currentTimeMillis() - start);
         };
