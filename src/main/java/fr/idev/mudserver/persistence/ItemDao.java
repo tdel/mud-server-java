@@ -3,7 +3,6 @@ package fr.idev.mudserver.persistence;
 import static fr.idev.mudserver.persistence.jooq.Tables.ITEM;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.jooq.DSLContext;
@@ -11,15 +10,21 @@ import org.springframework.stereotype.Repository;
 
 import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.Item;
+import fr.idev.mudserver.domain.ItemTemplate;
+import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.actor.GameCharacter;
+import fr.idev.mudserver.game.ItemTemplateService;
 import fr.idev.mudserver.persistence.jooq.tables.records.ItemRecord;
 
 @Repository
 public class ItemDao {
 
     private final DSLContext dsl;
+    private final ItemTemplateService itemTemplateService;
 
-    public ItemDao(DSLContext dsl) {
+    public ItemDao(DSLContext dsl, ItemTemplateService itemTemplateService) {
         this.dsl = dsl;
+        this.itemTemplateService = itemTemplateService;
     }
 
     public void insert(Item item) {
@@ -29,16 +34,13 @@ public class ItemDao {
                 .execute();
     }
 
-    public Optional<Item> findById(UUID id) {
-        return dsl.selectFrom(ITEM).where(ITEM.ID.eq(id)).fetchOptional(ItemDao::toDomain);
+    public List<Item> findByRoom(RoomInstance room) {
+        return dsl.selectFrom(ITEM).where(ITEM.ROOM_ID.eq(room.getId())).fetch(record -> toItem(record, room, null));
     }
 
-    public List<Item> findByRoomId(UUID roomId) {
-        return dsl.selectFrom(ITEM).where(ITEM.ROOM_ID.eq(roomId)).fetch(ItemDao::toDomain);
-    }
-
-    public List<Item> findByCharacterId(UUID characterId) {
-        return dsl.selectFrom(ITEM).where(ITEM.CHARACTER_ID.eq(characterId)).fetch(ItemDao::toDomain);
+    public List<Item> findByCharacter(GameCharacter character) {
+        return dsl.selectFrom(ITEM).where(ITEM.CHARACTER_ID.eq(character.getId()))
+                .fetch(record -> toItem(record, null, character));
     }
 
     public void assignToCharacter(UUID itemId, UUID characterId) {
@@ -59,9 +61,9 @@ public class ItemDao {
         dsl.deleteFrom(ITEM).where(ITEM.ID.eq(itemId)).execute();
     }
 
-    private static Item toDomain(ItemRecord record) {
+    private Item toItem(ItemRecord record, RoomInstance room, GameCharacter character) {
+        ItemTemplate template = itemTemplateService.getById(record.getTemplateId());
         String slot = record.getSlot();
-        return new Item(record.getId(), record.getTemplateId(), record.getRoomId(), record.getCharacterId(),
-                slot == null ? null : EquipmentSlot.valueOf(slot));
+        return new Item(record.getId(), template, room, character, slot == null ? null : EquipmentSlot.valueOf(slot));
     }
 }

@@ -76,11 +76,8 @@ public class ItemTemplateService {
         return Set.copyOf(templates.keySet());
     }
 
-    public Map<UUID, ItemSummary> templateSummariesById() {
-        Map<UUID, ItemSummary> summaries = new ConcurrentHashMap<>();
-        templates.forEach(
-                (id, template) -> summaries.put(id, new ItemSummary(template.getName(), template.getRarity())));
-        return summaries;
+    public Map<UUID, ItemTemplate> templatesById() {
+        return Map.copyOf(templates);
     }
 
     public ItemTemplate getById(UUID templateId) {
@@ -90,9 +87,6 @@ public class ItemTemplateService {
                     "ItemTemplate " + templateId + " absent du cache — warmItemTemplates() a-t-il été appelé ?");
         }
         return template;
-    }
-
-    public record ItemSummary(String name, Rarity rarity) {
     }
 
     private record ItemTemplateDefinition(UUID id, String name, String description, ItemType type, int weight,

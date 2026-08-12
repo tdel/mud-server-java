@@ -30,38 +30,23 @@ public class ItemService {
     private static final Logger log = LoggerFactory.getLogger(ItemService.class);
 
     private final ItemDao itemDao;
-    private final ItemTemplateService itemTemplateService;
 
-    public ItemService(ItemDao itemDao, ItemTemplateService itemTemplateService) {
+    public ItemService(ItemDao itemDao) {
         this.itemDao = itemDao;
-        this.itemTemplateService = itemTemplateService;
     }
 
     public List<Item> loadInventory(GamePlayer character) {
-        List<Item> items = attachTemplates(itemDao.findByCharacterId(character.getId()));
-        items.forEach(item -> item.attachCharacter(character));
-        return items;
+        return itemDao.findByCharacter(character);
     }
 
     public void warmRoomItems(Collection<RoomInstance> rooms) {
         int totalItems = 0;
         for (RoomInstance room : rooms) {
-            List<Item> items = attachTemplates(itemDao.findByRoomId(room.getId()));
-            items.forEach(item -> item.attachRoom(room));
+            List<Item> items = itemDao.findByRoom(room);
             room.setItems(items);
             totalItems += items.size();
         }
         log.info("item.room_items_loaded count={} rooms={}", totalItems, rooms.size());
-    }
-
-    private Item attachTemplate(Item item) {
-        item.attachTemplate(itemTemplateService.getById(item.getTemplateId()));
-        return item;
-    }
-
-    private List<Item> attachTemplates(List<Item> items) {
-        items.forEach(this::attachTemplate);
-        return items;
     }
 
     @EventListener
@@ -97,7 +82,6 @@ public class ItemService {
 
     @EventListener
     void onCharacterLootedItem(CharacterLootedItem event) {
-        attachTemplate(event.item());
         itemDao.insert(event.item());
         event.character().send(new EquipmentLooted(event.item().getName(), event.item().getRarity()));
         log.info("item.looted item={} character={}", event.item().getName(), event.character().getName());
@@ -105,7 +89,6 @@ public class ItemService {
 
     @EventListener
     void onItemPurchased(ItemPurchased event) {
-        attachTemplate(event.item());
         itemDao.insert(event.item());
         event.character().send(new ItemBought(event.item().getName(), event.item().getRarity(), event.price()));
         log.info("item.purchased item={} character={} price={}", event.item().getName(), event.character().getName(),

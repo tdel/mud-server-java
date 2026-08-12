@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import fr.idev.mudserver.domain.Item;
-import fr.idev.mudserver.domain.Rarity;
+import fr.idev.mudserver.domain.ItemTemplate;
 
 public final class GameNpcSeller extends GameNpc {
 
@@ -31,7 +31,8 @@ public final class GameNpcSeller extends GameNpc {
         } catch (NumberFormatException ignored) {
             // pas un index numérique : recherche par nom ci-dessous
         }
-        return shop.items().stream().filter(entry -> entry.itemName().equalsIgnoreCase(trimmed)).findFirst();
+        return shop.items().stream().filter(entry -> entry.itemTemplate().getName().equalsIgnoreCase(trimmed))
+                .findFirst();
     }
 
     public PurchaseOutcome sell(GamePlayer buyer, String input) {
@@ -40,7 +41,7 @@ public final class GameNpcSeller extends GameNpc {
             return new PurchaseOutcome.EntryNotFound();
         }
 
-        Item item = new Item(UUID.randomUUID(), entry.get().itemTemplateId(), null, buyer.getId(), null);
+        Item item = new Item(UUID.randomUUID(), entry.get().itemTemplate(), null, buyer, null);
         boolean bought = buyer.buyItem(item, entry.get().price());
         return bought
                 ? new PurchaseOutcome.Purchased(item, entry.get().price())
@@ -50,7 +51,7 @@ public final class GameNpcSeller extends GameNpc {
     public record NpcShop(List<NpcShopEntry> items) {
     }
 
-    public record NpcShopEntry(UUID itemTemplateId, String itemName, Rarity rarity, int price) {
+    public record NpcShopEntry(ItemTemplate itemTemplate, int price) {
     }
 
     public sealed interface PurchaseOutcome {

@@ -18,6 +18,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.HexCoordinate;
+import fr.idev.mudserver.domain.ItemTemplate;
 import fr.idev.mudserver.domain.MonsterSpawn;
 import fr.idev.mudserver.domain.RoomTemplate;
 import fr.idev.mudserver.domain.RoomTemplatePortal;
@@ -49,7 +50,7 @@ public class WorldTemplateService {
         this.resourcePatternResolver = resourcePatternResolver;
     }
 
-    public void warmWorldTemplates(Map<UUID, ItemTemplateService.ItemSummary> itemSummariesById) {
+    public void warmWorldTemplates(Map<UUID, ItemTemplate> itemTemplatesById) {
         Resource[] manifests;
         try {
             manifests = resourcePatternResolver.getResources(WORLDS_MANIFEST_PATTERN);
@@ -64,7 +65,7 @@ public class WorldTemplateService {
         Map<String, UUID> loadedByShortName = new LinkedHashMap<>();
         for (Resource manifest : manifests) {
             String shortName = shortNameOf(manifest);
-            WorldTemplate template = loadWorldTemplate(shortName, itemSummariesById);
+            WorldTemplate template = loadWorldTemplate(shortName, itemTemplatesById);
             if (loaded.putIfAbsent(template.getId(), template) != null) {
                 throw new IllegalStateException(
                         "Le monde " + shortName + " a un id " + template.getId() + " déjà utilisé par un autre monde");
@@ -98,8 +99,7 @@ public class WorldTemplateService {
         return rest.substring(0, slashIndex);
     }
 
-    private WorldTemplate loadWorldTemplate(String shortName,
-            Map<UUID, ItemTemplateService.ItemSummary> itemSummariesById) {
+    private WorldTemplate loadWorldTemplate(String shortName, Map<UUID, ItemTemplate> itemTemplatesById) {
         WorldManifestDefinition manifest = readJson(shortName, "world.json", WorldManifestDefinition.class);
         if (manifest.minPlayers() < 1) {
             throw new IllegalStateException(
@@ -119,7 +119,7 @@ public class WorldTemplateService {
                 new TypeReference<List<NpcDefinition>>() {
                 });
         Map<UUID, NpcTemplate> npcTemplates = buildNpcTemplates(shortName, npcDefinitions, roomTemplates,
-                itemSummariesById);
+                itemTemplatesById);
 
         WorldTemplate template = new WorldTemplate(manifest.id(), shortName, manifest.name(), manifest.description(),
                 manifest.minPlayers(), manifest.maxPlayers(), roomTemplates, npcTemplates);
@@ -202,7 +202,7 @@ public class WorldTemplateService {
     }
 
     Map<UUID, NpcTemplate> buildNpcTemplates(String shortName, List<NpcDefinition> definitions,
-            Map<UUID, RoomTemplate> roomTemplates, Map<UUID, ItemTemplateService.ItemSummary> itemSummariesById) {
+            Map<UUID, RoomTemplate> roomTemplates, Map<UUID, ItemTemplate> itemTemplatesById) {
         Map<UUID, NpcTemplate> templates = new LinkedHashMap<>();
         for (NpcDefinition definition : definitions) {
             RoomTemplate room = roomTemplates.get(definition.roomId());
@@ -212,7 +212,7 @@ public class WorldTemplateService {
             }
 
             GameNpc.NpcDialogue dialogue = toDialogue(definition);
-            GameNpcSeller.NpcShop shop = toShop(shortName, definition, itemSummariesById);
+            GameNpcSeller.NpcShop shop = toShop(shortName, definition, itemTemplatesById);
 
             NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), definition.roomId(),
                     new HexCoordinate(definition.cell().q(), definition.cell().r()), definition.description(), dialogue,
@@ -236,7 +236,7 @@ public class WorldTemplateService {
     }
 
     private GameNpcSeller.NpcShop toShop(String shortName, NpcDefinition definition,
-            Map<UUID, ItemTemplateService.ItemSummary> itemSummariesById) {
+            Map<UUID, ItemTemplate> itemTemplatesById) {
         DialogueDefinition dialogueDef = definition.dialogue();
         if (dialogueDef == null) {
             return null;
@@ -255,8 +255,8 @@ public class WorldTemplateService {
 
         List<GameNpcSeller.NpcShopEntry> entries = new ArrayList<>();
         for (ShopEntryDefinition entry : shopDef.items()) {
-            ItemTemplateService.ItemSummary summary = itemSummariesById.get(entry.itemTemplateId());
-            if (summary == null) {
+            ItemTemplate itemTemplate = itemTemplatesById.get(entry.itemTemplateId());
+            if (itemTemplate == null) {
                 throw new IllegalStateException("NPC " + definition.id() + " du monde " + shortName + " vend l'item "
                         + entry.itemTemplateId() + ", absent de data/items.json");
             }
@@ -264,8 +264,7 @@ public class WorldTemplateService {
                 throw new IllegalStateException("NPC " + definition.id() + " du monde " + shortName + " vend l'item "
                         + entry.itemTemplateId() + " à un prix invalide (" + entry.price() + ")");
             }
-            entries.add(new GameNpcSeller.NpcShopEntry(entry.itemTemplateId(), summary.name(), summary.rarity(),
-                    entry.price()));
+            entries.add(new GameNpcSeller.NpcShopEntry(itemTemplate, entry.price()));
         }
         return new GameNpcSeller.NpcShop(entries);
     }

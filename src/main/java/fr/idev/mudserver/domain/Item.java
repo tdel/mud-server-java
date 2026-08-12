@@ -3,51 +3,30 @@ package fr.idev.mudserver.domain;
 import java.util.Objects;
 import java.util.UUID;
 
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.GameCharacter;
 
 public class Item {
 
-    private UUID id;
-    private UUID templateId;
+    private final UUID id;
+    private final ItemTemplate template;
 
-    // Ne servent qu'à la persistance (ItemDao) — le code applicatif doit utiliser
-    // getCharacter()/getRoom(), attachées au chargement par
-    // ItemService.loadInventory/warmRoomItems, et tenues à jour par
-    // setCharacter()/setRoom() lors des changements de possesseur en jeu.
-    private UUID roomId;
-    private UUID characterId;
-
+    private RoomInstance room;
+    private GameCharacter character;
     private EquipmentSlot slot;
 
-    private ItemTemplate template;
-    private GamePlayer character;
-    private RoomInstance room;
-
-    public Item(UUID id, UUID templateId, UUID roomId, UUID characterId, EquipmentSlot slot) {
+    public Item(UUID id, ItemTemplate template, RoomInstance room, GameCharacter character, EquipmentSlot slot) {
         this.id = id;
-        this.templateId = templateId;
-        this.roomId = roomId;
-        this.characterId = characterId;
+        this.template = Objects.requireNonNull(template);
+        this.room = room;
+        this.character = character;
         this.slot = slot;
-    }
-
-    public void attachTemplate(ItemTemplate template) {
-        this.template = template;
     }
 
     public ItemTemplate getTemplate() {
         return template;
     }
 
-    public void attachCharacter(GamePlayer character) {
-        this.character = character;
-    }
-
-    public void attachRoom(RoomInstance room) {
-        this.room = room;
-    }
-
-    public GamePlayer getCharacter() {
+    public GameCharacter getCharacter() {
         return character;
     }
 
@@ -56,65 +35,54 @@ public class Item {
     }
 
     public String getName() {
-        return requireTemplate().getName();
+        return template.getName();
     }
 
     public String getDescription() {
-        return requireTemplate().getDescription();
+        return template.getDescription();
     }
 
     public ItemType getType() {
-        return requireTemplate().getType();
+        return template.getType();
     }
 
     public int getWeight() {
-        return requireTemplate().getWeight();
+        return template.getWeight();
     }
 
     public ArmorCategory getArmorCategory() {
-        return requireTemplate().getArmorCategory();
+        return template.getArmorCategory();
     }
 
     public int getBaseAc() {
-        return requireTemplate().getBaseAc();
+        return template.getBaseAc();
     }
 
     public String getDamageDice() {
-        return requireTemplate().getDamageDice();
+        return template.getDamageDice();
     }
 
     public WeaponCategory getWeaponCategory() {
-        return requireTemplate().getWeaponCategory();
+        return template.getWeaponCategory();
     }
 
     public Rarity getRarity() {
-        return requireTemplate().getRarity();
+        return template.getRarity();
     }
 
     public int getBonus() {
-        return requireTemplate().getBonus();
+        return template.getBonus();
     }
 
-    private ItemTemplate requireTemplate() {
-        if (template == null) {
-            throw new IllegalStateException("Item " + id + " has no ItemTemplate attached");
-        }
-        return template;
-    }
-
-    public void setCharacter(GamePlayer character) {
+    public void setCharacter(GameCharacter character) {
         this.character = character;
-        this.characterId = character.getId();
         this.room = null;
-        this.roomId = null;
         this.slot = null;
     }
 
     public void setRoom(RoomInstance room) {
         this.room = room;
-        this.roomId = room.getId();
         this.character = null;
-        this.characterId = null;
         this.slot = null;
     }
 
@@ -122,24 +90,16 @@ public class Item {
         return id;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public UUID getTemplateId() {
-        return templateId;
-    }
-
-    public void setTemplateId(UUID templateId) {
-        this.templateId = templateId;
+        return template.getId();
     }
 
     public UUID getRoomId() {
-        return roomId;
+        return room == null ? null : room.getId();
     }
 
     public UUID getCharacterId() {
-        return characterId;
+        return character == null ? null : character.getId();
     }
 
     public EquipmentSlot getSlot() {
@@ -158,19 +118,19 @@ public class Item {
         if (!(o instanceof Item other)) {
             return false;
         }
-        return Objects.equals(id, other.id) && Objects.equals(templateId, other.templateId)
-                && Objects.equals(roomId, other.roomId) && Objects.equals(characterId, other.characterId)
-                && slot == other.slot;
+        return Objects.equals(id, other.id) && Objects.equals(getTemplateId(), other.getTemplateId())
+                && Objects.equals(getRoomId(), other.getRoomId())
+                && Objects.equals(getCharacterId(), other.getCharacterId()) && slot == other.slot;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, templateId, roomId, characterId, slot);
+        return Objects.hash(id, getTemplateId(), getRoomId(), getCharacterId(), slot);
     }
 
     @Override
     public String toString() {
-        return "Item[id=" + id + ", templateId=" + templateId + ", roomId=" + roomId + ", characterId=" + characterId
-                + ", slot=" + slot + "]";
+        return "Item[id=" + id + ", templateId=" + getTemplateId() + ", roomId=" + getRoomId() + ", characterId="
+                + getCharacterId() + ", slot=" + slot + "]";
     }
 }
