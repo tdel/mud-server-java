@@ -15,7 +15,7 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Party;
 import fr.idev.mudserver.domain.PartyMember;
 import fr.idev.mudserver.domain.WorldInstance;
-import fr.idev.mudserver.domain.WorldTemplate;
+import fr.idev.mudserver.domain.WorldTemplateSummary;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.PartyService;
 import fr.idev.mudserver.game.WorldInstanceService;
@@ -73,12 +73,12 @@ public class WorldEnter implements ControllerHandler {
             return;
         }
 
-        Optional<WorldTemplate> templateOpt = worldTemplateService.findByShortName(shortName);
+        Optional<WorldTemplateSummary> templateOpt = worldTemplateService.findSummaryByShortName(shortName);
         if (templateOpt.isEmpty()) {
             connection.send(new NoWorldNamed(shortName));
             return;
         }
-        WorldTemplate template = templateOpt.get();
+        WorldTemplateSummary template = templateOpt.get();
 
         Account account = connection.account();
         Optional<Party> partyOpt = partyService.partyOf(account.getId());
@@ -91,28 +91,29 @@ public class WorldEnter implements ControllerHandler {
         enterAsParty(connection, account, partyOpt.get(), template);
     }
 
-    private void enterSolo(Connection connection, Account account, WorldTemplate template) {
-        WorldInstance instance = worldInstanceDao.findByAccountIdAndWorldTemplateId(account.getId(), template.getId())
-                .map(existing -> worldInstanceService.getOrMaterialize(existing.getId())).orElseGet(
-                        () -> worldInstanceService.createInstance(template, Set.of(account.getId()), account.getId()));
+    private void enterSolo(Connection connection, Account account, WorldTemplateSummary template) {
+        WorldInstance instance = worldInstanceDao.findByAccountIdAndWorldTemplateId(account.getId(), template.id())
+                .map(existing -> worldInstanceService.getOrMaterialize(existing.getId()))
+                .orElseGet(() -> worldInstanceService.createInstance(template.id(), Set.of(account.getId()),
+                        account.getId()));
 
         worldInstanceService.enterCharSelect(connection, instance);
         charSelectStatus.show(connection, account, instance);
     }
 
-    private void enterAsParty(Connection connection, Account account, Party party, WorldTemplate template) {
+    private void enterAsParty(Connection connection, Account account, Party party, WorldTemplateSummary template) {
         if (!party.isLeader(account.getId())) {
             connection.send(new NotPartyLeader());
             return;
         }
 
         List<PartyMember> members = party.getMembers();
-        if (members.size() < template.getMinPlayers()) {
-            connection.send(new NotEnoughPlayers(template.getMinPlayers(), members.size()));
+        if (members.size() < template.minPlayers()) {
+            connection.send(new NotEnoughPlayers(template.minPlayers(), members.size()));
             return;
         }
-        if (members.size() > template.getMaxPlayers()) {
-            connection.send(new TooManyPlayers(template.getMaxPlayers(), members.size()));
+        if (members.size() > template.maxPlayers()) {
+            connection.send(new TooManyPlayers(template.maxPlayers(), members.size()));
             return;
         }
 
@@ -129,7 +130,7 @@ public class WorldEnter implements ControllerHandler {
             memberAccountIds.add(member.accountId());
         }
 
-        WorldInstance instance = worldInstanceService.createInstance(template, memberAccountIds, account.getId());
+        WorldInstance instance = worldInstanceService.createInstance(template.id(), memberAccountIds, account.getId());
 
         for (Connection memberConnection : memberConnections) {
             Account memberAccount = memberConnection.account();

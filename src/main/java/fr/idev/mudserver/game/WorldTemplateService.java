@@ -23,6 +23,7 @@ import fr.idev.mudserver.domain.MonsterSpawn;
 import fr.idev.mudserver.domain.RoomTemplate;
 import fr.idev.mudserver.domain.RoomTemplatePortal;
 import fr.idev.mudserver.domain.WorldTemplate;
+import fr.idev.mudserver.domain.WorldTemplateSummary;
 import fr.idev.mudserver.domain.actor.GameNpc;
 import fr.idev.mudserver.domain.actor.GameNpc.NpcDialogueOptionType;
 import fr.idev.mudserver.domain.actor.GameNpcSeller;
@@ -39,18 +40,22 @@ public class WorldTemplateService {
     private static final String WORLDS_MANIFEST_PATTERN = "classpath*:data/worlds/*/world.json";
     private static final String WORLDS_DIR_MARKER = "data/worlds/";
 
-    private final Map<UUID, WorldTemplate> templatesById = new ConcurrentHashMap<>();
+    private final Map<UUID, WorldTemplateSummary> summariesById = new ConcurrentHashMap<>();
     private final Map<String, UUID> idByShortName = new ConcurrentHashMap<>();
+    private final Map<UUID, WorldTemplate> loadedTemplatesById = new ConcurrentHashMap<>();
 
     private final ObjectMapper objectMapper;
     private final ResourcePatternResolver resourcePatternResolver;
+    private final ItemTemplateService itemTemplateService;
 
-    public WorldTemplateService(ObjectMapper objectMapper, ResourcePatternResolver resourcePatternResolver) {
+    public WorldTemplateService(ObjectMapper objectMapper, ResourcePatternResolver resourcePatternResolver,
+            ItemTemplateService itemTemplateService) {
         this.objectMapper = objectMapper;
         this.resourcePatternResolver = resourcePatternResolver;
+        this.itemTemplateService = itemTemplateService;
     }
 
-    public void warmWorldTemplates(Map<UUID, ItemTemplate> itemTemplatesById) {
+    public void warmWorldTemplates() {
         Resource[] manifests;
         try {
             manifests = resourcePatternResolver.getResources(WORLDS_MANIFEST_PATTERN);
@@ -61,23 +66,23 @@ public class WorldTemplateService {
             throw new IllegalStateException("Aucun monde trouvé sous " + WORLDS_MANIFEST_PATTERN);
         }
 
-        Map<UUID, WorldTemplate> loaded = new LinkedHashMap<>();
+        Map<UUID, WorldTemplateSummary> loaded = new LinkedHashMap<>();
         Map<String, UUID> loadedByShortName = new LinkedHashMap<>();
         for (Resource manifest : manifests) {
             String shortName = shortNameOf(manifest);
-            WorldTemplate template = loadWorldTemplate(shortName, itemTemplatesById);
-            if (loaded.putIfAbsent(template.getId(), template) != null) {
+            WorldTemplateSummary summary = loadSummary(shortName);
+            if (loaded.putIfAbsent(summary.id(), summary) != null) {
                 throw new IllegalStateException(
-                        "Le monde " + shortName + " a un id " + template.getId() + " déjà utilisé par un autre monde");
+                        "Le monde " + shortName + " a un id " + summary.id() + " déjà utilisé par un autre monde");
             }
-            loadedByShortName.put(shortName, template.getId());
+            loadedByShortName.put(shortName, summary.id());
         }
 
-        templatesById.clear();
-        templatesById.putAll(loaded);
+        summariesById.clear();
+        summariesById.putAll(loaded);
         idByShortName.clear();
         idByShortName.putAll(loadedByShortName);
-        log.info("world.templates_loaded count={}", templatesById.size());
+        log.info("world.templates_loaded count={}", summariesById.size());
     }
 
     private String shortNameOf(Resource manifest) {
@@ -99,7 +104,7 @@ public class WorldTemplateService {
         return rest.substring(0, slashIndex);
     }
 
-    private WorldTemplate loadWorldTemplate(String shortName, Map<UUID, ItemTemplate> itemTemplatesById) {
+    private WorldTemplateSummary loadSummary(String shortName) {
         WorldManifestDefinition manifest = readJson(shortName, "world.json", WorldManifestDefinition.class);
         if (manifest.minPlayers() < 1) {
             throw new IllegalStateException(
@@ -109,7 +114,20 @@ public class WorldTemplateService {
             throw new IllegalStateException("Le monde " + shortName + " a un maxPlayers (" + manifest.maxPlayers()
                     + ") inférieur à son minPlayers (" + manifest.minPlayers() + ")");
         }
+        return new WorldTemplateSummary(manifest.id(), shortName, manifest.name(), manifest.description(),
+                manifest.minPlayers(), manifest.maxPlayers());
+    }
 
+    private WorldTemplate loadFullTemplate(UUID id) {
+        WorldTemplateSummary summary = summariesById.get(id);
+        if (summary == null) {
+            throw new IllegalStateException("WorldTemplate " + id + " absent de summariesById");
+        }
+        return loadWorldTemplate(summary, itemTemplateService.templatesById());
+    }
+
+    private WorldTemplate loadWorldTemplate(WorldTemplateSummary summary, Map<UUID, ItemTemplate> itemTemplatesById) {
+        String shortName = summary.shortName();
         List<RoomDefinition> roomDefinitions = readJsonList(shortName, "rooms.json",
                 new TypeReference<List<RoomDefinition>>() {
                 });
@@ -121,8 +139,8 @@ public class WorldTemplateService {
         Map<UUID, NpcTemplate> npcTemplates = buildNpcTemplates(shortName, npcDefinitions, roomTemplates,
                 itemTemplatesById);
 
-        WorldTemplate template = new WorldTemplate(manifest.id(), shortName, manifest.name(), manifest.description(),
-                manifest.minPlayers(), manifest.maxPlayers(), roomTemplates, npcTemplates);
+        WorldTemplate template = new WorldTemplate(summary.id(), shortName, summary.name(), summary.description(),
+                summary.minPlayers(), summary.maxPlayers(), roomTemplates, npcTemplates);
 
         log.info("world.template_loaded shortName={} id={} rooms={} npcs={}", shortName, template.getId(),
                 roomTemplates.size(), npcTemplates.size());
@@ -291,17 +309,24 @@ public class WorldTemplateService {
         return resourcePatternResolver.getResource("classpath:" + WORLDS_DIR_MARKER + shortName + "/" + fileName);
     }
 
-    public Collection<WorldTemplate> allTemplates() {
-        return templatesById.values();
+    public Collection<WorldTemplateSummary> allSummaries() {
+        return summariesById.values();
+    }
+
+    public Optional<WorldTemplateSummary> findSummaryById(UUID id) {
+        return Optional.ofNullable(summariesById.get(id));
+    }
+
+    public Optional<WorldTemplateSummary> findSummaryByShortName(String shortName) {
+        UUID id = idByShortName.get(shortName);
+        return id == null ? Optional.empty() : findSummaryById(id);
     }
 
     public Optional<WorldTemplate> findById(UUID id) {
-        return Optional.ofNullable(templatesById.get(id));
-    }
-
-    public Optional<WorldTemplate> findByShortName(String shortName) {
-        UUID id = idByShortName.get(shortName);
-        return id == null ? Optional.empty() : findById(id);
+        if (!summariesById.containsKey(id)) {
+            return Optional.empty();
+        }
+        return Optional.of(loadedTemplatesById.computeIfAbsent(id, this::loadFullTemplate));
     }
 
     record WorldManifestDefinition(UUID id, String name, String description, int minPlayers, int maxPlayers) {

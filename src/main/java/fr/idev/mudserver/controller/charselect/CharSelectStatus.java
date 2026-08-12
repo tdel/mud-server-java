@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.WorldInstance;
-import fr.idev.mudserver.domain.WorldTemplate;
+import fr.idev.mudserver.domain.WorldTemplateSummary;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.game.WorldTemplateService;
@@ -41,6 +41,7 @@ public class CharSelectStatus {
     }
 
     private String worldName(UUID worldTemplateId) {
-        return worldTemplateService.findById(worldTemplateId).map(WorldTemplate::getName).orElse("this world");
+        return worldTemplateService.findSummaryById(worldTemplateId).map(WorldTemplateSummary::name)
+                .orElse("this world");
     }
 }

@@ -104,8 +104,8 @@ public class WorldInstanceService {
         return instance;
     }
 
-    public WorldInstance createInstance(WorldTemplate template, Set<UUID> memberAccountIds, UUID leaderAccountId) {
-        WorldInstance instance = new WorldInstance(UUID.randomUUID(), template.getId(), Instant.now(), leaderAccountId,
+    public WorldInstance createInstance(UUID worldTemplateId, Set<UUID> memberAccountIds, UUID leaderAccountId) {
+        WorldInstance instance = new WorldInstance(UUID.randomUUID(), worldTemplateId, Instant.now(), leaderAccountId,
                 memberAccountIds);
         materialize(instance);
         DomainEventPublisher.publish(new WorldInstanceCreated(instance));

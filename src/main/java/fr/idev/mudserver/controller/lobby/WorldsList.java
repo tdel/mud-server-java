@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.WorldInstance;
-import fr.idev.mudserver.domain.WorldTemplate;
+import fr.idev.mudserver.domain.WorldTemplateSummary;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.game.WorldTemplateService;
@@ -47,18 +47,18 @@ public class WorldsList implements ControllerHandler {
         Account account = connection.account();
 
         List<fr.idev.mudserver.network.message.lobby.WorldsList.Entry> entries = new ArrayList<>();
-        for (WorldTemplate template : worldTemplateService.allTemplates()) {
+        for (WorldTemplateSummary template : worldTemplateService.allSummaries()) {
             // getOrMaterialize, pas l'instance brute renvoyée par le DAO : GamePlayer
             // exige désormais une RoomInstance résolue dès sa construction (voir
             // CharacterDao.toDomain), qui n'existe que sur une WorldInstance
             // matérialisée (son roomInstances est sinon vide).
             Optional<GamePlayer> existingCharacter = worldInstanceDao
-                    .findByAccountIdAndWorldTemplateId(account.getId(), template.getId())
+                    .findByAccountIdAndWorldTemplateId(account.getId(), template.id())
                     .map(instance -> worldInstanceService.getOrMaterialize(instance.getId()))
                     .flatMap(instance -> worldInstanceService.findCharacterFor(account, instance));
 
-            entries.add(new fr.idev.mudserver.network.message.lobby.WorldsList.Entry(template.getShortName(),
-                    template.getName(), template.getDescription(), template.getMinPlayers(), template.getMaxPlayers(),
+            entries.add(new fr.idev.mudserver.network.message.lobby.WorldsList.Entry(template.shortName(),
+                    template.name(), template.description(), template.minPlayers(), template.maxPlayers(),
                     existingCharacter.map(GamePlayer::getName).orElse(null),
                     existingCharacter.map(GamePlayer::getCharacterClass).orElse(null),
                     existingCharacter.map(GamePlayer::getLevel).orElse(null)));
