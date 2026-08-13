@@ -3,33 +3,21 @@ package fr.idev.mudserver.controller.ingame;
 import java.util.Optional;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.HexDirection;
-import fr.idev.mudserver.domain.actor.GameCharacter.MovementOutcome;
 import fr.idev.mudserver.domain.actor.GamePlayer;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
-import fr.idev.mudserver.network.message.ingame.MovementBlockedByBounds;
-import fr.idev.mudserver.network.message.ingame.MovementBlockedByOccupant;
 import fr.idev.mudserver.network.message.ingame.NoSuchDirection;
 
 @Component
 public class Go implements ControllerHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(Go.class);
-
     private static final int DEFAULT_STEP_COUNT = 1;
-
-    private final Look lookAction;
-
-    public Go(Look lookAction) {
-        this.lookAction = lookAction;
-    }
+    private static final int MAX_STEP_COUNT = 20;
 
     @Override
     public String name() {
@@ -62,18 +50,9 @@ public class Go implements ControllerHandler {
             connection.send(new Usage("go <direction> [count]"));
             return;
         }
+        requestedCells = Math.min(requestedCells, MAX_STEP_COUNT);
 
-        MovementOutcome outcome = character.moveToCell(direction.get(), requestedCells);
-
-        if (outcome.cellsMoved() == 0) {
-            String reason = outcome.blockedByOccupant() ? "occupant" : "bounds";
-            log.debug("room.move_blocked reason={} character={}", reason, character.getName());
-            connection.send(
-                    outcome.blockedByOccupant() ? new MovementBlockedByOccupant() : new MovementBlockedByBounds());
-            return;
-        }
-
-        lookAction.onReceive(connection, "");
+        character.startMovement(direction.get(), requestedCells);
     }
 
     private int parsePositiveInt(String token) {

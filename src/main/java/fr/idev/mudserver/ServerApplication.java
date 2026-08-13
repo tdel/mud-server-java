@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
 import fr.idev.mudserver.game.ItemTemplateService;
+import fr.idev.mudserver.game.MovementTicker;
 import fr.idev.mudserver.game.actor.LevelService;
 import fr.idev.mudserver.game.actor.MonsterService;
 import fr.idev.mudserver.game.WorldTemplateService;
@@ -35,5 +36,11 @@ public class ServerApplication {
             levelService.warmXpThresholds();
             log.info("startup.warmup_completed durationMs={}", System.currentTimeMillis() - start);
         };
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "app.telnet", name = "enabled", havingValue = "true", matchIfMissing = true)
+    public ApplicationRunner movementTickerRunner(MovementTicker movementTicker) {
+        return args -> movementTicker.start();
     }
 }

@@ -26,7 +26,6 @@ import fr.idev.mudserver.domain.EquipmentSlot;
 import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.RoomInstance;
-import fr.idev.mudserver.domain.RoomPortal;
 import fr.idev.mudserver.domain.WeaponCategory;
 import fr.idev.mudserver.domain.WorldInstance;
 import fr.idev.mudserver.game.CombatResult;
@@ -340,13 +339,7 @@ public final class GamePlayer extends GameCharacter {
     }
 
     @Override
-    protected boolean crossPortal(RoomPortal portal) {
-        moveToRoom(portal.targetRoom(), portal.targetCell());
-        return true;
-    }
-
-    @Override
-    protected boolean onEnteredCell(HexCoordinate cell) {
+    public boolean onEnteredCell(HexCoordinate cell) {
         if (isInCombat()) {
             return false;
         }
@@ -393,6 +386,7 @@ public final class GamePlayer extends GameCharacter {
         return inventory;
     }
 
+    @Override
     public void send(OutputMessage message) {
         if (null != connection) {
             this.connection.send(message);
