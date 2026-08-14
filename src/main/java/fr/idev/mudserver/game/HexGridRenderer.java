@@ -1,8 +1,10 @@
 package fr.idev.mudserver.game;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import fr.idev.mudserver.domain.HexCoordinate;
 import fr.idev.mudserver.domain.RoomInstance;
@@ -16,7 +18,7 @@ public final class HexGridRenderer {
     public static final int VIEWPORT_RADIUS = 5;
 
     public static final String LEGEND = "@ = you   p = other player   m = monster   n = npc   # = portal   "
-            + ". = floor   ~ = out of bounds";
+            + ". = floor   ~ = out of bounds   X = destination   - = path";
 
     private HexGridRenderer() {
     }
@@ -27,6 +29,9 @@ public final class HexGridRenderer {
 
     static List<String> render(RoomInstance room, GamePlayer viewer, int radius) {
         HexCoordinate center = viewer.getPosition();
+        List<HexCoordinate> path = viewer.remainingPath();
+        Set<HexCoordinate> pathCells = new HashSet<>(path);
+        HexCoordinate destination = path.isEmpty() ? null : path.get(path.size() - 1);
         List<String> lines = new ArrayList<>();
 
         for (int r = center.r() - radius; r <= center.r() + radius; r++) {
@@ -43,14 +48,15 @@ public final class HexGridRenderer {
                 if (dq > dqMin) {
                     line.append(' ');
                 }
-                line.append(glyphFor(room, viewer, cell));
+                line.append(glyphFor(room, viewer, cell, pathCells, destination));
             }
             lines.add(line.toString());
         }
         return lines;
     }
 
-    private static char glyphFor(RoomInstance room, GamePlayer viewer, HexCoordinate cell) {
+    private static char glyphFor(RoomInstance room, GamePlayer viewer, HexCoordinate cell, Set<HexCoordinate> pathCells,
+            HexCoordinate destination) {
         if (cell.equals(viewer.getPosition())) {
             return '@';
         }
@@ -65,6 +71,16 @@ public final class HexGridRenderer {
                 case GameMonster ignored -> 'm';
                 case GameNpc ignored -> 'n';
             };
+        }
+
+        if (cell.equals(destination)) {
+            // '*' est un glyphe interne, jamais affiché tel quel : Ansi.gridLine le
+            // traduit en 'X' coloré comme un portail, pour que la case d'arrivée
+            // reste cohérente visuellement quand elle est elle-même un portail.
+            return room.findPortalAt(cell).isPresent() ? '*' : 'X';
+        }
+        if (pathCells.contains(cell)) {
+            return '-';
         }
 
         if (room.findPortalAt(cell).isPresent()) {

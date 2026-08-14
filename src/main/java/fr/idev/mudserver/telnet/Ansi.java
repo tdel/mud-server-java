@@ -89,6 +89,7 @@ public final class Ansi {
                 case 'm' -> monster(String.valueOf(c));
                 case 'n' -> npc(String.valueOf(c));
                 case '#' -> room(String.valueOf(c));
+                case '*' -> room(String.valueOf('X')); // case d'arrivée sur un portail : même couleur qu'un portail
                 default -> String.valueOf(c);
             });
         }

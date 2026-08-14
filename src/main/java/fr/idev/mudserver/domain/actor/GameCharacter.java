@@ -1,6 +1,8 @@
 package fr.idev.mudserver.domain.actor;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -125,40 +127,6 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
         return DiceRoller.roll(new DiceExpression(1, 20, getModifier(Attribute.DEXTERITY))).total();
     }
 
-    public MovementOutcome moveToCell(HexDirection direction, int requestedCells) {
-        RoomInstance room = getCurrentRoom();
-        HexCoordinate current = getPosition();
-
-        int cellsMoved = 0;
-        boolean blockedByOccupant = false;
-        boolean triggeredCombat = false;
-
-        for (int i = 0; i < requestedCells; i++) {
-            HexCoordinate next = current.neighbor(direction);
-            if (!room.isInBounds(next)) {
-                break;
-            }
-            if (!room.tryClaimCell(next, this)) {
-                blockedByOccupant = true;
-                break;
-            }
-            room.releaseCell(current, this);
-            setPosition(next);
-            current = next;
-            cellsMoved++;
-
-            if (onEnteredCell(current)) {
-                triggeredCombat = true;
-                break;
-            }
-        }
-
-        boolean blockedByBounds = cellsMoved == 0 && !blockedByOccupant;
-        return new MovementOutcome(cellsMoved, blockedByBounds, blockedByOccupant, triggeredCombat);
-    }
-
-    // Avance d'une case sans déclencher de conséquence (combat, portail) :
-    // MovementTicker s'en charge après coup.
     public CellStepOutcome moveOneCell(HexDirection direction) {
         RoomInstance room = getCurrentRoom();
         HexCoordinate current = getPosition();
@@ -179,6 +147,20 @@ public abstract sealed class GameCharacter extends GameObject permits GamePlayer
 
     public boolean onEnteredCell(HexCoordinate cell) {
         return false;
+    }
+
+    public List<HexCoordinate> remainingPath() {
+        ActiveMovement movement = this.activeMovement; // photo unique du champ volatile
+        if (movement == null) {
+            return List.of();
+        }
+        List<HexCoordinate> path = new ArrayList<>(movement.cellsRemaining());
+        HexCoordinate cursor = getPosition();
+        for (int i = 0; i < movement.cellsRemaining(); i++) {
+            cursor = cursor.neighbor(movement.direction());
+            path.add(cursor);
+        }
+        return path;
     }
 
     public void startMovement(HexDirection direction, int cellsRequested) {
