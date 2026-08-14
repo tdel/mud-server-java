@@ -1,4 +1,15 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(graft:*)",
+      "Bash(npx graft:*)",
+      "Bash(graft-dev:*)",
+      "Bash(node dist/cli.js:*)",
+      "Bash(mcp__graft__:*)",
+      "graft - graft_trace_calls",
+      "graft - graft_find_all"
+    ]
+  },
   "hooks": {
     "PostToolUse": [
       {
@@ -71,19 +82,9 @@
     "type": "command",
     "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/helpers/graft-statusline.cjs\""
   },
+  "footerLinksRegexes": [],
   "subagentStatusLine": {
     "type": "command",
     "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/helpers/graft-statusline.cjs\""
-  },
-  "footerLinksRegexes": [
-    "graft/[\\w./-]+\\.md"
-  ],
-  "permissions": {
-    "allow": [
-      "Bash(graft:*)",
-      "Bash(npx graft:*)",
-      "Bash(graft-dev:*)",
-      "Bash(node dist/cli.js:*)"
-    ]
   }
 }
