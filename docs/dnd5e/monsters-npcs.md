@@ -55,3 +55,5 @@ NPCs reuse the monster stat-block format. A GM can bolt on racial traits (e.g. a
 ## Notes for this project
 
 `game/actor/CharacterService`, `MonsterService`, `NpcService`, and `data/monsters.json`/`npcs.json` back this today, but the game doesn't currently model CR, legendary actions, or size-based hit dice — monster stats are presumably authored directly rather than derived from CR. If CR-based balancing is ever wanted, the XP table above is the anchor point, and it already lines up with [leveling-xp.md](leveling-xp.md)'s character XP thresholds for encounter-difficulty math.
+
+`MonsterTemplate`/`data/monsters.json` now carry a `speed` field (`GameMonster.getSpeed()` overrides `GameCharacter.getSpeed()` to read it), on the same 5-ft-square scale as playable-race speeds in `data/race.json` (SRD ft ÷ 5 — e.g. 30 ft → 6). NPCs (`GameNpc`) have no `speed` field of their own and hardcode `speed = 0` in their constructor, since they don't move; see [movement-environment.md](movement-environment.md) for how `speed` feeds `GameCharacter.getMillisPerCell()`/`MovementTicker`.

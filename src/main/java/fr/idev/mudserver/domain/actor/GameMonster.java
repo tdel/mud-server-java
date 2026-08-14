@@ -85,6 +85,11 @@ public final class GameMonster extends GameCharacter {
     }
 
     @Override
+    public int getSpeed() {
+        return requireTemplate().getSpeed();
+    }
+
+    @Override
     public int getArmorClass() {
         Integer natural = requireTemplate().getNaturalArmorClass();
         return natural != null ? natural : super.getArmorClass();

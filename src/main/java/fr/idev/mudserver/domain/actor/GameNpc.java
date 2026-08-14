@@ -20,6 +20,7 @@ public sealed class GameNpc extends GameCharacter permits GameNpcSeller {
         this.roomId = roomId;
         this.description = description;
         this.dialogue = dialogue;
+        this.speed = 0;
     }
 
     public UUID getRoomId() {
