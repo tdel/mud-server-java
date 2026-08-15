@@ -7,32 +7,30 @@ import java.util.UUID;
 
 import fr.idev.mudserver.domain.Item;
 import fr.idev.mudserver.domain.ItemTemplate;
+import fr.idev.mudserver.domain.RoomInstance;
 
 public final class GameNpcSeller extends GameNpc {
 
-    private final NpcShop shop;
-
-    public GameNpcSeller(UUID id, String name, UUID roomId, String description, NpcDialogue dialogue, NpcShop shop,
-            int level) {
-        super(id, name, roomId, description, dialogue, level);
-        this.shop = Objects.requireNonNull(shop);
+    public GameNpcSeller(UUID id, NpcTemplate template, RoomInstance room) {
+        super(id, template, room);
+        Objects.requireNonNull(template.shop());
     }
 
     public NpcShop shop() {
-        return shop;
+        return getTemplate().shop();
     }
 
     public Optional<NpcShopEntry> resolveEntry(String input) {
         String trimmed = input.trim();
         try {
             int index = Integer.parseInt(trimmed);
-            if (index >= 1 && index <= shop.items().size()) {
-                return Optional.of(shop.items().get(index - 1));
+            if (index >= 1 && index <= shop().items().size()) {
+                return Optional.of(shop().items().get(index - 1));
             }
         } catch (NumberFormatException ignored) {
             // pas un index numérique : recherche par nom ci-dessous
         }
-        return shop.items().stream().filter(entry -> entry.itemTemplate().getName().equalsIgnoreCase(trimmed))
+        return shop().items().stream().filter(entry -> entry.itemTemplate().getName().equalsIgnoreCase(trimmed))
                 .findFirst();
     }
 

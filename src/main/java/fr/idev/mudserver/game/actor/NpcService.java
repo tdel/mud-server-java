@@ -44,11 +44,8 @@ public class NpcService {
 
     private void place(NpcTemplate template, RoomInstance room) {
         GameNpc npc = template.shop() != null
-                ? new GameNpcSeller(template.id(), template.name(), room.getId(), template.description(),
-                        template.dialogue(), template.shop(), template.level())
-                : new GameNpc(template.id(), template.name(), room.getId(), template.description(), template.dialogue(),
-                        template.level());
-        npc.setCurrentRoom(room);
+                ? new GameNpcSeller(template.id(), template, room)
+                : new GameNpc(template.id(), template, room);
         room.placeNpc(npc, template.cell());
     }
 }

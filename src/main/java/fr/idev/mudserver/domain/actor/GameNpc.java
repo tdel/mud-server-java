@@ -7,38 +7,35 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import fr.idev.mudserver.domain.RoomInstance;
+
 public sealed class GameNpc extends GameCharacter permits GameNpcSeller {
 
     private static final int NOMINAL_HEALTH = 1;
 
-    private final UUID roomId;
-    private final String description;
-    private final NpcDialogue dialogue;
-    private final int level;
+    private final NpcTemplate template;
 
-    public GameNpc(UUID id, String name, UUID roomId, String description, NpcDialogue dialogue, int level) {
-        super(id, name, neutralAttributes(), NOMINAL_HEALTH, NOMINAL_HEALTH);
-        this.roomId = roomId;
-        this.description = description;
-        this.dialogue = dialogue;
-        this.level = level;
+    public GameNpc(UUID id, NpcTemplate template, RoomInstance room) {
+        super(id, template.name(), neutralAttributes(), NOMINAL_HEALTH, NOMINAL_HEALTH);
+        this.template = Objects.requireNonNull(template);
+        setCurrentRoom(Objects.requireNonNull(room));
         this.speed = 0;
     }
 
-    public UUID getRoomId() {
-        return roomId;
-    }
-
     public String getDescription() {
-        return description;
+        return template.description();
     }
 
     public int getLevel() {
-        return level;
+        return template.level();
     }
 
     public Optional<NpcDialogue> getDialogue() {
-        return Optional.ofNullable(dialogue);
+        return Optional.ofNullable(template.dialogue());
+    }
+
+    protected NpcTemplate getTemplate() {
+        return template;
     }
 
     private static Map<Attribute, Integer> neutralAttributes() {
@@ -58,17 +55,17 @@ public sealed class GameNpc extends GameCharacter permits GameNpcSeller {
             return false;
         }
         return Objects.equals(getId(), other.getId()) && Objects.equals(getName(), other.getName())
-                && Objects.equals(roomId, other.roomId);
+                && Objects.equals(getCurrentRoom(), other.getCurrentRoom());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), roomId);
+        return Objects.hash(getId(), getName(), getCurrentRoom());
     }
 
     @Override
     public String toString() {
-        return "GameNpc[id=" + getId() + ", name=" + getName() + ", roomId=" + roomId + "]";
+        return "GameNpc[id=" + getId() + ", name=" + getName() + ", roomId=" + getCurrentRoom().getId() + "]";
     }
 
     public enum NpcDialogueOptionType {
