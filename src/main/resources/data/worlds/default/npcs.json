@@ -27,13 +27,15 @@
                     { "itemTemplateId": "95c33240-6454-408f-9584-cfb45427db84", "price": 3 }
                 ]
             }
-        }
+        },
+        "level": 1
     },
     {
         "id": "b0362279-5a46-4461-9672-6f4e0b2cf7e0",
         "name": "Garde du village",
         "roomId": "5e4ada37-37e1-438c-9233-581f10c055c7",
         "cell": { "q": 2, "r": 2 },
-        "description": "Un garde en armure de cuir surveille la place d'un œil sévère."
+        "description": "Un garde en armure de cuir surveille la place d'un œil sévère.",
+        "level": 2
     }
 ]

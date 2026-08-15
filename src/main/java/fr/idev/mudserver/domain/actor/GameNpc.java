@@ -14,12 +14,14 @@ public sealed class GameNpc extends GameCharacter permits GameNpcSeller {
     private final UUID roomId;
     private final String description;
     private final NpcDialogue dialogue;
+    private final int level;
 
-    public GameNpc(UUID id, String name, UUID roomId, String description, NpcDialogue dialogue) {
+    public GameNpc(UUID id, String name, UUID roomId, String description, NpcDialogue dialogue, int level) {
         super(id, name, neutralAttributes(), NOMINAL_HEALTH, NOMINAL_HEALTH);
         this.roomId = roomId;
         this.description = description;
         this.dialogue = dialogue;
+        this.level = level;
         this.speed = 0;
     }
 
@@ -29,6 +31,10 @@ public sealed class GameNpc extends GameCharacter permits GameNpcSeller {
 
     public String getDescription() {
         return description;
+    }
+
+    public int getLevel() {
+        return level;
     }
 
     public Optional<NpcDialogue> getDialogue() {

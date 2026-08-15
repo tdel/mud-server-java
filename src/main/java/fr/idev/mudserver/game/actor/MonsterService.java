@@ -94,7 +94,7 @@ public class MonsterService {
                     new MonsterTemplate(definition.id(), definition.name(), definition.description(),
                             definition.maxHealth(), definition.attributes(), definition.naturalArmorClass(),
                             definition.xpReward(), definition.naturalDamageDice(), definition.goldReward(), lootTable,
-                            definition.presenceRadius(), definition.speed()));
+                            definition.presenceRadius(), definition.speed(), definition.level()));
         }
         log.info("monster.templates_loaded count={}", templates.size());
     }
@@ -104,6 +104,6 @@ public class MonsterService {
 
     record MonsterTemplateDefinition(UUID id, String name, String description, int maxHealth,
             Map<Attribute, Integer> attributes, Integer naturalArmorClass, int xpReward, String naturalDamageDice,
-            int goldReward, List<LootTableEntryDefinition> lootTable, int presenceRadius, int speed) {
+            int goldReward, List<LootTableEntryDefinition> lootTable, int presenceRadius, int speed, int level) {
     }
 }

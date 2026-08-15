@@ -12,8 +12,9 @@ public final class GameNpcSeller extends GameNpc {
 
     private final NpcShop shop;
 
-    public GameNpcSeller(UUID id, String name, UUID roomId, String description, NpcDialogue dialogue, NpcShop shop) {
-        super(id, name, roomId, description, dialogue);
+    public GameNpcSeller(UUID id, String name, UUID roomId, String description, NpcDialogue dialogue, NpcShop shop,
+            int level) {
+        super(id, name, roomId, description, dialogue, level);
         this.shop = Objects.requireNonNull(shop);
     }
 

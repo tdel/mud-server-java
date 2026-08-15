@@ -21,7 +21,8 @@
             { "itemTemplateId": "019fa0a5-80c0-7035-9c2d-113b09a275df", "dropChance": 0.01 }
         ],
         "presenceRadius": 2,
-        "speed": 6
+        "speed": 6,
+        "level": 1
     },
     {
         "id": "dcff9d89-1f33-41e2-8011-e5b3b7092f0d",
@@ -42,7 +43,8 @@
         "goldReward": 1,
         "lootTable": [],
         "presenceRadius": 1,
-        "speed": 6
+        "speed": 6,
+        "level": 1
     },
     {
         "id": "e6caeb0d-f861-401b-b0c1-c88e315097c5",
@@ -63,7 +65,8 @@
         "goldReward": 2,
         "lootTable": [],
         "presenceRadius": 3,
-        "speed": 8
+        "speed": 8,
+        "level": 1
     },
     {
         "id": "7dfe22be-6147-45b3-bd07-89711810791d",
@@ -87,7 +90,8 @@
             { "itemTemplateId": "019faec6-116d-723d-b04c-76d51a2a2cb7", "dropChance": 0.001 }
         ],
         "presenceRadius": 2,
-        "speed": 6
+        "speed": 6,
+        "level": 1
     },
     {
         "id": "f6630034-a160-4ffc-888e-eb2fee9d9428",
@@ -112,7 +116,8 @@
             { "itemTemplateId": "019faec6-116d-723d-b04c-76d51a2a2cb7", "dropChance": 0.02 }
         ],
         "presenceRadius": 2,
-        "speed": 6
+        "speed": 6,
+        "level": 1
     },
     {
         "id": "026ce1a2-091d-4179-b715-65006480cfbe",
@@ -136,7 +141,8 @@
             { "itemTemplateId": "019fcf0d-1f8f-7d01-8e4f-fd592812a1a7", "dropChance": 0.001 }
         ],
         "presenceRadius": 3,
-        "speed": 6
+        "speed": 6,
+        "level": 3
     },
     {
         "id": "49e91691-3a13-4e2b-967f-bc1acf8cf03a",
@@ -160,6 +166,7 @@
             { "itemTemplateId": "019fcf0d-1f8d-7c4c-9275-33c4af4410a8", "dropChance": 0.0001 }
         ],
         "presenceRadius": 3,
-        "speed": 8
+        "speed": 8,
+        "level": 2
     }
 ]

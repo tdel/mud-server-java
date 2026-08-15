@@ -234,7 +234,7 @@ public class WorldTemplateService {
 
             NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), definition.roomId(),
                     new HexCoordinate(definition.cell().q(), definition.cell().r()), definition.description(), dialogue,
-                    shop);
+                    shop, definition.level());
             if (templates.putIfAbsent(template.id(), template) != null) {
                 throw new IllegalStateException("NPC " + definition.id() + " dupliqué dans le monde " + shortName);
             }
@@ -346,7 +346,7 @@ public class WorldTemplateService {
     }
 
     record NpcDefinition(UUID id, String name, UUID roomId, CellDefinition cell, String description,
-            DialogueDefinition dialogue) {
+            DialogueDefinition dialogue, int level) {
     }
 
     record DialogueDefinition(String greeting, List<DialogueOptionDefinition> options, ShopDefinition shop) {

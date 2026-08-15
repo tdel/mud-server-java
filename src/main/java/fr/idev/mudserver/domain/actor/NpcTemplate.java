@@ -5,5 +5,5 @@ import java.util.UUID;
 import fr.idev.mudserver.domain.HexCoordinate;
 
 public record NpcTemplate(UUID id, String name, UUID roomTemplateId, HexCoordinate cell, String description,
-        GameNpc.NpcDialogue dialogue, GameNpcSeller.NpcShop shop) {
+        GameNpc.NpcDialogue dialogue, GameNpcSeller.NpcShop shop, int level) {
 }

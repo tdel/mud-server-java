@@ -84,6 +84,10 @@ public final class GameMonster extends GameCharacter {
         return requireTemplate().getPresenceRadius();
     }
 
+    public int getLevel() {
+        return requireTemplate().getLevel();
+    }
+
     @Override
     public int getSpeed() {
         return requireTemplate().getSpeed();
