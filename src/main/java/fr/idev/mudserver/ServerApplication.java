@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
-import fr.idev.mudserver.game.MovementTicker;
+import fr.idev.mudserver.game.MovementEngine;
 import fr.idev.mudserver.game.catalog.ItemTemplateCatalog;
 import fr.idev.mudserver.game.catalog.LevelCatalog;
 import fr.idev.mudserver.game.catalog.MonsterCatalog;
@@ -40,7 +40,7 @@ public class ServerApplication {
 
     @Bean
     @ConditionalOnProperty(prefix = "app.telnet", name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ApplicationRunner movementTickerRunner(MovementTicker movementTicker) {
-        return args -> movementTicker.start();
+    public ApplicationRunner movementTickerRunner(MovementEngine movementEngine) {
+        return args -> movementEngine.start();
     }
 }
