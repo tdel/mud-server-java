@@ -1,17 +1,11 @@
 package fr.idev.mudserver.domain.actor;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import fr.idev.mudserver.domain.map.HexCoordinate;
-import fr.idev.mudserver.domain.map.HexDirection;
 import fr.idev.mudserver.domain.world.RoomInstance;
-import fr.idev.mudserver.domain.actor.event.CharacterStartedMoving;
-import fr.idev.mudserver.domain.actor.event.CharacterStoppedMoving;
-import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.combat.ActionEconomy;
 import fr.idev.mudserver.domain.combat.CombatEncounter;
 import fr.idev.mudserver.game.dice.DiceExpression;
@@ -32,8 +26,8 @@ public abstract class AbstractCharacter extends AbstractObject {
     private volatile HexCoordinate position;
     protected int speed = DEFAULT_SPEED;
     private volatile CombatEncounter encounter;
-    private volatile ActiveMovement activeMovement;
     private final ActionEconomy actionEconomy = new ActionEconomy();
+    private final CharacterMovementSystem movementSystem = new CharacterMovementSystem(this);
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
             int maxHealth) {
@@ -125,100 +119,19 @@ public abstract class AbstractCharacter extends AbstractObject {
         return actionEconomy;
     }
 
-    public int rollInitiative() {
-        return DiceRoller.roll(new DiceExpression(1, 20, getModifier(Attribute.DEXTERITY))).total();
+    public CharacterMovementSystem getMovementSystem() {
+        return movementSystem;
     }
 
-    public CellStepOutcome moveOneCell(HexDirection direction) {
-        RoomInstance room = getCurrentRoom();
-        HexCoordinate current = getPosition();
-        HexCoordinate next = current.neighbor(direction);
-
-        if (!room.isInBounds(next)) {
-            return new CellStepOutcome(false, true, false);
-        }
-        if (!room.tryClaimCell(next, this)) {
-            return new CellStepOutcome(false, false, true);
-        }
-
-        room.releaseCell(current, this);
-        setPosition(next);
-
-        return new CellStepOutcome(true, false, false);
+    public int rollInitiative() {
+        return DiceRoller.roll(new DiceExpression(1, 20, getModifier(Attribute.DEXTERITY))).total();
     }
 
     public boolean onEnteredCell(HexCoordinate cell) {
         return false;
     }
 
-    public List<HexCoordinate> remainingPath() {
-        ActiveMovement movement = this.activeMovement; // photo unique du champ volatile
-        if (movement == null) {
-            return List.of();
-        }
-        List<HexCoordinate> path = new ArrayList<>(movement.cellsRemaining());
-        HexCoordinate cursor = getPosition();
-        for (int i = 0; i < movement.cellsRemaining(); i++) {
-            cursor = cursor.neighbor(movement.direction());
-            path.add(cursor);
-        }
-        return path;
-    }
-
-    public void startMovement(HexDirection direction, int cellsRequested) {
-        this.activeMovement = new ActiveMovement(direction, cellsRequested, System.currentTimeMillis());
-        DomainEventPublisher.publish(new CharacterStartedMoving(this));
-    }
-
-    public void stopMovement() {
-        if (this.activeMovement == null) {
-            return;
-        }
-        this.activeMovement = null;
-        DomainEventPublisher.publish(new CharacterStoppedMoving(this));
-    }
-
-    public MovementStepOutcome updatePosition(long now) {
-        ActiveMovement movement = this.activeMovement;
-        if (movement == null || now - movement.lastStepAt() < getMillisPerCell()) {
-            return MovementStepOutcome.NO_MOVEMENT;
-        }
-
-        CellStepOutcome step = moveOneCell(movement.direction());
-        if (!step.moved()) {
-            this.activeMovement = null;
-            return step.blockedByOccupant()
-                    ? MovementStepOutcome.BLOCKED_BY_OCCUPANT
-                    : MovementStepOutcome.BLOCKED_BY_BOUNDS;
-        }
-
-        int remaining = movement.cellsRemaining() - 1;
-        if (remaining <= 0) {
-            this.activeMovement = null;
-            return MovementStepOutcome.FINISHED;
-        }
-        this.activeMovement = movement.withRemaining(remaining, now);
-        return MovementStepOutcome.STEPPED;
-    }
-
     // No-op par défaut : seul GamePlayer a une Connection à notifier.
     public void send(OutputMessage message) {
-    }
-
-    public record MovementOutcome(int cellsMoved, boolean blockedByBounds, boolean blockedByOccupant,
-            boolean triggeredCombat) {
-    }
-
-    public record CellStepOutcome(boolean moved, boolean blockedByBounds, boolean blockedByOccupant) {
-    }
-
-    private record ActiveMovement(HexDirection direction, int cellsRemaining, long lastStepAt) {
-        ActiveMovement withRemaining(int newRemaining, long stepAt) {
-            return new ActiveMovement(direction, newRemaining, stepAt);
-        }
-    }
-
-    public enum MovementStepOutcome {
-        NO_MOVEMENT, STEPPED, FINISHED, BLOCKED_BY_BOUNDS, BLOCKED_BY_OCCUPANT
     }
 }

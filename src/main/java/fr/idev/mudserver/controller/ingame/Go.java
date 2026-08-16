@@ -52,7 +52,7 @@ public class Go implements ControllerHandler {
         }
         requestedCells = Math.min(requestedCells, MAX_STEP_COUNT);
 
-        character.startMovement(direction.get(), requestedCells);
+        character.getMovementSystem().startMovement(direction.get(), requestedCells);
     }
 
     private int parsePositiveInt(String token) {

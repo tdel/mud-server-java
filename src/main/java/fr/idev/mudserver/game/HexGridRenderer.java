@@ -29,7 +29,7 @@ public final class HexGridRenderer {
 
     static List<String> render(RoomInstance room, CharacterInstance viewer, int radius) {
         HexCoordinate center = viewer.getPosition();
-        List<HexCoordinate> path = viewer.remainingPath();
+        List<HexCoordinate> path = viewer.getMovementSystem().remainingPath();
         Set<HexCoordinate> pathCells = new HashSet<>(path);
         HexCoordinate destination = path.isEmpty() ? null : path.get(path.size() - 1);
         List<String> lines = new ArrayList<>();

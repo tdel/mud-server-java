@@ -26,7 +26,7 @@ public class Stop implements ControllerHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
-        character.stopMovement();
+        character.getMovementSystem().stopMovement();
         connection.send(new MovementStopped());
     }
 }
