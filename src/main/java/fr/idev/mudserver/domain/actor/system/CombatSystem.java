@@ -85,7 +85,7 @@ public final class CombatSystem {
         boolean weaponProficient = weapon
                 .map(item -> attacker.getWeaponProficiencies().contains(item.getWeaponCategory())).orElse(true);
 
-        int strengthModifier = attacker.getModifier(Attribute.STRENGTH);
+        int strengthModifier = AttributeSystem.getModifier(attacker, Attribute.STRENGTH);
         int attackBonus = strengthModifier + (weaponProficient ? attacker.getProficiencyBonus() : 0) + weaponBonus;
         boolean disadvantage = InventorySystem.isWearingNonProficientArmor(attacker);
 
@@ -118,7 +118,7 @@ public final class CombatSystem {
     }
 
     private static CombatResult monsterAttack(MonsterInstance attacker, AbstractCharacter target) {
-        int strengthModifier = attacker.getModifier(Attribute.STRENGTH);
+        int strengthModifier = AttributeSystem.getModifier(attacker, Attribute.STRENGTH);
         int attackBonus = strengthModifier + 2;
 
         DiceRoll attackRoll = DiceRoller.roll(new DiceExpression(1, 20, attackBonus));

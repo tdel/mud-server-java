@@ -17,10 +17,9 @@ public class AbstractNpc extends AbstractCharacter {
     private final NpcTemplate template;
 
     public AbstractNpc(UUID id, NpcTemplate template, RoomInstance room) {
-        super(id, template.name(), neutralAttributes(), NOMINAL_HEALTH, NOMINAL_HEALTH);
+        super(id, template.name(), neutralAttributes(), NOMINAL_HEALTH, NOMINAL_HEALTH, 0);
         this.template = Objects.requireNonNull(template);
         setCurrentRoom(Objects.requireNonNull(room));
-        this.speed = 0;
     }
 
     public String getDescription() {

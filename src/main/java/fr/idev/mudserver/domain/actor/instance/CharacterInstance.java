@@ -9,14 +9,12 @@ import java.util.UUID;
 
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.*;
-import fr.idev.mudserver.domain.actor.component.InventoryComponent;
-import fr.idev.mudserver.domain.actor.component.LevelingComponent;
-import fr.idev.mudserver.domain.actor.component.NetworkComponent;
-import fr.idev.mudserver.domain.actor.component.RestComponent;
+import fr.idev.mudserver.domain.actor.component.*;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEnteredCell;
 import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
 import fr.idev.mudserver.domain.map.HexCoordinate;
+import fr.idev.mudserver.domain.actor.system.AttributeSystem;
 import fr.idev.mudserver.domain.actor.system.InventorySystem;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.item.WeaponCategory;
@@ -47,12 +45,11 @@ public final class CharacterInstance extends AbstractCharacter {
     public CharacterInstance(UUID id, Account account, String name, RoomInstance room, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold, int shortRestCount) {
-        super(id, name, attributes, currentHealth, maxHealth);
+        super(id, name, attributes, currentHealth, maxHealth, race.speed());
         this.account = account;
         setCurrentRoom(room);
         this.gender = gender;
         this.race = race;
-        this.speed = race.speed();
         this.characterClass = characterClass;
         attachComponent(new InventoryComponent(List.of(), gold));
         attachComponent(new LevelingComponent(level, xp));
@@ -147,7 +144,7 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     private CheckResult checkOrSave(Attribute attribute, boolean proficient, int dc, String label) {
-        int modifier = getModifier(attribute) + (proficient ? getProficiencyBonus() : 0);
+        int modifier = AttributeSystem.getModifier(this, attribute) + (proficient ? getProficiencyBonus() : 0);
         boolean disadvantage = (attribute == Attribute.STRENGTH || attribute == Attribute.DEXTERITY)
                 && InventorySystem.isWearingNonProficientArmor(this);
         DiceRoll diceRoll = DiceRoller.rollD20(modifier, disadvantage);
@@ -176,12 +173,6 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     @Override
-    public void send(OutputMessage message) {
-        findComponent(NetworkComponent.class)
-                .ifPresent(networkComponent -> networkComponent.connection().send(message));
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -202,7 +193,7 @@ public final class CharacterInstance extends AbstractCharacter {
                 && Objects.equals(getName(), other.getName())
                 && Objects.equals(getCurrentRoomId(), other.getCurrentRoomId()) && gender == other.gender
                 && race == other.race && characterClass == other.characterClass
-                && Objects.equals(getAttributes(), other.getAttributes());
+                && Objects.equals(AttributeSystem.getAttributes(this), AttributeSystem.getAttributes(other));
     }
 
     @Override
@@ -212,7 +203,7 @@ public final class CharacterInstance extends AbstractCharacter {
         RestComponent rest = component(RestComponent.class);
         return Objects.hash(getId(), getAccountId(), getName(), getCurrentRoomId(), gender, race, characterClass,
                 level.level(), level.xp(), inventory.gold(), getCurrentHealth(), getMaxHealth(), rest.shortRestCount(),
-                getAttributes());
+                AttributeSystem.getAttributes(this));
     }
 
     @Override
@@ -224,6 +215,6 @@ public final class CharacterInstance extends AbstractCharacter {
                 + getCurrentRoomId() + ", gender=" + gender + ", race=" + race + ", characterClass=" + characterClass
                 + ", level=" + level.level() + ", xp=" + level.xp() + ", gold=" + inventory.gold() + ", currentHealth="
                 + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + ", shortRestCount=" + rest.shortRestCount()
-                + ", attributes=" + getAttributes() + "]";
+                + ", attributes=" + AttributeSystem.getAttributes(this) + "]";
     }
 }

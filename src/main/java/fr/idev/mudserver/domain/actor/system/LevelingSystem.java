@@ -20,7 +20,7 @@ public final class LevelingSystem {
 
     public static int hitDieRecovery(CharacterInstance character) {
         int hitDie = character.getCharacterClass().hitDie();
-        return Math.max(1, hitDie / 2 + 1 + character.getModifier(Attribute.CONSTITUTION));
+        return Math.max(1, hitDie / 2 + 1 + AttributeSystem.getModifier(character, Attribute.CONSTITUTION));
     }
 
     public static void applyLevelUp(CharacterInstance character) {

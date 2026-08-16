@@ -16,6 +16,7 @@ import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import fr.idev.mudserver.domain.actor.component.RestComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
+import fr.idev.mudserver.domain.actor.system.AttributeSystem;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
@@ -44,10 +45,13 @@ public class CharacterDao {
                 .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentRoomId(),
                         character.getGender().name(), character.getRace().name(), character.getCharacterClass().name(),
                         character.component(LevelingComponent.class).level(), character.getCurrentHealth(),
-                        character.getMaxHealth(), character.getAttribute(Attribute.STRENGTH),
-                        character.getAttribute(Attribute.DEXTERITY), character.getAttribute(Attribute.CONSTITUTION),
-                        character.getAttribute(Attribute.INTELLIGENCE), character.getAttribute(Attribute.WISDOM),
-                        character.getAttribute(Attribute.CHARISMA), character.component(LevelingComponent.class).xp(),
+                        character.getMaxHealth(), AttributeSystem.getAttribute(character, Attribute.STRENGTH),
+                        AttributeSystem.getAttribute(character, Attribute.DEXTERITY),
+                        AttributeSystem.getAttribute(character, Attribute.CONSTITUTION),
+                        AttributeSystem.getAttribute(character, Attribute.INTELLIGENCE),
+                        AttributeSystem.getAttribute(character, Attribute.WISDOM),
+                        AttributeSystem.getAttribute(character, Attribute.CHARISMA),
+                        character.component(LevelingComponent.class).xp(),
                         character.component(InventoryComponent.class).gold(),
                         character.component(RestComponent.class).shortRestCount(), worldInstanceId)
                 .execute();

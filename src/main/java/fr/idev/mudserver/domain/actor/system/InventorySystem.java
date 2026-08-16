@@ -152,11 +152,11 @@ public final class InventorySystem {
     }
 
     private static int baseArmorClass(AbstractCharacter character) {
-        return 10 + character.getModifier(Attribute.DEXTERITY);
+        return 10 + AttributeSystem.getModifier(character, Attribute.DEXTERITY);
     }
 
     private static int armorAc(CharacterInstance character, Item armor) {
-        int dexMod = character.getModifier(Attribute.DEXTERITY);
+        int dexMod = AttributeSystem.getModifier(character, Attribute.DEXTERITY);
         int baseAndBonus = armor.getBaseAc() + armor.getBonus();
         return switch (armor.getArmorCategory()) {
             case LIGHT -> baseAndBonus + dexMod;

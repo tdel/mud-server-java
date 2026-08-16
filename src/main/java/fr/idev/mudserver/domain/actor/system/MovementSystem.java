@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
+import fr.idev.mudserver.domain.actor.component.MovementComponent;
 import fr.idev.mudserver.domain.actor.event.CharacterStartedMoving;
 import fr.idev.mudserver.domain.actor.event.CharacterStoppedMoving;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
@@ -13,11 +14,18 @@ import fr.idev.mudserver.domain.world.RoomInstance;
 
 public final class MovementSystem {
 
+    public static final int REFERENCE_SPEED = 5;
+    public static final long REFERENCE_TIME_MS = 1000L;
+
     private final AbstractCharacter character;
     private volatile ActiveMovement activeMovement;
 
     public MovementSystem(AbstractCharacter character) {
         this.character = character;
+    }
+
+    public long getMillisPerCell(AbstractCharacter character) {
+        return REFERENCE_TIME_MS * REFERENCE_SPEED / Math.max(1, character.component(MovementComponent.class).speed());
     }
 
     public CellStepOutcome moveOneCell(HexDirection direction) {
@@ -67,7 +75,7 @@ public final class MovementSystem {
 
     public MovementStepOutcome updatePosition(long now) {
         ActiveMovement movement = this.activeMovement;
-        if (movement == null || now - movement.lastStepAt() < character.getMillisPerCell()) {
+        if (movement == null || now - movement.lastStepAt() < getMillisPerCell(character)) {
             return MovementStepOutcome.NO_MOVEMENT;
         }
 

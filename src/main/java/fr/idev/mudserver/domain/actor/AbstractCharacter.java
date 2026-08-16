@@ -4,8 +4,12 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.UUID;
 
+import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
+import fr.idev.mudserver.domain.actor.component.MovementComponent;
+import fr.idev.mudserver.domain.actor.component.NetworkComponent;
 import fr.idev.mudserver.domain.map.HexCoordinate;
+import fr.idev.mudserver.domain.actor.system.AttributeSystem;
 import fr.idev.mudserver.domain.actor.system.InventorySystem;
 import fr.idev.mudserver.domain.actor.system.MovementSystem;
 import fr.idev.mudserver.domain.world.RoomInstance;
@@ -17,40 +21,22 @@ import fr.idev.mudserver.network.OutputMessage;
 
 public abstract class AbstractCharacter extends AbstractObject {
 
-    public static final int DEFAULT_SPEED = 6;
-    public static final int REFERENCE_SPEED = 5;
-    public static final long REFERENCE_TIME_MS = 1000L;
-
-    private final Map<Attribute, Integer> attributes;
-
     private volatile RoomInstance currentRoom;
     private volatile HexCoordinate position;
-    protected int speed = DEFAULT_SPEED;
     private volatile CombatEncounter encounter;
     private final ActionEconomy actionEconomy = new ActionEconomy();
     private final MovementSystem movementSystem = new MovementSystem(this);
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
-            int maxHealth) {
+            int maxHealth, int speed) {
         super(id, name);
-        this.attributes = new EnumMap<>(attributes);
+        this.attachComponent(new AttributeComponent(new EnumMap<>(attributes)));
         this.attachComponent(new CombatComponent(currentHealth, maxHealth, null));
-    }
-
-    public int getAttribute(Attribute attribute) {
-        return attributes.get(attribute);
-    }
-
-    public int getModifier(Attribute attribute) {
-        return Math.floorDiv(getAttribute(attribute) - 10, 2);
+        this.attachComponent(new MovementComponent(speed));
     }
 
     public int getArmorClass() {
         return InventorySystem.getArmorClass(this);
-    }
-
-    public Map<Attribute, Integer> getAttributes() {
-        return Map.copyOf(attributes);
     }
 
     public int getCurrentHealth() {
@@ -82,18 +68,6 @@ public abstract class AbstractCharacter extends AbstractObject {
         this.position = position;
     }
 
-    public int getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
-
-    public long getMillisPerCell() {
-        return REFERENCE_TIME_MS * REFERENCE_SPEED / Math.max(1, getSpeed());
-    }
-
     public boolean isInCombat() {
         return encounter != null;
     }
@@ -115,14 +89,16 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public int rollInitiative() {
-        return DiceRoller.roll(new DiceExpression(1, 20, getModifier(Attribute.DEXTERITY))).total();
+        return DiceRoller.roll(new DiceExpression(1, 20, AttributeSystem.getModifier(this, Attribute.DEXTERITY)))
+                .total();
     }
 
     public boolean onEnteredCell(HexCoordinate cell) {
         return false;
     }
 
-    // No-op par défaut : seul GamePlayer a une Connection à notifier.
     public void send(OutputMessage message) {
+        findComponent(NetworkComponent.class)
+                .ifPresent(networkComponent -> networkComponent.connection().send(message));
     }
 }

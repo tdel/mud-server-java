@@ -7,6 +7,7 @@ import java.util.UUID;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.component.BehaviorComponent;
+import fr.idev.mudserver.domain.actor.system.AttributeSystem;
 import fr.idev.mudserver.domain.actor.template.MonsterTemplate;
 
 public final class MonsterInstance extends AbstractCharacter {
@@ -18,7 +19,7 @@ public final class MonsterInstance extends AbstractCharacter {
 
     public MonsterInstance(UUID id, String name, UUID templateId, UUID roomId, Map<Attribute, Integer> attributes,
             int maxHealth) {
-        super(id, name, attributes, maxHealth, maxHealth);
+        super(id, name, attributes, maxHealth, maxHealth, 5);
         this.templateId = templateId;
         this.roomId = roomId;
         attachComponent(BehaviorComponent.idle());
@@ -48,11 +49,6 @@ public final class MonsterInstance extends AbstractCharacter {
         return requireTemplate().getLevel();
     }
 
-    @Override
-    public int getSpeed() {
-        return requireTemplate().getSpeed();
-    }
-
     private MonsterTemplate requireTemplate() {
         if (template == null) {
             throw new IllegalStateException("GameMonster " + getId() + " has no MonsterTemplate attached");
@@ -79,13 +75,13 @@ public final class MonsterInstance extends AbstractCharacter {
         return getCurrentHealth() == other.getCurrentHealth() && getMaxHealth() == other.getMaxHealth()
                 && Objects.equals(getId(), other.getId()) && Objects.equals(getName(), other.getName())
                 && Objects.equals(templateId, other.templateId) && Objects.equals(roomId, other.roomId)
-                && Objects.equals(getAttributes(), other.getAttributes());
+                && Objects.equals(AttributeSystem.getAttributes(this), AttributeSystem.getAttributes(other));
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), templateId, roomId, getAttributes(), getCurrentHealth(),
-                getMaxHealth());
+        return Objects.hash(getId(), getName(), templateId, roomId, AttributeSystem.getAttributes(this),
+                getCurrentHealth(), getMaxHealth());
     }
 
     @Override
