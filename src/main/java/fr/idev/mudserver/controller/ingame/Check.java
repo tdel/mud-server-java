@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.Skill;
+import fr.idev.mudserver.domain.actor.system.DiceSystem;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -47,7 +48,7 @@ public class Check implements ControllerHandler {
         }
 
         CharacterInstance character = connection.character();
-        connection.send(new CheckOutcome(character.check(skill, dc)));
+        connection.send(new CheckOutcome(DiceSystem.check(character, skill, dc)));
     }
 
     private Skill parseSkill(String input) {

@@ -13,14 +13,8 @@ import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEnteredCell;
 import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
 import fr.idev.mudserver.domain.map.HexCoordinate;
-import fr.idev.mudserver.domain.actor.system.AttributeSystem;
-import fr.idev.mudserver.domain.actor.system.InventorySystem;
-import fr.idev.mudserver.domain.actor.system.LevelingSystem;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.world.WorldInstance;
-import fr.idev.mudserver.game.dice.CheckResult;
-import fr.idev.mudserver.game.dice.DiceRoll;
-import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.OutputMessage;
 
 public final class CharacterInstance extends AbstractCharacter {
@@ -77,27 +71,6 @@ public final class CharacterInstance extends AbstractCharacter {
     public void setWorldInstance(WorldInstance worldInstance) {
         this.worldInstance = worldInstance;
         this.worldInstanceId = worldInstance.getId();
-    }
-
-    public CheckResult check(Skill skill, int dc) {
-        boolean proficient = component(AppearanceComponent.class).characterClass().skillProficiencies().contains(skill);
-        return checkOrSave(skill.getGoverningAttribute(), proficient, dc, skill.label());
-    }
-
-    public CheckResult save(Attribute attribute, int dc) {
-        boolean proficient = component(AppearanceComponent.class).characterClass().savingThrowProficiencies()
-                .contains(attribute);
-        return checkOrSave(attribute, proficient, dc, attribute.label());
-    }
-
-    private CheckResult checkOrSave(Attribute attribute, boolean proficient, int dc, String label) {
-        int modifier = AttributeSystem.getModifier(this, attribute)
-                + (proficient ? LevelingSystem.getProficiencyBonus(this) : 0);
-        boolean disadvantage = (attribute == Attribute.STRENGTH || attribute == Attribute.DEXTERITY)
-                && InventorySystem.isWearingNonProficientArmor(this);
-        DiceRoll diceRoll = DiceRoller.rollD20(modifier, disadvantage);
-        boolean success = diceRoll.total() >= dc;
-        return new CheckResult(label, diceRoll.total(), dc, proficient, disadvantage, success);
     }
 
     public void moveToRoom(RoomInstance destination) {
