@@ -7,12 +7,13 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import fr.idev.mudserver.config.GameConfig;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.item.FoodItem;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.item.ItemType;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
-import fr.idev.mudserver.game.actor.RestService;
+import fr.idev.mudserver.domain.actor.instance.RestOutcome;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -26,12 +27,6 @@ import fr.idev.mudserver.network.message.ingame.ProvisionSelection;
 
 @Component
 public class Rest implements ControllerHandler {
-
-    private final RestService restService;
-
-    public Rest(RestService restService) {
-        this.restService = restService;
-    }
 
     @Override
     public String name() {
@@ -56,13 +51,14 @@ public class Rest implements ControllerHandler {
     }
 
     private void restShort(Connection connection, CharacterInstance character) {
-        switch (restService.shortRest(character)) {
-            case RestService.RestOutcome.Rested ignored -> {
+        switch (character.doShortRest()) {
+            case RestOutcome.Rested ignored -> {
             }
-            case RestService.RestOutcome.InCombat ignored -> connection.send(new CannotRestInCombat());
-            case RestService.RestOutcome.NoShortRestLeft ignored -> connection.send(new NoShortRestsLeft());
-            case RestService.RestOutcome.NotEnoughProvisions ignored -> {
-                // Jamais renvoyé par shortRest — seul longRest peut échouer sur les provisions.
+            case RestOutcome.InCombat ignored -> connection.send(new CannotRestInCombat());
+            case RestOutcome.NoShortRestLeft ignored -> connection.send(new NoShortRestsLeft());
+            case RestOutcome.NotEnoughProvisions ignored -> {
+                // Jamais renvoyé par doShortRest — seul doLongRest peut échouer sur les
+                // provisions.
             }
         }
     }
@@ -90,7 +86,7 @@ public class Rest implements ControllerHandler {
                 .map(item -> new ProvisionSelection.Entry(item.getName(), nutritionValue(item))).toList();
 
         connection.requestBlocking(
-                new ProvisionSelection(entries, selectedValue, RestService.LONG_REST_PROVISION_THRESHOLD), line -> {
+                new ProvisionSelection(entries, selectedValue, GameConfig.LONG_REST_PROVISION_THRESHOLD), line -> {
                     String trimmed = line.trim();
 
                     if (trimmed.equalsIgnoreCase("cancel")) {
@@ -128,15 +124,15 @@ public class Rest implements ControllerHandler {
     }
 
     private void finalizeLongRest(Connection connection, CharacterInstance character, List<Item> selected) {
-        switch (restService.longRest(character, selected)) {
-            case RestService.RestOutcome.Rested ignored -> {
+        switch (character.doLongRest(selected)) {
+            case RestOutcome.Rested ignored -> {
             }
-            case RestService.RestOutcome.InCombat ignored -> connection.send(new CannotRestInCombat());
-            case RestService.RestOutcome.NoShortRestLeft ignored -> {
-                // Jamais renvoyé par longRest — seul shortRest a un plafond d'usages.
+            case RestOutcome.InCombat ignored -> connection.send(new CannotRestInCombat());
+            case RestOutcome.NoShortRestLeft ignored -> {
+                // Jamais renvoyé par doLongRest — seul doShortRest a un plafond d'usages.
             }
-            case RestService.RestOutcome.NotEnoughProvisions(int totalValue) ->
-                connection.send(new NotEnoughProvisions(totalValue, RestService.LONG_REST_PROVISION_THRESHOLD));
+            case RestOutcome.NotEnoughProvisions(int totalValue) ->
+                connection.send(new NotEnoughProvisions(totalValue, GameConfig.LONG_REST_PROVISION_THRESHOLD));
         }
     }
 

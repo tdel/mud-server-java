@@ -1,6 +1,7 @@
 package fr.idev.mudserver.domain.actor.instance;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -8,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import fr.idev.mudserver.config.GameConfig;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.*;
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
@@ -23,7 +25,10 @@ import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUnequippedItem;
 import fr.idev.mudserver.domain.actor.event.ItemDiscarded;
 import fr.idev.mudserver.domain.actor.event.ItemPurchased;
+import fr.idev.mudserver.domain.actor.event.LongRestTaken;
+import fr.idev.mudserver.domain.actor.event.ShortRestTaken;
 import fr.idev.mudserver.domain.item.EquipmentSlot;
+import fr.idev.mudserver.domain.item.FoodItem;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.world.RoomInstance;
@@ -305,6 +310,50 @@ public final class CharacterInstance extends AbstractCharacter {
 
     public void resetShortRestCount() {
         shortRestCount = 0;
+    }
+
+    public RestOutcome doShortRest() {
+        if (isInCombat()) {
+            return new RestOutcome.InCombat();
+        }
+        if (!canTakeShortRest()) {
+            return new RestOutcome.NoShortRestLeft();
+        }
+
+        Map<CharacterInstance, Integer> healedAmounts = new LinkedHashMap<>();
+        for (CharacterInstance character : worldInstance.onlineCharacters()) {
+            int amount = character.hitDieRecovery();
+            healedAmounts.put(character, character.heal(amount));
+            character.incrementShortRestCount();
+        }
+
+        DomainEventPublisher.publish(new ShortRestTaken(this, healedAmounts));
+        return new RestOutcome.Rested(healedAmounts);
+    }
+
+    public RestOutcome doLongRest(List<Item> selectedFood) {
+        if (isInCombat()) {
+            return new RestOutcome.InCombat();
+        }
+
+        int totalValue = selectedFood.stream().mapToInt(item -> ((FoodItem) item.getTemplate()).getNutritionValue())
+                .sum();
+        if (totalValue < GameConfig.LONG_REST_PROVISION_THRESHOLD) {
+            return new RestOutcome.NotEnoughProvisions(totalValue);
+        }
+
+        for (Item food : selectedFood) {
+            inventory.removeItem(food);
+        }
+
+        Map<CharacterInstance, Integer> healedAmounts = new LinkedHashMap<>();
+        for (CharacterInstance character : worldInstance.onlineCharacters()) {
+            healedAmounts.put(character, character.heal(character.getMaxHealth()));
+            character.resetShortRestCount();
+        }
+
+        DomainEventPublisher.publish(new LongRestTaken(this, healedAmounts, selectedFood));
+        return new RestOutcome.Rested(healedAmounts);
     }
 
     public void receiveGold(int amount) {
