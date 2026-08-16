@@ -3,6 +3,8 @@ package fr.idev.mudserver.domain.actor.system;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.component.MovementComponent;
 import fr.idev.mudserver.domain.actor.component.MovementComponent.ActiveMovement;
@@ -13,15 +15,13 @@ import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.map.HexDirection;
 import fr.idev.mudserver.domain.world.RoomInstance;
 
-public final class MovementSystem {
+@Service
+public class MovementSystem {
 
     public static final int REFERENCE_SPEED = 5;
     public static final long REFERENCE_TIME_MS = 1000L;
 
-    private MovementSystem() {
-    }
-
-    public static CellStepOutcome moveOneCell(AbstractCharacter character, HexDirection direction) {
+    public CellStepOutcome moveOneCell(AbstractCharacter character, HexDirection direction) {
         RoomInstance room = character.getCurrentRoom();
         HexCoordinate current = character.getPosition();
         HexCoordinate next = current.neighbor(direction);
@@ -39,7 +39,7 @@ public final class MovementSystem {
         return new CellStepOutcome(true, false, false);
     }
 
-    public static List<HexCoordinate> remainingPath(AbstractCharacter character) {
+    public List<HexCoordinate> remainingPath(AbstractCharacter character) {
         ActiveMovement movement = character.component(MovementComponent.class).activeMovement();
         if (movement == null) {
             return List.of();
@@ -53,13 +53,13 @@ public final class MovementSystem {
         return path;
     }
 
-    public static void startMovement(AbstractCharacter character, HexDirection direction, int cellsRequested) {
+    public void startMovement(AbstractCharacter character, HexDirection direction, int cellsRequested) {
         character.updateComponent(MovementComponent.class, current -> new MovementComponent(current.speed(),
                 new ActiveMovement(direction, cellsRequested, System.currentTimeMillis())));
         DomainEventPublisher.publish(new CharacterStartedMoving(character));
     }
 
-    public static void stopMovement(AbstractCharacter character) {
+    public void stopMovement(AbstractCharacter character) {
         if (character.component(MovementComponent.class).activeMovement() == null) {
             return;
         }
@@ -67,7 +67,7 @@ public final class MovementSystem {
         DomainEventPublisher.publish(new CharacterStoppedMoving(character));
     }
 
-    public static MovementStepOutcome updatePosition(AbstractCharacter character, long now) {
+    public MovementStepOutcome updatePosition(AbstractCharacter character, long now) {
         ActiveMovement movement = character.component(MovementComponent.class).activeMovement();
         if (movement == null || now - movement.lastStepAt() < getMillisPerCell(character)) {
             return MovementStepOutcome.NO_MOVEMENT;
@@ -92,7 +92,7 @@ public final class MovementSystem {
         return MovementStepOutcome.STEPPED;
     }
 
-    private static long getMillisPerCell(AbstractCharacter character) {
+    private long getMillisPerCell(AbstractCharacter character) {
         return REFERENCE_TIME_MS * REFERENCE_SPEED / Math.max(1, character.component(MovementComponent.class).speed());
     }
 

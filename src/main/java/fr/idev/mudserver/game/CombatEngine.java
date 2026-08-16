@@ -14,8 +14,10 @@ import fr.idev.mudserver.domain.item.ConsumableItem;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.combat.ActionEconomy;
 import fr.idev.mudserver.domain.combat.CombatEncounter;
+import fr.idev.mudserver.domain.actor.system.AttributeSystem;
 import fr.idev.mudserver.domain.actor.system.CombatSystem;
 import fr.idev.mudserver.domain.actor.system.DiceSystem;
+import fr.idev.mudserver.domain.actor.system.InventorySystem;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
@@ -41,6 +43,21 @@ import fr.idev.mudserver.network.message.ingame.YourTurn;
 public class CombatEngine {
 
     private static final Logger log = LoggerFactory.getLogger(CombatEngine.class);
+
+    private final CombatSystem combatSystem;
+    private final DiceSystem diceSystem;
+    private final AiSystem aiSystem;
+    private final InventorySystem inventorySystem;
+    private final AttributeSystem attributeSystem;
+
+    public CombatEngine(CombatSystem combatSystem, DiceSystem diceSystem, AiSystem aiSystem,
+            InventorySystem inventorySystem, AttributeSystem attributeSystem) {
+        this.combatSystem = combatSystem;
+        this.diceSystem = diceSystem;
+        this.aiSystem = aiSystem;
+        this.inventorySystem = inventorySystem;
+        this.attributeSystem = attributeSystem;
+    }
 
     public void attack(CharacterInstance attacker, MonsterInstance target) {
         CombatEncounter attackerEncounter = attacker.getEncounter();
@@ -75,7 +92,7 @@ public class CombatEngine {
 
         CombatEncounter encounter = user.getEncounter();
         if (encounter == null) {
-            consumable.consume(user, item);
+            consumable.consume(user, item, combatSystem, inventorySystem);
             return;
         }
 
@@ -83,7 +100,7 @@ public class CombatEngine {
             if (encounter.currentParticipant() != user || !user.getActionEconomy().trySpendAction()) {
                 user.send(new NotYourTurn());
             } else {
-                consumable.consume(user, item);
+                consumable.consume(user, item, combatSystem, inventorySystem);
                 continueOrEndTurn(encounter, user);
             }
         }
@@ -97,7 +114,7 @@ public class CombatEngine {
                 encounter = target.getEncounter();
                 foundedHere = false;
             } else {
-                encounter = new CombatEncounter(target.getCurrentRoom());
+                encounter = new CombatEncounter(target.getCurrentRoom(), attributeSystem);
                 target.setEncounter(encounter);
                 attacker.setEncounter(encounter);
                 foundedHere = true;
@@ -117,13 +134,13 @@ public class CombatEngine {
             encounter.joinBeforeInitiative(attacker);
         }
 
-        CombatResult result = CombatSystem.tryAttack(attacker, target);
+        CombatResult result = combatSystem.tryAttack(attacker, target);
         attacker.send(new AttackResult(result));
         target.getCurrentRoom().broadcast(new PlayerAttackBroadcast(attacker.getName(), result), attacker);
         log.info("combat.attack_resolved attacker={} target={} hit={} critical={} damage={}", attacker.getName(),
                 target.getName(), result.hit(), result.criticalHit(), result.damage());
 
-        if (result.hit() && CombatSystem.applyDamage(target, result.damage(), attacker)) {
+        if (result.hit() && combatSystem.applyDamage(target, result.damage(), attacker)) {
             // CombatEngine#onCharacterDied a déjà nettoyé encounter côté monstre ; côté
             // joueur en revanche, rien d'autre ne le fait ici — l'affrontement n'a jamais
             // eu
@@ -139,7 +156,7 @@ public class CombatEngine {
             // Relit pendingJoiners à l'intérieur du verrou, pour inclure tout rejoignant
             // concurrent arrivé pendant la fenêtre du coup d'ouverture (voir Javadoc de
             // CombatEncounter#establishInitiativeOrder).
-            encounter.establishInitiativeOrder(DiceSystem::rollInitiative);
+            encounter.establishInitiativeOrder(diceSystem::rollInitiative);
             // Pas d'avanceTurn() ici : le coup d'ouverture est hors ordre d'initiative,
             // donc
             // le participant à l'index 0 n'a encore rien joué dans l'ordre lui-même.
@@ -155,7 +172,7 @@ public class CombatEngine {
                 encounter = founder.getEncounter();
                 foundedHere = false;
             } else {
-                encounter = new CombatEncounter(founder.getCurrentRoom());
+                encounter = new CombatEncounter(founder.getCurrentRoom(), attributeSystem);
                 founder.setEncounter(encounter);
                 foundedHere = true;
             }
@@ -175,7 +192,7 @@ public class CombatEngine {
             encounter.joinBeforeInitiative(victim);
             victim.send(new MonsterAggroTriggered(founder.getName()));
             encounter.getRoom().broadcast(new MonsterAggroBroadcast(victim.getName(), founder.getName()), victim);
-            encounter.establishInitiativeOrder(DiceSystem::rollInitiative);
+            encounter.establishInitiativeOrder(diceSystem::rollInitiative);
             resolveFromCurrentTurn(encounter);
         }
         return encounter;
@@ -187,13 +204,13 @@ public class CombatEngine {
                 attacker.send(new NotYourTurn());
                 return;
             }
-            CombatResult result = CombatSystem.tryAttack(attacker, target);
+            CombatResult result = combatSystem.tryAttack(attacker, target);
             attacker.send(new AttackResult(result));
             encounter.getRoom().broadcast(new PlayerAttackBroadcast(attacker.getName(), result), attacker);
             log.info("combat.attack_resolved attacker={} target={} hit={} critical={} damage={}", attacker.getName(),
                     target.getName(), result.hit(), result.criticalHit(), result.damage());
             if (result.hit()) {
-                CombatSystem.applyDamage(target, result.damage(), attacker);
+                combatSystem.applyDamage(target, result.damage(), attacker);
             }
             continueOrEndTurn(encounter, attacker);
         }
@@ -232,7 +249,7 @@ public class CombatEngine {
 
     private void insertOrQueue(CombatEncounter encounter, AbstractCharacter character) {
         if (encounter.isInitiativeRolled()) {
-            int initiative = DiceSystem.rollInitiative(character);
+            int initiative = diceSystem.rollInitiative(character);
             encounter.insertLatecomer(character, initiative);
         } else {
             encounter.joinBeforeInitiative(character);
@@ -251,15 +268,15 @@ public class CombatEngine {
             if (livingPlayers.isEmpty()) {
                 break;
             }
-            CharacterInstance victim = AiSystem.chooseTarget(monster, livingPlayers);
+            CharacterInstance victim = aiSystem.chooseTarget(monster, livingPlayers);
 
-            CombatResult result = CombatSystem.tryAttack(monster, victim);
+            CombatResult result = combatSystem.tryAttack(monster, victim);
             victim.send(new MonsterAttackResult(monster.getName(), result));
             encounter.getRoom().broadcast(new MonsterAttackBroadcast(monster.getName(), result), victim);
             log.info("combat.monster_attack_resolved monster={} victim={} hit={} damage={}", monster.getName(),
                     victim.getName(), result.hit(), result.damage());
             if (result.hit()) {
-                CombatSystem.applyDamage(victim, result.damage(), monster);
+                combatSystem.applyDamage(victim, result.damage(), monster);
             }
             encounter.advanceTurn();
         }
@@ -287,7 +304,7 @@ public class CombatEngine {
         }
         encounter.remove(monster);
         monster.setEncounter(null);
-        AiSystem.clearTarget(monster);
+        aiSystem.clearTarget(monster);
         log.debug("combat.encounter_monster_removed monster={}", monster.getName());
     }
 

@@ -2,20 +2,19 @@ package fr.idev.mudserver.network.message.ingame;
 
 import java.util.stream.Collectors;
 
-import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
-import fr.idev.mudserver.domain.actor.system.AttributeSystem;
-import fr.idev.mudserver.domain.actor.system.InventorySystem;
-import fr.idev.mudserver.domain.actor.system.LevelingSystem;
 import fr.idev.mudserver.domain.actor.Skill;
 import fr.idev.mudserver.telnet.Ansi;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
-public record GamePlayerStats(CharacterInstance character) implements OutputTelnetMessage {
+public record GamePlayerStats(CharacterInstance character, int armorClass, int proficiencyBonus, int strength,
+        int strengthModifier, int dexterity, int dexterityModifier, int constitution, int constitutionModifier,
+        int intelligence, int intelligenceModifier, int wisdom, int wisdomModifier, int charisma,
+        int charismaModifier) implements OutputTelnetMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
@@ -26,19 +25,12 @@ public record GamePlayerStats(CharacterInstance character) implements OutputTeln
                 Ansi.player(c.getName()), c.component(AppearanceComponent.class).gender().label(),
                 c.component(LevelingComponent.class).level(),
                 c.component(AppearanceComponent.class).characterClass().label(), combat.currentHealth(),
-                combat.maxHealth(), InventorySystem.getArmorClass(c), LevelingSystem.getProficiencyBonus(c),
-                AttributeSystem.getAttribute(c, Attribute.STRENGTH), AttributeSystem.getModifier(c, Attribute.STRENGTH),
-                AttributeSystem.getAttribute(c, Attribute.DEXTERITY),
-                AttributeSystem.getModifier(c, Attribute.DEXTERITY),
-                AttributeSystem.getAttribute(c, Attribute.CONSTITUTION),
-                AttributeSystem.getModifier(c, Attribute.CONSTITUTION),
-                AttributeSystem.getAttribute(c, Attribute.INTELLIGENCE),
-                AttributeSystem.getModifier(c, Attribute.INTELLIGENCE),
-                AttributeSystem.getAttribute(c, Attribute.WISDOM), AttributeSystem.getModifier(c, Attribute.WISDOM),
-                AttributeSystem.getAttribute(c, Attribute.CHARISMA), AttributeSystem.getModifier(c, Attribute.CHARISMA),
+                combat.maxHealth(), armorClass, proficiencyBonus, strength, strengthModifier, dexterity,
+                dexterityModifier, constitution, constitutionModifier, intelligence, intelligenceModifier, wisdom,
+                wisdomModifier, charisma, charismaModifier,
                 c.component(AppearanceComponent.class).characterClass().primaryAbility().label(),
                 c.component(AppearanceComponent.class).characterClass().savingThrowProficiencies().stream().sorted()
-                        .map(Attribute::label).collect(Collectors.joining(", ")),
+                        .map(fr.idev.mudserver.domain.actor.Attribute::label).collect(Collectors.joining(", ")),
                 c.component(AppearanceComponent.class).characterClass().skillProficiencies().stream().sorted()
                         .map(Skill::label).collect(Collectors.joining(", "))));
     }

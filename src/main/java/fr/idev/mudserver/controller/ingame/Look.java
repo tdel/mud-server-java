@@ -19,6 +19,12 @@ import fr.idev.mudserver.network.message.ingame.RoomDescription;
 @Component
 public class Look implements ControllerHandler {
 
+    private final HexGridRenderer hexGridRenderer;
+
+    public Look(HexGridRenderer hexGridRenderer) {
+        this.hexGridRenderer = hexGridRenderer;
+    }
+
     @Override
     public String name() {
         return "look";
@@ -38,7 +44,7 @@ public class Look implements ControllerHandler {
     private RoomDescription describeRoom(CharacterInstance character) {
         RoomInstance room = character.getCurrentRoom();
 
-        List<String> gridLines = HexGridRenderer.render(room, character);
+        List<String> gridLines = hexGridRenderer.render(room, character);
         List<AbstractCharacter> nearby = room.occupantsWithin(character.getPosition(), HexGridRenderer.VIEWPORT_RADIUS);
 
         List<String> portalSummaries = room.getPortals().stream()

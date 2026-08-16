@@ -2,6 +2,9 @@ package fr.idev.mudserver.domain.actor.system;
 
 import java.util.Optional;
 
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
@@ -17,18 +20,27 @@ import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 
-public final class CombatSystem {
+@Service
+public class CombatSystem {
 
-    private CombatSystem() {
+    private final InventorySystem inventorySystem;
+    private final AttributeSystem attributeSystem;
+    private final LevelingSystem levelingSystem;
+
+    public CombatSystem(InventorySystem inventorySystem, AttributeSystem attributeSystem,
+            @Lazy LevelingSystem levelingSystem) {
+        this.inventorySystem = inventorySystem;
+        this.attributeSystem = attributeSystem;
+        this.levelingSystem = levelingSystem;
     }
 
-    public static void setTarget(AbstractCharacter target, AbstractCharacter attacker) {
+    public void setTarget(AbstractCharacter target, AbstractCharacter attacker) {
         attacker.updateComponent(CombatComponent.class, current -> {
             return new CombatComponent(current.currentHealth(), current.maxHealth(), target);
         });
     }
 
-    public static int heal(AbstractCharacter character, int amount) {
+    public int heal(AbstractCharacter character, int amount) {
         int[] healed = {0};
         character.updateComponent(CombatComponent.class, current -> {
             healed[0] = Math.min(amount, current.maxHealth() - current.currentHealth());
@@ -37,13 +49,13 @@ public final class CombatSystem {
         return healed[0];
     }
 
-    public static void increaseMaxHealth(AbstractCharacter character, int amount) {
+    public void increaseMaxHealth(AbstractCharacter character, int amount) {
         character.updateComponent(CombatComponent.class,
                 current -> new CombatComponent(current.currentHealth() + amount, current.maxHealth() + amount,
                         current.target()));
     }
 
-    public static CombatResult tryAttack(AbstractCharacter attacker, AbstractCharacter target) {
+    public CombatResult tryAttack(AbstractCharacter attacker, AbstractCharacter target) {
         return switch (attacker) {
             case CharacterInstance player -> playerAttack(player, target);
             case MonsterInstance monster -> monsterAttack(monster, target);
@@ -51,7 +63,7 @@ public final class CombatSystem {
         };
     }
 
-    public static boolean applyDamage(AbstractCharacter target, int amount, AbstractCharacter attacker) {
+    public boolean applyDamage(AbstractCharacter target, int amount, AbstractCharacter attacker) {
         boolean[] justDefeated = {false};
         target.updateComponent(CombatComponent.class, current -> {
             if (current.currentHealth() <= 0) {
@@ -70,7 +82,7 @@ public final class CombatSystem {
         return justDefeated[0];
     }
 
-    private static void publishDeath(AbstractCharacter target, AbstractCharacter attacker) {
+    private void publishDeath(AbstractCharacter target, AbstractCharacter attacker) {
         switch (target) {
             case CharacterInstance player ->
                 DomainEventPublisher.publish(new GamePlayerDied(player, (MonsterInstance) attacker));
@@ -80,21 +92,21 @@ public final class CombatSystem {
         }
     }
 
-    private static CombatResult playerAttack(CharacterInstance attacker, AbstractCharacter target) {
-        Optional<Item> weapon = InventorySystem.equippedWeapon(attacker);
+    private CombatResult playerAttack(CharacterInstance attacker, AbstractCharacter target) {
+        Optional<Item> weapon = inventorySystem.equippedWeapon(attacker);
         int weaponBonus = weapon.map(Item::getBonus).orElse(0);
         boolean weaponProficient = weapon.map(item -> attacker.component(AppearanceComponent.class).characterClass()
                 .weaponProficiencies().contains(item.getWeaponCategory())).orElse(true);
 
-        int strengthModifier = AttributeSystem.getModifier(attacker, Attribute.STRENGTH);
-        int attackBonus = strengthModifier + (weaponProficient ? LevelingSystem.getProficiencyBonus(attacker) : 0)
+        int strengthModifier = attributeSystem.getModifier(attacker, Attribute.STRENGTH);
+        int attackBonus = strengthModifier + (weaponProficient ? levelingSystem.getProficiencyBonus(attacker) : 0)
                 + weaponBonus;
-        boolean disadvantage = InventorySystem.isWearingNonProficientArmor(attacker);
+        boolean disadvantage = inventorySystem.isWearingNonProficientArmor(attacker);
 
         DiceRoll attackRoll = DiceRoller.rollD20(attackBonus, disadvantage);
         int naturalRoll = attackRoll.rolls()[0];
         boolean criticalHit = naturalRoll == 20;
-        int armorClass = InventorySystem.getArmorClass(target);
+        int armorClass = inventorySystem.getArmorClass(target);
         boolean hit = DiceRoller.resolveHit(naturalRoll, attackRoll.total(), armorClass);
 
         if (!hit) {
@@ -106,7 +118,7 @@ public final class CombatSystem {
                 disadvantage);
     }
 
-    private static int playerDamage(Optional<Item> weapon, int strengthModifier, boolean criticalHit) {
+    private int playerDamage(Optional<Item> weapon, int strengthModifier, boolean criticalHit) {
         if (weapon.isEmpty()) {
             // Attaque à mains nues (SRD) : 1 + modificateur de FOR, pas de dé donc rien à
             // doubler en cas de critique.
@@ -119,14 +131,14 @@ public final class CombatSystem {
         return Math.max(0, DiceRoller.roll(new DiceExpression(diceCount, base.sides(), modifier)).total());
     }
 
-    private static CombatResult monsterAttack(MonsterInstance attacker, AbstractCharacter target) {
-        int strengthModifier = AttributeSystem.getModifier(attacker, Attribute.STRENGTH);
+    private CombatResult monsterAttack(MonsterInstance attacker, AbstractCharacter target) {
+        int strengthModifier = attributeSystem.getModifier(attacker, Attribute.STRENGTH);
         int attackBonus = strengthModifier + 2;
 
         DiceRoll attackRoll = DiceRoller.roll(new DiceExpression(1, 20, attackBonus));
         int naturalRoll = attackRoll.rolls()[0];
         boolean criticalHit = naturalRoll == 20;
-        int armorClass = InventorySystem.getArmorClass(target);
+        int armorClass = inventorySystem.getArmorClass(target);
         boolean hit = DiceRoller.resolveHit(naturalRoll, attackRoll.total(), armorClass);
 
         if (!hit) {
@@ -137,7 +149,7 @@ public final class CombatSystem {
         return new CombatResult(target.getName(), true, criticalHit, attackRoll.total(), armorClass, damage, false);
     }
 
-    private static int monsterDamage(MonsterInstance attacker, int strengthModifier, boolean criticalHit) {
+    private int monsterDamage(MonsterInstance attacker, int strengthModifier, boolean criticalHit) {
         DiceExpression base = DiceExpression.parse(attacker.getNaturalDamageDice());
         int diceCount = criticalHit ? base.count() * 2 : base.count();
         return Math.max(0, DiceRoller.roll(new DiceExpression(diceCount, base.sides(), strengthModifier)).total());

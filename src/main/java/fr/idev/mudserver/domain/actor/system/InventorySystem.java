@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.ArmorProficiency;
 import fr.idev.mudserver.domain.actor.Attribute;
@@ -22,17 +24,21 @@ import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.item.EquipmentSlot;
 import fr.idev.mudserver.domain.item.Item;
 
-public final class InventorySystem {
+@Service
+public class InventorySystem {
 
-    private InventorySystem() {
+    private final AttributeSystem attributeSystem;
+
+    public InventorySystem(AttributeSystem attributeSystem) {
+        this.attributeSystem = attributeSystem;
     }
 
-    public static void addGold(CharacterInstance character, int amount) {
+    public void addGold(CharacterInstance character, int amount) {
         character.updateComponent(InventoryComponent.class,
                 current -> new InventoryComponent(current.items(), current.gold() + amount));
     }
 
-    public static boolean trySpendGold(CharacterInstance character, int amount) {
+    public boolean trySpendGold(CharacterInstance character, int amount) {
         boolean[] spent = {false};
         character.updateComponent(InventoryComponent.class, current -> {
             if (current.gold() < amount) {
@@ -44,7 +50,7 @@ public final class InventorySystem {
         return spent[0];
     }
 
-    public static void addItem(CharacterInstance character, Item item) {
+    public void addItem(CharacterInstance character, Item item) {
         character.updateComponent(InventoryComponent.class, current -> {
             List<Item> newItems = new ArrayList<>(current.items());
             newItems.add(item);
@@ -52,7 +58,7 @@ public final class InventorySystem {
         });
     }
 
-    public static void removeItem(CharacterInstance character, Item item) {
+    public void removeItem(CharacterInstance character, Item item) {
         character.updateComponent(InventoryComponent.class, current -> {
             List<Item> newItems = new ArrayList<>(current.items());
             newItems.remove(item);
@@ -60,23 +66,23 @@ public final class InventorySystem {
         });
     }
 
-    public static void replaceItems(CharacterInstance character, List<Item> newItems) {
+    public void replaceItems(CharacterInstance character, List<Item> newItems) {
         character.updateComponent(InventoryComponent.class,
                 current -> new InventoryComponent(List.copyOf(newItems), current.gold()));
     }
 
-    public static void receiveGold(CharacterInstance character, int amount) {
+    public void receiveGold(CharacterInstance character, int amount) {
         addGold(character, amount);
         DomainEventPublisher.publish(new CharacterReceivedGold(character, amount));
     }
 
-    public static void receiveLootItem(CharacterInstance character, Item item) {
+    public void receiveLootItem(CharacterInstance character, Item item) {
         item.setCharacter(character);
         addItem(character, item);
         DomainEventPublisher.publish(new CharacterLootedItem(character, item));
     }
 
-    public static boolean buyItem(CharacterInstance character, Item item, int price) {
+    public boolean buyItem(CharacterInstance character, Item item, int price) {
         if (!trySpendGold(character, price)) {
             return false;
         }
@@ -87,7 +93,7 @@ public final class InventorySystem {
         return true;
     }
 
-    public static Optional<EquipmentSlot> equip(CharacterInstance character, Item item) {
+    public Optional<EquipmentSlot> equip(CharacterInstance character, Item item) {
         Optional<EquipmentSlot> slot = item.getType().equipmentSlot();
 
         if (slot.isEmpty()) {
@@ -107,17 +113,17 @@ public final class InventorySystem {
         return slot;
     }
 
-    public static void unequip(CharacterInstance character, Item item) {
+    public void unequip(CharacterInstance character, Item item) {
         item.setSlot(null);
         DomainEventPublisher.publish(new GamePlayerUnequippedItem(character, item));
     }
 
-    public static void discard(CharacterInstance character, Item item) {
+    public void discard(CharacterInstance character, Item item) {
         removeItem(character, item);
         DomainEventPublisher.publish(new ItemDiscarded(character, item));
     }
 
-    public static int getArmorClass(AbstractCharacter character) {
+    public int getArmorClass(AbstractCharacter character) {
         return switch (character) {
             case CharacterInstance player -> playerArmorClass(player);
             case MonsterInstance monster -> monsterArmorClass(monster);
@@ -125,18 +131,18 @@ public final class InventorySystem {
         };
     }
 
-    public static boolean isWearingNonProficientArmor(CharacterInstance character) {
-        return component(character).equippedItems().stream().map(InventorySystem::requiredArmorProficiency)
+    public boolean isWearingNonProficientArmor(CharacterInstance character) {
+        return component(character).equippedItems().stream().map(this::requiredArmorProficiency)
                 .anyMatch(required -> required.isPresent() && !character.component(AppearanceComponent.class)
                         .characterClass().armorProficiencies().contains(required.get()));
     }
 
-    public static Optional<Item> equippedWeapon(CharacterInstance character) {
+    public Optional<Item> equippedWeapon(CharacterInstance character) {
         return component(character).equippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.WEAPON)
                 .findFirst();
     }
 
-    private static int playerArmorClass(CharacterInstance character) {
+    private int playerArmorClass(CharacterInstance character) {
         int ac = component(character).equippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.CHEST)
                 .findFirst().map(item -> armorAc(character, item)).orElseGet(() -> baseArmorClass(character));
 
@@ -145,7 +151,7 @@ public final class InventorySystem {
                         .mapToInt(item -> item.getBaseAc() + item.getBonus()).sum();
     }
 
-    private static int monsterArmorClass(MonsterInstance monster) {
+    private int monsterArmorClass(MonsterInstance monster) {
         if (monster.getTemplate() == null) {
             throw new IllegalStateException("MonsterInstance " + monster.getId() + " has no MonsterTemplate attached");
         }
@@ -153,12 +159,12 @@ public final class InventorySystem {
         return natural != null ? natural : baseArmorClass(monster);
     }
 
-    private static int baseArmorClass(AbstractCharacter character) {
-        return 10 + AttributeSystem.getModifier(character, Attribute.DEXTERITY);
+    private int baseArmorClass(AbstractCharacter character) {
+        return 10 + attributeSystem.getModifier(character, Attribute.DEXTERITY);
     }
 
-    private static int armorAc(CharacterInstance character, Item armor) {
-        int dexMod = AttributeSystem.getModifier(character, Attribute.DEXTERITY);
+    private int armorAc(CharacterInstance character, Item armor) {
+        int dexMod = attributeSystem.getModifier(character, Attribute.DEXTERITY);
         int baseAndBonus = armor.getBaseAc() + armor.getBonus();
         return switch (armor.getArmorCategory()) {
             case LIGHT -> baseAndBonus + dexMod;
@@ -167,7 +173,7 @@ public final class InventorySystem {
         };
     }
 
-    private static Optional<ArmorProficiency> requiredArmorProficiency(Item item) {
+    private Optional<ArmorProficiency> requiredArmorProficiency(Item item) {
         return switch (item.getType()) {
             case ARMOR, HELMET, PANTS, BOOTS, GLOVES -> Optional.of(ArmorProficiency.of(item.getArmorCategory()));
             case SHIELD -> Optional.of(ArmorProficiency.SHIELDS);
@@ -175,7 +181,7 @@ public final class InventorySystem {
         };
     }
 
-    private static InventoryComponent component(CharacterInstance character) {
+    private InventoryComponent component(CharacterInstance character) {
         return character.component(InventoryComponent.class);
     }
 }

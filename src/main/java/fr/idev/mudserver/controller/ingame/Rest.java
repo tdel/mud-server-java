@@ -30,6 +30,12 @@ import fr.idev.mudserver.network.message.ingame.ProvisionSelection;
 @Component
 public class Rest implements ControllerHandler {
 
+    private final RestSystem restSystem;
+
+    public Rest(RestSystem restSystem) {
+        this.restSystem = restSystem;
+    }
+
     @Override
     public String name() {
         return "rest";
@@ -53,7 +59,7 @@ public class Rest implements ControllerHandler {
     }
 
     private void restShort(Connection connection, CharacterInstance character) {
-        switch (RestSystem.doShortRest(character)) {
+        switch (restSystem.doShortRest(character)) {
             case RestOutcome.Rested ignored -> {
             }
             case RestOutcome.InCombat ignored -> connection.send(new CannotRestInCombat());
@@ -126,7 +132,7 @@ public class Rest implements ControllerHandler {
     }
 
     private void finalizeLongRest(Connection connection, CharacterInstance character, List<Item> selected) {
-        switch (RestSystem.doLongRest(character, selected)) {
+        switch (restSystem.doLongRest(character, selected)) {
             case RestOutcome.Rested ignored -> {
             }
             case RestOutcome.InCombat ignored -> connection.send(new CannotRestInCombat());

@@ -20,6 +20,12 @@ public class Save implements ControllerHandler {
 
     private static final String USAGE = "save <attribute> <dc>";
 
+    private final DiceSystem diceSystem;
+
+    public Save(DiceSystem diceSystem) {
+        this.diceSystem = diceSystem;
+    }
+
     @Override
     public String name() {
         return "save";
@@ -48,7 +54,7 @@ public class Save implements ControllerHandler {
         }
 
         CharacterInstance character = connection.character();
-        connection.send(new CheckOutcome(DiceSystem.save(character, attribute, dc)));
+        connection.send(new CheckOutcome(diceSystem.save(character, attribute, dc)));
     }
 
     private Attribute parseAttribute(String input) {

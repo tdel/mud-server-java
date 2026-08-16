@@ -15,6 +15,9 @@ import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
+import fr.idev.mudserver.domain.actor.system.AttributeSystem;
+import fr.idev.mudserver.domain.actor.system.InventorySystem;
+import fr.idev.mudserver.domain.actor.system.LevelingSystem;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -33,10 +36,17 @@ public class CharacterCreate implements ControllerHandler {
 
     private final WorldInstanceService worldInstanceService;
     private final CharSelectStatus charSelectStatus;
+    private final InventorySystem inventorySystem;
+    private final LevelingSystem levelingSystem;
+    private final AttributeSystem attributeSystem;
 
-    public CharacterCreate(WorldInstanceService worldInstanceService, CharSelectStatus charSelectStatus) {
+    public CharacterCreate(WorldInstanceService worldInstanceService, CharSelectStatus charSelectStatus,
+            InventorySystem inventorySystem, LevelingSystem levelingSystem, AttributeSystem attributeSystem) {
         this.worldInstanceService = worldInstanceService;
         this.charSelectStatus = charSelectStatus;
+        this.inventorySystem = inventorySystem;
+        this.levelingSystem = levelingSystem;
+        this.attributeSystem = attributeSystem;
     }
 
     @Override
@@ -157,6 +167,19 @@ public class CharacterCreate implements ControllerHandler {
         CharacterInstance character = instance.createCharacter(account, name, gender, race, characterClass);
 
         connection.send(new CharacterCreated(name));
-        connection.send(new GamePlayerStats(character));
+        connection.send(new GamePlayerStats(character, inventorySystem.getArmorClass(character),
+                levelingSystem.getProficiencyBonus(character),
+                attributeSystem.getAttribute(character, Attribute.STRENGTH),
+                attributeSystem.getModifier(character, Attribute.STRENGTH),
+                attributeSystem.getAttribute(character, Attribute.DEXTERITY),
+                attributeSystem.getModifier(character, Attribute.DEXTERITY),
+                attributeSystem.getAttribute(character, Attribute.CONSTITUTION),
+                attributeSystem.getModifier(character, Attribute.CONSTITUTION),
+                attributeSystem.getAttribute(character, Attribute.INTELLIGENCE),
+                attributeSystem.getModifier(character, Attribute.INTELLIGENCE),
+                attributeSystem.getAttribute(character, Attribute.WISDOM),
+                attributeSystem.getModifier(character, Attribute.WISDOM),
+                attributeSystem.getAttribute(character, Attribute.CHARISMA),
+                attributeSystem.getModifier(character, Attribute.CHARISMA)));
     }
 }

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.stereotype.Service;
+
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
@@ -14,23 +16,27 @@ import fr.idev.mudserver.domain.actor.AbstractNpc;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.system.MovementSystem;
 
-public final class HexGridRenderer {
+@Service
+public class HexGridRenderer {
 
     public static final int VIEWPORT_RADIUS = 5;
 
     public static final String LEGEND = "@ = you   p = other player   m = monster   n = npc   # = portal   "
             + ". = floor   ~ = out of bounds   X = destination   - = path";
 
-    private HexGridRenderer() {
+    private final MovementSystem movementSystem;
+
+    public HexGridRenderer(MovementSystem movementSystem) {
+        this.movementSystem = movementSystem;
     }
 
-    public static List<String> render(RoomInstance room, CharacterInstance viewer) {
+    public List<String> render(RoomInstance room, CharacterInstance viewer) {
         return render(room, viewer, VIEWPORT_RADIUS);
     }
 
-    static List<String> render(RoomInstance room, CharacterInstance viewer, int radius) {
+    List<String> render(RoomInstance room, CharacterInstance viewer, int radius) {
         HexCoordinate center = viewer.getPosition();
-        List<HexCoordinate> path = MovementSystem.remainingPath(viewer);
+        List<HexCoordinate> path = movementSystem.remainingPath(viewer);
         Set<HexCoordinate> pathCells = new HashSet<>(path);
         HexCoordinate destination = path.isEmpty() ? null : path.get(path.size() - 1);
         List<String> lines = new ArrayList<>();
@@ -56,8 +62,8 @@ public final class HexGridRenderer {
         return lines;
     }
 
-    private static char glyphFor(RoomInstance room, CharacterInstance viewer, HexCoordinate cell,
-            Set<HexCoordinate> pathCells, HexCoordinate destination) {
+    private char glyphFor(RoomInstance room, CharacterInstance viewer, HexCoordinate cell, Set<HexCoordinate> pathCells,
+            HexCoordinate destination) {
         if (cell.equals(viewer.getPosition())) {
             return '@';
         }

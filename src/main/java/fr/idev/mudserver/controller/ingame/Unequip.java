@@ -21,6 +21,12 @@ import fr.idev.mudserver.network.message.ingame.ItemUnequipped;
 @Component
 public class Unequip implements ControllerHandler {
 
+    private final InventorySystem inventorySystem;
+
+    public Unequip(InventorySystem inventorySystem) {
+        this.inventorySystem = inventorySystem;
+    }
+
     @Override
     public String name() {
         return "unequip";
@@ -55,7 +61,7 @@ public class Unequip implements ControllerHandler {
         }
 
         Rarity templateRarity = item.get().getRarity();
-        InventorySystem.unequip(character, item.get());
+        inventorySystem.unequip(character, item.get());
 
         connection.send(new ItemUnequipped(templateName, templateRarity));
     }

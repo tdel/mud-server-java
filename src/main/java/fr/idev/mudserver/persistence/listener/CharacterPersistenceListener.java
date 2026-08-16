@@ -45,10 +45,15 @@ public class CharacterPersistenceListener {
 
     private final CharacterDao characterDao;
     private final LevelCatalog levelCatalog;
+    private final CombatSystem combatSystem;
+    private final LevelingSystem levelingSystem;
 
-    public CharacterPersistenceListener(CharacterDao characterDao, LevelCatalog levelCatalog) {
+    public CharacterPersistenceListener(CharacterDao characterDao, LevelCatalog levelCatalog, CombatSystem combatSystem,
+            LevelingSystem levelingSystem) {
         this.characterDao = characterDao;
         this.levelCatalog = levelCatalog;
+        this.combatSystem = combatSystem;
+        this.levelingSystem = levelingSystem;
     }
 
     @EventListener
@@ -67,7 +72,7 @@ public class CharacterPersistenceListener {
         while (character.component(LevelingComponent.class).level() < levelCatalog.maxLevel()
                 && character.component(LevelingComponent.class).xp() >= levelCatalog
                         .xpRequiredForLevel(character.component(LevelingComponent.class).level() + 1)) {
-            LevelingSystem.applyLevelUp(character);
+            levelingSystem.applyLevelUp(character);
         }
 
         characterDao.update(character);
@@ -105,8 +110,8 @@ public class CharacterPersistenceListener {
     void onCharacterDied(CharacterDied event) {
         CharacterInstance killer = event.killer();
         int xpReward = event.character().getTemplate().getXpReward();
-        LevelingSystem.gainXp(killer, xpReward);
-        CombatSystem.setTarget(null, killer);
+        levelingSystem.gainXp(killer, xpReward);
+        combatSystem.setTarget(null, killer);
         log.info("combat.kill_credited killer={} monster={} xpReward={}", killer.getName(), event.character().getName(),
                 xpReward);
     }
@@ -118,7 +123,7 @@ public class CharacterPersistenceListener {
         RoomInstance startingRoom = character.getWorldInstance().startingRoomInstance()
                 .orElseThrow(() -> new IllegalStateException("Aucune starting room configurée"));
 
-        CombatSystem.heal(character, character.component(CombatComponent.class).maxHealth());
+        combatSystem.heal(character, character.component(CombatComponent.class).maxHealth());
         character.moveToRoom(startingRoom);
         characterDao.update(character);
 

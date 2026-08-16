@@ -56,10 +56,11 @@ public class WorldInstanceService {
     private final ItemPersistenceListener itemService;
     private final AccountDao accountDao;
     private final CharacterDao characterDao;
+    private final InventorySystem inventorySystem;
 
     public WorldInstanceService(WorldTemplateCatalog worldTemplateService, WorldInstanceDao worldInstanceDao,
             MonsterCatalog monsterService, NpcCatalog npcService, ItemPersistenceListener itemService,
-            AccountDao accountDao, CharacterDao characterDao) {
+            AccountDao accountDao, CharacterDao characterDao, InventorySystem inventorySystem) {
         this.worldTemplateService = worldTemplateService;
         this.worldInstanceDao = worldInstanceDao;
         this.monsterService = monsterService;
@@ -67,6 +68,7 @@ public class WorldInstanceService {
         this.itemService = itemService;
         this.accountDao = accountDao;
         this.characterDao = characterDao;
+        this.inventorySystem = inventorySystem;
     }
 
     public WorldInstance getOrMaterialize(UUID worldInstanceId) {
@@ -123,7 +125,7 @@ public class WorldInstanceService {
     public void enterGame(CharacterInstance player) {
         WorldInstance instance = player.getWorldInstance();
 
-        InventorySystem.replaceItems(player, itemService.loadInventory(player));
+        inventorySystem.replaceItems(player, itemService.loadInventory(player));
         player.getCurrentRoom().join(player);
 
         instance.addPlayer(player);

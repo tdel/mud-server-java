@@ -14,6 +14,12 @@ import fr.idev.mudserver.network.message.ingame.MovementStopped;
 @Component
 public class Stop implements ControllerHandler {
 
+    private final MovementSystem movementSystem;
+
+    public Stop(MovementSystem movementSystem) {
+        this.movementSystem = movementSystem;
+    }
+
     @Override
     public String name() {
         return "stop";
@@ -27,7 +33,7 @@ public class Stop implements ControllerHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
-        MovementSystem.stopMovement(character);
+        movementSystem.stopMovement(character);
         connection.send(new MovementStopped());
     }
 }

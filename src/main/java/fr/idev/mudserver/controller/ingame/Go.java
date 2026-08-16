@@ -20,6 +20,12 @@ public class Go implements ControllerHandler {
     private static final int DEFAULT_STEP_COUNT = 1;
     private static final int MAX_STEP_COUNT = 20;
 
+    private final MovementSystem movementSystem;
+
+    public Go(MovementSystem movementSystem) {
+        this.movementSystem = movementSystem;
+    }
+
     @Override
     public String name() {
         return "go";
@@ -53,7 +59,7 @@ public class Go implements ControllerHandler {
         }
         requestedCells = Math.min(requestedCells, MAX_STEP_COUNT);
 
-        MovementSystem.startMovement(character, direction.get(), requestedCells);
+        movementSystem.startMovement(character, direction.get(), requestedCells);
     }
 
     private int parsePositiveInt(String token) {

@@ -20,6 +20,12 @@ public class Check implements ControllerHandler {
 
     private static final String USAGE = "check <skill> <dc>";
 
+    private final DiceSystem diceSystem;
+
+    public Check(DiceSystem diceSystem) {
+        this.diceSystem = diceSystem;
+    }
+
     @Override
     public String name() {
         return "check";
@@ -48,7 +54,7 @@ public class Check implements ControllerHandler {
         }
 
         CharacterInstance character = connection.character();
-        connection.send(new CheckOutcome(DiceSystem.check(character, skill, dc)));
+        connection.send(new CheckOutcome(diceSystem.check(character, skill, dc)));
     }
 
     private Skill parseSkill(String input) {

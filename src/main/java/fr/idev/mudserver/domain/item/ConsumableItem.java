@@ -24,16 +24,18 @@ public class ConsumableItem extends ItemTemplate {
         this.effectDice = effectDice;
     }
 
-    public void consume(CharacterInstance character, Item item) {
+    public void consume(CharacterInstance character, Item item, CombatSystem combatSystem,
+            InventorySystem inventorySystem) {
         switch (effect) {
-            case HEALING -> heal(character, item);
+            case HEALING -> heal(character, item, combatSystem, inventorySystem);
         }
     }
 
-    private void heal(CharacterInstance character, Item item) {
+    private void heal(CharacterInstance character, Item item, CombatSystem combatSystem,
+            InventorySystem inventorySystem) {
         int amount = DiceRoller.roll(effectDice).total();
-        int healed = CombatSystem.heal(character, amount);
-        InventorySystem.removeItem(character, item);
+        int healed = combatSystem.heal(character, amount);
+        inventorySystem.removeItem(character, item);
         DomainEventPublisher.publish(new GamePlayerUsedPotion(character, item, healed));
     }
 }

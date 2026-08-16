@@ -28,6 +28,12 @@ import fr.idev.mudserver.network.message.ingame.TargetNotFound;
 @Component
 public class Talk implements ControllerHandler {
 
+    private final ShopSystem shopSystem;
+
+    public Talk(ShopSystem shopSystem) {
+        this.shopSystem = shopSystem;
+    }
+
     @Override
     public String name() {
         return "talk";
@@ -105,7 +111,7 @@ public class Talk implements ControllerHandler {
                         return;
                     }
 
-                    switch (ShopSystem.sell(npc, character, trimmed)) {
+                    switch (shopSystem.sell(npc, character, trimmed)) {
                         case NpcSellerInstance.PurchaseOutcome.Purchased ignored -> {
                         }
                         case NpcSellerInstance.PurchaseOutcome.EntryNotFound ignored ->

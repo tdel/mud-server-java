@@ -41,13 +41,15 @@ public class MovementEngine extends Thread {
 
     private final Look lookAction;
     private final ExecutorService virtualThreadExecutor;
+    private final MovementSystem movementSystem;
     private final Map<UUID, AbstractCharacter> movingCharacters = new ConcurrentHashMap<>();
     private final Map<UUID, CompletableFuture<Void>> pendingNotifications = new ConcurrentHashMap<>();
 
-    public MovementEngine(Look lookAction, ExecutorService virtualThreadExecutor) {
+    public MovementEngine(Look lookAction, ExecutorService virtualThreadExecutor, MovementSystem movementSystem) {
         super("movement-ticker");
         this.lookAction = lookAction;
         this.virtualThreadExecutor = virtualThreadExecutor;
+        this.movementSystem = movementSystem;
         setDaemon(true);
     }
 
@@ -85,7 +87,7 @@ public class MovementEngine extends Thread {
     }
 
     private void processIfDue(AbstractCharacter character, long now) {
-        switch (MovementSystem.updatePosition(character, now)) {
+        switch (movementSystem.updatePosition(character, now)) {
             case NO_MOVEMENT -> {
             }
             case STEPPED -> notifyMoved(character);

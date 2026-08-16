@@ -22,6 +22,12 @@ import fr.idev.mudserver.network.message.ingame.ItemNotEquippable;
 @Component
 public class Equip implements ControllerHandler {
 
+    private final InventorySystem inventorySystem;
+
+    public Equip(InventorySystem inventorySystem) {
+        this.inventorySystem = inventorySystem;
+    }
+
     @Override
     public String name() {
         return "equip";
@@ -49,7 +55,7 @@ public class Equip implements ControllerHandler {
         }
         Item item = itemQuery.get();
 
-        Optional<EquipmentSlot> slotQuery = InventorySystem.equip(character, item);
+        Optional<EquipmentSlot> slotQuery = inventorySystem.equip(character, item);
         if (slotQuery.isEmpty()) {
             connection.send(new ItemNotEquippable(item));
             return;

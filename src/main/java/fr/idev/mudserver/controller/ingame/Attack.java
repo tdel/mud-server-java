@@ -21,9 +21,11 @@ import fr.idev.mudserver.network.message.ingame.TargetNotFound;
 public class Attack implements ControllerHandler {
 
     private final CombatEngine combatEngine;
+    private final CombatSystem combatSystem;
 
-    public Attack(CombatEngine combatEngine) {
+    public Attack(CombatEngine combatEngine, CombatSystem combatSystem) {
         this.combatEngine = combatEngine;
+        this.combatSystem = combatSystem;
     }
 
     @Override
@@ -54,7 +56,7 @@ public class Attack implements ControllerHandler {
             }
 
             if (!character.getCurrentRoom().getMonsters().contains(target)) {
-                CombatSystem.setTarget(null, character);
+                combatSystem.setTarget(null, character);
                 connection.send(new TargetNotFound(target.getName()));
                 return;
             }
@@ -65,7 +67,7 @@ public class Attack implements ControllerHandler {
                 return;
             }
             target = found.get();
-            CombatSystem.setTarget(target, character);
+            combatSystem.setTarget(target, character);
         }
 
         combatEngine.attack(character, (MonsterInstance) target);

@@ -20,6 +20,12 @@ import fr.idev.mudserver.network.message.ingame.ItemNotCarried;
 @Component
 public class Drop implements ControllerHandler {
 
+    private final InventorySystem inventorySystem;
+
+    public Drop(InventorySystem inventorySystem) {
+        this.inventorySystem = inventorySystem;
+    }
+
     @Override
     public String name() {
         return "drop";
@@ -50,7 +56,7 @@ public class Drop implements ControllerHandler {
 
         String templateName = item.getName();
         Rarity templateRarity = item.getRarity();
-        InventorySystem.discard(character, item);
+        inventorySystem.discard(character, item);
 
         connection.send(new ItemDiscarded(templateName, templateRarity));
     }

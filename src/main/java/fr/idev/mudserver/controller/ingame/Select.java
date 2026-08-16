@@ -18,6 +18,12 @@ import fr.idev.mudserver.network.message.ingame.TargetSelected;
 @Component
 public class Select implements ControllerHandler {
 
+    private final CombatSystem combatSystem;
+
+    public Select(CombatSystem combatSystem) {
+        this.combatSystem = combatSystem;
+    }
+
     @Override
     public String name() {
         return "select";
@@ -46,7 +52,7 @@ public class Select implements ControllerHandler {
 
         MonsterInstance target = targetQuery.get();
 
-        CombatSystem.setTarget(target, character);
+        combatSystem.setTarget(target, character);
         connection.send(new TargetSelected(target.getName()));
     }
 }

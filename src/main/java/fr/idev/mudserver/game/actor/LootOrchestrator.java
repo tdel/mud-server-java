@@ -19,6 +19,12 @@ public class LootOrchestrator {
 
     private static final Logger log = LoggerFactory.getLogger(LootOrchestrator.class);
 
+    private final InventorySystem inventorySystem;
+
+    public LootOrchestrator(InventorySystem inventorySystem) {
+        this.inventorySystem = inventorySystem;
+    }
+
     @EventListener
     @Order(3)
     @Transactional
@@ -29,12 +35,12 @@ public class LootOrchestrator {
         LootResult loot = template.rollLoot(killer);
 
         if (loot.gold() > 0) {
-            InventorySystem.receiveGold(killer, loot.gold());
+            inventorySystem.receiveGold(killer, loot.gold());
             log.info("loot.gold_dropped killer={} amount={}", killer.getName(), loot.gold());
         }
 
         for (Item item : loot.items()) {
-            InventorySystem.receiveLootItem(killer, item);
+            inventorySystem.receiveLootItem(killer, item);
             log.info("loot.item_dropped killer={} item={}", killer.getName(), item.getName());
         }
     }

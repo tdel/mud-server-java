@@ -4,6 +4,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.stereotype.Service;
+
 import fr.idev.mudserver.config.GameConfig;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.component.RestComponent;
@@ -15,24 +17,32 @@ import fr.idev.mudserver.domain.actor.instance.RestOutcome;
 import fr.idev.mudserver.domain.item.FoodItem;
 import fr.idev.mudserver.domain.item.Item;
 
-public final class RestSystem {
+@Service
+public class RestSystem {
 
-    private RestSystem() {
+    private final InventorySystem inventorySystem;
+    private final CombatSystem combatSystem;
+    private final LevelingSystem levelingSystem;
+
+    public RestSystem(InventorySystem inventorySystem, CombatSystem combatSystem, LevelingSystem levelingSystem) {
+        this.inventorySystem = inventorySystem;
+        this.combatSystem = combatSystem;
+        this.levelingSystem = levelingSystem;
     }
 
-    public static boolean canTakeShortRest(CharacterInstance character) {
+    public boolean canTakeShortRest(CharacterInstance character) {
         return component(character).shortRestCount() < CharacterInstance.MAX_SHORT_RESTS_BEFORE_LONG_REST;
     }
 
-    public static void incrementShortRestCount(CharacterInstance character) {
+    public void incrementShortRestCount(CharacterInstance character) {
         character.updateComponent(RestComponent.class, current -> new RestComponent(current.shortRestCount() + 1));
     }
 
-    public static void resetShortRestCount(CharacterInstance character) {
+    public void resetShortRestCount(CharacterInstance character) {
         character.updateComponent(RestComponent.class, current -> new RestComponent(0));
     }
 
-    public static RestOutcome doShortRest(CharacterInstance initiator) {
+    public RestOutcome doShortRest(CharacterInstance initiator) {
         if (initiator.isInCombat()) {
             return new RestOutcome.InCombat();
         }
@@ -42,8 +52,8 @@ public final class RestSystem {
 
         Map<CharacterInstance, Integer> healedAmounts = new LinkedHashMap<>();
         for (CharacterInstance character : initiator.getWorldInstance().onlineCharacters()) {
-            int amount = LevelingSystem.hitDieRecovery(character);
-            healedAmounts.put(character, CombatSystem.heal(character, amount));
+            int amount = levelingSystem.hitDieRecovery(character);
+            healedAmounts.put(character, combatSystem.heal(character, amount));
             incrementShortRestCount(character);
         }
 
@@ -51,7 +61,7 @@ public final class RestSystem {
         return new RestOutcome.Rested(healedAmounts);
     }
 
-    public static RestOutcome doLongRest(CharacterInstance initiator, List<Item> selectedFood) {
+    public RestOutcome doLongRest(CharacterInstance initiator, List<Item> selectedFood) {
         if (initiator.isInCombat()) {
             return new RestOutcome.InCombat();
         }
@@ -63,13 +73,13 @@ public final class RestSystem {
         }
 
         for (Item food : selectedFood) {
-            InventorySystem.removeItem(initiator, food);
+            inventorySystem.removeItem(initiator, food);
         }
 
         Map<CharacterInstance, Integer> healedAmounts = new LinkedHashMap<>();
         for (CharacterInstance character : initiator.getWorldInstance().onlineCharacters()) {
             healedAmounts.put(character,
-                    CombatSystem.heal(character, character.component(CombatComponent.class).maxHealth()));
+                    combatSystem.heal(character, character.component(CombatComponent.class).maxHealth()));
             resetShortRestCount(character);
         }
 
@@ -77,7 +87,7 @@ public final class RestSystem {
         return new RestOutcome.Rested(healedAmounts);
     }
 
-    private static RestComponent component(CharacterInstance character) {
+    private RestComponent component(CharacterInstance character) {
         return character.component(RestComponent.class);
     }
 }

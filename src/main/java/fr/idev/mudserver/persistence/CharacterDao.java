@@ -30,9 +30,11 @@ import fr.idev.mudserver.persistence.jooq.tables.records.CharacterRecord;
 public class CharacterDao {
 
     private final DSLContext dsl;
+    private final AttributeSystem attributeSystem;
 
-    public CharacterDao(DSLContext dsl) {
+    public CharacterDao(DSLContext dsl, AttributeSystem attributeSystem) {
         this.dsl = dsl;
+        this.attributeSystem = attributeSystem;
     }
 
     public void insert(CharacterInstance character) {
@@ -50,12 +52,12 @@ public class CharacterDao {
                         character.component(AppearanceComponent.class).race().name(),
                         character.component(AppearanceComponent.class).characterClass().name(),
                         character.component(LevelingComponent.class).level(), combat.currentHealth(),
-                        combat.maxHealth(), AttributeSystem.getAttribute(character, Attribute.STRENGTH),
-                        AttributeSystem.getAttribute(character, Attribute.DEXTERITY),
-                        AttributeSystem.getAttribute(character, Attribute.CONSTITUTION),
-                        AttributeSystem.getAttribute(character, Attribute.INTELLIGENCE),
-                        AttributeSystem.getAttribute(character, Attribute.WISDOM),
-                        AttributeSystem.getAttribute(character, Attribute.CHARISMA),
+                        combat.maxHealth(), attributeSystem.getAttribute(character, Attribute.STRENGTH),
+                        attributeSystem.getAttribute(character, Attribute.DEXTERITY),
+                        attributeSystem.getAttribute(character, Attribute.CONSTITUTION),
+                        attributeSystem.getAttribute(character, Attribute.INTELLIGENCE),
+                        attributeSystem.getAttribute(character, Attribute.WISDOM),
+                        attributeSystem.getAttribute(character, Attribute.CHARISMA),
                         character.component(LevelingComponent.class).xp(),
                         character.component(InventoryComponent.class).gold(),
                         character.component(RestComponent.class).shortRestCount(), worldInstanceId)

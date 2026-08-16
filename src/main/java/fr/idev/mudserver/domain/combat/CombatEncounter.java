@@ -15,6 +15,7 @@ import fr.idev.mudserver.domain.actor.system.AttributeSystem;
 public final class CombatEncounter {
 
     private final RoomInstance room;
+    private final AttributeSystem attributeSystem;
     private final List<AbstractCharacter> pendingJoiners = new ArrayList<>();
     private final List<InitiativeEntry> order = new ArrayList<>();
     private boolean initiativeRolled;
@@ -23,8 +24,9 @@ public final class CombatEncounter {
     private record InitiativeEntry(AbstractCharacter character, int initiative) {
     }
 
-    public CombatEncounter(RoomInstance room) {
+    public CombatEncounter(RoomInstance room, AttributeSystem attributeSystem) {
         this.room = room;
+        this.attributeSystem = attributeSystem;
     }
 
     public RoomInstance getRoom() {
@@ -125,8 +127,8 @@ public final class CombatEncounter {
         if (byInitiative != 0) {
             return byInitiative;
         }
-        return -Integer.compare(AttributeSystem.getModifier(a.character(), Attribute.DEXTERITY),
-                AttributeSystem.getModifier(b.character(), Attribute.DEXTERITY));
+        return -Integer.compare(attributeSystem.getModifier(a.character(), Attribute.DEXTERITY),
+                attributeSystem.getModifier(b.character(), Attribute.DEXTERITY));
     }
 
     private int indexOf(AbstractCharacter character) {
