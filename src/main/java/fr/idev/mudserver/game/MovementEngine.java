@@ -31,9 +31,9 @@ import fr.idev.mudserver.network.message.ingame.MovementBlockedByOccupant;
  * faire d'I/O bloquant sur ce thread partagé par tous les joueurs.
  */
 @Component
-public class MovementTicker extends Thread {
+public class MovementEngine extends Thread {
 
-    private static final Logger log = LoggerFactory.getLogger(MovementTicker.class);
+    private static final Logger log = LoggerFactory.getLogger(MovementEngine.class);
 
     private static final long TICK_INTERVAL_MS = 100L;
 
@@ -42,7 +42,7 @@ public class MovementTicker extends Thread {
     private final Map<UUID, AbstractCharacter> movingCharacters = new ConcurrentHashMap<>();
     private final Map<UUID, CompletableFuture<Void>> pendingNotifications = new ConcurrentHashMap<>();
 
-    public MovementTicker(Look lookAction, ExecutorService virtualThreadExecutor) {
+    public MovementEngine(Look lookAction, ExecutorService virtualThreadExecutor) {
         super("movement-ticker");
         this.lookAction = lookAction;
         this.virtualThreadExecutor = virtualThreadExecutor;
@@ -83,7 +83,7 @@ public class MovementTicker extends Thread {
     }
 
     private void processIfDue(AbstractCharacter character, long now) {
-        switch (character.updatePosition(now)) {
+        switch (character.getMovementSystem().updatePosition(now)) {
             case NO_MOVEMENT -> {
             }
             case STEPPED -> notifyMoved(character);

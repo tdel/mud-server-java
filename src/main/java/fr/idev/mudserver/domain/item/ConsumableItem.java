@@ -6,6 +6,8 @@ import fr.idev.mudserver.domain.*;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUsedPotion;
+import fr.idev.mudserver.domain.actor.system.CombatSystem;
+import fr.idev.mudserver.domain.actor.system.InventorySystem;
 import fr.idev.mudserver.game.dice.DiceRoller;
 
 public class ConsumableItem extends ItemTemplate {
@@ -30,8 +32,8 @@ public class ConsumableItem extends ItemTemplate {
 
     private void heal(CharacterInstance character, Item item) {
         int amount = DiceRoller.roll(effectDice).total();
-        int healed = character.heal(amount);
-        character.getInventory().removeItem(item);
+        int healed = CombatSystem.heal(character, amount);
+        InventorySystem.removeItem(character, item);
         DomainEventPublisher.publish(new GamePlayerUsedPotion(character, item, healed));
     }
 }

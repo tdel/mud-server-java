@@ -160,7 +160,7 @@ private boolean tryStepToward(GameMonster monster, HexCoordinate targetPosition)
     }
     ```
 
-Limite acceptée, pas dans le scope de cette demande : le mouvement du joueur reste asynchrone via `MovementTicker` et rien ne le suspend si son tour se termine avant la fin du trajet (ex. il attaque avant d'avoir fini de se déplacer) — gap préexistant dans `ActionEconomy`, pas introduit ici.
+Limite acceptée, pas dans le scope de cette demande : le mouvement du joueur reste asynchrone via `MovementEngine` et rien ne le suspend si son tour se termine avant la fin du trajet (ex. il attaque avant d'avoir fini de se déplacer) — gap préexistant dans `ActionEconomy`, pas introduit ici.
 
 ## Cas limites couverts
 

@@ -1,8 +1,9 @@
-package fr.idev.mudserver.domain.actor;
+package fr.idev.mudserver.domain.actor.system;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.event.CharacterStartedMoving;
 import fr.idev.mudserver.domain.actor.event.CharacterStoppedMoving;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
@@ -10,12 +11,12 @@ import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.map.HexDirection;
 import fr.idev.mudserver.domain.world.RoomInstance;
 
-public final class CharacterMovementSystem {
+public final class MovementSystem {
 
     private final AbstractCharacter character;
     private volatile ActiveMovement activeMovement;
 
-    public CharacterMovementSystem(AbstractCharacter character) {
+    public MovementSystem(AbstractCharacter character) {
         this.character = character;
     }
 

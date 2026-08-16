@@ -5,9 +5,12 @@ import java.util.Map;
 import java.util.UUID;
 
 import fr.idev.mudserver.domain.map.HexCoordinate;
+import fr.idev.mudserver.domain.actor.system.InventorySystem;
+import fr.idev.mudserver.domain.actor.system.MovementSystem;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.combat.ActionEconomy;
 import fr.idev.mudserver.domain.combat.CombatEncounter;
+import fr.idev.mudserver.domain.actor.system.CombatSystem;
 import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.OutputMessage;
@@ -19,22 +22,19 @@ public abstract class AbstractCharacter extends AbstractObject {
     public static final long REFERENCE_TIME_MS = 1000L;
 
     private final Map<Attribute, Integer> attributes;
-    private int currentHealth;
-    private int maxHealth;
 
     private volatile RoomInstance currentRoom;
     private volatile HexCoordinate position;
     protected int speed = DEFAULT_SPEED;
     private volatile CombatEncounter encounter;
     private final ActionEconomy actionEconomy = new ActionEconomy();
-    private final CharacterMovementSystem movementSystem = new CharacterMovementSystem(this);
+    private final MovementSystem movementSystem = new MovementSystem(this);
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
             int maxHealth) {
         super(id, name);
         this.attributes = new EnumMap<>(attributes);
-        this.currentHealth = currentHealth;
-        this.maxHealth = maxHealth;
+        CombatSystem.attach(this, currentHealth, maxHealth);
     }
 
     public int getAttribute(Attribute attribute) {
@@ -46,7 +46,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public int getArmorClass() {
-        return 10 + getModifier(Attribute.DEXTERITY);
+        return InventorySystem.getArmorClass(this);
     }
 
     public Map<Attribute, Integer> getAttributes() {
@@ -54,25 +54,15 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public int getCurrentHealth() {
-        return currentHealth;
+        return CombatSystem.currentHealth(this);
     }
 
     public void setCurrentHealth(int currentHealth) {
-        this.currentHealth = currentHealth;
+        CombatSystem.setCurrentHealth(this, currentHealth);
     }
 
     public int getMaxHealth() {
-        return maxHealth;
-    }
-
-    public void setMaxHealth(int maxHealth) {
-        this.maxHealth = maxHealth;
-    }
-
-    public int heal(int amount) {
-        int healed = Math.min(amount, maxHealth - currentHealth);
-        currentHealth += healed;
-        return healed;
+        return CombatSystem.maxHealth(this);
     }
 
     public RoomInstance getCurrentRoom() {
@@ -119,7 +109,7 @@ public abstract class AbstractCharacter extends AbstractObject {
         return actionEconomy;
     }
 
-    public CharacterMovementSystem getMovementSystem() {
+    public MovementSystem getMovementSystem() {
         return movementSystem;
     }
 

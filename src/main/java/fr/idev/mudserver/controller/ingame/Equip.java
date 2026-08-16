@@ -6,6 +6,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
+import fr.idev.mudserver.domain.actor.system.InventorySystem;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.item.EquipmentSlot;
 import fr.idev.mudserver.domain.item.Item;
@@ -40,7 +41,7 @@ public class Equip implements ControllerHandler {
             return;
         }
 
-        Optional<Item> item = character.getInventory().findOneByName(name);
+        Optional<Item> item = character.findOneByName(name);
 
         if (item.isEmpty()) {
             connection.send(new ItemNotCarried(name));
@@ -49,7 +50,7 @@ public class Equip implements ControllerHandler {
 
         String templateName = item.get().getName();
         Rarity templateRarity = item.get().getRarity();
-        Optional<EquipmentSlot> slot = character.equipItem(item.get());
+        Optional<EquipmentSlot> slot = InventorySystem.equip(character, item.get());
 
         if (slot.isEmpty()) {
             connection.send(new ItemNotEquippable(templateName));

@@ -44,8 +44,7 @@ public class CharacterDao {
                         character.getAttribute(Attribute.STRENGTH), character.getAttribute(Attribute.DEXTERITY),
                         character.getAttribute(Attribute.CONSTITUTION), character.getAttribute(Attribute.INTELLIGENCE),
                         character.getAttribute(Attribute.WISDOM), character.getAttribute(Attribute.CHARISMA),
-                        character.getXp(), character.getInventory().getGold(), character.getShortRestCount(),
-                        worldInstanceId)
+                        character.getXp(), character.getGold(), character.getShortRestCount(), worldInstanceId)
                 .execute();
     }
 
@@ -70,8 +69,7 @@ public class CharacterDao {
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_ROOM_ID, character.getCurrentRoomId())
                 .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).set(CHARACTER.XP, character.getXp())
                 .set(CHARACTER.LEVEL, character.getLevel()).set(CHARACTER.MAX_HEALTH, character.getMaxHealth())
-                .set(CHARACTER.GOLD, character.getInventory().getGold())
-                .set(CHARACTER.SHORT_REST_COUNT, character.getShortRestCount())
+                .set(CHARACTER.GOLD, character.getGold()).set(CHARACTER.SHORT_REST_COUNT, character.getShortRestCount())
                 .where(CHARACTER.ID.eq(character.getId())).execute();
     }
 

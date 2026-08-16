@@ -1,11 +1,16 @@
 package fr.idev.mudserver.domain.actor;
 
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.UnaryOperator;
 
 public abstract class AbstractObject {
 
     private UUID id;
     private String name;
+    private final Map<Class<?>, Object> components = new ConcurrentHashMap<>();
 
     protected AbstractObject(UUID id, String name) {
         this.id = id;
@@ -26,5 +31,23 @@ public abstract class AbstractObject {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public <C> void attachComponent(C component) {
+        components.put(component.getClass(), component);
+    }
+
+    public <C> Optional<C> findComponent(Class<C> type) {
+        return Optional.ofNullable(type.cast(components.get(type)));
+    }
+
+    public <C> C component(Class<C> type) {
+        return findComponent(type).orElseThrow(
+                () -> new IllegalStateException("No " + type.getSimpleName() + " attached to entity " + id));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <C> C updateComponent(Class<C> type, UnaryOperator<C> mutator) {
+        return (C) components.compute(type, (t, current) -> mutator.apply((C) current));
     }
 }

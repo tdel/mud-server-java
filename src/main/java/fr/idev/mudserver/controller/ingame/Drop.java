@@ -6,6 +6,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
+import fr.idev.mudserver.domain.actor.system.InventorySystem;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.item.Rarity;
@@ -38,7 +39,7 @@ public class Drop implements ControllerHandler {
             return;
         }
 
-        Optional<Item> item = character.getInventory().findOneByName(name);
+        Optional<Item> item = character.findOneByName(name);
 
         if (item.isEmpty()) {
             connection.send(new ItemNotCarried(name));
@@ -47,7 +48,7 @@ public class Drop implements ControllerHandler {
 
         String templateName = item.get().getName();
         Rarity templateRarity = item.get().getRarity();
-        character.discardItem(item.get());
+        InventorySystem.discard(character, item.get());
 
         connection.send(new ItemDiscarded(templateName, templateRarity));
     }

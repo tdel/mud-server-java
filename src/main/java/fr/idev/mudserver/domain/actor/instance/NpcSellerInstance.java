@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import fr.idev.mudserver.domain.actor.AbstractNpc;
+import fr.idev.mudserver.domain.actor.system.InventorySystem;
 import fr.idev.mudserver.domain.actor.template.NpcTemplate;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.item.ItemTemplate;
@@ -43,7 +44,7 @@ public final class NpcSellerInstance extends AbstractNpc {
         }
 
         Item item = new Item(UUID.randomUUID(), entry.get().itemTemplate(), buyer, null);
-        boolean bought = buyer.buyItem(item, entry.get().price());
+        boolean bought = InventorySystem.buyItem(buyer, item, entry.get().price());
         return bought
                 ? new PurchaseOutcome.Purchased(item, entry.get().price())
                 : new PurchaseOutcome.InsufficientGold(entry.get().price());

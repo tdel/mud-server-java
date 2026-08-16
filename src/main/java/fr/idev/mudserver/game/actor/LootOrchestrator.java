@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
+import fr.idev.mudserver.domain.actor.system.InventorySystem;
 import fr.idev.mudserver.domain.actor.template.MonsterTemplate;
 import fr.idev.mudserver.domain.actor.template.MonsterTemplate.LootResult;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
@@ -28,12 +29,12 @@ public class LootOrchestrator {
         LootResult loot = template.rollLoot(killer);
 
         if (loot.gold() > 0) {
-            killer.receiveGold(loot.gold());
+            InventorySystem.receiveGold(killer, loot.gold());
             log.info("loot.gold_dropped killer={} amount={}", killer.getName(), loot.gold());
         }
 
         for (Item item : loot.items()) {
-            killer.receiveLootItem(item);
+            InventorySystem.receiveLootItem(killer, item);
             log.info("loot.item_dropped killer={} item={}", killer.getName(), item.getName());
         }
     }

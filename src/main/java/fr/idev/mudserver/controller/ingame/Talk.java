@@ -95,23 +95,22 @@ public class Talk implements ControllerHandler {
                         entry.price()))
                 .toList();
 
-        connection.requestBlocking(new ShopCatalog(npc.getName(), entries, character.getInventory().getGold()),
-                line -> {
-                    String trimmed = line.trim();
-                    if (trimmed.equals("0") || trimmed.equalsIgnoreCase("back") || trimmed.equalsIgnoreCase("retour")) {
-                        promptDialogue(connection, character, npc, dialogue);
-                        return;
-                    }
+        connection.requestBlocking(new ShopCatalog(npc.getName(), entries, character.getGold()), line -> {
+            String trimmed = line.trim();
+            if (trimmed.equals("0") || trimmed.equalsIgnoreCase("back") || trimmed.equalsIgnoreCase("retour")) {
+                promptDialogue(connection, character, npc, dialogue);
+                return;
+            }
 
-                    switch (npc.sell(character, trimmed)) {
-                        case NpcSellerInstance.PurchaseOutcome.Purchased ignored -> {
-                        }
-                        case NpcSellerInstance.PurchaseOutcome.EntryNotFound ignored ->
-                            connection.send(new ShopItemNotFound(trimmed));
-                        case NpcSellerInstance.PurchaseOutcome.InsufficientGold(int price) ->
-                            connection.send(new NotEnoughGold(price));
-                    }
-                    promptShop(connection, character, npc, dialogue);
-                });
+            switch (npc.sell(character, trimmed)) {
+                case NpcSellerInstance.PurchaseOutcome.Purchased ignored -> {
+                }
+                case NpcSellerInstance.PurchaseOutcome.EntryNotFound ignored ->
+                    connection.send(new ShopItemNotFound(trimmed));
+                case NpcSellerInstance.PurchaseOutcome.InsufficientGold(int price) ->
+                    connection.send(new NotEnoughGold(price));
+            }
+            promptShop(connection, character, npc, dialogue);
+        });
     }
 }

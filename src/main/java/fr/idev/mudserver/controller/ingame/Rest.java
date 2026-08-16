@@ -14,6 +14,7 @@ import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.item.ItemType;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.instance.RestOutcome;
+import fr.idev.mudserver.domain.actor.system.LevelingSystem;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -51,7 +52,7 @@ public class Rest implements ControllerHandler {
     }
 
     private void restShort(Connection connection, CharacterInstance character) {
-        switch (character.doShortRest()) {
+        switch (LevelingSystem.doShortRest(character)) {
             case RestOutcome.Rested ignored -> {
             }
             case RestOutcome.InCombat ignored -> connection.send(new CannotRestInCombat());
@@ -69,8 +70,8 @@ public class Rest implements ControllerHandler {
             return;
         }
 
-        List<Item> available = new ArrayList<>(character.getInventory().getCarriedItems().stream()
-                .filter(item -> item.getType() == ItemType.FOOD).toList());
+        List<Item> available = new ArrayList<>(
+                character.getCarriedItems().stream().filter(item -> item.getType() == ItemType.FOOD).toList());
         if (available.isEmpty()) {
             connection.send(new NoProvisionsAvailable());
             return;
@@ -124,7 +125,7 @@ public class Rest implements ControllerHandler {
     }
 
     private void finalizeLongRest(Connection connection, CharacterInstance character, List<Item> selected) {
-        switch (character.doLongRest(selected)) {
+        switch (LevelingSystem.doLongRest(character, selected)) {
             case RestOutcome.Rested ignored -> {
             }
             case RestOutcome.InCombat ignored -> connection.send(new CannotRestInCombat());

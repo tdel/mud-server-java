@@ -2,9 +2,9 @@
 
 ## Contexte
 
-Le déplacement a été récemment refondu en case-par-case via `MovementTicker` (commit `d51e4b6`). À cette occasion, le hook `onEnteredCell(HexCoordinate)` — déjà présent et déjà câblé côté combat (`GamePlayer.onEnteredCell` publie `GamePlayerEnteredCell`, `CombatEngine.onGamePlayerEnteredCell` déclenche l'aggro via `presenceRadius`) — a cessé d'être appelé. Vérifié exhaustivement (grep + graft) : **aucun appelant** de `onEnteredCell` n'existe plus dans `src/main`, ni dans `moveOneCell` ni dans `MovementTicker`.
+Le déplacement a été récemment refondu en case-par-case via `MovementEngine` (commit `d51e4b6`). À cette occasion, le hook `onEnteredCell(HexCoordinate)` — déjà présent et déjà câblé côté combat (`GamePlayer.onEnteredCell` publie `GamePlayerEnteredCell`, `CombatEngine.onGamePlayerEnteredCell` déclenche l'aggro via `presenceRadius`) — a cessé d'être appelé. Vérifié exhaustivement (grep + graft) : **aucun appelant** de `onEnteredCell` n'existe plus dans `src/main`, ni dans `moveOneCell` ni dans `MovementEngine`.
 
-Conséquence : **aujourd'hui, se déplacer case par case ne déclenche plus jamais l'aggro**, malgré CLAUDE.md qui documente ce comportement comme existant ("Monsters have a presence/aggro zone that triggers combat when a player enters it"). C'est une régression du refactor `MovementTicker`, pas une fonctionnalité à concevoir de zéro : tout le câblage aval (event, listener, rayon de présence) est prêt et fonctionnel — seul l'appel manque, et rien n'arrête le mouvement en cours une fois le combat démarré.
+Conséquence : **aujourd'hui, se déplacer case par case ne déclenche plus jamais l'aggro**, malgré CLAUDE.md qui documente ce comportement comme existant ("Monsters have a presence/aggro zone that triggers combat when a player enters it"). C'est une régression du refactor `MovementEngine`, pas une fonctionnalité à concevoir de zéro : tout le câblage aval (event, listener, rayon de présence) est prêt et fonctionnel — seul l'appel manque, et rien n'arrête le mouvement en cours une fois le combat démarré.
 
 Ce plan présente plusieurs options d'implémentation pour ce correctif, comparées, avec une recommandation.
 

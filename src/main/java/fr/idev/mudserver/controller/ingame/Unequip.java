@@ -6,6 +6,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
+import fr.idev.mudserver.domain.actor.system.InventorySystem;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.item.Rarity;
@@ -39,7 +40,7 @@ public class Unequip implements ControllerHandler {
             return;
         }
 
-        Optional<Item> item = character.getInventory().findOneByName(name);
+        Optional<Item> item = character.findOneByName(name);
 
         if (item.isEmpty()) {
             connection.send(new ItemNotCarried(name));
@@ -54,7 +55,7 @@ public class Unequip implements ControllerHandler {
         }
 
         Rarity templateRarity = item.get().getRarity();
-        character.unequipItem(item.get());
+        InventorySystem.unequip(character, item.get());
 
         connection.send(new ItemUnequipped(templateName, templateRarity));
     }

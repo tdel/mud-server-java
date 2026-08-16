@@ -19,6 +19,7 @@ import fr.idev.mudserver.domain.actor.event.GamePlayerUsedPotion;
 import fr.idev.mudserver.domain.actor.event.LongRestTaken;
 import fr.idev.mudserver.domain.actor.event.NewGamePlayerCreated;
 import fr.idev.mudserver.domain.actor.event.ShortRestTaken;
+import fr.idev.mudserver.domain.actor.system.LevelingSystem;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.game.catalog.LevelCatalog;
 import fr.idev.mudserver.network.message.ingame.GoldLooted;
@@ -59,7 +60,7 @@ public class CharacterPersistenceListener {
 
         while (character.getLevel() < levelCatalog.maxLevel()
                 && character.getXp() >= levelCatalog.xpRequiredForLevel(character.getLevel() + 1)) {
-            character.applyLevelUp();
+            LevelingSystem.applyLevelUp(character);
         }
 
         characterDao.update(character);
@@ -80,7 +81,7 @@ public class CharacterPersistenceListener {
         characterDao.update(event.character());
         event.character().send(new GoldLooted(event.amount()));
         log.info("character.gold_received character={} amount={} newGold={}", event.character().getName(),
-                event.amount(), event.character().getInventory().getGold());
+                event.amount(), event.character().getGold());
     }
 
     @EventListener
@@ -88,7 +89,7 @@ public class CharacterPersistenceListener {
         characterDao.update(event.character());
         event.character().send(new GoldSpent(event.amount()));
         log.info("character.gold_spent character={} amount={} newGold={}", event.character().getName(), event.amount(),
-                event.character().getInventory().getGold());
+                event.character().getGold());
     }
 
     @EventListener
@@ -96,7 +97,7 @@ public class CharacterPersistenceListener {
     void onCharacterDied(CharacterDied event) {
         CharacterInstance killer = event.killer();
         int xpReward = event.character().getTemplate().getXpReward();
-        killer.gainXp(xpReward);
+        LevelingSystem.gainXp(killer, xpReward);
         killer.setTarget(null);
         log.info("combat.kill_credited killer={} monster={} xpReward={}", killer.getName(), event.character().getName(),
                 xpReward);

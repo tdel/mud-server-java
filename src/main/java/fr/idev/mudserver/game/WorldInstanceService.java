@@ -26,6 +26,7 @@ import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.event.WorldInstanceCreated;
+import fr.idev.mudserver.domain.actor.system.InventorySystem;
 import fr.idev.mudserver.game.catalog.MonsterCatalog;
 import fr.idev.mudserver.game.catalog.NpcCatalog;
 import fr.idev.mudserver.game.catalog.WorldTemplateCatalog;
@@ -122,7 +123,7 @@ public class WorldInstanceService {
     public void enterGame(CharacterInstance player) {
         WorldInstance instance = player.getWorldInstance();
 
-        player.getInventory().replaceItems(itemService.loadInventory(player));
+        InventorySystem.replaceItems(player, itemService.loadInventory(player));
         player.getCurrentRoom().join(player);
 
         instance.addPlayer(player);

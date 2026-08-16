@@ -8,18 +8,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import fr.idev.mudserver.domain.actor.system.AiSystem;
 import fr.idev.mudserver.domain.item.ConsumableItem;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.combat.ActionEconomy;
 import fr.idev.mudserver.domain.combat.CombatEncounter;
+import fr.idev.mudserver.domain.actor.system.CombatSystem;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEnteredCell;
-import fr.idev.mudserver.game.dice.DiceExpression;
-import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.message.ingame.ActionsRemaining;
 import fr.idev.mudserver.network.message.ingame.AlreadyInAnotherEncounter;
 import fr.idev.mudserver.network.message.ingame.AttackResult;
@@ -115,13 +115,13 @@ public class CombatEngine {
             encounter.joinBeforeInitiative(attacker);
         }
 
-        CombatResult result = attacker.tryAttack(target);
+        CombatResult result = CombatSystem.tryAttack(attacker, target);
         attacker.send(new AttackResult(result));
         target.getCurrentRoom().broadcast(new PlayerAttackBroadcast(attacker.getName(), result), attacker);
         log.info("combat.attack_resolved attacker={} target={} hit={} critical={} damage={}", attacker.getName(),
                 target.getName(), result.hit(), result.criticalHit(), result.damage());
 
-        if (result.hit() && target.takeDamage(result.damage(), attacker)) {
+        if (result.hit() && CombatSystem.applyDamage(target, result.damage(), attacker)) {
             // CombatEngine#onCharacterDied a déjà nettoyé encounter côté monstre ; côté
             // joueur en revanche, rien d'autre ne le fait ici — l'affrontement n'a jamais
             // eu
@@ -185,13 +185,13 @@ public class CombatEngine {
                 attacker.send(new NotYourTurn());
                 return;
             }
-            CombatResult result = attacker.tryAttack(target);
+            CombatResult result = CombatSystem.tryAttack(attacker, target);
             attacker.send(new AttackResult(result));
             encounter.getRoom().broadcast(new PlayerAttackBroadcast(attacker.getName(), result), attacker);
             log.info("combat.attack_resolved attacker={} target={} hit={} critical={} damage={}", attacker.getName(),
                     target.getName(), result.hit(), result.criticalHit(), result.damage());
             if (result.hit()) {
-                target.takeDamage(result.damage(), attacker);
+                CombatSystem.applyDamage(target, result.damage(), attacker);
             }
             continueOrEndTurn(encounter, attacker);
         }
@@ -249,17 +249,15 @@ public class CombatEngine {
             if (livingPlayers.isEmpty()) {
                 break;
             }
-            CharacterInstance victim = livingPlayers.size() == 1
-                    ? livingPlayers.get(0)
-                    : livingPlayers.get(DiceRoller.roll(new DiceExpression(1, livingPlayers.size(), 0)).total() - 1);
+            CharacterInstance victim = AiSystem.chooseTarget(monster, livingPlayers);
 
-            CombatResult result = monster.tryAttack(victim);
+            CombatResult result = CombatSystem.tryAttack(monster, victim);
             victim.send(new MonsterAttackResult(monster.getName(), result));
             encounter.getRoom().broadcast(new MonsterAttackBroadcast(monster.getName(), result), victim);
             log.info("combat.monster_attack_resolved monster={} victim={} hit={} damage={}", monster.getName(),
                     victim.getName(), result.hit(), result.damage());
             if (result.hit()) {
-                victim.takeDamage(result.damage(), monster);
+                CombatSystem.applyDamage(victim, result.damage(), monster);
             }
             encounter.advanceTurn();
         }
@@ -287,6 +285,7 @@ public class CombatEngine {
         }
         encounter.remove(monster);
         monster.setEncounter(null);
+        AiSystem.clearTarget(monster);
         log.debug("combat.encounter_monster_removed monster={}", monster.getName());
     }
 
