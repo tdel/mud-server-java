@@ -9,7 +9,7 @@ import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
-import fr.idev.mudserver.domain.actor.component.HealthComponent;
+import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.game.CombatResult;
 import fr.idev.mudserver.game.dice.DiceExpression;
@@ -21,18 +21,25 @@ public final class CombatSystem {
     private CombatSystem() {
     }
 
+    public static void setTarget(AbstractCharacter target, AbstractCharacter attacker) {
+        attacker.updateComponent(CombatComponent.class, current -> {
+            return new CombatComponent(current.currentHealth(), current.maxHealth(), target);
+        });
+    }
+
     public static int heal(AbstractCharacter character, int amount) {
         int[] healed = {0};
-        character.updateComponent(HealthComponent.class, current -> {
+        character.updateComponent(CombatComponent.class, current -> {
             healed[0] = Math.min(amount, current.maxHealth() - current.currentHealth());
-            return new HealthComponent(current.currentHealth() + healed[0], current.maxHealth());
+            return new CombatComponent(current.currentHealth() + healed[0], current.maxHealth(), current.target());
         });
         return healed[0];
     }
 
     public static void increaseMaxHealth(AbstractCharacter character, int amount) {
-        character.updateComponent(HealthComponent.class,
-                current -> new HealthComponent(current.currentHealth() + amount, current.maxHealth() + amount));
+        character.updateComponent(CombatComponent.class,
+                current -> new CombatComponent(current.currentHealth() + amount, current.maxHealth() + amount,
+                        current.target()));
     }
 
     public static CombatResult tryAttack(AbstractCharacter attacker, AbstractCharacter target) {
@@ -45,7 +52,7 @@ public final class CombatSystem {
 
     public static boolean applyDamage(AbstractCharacter target, int amount, AbstractCharacter attacker) {
         boolean[] justDefeated = {false};
-        target.updateComponent(HealthComponent.class, current -> {
+        target.updateComponent(CombatComponent.class, current -> {
             if (current.currentHealth() <= 0) {
                 return current;
             }
@@ -53,7 +60,7 @@ public final class CombatSystem {
             if (newHealth <= 0) {
                 justDefeated[0] = true;
             }
-            return new HealthComponent(newHealth, current.maxHealth());
+            return new CombatComponent(newHealth, current.maxHealth(), target);
         });
 
         if (justDefeated[0]) {

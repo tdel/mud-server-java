@@ -4,7 +4,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.UUID;
 
-import fr.idev.mudserver.domain.actor.component.HealthComponent;
+import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.actor.system.InventorySystem;
 import fr.idev.mudserver.domain.actor.system.MovementSystem;
@@ -34,7 +34,7 @@ public abstract class AbstractCharacter extends AbstractObject {
             int maxHealth) {
         super(id, name);
         this.attributes = new EnumMap<>(attributes);
-        this.attachComponent(new HealthComponent(currentHealth, maxHealth));
+        this.attachComponent(new CombatComponent(currentHealth, maxHealth, null));
     }
 
     public int getAttribute(Attribute attribute) {
@@ -54,15 +54,16 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public int getCurrentHealth() {
-        return component(HealthComponent.class).currentHealth();
+        return component(CombatComponent.class).currentHealth();
     }
 
     public void setCurrentHealth(int currentHealth) {
-        updateComponent(HealthComponent.class, current -> new HealthComponent(currentHealth, current.maxHealth()));
+        updateComponent(CombatComponent.class,
+                current -> new CombatComponent(currentHealth, current.maxHealth(), current.target()));
     }
 
     public int getMaxHealth() {
-        return component(HealthComponent.class).maxHealth();
+        return component(CombatComponent.class).maxHealth();
     }
 
     public RoomInstance getCurrentRoom() {

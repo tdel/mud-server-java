@@ -2,6 +2,7 @@ package fr.idev.mudserver.persistence.listener;
 
 import java.util.Map;
 
+import fr.idev.mudserver.domain.actor.system.CombatSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -98,7 +99,7 @@ public class CharacterPersistenceListener {
         CharacterInstance killer = event.killer();
         int xpReward = event.character().getTemplate().getXpReward();
         LevelingSystem.gainXp(killer, xpReward);
-        killer.setTarget(null);
+        CombatSystem.setTarget(null, killer);
         log.info("combat.kill_credited killer={} monster={} xpReward={}", killer.getName(), event.character().getName(),
                 xpReward);
     }

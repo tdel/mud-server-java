@@ -11,6 +11,7 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.*;
 import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
+import fr.idev.mudserver.domain.actor.component.NetworkComponent;
 import fr.idev.mudserver.domain.actor.component.RestComponent;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEnteredCell;
@@ -24,7 +25,6 @@ import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.game.dice.CheckResult;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
-import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.OutputMessage;
 
 public final class CharacterInstance extends AbstractCharacter {
@@ -35,9 +35,6 @@ public final class CharacterInstance extends AbstractCharacter {
     private Gender gender;
     private Race race;
     private CharacterClass characterClass;
-
-    private Connection connection;
-    private MonsterInstance target;
 
     public static final int MAX_SHORT_RESTS_BEFORE_LONG_REST = 2;
 
@@ -163,22 +160,6 @@ public final class CharacterInstance extends AbstractCharacter {
         return new CheckResult(label, diceRoll.total(), dc, proficient, disadvantage, success);
     }
 
-    public Connection getConnection() {
-        return connection;
-    }
-
-    public void setConnection(Connection connection) {
-        this.connection = connection;
-    }
-
-    public MonsterInstance getTarget() {
-        return target;
-    }
-
-    public void setTarget(MonsterInstance target) {
-        this.target = target;
-    }
-
     public int getXp() {
         return component(LevelingComponent.class).xp();
     }
@@ -221,9 +202,8 @@ public final class CharacterInstance extends AbstractCharacter {
 
     @Override
     public void send(OutputMessage message) {
-        if (null != connection) {
-            this.connection.send(message);
-        }
+        findComponent(NetworkComponent.class)
+                .ifPresent(networkComponent -> networkComponent.connection().send(message));
     }
 
     @Override

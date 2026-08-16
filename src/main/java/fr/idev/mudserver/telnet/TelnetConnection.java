@@ -3,6 +3,7 @@ package fr.idev.mudserver.telnet;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
+import fr.idev.mudserver.domain.actor.component.NetworkComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,13 +148,15 @@ public class TelnetConnection implements Connection, TelnetOutput {
     @Override
     public void attachCharacter(CharacterInstance character) {
         this.player = character;
-        character.setConnection(this);
+        character.updateComponent(NetworkComponent.class, networkComponent -> new NetworkComponent(this));
         this.setState(ConnectionState.INGAME);
     }
 
     @Override
     public void detachCharacter() {
+        // this.player.detachComponent(NetworkComponent); TODO
         this.player = null;
+
         this.setState(ConnectionState.LOBBY);
     }
 

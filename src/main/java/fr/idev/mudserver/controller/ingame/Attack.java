@@ -3,6 +3,9 @@ package fr.idev.mudserver.controller.ingame;
 import java.util.Optional;
 import java.util.Set;
 
+import fr.idev.mudserver.domain.actor.AbstractCharacter;
+import fr.idev.mudserver.domain.actor.component.CombatComponent;
+import fr.idev.mudserver.domain.actor.system.CombatSystem;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
@@ -38,15 +41,20 @@ public class Attack implements ControllerHandler {
         CharacterInstance character = connection.character();
         String name = argument.trim();
 
-        MonsterInstance target;
+        AbstractCharacter target;
         if (name.isEmpty()) {
-            target = character.getTarget();
+            target = character.component(CombatComponent.class).target();
             if (target == null) {
                 connection.send(new NoTargetSelected());
                 return;
             }
+
+            if (!(target instanceof MonsterInstance)) {
+                return;
+            }
+
             if (!character.getCurrentRoom().getMonsters().contains(target)) {
-                character.setTarget(null);
+                CombatSystem.setTarget(null, character);
                 connection.send(new TargetNotFound(target.getName()));
                 return;
             }
@@ -57,9 +65,9 @@ public class Attack implements ControllerHandler {
                 return;
             }
             target = found.get();
-            character.setTarget(target);
+            CombatSystem.setTarget(target, character);
         }
 
-        combatEngine.attack(character, target);
+        combatEngine.attack(character, (MonsterInstance) target);
     }
 }

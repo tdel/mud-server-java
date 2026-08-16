@@ -13,6 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import fr.idev.mudserver.domain.MonsterSpawn;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
+import fr.idev.mudserver.domain.actor.component.NetworkComponent;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.actor.AbstractNpc;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
@@ -236,10 +237,10 @@ public class RoomInstance {
 
     public void broadcast(OutputMessage message, CharacterInstance exclude) {
         for (CharacterInstance character : clients.values()) {
-            if (character == exclude || character.getConnection() == null) {
+            if (character == exclude || character.findComponent(NetworkComponent.class).isEmpty()) {
                 continue;
             }
-            character.getConnection().send(message);
+            character.component(NetworkComponent.class).connection().send(message);
         }
     }
 

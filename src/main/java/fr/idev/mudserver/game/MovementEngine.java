@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
+import fr.idev.mudserver.domain.actor.component.NetworkComponent;
 import jakarta.annotation.PreDestroy;
 
 import org.slf4j.Logger;
@@ -107,7 +108,8 @@ public class MovementEngine extends Thread {
     // no-op ici plutôt qu'un appel à retirer plus tard.
     private void notifyMoved(AbstractCharacter character) {
         if (character instanceof CharacterInstance player) {
-            notifyAsync(character, () -> lookAction.onReceive(player.getConnection(), ""));
+            notifyAsync(character,
+                    () -> lookAction.onReceive(player.component(NetworkComponent.class).connection(), ""));
         }
     }
 
