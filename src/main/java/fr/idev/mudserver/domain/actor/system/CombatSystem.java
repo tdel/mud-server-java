@@ -9,6 +9,7 @@ import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
+import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.game.CombatResult;
@@ -82,11 +83,12 @@ public final class CombatSystem {
     private static CombatResult playerAttack(CharacterInstance attacker, AbstractCharacter target) {
         Optional<Item> weapon = InventorySystem.equippedWeapon(attacker);
         int weaponBonus = weapon.map(Item::getBonus).orElse(0);
-        boolean weaponProficient = weapon
-                .map(item -> attacker.getWeaponProficiencies().contains(item.getWeaponCategory())).orElse(true);
+        boolean weaponProficient = weapon.map(item -> attacker.component(AppearanceComponent.class).characterClass()
+                .weaponProficiencies().contains(item.getWeaponCategory())).orElse(true);
 
         int strengthModifier = AttributeSystem.getModifier(attacker, Attribute.STRENGTH);
-        int attackBonus = strengthModifier + (weaponProficient ? attacker.getProficiencyBonus() : 0) + weaponBonus;
+        int attackBonus = strengthModifier + (weaponProficient ? LevelingSystem.getProficiencyBonus(attacker) : 0)
+                + weaponBonus;
         boolean disadvantage = InventorySystem.isWearingNonProficientArmor(attacker);
 
         DiceRoll attackRoll = DiceRoller.rollD20(attackBonus, disadvantage);

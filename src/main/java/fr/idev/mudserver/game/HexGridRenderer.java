@@ -12,6 +12,7 @@ import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.actor.AbstractNpc;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
+import fr.idev.mudserver.domain.actor.system.MovementSystem;
 
 public final class HexGridRenderer {
 
@@ -29,7 +30,7 @@ public final class HexGridRenderer {
 
     static List<String> render(RoomInstance room, CharacterInstance viewer, int radius) {
         HexCoordinate center = viewer.getPosition();
-        List<HexCoordinate> path = viewer.getMovementSystem().remainingPath();
+        List<HexCoordinate> path = MovementSystem.remainingPath(viewer);
         Set<HexCoordinate> pathCells = new HashSet<>(path);
         HexCoordinate destination = path.isEmpty() ? null : path.get(path.size() - 1);
         List<String> lines = new ArrayList<>();

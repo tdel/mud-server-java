@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.map.HexDirection;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
+import fr.idev.mudserver.domain.actor.system.MovementSystem;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -52,7 +53,7 @@ public class Go implements ControllerHandler {
         }
         requestedCells = Math.min(requestedCells, MAX_STEP_COUNT);
 
-        character.getMovementSystem().startMovement(direction.get(), requestedCells);
+        MovementSystem.startMovement(character, direction.get(), requestedCells);
     }
 
     private int parsePositiveInt(String token) {

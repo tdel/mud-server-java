@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import fr.idev.mudserver.domain.Account;
@@ -16,8 +15,8 @@ import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.actor.system.AttributeSystem;
 import fr.idev.mudserver.domain.actor.system.InventorySystem;
+import fr.idev.mudserver.domain.actor.system.LevelingSystem;
 import fr.idev.mudserver.domain.world.RoomInstance;
-import fr.idev.mudserver.domain.item.WeaponCategory;
 import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.game.dice.CheckResult;
 import fr.idev.mudserver.game.dice.DiceRoll;
@@ -80,42 +79,20 @@ public final class CharacterInstance extends AbstractCharacter {
         this.worldInstanceId = worldInstance.getId();
     }
 
-    public Attribute getPrimaryAbility() {
-        return component(AppearanceComponent.class).characterClass().primaryAbility();
-    }
-
-    public Set<Attribute> getSavingThrowProficiencies() {
-        return component(AppearanceComponent.class).characterClass().savingThrowProficiencies();
-    }
-
-    public Set<Skill> getSkillProficiencies() {
-        return component(AppearanceComponent.class).characterClass().skillProficiencies();
-    }
-
-    public Set<WeaponCategory> getWeaponProficiencies() {
-        return component(AppearanceComponent.class).characterClass().weaponProficiencies();
-    }
-
-    public Set<ArmorProficiency> getArmorProficiencies() {
-        return component(AppearanceComponent.class).characterClass().armorProficiencies();
-    }
-
-    public int getProficiencyBonus() {
-        return 2 + Math.floorDiv(component(LevelingComponent.class).level() - 1, 4);
-    }
-
     public CheckResult check(Skill skill, int dc) {
-        boolean proficient = getSkillProficiencies().contains(skill);
+        boolean proficient = component(AppearanceComponent.class).characterClass().skillProficiencies().contains(skill);
         return checkOrSave(skill.getGoverningAttribute(), proficient, dc, skill.label());
     }
 
     public CheckResult save(Attribute attribute, int dc) {
-        boolean proficient = getSavingThrowProficiencies().contains(attribute);
+        boolean proficient = component(AppearanceComponent.class).characterClass().savingThrowProficiencies()
+                .contains(attribute);
         return checkOrSave(attribute, proficient, dc, attribute.label());
     }
 
     private CheckResult checkOrSave(Attribute attribute, boolean proficient, int dc, String label) {
-        int modifier = AttributeSystem.getModifier(this, attribute) + (proficient ? getProficiencyBonus() : 0);
+        int modifier = AttributeSystem.getModifier(this, attribute)
+                + (proficient ? LevelingSystem.getProficiencyBonus(this) : 0);
         boolean disadvantage = (attribute == Attribute.STRENGTH || attribute == Attribute.DEXTERITY)
                 && InventorySystem.isWearingNonProficientArmor(this);
         DiceRoll diceRoll = DiceRoller.rollD20(modifier, disadvantage);

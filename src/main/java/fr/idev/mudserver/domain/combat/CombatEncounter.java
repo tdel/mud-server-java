@@ -7,6 +7,7 @@ import java.util.function.Function;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
+import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.actor.system.AttributeSystem;
@@ -114,7 +115,8 @@ public final class CombatEncounter {
 
     public synchronized List<CharacterInstance> livingPlayers() {
         return order.stream().map(InitiativeEntry::character)
-                .filter(character -> character instanceof CharacterInstance && character.getCurrentHealth() > 0)
+                .filter(character -> character instanceof CharacterInstance
+                        && character.component(CombatComponent.class).currentHealth() > 0)
                 .map(CharacterInstance.class::cast).toList();
     }
 

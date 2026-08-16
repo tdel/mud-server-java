@@ -10,6 +10,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
+import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
@@ -117,7 +118,7 @@ public class CharacterPersistenceListener {
         RoomInstance startingRoom = character.getWorldInstance().startingRoomInstance()
                 .orElseThrow(() -> new IllegalStateException("Aucune starting room configurée"));
 
-        character.setCurrentHealth(character.getMaxHealth());
+        CombatSystem.heal(character, character.component(CombatComponent.class).maxHealth());
         character.moveToRoom(startingRoom);
         characterDao.update(character);
 
@@ -129,8 +130,9 @@ public class CharacterPersistenceListener {
     void onGamePlayerUsedPotion(GamePlayerUsedPotion event) {
         CharacterInstance character = event.character();
         characterDao.update(character);
+        CombatComponent combat = character.component(CombatComponent.class);
         character.send(new ItemUsed(event.item().getName(), event.item().getRarity(), event.healedAmount(),
-                character.getCurrentHealth(), character.getMaxHealth()));
+                combat.currentHealth(), combat.maxHealth()));
         log.info("character.used_potion character={} item={} healedAmount={}", character.getName(),
                 event.item().getName(), event.healedAmount());
     }
@@ -140,7 +142,8 @@ public class CharacterPersistenceListener {
         for (Map.Entry<CharacterInstance, Integer> entry : event.healedAmounts().entrySet()) {
             CharacterInstance character = entry.getKey();
             characterDao.update(character);
-            character.send(new HpRestored(entry.getValue(), character.getCurrentHealth(), character.getMaxHealth()));
+            CombatComponent combat = character.component(CombatComponent.class);
+            character.send(new HpRestored(entry.getValue(), combat.currentHealth(), combat.maxHealth()));
         }
         event.initiator().getWorldInstance().broadcast(new ShortRestAnnounced(event.initiator().getName()), null);
         log.info("character.short_rest_taken initiator={} affected={}", event.initiator().getName(),
@@ -152,7 +155,8 @@ public class CharacterPersistenceListener {
         for (Map.Entry<CharacterInstance, Integer> entry : event.healedAmounts().entrySet()) {
             CharacterInstance character = entry.getKey();
             characterDao.update(character);
-            character.send(new HpRestored(entry.getValue(), character.getCurrentHealth(), character.getMaxHealth()));
+            CombatComponent combat = character.component(CombatComponent.class);
+            character.send(new HpRestored(entry.getValue(), combat.currentHealth(), combat.maxHealth()));
         }
         event.initiator().getWorldInstance().broadcast(new LongRestAnnounced(event.initiator().getName()), null);
         log.info("character.long_rest_taken initiator={} affected={} provisionsConsumed={}",

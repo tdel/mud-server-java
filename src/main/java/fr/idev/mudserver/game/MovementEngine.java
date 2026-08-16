@@ -19,6 +19,7 @@ import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.event.CharacterStartedMoving;
 import fr.idev.mudserver.domain.actor.event.CharacterStoppedMoving;
+import fr.idev.mudserver.domain.actor.system.MovementSystem;
 import fr.idev.mudserver.network.message.ingame.MovementBlockedByBounds;
 import fr.idev.mudserver.network.message.ingame.MovementBlockedByOccupant;
 
@@ -84,7 +85,7 @@ public class MovementEngine extends Thread {
     }
 
     private void processIfDue(AbstractCharacter character, long now) {
-        switch (character.getMovementSystem().updatePosition(now)) {
+        switch (MovementSystem.updatePosition(character, now)) {
             case NO_MOVEMENT -> {
             }
             case STEPPED -> notifyMoved(character);

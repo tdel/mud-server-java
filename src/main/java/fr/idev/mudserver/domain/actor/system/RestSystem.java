@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import fr.idev.mudserver.config.GameConfig;
+import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.component.RestComponent;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.LongRestTaken;
@@ -67,7 +68,8 @@ public final class RestSystem {
 
         Map<CharacterInstance, Integer> healedAmounts = new LinkedHashMap<>();
         for (CharacterInstance character : initiator.getWorldInstance().onlineCharacters()) {
-            healedAmounts.put(character, CombatSystem.heal(character, character.getMaxHealth()));
+            healedAmounts.put(character,
+                    CombatSystem.heal(character, character.component(CombatComponent.class).maxHealth()));
             resetShortRestCount(character);
         }
 

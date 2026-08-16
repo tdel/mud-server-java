@@ -19,6 +19,10 @@ public final class LevelingSystem {
         DomainEventPublisher.publish(new CharacterGainedXp(character, amount));
     }
 
+    public static int getProficiencyBonus(CharacterInstance character) {
+        return 2 + Math.floorDiv(character.component(LevelingComponent.class).level() - 1, 4);
+    }
+
     public static int hitDieRecovery(CharacterInstance character) {
         int hitDie = character.component(AppearanceComponent.class).characterClass().hitDie();
         return Math.max(1, hitDie / 2 + 1 + AttributeSystem.getModifier(character, Attribute.CONSTITUTION));

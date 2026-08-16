@@ -7,6 +7,7 @@ import java.util.Optional;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.ArmorProficiency;
 import fr.idev.mudserver.domain.actor.Attribute;
+import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
 import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
 import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
@@ -125,8 +126,9 @@ public final class InventorySystem {
     }
 
     public static boolean isWearingNonProficientArmor(CharacterInstance character) {
-        return component(character).equippedItems().stream().map(InventorySystem::requiredArmorProficiency).anyMatch(
-                required -> required.isPresent() && !character.getArmorProficiencies().contains(required.get()));
+        return component(character).equippedItems().stream().map(InventorySystem::requiredArmorProficiency)
+                .anyMatch(required -> required.isPresent() && !character.component(AppearanceComponent.class)
+                        .characterClass().armorProficiencies().contains(required.get()));
     }
 
     public static Optional<Item> equippedWeapon(CharacterInstance character) {

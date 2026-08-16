@@ -5,6 +5,7 @@ import java.util.List;
 
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.component.MovementComponent;
+import fr.idev.mudserver.domain.actor.component.MovementComponent.ActiveMovement;
 import fr.idev.mudserver.domain.actor.event.CharacterStartedMoving;
 import fr.idev.mudserver.domain.actor.event.CharacterStoppedMoving;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
@@ -17,18 +18,10 @@ public final class MovementSystem {
     public static final int REFERENCE_SPEED = 5;
     public static final long REFERENCE_TIME_MS = 1000L;
 
-    private final AbstractCharacter character;
-    private volatile ActiveMovement activeMovement;
-
-    public MovementSystem(AbstractCharacter character) {
-        this.character = character;
+    private MovementSystem() {
     }
 
-    public long getMillisPerCell(AbstractCharacter character) {
-        return REFERENCE_TIME_MS * REFERENCE_SPEED / Math.max(1, character.component(MovementComponent.class).speed());
-    }
-
-    public CellStepOutcome moveOneCell(HexDirection direction) {
+    public static CellStepOutcome moveOneCell(AbstractCharacter character, HexDirection direction) {
         RoomInstance room = character.getCurrentRoom();
         HexCoordinate current = character.getPosition();
         HexCoordinate next = current.neighbor(direction);
@@ -46,8 +39,8 @@ public final class MovementSystem {
         return new CellStepOutcome(true, false, false);
     }
 
-    public List<HexCoordinate> remainingPath() {
-        ActiveMovement movement = this.activeMovement; // photo unique du champ volatile
+    public static List<HexCoordinate> remainingPath(AbstractCharacter character) {
+        ActiveMovement movement = character.component(MovementComponent.class).activeMovement();
         if (movement == null) {
             return List.of();
         }
@@ -60,28 +53,29 @@ public final class MovementSystem {
         return path;
     }
 
-    public void startMovement(HexDirection direction, int cellsRequested) {
-        this.activeMovement = new ActiveMovement(direction, cellsRequested, System.currentTimeMillis());
+    public static void startMovement(AbstractCharacter character, HexDirection direction, int cellsRequested) {
+        character.updateComponent(MovementComponent.class, current -> new MovementComponent(current.speed(),
+                new ActiveMovement(direction, cellsRequested, System.currentTimeMillis())));
         DomainEventPublisher.publish(new CharacterStartedMoving(character));
     }
 
-    public void stopMovement() {
-        if (this.activeMovement == null) {
+    public static void stopMovement(AbstractCharacter character) {
+        if (character.component(MovementComponent.class).activeMovement() == null) {
             return;
         }
-        this.activeMovement = null;
+        character.updateComponent(MovementComponent.class, current -> new MovementComponent(current.speed(), null));
         DomainEventPublisher.publish(new CharacterStoppedMoving(character));
     }
 
-    public MovementStepOutcome updatePosition(long now) {
-        ActiveMovement movement = this.activeMovement;
+    public static MovementStepOutcome updatePosition(AbstractCharacter character, long now) {
+        ActiveMovement movement = character.component(MovementComponent.class).activeMovement();
         if (movement == null || now - movement.lastStepAt() < getMillisPerCell(character)) {
             return MovementStepOutcome.NO_MOVEMENT;
         }
 
-        CellStepOutcome step = moveOneCell(movement.direction());
+        CellStepOutcome step = moveOneCell(character, movement.direction());
         if (!step.moved()) {
-            this.activeMovement = null;
+            character.updateComponent(MovementComponent.class, current -> new MovementComponent(current.speed(), null));
             return step.blockedByOccupant()
                     ? MovementStepOutcome.BLOCKED_BY_OCCUPANT
                     : MovementStepOutcome.BLOCKED_BY_BOUNDS;
@@ -89,20 +83,20 @@ public final class MovementSystem {
 
         int remaining = movement.cellsRemaining() - 1;
         if (remaining <= 0) {
-            this.activeMovement = null;
+            character.updateComponent(MovementComponent.class, current -> new MovementComponent(current.speed(), null));
             return MovementStepOutcome.FINISHED;
         }
-        this.activeMovement = movement.withRemaining(remaining, now);
+        ActiveMovement updatedMovement = movement.withRemaining(remaining, now);
+        character.updateComponent(MovementComponent.class,
+                current -> new MovementComponent(current.speed(), updatedMovement));
         return MovementStepOutcome.STEPPED;
     }
 
-    public record CellStepOutcome(boolean moved, boolean blockedByBounds, boolean blockedByOccupant) {
+    private static long getMillisPerCell(AbstractCharacter character) {
+        return REFERENCE_TIME_MS * REFERENCE_SPEED / Math.max(1, character.component(MovementComponent.class).speed());
     }
 
-    private record ActiveMovement(HexDirection direction, int cellsRemaining, long lastStepAt) {
-        ActiveMovement withRemaining(int newRemaining, long stepAt) {
-            return new ActiveMovement(direction, newRemaining, stepAt);
-        }
+    public record CellStepOutcome(boolean moved, boolean blockedByBounds, boolean blockedByOccupant) {
     }
 
     public enum MovementStepOutcome {

@@ -11,7 +11,6 @@ import fr.idev.mudserver.domain.actor.component.NetworkComponent;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.actor.system.AttributeSystem;
 import fr.idev.mudserver.domain.actor.system.InventorySystem;
-import fr.idev.mudserver.domain.actor.system.MovementSystem;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.combat.ActionEconomy;
 import fr.idev.mudserver.domain.combat.CombatEncounter;
@@ -25,7 +24,6 @@ public abstract class AbstractCharacter extends AbstractObject {
     private volatile HexCoordinate position;
     private volatile CombatEncounter encounter;
     private final ActionEconomy actionEconomy = new ActionEconomy();
-    private final MovementSystem movementSystem = new MovementSystem(this);
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
             int maxHealth, int speed) {
@@ -37,19 +35,6 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public int getArmorClass() {
         return InventorySystem.getArmorClass(this);
-    }
-
-    public int getCurrentHealth() {
-        return component(CombatComponent.class).currentHealth();
-    }
-
-    public void setCurrentHealth(int currentHealth) {
-        updateComponent(CombatComponent.class,
-                current -> new CombatComponent(currentHealth, current.maxHealth(), current.target()));
-    }
-
-    public int getMaxHealth() {
-        return component(CombatComponent.class).maxHealth();
     }
 
     public RoomInstance getCurrentRoom() {
@@ -82,10 +67,6 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public ActionEconomy getActionEconomy() {
         return actionEconomy;
-    }
-
-    public MovementSystem getMovementSystem() {
-        return movementSystem;
     }
 
     public int rollInitiative() {

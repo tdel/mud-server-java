@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.system.AiSystem;
 import fr.idev.mudserver.domain.item.ConsumableItem;
 import fr.idev.mudserver.domain.item.Item;
@@ -309,7 +310,7 @@ public class CombatEngine {
         }
 
         List<MonsterInstance> aggressors = victim.getCurrentRoom().getMonsters().stream()
-                .filter(monster -> monster.getCurrentHealth() > 0)
+                .filter(monster -> monster.component(CombatComponent.class).currentHealth() > 0)
                 .filter(monster -> monster.getPosition().distanceTo(event.cell()) <= monster.getPresenceRadius())
                 .toList();
         if (aggressors.isEmpty()) {

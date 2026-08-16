@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
+import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import fr.idev.mudserver.domain.actor.component.RestComponent;
@@ -38,6 +39,7 @@ public class CharacterDao {
         UUID worldInstanceId = character.getWorldInstanceId() != null
                 ? character.getWorldInstanceId()
                 : WorldInstance.DEFAULT_ID;
+        CombatComponent combat = character.component(CombatComponent.class);
         dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_ROOM_ID,
                 CHARACTER.GENDER, CHARACTER.RACE, CHARACTER.CHARACTER_CLASS, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH,
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
@@ -47,8 +49,8 @@ public class CharacterDao {
                         character.component(AppearanceComponent.class).gender().name(),
                         character.component(AppearanceComponent.class).race().name(),
                         character.component(AppearanceComponent.class).characterClass().name(),
-                        character.component(LevelingComponent.class).level(), character.getCurrentHealth(),
-                        character.getMaxHealth(), AttributeSystem.getAttribute(character, Attribute.STRENGTH),
+                        character.component(LevelingComponent.class).level(), combat.currentHealth(),
+                        combat.maxHealth(), AttributeSystem.getAttribute(character, Attribute.STRENGTH),
                         AttributeSystem.getAttribute(character, Attribute.DEXTERITY),
                         AttributeSystem.getAttribute(character, Attribute.CONSTITUTION),
                         AttributeSystem.getAttribute(character, Attribute.INTELLIGENCE),
@@ -79,9 +81,10 @@ public class CharacterDao {
 
     public void update(CharacterInstance character) {
         LevelingComponent leveling = character.component(LevelingComponent.class);
+        CombatComponent combat = character.component(CombatComponent.class);
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_ROOM_ID, character.getCurrentRoomId())
-                .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).set(CHARACTER.XP, leveling.xp())
-                .set(CHARACTER.LEVEL, leveling.level()).set(CHARACTER.MAX_HEALTH, character.getMaxHealth())
+                .set(CHARACTER.CURRENT_HEALTH, combat.currentHealth()).set(CHARACTER.XP, leveling.xp())
+                .set(CHARACTER.LEVEL, leveling.level()).set(CHARACTER.MAX_HEALTH, combat.maxHealth())
                 .set(CHARACTER.GOLD, character.component(InventoryComponent.class).gold())
                 .set(CHARACTER.SHORT_REST_COUNT, character.component(RestComponent.class).shortRestCount())
                 .where(CHARACTER.ID.eq(character.getId())).execute();
