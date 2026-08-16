@@ -12,18 +12,18 @@ import fr.idev.mudserver.domain.item.EquipmentSlot;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.item.ItemTemplate;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
-import fr.idev.mudserver.game.ItemTemplateService;
+import fr.idev.mudserver.game.catalog.ItemTemplateCatalog;
 import fr.idev.mudserver.persistence.jooq.tables.records.ItemRecord;
 
 @Repository
 public class ItemDao {
 
     private final DSLContext dsl;
-    private final ItemTemplateService itemTemplateService;
+    private final ItemTemplateCatalog itemTemplateCatalog;
 
-    public ItemDao(DSLContext dsl, ItemTemplateService itemTemplateService) {
+    public ItemDao(DSLContext dsl, ItemTemplateCatalog itemTemplateCatalog) {
         this.dsl = dsl;
-        this.itemTemplateService = itemTemplateService;
+        this.itemTemplateCatalog = itemTemplateCatalog;
     }
 
     public void insert(Item item) {
@@ -50,7 +50,7 @@ public class ItemDao {
     }
 
     private Item toItem(ItemRecord record, AbstractCharacter character) {
-        ItemTemplate template = itemTemplateService.getById(record.getTemplateId());
+        ItemTemplate template = itemTemplateCatalog.getById(record.getTemplateId());
         String slot = record.getSlot();
         return new Item(record.getId(), template, character, slot == null ? null : EquipmentSlot.valueOf(slot));
     }

@@ -1,4 +1,4 @@
-package fr.idev.mudserver.game.actor;
+package fr.idev.mudserver.game.catalog;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,14 +13,14 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 @Service
-public class LevelService {
+public class LevelCatalog {
 
     private static final String LEVELS_RESOURCE = "/data/levels.json";
 
     private final Map<Integer, Integer> xpRequiredByLevel = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper;
 
-    public LevelService(ObjectMapper objectMapper) {
+    public LevelCatalog(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 

@@ -12,7 +12,7 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.world.WorldTemplateSummary;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.game.WorldInstanceService;
-import fr.idev.mudserver.game.WorldTemplateService;
+import fr.idev.mudserver.game.catalog.WorldTemplateCatalog;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.persistence.WorldInstanceDao;
@@ -20,11 +20,11 @@ import fr.idev.mudserver.persistence.WorldInstanceDao;
 @Component
 public class WorldsList implements ControllerHandler {
 
-    private final WorldTemplateService worldTemplateService;
+    private final WorldTemplateCatalog worldTemplateService;
     private final WorldInstanceDao worldInstanceDao;
     private final WorldInstanceService worldInstanceService;
 
-    public WorldsList(WorldTemplateService worldTemplateService, WorldInstanceDao worldInstanceDao,
+    public WorldsList(WorldTemplateCatalog worldTemplateService, WorldInstanceDao worldInstanceDao,
             WorldInstanceService worldInstanceService) {
         this.worldTemplateService = worldTemplateService;
         this.worldInstanceDao = worldInstanceDao;

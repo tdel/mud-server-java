@@ -1,4 +1,4 @@
-package fr.idev.mudserver.game;
+package fr.idev.mudserver.game.catalog;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,9 +24,9 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 @Service
-public class ItemTemplateService {
+public class ItemTemplateCatalog {
 
-    private static final Logger log = LoggerFactory.getLogger(ItemTemplateService.class);
+    private static final Logger log = LoggerFactory.getLogger(ItemTemplateCatalog.class);
 
     private static final String ITEM_TEMPLATE_RESOURCE = "/data/items.json";
 
@@ -34,7 +34,7 @@ public class ItemTemplateService {
 
     private final ObjectMapper objectMapper;
 
-    public ItemTemplateService(ObjectMapper objectMapper) {
+    public ItemTemplateCatalog(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 

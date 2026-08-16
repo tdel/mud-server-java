@@ -1,4 +1,4 @@
-package fr.idev.mudserver.game;
+package fr.idev.mudserver.persistence.listener;
 
 import java.util.List;
 
@@ -22,13 +22,13 @@ import fr.idev.mudserver.network.message.ingame.ItemBought;
 import fr.idev.mudserver.persistence.ItemDao;
 
 @Service
-public class ItemService {
+public class ItemPersistenceListener {
 
-    private static final Logger log = LoggerFactory.getLogger(ItemService.class);
+    private static final Logger log = LoggerFactory.getLogger(ItemPersistenceListener.class);
 
     private final ItemDao itemDao;
 
-    public ItemService(ItemDao itemDao) {
+    public ItemPersistenceListener(ItemDao itemDao) {
         this.itemDao = itemDao;
     }
 

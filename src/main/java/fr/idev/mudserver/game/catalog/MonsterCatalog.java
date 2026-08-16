@@ -1,4 +1,4 @@
-package fr.idev.mudserver.game.actor;
+package fr.idev.mudserver.game.catalog;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import fr.idev.mudserver.game.ItemTemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -26,20 +25,20 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 @Service
-public class MonsterService {
+public class MonsterCatalog {
 
-    private static final Logger log = LoggerFactory.getLogger(MonsterService.class);
+    private static final Logger log = LoggerFactory.getLogger(MonsterCatalog.class);
 
     private static final String MONSTERS_RESOURCE = "/data/monsters.json";
 
     private final Map<UUID, MonsterTemplate> templates = new ConcurrentHashMap<>();
 
     private final ObjectMapper objectMapper;
-    private final ItemTemplateService itemTemplateService;
+    private final ItemTemplateCatalog itemTemplateCatalog;
 
-    public MonsterService(ObjectMapper objectMapper, ItemTemplateService itemTemplateService) {
+    public MonsterCatalog(ObjectMapper objectMapper, ItemTemplateCatalog itemTemplateCatalog) {
         this.objectMapper = objectMapper;
-        this.itemTemplateService = itemTemplateService;
+        this.itemTemplateCatalog = itemTemplateCatalog;
     }
 
     public void warmMonsterTemplates() {
@@ -83,7 +82,7 @@ public class MonsterService {
                     throw new IllegalStateException("Template " + definition.id() + " a une entrée de lootTable avec "
                             + "dropChance=" + entryDef.dropChance() + " hors de [0, 100] dans " + MONSTERS_RESOURCE);
                 }
-                ItemTemplate itemTemplate = this.itemTemplateService.getById(entryDef.itemTemplateId());
+                ItemTemplate itemTemplate = this.itemTemplateCatalog.getById(entryDef.itemTemplateId());
                 if (itemTemplate == null) {
                     throw new IllegalStateException("Template " + definition.id() + " référence l'item "
                             + entryDef.itemTemplateId() + " dans sa lootTable, absent de data/items.json");

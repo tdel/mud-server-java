@@ -1,18 +1,17 @@
-package fr.idev.mudserver.event;
+package fr.idev.mudserver.persistence.listener;
 
 import java.util.Map;
 
-import fr.idev.mudserver.game.actor.LevelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
-import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
+import fr.idev.mudserver.domain.actor.event.CharacterLeveledUp;
 import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
 import fr.idev.mudserver.domain.actor.event.CharacterSpentGold;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
@@ -21,6 +20,7 @@ import fr.idev.mudserver.domain.actor.event.LongRestTaken;
 import fr.idev.mudserver.domain.actor.event.NewGamePlayerCreated;
 import fr.idev.mudserver.domain.actor.event.ShortRestTaken;
 import fr.idev.mudserver.domain.world.RoomInstance;
+import fr.idev.mudserver.game.catalog.LevelCatalog;
 import fr.idev.mudserver.network.message.ingame.GoldLooted;
 import fr.idev.mudserver.network.message.ingame.GoldSpent;
 import fr.idev.mudserver.network.message.ingame.HpRestored;
@@ -33,16 +33,16 @@ import fr.idev.mudserver.network.message.ingame.XpGained;
 import fr.idev.mudserver.persistence.CharacterDao;
 
 @Service
-public class CharacterListener {
+public class CharacterPersistenceListener {
 
-    private static final Logger log = LoggerFactory.getLogger(CharacterListener.class);
+    private static final Logger log = LoggerFactory.getLogger(CharacterPersistenceListener.class);
 
     private final CharacterDao characterDao;
-    private final LevelService levelService;
+    private final LevelCatalog levelCatalog;
 
-    public CharacterListener(CharacterDao characterDao, LevelService levelService) {
+    public CharacterPersistenceListener(CharacterDao characterDao, LevelCatalog levelCatalog) {
         this.characterDao = characterDao;
-        this.levelService = levelService;
+        this.levelCatalog = levelCatalog;
     }
 
     @EventListener
@@ -56,27 +56,23 @@ public class CharacterListener {
     void onCharacterGainedXp(CharacterGainedXp event) {
         CharacterInstance character = event.character();
         character.send(new XpGained(event.amount()));
-        boolean leveledUp = false;
 
-        while (character.getLevel() < levelService.maxLevel()
-                && character.getXp() >= levelService.xpRequiredForLevel(character.getLevel() + 1)) {
-            int hitDie = character.getCharacterClass().hitDie();
-            int constitutionModifier = character.getModifier(Attribute.CONSTITUTION);
-            int hpGain = Math.max(1, hitDie / 2 + 1 + constitutionModifier);
-
-            character.setLevel(character.getLevel() + 1);
-            character.setMaxHealth(character.getMaxHealth() + hpGain);
-            character.setCurrentHealth(character.getCurrentHealth() + hpGain);
-            leveledUp = true;
+        while (character.getLevel() < levelCatalog.maxLevel()
+                && character.getXp() >= levelCatalog.xpRequiredForLevel(character.getLevel() + 1)) {
+            character.applyLevelUp();
         }
 
         characterDao.update(character);
-        log.info("character.xp_gained character={} amount={} newXp={} leveledUp={} newLevel={}", character.getName(),
-                event.amount(), character.getXp(), leveledUp, character.getLevel());
+        log.info("character.xp_gained character={} amount={} newXp={} newLevel={}", character.getName(), event.amount(),
+                character.getXp(), character.getLevel());
+    }
 
-        if (leveledUp) {
-            character.getCurrentRoom().broadcast(new PlayerLeveledUp(character.getName(), character.getLevel()), null);
-        }
+    @EventListener
+    void onCharacterLeveledUp(CharacterLeveledUp event) {
+        CharacterInstance character = event.character();
+        character.getCurrentRoom().broadcast(new PlayerLeveledUp(character.getName(), event.newLevel()), null);
+        log.info("character.leveled_up character={} newLevel={} hpGained={}", character.getName(), event.newLevel(),
+                event.hpGained());
     }
 
     @EventListener

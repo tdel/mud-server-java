@@ -11,6 +11,7 @@ import java.util.UUID;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.*;
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
+import fr.idev.mudserver.domain.actor.event.CharacterLeveledUp;
 import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
 import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
 import fr.idev.mudserver.domain.actor.event.CharacterSpentGold;
@@ -275,6 +276,19 @@ public final class CharacterInstance extends AbstractCharacter {
     public void gainXp(int amount) {
         this.xp += amount;
         DomainEventPublisher.publish(new CharacterGainedXp(this, amount));
+    }
+
+    public int hitDieRecovery() {
+        int hitDie = characterClass.hitDie();
+        return Math.max(1, hitDie / 2 + 1 + getModifier(Attribute.CONSTITUTION));
+    }
+
+    public void applyLevelUp() {
+        int hpGain = hitDieRecovery();
+        level++;
+        setMaxHealth(getMaxHealth() + hpGain);
+        setCurrentHealth(getCurrentHealth() + hpGain);
+        DomainEventPublisher.publish(new CharacterLeveledUp(this, level, hpGain));
     }
 
     public int getShortRestCount() {

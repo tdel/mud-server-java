@@ -1,4 +1,4 @@
-package fr.idev.mudserver.game;
+package fr.idev.mudserver.game.catalog;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,9 +33,9 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 @Service
-public class WorldTemplateService {
+public class WorldTemplateCatalog {
 
-    private static final Logger log = LoggerFactory.getLogger(WorldTemplateService.class);
+    private static final Logger log = LoggerFactory.getLogger(WorldTemplateCatalog.class);
 
     private static final String WORLDS_MANIFEST_PATTERN = "classpath*:data/worlds/*/world.json";
     private static final String WORLDS_DIR_MARKER = "data/worlds/";
@@ -46,13 +46,13 @@ public class WorldTemplateService {
 
     private final ObjectMapper objectMapper;
     private final ResourcePatternResolver resourcePatternResolver;
-    private final ItemTemplateService itemTemplateService;
+    private final ItemTemplateCatalog itemTemplateCatalog;
 
-    public WorldTemplateService(ObjectMapper objectMapper, ResourcePatternResolver resourcePatternResolver,
-            ItemTemplateService itemTemplateService) {
+    public WorldTemplateCatalog(ObjectMapper objectMapper, ResourcePatternResolver resourcePatternResolver,
+            ItemTemplateCatalog itemTemplateCatalog) {
         this.objectMapper = objectMapper;
         this.resourcePatternResolver = resourcePatternResolver;
-        this.itemTemplateService = itemTemplateService;
+        this.itemTemplateCatalog = itemTemplateCatalog;
     }
 
     public void warmWorldTemplates() {
@@ -123,7 +123,7 @@ public class WorldTemplateService {
         if (summary == null) {
             throw new IllegalStateException("WorldTemplate " + id + " absent de summariesById");
         }
-        return loadWorldTemplate(summary, itemTemplateService.templatesById());
+        return loadWorldTemplate(summary, itemTemplateCatalog.templatesById());
     }
 
     private WorldTemplate loadWorldTemplate(WorldTemplateSummary summary, Map<UUID, ItemTemplate> itemTemplatesById) {

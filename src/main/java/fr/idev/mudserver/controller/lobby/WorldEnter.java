@@ -19,7 +19,7 @@ import fr.idev.mudserver.domain.world.WorldTemplateSummary;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.PartyService;
 import fr.idev.mudserver.game.WorldInstanceService;
-import fr.idev.mudserver.game.WorldTemplateService;
+import fr.idev.mudserver.game.catalog.WorldTemplateCatalog;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -34,7 +34,7 @@ import fr.idev.mudserver.persistence.WorldInstanceDao;
 @Component
 public class WorldEnter implements ControllerHandler {
 
-    private final WorldTemplateService worldTemplateService;
+    private final WorldTemplateCatalog worldTemplateService;
     private final WorldInstanceDao worldInstanceDao;
     private final WorldInstanceService worldInstanceService;
     private final AuthWorld authWorld;
@@ -42,7 +42,7 @@ public class WorldEnter implements ControllerHandler {
     private final PartyService partyService;
     private final AccountDao accountDao;
 
-    public WorldEnter(WorldTemplateService worldTemplateService, WorldInstanceDao worldInstanceDao,
+    public WorldEnter(WorldTemplateCatalog worldTemplateService, WorldInstanceDao worldInstanceDao,
             WorldInstanceService worldInstanceService, AuthWorld authWorld, CharSelectStatus charSelectStatus,
             PartyService partyService, AccountDao accountDao) {
         this.worldTemplateService = worldTemplateService;

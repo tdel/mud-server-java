@@ -25,11 +25,10 @@ import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
-import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
-import fr.idev.mudserver.domain.actor.event.GamePlayerSpawnedToRoom;
 import fr.idev.mudserver.domain.actor.event.WorldInstanceCreated;
-import fr.idev.mudserver.game.actor.MonsterService;
-import fr.idev.mudserver.game.actor.NpcService;
+import fr.idev.mudserver.game.catalog.MonsterCatalog;
+import fr.idev.mudserver.game.catalog.NpcCatalog;
+import fr.idev.mudserver.game.catalog.WorldTemplateCatalog;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ingame.GamePlayerDefeated;
@@ -37,7 +36,11 @@ import fr.idev.mudserver.network.message.ingame.MonsterDefeated;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 import fr.idev.mudserver.persistence.WorldInstanceDao;
+import fr.idev.mudserver.persistence.listener.ItemPersistenceListener;
 
+// La persistance de WorldInstanceCreated/GamePlayerMovedToRoom/GamePlayerSpawnedToRoom vit
+// dans persistence.listener.WorldInstancePersistenceListener — ici ne reste que
+// l'orchestration (matérialisation, entrée/sortie de partie, nettoyage de room).
 @Service
 public class WorldInstanceService {
 
@@ -45,17 +48,17 @@ public class WorldInstanceService {
 
     private final Map<UUID, WorldInstance> residentInstances = new ConcurrentHashMap<>();
 
-    private final WorldTemplateService worldTemplateService;
+    private final WorldTemplateCatalog worldTemplateService;
     private final WorldInstanceDao worldInstanceDao;
-    private final MonsterService monsterService;
-    private final NpcService npcService;
-    private final ItemService itemService;
+    private final MonsterCatalog monsterService;
+    private final NpcCatalog npcService;
+    private final ItemPersistenceListener itemService;
     private final AccountDao accountDao;
     private final CharacterDao characterDao;
 
-    public WorldInstanceService(WorldTemplateService worldTemplateService, WorldInstanceDao worldInstanceDao,
-            MonsterService monsterService, NpcService npcService, ItemService itemService, AccountDao accountDao,
-            CharacterDao characterDao) {
+    public WorldInstanceService(WorldTemplateCatalog worldTemplateService, WorldInstanceDao worldInstanceDao,
+            MonsterCatalog monsterService, NpcCatalog npcService, ItemPersistenceListener itemService,
+            AccountDao accountDao, CharacterDao characterDao) {
         this.worldTemplateService = worldTemplateService;
         this.worldInstanceDao = worldInstanceDao;
         this.monsterService = monsterService;
@@ -112,11 +115,6 @@ public class WorldInstanceService {
         return instance;
     }
 
-    @EventListener
-    void onWorldInstanceCreated(WorldInstanceCreated event) {
-        worldInstanceDao.insert(event.instance());
-    }
-
     public Optional<CharacterInstance> findCharacterFor(Account account, WorldInstance instance) {
         return characterDao.findByAccountAndWorldInstance(account, instance);
     }
@@ -153,18 +151,6 @@ public class WorldInstanceService {
             log.info("world_instance.evicted id={} worldTemplateId={}", instance.getId(),
                     instance.getWorldTemplateId());
         }
-    }
-
-    @EventListener
-    void onGamePlayerMovedToRoom(GamePlayerMovedToRoom event) {
-        characterDao.updateCurrentRoom(event.character().getId(), event.to().getTemplateId());
-        log.debug("room.player_moved character={} to={}", event.character().getName(), event.to().getName());
-    }
-
-    @EventListener
-    void onGamePlayerSpawnedToRoom(GamePlayerSpawnedToRoom event) {
-        characterDao.updateCurrentRoom(event.character().getId(), event.room().getTemplateId());
-        log.info("room.player_spawned character={} room={}", event.character().getName(), event.room().getName());
     }
 
     @EventListener

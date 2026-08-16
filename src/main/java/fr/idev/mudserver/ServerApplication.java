@@ -8,11 +8,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
-import fr.idev.mudserver.game.ItemTemplateService;
 import fr.idev.mudserver.game.MovementTicker;
-import fr.idev.mudserver.game.actor.LevelService;
-import fr.idev.mudserver.game.actor.MonsterService;
-import fr.idev.mudserver.game.WorldTemplateService;
+import fr.idev.mudserver.game.catalog.ItemTemplateCatalog;
+import fr.idev.mudserver.game.catalog.LevelCatalog;
+import fr.idev.mudserver.game.catalog.MonsterCatalog;
+import fr.idev.mudserver.game.catalog.WorldTemplateCatalog;
 
 @SpringBootApplication
 public class ServerApplication {
@@ -25,15 +25,15 @@ public class ServerApplication {
 
     @Bean
     @ConditionalOnProperty(prefix = "app.telnet", name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ApplicationRunner warmupRunner(ItemTemplateService itemTemplateService, LevelService levelService,
-            MonsterService monsterService, WorldTemplateService worldTemplateService) {
+    public ApplicationRunner warmupRunner(ItemTemplateCatalog itemTemplateCatalog, LevelCatalog levelCatalog,
+            MonsterCatalog monsterCatalog, WorldTemplateCatalog worldTemplateCatalog) {
         return args -> {
             long start = System.currentTimeMillis();
             log.info("startup.warmup_started");
-            itemTemplateService.warmItemTemplates();
-            worldTemplateService.warmWorldTemplates();
-            monsterService.warmMonsterTemplates();
-            levelService.warmXpThresholds();
+            itemTemplateCatalog.warmItemTemplates();
+            worldTemplateCatalog.warmWorldTemplates();
+            monsterCatalog.warmMonsterTemplates();
+            levelCatalog.warmXpThresholds();
             log.info("startup.warmup_completed durationMs={}", System.currentTimeMillis() - start);
         };
     }

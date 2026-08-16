@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.item.FoodItem;
 import fr.idev.mudserver.domain.item.Item;
-import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.LongRestTaken;
@@ -48,9 +47,7 @@ public class RestService {
 
         Map<CharacterInstance, Integer> healedAmounts = new LinkedHashMap<>();
         for (CharacterInstance character : initiator.getWorldInstance().onlineCharacters()) {
-            int hitDie = character.getCharacterClass().hitDie();
-            int constitutionModifier = character.getModifier(Attribute.CONSTITUTION);
-            int amount = Math.max(1, hitDie / 2 + 1 + constitutionModifier);
+            int amount = character.hitDieRecovery();
             healedAmounts.put(character, character.heal(amount));
             character.incrementShortRestCount();
         }

@@ -1,12 +1,16 @@
 package fr.idev.mudserver.domain.actor.template;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 import fr.idev.mudserver.domain.actor.Attribute;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
+import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.item.ItemTemplate;
+import fr.idev.mudserver.game.dice.DiceRoller;
 
 public class MonsterTemplate {
 
@@ -146,6 +150,16 @@ public class MonsterTemplate {
         this.level = level;
     }
 
+    public LootResult rollLoot(CharacterInstance killer) {
+        List<Item> items = new ArrayList<>();
+        for (LootTableEntry entry : lootTable) {
+            if (DiceRoller.rollChance(entry.dropChance())) {
+                items.add(new Item(UUID.randomUUID(), entry.itemTemplate(), killer, null));
+            }
+        }
+        return new LootResult(goldReward, items);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -178,5 +192,8 @@ public class MonsterTemplate {
     }
 
     public record LootTableEntry(ItemTemplate itemTemplate, double dropChance) {
+    }
+
+    public record LootResult(int gold, List<Item> items) {
     }
 }

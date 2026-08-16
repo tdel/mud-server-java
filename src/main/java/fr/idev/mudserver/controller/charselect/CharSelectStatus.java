@@ -10,7 +10,7 @@ import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.domain.world.WorldTemplateSummary;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.game.WorldInstanceService;
-import fr.idev.mudserver.game.WorldTemplateService;
+import fr.idev.mudserver.game.catalog.WorldTemplateCatalog;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.message.charselect.ExistingCharacterInWorld;
 import fr.idev.mudserver.network.message.charselect.NoCharacterInWorld;
@@ -19,9 +19,9 @@ import fr.idev.mudserver.network.message.charselect.NoCharacterInWorld;
 public class CharSelectStatus {
 
     private final WorldInstanceService worldInstanceService;
-    private final WorldTemplateService worldTemplateService;
+    private final WorldTemplateCatalog worldTemplateService;
 
-    public CharSelectStatus(WorldInstanceService worldInstanceService, WorldTemplateService worldTemplateService) {
+    public CharSelectStatus(WorldInstanceService worldInstanceService, WorldTemplateCatalog worldTemplateService) {
         this.worldInstanceService = worldInstanceService;
         this.worldTemplateService = worldTemplateService;
     }

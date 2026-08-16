@@ -1,4 +1,4 @@
-package fr.idev.mudserver.game.actor;
+package fr.idev.mudserver.game.catalog;
 
 import java.util.Collection;
 import java.util.Map;
@@ -16,9 +16,9 @@ import fr.idev.mudserver.domain.actor.instance.NpcSellerInstance;
 import fr.idev.mudserver.domain.actor.template.NpcTemplate;
 
 @Service
-public class NpcService {
+public class NpcCatalog {
 
-    private static final Logger log = LoggerFactory.getLogger(NpcService.class);
+    private static final Logger log = LoggerFactory.getLogger(NpcCatalog.class);
 
     public void warmNpcs(Collection<WorldTemplate> worldTemplates, Collection<RoomInstance> rooms) {
         Map<UUID, RoomInstance> roomsByTemplateId = new ConcurrentHashMap<>();
