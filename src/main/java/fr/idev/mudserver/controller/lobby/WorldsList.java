@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.world.WorldTemplateSummary;
+import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.game.catalog.WorldTemplateCatalog;
@@ -59,8 +60,8 @@ public class WorldsList implements ControllerHandler {
             entries.add(new fr.idev.mudserver.network.message.lobby.WorldsList.Entry(template.shortName(),
                     template.name(), template.description(), template.minPlayers(), template.maxPlayers(),
                     existingCharacter.map(CharacterInstance::getName).orElse(null),
-                    existingCharacter.map(CharacterInstance::getCharacterClass).orElse(null),
-                    existingCharacter.map(CharacterInstance::getLevel).orElse(null)));
+                    existingCharacter.map(CharacterInstance::getCharacterClass).orElse(null), existingCharacter
+                            .map(character -> character.component(LevelingComponent.class).level()).orElse(null)));
         }
 
         connection.send(new fr.idev.mudserver.network.message.lobby.WorldsList(entries));

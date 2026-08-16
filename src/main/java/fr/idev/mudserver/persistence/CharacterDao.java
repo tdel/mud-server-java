@@ -12,6 +12,9 @@ import org.springframework.stereotype.Repository;
 
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.Attribute;
+import fr.idev.mudserver.domain.actor.component.InventoryComponent;
+import fr.idev.mudserver.domain.actor.component.LevelingComponent;
+import fr.idev.mudserver.domain.actor.component.RestComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
@@ -40,11 +43,13 @@ public class CharacterDao {
                 CHARACTER.SHORT_REST_COUNT, CHARACTER.WORLD_INSTANCE_ID)
                 .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentRoomId(),
                         character.getGender().name(), character.getRace().name(), character.getCharacterClass().name(),
-                        character.getLevel(), character.getCurrentHealth(), character.getMaxHealth(),
-                        character.getAttribute(Attribute.STRENGTH), character.getAttribute(Attribute.DEXTERITY),
-                        character.getAttribute(Attribute.CONSTITUTION), character.getAttribute(Attribute.INTELLIGENCE),
-                        character.getAttribute(Attribute.WISDOM), character.getAttribute(Attribute.CHARISMA),
-                        character.getXp(), character.getGold(), character.getShortRestCount(), worldInstanceId)
+                        character.component(LevelingComponent.class).level(), character.getCurrentHealth(),
+                        character.getMaxHealth(), character.getAttribute(Attribute.STRENGTH),
+                        character.getAttribute(Attribute.DEXTERITY), character.getAttribute(Attribute.CONSTITUTION),
+                        character.getAttribute(Attribute.INTELLIGENCE), character.getAttribute(Attribute.WISDOM),
+                        character.getAttribute(Attribute.CHARISMA), character.component(LevelingComponent.class).xp(),
+                        character.component(InventoryComponent.class).gold(),
+                        character.component(RestComponent.class).shortRestCount(), worldInstanceId)
                 .execute();
     }
 
@@ -66,10 +71,12 @@ public class CharacterDao {
     }
 
     public void update(CharacterInstance character) {
+        LevelingComponent leveling = character.component(LevelingComponent.class);
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_ROOM_ID, character.getCurrentRoomId())
-                .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).set(CHARACTER.XP, character.getXp())
-                .set(CHARACTER.LEVEL, character.getLevel()).set(CHARACTER.MAX_HEALTH, character.getMaxHealth())
-                .set(CHARACTER.GOLD, character.getGold()).set(CHARACTER.SHORT_REST_COUNT, character.getShortRestCount())
+                .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).set(CHARACTER.XP, leveling.xp())
+                .set(CHARACTER.LEVEL, leveling.level()).set(CHARACTER.MAX_HEALTH, character.getMaxHealth())
+                .set(CHARACTER.GOLD, character.component(InventoryComponent.class).gold())
+                .set(CHARACTER.SHORT_REST_COUNT, character.component(RestComponent.class).shortRestCount())
                 .where(CHARACTER.ID.eq(character.getId())).execute();
     }
 

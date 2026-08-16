@@ -9,6 +9,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import fr.idev.mudserver.domain.actor.component.InventoryComponent;
+import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
@@ -59,14 +61,16 @@ public class CharacterPersistenceListener {
         CharacterInstance character = event.character();
         character.send(new XpGained(event.amount()));
 
-        while (character.getLevel() < levelCatalog.maxLevel()
-                && character.getXp() >= levelCatalog.xpRequiredForLevel(character.getLevel() + 1)) {
+        while (character.component(LevelingComponent.class).level() < levelCatalog.maxLevel()
+                && character.component(LevelingComponent.class).xp() >= levelCatalog
+                        .xpRequiredForLevel(character.component(LevelingComponent.class).level() + 1)) {
             LevelingSystem.applyLevelUp(character);
         }
 
         characterDao.update(character);
+        LevelingComponent leveling = character.component(LevelingComponent.class);
         log.info("character.xp_gained character={} amount={} newXp={} newLevel={}", character.getName(), event.amount(),
-                character.getXp(), character.getLevel());
+                leveling.xp(), leveling.level());
     }
 
     @EventListener
@@ -82,7 +86,7 @@ public class CharacterPersistenceListener {
         characterDao.update(event.character());
         event.character().send(new GoldLooted(event.amount()));
         log.info("character.gold_received character={} amount={} newGold={}", event.character().getName(),
-                event.amount(), event.character().getGold());
+                event.amount(), event.character().component(InventoryComponent.class).gold());
     }
 
     @EventListener
@@ -90,7 +94,7 @@ public class CharacterPersistenceListener {
         characterDao.update(event.character());
         event.character().send(new GoldSpent(event.amount()));
         log.info("character.gold_spent character={} amount={} newGold={}", event.character().getName(), event.amount(),
-                event.character().getGold());
+                event.character().component(InventoryComponent.class).gold());
     }
 
     @EventListener

@@ -17,7 +17,6 @@ import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEnteredCell;
 import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
 import fr.idev.mudserver.domain.map.HexCoordinate;
-import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.actor.system.InventorySystem;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.item.WeaponCategory;
@@ -133,12 +132,8 @@ public final class CharacterInstance extends AbstractCharacter {
         return characterClass.armorProficiencies();
     }
 
-    public int getLevel() {
-        return component(LevelingComponent.class).level();
-    }
-
     public int getProficiencyBonus() {
-        return 2 + Math.floorDiv(getLevel() - 1, 4);
+        return 2 + Math.floorDiv(component(LevelingComponent.class).level() - 1, 4);
     }
 
     public CheckResult check(Skill skill, int dc) {
@@ -158,14 +153,6 @@ public final class CharacterInstance extends AbstractCharacter {
         DiceRoll diceRoll = DiceRoller.rollD20(modifier, disadvantage);
         boolean success = diceRoll.total() >= dc;
         return new CheckResult(label, diceRoll.total(), dc, proficient, disadvantage, success);
-    }
-
-    public int getXp() {
-        return component(LevelingComponent.class).xp();
-    }
-
-    public int getShortRestCount() {
-        return component(RestComponent.class).shortRestCount();
     }
 
     public void moveToRoom(RoomInstance destination) {
@@ -188,18 +175,6 @@ public final class CharacterInstance extends AbstractCharacter {
         return isInCombat();
     }
 
-    public int getGold() {
-        return component(InventoryComponent.class).gold();
-    }
-
-    public List<Item> getItems() {
-        return component(InventoryComponent.class).items();
-    }
-
-    public List<Item> getCarriedItems() {
-        return component(InventoryComponent.class).carriedItems();
-    }
-
     @Override
     public void send(OutputMessage message) {
         findComponent(NetworkComponent.class)
@@ -214,10 +189,17 @@ public final class CharacterInstance extends AbstractCharacter {
         if (!(o instanceof CharacterInstance other)) {
             return false;
         }
-        return getLevel() == other.getLevel() && getXp() == other.getXp() && getGold() == other.getGold()
-                && getCurrentHealth() == other.getCurrentHealth() && getMaxHealth() == other.getMaxHealth()
-                && getShortRestCount() == other.getShortRestCount() && Objects.equals(getId(), other.getId())
-                && Objects.equals(getAccountId(), other.getAccountId()) && Objects.equals(getName(), other.getName())
+        LevelingComponent level = component(LevelingComponent.class);
+        LevelingComponent otherLevel = other.component(LevelingComponent.class);
+        InventoryComponent inventory = component(InventoryComponent.class);
+        InventoryComponent otherInventory = other.component(InventoryComponent.class);
+        RestComponent rest = component(RestComponent.class);
+        RestComponent otherRest = other.component(RestComponent.class);
+        return level.level() == otherLevel.level() && level.xp() == otherLevel.xp()
+                && inventory.gold() == otherInventory.gold() && getCurrentHealth() == other.getCurrentHealth()
+                && getMaxHealth() == other.getMaxHealth() && rest.shortRestCount() == otherRest.shortRestCount()
+                && Objects.equals(getId(), other.getId()) && Objects.equals(getAccountId(), other.getAccountId())
+                && Objects.equals(getName(), other.getName())
                 && Objects.equals(getCurrentRoomId(), other.getCurrentRoomId()) && gender == other.gender
                 && race == other.race && characterClass == other.characterClass
                 && Objects.equals(getAttributes(), other.getAttributes());
@@ -225,17 +207,23 @@ public final class CharacterInstance extends AbstractCharacter {
 
     @Override
     public int hashCode() {
+        LevelingComponent level = component(LevelingComponent.class);
+        InventoryComponent inventory = component(InventoryComponent.class);
+        RestComponent rest = component(RestComponent.class);
         return Objects.hash(getId(), getAccountId(), getName(), getCurrentRoomId(), gender, race, characterClass,
-                getLevel(), getXp(), getGold(), getCurrentHealth(), getMaxHealth(), getShortRestCount(),
+                level.level(), level.xp(), inventory.gold(), getCurrentHealth(), getMaxHealth(), rest.shortRestCount(),
                 getAttributes());
     }
 
     @Override
     public String toString() {
+        LevelingComponent level = component(LevelingComponent.class);
+        InventoryComponent inventory = component(InventoryComponent.class);
+        RestComponent rest = component(RestComponent.class);
         return "GamePlayer[id=" + getId() + ", accountId=" + getAccountId() + ", name=" + getName() + ", currentRoomId="
                 + getCurrentRoomId() + ", gender=" + gender + ", race=" + race + ", characterClass=" + characterClass
-                + ", level=" + getLevel() + ", xp=" + getXp() + ", gold=" + getGold() + ", currentHealth="
-                + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + ", shortRestCount=" + getShortRestCount()
+                + ", level=" + level.level() + ", xp=" + level.xp() + ", gold=" + inventory.gold() + ", currentHealth="
+                + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + ", shortRestCount=" + rest.shortRestCount()
                 + ", attributes=" + getAttributes() + "]";
     }
 }
