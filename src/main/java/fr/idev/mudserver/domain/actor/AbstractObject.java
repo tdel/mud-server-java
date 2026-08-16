@@ -1,6 +1,10 @@
 package fr.idev.mudserver.domain.actor;
 
+import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
+import fr.idev.mudserver.domain.actor.system.AttributeSystem;
+
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,5 +53,27 @@ public abstract class AbstractObject {
     @SuppressWarnings("unchecked")
     public <C> C updateComponent(Class<C> type, UnaryOperator<C> mutator) {
         return (C) components.compute(type, (t, current) -> mutator.apply((C) current));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof AbstractObject other)) {
+            return false;
+        }
+
+        return this.id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
+    @Override
+    public String toString() {
+        return "AbstractObject[id=" + getId() + ", name=" + getName() + "]";
     }
 }

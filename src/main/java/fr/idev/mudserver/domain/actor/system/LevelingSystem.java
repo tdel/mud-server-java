@@ -1,6 +1,7 @@
 package fr.idev.mudserver.domain.actor.system;
 
 import fr.idev.mudserver.domain.actor.Attribute;
+import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
 import fr.idev.mudserver.domain.actor.event.CharacterLeveledUp;
@@ -19,7 +20,7 @@ public final class LevelingSystem {
     }
 
     public static int hitDieRecovery(CharacterInstance character) {
-        int hitDie = character.getCharacterClass().hitDie();
+        int hitDie = character.component(AppearanceComponent.class).characterClass().hitDie();
         return Math.max(1, hitDie / 2 + 1 + AttributeSystem.getModifier(character, Attribute.CONSTITUTION));
     }
 

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.domain.world.WorldTemplateSummary;
+import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.game.WorldInstanceService;
@@ -37,7 +38,8 @@ public class CharSelectStatus {
         }
 
         CharacterInstance existing = character.get();
-        connection.send(new ExistingCharacterInWorld(worldName, existing.getName(), existing.getCharacterClass(),
+        connection.send(new ExistingCharacterInWorld(worldName, existing.getName(),
+                existing.component(AppearanceComponent.class).characterClass(),
                 existing.component(LevelingComponent.class).level()));
     }
 

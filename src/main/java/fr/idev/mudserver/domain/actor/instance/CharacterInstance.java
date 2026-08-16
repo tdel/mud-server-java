@@ -29,9 +29,6 @@ public final class CharacterInstance extends AbstractCharacter {
     private final Account account;
     private UUID worldInstanceId;
     private WorldInstance worldInstance;
-    private Gender gender;
-    private Race race;
-    private CharacterClass characterClass;
 
     public static final int MAX_SHORT_RESTS_BEFORE_LONG_REST = 2;
 
@@ -48,12 +45,10 @@ public final class CharacterInstance extends AbstractCharacter {
         super(id, name, attributes, currentHealth, maxHealth, race.speed());
         this.account = account;
         setCurrentRoom(room);
-        this.gender = gender;
-        this.race = race;
-        this.characterClass = characterClass;
         attachComponent(new InventoryComponent(List.of(), gold));
         attachComponent(new LevelingComponent(level, xp));
         attachComponent(new RestComponent(shortRestCount));
+        attachComponent(new AppearanceComponent(race, gender, characterClass));
     }
 
     public Account getAccount() {
@@ -85,48 +80,24 @@ public final class CharacterInstance extends AbstractCharacter {
         this.worldInstanceId = worldInstance.getId();
     }
 
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public Race getRace() {
-        return race;
-    }
-
-    public void setRace(Race race) {
-        this.race = race;
-    }
-
-    public CharacterClass getCharacterClass() {
-        return characterClass;
-    }
-
-    public void setCharacterClass(CharacterClass characterClass) {
-        this.characterClass = characterClass;
-    }
-
     public Attribute getPrimaryAbility() {
-        return characterClass.primaryAbility();
+        return component(AppearanceComponent.class).characterClass().primaryAbility();
     }
 
     public Set<Attribute> getSavingThrowProficiencies() {
-        return characterClass.savingThrowProficiencies();
+        return component(AppearanceComponent.class).characterClass().savingThrowProficiencies();
     }
 
     public Set<Skill> getSkillProficiencies() {
-        return characterClass.skillProficiencies();
+        return component(AppearanceComponent.class).characterClass().skillProficiencies();
     }
 
     public Set<WeaponCategory> getWeaponProficiencies() {
-        return characterClass.weaponProficiencies();
+        return component(AppearanceComponent.class).characterClass().weaponProficiencies();
     }
 
     public Set<ArmorProficiency> getArmorProficiencies() {
-        return characterClass.armorProficiencies();
+        return component(AppearanceComponent.class).characterClass().armorProficiencies();
     }
 
     public int getProficiencyBonus() {
@@ -172,49 +143,4 @@ public final class CharacterInstance extends AbstractCharacter {
         return isInCombat();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof CharacterInstance other)) {
-            return false;
-        }
-        LevelingComponent level = component(LevelingComponent.class);
-        LevelingComponent otherLevel = other.component(LevelingComponent.class);
-        InventoryComponent inventory = component(InventoryComponent.class);
-        InventoryComponent otherInventory = other.component(InventoryComponent.class);
-        RestComponent rest = component(RestComponent.class);
-        RestComponent otherRest = other.component(RestComponent.class);
-        return level.level() == otherLevel.level() && level.xp() == otherLevel.xp()
-                && inventory.gold() == otherInventory.gold() && getCurrentHealth() == other.getCurrentHealth()
-                && getMaxHealth() == other.getMaxHealth() && rest.shortRestCount() == otherRest.shortRestCount()
-                && Objects.equals(getId(), other.getId()) && Objects.equals(getAccountId(), other.getAccountId())
-                && Objects.equals(getName(), other.getName())
-                && Objects.equals(getCurrentRoomId(), other.getCurrentRoomId()) && gender == other.gender
-                && race == other.race && characterClass == other.characterClass
-                && Objects.equals(AttributeSystem.getAttributes(this), AttributeSystem.getAttributes(other));
-    }
-
-    @Override
-    public int hashCode() {
-        LevelingComponent level = component(LevelingComponent.class);
-        InventoryComponent inventory = component(InventoryComponent.class);
-        RestComponent rest = component(RestComponent.class);
-        return Objects.hash(getId(), getAccountId(), getName(), getCurrentRoomId(), gender, race, characterClass,
-                level.level(), level.xp(), inventory.gold(), getCurrentHealth(), getMaxHealth(), rest.shortRestCount(),
-                AttributeSystem.getAttributes(this));
-    }
-
-    @Override
-    public String toString() {
-        LevelingComponent level = component(LevelingComponent.class);
-        InventoryComponent inventory = component(InventoryComponent.class);
-        RestComponent rest = component(RestComponent.class);
-        return "GamePlayer[id=" + getId() + ", accountId=" + getAccountId() + ", name=" + getName() + ", currentRoomId="
-                + getCurrentRoomId() + ", gender=" + gender + ", race=" + race + ", characterClass=" + characterClass
-                + ", level=" + level.level() + ", xp=" + level.xp() + ", gold=" + inventory.gold() + ", currentHealth="
-                + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + ", shortRestCount=" + rest.shortRestCount()
-                + ", attributes=" + AttributeSystem.getAttributes(this) + "]";
-    }
 }

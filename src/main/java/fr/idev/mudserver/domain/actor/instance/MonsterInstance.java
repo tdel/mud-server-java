@@ -64,29 +64,4 @@ public final class MonsterInstance extends AbstractCharacter {
         return roomId;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof MonsterInstance other)) {
-            return false;
-        }
-        return getCurrentHealth() == other.getCurrentHealth() && getMaxHealth() == other.getMaxHealth()
-                && Objects.equals(getId(), other.getId()) && Objects.equals(getName(), other.getName())
-                && Objects.equals(templateId, other.templateId) && Objects.equals(roomId, other.roomId)
-                && Objects.equals(AttributeSystem.getAttributes(this), AttributeSystem.getAttributes(other));
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getName(), templateId, roomId, AttributeSystem.getAttributes(this),
-                getCurrentHealth(), getMaxHealth());
-    }
-
-    @Override
-    public String toString() {
-        return "GameMonster[id=" + getId() + ", name=" + getName() + ", templateId=" + templateId + ", roomId=" + roomId
-                + ", currentHealth=" + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + "]";
-    }
 }

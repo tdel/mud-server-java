@@ -9,6 +9,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
 import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
@@ -53,7 +54,8 @@ public class CharacterPersistenceListener {
     void onNewGamePlayerCreated(NewGamePlayerCreated event) {
         characterDao.insert(event.character());
         log.info("character.created character={} accountId={} race={} class={}", event.character().getName(),
-                event.character().getAccountId(), event.character().getRace(), event.character().getCharacterClass());
+                event.character().getAccountId(), event.character().component(AppearanceComponent.class).race(),
+                event.character().component(AppearanceComponent.class).characterClass());
     }
 
     @EventListener
