@@ -46,28 +46,6 @@ public class AbstractNpc extends AbstractCharacter {
         return attributes;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof AbstractNpc other)) {
-            return false;
-        }
-        return Objects.equals(getId(), other.getId()) && Objects.equals(getName(), other.getName())
-                && Objects.equals(getCurrentRoom(), other.getCurrentRoom());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getName(), getCurrentRoom());
-    }
-
-    @Override
-    public String toString() {
-        return "GameNpc[id=" + getId() + ", name=" + getName() + ", roomId=" + getCurrentRoom().getId() + "]";
-    }
-
     public enum NpcDialogueOptionType {
         RESPONSE, SHOP, LEAVE
     }
