@@ -3,6 +3,7 @@ package fr.idev.mudserver.controller.ingame;
 import java.util.Optional;
 import java.util.Set;
 
+import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
@@ -39,16 +40,17 @@ public class Drop implements ControllerHandler {
             return;
         }
 
-        Optional<Item> item = character.findOneByName(name);
-
-        if (item.isEmpty()) {
+        Optional<Item> itemQuery = character.component(InventoryComponent.class).findOneByName(name);
+        if (itemQuery.isEmpty()) {
             connection.send(new ItemNotCarried(name));
             return;
         }
 
-        String templateName = item.get().getName();
-        Rarity templateRarity = item.get().getRarity();
-        InventorySystem.discard(character, item.get());
+        Item item = itemQuery.get();
+
+        String templateName = item.getName();
+        Rarity templateRarity = item.getRarity();
+        InventorySystem.discard(character, item);
 
         connection.send(new ItemDiscarded(templateName, templateRarity));
     }

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
-import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ingame.Chat;
@@ -15,12 +14,6 @@ import fr.idev.mudserver.network.message.ingame.YouSaid;
 
 @Component
 public class Say implements ControllerHandler {
-
-    private final WorldInstanceService worldInstanceService;
-
-    public Say(WorldInstanceService worldInstanceService) {
-        this.worldInstanceService = worldInstanceService;
-    }
 
     @Override
     public String name() {

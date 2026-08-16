@@ -21,22 +21,6 @@ public final class CombatSystem {
     private CombatSystem() {
     }
 
-    public static void attach(AbstractCharacter character, int currentHealth, int maxHealth) {
-        character.attachComponent(new HealthComponent(currentHealth, maxHealth));
-    }
-
-    public static int currentHealth(AbstractCharacter character) {
-        return component(character).currentHealth();
-    }
-
-    public static int maxHealth(AbstractCharacter character) {
-        return component(character).maxHealth();
-    }
-
-    public static void setCurrentHealth(AbstractCharacter character, int value) {
-        character.updateComponent(HealthComponent.class, current -> new HealthComponent(value, current.maxHealth()));
-    }
-
     public static int heal(AbstractCharacter character, int amount) {
         int[] healed = {0};
         character.updateComponent(HealthComponent.class, current -> {
@@ -148,9 +132,5 @@ public final class CombatSystem {
         DiceExpression base = DiceExpression.parse(attacker.getNaturalDamageDice());
         int diceCount = criticalHit ? base.count() * 2 : base.count();
         return Math.max(0, DiceRoller.roll(new DiceExpression(diceCount, base.sides(), strengthModifier)).total());
-    }
-
-    private static HealthComponent component(AbstractCharacter character) {
-        return character.component(HealthComponent.class);
     }
 }

@@ -3,6 +3,7 @@ package fr.idev.mudserver.controller.ingame;
 import java.util.Optional;
 import java.util.Set;
 
+import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
@@ -40,8 +41,7 @@ public class Unequip implements ControllerHandler {
             return;
         }
 
-        Optional<Item> item = character.findOneByName(name);
-
+        Optional<Item> item = character.component(InventoryComponent.class).findOneByName(name);
         if (item.isEmpty()) {
             connection.send(new ItemNotCarried(name));
             return;

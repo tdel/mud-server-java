@@ -1,4 +1,4 @@
 package fr.idev.mudserver.domain.actor.component;
 
-public record LevelingComponent(int level, int xp) {
+public record RestComponent(int shortRestCount) {
 }

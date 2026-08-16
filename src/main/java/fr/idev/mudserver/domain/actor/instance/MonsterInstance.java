@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
-import fr.idev.mudserver.domain.actor.system.AiSystem;
+import fr.idev.mudserver.domain.actor.component.BehaviorComponent;
 import fr.idev.mudserver.domain.actor.template.MonsterTemplate;
 
 public final class MonsterInstance extends AbstractCharacter {
@@ -21,7 +21,7 @@ public final class MonsterInstance extends AbstractCharacter {
         super(id, name, attributes, maxHealth, maxHealth);
         this.templateId = templateId;
         this.roomId = roomId;
-        AiSystem.attach(this);
+        attachComponent(BehaviorComponent.idle());
     }
 
     public void attachTemplate(MonsterTemplate template) {

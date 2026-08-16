@@ -9,10 +9,12 @@ import java.util.UUID;
 
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.*;
+import fr.idev.mudserver.domain.actor.component.InventoryComponent;
+import fr.idev.mudserver.domain.actor.component.LevelingComponent;
+import fr.idev.mudserver.domain.actor.component.RestComponent;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEnteredCell;
 import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
-import fr.idev.mudserver.domain.actor.system.LevelingSystem;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.actor.system.InventorySystem;
@@ -56,8 +58,9 @@ public final class CharacterInstance extends AbstractCharacter {
         this.race = race;
         this.speed = race.speed();
         this.characterClass = characterClass;
-        InventorySystem.attach(this, gold);
-        LevelingSystem.attach(this, level, xp, shortRestCount);
+        attachComponent(new InventoryComponent(List.of(), gold));
+        attachComponent(new LevelingComponent(level, xp));
+        attachComponent(new RestComponent(shortRestCount));
     }
 
     public Account getAccount() {
@@ -134,7 +137,7 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     public int getLevel() {
-        return LevelingSystem.level(this);
+        return component(LevelingComponent.class).level();
     }
 
     public int getProficiencyBonus() {
@@ -177,11 +180,11 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     public int getXp() {
-        return LevelingSystem.xp(this);
+        return component(LevelingComponent.class).xp();
     }
 
     public int getShortRestCount() {
-        return LevelingSystem.shortRestCount(this);
+        return component(RestComponent.class).shortRestCount();
     }
 
     public void moveToRoom(RoomInstance destination) {
@@ -205,19 +208,15 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     public int getGold() {
-        return InventorySystem.gold(this);
+        return component(InventoryComponent.class).gold();
     }
 
     public List<Item> getItems() {
-        return InventorySystem.items(this);
+        return component(InventoryComponent.class).items();
     }
 
     public List<Item> getCarriedItems() {
-        return InventorySystem.carriedItems(this);
-    }
-
-    public Optional<Item> findOneByName(String name) {
-        return InventorySystem.findOneByName(this, name);
+        return component(InventoryComponent.class).carriedItems();
     }
 
     @Override

@@ -15,10 +15,6 @@ public final class AiSystem {
     private AiSystem() {
     }
 
-    public static void attach(MonsterInstance monster) {
-        monster.attachComponent(BehaviorComponent.idle());
-    }
-
     public static Optional<UUID> currentTargetId(MonsterInstance monster) {
         return Optional.ofNullable(component(monster).currentTargetId());
     }

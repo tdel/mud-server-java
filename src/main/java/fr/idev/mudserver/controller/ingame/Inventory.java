@@ -3,6 +3,7 @@ package fr.idev.mudserver.controller.ingame;
 import java.util.List;
 import java.util.Set;
 
+import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
@@ -28,11 +29,12 @@ public class Inventory implements ControllerHandler {
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
 
-        List<Item> items = character.getItems();
+        int gold = character.component(InventoryComponent.class).gold();
+        List<Item> items = character.component(InventoryComponent.class).items();
         List<fr.idev.mudserver.network.message.ingame.Inventory.Entry> entries = items.stream().map(
                 item -> new fr.idev.mudserver.network.message.ingame.Inventory.Entry(item.getName(), item.getRarity()))
                 .toList();
 
-        connection.send(new fr.idev.mudserver.network.message.ingame.Inventory(entries, character.getGold()));
+        connection.send(new fr.idev.mudserver.network.message.ingame.Inventory(entries, gold));
     }
 }

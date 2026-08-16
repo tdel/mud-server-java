@@ -3,6 +3,7 @@ package fr.idev.mudserver.controller.ingame;
 import java.util.Optional;
 import java.util.Set;
 
+import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
@@ -33,30 +34,27 @@ public class Equip implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        CharacterInstance character = connection.character();
         String name = argument.trim();
-
         if (name.isEmpty()) {
             connection.send(new Usage("equip <name>"));
             return;
         }
 
-        Optional<Item> item = character.findOneByName(name);
+        CharacterInstance character = connection.character();
 
-        if (item.isEmpty()) {
+        Optional<Item> itemQuery = character.component(InventoryComponent.class).findOneByName(name);
+        if (itemQuery.isEmpty()) {
             connection.send(new ItemNotCarried(name));
             return;
         }
+        Item item = itemQuery.get();
 
-        String templateName = item.get().getName();
-        Rarity templateRarity = item.get().getRarity();
-        Optional<EquipmentSlot> slot = InventorySystem.equip(character, item.get());
-
-        if (slot.isEmpty()) {
-            connection.send(new ItemNotEquippable(templateName));
+        Optional<EquipmentSlot> slotQuery = InventorySystem.equip(character, item);
+        if (slotQuery.isEmpty()) {
+            connection.send(new ItemNotEquippable(item));
             return;
         }
 
-        connection.send(new ItemEquipped(templateName, templateRarity, slot.get()));
+        connection.send(new ItemEquipped(item, slotQuery.get()));
     }
 }

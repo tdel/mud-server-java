@@ -4,13 +4,13 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.UUID;
 
+import fr.idev.mudserver.domain.actor.component.HealthComponent;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.actor.system.InventorySystem;
 import fr.idev.mudserver.domain.actor.system.MovementSystem;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.combat.ActionEconomy;
 import fr.idev.mudserver.domain.combat.CombatEncounter;
-import fr.idev.mudserver.domain.actor.system.CombatSystem;
 import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.OutputMessage;
@@ -34,7 +34,7 @@ public abstract class AbstractCharacter extends AbstractObject {
             int maxHealth) {
         super(id, name);
         this.attributes = new EnumMap<>(attributes);
-        CombatSystem.attach(this, currentHealth, maxHealth);
+        this.attachComponent(new HealthComponent(currentHealth, maxHealth));
     }
 
     public int getAttribute(Attribute attribute) {
@@ -54,15 +54,15 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public int getCurrentHealth() {
-        return CombatSystem.currentHealth(this);
+        return component(HealthComponent.class).currentHealth();
     }
 
     public void setCurrentHealth(int currentHealth) {
-        CombatSystem.setCurrentHealth(this, currentHealth);
+        updateComponent(HealthComponent.class, current -> new HealthComponent(currentHealth, current.maxHealth()));
     }
 
     public int getMaxHealth() {
-        return CombatSystem.maxHealth(this);
+        return component(HealthComponent.class).maxHealth();
     }
 
     public RoomInstance getCurrentRoom() {

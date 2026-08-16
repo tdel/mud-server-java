@@ -26,26 +26,6 @@ public final class InventorySystem {
     private InventorySystem() {
     }
 
-    public static void attach(CharacterInstance character, int gold) {
-        character.attachComponent(new InventoryComponent(List.of(), gold));
-    }
-
-    public static int gold(CharacterInstance character) {
-        return component(character).gold();
-    }
-
-    public static List<Item> items(CharacterInstance character) {
-        return component(character).items();
-    }
-
-    public static List<Item> carriedItems(CharacterInstance character) {
-        return items(character).stream().filter(item -> item.getSlot() == null).toList();
-    }
-
-    public static Optional<Item> findOneByName(CharacterInstance character, String name) {
-        return items(character).stream().filter(item -> item.getName().equalsIgnoreCase(name)).findFirst();
-    }
-
     public static void addGold(CharacterInstance character, int amount) {
         character.updateComponent(InventoryComponent.class,
                 current -> new InventoryComponent(current.items(), current.gold() + amount));
@@ -114,7 +94,7 @@ public final class InventorySystem {
         }
 
         List<Item> previousOccupants = new ArrayList<>();
-        for (Item existing : equippedItems(character)) {
+        for (Item existing : component(character).equippedItems()) {
             if (!existing.getId().equals(item.getId()) && existing.getSlot() == slot.get()) {
                 previousOccupants.add(existing);
                 existing.setSlot(null);
@@ -145,20 +125,22 @@ public final class InventorySystem {
     }
 
     public static boolean isWearingNonProficientArmor(CharacterInstance character) {
-        return equippedItems(character).stream().map(InventorySystem::requiredArmorProficiency).anyMatch(
+        return component(character).equippedItems().stream().map(InventorySystem::requiredArmorProficiency).anyMatch(
                 required -> required.isPresent() && !character.getArmorProficiencies().contains(required.get()));
     }
 
     public static Optional<Item> equippedWeapon(CharacterInstance character) {
-        return equippedItems(character).stream().filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
+        return component(character).equippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.WEAPON)
+                .findFirst();
     }
 
     private static int playerArmorClass(CharacterInstance character) {
-        int ac = equippedItems(character).stream().filter(item -> item.getSlot() == EquipmentSlot.CHEST).findFirst()
-                .map(item -> armorAc(character, item)).orElseGet(() -> baseArmorClass(character));
+        int ac = component(character).equippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.CHEST)
+                .findFirst().map(item -> armorAc(character, item)).orElseGet(() -> baseArmorClass(character));
 
-        return ac + equippedItems(character).stream().filter(item -> item.getSlot() == EquipmentSlot.OFF_HAND)
-                .mapToInt(item -> item.getBaseAc() + item.getBonus()).sum();
+        return ac
+                + component(character).equippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.OFF_HAND)
+                        .mapToInt(item -> item.getBaseAc() + item.getBonus()).sum();
     }
 
     private static int monsterArmorClass(MonsterInstance monster) {
@@ -189,10 +171,6 @@ public final class InventorySystem {
             case SHIELD -> Optional.of(ArmorProficiency.SHIELDS);
             default -> Optional.empty();
         };
-    }
-
-    private static List<Item> equippedItems(CharacterInstance character) {
-        return items(character).stream().filter(item -> item.getSlot() != null).toList();
     }
 
     private static InventoryComponent component(CharacterInstance character) {

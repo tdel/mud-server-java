@@ -5,9 +5,12 @@
       "Bash(npx graft:*)",
       "Bash(graft-dev:*)",
       "Bash(node dist/cli.js:*)",
-      "Bash(mcp__graft__:*)",
-      "graft - graft_trace_calls",
-      "graft - graft_find_all"
+      "mcp__graft__graft_repo_map",
+      "mcp__graft__graft_find_code",
+      "mcp__graft__graft_file_api",
+      "mcp__graft__graft_find_all",
+      "mcp__graft__graft_trace_calls",
+      "mcp__graft__graft_check_freshness"
     ]
   },
   "hooks": {
