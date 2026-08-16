@@ -3,7 +3,7 @@ package fr.idev.mudserver.network.message.ingame;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import fr.idev.mudserver.domain.Rarity;
+import fr.idev.mudserver.domain.item.Rarity;
 import fr.idev.mudserver.telnet.Ansi;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;

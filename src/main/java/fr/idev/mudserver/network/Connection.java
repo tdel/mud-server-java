@@ -3,8 +3,8 @@ package fr.idev.mudserver.network;
 import java.util.function.Consumer;
 
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.WorldInstance;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.world.WorldInstance;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 
 public interface Connection {
 
@@ -18,15 +18,17 @@ public interface Connection {
 
     void close();
 
-    void setCharacter(GamePlayer character);
+    void attachCharacter(CharacterInstance character);
+    void detachCharacter();
 
-    GamePlayer character();
+    CharacterInstance character();
 
     void setAccount(Account account);
 
     Account account();
 
-    void setWorldInstance(WorldInstance worldInstance);
+    void attachWorldInstance(WorldInstance worldInstance);
+    void detachWorldInstance();
 
     WorldInstance worldInstance();
 }

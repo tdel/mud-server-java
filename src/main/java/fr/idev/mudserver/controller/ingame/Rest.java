@@ -8,10 +8,10 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.FoodItem;
-import fr.idev.mudserver.domain.Item;
-import fr.idev.mudserver.domain.ItemType;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.item.FoodItem;
+import fr.idev.mudserver.domain.item.Item;
+import fr.idev.mudserver.domain.item.ItemType;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.game.actor.RestService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -45,7 +45,7 @@ public class Rest implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        GamePlayer character = connection.character();
+        CharacterInstance character = connection.character();
         String choice = argument.trim();
 
         switch (choice.toLowerCase()) {
@@ -55,7 +55,7 @@ public class Rest implements ControllerHandler {
         }
     }
 
-    private void restShort(Connection connection, GamePlayer character) {
+    private void restShort(Connection connection, CharacterInstance character) {
         switch (restService.shortRest(character)) {
             case RestService.RestOutcome.Rested ignored -> {
             }
@@ -67,7 +67,7 @@ public class Rest implements ControllerHandler {
         }
     }
 
-    private void restLong(Connection connection, GamePlayer character) {
+    private void restLong(Connection connection, CharacterInstance character) {
         if (character.isInCombat()) {
             connection.send(new CannotRestInCombat());
             return;
@@ -83,7 +83,7 @@ public class Rest implements ControllerHandler {
         promptProvisions(connection, character, available, new ArrayList<>());
     }
 
-    private void promptProvisions(Connection connection, GamePlayer character, List<Item> available,
+    private void promptProvisions(Connection connection, CharacterInstance character, List<Item> available,
             List<Item> selected) {
         int selectedValue = selected.stream().mapToInt(Rest::nutritionValue).sum();
         List<ProvisionSelection.Entry> entries = available.stream()
@@ -127,7 +127,7 @@ public class Rest implements ControllerHandler {
         return available.stream().filter(item -> item.getName().equalsIgnoreCase(input)).findFirst();
     }
 
-    private void finalizeLongRest(Connection connection, GamePlayer character, List<Item> selected) {
+    private void finalizeLongRest(Connection connection, CharacterInstance character, List<Item> selected) {
         switch (restService.longRest(character, selected)) {
             case RestService.RestOutcome.Rested ignored -> {
             }

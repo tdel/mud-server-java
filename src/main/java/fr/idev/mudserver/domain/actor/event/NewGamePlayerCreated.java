@@ -1,6 +1,6 @@
 package fr.idev.mudserver.domain.actor.event;
 
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 
-public record NewGamePlayerCreated(GamePlayer character) {
+public record NewGamePlayerCreated(CharacterInstance character) {
 }

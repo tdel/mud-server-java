@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.WorldInstance;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.world.WorldInstance;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -58,7 +58,8 @@ public class CharacterDelete implements ControllerHandler {
         Account account = connection.account();
         WorldInstance instance = connection.worldInstance();
 
-        Optional<GamePlayer> character = characterDao.findByAccountAndWorldInstanceAndName(account, instance, name);
+        Optional<CharacterInstance> character = characterDao.findByAccountAndWorldInstanceAndName(account, instance,
+                name);
         if (character.isEmpty()) {
             connection.send(new NoCharacterNamed(name));
             charSelectStatus.show(connection, account, instance);

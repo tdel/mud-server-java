@@ -38,4 +38,4 @@ A long rest reduces exhaustion by 1 level, but only if the creature also eats an
 
 ## Notes for this project
 
-None of these are implemented as a generic status-effect system yet — combat currently resolves via `GameMonster`/`GamePlayer` HP exchange without conditions. If conditions are added, this table is the canonical effect list to encode; grappled/restrained/prone interact directly with the hex-grid movement system (`domain/HexCoordinate`).
+None of these are implemented as a generic status-effect system yet — combat currently resolves via `MonsterInstance`/`CharacterInstance` HP exchange without conditions. If conditions are added, this table is the canonical effect list to encode; grappled/restrained/prone interact directly with the hex-grid movement system (`domain/HexCoordinate`).

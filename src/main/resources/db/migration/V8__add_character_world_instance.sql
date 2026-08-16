@@ -1,7 +1,7 @@
 -- Rattache chaque personnage à la WorldInstance qui l'héberge. L'id de la
 -- WorldInstance par défaut ci-dessous (créée pour ne rien perdre des personnages
 -- déjà existants) doit rester synchronisé avec
--- fr.idev.mudserver.domain.WorldInstance.DEFAULT_ID, et son world_template_id
+-- fr.idev.mudserver.domain.world.WorldInstance.DEFAULT_ID, et son world_template_id
 -- avec l'id du monde "default" (voir data/worlds/default/world.json) :
 -- littéraux fixes des deux côtés, pas générés à l'exécution, pour que ce
 -- backfill reste déterministe et reproductible.

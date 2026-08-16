@@ -5,7 +5,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ingame.MovementStopped;
@@ -25,7 +25,7 @@ public class Stop implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        GamePlayer character = connection.character();
+        CharacterInstance character = connection.character();
         character.stopMovement();
         connection.send(new MovementStopped());
     }

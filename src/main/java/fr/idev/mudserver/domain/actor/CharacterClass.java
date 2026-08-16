@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
-import fr.idev.mudserver.domain.WeaponCategory;
+import fr.idev.mudserver.domain.item.WeaponCategory;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;

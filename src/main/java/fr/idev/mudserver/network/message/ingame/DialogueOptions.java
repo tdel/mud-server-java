@@ -2,12 +2,12 @@ package fr.idev.mudserver.network.message.ingame;
 
 import java.util.List;
 
-import fr.idev.mudserver.domain.actor.GameNpc;
+import fr.idev.mudserver.domain.actor.AbstractNpc;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
 public record DialogueOptions(String npcName, String greeting,
-        List<GameNpc.NpcDialogueOption> options) implements OutputTelnetMessage {
+        List<AbstractNpc.NpcDialogueOption> options) implements OutputTelnetMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {

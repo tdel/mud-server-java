@@ -14,8 +14,8 @@ import fr.idev.mudserver.controller.charselect.CharSelectStatus;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Party;
 import fr.idev.mudserver.domain.PartyMember;
-import fr.idev.mudserver.domain.WorldInstance;
-import fr.idev.mudserver.domain.WorldTemplateSummary;
+import fr.idev.mudserver.domain.world.WorldInstance;
+import fr.idev.mudserver.domain.world.WorldTemplateSummary;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.PartyService;
 import fr.idev.mudserver.game.WorldInstanceService;
@@ -97,7 +97,7 @@ public class WorldEnter implements ControllerHandler {
                 .orElseGet(() -> worldInstanceService.createInstance(template.id(), Set.of(account.getId()),
                         account.getId()));
 
-        worldInstanceService.enterCharSelect(connection, instance);
+        connection.attachWorldInstance(instance);
         charSelectStatus.show(connection, account, instance);
     }
 
@@ -134,7 +134,7 @@ public class WorldEnter implements ControllerHandler {
 
         for (Connection memberConnection : memberConnections) {
             Account memberAccount = memberConnection.account();
-            worldInstanceService.enterCharSelect(memberConnection, instance);
+            memberConnection.attachWorldInstance(instance);
             charSelectStatus.show(memberConnection, memberAccount, instance);
         }
 

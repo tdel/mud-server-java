@@ -3,17 +3,17 @@ package fr.idev.mudserver.network.message.ingame;
 import java.util.stream.Collectors;
 
 import fr.idev.mudserver.domain.actor.Attribute;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.Skill;
 import fr.idev.mudserver.telnet.Ansi;
 import fr.idev.mudserver.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.telnet.TelnetOutput;
 
-public record GamePlayerStats(GamePlayer character) implements OutputTelnetMessage {
+public record GamePlayerStats(CharacterInstance character) implements OutputTelnetMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        GamePlayer c = character;
+        CharacterInstance c = character;
         output.write(String.format(
                 "== %s (%s, Level %d %s) ==\nHealth: %d/%d\nArmor Class: %d\nProficiency: %+d\nStrength: %d (%+d)  Dexterity: %d (%+d)  Constitution: %d (%+d)\nIntelligence: %d (%+d)  Wisdom: %d (%+d)  Charisma: %d (%+d)\nPrimary Ability: %s\nSaving Throws: %s\nSkills: %s\n",
                 Ansi.player(c.getName()), c.getGender().label(), c.getLevel(), c.getCharacterClass().label(),

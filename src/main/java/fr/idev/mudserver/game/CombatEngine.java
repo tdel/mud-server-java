@@ -8,13 +8,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import fr.idev.mudserver.domain.ConsumableItem;
-import fr.idev.mudserver.domain.Item;
-import fr.idev.mudserver.domain.actor.ActionEconomy;
-import fr.idev.mudserver.domain.actor.CombatEncounter;
-import fr.idev.mudserver.domain.actor.GameCharacter;
-import fr.idev.mudserver.domain.actor.GameMonster;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.item.ConsumableItem;
+import fr.idev.mudserver.domain.item.Item;
+import fr.idev.mudserver.domain.combat.ActionEconomy;
+import fr.idev.mudserver.domain.combat.CombatEncounter;
+import fr.idev.mudserver.domain.actor.AbstractCharacter;
+import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEnteredCell;
@@ -40,7 +40,7 @@ public class CombatEngine {
 
     private static final Logger log = LoggerFactory.getLogger(CombatEngine.class);
 
-    public void attack(GamePlayer attacker, GameMonster target) {
+    public void attack(CharacterInstance attacker, MonsterInstance target) {
         CombatEncounter attackerEncounter = attacker.getEncounter();
         CombatEncounter targetEncounter = target.getEncounter();
 
@@ -65,7 +65,7 @@ public class CombatEngine {
         startNewEncounter(attacker, target);
     }
 
-    public void useItem(GamePlayer user, Item item) {
+    public void useItem(CharacterInstance user, Item item) {
         if (!(item.getTemplate() instanceof ConsumableItem consumable)) {
             user.send(new ItemNotUsable(item.getName()));
             return;
@@ -87,7 +87,7 @@ public class CombatEngine {
         }
     }
 
-    private void startNewEncounter(GamePlayer attacker, GameMonster target) {
+    private void startNewEncounter(CharacterInstance attacker, MonsterInstance target) {
         CombatEncounter encounter;
         boolean foundedHere;
         synchronized (target) {
@@ -137,7 +137,7 @@ public class CombatEngine {
             // Relit pendingJoiners à l'intérieur du verrou, pour inclure tout rejoignant
             // concurrent arrivé pendant la fenêtre du coup d'ouverture (voir Javadoc de
             // CombatEncounter#establishInitiativeOrder).
-            encounter.establishInitiativeOrder(GameCharacter::rollInitiative);
+            encounter.establishInitiativeOrder(AbstractCharacter::rollInitiative);
             // Pas d'avanceTurn() ici : le coup d'ouverture est hors ordre d'initiative,
             // donc
             // le participant à l'index 0 n'a encore rien joué dans l'ordre lui-même.
@@ -145,7 +145,7 @@ public class CombatEngine {
         }
     }
 
-    private CombatEncounter startAggroEncounter(GameMonster founder, GamePlayer victim) {
+    private CombatEncounter startAggroEncounter(MonsterInstance founder, CharacterInstance victim) {
         CombatEncounter encounter;
         boolean foundedHere;
         synchronized (founder) {
@@ -173,13 +173,13 @@ public class CombatEngine {
             encounter.joinBeforeInitiative(victim);
             victim.send(new MonsterAggroTriggered(founder.getName()));
             encounter.getRoom().broadcast(new MonsterAggroBroadcast(victim.getName(), founder.getName()), victim);
-            encounter.establishInitiativeOrder(GameCharacter::rollInitiative);
+            encounter.establishInitiativeOrder(AbstractCharacter::rollInitiative);
             resolveFromCurrentTurn(encounter);
         }
         return encounter;
     }
 
-    private void performTurnAttack(CombatEncounter encounter, GamePlayer attacker, GameMonster target) {
+    private void performTurnAttack(CombatEncounter encounter, CharacterInstance attacker, MonsterInstance target) {
         synchronized (encounter) {
             if (encounter.currentParticipant() != attacker || !attacker.getActionEconomy().trySpendAction()) {
                 attacker.send(new NotYourTurn());
@@ -197,7 +197,7 @@ public class CombatEngine {
         }
     }
 
-    private void continueOrEndTurn(CombatEncounter encounter, GamePlayer actor) {
+    private void continueOrEndTurn(CombatEncounter encounter, CharacterInstance actor) {
         ActionEconomy economy = actor.getActionEconomy();
         if (economy.hasActionRemaining()) {
             actor.send(new ActionsRemaining(economy.getActionsRemaining(), economy.getExtraActionsRemaining()));
@@ -206,7 +206,7 @@ public class CombatEngine {
         }
     }
 
-    private void joinPlayerInto(CombatEncounter encounter, GamePlayer joiner) {
+    private void joinPlayerInto(CombatEncounter encounter, CharacterInstance joiner) {
         synchronized (encounter) {
             joiner.setEncounter(encounter);
             insertOrQueue(encounter, joiner);
@@ -215,7 +215,7 @@ public class CombatEngine {
         encounter.getRoom().broadcast(new CombatantJoined(joiner.getName()), joiner);
     }
 
-    private void mergeMonsterInto(CombatEncounter encounter, GameMonster joiner) {
+    private void mergeMonsterInto(CombatEncounter encounter, MonsterInstance joiner) {
         synchronized (joiner) {
             if (joiner.getEncounter() != null) {
                 return; // course : déjà rattaché par un autre thread entre-temps.
@@ -228,7 +228,7 @@ public class CombatEngine {
         encounter.getRoom().broadcast(new CombatantJoined(joiner.getName()), null);
     }
 
-    private void insertOrQueue(CombatEncounter encounter, GameCharacter character) {
+    private void insertOrQueue(CombatEncounter encounter, AbstractCharacter character) {
         if (encounter.isInitiativeRolled()) {
             int initiative = character.rollInitiative();
             encounter.insertLatecomer(character, initiative);
@@ -243,13 +243,13 @@ public class CombatEngine {
     }
 
     private void resolveFromCurrentTurn(CombatEncounter encounter) {
-        while (!encounter.isOver() && encounter.currentParticipant() instanceof GameMonster monster) {
+        while (!encounter.isOver() && encounter.currentParticipant() instanceof MonsterInstance monster) {
             monster.getActionEconomy().resetForTurn();
-            List<GamePlayer> livingPlayers = encounter.livingPlayers();
+            List<CharacterInstance> livingPlayers = encounter.livingPlayers();
             if (livingPlayers.isEmpty()) {
                 break;
             }
-            GamePlayer victim = livingPlayers.size() == 1
+            CharacterInstance victim = livingPlayers.size() == 1
                     ? livingPlayers.get(0)
                     : livingPlayers.get(DiceRoller.roll(new DiceExpression(1, livingPlayers.size(), 0)).total() - 1);
 
@@ -265,13 +265,13 @@ public class CombatEngine {
         }
 
         if (encounter.isOver()) {
-            boolean playersWon = encounter.participants().stream().noneMatch(GameMonster.class::isInstance);
-            for (GameCharacter participant : encounter.participants()) {
+            boolean playersWon = encounter.participants().stream().noneMatch(MonsterInstance.class::isInstance);
+            for (AbstractCharacter participant : encounter.participants()) {
                 participant.setEncounter(null);
             }
             encounter.getRoom().broadcast(new EncounterEnded(playersWon), null);
             log.info("combat.encounter_ended room={} playersWon={}", encounter.getRoom().getName(), playersWon);
-        } else if (encounter.currentParticipant() instanceof GamePlayer nextPlayer) {
+        } else if (encounter.currentParticipant() instanceof CharacterInstance nextPlayer) {
             nextPlayer.getActionEconomy().resetForTurn();
             ActionEconomy economy = nextPlayer.getActionEconomy();
             nextPlayer.send(new YourTurn(economy.getActionsRemaining(), economy.getExtraActionsRemaining()));
@@ -280,7 +280,7 @@ public class CombatEngine {
 
     @EventListener
     void onCharacterDied(CharacterDied event) {
-        GameMonster monster = event.character();
+        MonsterInstance monster = event.character();
         CombatEncounter encounter = monster.getEncounter();
         if (encounter == null) {
             return;
@@ -292,7 +292,7 @@ public class CombatEngine {
 
     @EventListener
     void onGamePlayerDied(GamePlayerDied event) {
-        GamePlayer player = event.character();
+        CharacterInstance player = event.character();
         CombatEncounter encounter = player.getEncounter();
         if (encounter == null) {
             return;
@@ -304,12 +304,12 @@ public class CombatEngine {
 
     @EventListener
     void onGamePlayerEnteredCell(GamePlayerEnteredCell event) {
-        GamePlayer victim = event.character();
+        CharacterInstance victim = event.character();
         if (victim.isInCombat()) {
             return;
         }
 
-        List<GameMonster> aggressors = victim.getCurrentRoom().getMonsters().stream()
+        List<MonsterInstance> aggressors = victim.getCurrentRoom().getMonsters().stream()
                 .filter(monster -> monster.getCurrentHealth() > 0)
                 .filter(monster -> monster.getPosition().distanceTo(event.cell()) <= monster.getPresenceRadius())
                 .toList();
@@ -318,10 +318,10 @@ public class CombatEngine {
         }
 
         log.info("combat.aggro_triggered victim={} aggressors={}", victim.getName(),
-                aggressors.stream().map(GameMonster::getName).toList());
+                aggressors.stream().map(MonsterInstance::getName).toList());
 
-        Optional<GameMonster> alreadyFighting = aggressors.stream().filter(monster -> monster.getEncounter() != null)
-                .findFirst();
+        Optional<MonsterInstance> alreadyFighting = aggressors.stream()
+                .filter(monster -> monster.getEncounter() != null).findFirst();
         if (alreadyFighting.isPresent()) {
             joinPlayerInto(alreadyFighting.get().getEncounter(), victim);
         } else {
@@ -335,7 +335,7 @@ public class CombatEngine {
             return;
         }
         CombatEncounter encounter = victim.getEncounter();
-        for (GameMonster monster : aggressors) {
+        for (MonsterInstance monster : aggressors) {
             if (monster.getEncounter() == null) {
                 mergeMonsterInto(encounter, monster);
             }

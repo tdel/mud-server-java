@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.actor.GameCharacter;
-import fr.idev.mudserver.domain.actor.GameMonster;
-import fr.idev.mudserver.domain.actor.GameNpc;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.AbstractCharacter;
+import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
+import fr.idev.mudserver.domain.actor.AbstractNpc;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -34,7 +34,7 @@ public class Examine implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        GamePlayer character = connection.character();
+        CharacterInstance character = connection.character();
         String name = argument.trim();
 
         if (name.isEmpty()) {
@@ -42,7 +42,7 @@ public class Examine implements ControllerHandler {
             return;
         }
 
-        Optional<GameCharacter> target = character.getCurrentRoom().findOccupantByName(name);
+        Optional<AbstractCharacter> target = character.getCurrentRoom().findOccupantByName(name);
 
         if (target.isEmpty()) {
             connection.send(new TargetNotFound(name));
@@ -50,9 +50,10 @@ public class Examine implements ControllerHandler {
         }
 
         switch (target.get()) {
-            case GamePlayer p -> connection.send(new GamePlayerStats(p));
-            case GameMonster m -> connection.send(new MonsterStatBlock(m));
-            case GameNpc n -> connection.send(new NpcDescription(n));
+            case CharacterInstance p -> connection.send(new GamePlayerStats(p));
+            case MonsterInstance m -> connection.send(new MonsterStatBlock(m));
+            case AbstractNpc n -> connection.send(new NpcDescription(n));
+            default -> throw new IllegalStateException("Type de cible inattendu : " + target.get().getClass());
         }
     }
 }

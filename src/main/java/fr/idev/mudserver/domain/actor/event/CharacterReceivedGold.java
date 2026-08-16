@@ -1,6 +1,6 @@
 package fr.idev.mudserver.domain.actor.event;
 
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 
-public record CharacterReceivedGold(GamePlayer character, int amount) {
+public record CharacterReceivedGold(CharacterInstance character, int amount) {
 }

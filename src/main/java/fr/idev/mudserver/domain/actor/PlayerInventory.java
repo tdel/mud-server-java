@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import fr.idev.mudserver.domain.Item;
+import fr.idev.mudserver.domain.item.Item;
 
 public final class PlayerInventory {
 

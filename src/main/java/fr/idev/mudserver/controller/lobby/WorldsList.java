@@ -9,9 +9,8 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.WorldInstance;
-import fr.idev.mudserver.domain.WorldTemplateSummary;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.world.WorldTemplateSummary;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.game.WorldTemplateService;
 import fr.idev.mudserver.network.Connection;
@@ -52,16 +51,16 @@ public class WorldsList implements ControllerHandler {
             // exige désormais une RoomInstance résolue dès sa construction (voir
             // CharacterDao.toDomain), qui n'existe que sur une WorldInstance
             // matérialisée (son roomInstances est sinon vide).
-            Optional<GamePlayer> existingCharacter = worldInstanceDao
+            Optional<CharacterInstance> existingCharacter = worldInstanceDao
                     .findByAccountIdAndWorldTemplateId(account.getId(), template.id())
                     .map(instance -> worldInstanceService.getOrMaterialize(instance.getId()))
                     .flatMap(instance -> worldInstanceService.findCharacterFor(account, instance));
 
             entries.add(new fr.idev.mudserver.network.message.lobby.WorldsList.Entry(template.shortName(),
                     template.name(), template.description(), template.minPlayers(), template.maxPlayers(),
-                    existingCharacter.map(GamePlayer::getName).orElse(null),
-                    existingCharacter.map(GamePlayer::getCharacterClass).orElse(null),
-                    existingCharacter.map(GamePlayer::getLevel).orElse(null)));
+                    existingCharacter.map(CharacterInstance::getName).orElse(null),
+                    existingCharacter.map(CharacterInstance::getCharacterClass).orElse(null),
+                    existingCharacter.map(CharacterInstance::getLevel).orElse(null)));
         }
 
         connection.send(new fr.idev.mudserver.network.message.lobby.WorldsList(entries));

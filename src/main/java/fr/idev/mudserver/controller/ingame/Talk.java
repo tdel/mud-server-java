@@ -7,9 +7,9 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.actor.GameNpc;
-import fr.idev.mudserver.domain.actor.GameNpcSeller;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.AbstractNpc;
+import fr.idev.mudserver.domain.actor.instance.NpcSellerInstance;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -38,7 +38,7 @@ public class Talk implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        GamePlayer character = connection.character();
+        CharacterInstance character = connection.character();
         String name = argument.trim();
 
         if (name.isEmpty()) {
@@ -46,13 +46,13 @@ public class Talk implements ControllerHandler {
             return;
         }
 
-        Optional<GameNpc> npc = character.getCurrentRoom().findNpcByName(name);
+        Optional<AbstractNpc> npc = character.getCurrentRoom().findNpcByName(name);
         if (npc.isEmpty()) {
             connection.send(new TargetNotFound(name));
             return;
         }
 
-        Optional<GameNpc.NpcDialogue> dialogue = npc.get().getDialogue();
+        Optional<AbstractNpc.NpcDialogue> dialogue = npc.get().getDialogue();
         if (dialogue.isEmpty()) {
             connection.send(new NpcDescription(npc.get()));
             return;
@@ -61,11 +61,11 @@ public class Talk implements ControllerHandler {
         promptDialogue(connection, character, npc.get(), dialogue.get());
     }
 
-    private void promptDialogue(Connection connection, GamePlayer character, GameNpc npc,
-            GameNpc.NpcDialogue dialogue) {
+    private void promptDialogue(Connection connection, CharacterInstance character, AbstractNpc npc,
+            AbstractNpc.NpcDialogue dialogue) {
         connection.requestBlocking(new DialogueOptions(npc.getName(), dialogue.greeting(), dialogue.options()),
                 line -> {
-                    Optional<GameNpc.NpcDialogueOption> choice = dialogue.resolveOption(line);
+                    Optional<AbstractNpc.NpcDialogueOption> choice = dialogue.resolveOption(line);
 
                     if (choice.isEmpty()) {
                         connection.send(new InvalidDialogueChoice(line.trim()));
@@ -79,7 +79,7 @@ public class Talk implements ControllerHandler {
                             promptDialogue(connection, character, npc, dialogue);
                         }
                         case SHOP -> {
-                            if (npc instanceof GameNpcSeller seller) {
+                            if (npc instanceof NpcSellerInstance seller) {
                                 promptShop(connection, character, seller, dialogue);
                             }
                         }
@@ -88,8 +88,8 @@ public class Talk implements ControllerHandler {
                 });
     }
 
-    private void promptShop(Connection connection, GamePlayer character, GameNpcSeller npc,
-            GameNpc.NpcDialogue dialogue) {
+    private void promptShop(Connection connection, CharacterInstance character, NpcSellerInstance npc,
+            AbstractNpc.NpcDialogue dialogue) {
         List<ShopCatalog.Entry> entries = npc.shop().items().stream()
                 .map(entry -> new ShopCatalog.Entry(entry.itemTemplate().getName(), entry.itemTemplate().getRarity(),
                         entry.price()))
@@ -104,11 +104,11 @@ public class Talk implements ControllerHandler {
                     }
 
                     switch (npc.sell(character, trimmed)) {
-                        case GameNpcSeller.PurchaseOutcome.Purchased ignored -> {
+                        case NpcSellerInstance.PurchaseOutcome.Purchased ignored -> {
                         }
-                        case GameNpcSeller.PurchaseOutcome.EntryNotFound ignored ->
+                        case NpcSellerInstance.PurchaseOutcome.EntryNotFound ignored ->
                             connection.send(new ShopItemNotFound(trimmed));
-                        case GameNpcSeller.PurchaseOutcome.InsufficientGold(int price) ->
+                        case NpcSellerInstance.PurchaseOutcome.InsufficientGold(int price) ->
                             connection.send(new NotEnoughGold(price));
                     }
                     promptShop(connection, character, npc, dialogue);

@@ -1,6 +1,6 @@
 package fr.idev.mudserver.domain.actor.event;
 
-import fr.idev.mudserver.domain.actor.GameCharacter;
+import fr.idev.mudserver.domain.actor.AbstractCharacter;
 
-public record CharacterStartedMoving(GameCharacter character) {
+public record CharacterStartedMoving(AbstractCharacter character) {
 }

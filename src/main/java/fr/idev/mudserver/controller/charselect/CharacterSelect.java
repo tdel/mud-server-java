@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.controller.ingame.Look;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.WorldInstance;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.world.WorldInstance;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -44,15 +44,17 @@ public class CharacterSelect implements ControllerHandler {
         Account account = connection.account();
         WorldInstance instance = connection.worldInstance();
 
-        Optional<GamePlayer> character = worldInstanceService.findCharacterFor(account, instance);
+        Optional<CharacterInstance> character = worldInstanceService.findCharacterFor(account, instance);
         if (character.isEmpty()) {
             charSelectStatus.show(connection, account, instance);
             return;
         }
 
-        worldInstanceService.enterGame(connection, character.get());
+        CharacterInstance loadedChar = character.get();
+        connection.attachCharacter(loadedChar);
+        worldInstanceService.enterGame(loadedChar);
 
-        connection.send(new NowPlaying(character.get().getName()));
+        connection.send(new NowPlaying(loadedChar.getName()));
         lookAction.onReceive(connection, "");
     }
 }

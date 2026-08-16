@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.WorldInstance;
+import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.domain.actor.Attribute;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
@@ -154,7 +154,7 @@ public class CharacterCreate implements ControllerHandler {
 
     private void createCharacter(Connection connection, Account account, WorldInstance instance, String name,
             Gender gender, Race race, CharacterClass characterClass) {
-        GamePlayer character = instance.createCharacter(account, name, gender, race, characterClass);
+        CharacterInstance character = instance.createCharacter(account, name, gender, race, characterClass);
 
         connection.send(new CharacterCreated(name));
         connection.send(new GamePlayerStats(character));

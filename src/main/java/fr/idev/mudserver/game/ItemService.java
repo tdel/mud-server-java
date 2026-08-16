@@ -8,8 +8,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import fr.idev.mudserver.domain.actor.GamePlayer;
-import fr.idev.mudserver.domain.Item;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
+import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEquippedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUnequippedItem;
@@ -32,7 +32,7 @@ public class ItemService {
         this.itemDao = itemDao;
     }
 
-    public List<Item> loadInventory(GamePlayer character) {
+    public List<Item> loadInventory(CharacterInstance character) {
         return itemDao.findByCharacter(character);
     }
 

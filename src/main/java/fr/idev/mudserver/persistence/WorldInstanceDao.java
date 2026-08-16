@@ -12,7 +12,7 @@ import java.util.UUID;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
-import fr.idev.mudserver.domain.WorldInstance;
+import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.persistence.jooq.tables.records.WorldInstanceRecord;
 
 @Repository

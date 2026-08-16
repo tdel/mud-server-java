@@ -15,12 +15,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.actor.Attribute;
-import fr.idev.mudserver.domain.actor.GameMonster;
-import fr.idev.mudserver.domain.actor.MonsterTemplate;
-import fr.idev.mudserver.domain.actor.MonsterTemplate.LootTableEntry;
-import fr.idev.mudserver.domain.ItemTemplate;
+import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
+import fr.idev.mudserver.domain.actor.template.MonsterTemplate;
+import fr.idev.mudserver.domain.actor.template.MonsterTemplate.LootTableEntry;
+import fr.idev.mudserver.domain.item.ItemTemplate;
 import fr.idev.mudserver.domain.MonsterSpawn;
-import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.world.RoomInstance;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -63,8 +63,8 @@ public class MonsterService {
                             + " référence le template " + spawn.templateId() + ", absent de " + MONSTERS_RESOURCE);
                 }
 
-                GameMonster monster = new GameMonster(spawn.id(), template.getName(), template.getId(), room.getId(),
-                        template.getAttributes(), template.getMaxHealth());
+                MonsterInstance monster = new MonsterInstance(spawn.id(), template.getName(), template.getId(),
+                        room.getId(), template.getAttributes(), template.getMaxHealth());
                 monster.attachTemplate(template);
                 monster.setCurrentRoom(room);
                 room.placeMonster(monster, spawn.cell());

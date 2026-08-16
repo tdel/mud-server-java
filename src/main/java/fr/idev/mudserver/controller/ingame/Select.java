@@ -6,8 +6,8 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.actor.GameMonster;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -29,7 +29,7 @@ public class Select implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        GamePlayer character = connection.character();
+        CharacterInstance character = connection.character();
         String name = argument.trim();
 
         if (name.isEmpty()) {
@@ -37,7 +37,7 @@ public class Select implements ControllerHandler {
             return;
         }
 
-        Optional<GameMonster> target = character.getCurrentRoom().findMonsterByName(name);
+        Optional<MonsterInstance> target = character.getCurrentRoom().findMonsterByName(name);
         if (target.isEmpty()) {
             connection.send(new TargetNotFound(name));
             return;

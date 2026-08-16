@@ -11,8 +11,8 @@ import io.netty.channel.Channel;
 
 import fr.idev.mudserver.controller.ControllerDispatcher;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.WorldInstance;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.world.WorldInstance;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
@@ -31,7 +31,7 @@ public class TelnetConnection implements Connection, TelnetOutput {
     private final WorldInstanceService worldInstanceService;
 
     private ConnectionState state = ConnectionState.CONNECTED;
-    private GamePlayer character;
+    private CharacterInstance player;
     private Account account;
     private WorldInstance worldInstance;
     private Consumer<String> pendingLine;
@@ -83,7 +83,7 @@ public class TelnetConnection implements Connection, TelnetOutput {
             log.error("telnet.disconnect_cleanup_failed stage=game", e);
         }
         try {
-            worldInstanceService.exitCharSelect(this);
+            this.detachWorldInstance();
         } catch (Exception e) {
             log.error("telnet.disconnect_cleanup_failed stage=charselect", e);
         }
@@ -145,16 +145,24 @@ public class TelnetConnection implements Connection, TelnetOutput {
     }
 
     @Override
-    public void setCharacter(GamePlayer character) {
-        this.character = character;
+    public void attachCharacter(CharacterInstance character) {
+        this.player = character;
+        character.setConnection(this);
+        this.setState(ConnectionState.INGAME);
     }
 
     @Override
-    public GamePlayer character() {
+    public void detachCharacter() {
+        this.player = null;
+        this.setState(ConnectionState.LOBBY);
+    }
+
+    @Override
+    public CharacterInstance character() {
         if (state != ConnectionState.INGAME) {
             throw new IllegalStateException("Connection " + connectionId + " n'est pas en état INGAME (" + state + ")");
         }
-        return character;
+        return player;
     }
 
     @Override
@@ -171,8 +179,15 @@ public class TelnetConnection implements Connection, TelnetOutput {
     }
 
     @Override
-    public void setWorldInstance(WorldInstance worldInstance) {
+    public void attachWorldInstance(WorldInstance worldInstance) {
         this.worldInstance = worldInstance;
+        this.setState(ConnectionState.CHARSELECT);
+    }
+
+    @Override
+    public void detachWorldInstance() {
+        this.worldInstance = null;
+        this.setState(ConnectionState.LOBBY);
     }
 
     @Override

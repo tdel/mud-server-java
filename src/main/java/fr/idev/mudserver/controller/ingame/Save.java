@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.actor.Attribute;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -46,7 +46,7 @@ public class Save implements ControllerHandler {
             return;
         }
 
-        GamePlayer character = connection.character();
+        CharacterInstance character = connection.character();
         connection.send(new CheckOutcome(character.save(attribute, dc)));
     }
 

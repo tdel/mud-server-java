@@ -8,10 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import fr.idev.mudserver.domain.FoodItem;
-import fr.idev.mudserver.domain.Item;
+import fr.idev.mudserver.domain.item.FoodItem;
+import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.actor.Attribute;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.LongRestTaken;
 import fr.idev.mudserver.domain.actor.event.ShortRestTaken;
@@ -25,7 +25,7 @@ public class RestService {
 
     public sealed interface RestOutcome {
 
-        record Rested(Map<GamePlayer, Integer> healedAmounts) implements RestOutcome {
+        record Rested(Map<CharacterInstance, Integer> healedAmounts) implements RestOutcome {
         }
 
         record InCombat() implements RestOutcome {
@@ -38,7 +38,7 @@ public class RestService {
         }
     }
 
-    public RestOutcome shortRest(GamePlayer initiator) {
+    public RestOutcome shortRest(CharacterInstance initiator) {
         if (initiator.isInCombat()) {
             return new RestOutcome.InCombat();
         }
@@ -46,8 +46,8 @@ public class RestService {
             return new RestOutcome.NoShortRestLeft();
         }
 
-        Map<GamePlayer, Integer> healedAmounts = new LinkedHashMap<>();
-        for (GamePlayer character : initiator.getWorldInstance().onlineCharacters()) {
+        Map<CharacterInstance, Integer> healedAmounts = new LinkedHashMap<>();
+        for (CharacterInstance character : initiator.getWorldInstance().onlineCharacters()) {
             int hitDie = character.getCharacterClass().hitDie();
             int constitutionModifier = character.getModifier(Attribute.CONSTITUTION);
             int amount = Math.max(1, hitDie / 2 + 1 + constitutionModifier);
@@ -60,7 +60,7 @@ public class RestService {
         return new RestOutcome.Rested(healedAmounts);
     }
 
-    public RestOutcome longRest(GamePlayer initiator, List<Item> selectedFood) {
+    public RestOutcome longRest(CharacterInstance initiator, List<Item> selectedFood) {
         if (initiator.isInCombat()) {
             return new RestOutcome.InCombat();
         }
@@ -75,8 +75,8 @@ public class RestService {
             initiator.getInventory().removeItem(food);
         }
 
-        Map<GamePlayer, Integer> healedAmounts = new LinkedHashMap<>();
-        for (GamePlayer character : initiator.getWorldInstance().onlineCharacters()) {
+        Map<CharacterInstance, Integer> healedAmounts = new LinkedHashMap<>();
+        for (CharacterInstance character : initiator.getWorldInstance().onlineCharacters()) {
             healedAmounts.put(character, character.heal(character.getMaxHealth()));
             character.resetShortRestCount();
         }

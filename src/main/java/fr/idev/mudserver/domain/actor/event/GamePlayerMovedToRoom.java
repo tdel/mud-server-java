@@ -1,7 +1,7 @@
 package fr.idev.mudserver.domain.actor.event;
 
-import fr.idev.mudserver.domain.actor.GamePlayer;
-import fr.idev.mudserver.domain.RoomInstance;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
+import fr.idev.mudserver.domain.world.RoomInstance;
 
-public record GamePlayerMovedToRoom(GamePlayer character, RoomInstance from, RoomInstance to) {
+public record GamePlayerMovedToRoom(CharacterInstance character, RoomInstance from, RoomInstance to) {
 }

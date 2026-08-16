@@ -6,9 +6,9 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.actor.GamePlayer;
-import fr.idev.mudserver.domain.Item;
-import fr.idev.mudserver.domain.Rarity;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
+import fr.idev.mudserver.domain.item.Item;
+import fr.idev.mudserver.domain.item.Rarity;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -30,7 +30,7 @@ public class Drop implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        GamePlayer character = connection.character();
+        CharacterInstance character = connection.character();
         String name = argument.trim();
 
         if (name.isEmpty()) {

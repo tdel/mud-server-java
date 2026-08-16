@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
@@ -42,10 +42,10 @@ public class Logout implements ControllerHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         if (connection.state() == ConnectionState.INGAME) {
-            GamePlayer character = connection.character();
+            CharacterInstance character = connection.character();
 
             worldInstanceService.exitGame(connection);
-            worldInstanceService.exitCharSelect(connection);
+            connection.detachWorldInstance();
 
             connection.send(new StoppedPlaying(character.getName()));
             connection.send(new BackInLobby());
@@ -53,7 +53,7 @@ public class Logout implements ControllerHandler {
         }
 
         if (connection.state() == ConnectionState.CHARSELECT) {
-            worldInstanceService.exitCharSelect(connection);
+            connection.detachWorldInstance();
             connection.send(new BackInLobby());
             return;
         }

@@ -9,11 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import fr.idev.mudserver.domain.RoomInstance;
-import fr.idev.mudserver.domain.WorldTemplate;
-import fr.idev.mudserver.domain.actor.GameNpc;
-import fr.idev.mudserver.domain.actor.GameNpcSeller;
-import fr.idev.mudserver.domain.actor.NpcTemplate;
+import fr.idev.mudserver.domain.world.RoomInstance;
+import fr.idev.mudserver.domain.world.WorldTemplate;
+import fr.idev.mudserver.domain.actor.AbstractNpc;
+import fr.idev.mudserver.domain.actor.instance.NpcSellerInstance;
+import fr.idev.mudserver.domain.actor.template.NpcTemplate;
 
 @Service
 public class NpcService {
@@ -43,9 +43,9 @@ public class NpcService {
     }
 
     private void place(NpcTemplate template, RoomInstance room) {
-        GameNpc npc = template.shop() != null
-                ? new GameNpcSeller(template.id(), template, room)
-                : new GameNpc(template.id(), template, room);
+        AbstractNpc npc = template.shop() != null
+                ? new NpcSellerInstance(template.id(), template, room)
+                : new AbstractNpc(template.id(), template, room);
         room.placeNpc(npc, template.cell());
     }
 }

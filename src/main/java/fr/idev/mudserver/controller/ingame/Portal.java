@@ -6,8 +6,8 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.RoomPortal;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.world.RoomPortal;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ingame.NoPortalHere;
@@ -33,7 +33,7 @@ public class Portal implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        GamePlayer character = connection.character();
+        CharacterInstance character = connection.character();
         Optional<RoomPortal> portal = character.getCurrentRoom().findPortalAt(character.getPosition());
         if (portal.isEmpty()) {
             connection.send(new NoPortalHere());

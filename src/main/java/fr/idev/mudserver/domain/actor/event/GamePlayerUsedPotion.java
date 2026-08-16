@@ -1,7 +1,7 @@
 package fr.idev.mudserver.domain.actor.event;
 
-import fr.idev.mudserver.domain.Item;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.item.Item;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 
-public record GamePlayerUsedPotion(GamePlayer character, Item item, int healedAmount) {
+public record GamePlayerUsedPotion(CharacterInstance character, Item item, int healedAmount) {
 }

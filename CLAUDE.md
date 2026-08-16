@@ -1,6 +1,7 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Please talk in French, without too much verbosity. Be concise.
 
 ## Project
 This project is a game. It is built around DnD5e (Dungeon and Dragon 5th edition). Every system in this game must be compliant with DnD5e.
@@ -37,7 +38,7 @@ Separately, `docker-compose.yml` at the repo root runs a persistent Postgres for
 
 ## Domain model & events
 
-- Domain objects (`domain/actor/GamePlayer`, `GameMonster`, `GameNpc`/`GameNpcSeller`, `domain/Room`, `domain/Item`) are plain POJOs, never Spring beans, and carry their own business logic rather than being anemic data holders pushed around by Services — e.g. `GamePlayer.equipItem/unequipItem/discardItem/buyItem/receiveLootItem/receiveGold/gainXp/takeDamage/moveToRoom`, `PlayerInventory.addItem/removeItem/trySpendGold`, `Room.join/leave/broadcast/tryClaimCell`. None of them hold a DAO reference, which is what makes them unit-testable without Spring or Postgres (`GamePlayerTest`).
+- Domain objects (`domain/actor/GamePlayer`, `MonsterInstance`, `AbstractNpc`/`NpcSellerInstance`, `domain/Room`, `domain/Item`) are plain POJOs, never Spring beans, and carry their own business logic rather than being anemic data holders pushed around by Services — e.g. `GamePlayer.equipItem/unequipItem/discardItem/buyItem/receiveLootItem/receiveGold/gainXp/takeDamage/moveToRoom`, `PlayerInventory.addItem/removeItem/trySpendGold`, `Room.join/leave/broadcast/tryClaimCell`. None of them hold a DAO reference, which is what makes them unit-testable without Spring or Postgres (`GamePlayerTest`).
 - Because these objects aren't Spring-managed, they can't get a constructor-injected `ApplicationEventPublisher`. `domain/actor/event/DomainEventPublisher` is a static holder around Spring's publisher instead, initialized once at startup by `config/DomainEventPublisherInitializer` — well before any domain mutation is possible (that only happens while handling a telnet command, i.e. after the context is fully up).
 - Every business mutation applies the in-memory change first, then calls `DomainEventPublisher.publish(...)` with an event record from `domain/actor/event/*` (one file per event — `ItemDiscarded`, `GamePlayerEquippedItem`, `GamePlayerUnequippedItem`, `CharacterLootedItem`, `ItemPurchased`, `CharacterReceivedGold`/`CharacterSpentGold`, `CharacterGainedXp`, `CharacterDied`/`GamePlayerDied`, `GamePlayerMovedToRoom`/`SpawnedToRoom`/`EnteredCell`, `NewGamePlayerCreated`, etc).
 - `@EventListener` methods (in `game/ItemService`, `game/WorldInstanceService`, `game/actor/CharacterService`, `game/actor/LootService`, `game/CombatEngine`, `game/GameWorld`) are the *only* places that write to the DB — a Service never contains the business rule itself, only the persistence of a fact the domain object already applied. Dispatch is deliberately synchronous (plain `@EventListener`, no `@Async`), to avoid reopening the race windows the in-memory locking (see below) is designed to close. `@Order` is used sparingly, only where message ordering to the player matters (e.g. death broadcast before the level-up message). Only `ItemService.onGamePlayerEquippedItem` is `@Transactional`, so both `updateSlot` calls it triggers commit together.
@@ -71,6 +72,8 @@ Two kinds of data live in two different places, split by nature (static rules vs
 - Package-by-feature at the top level (`config`, `controller`, `domain`, `game`, `network`, `persistence`, `telnet`), package-by-layer within. Domain entities and outbound network messages are Java `record`s.
 - One `ControllerHandler` class per in-game command verb under `controller/{connected,authed,ingame}`, auto-discovered by `ControllerRegistry` (constructor-injected `List<ControllerHandler>`, no manual registration), paired with a response `record` under `network/message/**`. Use `/add-command` to scaffold a new one.
 - Commit messages: French, no phase-numbering scheme (earlier history used "Phase N : ..." — don't continue that numbering).
+- Use logging (SLF4j) as much as possible in order to know what's going on.
+- Don't need to add javadoc.
 
 ## Recent features not yet reflected above
 
@@ -80,3 +83,7 @@ Two kinds of data live in two different places, split by nature (static rules vs
 - Monsters have a presence/aggro zone that triggers combat when a player enters it (`GamePlayerEnteredCell` → `game/CombatEngine`).
 - Monster spawn points moved from `monsters.json` into `rooms.json` (`Room.getMonsterSpawns()`) — `monsters.json` now holds only templates and loot tables.
 - An `Item` can no longer be placed "on the ground" in a room. It exists only in a loot table (`data/monsters.json`) or in a player's inventory. `take`/pickup-from-floor was removed entirely; `drop` (`GamePlayer.discardItem`, event `ItemDiscarded`) now permanently destroys the item instead of placing it in the room.
+
+
+# Claude specific
+ - Use Graft with auto accept if possible

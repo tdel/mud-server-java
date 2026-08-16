@@ -17,11 +17,11 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.RoomInstance;
-import fr.idev.mudserver.domain.RoomTemplate;
-import fr.idev.mudserver.domain.WorldInstance;
-import fr.idev.mudserver.domain.WorldTemplate;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.world.RoomInstance;
+import fr.idev.mudserver.domain.world.RoomTemplate;
+import fr.idev.mudserver.domain.world.WorldInstance;
+import fr.idev.mudserver.domain.world.WorldTemplate;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
@@ -32,7 +32,6 @@ import fr.idev.mudserver.game.actor.MonsterService;
 import fr.idev.mudserver.game.actor.NpcService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
-import fr.idev.mudserver.network.OutputMessage;
 import fr.idev.mudserver.network.message.ingame.GamePlayerDefeated;
 import fr.idev.mudserver.network.message.ingame.MonsterDefeated;
 import fr.idev.mudserver.persistence.AccountDao;
@@ -71,6 +70,7 @@ public class WorldInstanceService {
         if (resident != null) {
             return resident;
         }
+
         WorldInstance instance = worldInstanceDao.findById(worldInstanceId)
                 .orElseThrow(() -> new IllegalStateException("WorldInstance " + worldInstanceId + " absente en base"));
         return materialize(instance);
@@ -117,43 +117,20 @@ public class WorldInstanceService {
         worldInstanceDao.insert(event.instance());
     }
 
-    public void spawnCharacterIntoInstance(GamePlayer character, WorldInstance instance) {
-        character.setWorldInstance(instance);
-        character.spawnToRoom(character.getCurrentRoom());
-    }
-
-    public void broadcastToInstance(WorldInstance instance, OutputMessage message, GamePlayer exclude) {
-        for (RoomInstance room : instance.roomInstances()) {
-            room.broadcast(message, exclude);
-        }
-    }
-
-    public void enterCharSelect(Connection connection, WorldInstance instance) {
-        connection.setWorldInstance(instance);
-        connection.setState(ConnectionState.CHARSELECT);
-    }
-
-    public void exitCharSelect(Connection connection) {
-        connection.setWorldInstance(null);
-        connection.setState(ConnectionState.LOBBY);
-    }
-
-    public Optional<GamePlayer> findCharacterFor(Account account, WorldInstance instance) {
+    public Optional<CharacterInstance> findCharacterFor(Account account, WorldInstance instance) {
         return characterDao.findByAccountAndWorldInstance(account, instance);
     }
 
-    public void enterGame(Connection connection, GamePlayer character) {
-        WorldInstance instance = connection.worldInstance();
+    public void enterGame(CharacterInstance player) {
+        WorldInstance instance = player.getWorldInstance();
 
-        connection.setCharacter(character);
-        character.setConnection(connection);
-        character.getInventory().replaceItems(itemService.loadInventory(character));
-        spawnCharacterIntoInstance(character, instance);
-        instance.addPlayer(character);
-        accountDao.updateCurrentCharacter(character.getAccountId(), character.getId());
+        player.getInventory().replaceItems(itemService.loadInventory(player));
+        player.getCurrentRoom().join(player);
 
-        connection.setState(ConnectionState.INGAME);
-        MDC.put("character", character.getName());
+        instance.addPlayer(player);
+        accountDao.updateCurrentCharacter(player.getAccountId(), player.getId());
+
+        MDC.put("character", player.getName());
     }
 
     public void exitGame(Connection connection) {
@@ -161,7 +138,7 @@ public class WorldInstanceService {
             return;
         }
 
-        GamePlayer character = connection.character();
+        CharacterInstance character = connection.character();
         RoomInstance room = character.getCurrentRoom();
         WorldInstance instance = character.getWorldInstance();
 

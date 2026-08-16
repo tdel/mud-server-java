@@ -7,7 +7,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.Skill;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -46,7 +46,7 @@ public class Check implements ControllerHandler {
             return;
         }
 
-        GamePlayer character = connection.character();
+        CharacterInstance character = connection.character();
         connection.send(new CheckOutcome(character.check(skill, dc)));
     }
 

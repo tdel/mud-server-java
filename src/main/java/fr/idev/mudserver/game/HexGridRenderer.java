@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import fr.idev.mudserver.domain.HexCoordinate;
-import fr.idev.mudserver.domain.RoomInstance;
-import fr.idev.mudserver.domain.actor.GameCharacter;
-import fr.idev.mudserver.domain.actor.GameMonster;
-import fr.idev.mudserver.domain.actor.GameNpc;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.map.HexCoordinate;
+import fr.idev.mudserver.domain.world.RoomInstance;
+import fr.idev.mudserver.domain.actor.AbstractCharacter;
+import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
+import fr.idev.mudserver.domain.actor.AbstractNpc;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 
 public final class HexGridRenderer {
 
@@ -23,11 +23,11 @@ public final class HexGridRenderer {
     private HexGridRenderer() {
     }
 
-    public static List<String> render(RoomInstance room, GamePlayer viewer) {
+    public static List<String> render(RoomInstance room, CharacterInstance viewer) {
         return render(room, viewer, VIEWPORT_RADIUS);
     }
 
-    static List<String> render(RoomInstance room, GamePlayer viewer, int radius) {
+    static List<String> render(RoomInstance room, CharacterInstance viewer, int radius) {
         HexCoordinate center = viewer.getPosition();
         List<HexCoordinate> path = viewer.remainingPath();
         Set<HexCoordinate> pathCells = new HashSet<>(path);
@@ -55,8 +55,8 @@ public final class HexGridRenderer {
         return lines;
     }
 
-    private static char glyphFor(RoomInstance room, GamePlayer viewer, HexCoordinate cell, Set<HexCoordinate> pathCells,
-            HexCoordinate destination) {
+    private static char glyphFor(RoomInstance room, CharacterInstance viewer, HexCoordinate cell,
+            Set<HexCoordinate> pathCells, HexCoordinate destination) {
         if (cell.equals(viewer.getPosition())) {
             return '@';
         }
@@ -64,12 +64,13 @@ public final class HexGridRenderer {
             return '~';
         }
 
-        Optional<GameCharacter> occupant = room.occupantAt(cell);
+        Optional<AbstractCharacter> occupant = room.occupantAt(cell);
         if (occupant.isPresent()) {
             return switch (occupant.get()) {
-                case GamePlayer ignored -> 'p';
-                case GameMonster ignored -> 'm';
-                case GameNpc ignored -> 'n';
+                case CharacterInstance ignored -> 'p';
+                case MonsterInstance ignored -> 'm';
+                case AbstractNpc ignored -> 'n';
+                default -> throw new IllegalStateException("Type d'occupant inattendu : " + occupant.get().getClass());
             };
         }
 

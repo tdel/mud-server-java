@@ -5,7 +5,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -34,7 +34,7 @@ public class Say implements ControllerHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        GamePlayer character = connection.character();
+        CharacterInstance character = connection.character();
         String message = argument.trim();
 
         if (message.isEmpty()) {
@@ -42,9 +42,7 @@ public class Say implements ControllerHandler {
             return;
         }
 
-        worldInstanceService.broadcastToInstance(character.getWorldInstance(), new Chat(character.getName(), message),
-                character);
-
+        character.getWorldInstance().broadcast(new Chat(character.getName(), message), character);
         connection.send(new YouSaid(message));
     }
 }

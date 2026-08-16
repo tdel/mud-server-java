@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ActionNotFound;
@@ -28,7 +28,7 @@ public class ControllerDispatcher {
 
     public void dispatch(Connection connection, String actionName, String argument) {
         if (connection.state() == ConnectionState.INGAME) {
-            GamePlayer character = connection.character();
+            CharacterInstance character = connection.character();
             if (character != null && character.isInCombat() && !COMBAT_ALLOWED_VERBS.contains(actionName)) {
                 log.debug("combat.action_blocked verb={} character={}", actionName, character.getName());
                 connection.send(new CombatActionRequired());

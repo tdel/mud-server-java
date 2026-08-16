@@ -12,12 +12,12 @@ import org.springframework.stereotype.Repository;
 
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.Attribute;
-import fr.idev.mudserver.domain.actor.GamePlayer;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
-import fr.idev.mudserver.domain.RoomInstance;
-import fr.idev.mudserver.domain.WorldInstance;
+import fr.idev.mudserver.domain.world.RoomInstance;
+import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.persistence.jooq.tables.records.CharacterRecord;
 
 @Repository
@@ -29,7 +29,7 @@ public class CharacterDao {
         this.dsl = dsl;
     }
 
-    public void insert(GamePlayer character) {
+    public void insert(CharacterInstance character) {
         UUID worldInstanceId = character.getWorldInstanceId() != null
                 ? character.getWorldInstanceId()
                 : WorldInstance.DEFAULT_ID;
@@ -49,13 +49,13 @@ public class CharacterDao {
                 .execute();
     }
 
-    public Optional<GamePlayer> findByAccountAndWorldInstance(Account account, WorldInstance instance) {
+    public Optional<CharacterInstance> findByAccountAndWorldInstance(Account account, WorldInstance instance) {
         return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(account.getId()))
                 .and(CHARACTER.WORLD_INSTANCE_ID.eq(instance.getId()))
                 .fetchOptional(record -> toDomain(record, account, instance));
     }
 
-    public Optional<GamePlayer> findByAccountAndWorldInstanceAndName(Account account, WorldInstance instance,
+    public Optional<CharacterInstance> findByAccountAndWorldInstanceAndName(Account account, WorldInstance instance,
             String name) {
         return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(account.getId()))
                 .and(CHARACTER.WORLD_INSTANCE_ID.eq(instance.getId())).and(CHARACTER.NAME.eq(name))
@@ -66,7 +66,7 @@ public class CharacterDao {
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_ROOM_ID, roomId).where(CHARACTER.ID.eq(characterId)).execute();
     }
 
-    public void update(GamePlayer character) {
+    public void update(CharacterInstance character) {
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_ROOM_ID, character.getCurrentRoomId())
                 .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).set(CHARACTER.XP, character.getXp())
                 .set(CHARACTER.LEVEL, character.getLevel()).set(CHARACTER.MAX_HEALTH, character.getMaxHealth())
@@ -79,7 +79,7 @@ public class CharacterDao {
         dsl.deleteFrom(CHARACTER).where(CHARACTER.ID.eq(characterId)).execute();
     }
 
-    private GamePlayer toDomain(CharacterRecord record, Account account, WorldInstance instance) {
+    private CharacterInstance toDomain(CharacterRecord record, Account account, WorldInstance instance) {
         Map<Attribute, Integer> attributes = new EnumMap<>(Attribute.class);
         attributes.put(Attribute.STRENGTH, record.getStrength());
         attributes.put(Attribute.DEXTERITY, record.getDexterity());
@@ -95,7 +95,7 @@ public class CharacterDao {
                 .or(instance::startingRoomInstance).orElseThrow(() -> new IllegalStateException(
                         "WorldInstance " + instance.getId() + " n'a aucune room de départ"));
 
-        GamePlayer character = new GamePlayer(record.getId(), account, record.getName(), room,
+        CharacterInstance character = new CharacterInstance(record.getId(), account, record.getName(), room,
                 Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
                 record.getMaxHealth(), attributes, record.getXp(), record.getGold(), record.getShortRestCount());
         character.setWorldInstance(instance);

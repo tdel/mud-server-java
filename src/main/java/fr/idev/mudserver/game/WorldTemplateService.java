@@ -17,17 +17,17 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
-import fr.idev.mudserver.domain.HexCoordinate;
-import fr.idev.mudserver.domain.ItemTemplate;
+import fr.idev.mudserver.domain.map.HexCoordinate;
+import fr.idev.mudserver.domain.item.ItemTemplate;
 import fr.idev.mudserver.domain.MonsterSpawn;
-import fr.idev.mudserver.domain.RoomTemplate;
-import fr.idev.mudserver.domain.RoomTemplatePortal;
-import fr.idev.mudserver.domain.WorldTemplate;
-import fr.idev.mudserver.domain.WorldTemplateSummary;
-import fr.idev.mudserver.domain.actor.GameNpc;
-import fr.idev.mudserver.domain.actor.GameNpc.NpcDialogueOptionType;
-import fr.idev.mudserver.domain.actor.GameNpcSeller;
-import fr.idev.mudserver.domain.actor.NpcTemplate;
+import fr.idev.mudserver.domain.world.RoomTemplate;
+import fr.idev.mudserver.domain.world.RoomTemplatePortal;
+import fr.idev.mudserver.domain.world.WorldTemplate;
+import fr.idev.mudserver.domain.world.WorldTemplateSummary;
+import fr.idev.mudserver.domain.actor.AbstractNpc;
+import fr.idev.mudserver.domain.actor.AbstractNpc.NpcDialogueOptionType;
+import fr.idev.mudserver.domain.actor.instance.NpcSellerInstance;
+import fr.idev.mudserver.domain.actor.template.NpcTemplate;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -229,8 +229,8 @@ public class WorldTemplateService {
                         + " référence la room " + definition.roomId() + ", absente de ce monde");
             }
 
-            GameNpc.NpcDialogue dialogue = toDialogue(definition);
-            GameNpcSeller.NpcShop shop = toShop(shortName, definition, itemTemplatesById);
+            AbstractNpc.NpcDialogue dialogue = toDialogue(definition);
+            NpcSellerInstance.NpcShop shop = toShop(shortName, definition, itemTemplatesById);
 
             NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), definition.roomId(),
                     new HexCoordinate(definition.cell().q(), definition.cell().r()), definition.description(), dialogue,
@@ -242,18 +242,18 @@ public class WorldTemplateService {
         return Map.copyOf(templates);
     }
 
-    private GameNpc.NpcDialogue toDialogue(NpcDefinition definition) {
+    private AbstractNpc.NpcDialogue toDialogue(NpcDefinition definition) {
         DialogueDefinition dialogueDef = definition.dialogue();
         if (dialogueDef == null) {
             return null;
         }
 
-        List<GameNpc.NpcDialogueOption> options = dialogueDef.options().stream()
-                .map(o -> new GameNpc.NpcDialogueOption(o.label(), o.type(), o.response())).toList();
-        return new GameNpc.NpcDialogue(dialogueDef.greeting(), options);
+        List<AbstractNpc.NpcDialogueOption> options = dialogueDef.options().stream()
+                .map(o -> new AbstractNpc.NpcDialogueOption(o.label(), o.type(), o.response())).toList();
+        return new AbstractNpc.NpcDialogue(dialogueDef.greeting(), options);
     }
 
-    private GameNpcSeller.NpcShop toShop(String shortName, NpcDefinition definition,
+    private NpcSellerInstance.NpcShop toShop(String shortName, NpcDefinition definition,
             Map<UUID, ItemTemplate> itemTemplatesById) {
         DialogueDefinition dialogueDef = definition.dialogue();
         if (dialogueDef == null) {
@@ -271,7 +271,7 @@ public class WorldTemplateService {
                     + " a une option SHOP mais aucun catalogue \"shop\"");
         }
 
-        List<GameNpcSeller.NpcShopEntry> entries = new ArrayList<>();
+        List<NpcSellerInstance.NpcShopEntry> entries = new ArrayList<>();
         for (ShopEntryDefinition entry : shopDef.items()) {
             ItemTemplate itemTemplate = itemTemplatesById.get(entry.itemTemplateId());
             if (itemTemplate == null) {
@@ -282,9 +282,9 @@ public class WorldTemplateService {
                 throw new IllegalStateException("NPC " + definition.id() + " du monde " + shortName + " vend l'item "
                         + entry.itemTemplateId() + " à un prix invalide (" + entry.price() + ")");
             }
-            entries.add(new GameNpcSeller.NpcShopEntry(itemTemplate, entry.price()));
+            entries.add(new NpcSellerInstance.NpcShopEntry(itemTemplate, entry.price()));
         }
-        return new GameNpcSeller.NpcShop(entries);
+        return new NpcSellerInstance.NpcShop(entries);
     }
 
     private <T> T readJson(String shortName, String fileName, Class<T> type) {

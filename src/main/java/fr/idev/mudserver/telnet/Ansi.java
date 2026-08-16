@@ -3,7 +3,7 @@ package fr.idev.mudserver.telnet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import fr.idev.mudserver.domain.Rarity;
+import fr.idev.mudserver.domain.item.Rarity;
 
 public final class Ansi {
 
