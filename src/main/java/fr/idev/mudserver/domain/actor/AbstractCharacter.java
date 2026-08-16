@@ -9,13 +9,9 @@ import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.component.MovementComponent;
 import fr.idev.mudserver.domain.actor.component.NetworkComponent;
 import fr.idev.mudserver.domain.map.HexCoordinate;
-import fr.idev.mudserver.domain.actor.system.AttributeSystem;
-import fr.idev.mudserver.domain.actor.system.InventorySystem;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.combat.ActionEconomy;
 import fr.idev.mudserver.domain.combat.CombatEncounter;
-import fr.idev.mudserver.game.dice.DiceExpression;
-import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.OutputMessage;
 
 public abstract class AbstractCharacter extends AbstractObject {
@@ -31,10 +27,6 @@ public abstract class AbstractCharacter extends AbstractObject {
         this.attachComponent(new AttributeComponent(new EnumMap<>(attributes)));
         this.attachComponent(new CombatComponent(currentHealth, maxHealth, null));
         this.attachComponent(new MovementComponent(speed));
-    }
-
-    public int getArmorClass() {
-        return InventorySystem.getArmorClass(this);
     }
 
     public RoomInstance getCurrentRoom() {
@@ -67,11 +59,6 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public ActionEconomy getActionEconomy() {
         return actionEconomy;
-    }
-
-    public int rollInitiative() {
-        return DiceRoller.roll(new DiceExpression(1, 20, AttributeSystem.getModifier(this, Attribute.DEXTERITY)))
-                .total();
     }
 
     public boolean onEnteredCell(HexCoordinate cell) {

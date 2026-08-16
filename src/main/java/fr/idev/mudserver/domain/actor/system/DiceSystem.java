@@ -1,16 +1,23 @@
 package fr.idev.mudserver.domain.actor.system;
 
+import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.Skill;
 import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.game.dice.CheckResult;
+import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 
 public final class DiceSystem {
 
     private DiceSystem() {
+    }
+
+    public static int rollInitiative(AbstractCharacter character) {
+        return DiceRoller.roll(new DiceExpression(1, 20, AttributeSystem.getModifier(character, Attribute.DEXTERITY)))
+                .total();
     }
 
     public static CheckResult check(CharacterInstance character, Skill skill, int dc) {

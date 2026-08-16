@@ -15,6 +15,7 @@ import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.combat.ActionEconomy;
 import fr.idev.mudserver.domain.combat.CombatEncounter;
 import fr.idev.mudserver.domain.actor.system.CombatSystem;
+import fr.idev.mudserver.domain.actor.system.DiceSystem;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
@@ -138,7 +139,7 @@ public class CombatEngine {
             // Relit pendingJoiners à l'intérieur du verrou, pour inclure tout rejoignant
             // concurrent arrivé pendant la fenêtre du coup d'ouverture (voir Javadoc de
             // CombatEncounter#establishInitiativeOrder).
-            encounter.establishInitiativeOrder(AbstractCharacter::rollInitiative);
+            encounter.establishInitiativeOrder(DiceSystem::rollInitiative);
             // Pas d'avanceTurn() ici : le coup d'ouverture est hors ordre d'initiative,
             // donc
             // le participant à l'index 0 n'a encore rien joué dans l'ordre lui-même.
@@ -174,7 +175,7 @@ public class CombatEngine {
             encounter.joinBeforeInitiative(victim);
             victim.send(new MonsterAggroTriggered(founder.getName()));
             encounter.getRoom().broadcast(new MonsterAggroBroadcast(victim.getName(), founder.getName()), victim);
-            encounter.establishInitiativeOrder(AbstractCharacter::rollInitiative);
+            encounter.establishInitiativeOrder(DiceSystem::rollInitiative);
             resolveFromCurrentTurn(encounter);
         }
         return encounter;
@@ -231,7 +232,7 @@ public class CombatEngine {
 
     private void insertOrQueue(CombatEncounter encounter, AbstractCharacter character) {
         if (encounter.isInitiativeRolled()) {
-            int initiative = character.rollInitiative();
+            int initiative = DiceSystem.rollInitiative(character);
             encounter.insertLatecomer(character, initiative);
         } else {
             encounter.joinBeforeInitiative(character);

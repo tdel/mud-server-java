@@ -8,6 +8,7 @@ import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.system.AttributeSystem;
+import fr.idev.mudserver.domain.actor.system.InventorySystem;
 import fr.idev.mudserver.domain.actor.system.LevelingSystem;
 import fr.idev.mudserver.domain.actor.Skill;
 import fr.idev.mudserver.telnet.Ansi;
@@ -25,7 +26,7 @@ public record GamePlayerStats(CharacterInstance character) implements OutputTeln
                 Ansi.player(c.getName()), c.component(AppearanceComponent.class).gender().label(),
                 c.component(LevelingComponent.class).level(),
                 c.component(AppearanceComponent.class).characterClass().label(), combat.currentHealth(),
-                combat.maxHealth(), c.getArmorClass(), LevelingSystem.getProficiencyBonus(c),
+                combat.maxHealth(), InventorySystem.getArmorClass(c), LevelingSystem.getProficiencyBonus(c),
                 AttributeSystem.getAttribute(c, Attribute.STRENGTH), AttributeSystem.getModifier(c, Attribute.STRENGTH),
                 AttributeSystem.getAttribute(c, Attribute.DEXTERITY),
                 AttributeSystem.getModifier(c, Attribute.DEXTERITY),
