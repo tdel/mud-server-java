@@ -11,6 +11,7 @@ import fr.idev.mudserver.domain.actor.AbstractNpc;
 import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import fr.idev.mudserver.domain.actor.instance.NpcSellerInstance;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
+import fr.idev.mudserver.domain.actor.system.ShopSystem;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -104,7 +105,7 @@ public class Talk implements ControllerHandler {
                         return;
                     }
 
-                    switch (npc.sell(character, trimmed)) {
+                    switch (ShopSystem.sell(npc, character, trimmed)) {
                         case NpcSellerInstance.PurchaseOutcome.Purchased ignored -> {
                         }
                         case NpcSellerInstance.PurchaseOutcome.EntryNotFound ignored ->
