@@ -24,19 +24,10 @@ import fr.idev.mudserver.domain.actor.system.NetworkSystem;
 import fr.idev.mudserver.network.message.ingame.MovementBlockedByBounds;
 import fr.idev.mudserver.network.message.ingame.MovementBlockedByOccupant;
 
-/**
- * Fait avancer tous les personnages en déplacement d'une case à la fois, au
- * rythme de leur propre vitesse. La logique métier du déplacement (décompte des
- * cases, blocage, fin de mouvement) vit sur GameCharacter#updatePosition ; ce
- * ticker se contente de savoir QUI est en train de bouger (via les événements
- * CharacterStartedMoving/CharacterStoppedMoving) et d'envoyer les notifications
- * réseau correspondantes sur le pool de threads virtuels, afin de ne jamais
- * faire d'I/O bloquant sur ce thread partagé par tous les joueurs.
- */
 @Component
-public class MovementEngine extends Thread {
+public class MovementSubsystem extends Thread {
 
-    private static final Logger log = LoggerFactory.getLogger(MovementEngine.class);
+    private static final Logger log = LoggerFactory.getLogger(MovementSubsystem.class);
 
     private static final long TICK_INTERVAL_MS = 100L;
 
@@ -47,8 +38,8 @@ public class MovementEngine extends Thread {
     private final Map<UUID, AbstractCharacter> movingCharacters = new ConcurrentHashMap<>();
     private final Map<UUID, CompletableFuture<Void>> pendingNotifications = new ConcurrentHashMap<>();
 
-    public MovementEngine(Look lookAction, ExecutorService virtualThreadExecutor, MovementSystem movementSystem,
-            NetworkSystem networkSystem) {
+    public MovementSubsystem(Look lookAction, ExecutorService virtualThreadExecutor, MovementSystem movementSystem,
+                             NetworkSystem networkSystem) {
         super("movement-ticker");
         this.lookAction = lookAction;
         this.virtualThreadExecutor = virtualThreadExecutor;
@@ -110,9 +101,6 @@ public class MovementEngine extends Thread {
         }
     }
 
-    // Le rafraîchissement du "look" nécessite une Connection, donc n'a de sens
-    // que pour un GamePlayer ; pour un NPC/monstre en mouvement, ce serait un
-    // no-op ici plutôt qu'un appel à retirer plus tard.
     private void notifyMoved(AbstractCharacter character) {
         if (character instanceof CharacterInstance player) {
             notifyAsync(character,
