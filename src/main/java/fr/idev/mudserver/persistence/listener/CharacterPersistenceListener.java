@@ -60,7 +60,8 @@ public class CharacterPersistenceListener {
     void onNewGamePlayerCreated(NewGamePlayerCreated event) {
         characterDao.insert(event.character());
         log.info("character.created character={} accountId={} race={} class={}", event.character().getName(),
-                event.character().getAccountId(), event.character().component(AppearanceComponent.class).race(),
+                event.character().component(AccountComponent.class).account().getId(),
+                event.character().component(AppearanceComponent.class).race(),
                 event.character().component(AppearanceComponent.class).characterClass());
     }
 

@@ -14,8 +14,6 @@ import fr.idev.mudserver.network.OutputMessage;
 
 public final class CharacterInstance extends AbstractCharacter {
 
-    private final Account account;
-
     public static final int MAX_SHORT_RESTS_BEFORE_LONG_REST = 2;
 
     public CharacterInstance(UUID id, Account account, String name, RoomInstance room, Gender gender, Race race,
@@ -29,20 +27,12 @@ public final class CharacterInstance extends AbstractCharacter {
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold, int shortRestCount) {
         super(id, name, attributes, currentHealth, maxHealth, race.speed());
-        this.account = account;
+        attachComponent(new AccountComponent(account));
         attachComponent(new PositionComponent(room, null)); // missing hexCoordinate here !
         attachComponent(new InventoryComponent(List.of(), gold));
         attachComponent(new LevelingComponent(level, xp));
         attachComponent(new RestComponent(shortRestCount));
         attachComponent(new AppearanceComponent(race, gender, characterClass));
-    }
-
-    public Account getAccount() {
-        return account;
-    }
-
-    public UUID getAccountId() {
-        return account.getId();
     }
 
 }

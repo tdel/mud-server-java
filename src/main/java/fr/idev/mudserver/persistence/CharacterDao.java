@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.Attribute;
+import fr.idev.mudserver.domain.actor.component.AccountComponent;
 import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
 import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
@@ -47,7 +48,8 @@ public class CharacterDao {
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
                 CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA, CHARACTER.XP, CHARACTER.GOLD,
                 CHARACTER.SHORT_REST_COUNT, CHARACTER.WORLD_INSTANCE_ID)
-                .values(character.getId(), character.getAccountId(), character.getName(), currentRoomId,
+                .values(character.getId(), character.component(AccountComponent.class).account().getId(),
+                        character.getName(), currentRoomId,
                         character.component(AppearanceComponent.class).gender().name(),
                         character.component(AppearanceComponent.class).race().name(),
                         character.component(AppearanceComponent.class).characterClass().name(),

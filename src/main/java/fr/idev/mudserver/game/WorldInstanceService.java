@@ -22,6 +22,7 @@ import fr.idev.mudserver.domain.world.RoomTemplate;
 import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.domain.world.WorldTemplate;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
+import fr.idev.mudserver.domain.actor.component.AccountComponent;
 import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import fr.idev.mudserver.domain.actor.component.WorldComponent;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
@@ -131,7 +132,7 @@ public class WorldInstanceService {
         player.component(PositionComponent.class).currentRoom().join(player);
 
         instance.addPlayer(player);
-        accountDao.updateCurrentCharacter(player.getAccountId(), player.getId());
+        accountDao.updateCurrentCharacter(player.component(AccountComponent.class).account().getId(), player.getId());
 
         MDC.put("character", player.getName());
     }
