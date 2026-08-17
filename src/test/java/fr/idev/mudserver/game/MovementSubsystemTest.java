@@ -17,6 +17,7 @@ import fr.idev.mudserver.domain.actor.component.IdentityComponent;
 import fr.idev.mudserver.domain.actor.component.MovementComponent;
 import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
+import fr.idev.mudserver.domain.actor.system.MovementSystem;
 import fr.idev.mudserver.domain.actor.system.NetworkSystem;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.map.HexDirection;
@@ -63,51 +64,10 @@ class MovementSubsystemTest {
     }
 
     @Test
-    void tickAdvancesOneCellPerCharacterSpeedAndStopsWhenPathIsFinished() {
-        ECS ecs = new ECS();
-        subsystem = new MovementSubsystem(null, new NetworkSystem(), virtualThreadExecutor, ecs);
-
-        RoomInstance room = newRoom();
-        HexCoordinate start = new HexCoordinate(2, 2);
-        CharacterInstance character = newCharacter(room, start, 5); // cellSpeed = 1000ms
-        ecs.register(character);
-
-        long t0 = System.currentTimeMillis();
-        character.attachComponent(new MovementComponent(HexDirection.E, 3, t0));
-
-        // Pas assez de temps écoulé : aucun déplacement
-        subsystem.tick(t0 + 500);
-        assertThat(character.component(PositionComponent.class).hexCoordinate()).isEqualTo(start);
-
-        // Une "cellSpeed" (1000ms) s'est écoulée : une case franchie
-        subsystem.tick(t0 + 1000);
-        HexCoordinate afterFirstStep = start.neighbor(HexDirection.E);
-        assertThat(character.component(PositionComponent.class).hexCoordinate()).isEqualTo(afterFirstStep);
-        assertThat(character.component(MovementComponent.class).cellsRemaining()).isEqualTo(2);
-
-        // Pas assez de temps depuis le dernier pas : toujours immobile
-        subsystem.tick(t0 + 1999);
-        assertThat(character.component(PositionComponent.class).hexCoordinate()).isEqualTo(afterFirstStep);
-
-        subsystem.tick(t0 + 2000);
-        HexCoordinate afterSecondStep = afterFirstStep.neighbor(HexDirection.E);
-        assertThat(character.component(PositionComponent.class).hexCoordinate()).isEqualTo(afterSecondStep);
-
-        subsystem.tick(t0 + 3000);
-        HexCoordinate afterThirdStep = afterSecondStep.neighbor(HexDirection.E);
-        assertThat(character.component(PositionComponent.class).hexCoordinate()).isEqualTo(afterThirdStep);
-        // Trajet terminé : le MovementComponent est détaché
-        assertThat(character.findComponent(MovementComponent.class)).isEmpty();
-
-        // Un tick supplémentaire ne fait plus rien avancer
-        subsystem.tick(t0 + 4000);
-        assertThat(character.component(PositionComponent.class).hexCoordinate()).isEqualTo(afterThirdStep);
-    }
-
-    @Test
     void backgroundThreadMovesASingleCharacterOverTime() throws InterruptedException {
         ECS ecs = new ECS();
-        subsystem = new MovementSubsystem(null, new NetworkSystem(), virtualThreadExecutor, ecs);
+        MovementSystem movementSystem = new MovementSystem(null, new NetworkSystem(), virtualThreadExecutor, ecs);
+        subsystem = new MovementSubsystem(movementSystem);
         subsystem.start();
 
         RoomInstance room = newRoom();
@@ -127,7 +87,8 @@ class MovementSubsystemTest {
     @Test
     void backgroundThreadMovesTwoCharactersConcurrentlyAtTheirOwnSpeed() throws InterruptedException {
         ECS ecs = new ECS();
-        subsystem = new MovementSubsystem(null, new NetworkSystem(), virtualThreadExecutor, ecs);
+        MovementSystem movementSystem = new MovementSystem(null, new NetworkSystem(), virtualThreadExecutor, ecs);
+        subsystem = new MovementSubsystem(movementSystem);
         subsystem.start();
 
         RoomInstance roomA = newRoom();

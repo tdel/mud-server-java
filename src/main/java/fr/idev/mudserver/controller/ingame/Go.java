@@ -3,6 +3,7 @@ package fr.idev.mudserver.controller.ingame;
 import java.util.Optional;
 import java.util.Set;
 
+import fr.idev.mudserver.domain.actor.component.MovementComponent;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
@@ -57,9 +58,10 @@ public class Go implements ControllerHandler {
             connection.send(new Usage("go <direction> [count]"));
             return;
         }
-        requestedCells = Math.min(requestedCells, MAX_STEP_COUNT);
+        final int cellsCount = Math.min(requestedCells, MAX_STEP_COUNT);
 
-        movementSystem.startMovement(character, direction.get(), requestedCells);
+        character.updateComponent(MovementComponent.class,
+                current -> new MovementComponent(direction.get(), cellsCount, System.currentTimeMillis()));
     }
 
     private int parsePositiveInt(String token) {

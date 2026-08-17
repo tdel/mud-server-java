@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import fr.idev.mudserver.domain.actor.component.MovementComponent;
 import fr.idev.mudserver.domain.actor.component.PositionComponent;
+import fr.idev.mudserver.domain.map.HexDirection;
 import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.map.HexCoordinate;
@@ -25,19 +27,13 @@ public class HexGridRenderer {
     public static final String LEGEND = "@ = you   p = other player   m = monster   n = npc   # = portal   "
             + ". = floor   ~ = out of bounds   X = destination   - = path";
 
-    private final MovementSystem movementSystem;
-
-    public HexGridRenderer(MovementSystem movementSystem) {
-        this.movementSystem = movementSystem;
-    }
-
     public List<String> render(RoomInstance room, CharacterInstance viewer) {
         return render(room, viewer, VIEWPORT_RADIUS);
     }
 
     List<String> render(RoomInstance room, CharacterInstance viewer, int radius) {
         HexCoordinate center = viewer.component(PositionComponent.class).hexCoordinate();
-        List<HexCoordinate> path = movementSystem.remainingPath(viewer);
+        List<HexCoordinate> path = remainingPath(viewer);
         Set<HexCoordinate> pathCells = new HashSet<>(path);
         HexCoordinate destination = path.isEmpty() ? null : path.get(path.size() - 1);
         List<String> lines = new ArrayList<>();
@@ -97,5 +93,21 @@ public class HexGridRenderer {
         }
 
         return '.';
+    }
+
+    private List<HexCoordinate> remainingPath(AbstractCharacter character) {
+        Optional<MovementComponent> movement = character.findComponent(MovementComponent.class);
+        if (movement.isEmpty()) {
+            return List.of();
+        }
+        int cellsRemaining = movement.get().cellsRemaining();
+        HexDirection direction = movement.get().direction();
+        List<HexCoordinate> path = new ArrayList<>(cellsRemaining);
+        HexCoordinate cursor = character.component(PositionComponent.class).hexCoordinate();
+        for (int i = 0; i < cellsRemaining; i++) {
+            cursor = cursor.neighbor(direction);
+            path.add(cursor);
+        }
+        return path;
     }
 }
