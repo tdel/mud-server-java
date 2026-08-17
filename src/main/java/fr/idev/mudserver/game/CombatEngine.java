@@ -3,6 +3,8 @@ package fr.idev.mudserver.game;
 import java.util.List;
 import java.util.Optional;
 
+import fr.idev.mudserver.domain.actor.component.AggroComponent;
+import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -111,7 +113,7 @@ public class CombatEngine {
                 encounter = target.getEncounter();
                 foundedHere = false;
             } else {
-                encounter = new CombatEncounter(target.getCurrentRoom());
+                encounter = new CombatEncounter(target.component(PositionComponent.class).currentRoom());
                 target.setEncounter(encounter);
                 attacker.setEncounter(encounter);
                 foundedHere = true;
@@ -133,7 +135,8 @@ public class CombatEngine {
 
         CombatResult result = combatSystem.tryAttack(attacker, target);
         attacker.send(new AttackResult(result));
-        target.getCurrentRoom().broadcast(new PlayerAttackBroadcast(attacker.getName(), result), attacker);
+        target.component(PositionComponent.class).currentRoom()
+                .broadcast(new PlayerAttackBroadcast(attacker.getName(), result), attacker);
         log.info("combat.attack_resolved attacker={} target={} hit={} critical={} damage={}", attacker.getName(),
                 target.getName(), result.hit(), result.criticalHit(), result.damage());
 
@@ -169,7 +172,7 @@ public class CombatEngine {
                 encounter = founder.getEncounter();
                 foundedHere = false;
             } else {
-                encounter = new CombatEncounter(founder.getCurrentRoom());
+                encounter = new CombatEncounter(founder.component(PositionComponent.class).currentRoom());
                 founder.setEncounter(encounter);
                 foundedHere = true;
             }
@@ -324,9 +327,10 @@ public class CombatEngine {
             return;
         }
 
-        List<MonsterInstance> aggressors = victim.getCurrentRoom().getMonsters().stream()
-                .filter(monster -> monster.component(CombatComponent.class).currentHealth() > 0)
-                .filter(monster -> monster.getPosition().distanceTo(event.cell()) <= monster.getPresenceRadius())
+        List<MonsterInstance> aggressors = victim.component(PositionComponent.class).currentRoom().getMonsters()
+                .stream().filter(monster -> monster.component(CombatComponent.class).currentHealth() > 0)
+                .filter(monster -> monster.component(PositionComponent.class).hexCoordinate()
+                        .distanceTo(event.cell()) <= monster.component(AggroComponent.class).aggroRadius())
                 .toList();
         if (aggressors.isEmpty()) {
             return;

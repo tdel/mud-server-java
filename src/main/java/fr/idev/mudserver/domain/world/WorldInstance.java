@@ -125,7 +125,6 @@ public class WorldInstance {
         character.setWorldInstance(this);
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));
-        character.setCurrentRoom(startingRoom);
 
         return character;
     }

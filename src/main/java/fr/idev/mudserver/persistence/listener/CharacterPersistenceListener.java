@@ -2,6 +2,7 @@ package fr.idev.mudserver.persistence.listener;
 
 import java.util.Map;
 
+import fr.idev.mudserver.domain.actor.component.*;
 import fr.idev.mudserver.domain.actor.system.CombatSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,10 +10,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
-import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
-import fr.idev.mudserver.domain.actor.component.CombatComponent;
-import fr.idev.mudserver.domain.actor.component.InventoryComponent;
-import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
@@ -84,7 +81,8 @@ public class CharacterPersistenceListener {
     @EventListener
     void onCharacterLeveledUp(CharacterLeveledUp event) {
         CharacterInstance character = event.character();
-        character.getCurrentRoom().broadcast(new PlayerLeveledUp(character.getName(), event.newLevel()), null);
+        character.component(PositionComponent.class).currentRoom()
+                .broadcast(new PlayerLeveledUp(character.getName(), event.newLevel()), null);
         log.info("character.leveled_up character={} newLevel={} hpGained={}", character.getName(), event.newLevel(),
                 event.hpGained());
     }
@@ -109,9 +107,9 @@ public class CharacterPersistenceListener {
     @Order(2)
     void onCharacterDied(CharacterDied event) {
         CharacterInstance killer = event.killer();
-        int xpReward = event.character().getTemplate().getXpReward();
+        int xpReward = event.character().component(LootComponent.class).xpReward(); // should be moved on LootSystem ?
         levelingSystem.gainXp(killer, xpReward);
-        combatSystem.setTarget(null, killer);
+        combatSystem.setTarget(null, killer); // well, should be moved on combatSystem ?
         log.info("combat.kill_credited killer={} monster={} xpReward={}", killer.getName(), event.character().getName(),
                 xpReward);
     }

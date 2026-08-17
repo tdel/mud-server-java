@@ -3,6 +3,7 @@ package fr.idev.mudserver.domain.actor.system;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
@@ -22,19 +23,20 @@ public class MovementSystem {
     public static final long REFERENCE_TIME_MS = 1000L;
 
     public CellStepOutcome moveOneCell(AbstractCharacter character, HexDirection direction) {
-        RoomInstance room = character.getCurrentRoom();
-        HexCoordinate current = character.getPosition();
-        HexCoordinate next = current.neighbor(direction);
+        PositionComponent position = character.component(PositionComponent.class);
+        RoomInstance room = position.currentRoom();
+        HexCoordinate currentCoord = position.hexCoordinate();
+        HexCoordinate nextCoord = currentCoord.neighbor(direction);
 
-        if (!room.isInBounds(next)) {
+        if (!room.isInBounds(nextCoord)) {
             return new CellStepOutcome(false, true, false);
         }
-        if (!room.tryClaimCell(next, character)) {
+        if (!room.tryClaimCell(nextCoord, character)) {
             return new CellStepOutcome(false, false, true);
         }
 
-        room.releaseCell(current, character);
-        character.setPosition(next);
+        room.releaseCell(currentCoord, character);
+        character.updateComponent(PositionComponent.class, current -> new PositionComponent(room, nextCoord));
 
         return new CellStepOutcome(true, false, false);
     }
@@ -45,7 +47,7 @@ public class MovementSystem {
             return List.of();
         }
         List<HexCoordinate> path = new ArrayList<>(movement.cellsRemaining());
-        HexCoordinate cursor = character.getPosition();
+        HexCoordinate cursor = character.component(PositionComponent.class).hexCoordinate();
         for (int i = 0; i < movement.cellsRemaining(); i++) {
             cursor = cursor.neighbor(movement.direction());
             path.add(cursor);

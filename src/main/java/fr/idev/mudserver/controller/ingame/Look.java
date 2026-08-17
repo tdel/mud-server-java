@@ -3,6 +3,7 @@ package fr.idev.mudserver.controller.ingame;
 import java.util.List;
 import java.util.Set;
 
+import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
@@ -42,10 +43,11 @@ public class Look implements ControllerHandler {
     }
 
     private RoomDescription describeRoom(CharacterInstance character) {
-        RoomInstance room = character.getCurrentRoom();
+        RoomInstance room = character.component(PositionComponent.class).currentRoom();
 
         List<String> gridLines = hexGridRenderer.render(room, character);
-        List<AbstractCharacter> nearby = room.occupantsWithin(character.getPosition(), HexGridRenderer.VIEWPORT_RADIUS);
+        List<AbstractCharacter> nearby = room.occupantsWithin(
+                character.component(PositionComponent.class).hexCoordinate(), HexGridRenderer.VIEWPORT_RADIUS);
 
         List<String> portalSummaries = room.getPortals().stream()
                 .map(portal -> portal.direction() + ": " + portal.targetRoom().getName()).toList();

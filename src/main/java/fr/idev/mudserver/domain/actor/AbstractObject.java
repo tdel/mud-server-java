@@ -1,8 +1,5 @@
 package fr.idev.mudserver.domain.actor;
 
-import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
-import fr.idev.mudserver.domain.actor.system.AttributeSystem;
-
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -12,8 +9,8 @@ import java.util.function.UnaryOperator;
 
 public abstract class AbstractObject {
 
-    private UUID id;
-    private String name;
+    private final UUID id;
+    private final String name;
     private final Map<Class<?>, Object> components = new ConcurrentHashMap<>();
 
     protected AbstractObject(UUID id, String name) {
@@ -25,16 +22,8 @@ public abstract class AbstractObject {
         return id;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public <C> void attachComponent(C component) {

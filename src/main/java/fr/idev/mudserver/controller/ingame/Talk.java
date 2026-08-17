@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.actor.AbstractNpc;
 import fr.idev.mudserver.domain.actor.component.InventoryComponent;
+import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import fr.idev.mudserver.domain.actor.instance.NpcSellerInstance;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.system.ShopSystem;
@@ -54,7 +55,7 @@ public class Talk implements ControllerHandler {
             return;
         }
 
-        Optional<AbstractNpc> npc = character.getCurrentRoom().findNpcByName(name);
+        Optional<AbstractNpc> npc = character.component(PositionComponent.class).currentRoom().findNpcByName(name);
         if (npc.isEmpty()) {
             connection.send(new TargetNotFound(name));
             return;

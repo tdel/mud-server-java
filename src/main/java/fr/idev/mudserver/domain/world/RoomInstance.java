@@ -14,6 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import fr.idev.mudserver.domain.MonsterSpawn;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.component.NetworkComponent;
+import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.actor.AbstractNpc;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
@@ -99,8 +100,8 @@ public class RoomInstance {
     }
 
     public void join(CharacterInstance character, HexCoordinate cell) {
-        character.setCurrentRoom(this);
-        character.setPosition(claimNearestFreeCell(cell, character));
+        character.updateComponent(PositionComponent.class,
+                current -> new PositionComponent(this, claimNearestFreeCell(cell, character)));
         clients.put(character.getId(), character);
         DomainEventPublisher.publish(new GamePlayerSpawnedToRoom(character, this));
 
@@ -109,15 +110,13 @@ public class RoomInstance {
 
     public void leave(CharacterInstance character) {
         clients.remove(character.getId());
-        releaseCell(character.getPosition(), character);
-        character.setPosition(null);
+        releaseCell(character.component(PositionComponent.class).hexCoordinate(), character);
         broadcast(new GamePlayerLeftRoom(character.getName()), character);
     }
 
     public void disconnect(CharacterInstance character) {
         clients.remove(character.getId());
-        releaseCell(character.getPosition(), character);
-        character.setPosition(null);
+        releaseCell(character.component(PositionComponent.class).hexCoordinate(), character);
         broadcast(new GamePlayerDisconnected(character.getName()), character);
     }
 
@@ -143,7 +142,7 @@ public class RoomInstance {
 
     public void removeMonster(MonsterInstance monster) {
         monsters.remove(monster);
-        releaseCell(monster.getPosition(), monster);
+        releaseCell(monster.component(PositionComponent.class).hexCoordinate(), monster);
     }
 
     public Optional<MonsterInstance> findMonsterByName(String name) {
@@ -161,7 +160,8 @@ public class RoomInstance {
 
     public void placeMonster(MonsterInstance monster, HexCoordinate cell) {
         addMonster(monster);
-        monster.setPosition(claimNearestFreeCell(cell, monster));
+        monster.updateComponent(PositionComponent.class,
+                current -> new PositionComponent(current.currentRoom(), claimNearestFreeCell(cell, monster)));
     }
 
     public List<AbstractNpc> getNpcs() {
@@ -179,7 +179,8 @@ public class RoomInstance {
 
     public void placeNpc(AbstractNpc npc, HexCoordinate cell) {
         addNpc(npc);
-        npc.setPosition(claimNearestFreeCell(cell, npc));
+        npc.updateComponent(PositionComponent.class,
+                current -> new PositionComponent(current.currentRoom(), claimNearestFreeCell(cell, npc)));
     }
 
     public Optional<AbstractNpc> findNpcByName(String name) {

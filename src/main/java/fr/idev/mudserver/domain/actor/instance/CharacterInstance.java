@@ -37,7 +37,7 @@ public final class CharacterInstance extends AbstractCharacter {
             Map<Attribute, Integer> attributes, int xp, int gold, int shortRestCount) {
         super(id, name, attributes, currentHealth, maxHealth, race.speed());
         this.account = account;
-        setCurrentRoom(room);
+        attachComponent(new PositionComponent(room, null)); // missing hexCoordinate here !
         attachComponent(new InventoryComponent(List.of(), gold));
         attachComponent(new LevelingComponent(level, xp));
         attachComponent(new RestComponent(shortRestCount));
@@ -53,7 +53,7 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     public UUID getCurrentRoomId() {
-        return getCurrentRoom().getTemplateId();
+        return component(PositionComponent.class).currentRoom().getTemplateId();
     }
 
     public UUID getWorldInstanceId() {
@@ -78,7 +78,7 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     public void moveToRoom(RoomInstance destination, HexCoordinate targetCell) {
-        RoomInstance previous = getCurrentRoom();
+        RoomInstance previous = component(PositionComponent.class).currentRoom();
         previous.leave(this);
         destination.join(this, targetCell);
         DomainEventPublisher.publish(new GamePlayerMovedToRoom(this, previous, destination));

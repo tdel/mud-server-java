@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.map.HexCoordinate;
@@ -35,7 +36,7 @@ public class HexGridRenderer {
     }
 
     List<String> render(RoomInstance room, CharacterInstance viewer, int radius) {
-        HexCoordinate center = viewer.getPosition();
+        HexCoordinate center = viewer.component(PositionComponent.class).hexCoordinate();
         List<HexCoordinate> path = movementSystem.remainingPath(viewer);
         Set<HexCoordinate> pathCells = new HashSet<>(path);
         HexCoordinate destination = path.isEmpty() ? null : path.get(path.size() - 1);
@@ -64,7 +65,7 @@ public class HexGridRenderer {
 
     private char glyphFor(RoomInstance room, CharacterInstance viewer, HexCoordinate cell, Set<HexCoordinate> pathCells,
             HexCoordinate destination) {
-        if (cell.equals(viewer.getPosition())) {
+        if (cell.equals(viewer.component(PositionComponent.class).hexCoordinate())) {
             return '@';
         }
         if (!room.isInBounds(cell)) {

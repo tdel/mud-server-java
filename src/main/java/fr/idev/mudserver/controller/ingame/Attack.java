@@ -5,6 +5,7 @@ import java.util.Set;
 
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
+import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import fr.idev.mudserver.domain.actor.system.CombatSystem;
 import org.springframework.stereotype.Component;
 
@@ -55,13 +56,14 @@ public class Attack implements ControllerHandler {
                 return;
             }
 
-            if (!character.getCurrentRoom().getMonsters().contains(target)) {
+            if (!character.component(PositionComponent.class).currentRoom().getMonsters().contains(target)) {
                 combatSystem.setTarget(null, character);
                 connection.send(new TargetNotFound(target.getName()));
                 return;
             }
         } else {
-            Optional<MonsterInstance> found = character.getCurrentRoom().findMonsterByName(name);
+            Optional<MonsterInstance> found = character.component(PositionComponent.class).currentRoom()
+                    .findMonsterByName(name);
             if (found.isEmpty()) {
                 connection.send(new TargetNotFound(name));
                 return;

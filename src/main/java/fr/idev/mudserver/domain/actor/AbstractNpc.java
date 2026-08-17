@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.actor.template.NpcTemplate;
 
@@ -19,7 +20,7 @@ public class AbstractNpc extends AbstractCharacter {
     public AbstractNpc(UUID id, NpcTemplate template, RoomInstance room) {
         super(id, template.name(), neutralAttributes(), NOMINAL_HEALTH, NOMINAL_HEALTH, 0);
         this.template = Objects.requireNonNull(template);
-        setCurrentRoom(Objects.requireNonNull(room));
+        attachComponent(new PositionComponent(room, template.cell()));
     }
 
     public String getDescription() {

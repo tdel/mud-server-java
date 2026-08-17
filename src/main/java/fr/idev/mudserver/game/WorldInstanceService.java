@@ -22,6 +22,7 @@ import fr.idev.mudserver.domain.world.RoomTemplate;
 import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.domain.world.WorldTemplate;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
+import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
@@ -126,7 +127,7 @@ public class WorldInstanceService {
         WorldInstance instance = player.getWorldInstance();
 
         inventorySystem.replaceItems(player, itemService.loadInventory(player));
-        player.getCurrentRoom().join(player);
+        player.component(PositionComponent.class).currentRoom().join(player);
 
         instance.addPlayer(player);
         accountDao.updateCurrentCharacter(player.getAccountId(), player.getId());
@@ -140,7 +141,7 @@ public class WorldInstanceService {
         }
 
         CharacterInstance character = connection.character();
-        RoomInstance room = character.getCurrentRoom();
+        RoomInstance room = character.component(PositionComponent.class).currentRoom();
         WorldInstance instance = character.getWorldInstance();
 
         characterDao.update(character);
@@ -159,7 +160,7 @@ public class WorldInstanceService {
     @EventListener
     @Order(1)
     void onCharacterDied(CharacterDied event) {
-        RoomInstance room = event.character().getCurrentRoom();
+        RoomInstance room = event.character().component(PositionComponent.class).currentRoom();
         room.removeMonster(event.character());
         room.broadcast(new MonsterDefeated(event.character().getName()), null);
         log.info("combat.monster_removed_from_room monster={} room={}", event.character().getName(), room.getName());
@@ -168,7 +169,7 @@ public class WorldInstanceService {
     @EventListener
     @Order(1)
     void onGamePlayerDied(GamePlayerDied event) {
-        RoomInstance room = event.character().getCurrentRoom();
+        RoomInstance room = event.character().component(PositionComponent.class).currentRoom();
         room.broadcast(new GamePlayerDefeated(event.character().getName(), event.killer().getName()),
                 event.character());
         log.info("combat.player_defeated character={} killer={} room={}", event.character().getName(),

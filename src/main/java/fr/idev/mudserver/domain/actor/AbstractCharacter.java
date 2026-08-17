@@ -9,15 +9,12 @@ import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.component.MovementComponent;
 import fr.idev.mudserver.domain.actor.component.NetworkComponent;
 import fr.idev.mudserver.domain.map.HexCoordinate;
-import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.combat.ActionEconomy;
 import fr.idev.mudserver.domain.combat.CombatEncounter;
 import fr.idev.mudserver.network.OutputMessage;
 
 public abstract class AbstractCharacter extends AbstractObject {
 
-    private volatile RoomInstance currentRoom;
-    private volatile HexCoordinate position;
     private volatile CombatEncounter encounter;
     private final ActionEconomy actionEconomy = new ActionEconomy();
 
@@ -27,22 +24,6 @@ public abstract class AbstractCharacter extends AbstractObject {
         this.attachComponent(new AttributeComponent(new EnumMap<>(attributes)));
         this.attachComponent(new CombatComponent(currentHealth, maxHealth, null));
         this.attachComponent(new MovementComponent(speed));
-    }
-
-    public RoomInstance getCurrentRoom() {
-        return currentRoom;
-    }
-
-    public void setCurrentRoom(RoomInstance currentRoom) {
-        this.currentRoom = currentRoom;
-    }
-
-    public HexCoordinate getPosition() {
-        return position;
-    }
-
-    public void setPosition(HexCoordinate position) {
-        this.position = position;
     }
 
     public boolean isInCombat() {

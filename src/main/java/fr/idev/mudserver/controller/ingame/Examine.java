@@ -4,6 +4,7 @@ import java.util.Set;
 
 import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
+import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -55,7 +56,8 @@ public class Examine implements ControllerHandler {
             return;
         }
 
-        Optional<AbstractCharacter> target = character.getCurrentRoom().findOccupantByName(name);
+        Optional<AbstractCharacter> target = character.component(PositionComponent.class).currentRoom()
+                .findOccupantByName(name);
 
         if (target.isEmpty()) {
             connection.send(new TargetNotFound(name));

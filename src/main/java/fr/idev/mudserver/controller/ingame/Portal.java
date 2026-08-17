@@ -3,6 +3,7 @@ package fr.idev.mudserver.controller.ingame;
 import java.util.Optional;
 import java.util.Set;
 
+import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
@@ -34,13 +35,15 @@ public class Portal implements ControllerHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
-        Optional<RoomPortal> portal = character.getCurrentRoom().findPortalAt(character.getPosition());
-        if (portal.isEmpty()) {
+        PositionComponent position = character.component(PositionComponent.class);
+        Optional<RoomPortal> portalQuery = position.currentRoom().findPortalAt(position.hexCoordinate());
+        if (portalQuery.isEmpty()) {
             connection.send(new NoPortalHere());
             return;
         }
 
-        character.moveToRoom(portal.get().targetRoom(), portal.get().targetCell());
+        RoomPortal portal = portalQuery.get();
+        character.moveToRoom(portal.targetRoom(), portal.targetCell()); // must be inside a System !
         lookAction.onReceive(connection, "");
     }
 }

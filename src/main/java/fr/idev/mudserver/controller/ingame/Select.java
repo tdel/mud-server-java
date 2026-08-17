@@ -3,6 +3,7 @@ package fr.idev.mudserver.controller.ingame;
 import java.util.Optional;
 import java.util.Set;
 
+import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import fr.idev.mudserver.domain.actor.system.CombatSystem;
 import org.springframework.stereotype.Component;
 
@@ -44,7 +45,8 @@ public class Select implements ControllerHandler {
             return;
         }
 
-        Optional<MonsterInstance> targetQuery = character.getCurrentRoom().findMonsterByName(name);
+        Optional<MonsterInstance> targetQuery = character.component(PositionComponent.class).currentRoom()
+                .findMonsterByName(name);
         if (targetQuery.isEmpty()) {
             connection.send(new TargetNotFound(name));
             return;

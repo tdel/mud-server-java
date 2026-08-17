@@ -147,7 +147,7 @@ public class InventorySystem {
     }
 
     private int monsterArmorClass(MonsterInstance monster) {
-        Integer natural = monster.getTemplate().getNaturalArmorClass();
+        Integer natural = monster.getTemplate().naturalArmorClass();
         return natural != null ? natural : baseArmorClass(monster);
     }
 
