@@ -121,7 +121,7 @@ public class CharacterPersistenceListener {
     @Order(2)
     void onGamePlayerDied(GamePlayerDied event) {
         CharacterInstance character = event.character();
-        RoomInstance startingRoom = character.getWorldInstance().startingRoomInstance()
+        RoomInstance startingRoom = character.component(WorldComponent.class).worldInstance().startingRoomInstance()
                 .orElseThrow(() -> new IllegalStateException("Aucune starting room configurée"));
 
         combatSystem.heal(character, character.component(CombatComponent.class).maxHealth());
@@ -151,7 +151,8 @@ public class CharacterPersistenceListener {
             CombatComponent combat = character.component(CombatComponent.class);
             character.send(new HpRestored(entry.getValue(), combat.currentHealth(), combat.maxHealth()));
         }
-        event.initiator().getWorldInstance().broadcast(new ShortRestAnnounced(event.initiator().getName()), null);
+        event.initiator().component(WorldComponent.class).worldInstance()
+                .broadcast(new ShortRestAnnounced(event.initiator().getName()), null);
         log.info("character.short_rest_taken initiator={} affected={}", event.initiator().getName(),
                 event.healedAmounts().size());
     }
@@ -164,7 +165,8 @@ public class CharacterPersistenceListener {
             CombatComponent combat = character.component(CombatComponent.class);
             character.send(new HpRestored(entry.getValue(), combat.currentHealth(), combat.maxHealth()));
         }
-        event.initiator().getWorldInstance().broadcast(new LongRestAnnounced(event.initiator().getName()), null);
+        event.initiator().component(WorldComponent.class).worldInstance()
+                .broadcast(new LongRestAnnounced(event.initiator().getName()), null);
         log.info("character.long_rest_taken initiator={} affected={} provisionsConsumed={}",
                 event.initiator().getName(), event.healedAmounts().size(), event.consumedFood().size());
     }

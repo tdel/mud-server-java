@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.CharacterClass;
+import fr.idev.mudserver.domain.actor.component.WorldComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
@@ -122,7 +123,7 @@ public class WorldInstance {
 
         CharacterInstance character = new CharacterInstance(UUID.randomUUID(), account, name, startingRoom, gender,
                 race, characterClass, 1, maxHealth, maxHealth, scores, 0, gold);
-        character.setWorldInstance(this);
+        character.attachComponent(new WorldComponent(this));
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));
 

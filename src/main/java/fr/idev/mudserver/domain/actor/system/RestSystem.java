@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import fr.idev.mudserver.config.GameConfig;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.component.RestComponent;
+import fr.idev.mudserver.domain.actor.component.WorldComponent;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.LongRestTaken;
 import fr.idev.mudserver.domain.actor.event.ShortRestTaken;
@@ -51,7 +52,8 @@ public class RestSystem {
         }
 
         Map<CharacterInstance, Integer> healedAmounts = new LinkedHashMap<>();
-        for (CharacterInstance character : initiator.getWorldInstance().onlineCharacters()) {
+        for (CharacterInstance character : initiator.component(WorldComponent.class).worldInstance()
+                .onlineCharacters()) {
             int amount = levelingSystem.hitDieRecovery(character);
             healedAmounts.put(character, combatSystem.heal(character, amount));
             incrementShortRestCount(character);
@@ -77,7 +79,8 @@ public class RestSystem {
         }
 
         Map<CharacterInstance, Integer> healedAmounts = new LinkedHashMap<>();
-        for (CharacterInstance character : initiator.getWorldInstance().onlineCharacters()) {
+        for (CharacterInstance character : initiator.component(WorldComponent.class).worldInstance()
+                .onlineCharacters()) {
             healedAmounts.put(character,
                     combatSystem.heal(character, character.component(CombatComponent.class).maxHealth()));
             resetShortRestCount(character);

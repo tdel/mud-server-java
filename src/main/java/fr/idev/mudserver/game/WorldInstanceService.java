@@ -23,6 +23,7 @@ import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.domain.world.WorldTemplate;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.component.PositionComponent;
+import fr.idev.mudserver.domain.actor.component.WorldComponent;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
@@ -124,7 +125,7 @@ public class WorldInstanceService {
     }
 
     public void enterGame(CharacterInstance player) {
-        WorldInstance instance = player.getWorldInstance();
+        WorldInstance instance = player.component(WorldComponent.class).worldInstance();
 
         inventorySystem.replaceItems(player, itemService.loadInventory(player));
         player.component(PositionComponent.class).currentRoom().join(player);
@@ -142,7 +143,7 @@ public class WorldInstanceService {
 
         CharacterInstance character = connection.character();
         RoomInstance room = character.component(PositionComponent.class).currentRoom();
-        WorldInstance instance = character.getWorldInstance();
+        WorldInstance instance = character.component(WorldComponent.class).worldInstance();
 
         characterDao.update(character);
         room.disconnect(character);

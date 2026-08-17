@@ -10,14 +10,11 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.*;
 import fr.idev.mudserver.domain.actor.component.*;
 import fr.idev.mudserver.domain.world.RoomInstance;
-import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.network.OutputMessage;
 
 public final class CharacterInstance extends AbstractCharacter {
 
     private final Account account;
-    private UUID worldInstanceId;
-    private WorldInstance worldInstance;
 
     public static final int MAX_SHORT_RESTS_BEFORE_LONG_REST = 2;
 
@@ -46,27 +43,6 @@ public final class CharacterInstance extends AbstractCharacter {
 
     public UUID getAccountId() {
         return account.getId();
-    }
-
-    public UUID getCurrentRoomId() {
-        return component(PositionComponent.class).currentRoom().getTemplateId();
-    }
-
-    public UUID getWorldInstanceId() {
-        return worldInstanceId;
-    }
-
-    public void setWorldInstanceId(UUID worldInstanceId) {
-        this.worldInstanceId = worldInstanceId;
-    }
-
-    public WorldInstance getWorldInstance() {
-        return worldInstance;
-    }
-
-    public void setWorldInstance(WorldInstance worldInstance) {
-        this.worldInstance = worldInstance;
-        this.worldInstanceId = worldInstance.getId();
     }
 
 }

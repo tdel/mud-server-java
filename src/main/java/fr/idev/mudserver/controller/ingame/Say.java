@@ -5,6 +5,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
+import fr.idev.mudserver.domain.actor.component.WorldComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -35,7 +36,8 @@ public class Say implements ControllerHandler {
             return;
         }
 
-        character.getWorldInstance().broadcast(new Chat(character.getName(), message), character);
+        character.component(WorldComponent.class).worldInstance().broadcast(new Chat(character.getName(), message),
+                character);
         connection.send(new YouSaid(message));
     }
 }
