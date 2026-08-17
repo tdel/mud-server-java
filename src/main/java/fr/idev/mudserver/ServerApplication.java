@@ -1,6 +1,5 @@
 package fr.idev.mudserver;
 
-import fr.idev.mudserver.game.MovementSubsystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationRunner;
@@ -36,11 +35,5 @@ public class ServerApplication {
             levelCatalog.warmXpThresholds();
             log.info("startup.warmup_completed durationMs={}", System.currentTimeMillis() - start);
         };
-    }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "app.telnet", name = "enabled", havingValue = "true", matchIfMissing = true)
-    public ApplicationRunner movementTickerRunner(MovementSubsystem movementSubsystem) {
-        return args -> movementSubsystem.start();
     }
 }

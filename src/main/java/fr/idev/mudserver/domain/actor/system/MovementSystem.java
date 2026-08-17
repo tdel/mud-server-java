@@ -10,12 +10,12 @@ import fr.idev.mudserver.domain.actor.AbstractObject;
 import fr.idev.mudserver.domain.actor.component.NetworkComponent;
 import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import fr.idev.mudserver.game.ECS;
-import fr.idev.mudserver.game.MovementSubsystem;
 import fr.idev.mudserver.game.Query;
 import fr.idev.mudserver.network.message.ingame.MovementBlockedByBounds;
 import fr.idev.mudserver.network.message.ingame.MovementBlockedByOccupant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
@@ -50,7 +50,9 @@ public class MovementSystem {
         this.ecs = ecs;
     }
 
-    public void update(long now) {
+    @Scheduled(fixedRate = 100)
+    public void update() {
+        long now = System.currentTimeMillis();
         Query q = ecs.createQuery();
         q.addRequirement(MovementComponent.class);
         q.addRequirement(IdentityComponent.class);
