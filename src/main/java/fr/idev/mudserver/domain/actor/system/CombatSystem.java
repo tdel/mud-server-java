@@ -2,6 +2,7 @@ package fr.idev.mudserver.domain.actor.system;
 
 import java.util.Optional;
 
+import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
+import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.game.CombatResult;
@@ -24,13 +26,10 @@ import fr.idev.mudserver.game.dice.DiceRoller;
 public class CombatSystem {
 
     private final InventorySystem inventorySystem;
-    private final AttributeSystem attributeSystem;
     private final LevelingSystem levelingSystem;
 
-    public CombatSystem(InventorySystem inventorySystem, AttributeSystem attributeSystem,
-            @Lazy LevelingSystem levelingSystem) {
+    public CombatSystem(InventorySystem inventorySystem, @Lazy LevelingSystem levelingSystem) {
         this.inventorySystem = inventorySystem;
-        this.attributeSystem = attributeSystem;
         this.levelingSystem = levelingSystem;
     }
 
@@ -98,9 +97,9 @@ public class CombatSystem {
         boolean weaponProficient = weapon.map(item -> attacker.component(AppearanceComponent.class).characterClass()
                 .weaponProficiencies().contains(item.getWeaponCategory())).orElse(true);
 
-        int strengthModifier = attributeSystem.getModifier(attacker, Attribute.STRENGTH);
-        int attackBonus = strengthModifier + (weaponProficient ? levelingSystem.getProficiencyBonus(attacker) : 0)
-                + weaponBonus;
+        int strengthModifier = attacker.component(AttributeComponent.class).modifier(Attribute.STRENGTH);
+        int attackBonus = strengthModifier
+                + (weaponProficient ? attacker.component(LevelingComponent.class).proficiencyBonus() : 0) + weaponBonus;
         boolean disadvantage = inventorySystem.isWearingNonProficientArmor(attacker);
 
         DiceRoll attackRoll = DiceRoller.rollD20(attackBonus, disadvantage);
@@ -132,7 +131,7 @@ public class CombatSystem {
     }
 
     private CombatResult monsterAttack(MonsterInstance attacker, AbstractCharacter target) {
-        int strengthModifier = attributeSystem.getModifier(attacker, Attribute.STRENGTH);
+        int strengthModifier = attacker.component(AttributeComponent.class).modifier(Attribute.STRENGTH);
         int attackBonus = strengthModifier + 2;
 
         DiceRoll attackRoll = DiceRoller.roll(new DiceExpression(1, 20, attackBonus));

@@ -14,7 +14,6 @@ import fr.idev.mudserver.domain.item.ConsumableItem;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.combat.ActionEconomy;
 import fr.idev.mudserver.domain.combat.CombatEncounter;
-import fr.idev.mudserver.domain.actor.system.AttributeSystem;
 import fr.idev.mudserver.domain.actor.system.CombatSystem;
 import fr.idev.mudserver.domain.actor.system.DiceSystem;
 import fr.idev.mudserver.domain.actor.system.InventorySystem;
@@ -48,15 +47,13 @@ public class CombatEngine {
     private final DiceSystem diceSystem;
     private final AiSystem aiSystem;
     private final InventorySystem inventorySystem;
-    private final AttributeSystem attributeSystem;
 
     public CombatEngine(CombatSystem combatSystem, DiceSystem diceSystem, AiSystem aiSystem,
-            InventorySystem inventorySystem, AttributeSystem attributeSystem) {
+            InventorySystem inventorySystem) {
         this.combatSystem = combatSystem;
         this.diceSystem = diceSystem;
         this.aiSystem = aiSystem;
         this.inventorySystem = inventorySystem;
-        this.attributeSystem = attributeSystem;
     }
 
     public void attack(CharacterInstance attacker, MonsterInstance target) {
@@ -114,7 +111,7 @@ public class CombatEngine {
                 encounter = target.getEncounter();
                 foundedHere = false;
             } else {
-                encounter = new CombatEncounter(target.getCurrentRoom(), attributeSystem);
+                encounter = new CombatEncounter(target.getCurrentRoom());
                 target.setEncounter(encounter);
                 attacker.setEncounter(encounter);
                 foundedHere = true;
@@ -172,7 +169,7 @@ public class CombatEngine {
                 encounter = founder.getEncounter();
                 foundedHere = false;
             } else {
-                encounter = new CombatEncounter(founder.getCurrentRoom(), attributeSystem);
+                encounter = new CombatEncounter(founder.getCurrentRoom());
                 founder.setEncounter(encounter);
                 foundedHere = true;
             }

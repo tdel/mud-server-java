@@ -13,12 +13,12 @@ import org.springframework.stereotype.Repository;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
+import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import fr.idev.mudserver.domain.actor.component.RestComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
-import fr.idev.mudserver.domain.actor.system.AttributeSystem;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
@@ -30,11 +30,9 @@ import fr.idev.mudserver.persistence.jooq.tables.records.CharacterRecord;
 public class CharacterDao {
 
     private final DSLContext dsl;
-    private final AttributeSystem attributeSystem;
 
-    public CharacterDao(DSLContext dsl, AttributeSystem attributeSystem) {
+    public CharacterDao(DSLContext dsl) {
         this.dsl = dsl;
-        this.attributeSystem = attributeSystem;
     }
 
     public void insert(CharacterInstance character) {
@@ -52,12 +50,12 @@ public class CharacterDao {
                         character.component(AppearanceComponent.class).race().name(),
                         character.component(AppearanceComponent.class).characterClass().name(),
                         character.component(LevelingComponent.class).level(), combat.currentHealth(),
-                        combat.maxHealth(), attributeSystem.getAttribute(character, Attribute.STRENGTH),
-                        attributeSystem.getAttribute(character, Attribute.DEXTERITY),
-                        attributeSystem.getAttribute(character, Attribute.CONSTITUTION),
-                        attributeSystem.getAttribute(character, Attribute.INTELLIGENCE),
-                        attributeSystem.getAttribute(character, Attribute.WISDOM),
-                        attributeSystem.getAttribute(character, Attribute.CHARISMA),
+                        combat.maxHealth(), character.component(AttributeComponent.class).valueOf(Attribute.STRENGTH),
+                        character.component(AttributeComponent.class).valueOf(Attribute.DEXTERITY),
+                        character.component(AttributeComponent.class).valueOf(Attribute.CONSTITUTION),
+                        character.component(AttributeComponent.class).valueOf(Attribute.INTELLIGENCE),
+                        character.component(AttributeComponent.class).valueOf(Attribute.WISDOM),
+                        character.component(AttributeComponent.class).valueOf(Attribute.CHARISMA),
                         character.component(LevelingComponent.class).xp(),
                         character.component(InventoryComponent.class).gold(),
                         character.component(RestComponent.class).shortRestCount(), worldInstanceId)

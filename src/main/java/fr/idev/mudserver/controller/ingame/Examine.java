@@ -2,6 +2,8 @@ package fr.idev.mudserver.controller.ingame;
 
 import java.util.Set;
 
+import fr.idev.mudserver.domain.actor.component.AttributeComponent;
+import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -12,7 +14,6 @@ import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.actor.AbstractNpc;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
-import fr.idev.mudserver.domain.actor.system.AttributeSystem;
 import fr.idev.mudserver.domain.actor.system.InventorySystem;
 import fr.idev.mudserver.domain.actor.system.LevelingSystem;
 import fr.idev.mudserver.network.Connection;
@@ -28,12 +29,10 @@ public class Examine implements ControllerHandler {
 
     private final InventorySystem inventorySystem;
     private final LevelingSystem levelingSystem;
-    private final AttributeSystem attributeSystem;
 
-    public Examine(InventorySystem inventorySystem, LevelingSystem levelingSystem, AttributeSystem attributeSystem) {
+    public Examine(InventorySystem inventorySystem, LevelingSystem levelingSystem) {
         this.inventorySystem = inventorySystem;
         this.levelingSystem = levelingSystem;
-        this.attributeSystem = attributeSystem;
     }
 
     @Override
@@ -64,30 +63,27 @@ public class Examine implements ControllerHandler {
         }
 
         switch (target.get()) {
-            case CharacterInstance p -> connection.send(new GamePlayerStats(p, inventorySystem.getArmorClass(p),
-                    levelingSystem.getProficiencyBonus(p), attributeSystem.getAttribute(p, Attribute.STRENGTH),
-                    attributeSystem.getModifier(p, Attribute.STRENGTH),
-                    attributeSystem.getAttribute(p, Attribute.DEXTERITY),
-                    attributeSystem.getModifier(p, Attribute.DEXTERITY),
-                    attributeSystem.getAttribute(p, Attribute.CONSTITUTION),
-                    attributeSystem.getModifier(p, Attribute.CONSTITUTION),
-                    attributeSystem.getAttribute(p, Attribute.INTELLIGENCE),
-                    attributeSystem.getModifier(p, Attribute.INTELLIGENCE),
-                    attributeSystem.getAttribute(p, Attribute.WISDOM), attributeSystem.getModifier(p, Attribute.WISDOM),
-                    attributeSystem.getAttribute(p, Attribute.CHARISMA),
-                    attributeSystem.getModifier(p, Attribute.CHARISMA)));
-            case MonsterInstance m -> connection.send(new MonsterStatBlock(m, inventorySystem.getArmorClass(m),
-                    attributeSystem.getAttribute(m, Attribute.STRENGTH),
-                    attributeSystem.getModifier(m, Attribute.STRENGTH),
-                    attributeSystem.getAttribute(m, Attribute.DEXTERITY),
-                    attributeSystem.getModifier(m, Attribute.DEXTERITY),
-                    attributeSystem.getAttribute(m, Attribute.CONSTITUTION),
-                    attributeSystem.getModifier(m, Attribute.CONSTITUTION),
-                    attributeSystem.getAttribute(m, Attribute.INTELLIGENCE),
-                    attributeSystem.getModifier(m, Attribute.INTELLIGENCE),
-                    attributeSystem.getAttribute(m, Attribute.WISDOM), attributeSystem.getModifier(m, Attribute.WISDOM),
-                    attributeSystem.getAttribute(m, Attribute.CHARISMA),
-                    attributeSystem.getModifier(m, Attribute.CHARISMA)));
+            case CharacterInstance p -> {
+                AttributeComponent attributes = p.component(AttributeComponent.class);
+                connection.send(new GamePlayerStats(p, inventorySystem.getArmorClass(p),
+                        p.component(LevelingComponent.class).proficiencyBonus(), attributes.valueOf(Attribute.STRENGTH),
+                        attributes.modifier(Attribute.STRENGTH), attributes.valueOf(Attribute.DEXTERITY),
+                        attributes.modifier(Attribute.DEXTERITY), attributes.valueOf(Attribute.CONSTITUTION),
+                        attributes.modifier(Attribute.CONSTITUTION), attributes.valueOf(Attribute.INTELLIGENCE),
+                        attributes.modifier(Attribute.INTELLIGENCE), attributes.valueOf(Attribute.WISDOM),
+                        attributes.modifier(Attribute.WISDOM), attributes.valueOf(Attribute.CHARISMA),
+                        attributes.modifier(Attribute.CHARISMA)));
+            }
+            case MonsterInstance m -> {
+                AttributeComponent attributes = m.component(AttributeComponent.class);
+                connection.send(new MonsterStatBlock(m, inventorySystem.getArmorClass(m),
+                        attributes.valueOf(Attribute.STRENGTH), attributes.modifier(Attribute.STRENGTH),
+                        attributes.valueOf(Attribute.DEXTERITY), attributes.modifier(Attribute.DEXTERITY),
+                        attributes.valueOf(Attribute.CONSTITUTION), attributes.modifier(Attribute.CONSTITUTION),
+                        attributes.valueOf(Attribute.INTELLIGENCE), attributes.modifier(Attribute.INTELLIGENCE),
+                        attributes.valueOf(Attribute.WISDOM), attributes.modifier(Attribute.WISDOM),
+                        attributes.valueOf(Attribute.CHARISMA), attributes.modifier(Attribute.CHARISMA)));
+            }
             case AbstractNpc n -> connection.send(new NpcDescription(n));
             default -> throw new IllegalStateException("Type de cible inattendu : " + target.get().getClass());
         }

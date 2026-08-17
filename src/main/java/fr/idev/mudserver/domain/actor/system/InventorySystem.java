@@ -10,6 +10,7 @@ import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.ArmorProficiency;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
+import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
 import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
@@ -26,12 +27,6 @@ import fr.idev.mudserver.domain.item.Item;
 
 @Service
 public class InventorySystem {
-
-    private final AttributeSystem attributeSystem;
-
-    public InventorySystem(AttributeSystem attributeSystem) {
-        this.attributeSystem = attributeSystem;
-    }
 
     public void addGold(CharacterInstance character, int amount) {
         character.updateComponent(InventoryComponent.class,
@@ -160,11 +155,11 @@ public class InventorySystem {
     }
 
     private int baseArmorClass(AbstractCharacter character) {
-        return 10 + attributeSystem.getModifier(character, Attribute.DEXTERITY);
+        return 10 + character.component(AttributeComponent.class).modifier(Attribute.DEXTERITY);
     }
 
     private int armorAc(CharacterInstance character, Item armor) {
-        int dexMod = attributeSystem.getModifier(character, Attribute.DEXTERITY);
+        int dexMod = character.component(AttributeComponent.class).modifier(Attribute.DEXTERITY);
         int baseAndBonus = armor.getBaseAc() + armor.getBonus();
         return switch (armor.getArmorCategory()) {
             case LIGHT -> baseAndBonus + dexMod;

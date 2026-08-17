@@ -7,15 +7,14 @@ import java.util.function.Function;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
+import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
-import fr.idev.mudserver.domain.actor.system.AttributeSystem;
 
 public final class CombatEncounter {
 
     private final RoomInstance room;
-    private final AttributeSystem attributeSystem;
     private final List<AbstractCharacter> pendingJoiners = new ArrayList<>();
     private final List<InitiativeEntry> order = new ArrayList<>();
     private boolean initiativeRolled;
@@ -24,9 +23,8 @@ public final class CombatEncounter {
     private record InitiativeEntry(AbstractCharacter character, int initiative) {
     }
 
-    public CombatEncounter(RoomInstance room, AttributeSystem attributeSystem) {
+    public CombatEncounter(RoomInstance room) {
         this.room = room;
-        this.attributeSystem = attributeSystem;
     }
 
     public RoomInstance getRoom() {
@@ -127,8 +125,8 @@ public final class CombatEncounter {
         if (byInitiative != 0) {
             return byInitiative;
         }
-        return -Integer.compare(attributeSystem.getModifier(a.character(), Attribute.DEXTERITY),
-                attributeSystem.getModifier(b.character(), Attribute.DEXTERITY));
+        return -Integer.compare(a.character().component(AttributeComponent.class).modifier(Attribute.DEXTERITY),
+                b.character().component(AttributeComponent.class).modifier(Attribute.DEXTERITY));
     }
 
     private int indexOf(AbstractCharacter character) {

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
+import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
 import fr.idev.mudserver.domain.actor.event.CharacterLeveledUp;
@@ -13,11 +14,9 @@ import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 @Service
 public class LevelingSystem {
 
-    private final AttributeSystem attributeSystem;
     private final CombatSystem combatSystem;
 
-    public LevelingSystem(AttributeSystem attributeSystem, CombatSystem combatSystem) {
-        this.attributeSystem = attributeSystem;
+    public LevelingSystem(CombatSystem combatSystem) {
         this.combatSystem = combatSystem;
     }
 
@@ -27,13 +26,10 @@ public class LevelingSystem {
         DomainEventPublisher.publish(new CharacterGainedXp(character, amount));
     }
 
-    public int getProficiencyBonus(CharacterInstance character) {
-        return 2 + Math.floorDiv(character.component(LevelingComponent.class).level() - 1, 4);
-    }
-
     public int hitDieRecovery(CharacterInstance character) {
         int hitDie = character.component(AppearanceComponent.class).characterClass().hitDie();
-        return Math.max(1, hitDie / 2 + 1 + attributeSystem.getModifier(character, Attribute.CONSTITUTION));
+        return Math.max(1,
+                hitDie / 2 + 1 + character.component(AttributeComponent.class).modifier(Attribute.CONSTITUTION));
     }
 
     public void applyLevelUp(CharacterInstance character) {

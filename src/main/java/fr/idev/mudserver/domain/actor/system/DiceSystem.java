@@ -1,11 +1,13 @@
 package fr.idev.mudserver.domain.actor.system;
 
+import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.Skill;
 import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
+import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.game.dice.CheckResult;
 import fr.idev.mudserver.game.dice.DiceExpression;
@@ -16,17 +18,16 @@ import fr.idev.mudserver.game.dice.DiceRoller;
 public class DiceSystem {
 
     private final InventorySystem inventorySystem;
-    private final AttributeSystem attributeSystem;
     private final LevelingSystem levelingSystem;
 
-    public DiceSystem(InventorySystem inventorySystem, AttributeSystem attributeSystem, LevelingSystem levelingSystem) {
+    public DiceSystem(InventorySystem inventorySystem, LevelingSystem levelingSystem) {
         this.inventorySystem = inventorySystem;
-        this.attributeSystem = attributeSystem;
         this.levelingSystem = levelingSystem;
     }
 
     public int rollInitiative(AbstractCharacter character) {
-        return DiceRoller.roll(new DiceExpression(1, 20, attributeSystem.getModifier(character, Attribute.DEXTERITY)))
+        return DiceRoller.roll(
+                new DiceExpression(1, 20, character.component(AttributeComponent.class).modifier(Attribute.DEXTERITY)))
                 .total();
     }
 
@@ -44,8 +45,8 @@ public class DiceSystem {
 
     private CheckResult checkOrSave(CharacterInstance character, Attribute attribute, boolean proficient, int dc,
             String label) {
-        int modifier = attributeSystem.getModifier(character, attribute)
-                + (proficient ? levelingSystem.getProficiencyBonus(character) : 0);
+        int modifier = character.component(AttributeComponent.class).modifier(attribute)
+                + (proficient ? character.component(LevelingComponent.class).proficiencyBonus() : 0);
         boolean disadvantage = (attribute == Attribute.STRENGTH || attribute == Attribute.DEXTERITY)
                 && inventorySystem.isWearingNonProficientArmor(character);
         DiceRoll diceRoll = DiceRoller.rollD20(modifier, disadvantage);

@@ -2,12 +2,13 @@ package fr.idev.mudserver.controller.ingame;
 
 import java.util.Set;
 
+import fr.idev.mudserver.domain.actor.component.AttributeComponent;
+import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
-import fr.idev.mudserver.domain.actor.system.AttributeSystem;
 import fr.idev.mudserver.domain.actor.system.InventorySystem;
 import fr.idev.mudserver.domain.actor.system.LevelingSystem;
 import fr.idev.mudserver.network.Connection;
@@ -19,12 +20,10 @@ public class Stats implements ControllerHandler {
 
     private final InventorySystem inventorySystem;
     private final LevelingSystem levelingSystem;
-    private final AttributeSystem attributeSystem;
 
-    public Stats(InventorySystem inventorySystem, LevelingSystem levelingSystem, AttributeSystem attributeSystem) {
+    public Stats(InventorySystem inventorySystem, LevelingSystem levelingSystem) {
         this.inventorySystem = inventorySystem;
         this.levelingSystem = levelingSystem;
-        this.attributeSystem = attributeSystem;
     }
 
     @Override
@@ -40,19 +39,14 @@ public class Stats implements ControllerHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
+        AttributeComponent attributes = character.component(AttributeComponent.class);
         connection.send(new GamePlayerStats(character, inventorySystem.getArmorClass(character),
-                levelingSystem.getProficiencyBonus(character),
-                attributeSystem.getAttribute(character, Attribute.STRENGTH),
-                attributeSystem.getModifier(character, Attribute.STRENGTH),
-                attributeSystem.getAttribute(character, Attribute.DEXTERITY),
-                attributeSystem.getModifier(character, Attribute.DEXTERITY),
-                attributeSystem.getAttribute(character, Attribute.CONSTITUTION),
-                attributeSystem.getModifier(character, Attribute.CONSTITUTION),
-                attributeSystem.getAttribute(character, Attribute.INTELLIGENCE),
-                attributeSystem.getModifier(character, Attribute.INTELLIGENCE),
-                attributeSystem.getAttribute(character, Attribute.WISDOM),
-                attributeSystem.getModifier(character, Attribute.WISDOM),
-                attributeSystem.getAttribute(character, Attribute.CHARISMA),
-                attributeSystem.getModifier(character, Attribute.CHARISMA)));
+                character.component(LevelingComponent.class).proficiencyBonus(), attributes.valueOf(Attribute.STRENGTH),
+                attributes.modifier(Attribute.STRENGTH), attributes.valueOf(Attribute.DEXTERITY),
+                attributes.modifier(Attribute.DEXTERITY), attributes.valueOf(Attribute.CONSTITUTION),
+                attributes.modifier(Attribute.CONSTITUTION), attributes.valueOf(Attribute.INTELLIGENCE),
+                attributes.modifier(Attribute.INTELLIGENCE), attributes.valueOf(Attribute.WISDOM),
+                attributes.modifier(Attribute.WISDOM), attributes.valueOf(Attribute.CHARISMA),
+                attributes.modifier(Attribute.CHARISMA)));
     }
 }
