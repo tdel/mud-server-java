@@ -108,7 +108,7 @@ public class CombatSystem {
             if (newHealth <= 0) {
                 justDefeated[0] = true;
             }
-            return new CombatComponent(newHealth, current.maxHealth(), target, current.actionsMax(),
+            return new CombatComponent(newHealth, current.maxHealth(), current.target(), current.actionsMax(),
                     current.extraActionsMax(), current.actionsRemaining(), current.extraActionsRemaining());
         });
 
