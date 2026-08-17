@@ -2,6 +2,7 @@ package fr.idev.mudserver.domain.combat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 
 import fr.idev.mudserver.domain.world.RoomInstance;
@@ -14,6 +15,7 @@ import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 
 public final class CombatEncounter {
 
+    private final UUID id = UUID.randomUUID();
     private final RoomInstance room;
     private final List<AbstractCharacter> pendingJoiners = new ArrayList<>();
     private final List<InitiativeEntry> order = new ArrayList<>();
@@ -25,6 +27,10 @@ public final class CombatEncounter {
 
     public CombatEncounter(RoomInstance room) {
         this.room = room;
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public RoomInstance getRoom() {

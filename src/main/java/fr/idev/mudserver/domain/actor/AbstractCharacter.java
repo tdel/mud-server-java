@@ -8,12 +8,9 @@ import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.component.MovementComponent;
 import fr.idev.mudserver.domain.actor.component.NetworkComponent;
-import fr.idev.mudserver.domain.combat.CombatEncounter;
 import fr.idev.mudserver.network.OutputMessage;
 
 public abstract class AbstractCharacter extends AbstractObject {
-
-    private volatile CombatEncounter encounter;
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
             int maxHealth, int speed) {
@@ -23,18 +20,6 @@ public abstract class AbstractCharacter extends AbstractObject {
                 CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX, CombatComponent.DEFAULT_ACTIONS_MAX,
                 CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX));
         this.attachComponent(new MovementComponent(speed));
-    }
-
-    public boolean isInCombat() {
-        return encounter != null;
-    }
-
-    public CombatEncounter getEncounter() {
-        return encounter;
-    }
-
-    public void setEncounter(CombatEncounter encounter) {
-        this.encounter = encounter;
     }
 
     public void send(OutputMessage message) {

@@ -24,11 +24,14 @@ public class RestSystem {
     private final InventorySystem inventorySystem;
     private final CombatSystem combatSystem;
     private final LevelingSystem levelingSystem;
+    private final EncounterSystem encounterSystem;
 
-    public RestSystem(InventorySystem inventorySystem, CombatSystem combatSystem, LevelingSystem levelingSystem) {
+    public RestSystem(InventorySystem inventorySystem, CombatSystem combatSystem, LevelingSystem levelingSystem,
+            EncounterSystem encounterSystem) {
         this.inventorySystem = inventorySystem;
         this.combatSystem = combatSystem;
         this.levelingSystem = levelingSystem;
+        this.encounterSystem = encounterSystem;
     }
 
     public boolean canTakeShortRest(CharacterInstance character) {
@@ -44,7 +47,7 @@ public class RestSystem {
     }
 
     public RestOutcome doShortRest(CharacterInstance initiator) {
-        if (initiator.isInCombat()) {
+        if (encounterSystem.isInCombat(initiator)) {
             return new RestOutcome.InCombat();
         }
         if (!canTakeShortRest(initiator)) {
@@ -64,7 +67,7 @@ public class RestSystem {
     }
 
     public RestOutcome doLongRest(CharacterInstance initiator, List<Item> selectedFood) {
-        if (initiator.isInCombat()) {
+        if (encounterSystem.isInCombat(initiator)) {
             return new RestOutcome.InCombat();
         }
 

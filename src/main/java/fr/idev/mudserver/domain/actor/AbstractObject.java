@@ -30,6 +30,10 @@ public abstract class AbstractObject {
         components.put(component.getClass(), component);
     }
 
+    public <C> void detachComponent(Class<C> type) {
+        components.remove(type);
+    }
+
     public <C> Optional<C> findComponent(Class<C> type) {
         return Optional.ofNullable(type.cast(components.get(type)));
     }

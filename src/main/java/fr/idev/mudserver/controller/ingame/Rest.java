@@ -15,6 +15,7 @@ import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.item.ItemType;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.instance.RestOutcome;
+import fr.idev.mudserver.domain.actor.system.EncounterSystem;
 import fr.idev.mudserver.domain.actor.system.RestSystem;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -31,9 +32,11 @@ import fr.idev.mudserver.network.message.ingame.ProvisionSelection;
 public class Rest implements ControllerHandler {
 
     private final RestSystem restSystem;
+    private final EncounterSystem encounterSystem;
 
-    public Rest(RestSystem restSystem) {
+    public Rest(RestSystem restSystem, EncounterSystem encounterSystem) {
         this.restSystem = restSystem;
+        this.encounterSystem = encounterSystem;
     }
 
     @Override
@@ -72,7 +75,7 @@ public class Rest implements ControllerHandler {
     }
 
     private void restLong(Connection connection, CharacterInstance character) {
-        if (character.isInCombat()) {
+        if (encounterSystem.isInCombat(character)) {
             connection.send(new CannotRestInCombat());
             return;
         }
