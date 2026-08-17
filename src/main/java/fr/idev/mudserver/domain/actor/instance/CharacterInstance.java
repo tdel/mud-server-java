@@ -9,9 +9,6 @@ import java.util.UUID;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.*;
 import fr.idev.mudserver.domain.actor.component.*;
-import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
-import fr.idev.mudserver.domain.actor.event.GamePlayerEnteredCell;
-import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.network.OutputMessage;
@@ -70,15 +67,6 @@ public final class CharacterInstance extends AbstractCharacter {
     public void setWorldInstance(WorldInstance worldInstance) {
         this.worldInstance = worldInstance;
         this.worldInstanceId = worldInstance.getId();
-    }
-
-    @Override
-    public boolean onEnteredCell(HexCoordinate cell) {
-        if (isInCombat()) {
-            return false;
-        }
-        DomainEventPublisher.publish(new GamePlayerEnteredCell(this, cell));
-        return isInCombat();
     }
 
 }
