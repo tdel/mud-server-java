@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import fr.idev.mudserver.game.ECS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,12 @@ public class NpcCatalog {
     private static final Logger log = LoggerFactory.getLogger(NpcCatalog.class);
 
     private static final int NPC_NOMINAL_HEALTH = 1;
+
+    private final ECS ecs;
+
+    public NpcCatalog(ECS ecs) {
+        this.ecs = ecs;
+    }
 
     public void warmNpcs(Collection<WorldTemplate> worldTemplates, Collection<RoomInstance> rooms) {
         Map<UUID, RoomInstance> roomsByTemplateId = new ConcurrentHashMap<>();
@@ -73,6 +80,7 @@ public class NpcCatalog {
         }
 
         room.placeNpc(npc, template.cell());
+        ecs.register(npc);
     }
 
     private static Map<Attribute, Integer> neutralAttributes() {

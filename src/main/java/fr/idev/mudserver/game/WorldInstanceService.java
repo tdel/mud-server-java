@@ -62,10 +62,11 @@ public class WorldInstanceService {
     private final AccountDao accountDao;
     private final CharacterDao characterDao;
     private final InventorySystem inventorySystem;
+    private final ECS ecs;
 
     public WorldInstanceService(WorldTemplateCatalog worldTemplateService, WorldInstanceDao worldInstanceDao,
             MonsterCatalog monsterService, NpcCatalog npcService, ItemPersistenceListener itemService,
-            AccountDao accountDao, CharacterDao characterDao, InventorySystem inventorySystem) {
+            AccountDao accountDao, CharacterDao characterDao, InventorySystem inventorySystem, ECS ecs) {
         this.worldTemplateService = worldTemplateService;
         this.worldInstanceDao = worldInstanceDao;
         this.monsterService = monsterService;
@@ -74,6 +75,7 @@ public class WorldInstanceService {
         this.accountDao = accountDao;
         this.characterDao = characterDao;
         this.inventorySystem = inventorySystem;
+        this.ecs = ecs;
     }
 
     public WorldInstance getOrMaterialize(UUID worldInstanceId) {
@@ -134,6 +136,7 @@ public class WorldInstanceService {
         player.component(PositionComponent.class).currentRoom().join(player);
 
         instance.addPlayer(player);
+        ecs.register(player);
         accountDao.updateCurrentCharacter(player.component(AccountComponent.class).account().getId(), player.getId());
 
         MDC.put("character", player.component(IdentityComponent.class).name());
@@ -151,6 +154,7 @@ public class WorldInstanceService {
         characterDao.update(character);
         room.disconnect(character);
         instance.removePlayer(character);
+        ecs.unregister(character);
         log.info("character.session_ended character={} room={}", character.component(IdentityComponent.class).name(),
                 room.getName());
         MDC.remove("character");
@@ -167,6 +171,7 @@ public class WorldInstanceService {
     void onCharacterDied(CharacterDied event) {
         RoomInstance room = event.character().component(PositionComponent.class).currentRoom();
         room.removeMonster(event.character());
+        ecs.unregister(event.character());
         room.broadcast(new MonsterDefeated(event.character().component(IdentityComponent.class).name()), null);
         log.info("combat.monster_removed_from_room monster={} room={}",
                 event.character().component(IdentityComponent.class).name(), room.getName());

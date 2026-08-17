@@ -25,6 +25,7 @@ import fr.idev.mudserver.domain.actor.component.MonsterCombatComponent;
 import fr.idev.mudserver.domain.actor.component.MovementComponent;
 import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
+import fr.idev.mudserver.game.ECS;
 import fr.idev.mudserver.domain.actor.template.MonsterTemplate;
 import fr.idev.mudserver.domain.actor.template.MonsterTemplate.LootTableEntry;
 import fr.idev.mudserver.domain.item.ItemTemplate;
@@ -45,10 +46,12 @@ public class MonsterCatalog {
 
     private final ObjectMapper objectMapper;
     private final ItemTemplateCatalog itemTemplateCatalog;
+    private final ECS ecs;
 
-    public MonsterCatalog(ObjectMapper objectMapper, ItemTemplateCatalog itemTemplateCatalog) {
+    public MonsterCatalog(ObjectMapper objectMapper, ItemTemplateCatalog itemTemplateCatalog, ECS ecs) {
         this.objectMapper = objectMapper;
         this.itemTemplateCatalog = itemTemplateCatalog;
+        this.ecs = ecs;
     }
 
     public void warmMonsterTemplates() {
@@ -88,6 +91,7 @@ public class MonsterCatalog {
                         new MonsterCombatComponent(template.naturalDamageDice(), template.naturalArmorClass()));
 
                 room.placeMonster(monster, spawn.cell());
+                ecs.register(monster);
                 placedCount++;
             }
         }

@@ -39,7 +39,7 @@ public class MovementSubsystem extends Thread {
     private final Map<UUID, CompletableFuture<Void>> pendingNotifications = new ConcurrentHashMap<>();
 
     public MovementSubsystem(Look lookAction, ExecutorService virtualThreadExecutor, MovementSystem movementSystem,
-                             NetworkSystem networkSystem) {
+            NetworkSystem networkSystem) {
         super("movement-ticker");
         this.lookAction = lookAction;
         this.virtualThreadExecutor = virtualThreadExecutor;
