@@ -22,7 +22,6 @@ import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.component.IdentityComponent;
 import fr.idev.mudserver.domain.actor.component.LootComponent;
 import fr.idev.mudserver.domain.actor.component.MonsterCombatComponent;
-import fr.idev.mudserver.domain.actor.component.MovementComponent;
 import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.game.ECS;
@@ -76,12 +75,11 @@ public class MonsterCatalog {
                 }
 
                 MonsterInstance monster = new MonsterInstance(spawn.id());
-                monster.attachComponent(new IdentityComponent(template.name()));
+                monster.attachComponent(new IdentityComponent(template.name(), template.speed()));
                 monster.attachComponent(new AttributeComponent(new EnumMap<>(template.attributes())));
                 monster.attachComponent(new CombatComponent(template.maxHealth(), template.maxHealth(), null,
                         CombatComponent.DEFAULT_ACTIONS_MAX, CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX,
                         CombatComponent.DEFAULT_ACTIONS_MAX, CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX));
-                monster.attachComponent(new MovementComponent(template.speed()));
                 monster.attachComponent(BehaviorComponent.idle());
                 monster.attachComponent(
                         new LootComponent(template.lootTable(), template.xpReward(), template.goldReward()));

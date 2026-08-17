@@ -19,7 +19,6 @@ import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.component.IdentityComponent;
-import fr.idev.mudserver.domain.actor.component.MovementComponent;
 import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import fr.idev.mudserver.domain.actor.instance.NpcSellerInstance;
 import fr.idev.mudserver.domain.actor.template.NpcTemplate;
@@ -64,12 +63,11 @@ public class NpcCatalog {
                 ? new NpcSellerInstance(template.id())
                 : new AbstractNpc(template.id());
 
-        npc.attachComponent(new IdentityComponent(template.name()));
+        npc.attachComponent(new IdentityComponent(template.name(), 0));
         npc.attachComponent(new AttributeComponent(neutralAttributes()));
         npc.attachComponent(new CombatComponent(NPC_NOMINAL_HEALTH, NPC_NOMINAL_HEALTH, null,
                 CombatComponent.DEFAULT_ACTIONS_MAX, CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX,
                 CombatComponent.DEFAULT_ACTIONS_MAX, CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX));
-        npc.attachComponent(new MovementComponent(0));
         npc.attachComponent(new PositionComponent(room, template.cell()));
         npc.attachComponent(template.descriptor());
         if (template.dialogue() != null) {

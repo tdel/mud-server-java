@@ -1,4 +1,4 @@
 package fr.idev.mudserver.domain.actor.component;
 
-public record IdentityComponent(String name) {
+public record IdentityComponent(String name, int speed) {
 }

@@ -21,7 +21,6 @@ import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
-import fr.idev.mudserver.domain.actor.component.MovementComponent;
 import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import fr.idev.mudserver.domain.actor.component.RestComponent;
 import fr.idev.mudserver.domain.actor.component.WorldComponent;
@@ -120,12 +119,11 @@ public class CharacterDao {
                         "WorldInstance " + instance.getId() + " n'a aucune room de départ"));
 
         CharacterInstance character = new CharacterInstance(record.getId());
-        character.attachComponent(new IdentityComponent(record.getName()));
+        character.attachComponent(new IdentityComponent(record.getName(), race.speed()));
         character.attachComponent(new AttributeComponent(attributes));
         character.attachComponent(new CombatComponent(record.getCurrentHealth(), record.getMaxHealth(), null,
                 CombatComponent.DEFAULT_ACTIONS_MAX, CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX,
                 CombatComponent.DEFAULT_ACTIONS_MAX, CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX));
-        character.attachComponent(new MovementComponent(race.speed()));
         character.attachComponent(new AccountComponent(account));
         character.attachComponent(new PositionComponent(room, null)); // missing hexCoordinate here !
         character.attachComponent(new InventoryComponent(List.of(), record.getGold()));

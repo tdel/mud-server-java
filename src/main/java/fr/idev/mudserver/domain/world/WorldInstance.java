@@ -22,7 +22,6 @@ import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.component.IdentityComponent;
 import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
-import fr.idev.mudserver.domain.actor.component.MovementComponent;
 import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import fr.idev.mudserver.domain.actor.component.RestComponent;
 import fr.idev.mudserver.domain.actor.component.WorldComponent;
@@ -133,12 +132,11 @@ public class WorldInstance {
         int gold = DiceRoller.roll(startingGold.dice()).total() * startingGold.multiplier();
 
         CharacterInstance character = new CharacterInstance(UUID.randomUUID());
-        character.attachComponent(new IdentityComponent(name));
+        character.attachComponent(new IdentityComponent(name, race.speed()));
         character.attachComponent(new AttributeComponent(new EnumMap<>(scores)));
         character.attachComponent(new CombatComponent(maxHealth, maxHealth, null, CombatComponent.DEFAULT_ACTIONS_MAX,
                 CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX, CombatComponent.DEFAULT_ACTIONS_MAX,
                 CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX));
-        character.attachComponent(new MovementComponent(race.speed()));
         character.attachComponent(new AccountComponent(account));
         character.attachComponent(new PositionComponent(startingRoom, null)); // missing hexCoordinate here !
         character.attachComponent(new InventoryComponent(List.of(), gold));
