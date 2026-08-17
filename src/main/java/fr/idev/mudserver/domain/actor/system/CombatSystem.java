@@ -34,16 +34,19 @@ public class CombatSystem {
     }
 
     public void setTarget(AbstractCharacter target, AbstractCharacter attacker) {
-        attacker.updateComponent(CombatComponent.class, current -> {
-            return new CombatComponent(current.currentHealth(), current.maxHealth(), target);
-        });
+        attacker.updateComponent(CombatComponent.class,
+                current -> new CombatComponent(current.currentHealth(), current.maxHealth(), target,
+                        current.actionsMax(), current.extraActionsMax(), current.actionsRemaining(),
+                        current.extraActionsRemaining()));
     }
 
     public int heal(AbstractCharacter character, int amount) {
         int[] healed = {0};
         character.updateComponent(CombatComponent.class, current -> {
             healed[0] = Math.min(amount, current.maxHealth() - current.currentHealth());
-            return new CombatComponent(current.currentHealth() + healed[0], current.maxHealth(), current.target());
+            return new CombatComponent(current.currentHealth() + healed[0], current.maxHealth(), current.target(),
+                    current.actionsMax(), current.extraActionsMax(), current.actionsRemaining(),
+                    current.extraActionsRemaining());
         });
         return healed[0];
     }
@@ -51,7 +54,40 @@ public class CombatSystem {
     public void increaseMaxHealth(AbstractCharacter character, int amount) {
         character.updateComponent(CombatComponent.class,
                 current -> new CombatComponent(current.currentHealth() + amount, current.maxHealth() + amount,
-                        current.target()));
+                        current.target(), current.actionsMax(), current.extraActionsMax(), current.actionsRemaining(),
+                        current.extraActionsRemaining()));
+    }
+
+    public boolean trySpendAction(AbstractCharacter character) {
+        boolean[] spent = {false};
+        character.updateComponent(CombatComponent.class, current -> {
+            if (current.actionsRemaining() > 0) {
+                spent[0] = true;
+                return new CombatComponent(current.currentHealth(), current.maxHealth(), current.target(),
+                        current.actionsMax(), current.extraActionsMax(), current.actionsRemaining() - 1,
+                        current.extraActionsRemaining());
+            }
+            if (current.extraActionsRemaining() > 0) {
+                spent[0] = true;
+                return new CombatComponent(current.currentHealth(), current.maxHealth(), current.target(),
+                        current.actionsMax(), current.extraActionsMax(), current.actionsRemaining(),
+                        current.extraActionsRemaining() - 1);
+            }
+            return current;
+        });
+        return spent[0];
+    }
+
+    public void resetForTurn(AbstractCharacter character) {
+        character.updateComponent(CombatComponent.class,
+                current -> new CombatComponent(current.currentHealth(), current.maxHealth(), current.target(),
+                        current.actionsMax(), current.extraActionsMax(), current.actionsMax(),
+                        current.extraActionsMax()));
+    }
+
+    public boolean hasActionRemaining(AbstractCharacter character) {
+        CombatComponent current = character.component(CombatComponent.class);
+        return current.actionsRemaining() > 0 || current.extraActionsRemaining() > 0;
     }
 
     public CombatResult tryAttack(AbstractCharacter attacker, AbstractCharacter target) {
@@ -72,7 +108,8 @@ public class CombatSystem {
             if (newHealth <= 0) {
                 justDefeated[0] = true;
             }
-            return new CombatComponent(newHealth, current.maxHealth(), target);
+            return new CombatComponent(newHealth, current.maxHealth(), target, current.actionsMax(),
+                    current.extraActionsMax(), current.actionsRemaining(), current.extraActionsRemaining());
         });
 
         if (justDefeated[0]) {

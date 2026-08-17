@@ -8,21 +8,20 @@ import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.component.MovementComponent;
 import fr.idev.mudserver.domain.actor.component.NetworkComponent;
-import fr.idev.mudserver.domain.map.HexCoordinate;
-import fr.idev.mudserver.domain.combat.ActionEconomy;
 import fr.idev.mudserver.domain.combat.CombatEncounter;
 import fr.idev.mudserver.network.OutputMessage;
 
 public abstract class AbstractCharacter extends AbstractObject {
 
     private volatile CombatEncounter encounter;
-    private final ActionEconomy actionEconomy = new ActionEconomy();
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
             int maxHealth, int speed) {
         super(id, name);
         this.attachComponent(new AttributeComponent(new EnumMap<>(attributes)));
-        this.attachComponent(new CombatComponent(currentHealth, maxHealth, null));
+        this.attachComponent(new CombatComponent(currentHealth, maxHealth, null, CombatComponent.DEFAULT_ACTIONS_MAX,
+                CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX, CombatComponent.DEFAULT_ACTIONS_MAX,
+                CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX));
         this.attachComponent(new MovementComponent(speed));
     }
 
@@ -36,14 +35,6 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public void setEncounter(CombatEncounter encounter) {
         this.encounter = encounter;
-    }
-
-    public ActionEconomy getActionEconomy() {
-        return actionEconomy;
-    }
-
-    public boolean onEnteredCell(HexCoordinate cell) {
-        return false;
     }
 
     public void send(OutputMessage message) {

@@ -14,7 +14,6 @@ import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.system.AiSystem;
 import fr.idev.mudserver.domain.item.ConsumableItem;
 import fr.idev.mudserver.domain.item.Item;
-import fr.idev.mudserver.domain.combat.ActionEconomy;
 import fr.idev.mudserver.domain.combat.CombatEncounter;
 import fr.idev.mudserver.domain.actor.system.CombatSystem;
 import fr.idev.mudserver.domain.actor.system.DiceSystem;
@@ -96,7 +95,7 @@ public class CombatEngine {
         }
 
         synchronized (encounter) {
-            if (encounter.currentParticipant() != user || !user.getActionEconomy().trySpendAction()) {
+            if (encounter.currentParticipant() != user || !combatSystem.trySpendAction(user)) {
                 user.send(new NotYourTurn());
             } else {
                 consumable.consume(user, item, combatSystem, inventorySystem);
@@ -200,7 +199,7 @@ public class CombatEngine {
 
     private void performTurnAttack(CombatEncounter encounter, CharacterInstance attacker, MonsterInstance target) {
         synchronized (encounter) {
-            if (encounter.currentParticipant() != attacker || !attacker.getActionEconomy().trySpendAction()) {
+            if (encounter.currentParticipant() != attacker || !combatSystem.trySpendAction(attacker)) {
                 attacker.send(new NotYourTurn());
                 return;
             }
@@ -217,9 +216,9 @@ public class CombatEngine {
     }
 
     private void continueOrEndTurn(CombatEncounter encounter, CharacterInstance actor) {
-        ActionEconomy economy = actor.getActionEconomy();
-        if (economy.hasActionRemaining()) {
-            actor.send(new ActionsRemaining(economy.getActionsRemaining(), economy.getExtraActionsRemaining()));
+        if (combatSystem.hasActionRemaining(actor)) {
+            CombatComponent combat = actor.component(CombatComponent.class);
+            actor.send(new ActionsRemaining(combat.actionsRemaining(), combat.extraActionsRemaining()));
         } else {
             cascade(encounter);
         }
@@ -263,7 +262,7 @@ public class CombatEngine {
 
     private void resolveFromCurrentTurn(CombatEncounter encounter) {
         while (!encounter.isOver() && encounter.currentParticipant() instanceof MonsterInstance monster) {
-            monster.getActionEconomy().resetForTurn();
+            combatSystem.resetForTurn(monster);
             List<CharacterInstance> livingPlayers = encounter.livingPlayers();
             if (livingPlayers.isEmpty()) {
                 break;
@@ -289,9 +288,9 @@ public class CombatEngine {
             encounter.getRoom().broadcast(new EncounterEnded(playersWon), null);
             log.info("combat.encounter_ended room={} playersWon={}", encounter.getRoom().getName(), playersWon);
         } else if (encounter.currentParticipant() instanceof CharacterInstance nextPlayer) {
-            nextPlayer.getActionEconomy().resetForTurn();
-            ActionEconomy economy = nextPlayer.getActionEconomy();
-            nextPlayer.send(new YourTurn(economy.getActionsRemaining(), economy.getExtraActionsRemaining()));
+            combatSystem.resetForTurn(nextPlayer);
+            CombatComponent combat = nextPlayer.component(CombatComponent.class);
+            nextPlayer.send(new YourTurn(combat.actionsRemaining(), combat.extraActionsRemaining()));
         }
     }
 
