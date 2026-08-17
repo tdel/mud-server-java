@@ -1,25 +1,27 @@
 package fr.idev.mudserver.game;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
+import fr.idev.mudserver.domain.actor.AbstractObject;
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+import fr.idev.mudserver.domain.actor.component.MovementComponent;
 import fr.idev.mudserver.domain.actor.component.NetworkComponent;
+import fr.idev.mudserver.domain.actor.component.PositionComponent;
+import fr.idev.mudserver.domain.map.HexCoordinate;
+import fr.idev.mudserver.domain.world.RoomInstance;
 import jakarta.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ingame.Look;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
-import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
-import fr.idev.mudserver.domain.actor.event.CharacterStartedMoving;
-import fr.idev.mudserver.domain.actor.event.CharacterStoppedMoving;
-import fr.idev.mudserver.domain.actor.system.MovementSystem;
 import fr.idev.mudserver.domain.actor.system.NetworkSystem;
 import fr.idev.mudserver.network.message.ingame.MovementBlockedByBounds;
 import fr.idev.mudserver.network.message.ingame.MovementBlockedByOccupant;
@@ -33,29 +35,18 @@ public class MovementSubsystem extends Thread {
 
     private final Look lookAction;
     private final ExecutorService virtualThreadExecutor;
-    private final MovementSystem movementSystem;
     private final NetworkSystem networkSystem;
-    private final Map<UUID, AbstractCharacter> movingCharacters = new ConcurrentHashMap<>();
+    private final ECS ecs;
     private final Map<UUID, CompletableFuture<Void>> pendingNotifications = new ConcurrentHashMap<>();
 
-    public MovementSubsystem(Look lookAction, ExecutorService virtualThreadExecutor, MovementSystem movementSystem,
-            NetworkSystem networkSystem) {
+    public MovementSubsystem(Look lookAction, NetworkSystem networkSystem, ExecutorService virtualThreadExecutor,
+            ECS ecs) {
         super("movement-ticker");
         this.lookAction = lookAction;
-        this.virtualThreadExecutor = virtualThreadExecutor;
-        this.movementSystem = movementSystem;
         this.networkSystem = networkSystem;
+        this.virtualThreadExecutor = virtualThreadExecutor;
+        this.ecs = ecs;
         setDaemon(true);
-    }
-
-    @EventListener
-    void onCharacterStartedMoving(CharacterStartedMoving event) {
-        movingCharacters.put(event.character().getId(), event.character());
-    }
-
-    @EventListener
-    void onCharacterStoppedMoving(CharacterStoppedMoving event) {
-        movingCharacters.remove(event.character().getId());
     }
 
     @Override
@@ -76,48 +67,64 @@ public class MovementSubsystem extends Thread {
     }
 
     void tick(long now) {
-        for (AbstractCharacter character : movingCharacters.values()) {
-            processIfDue(character, now);
+
+        Query q = ecs.createQuery();
+        q.addRequirement(MovementComponent.class);
+        q.addRequirement(IdentityComponent.class);
+        q.addRequirement(PositionComponent.class);
+
+        List<AbstractObject> entities = ecs.execute(q);
+        for (AbstractObject entity : entities) {
+            MovementComponent movementComponent = entity.component(MovementComponent.class);
+            IdentityComponent identityComponent = entity.component(IdentityComponent.class);
+            PositionComponent positionComponent = entity.component(PositionComponent.class);
+
+            if (now - movementComponent.lastStepAt() < identityComponent.cellSpeed()) {
+                continue;
+            }
+
+            HexCoordinate currentCoord = positionComponent.hexCoordinate();
+            HexCoordinate nextCoord = currentCoord.neighbor(movementComponent.direction());
+            RoomInstance room = positionComponent.currentRoom();
+            if (!room.isInBounds(nextCoord)) {
+                entity.detachComponent(MovementComponent.class);
+                notifyAsync(entity, () -> networkSystem.send(entity, new MovementBlockedByBounds()));
+                continue;
+            }
+
+            if (!room.tryClaimCell(nextCoord, (AbstractCharacter) entity)) {
+                entity.detachComponent(MovementComponent.class);
+                notifyAsync(entity, () -> networkSystem.send(entity, new MovementBlockedByOccupant()));
+                continue;
+            }
+
+            room.releaseCell(currentCoord, (AbstractCharacter) entity); // not with an ECS system right now
+            entity.updateComponent(PositionComponent.class, current -> new PositionComponent(room, nextCoord));
+
+            int remaining = movementComponent.cellsRemaining() - 1;
+            if (remaining <= 0) {
+                entity.detachComponent(MovementComponent.class);
+            } else {
+                entity.updateComponent(MovementComponent.class, current -> current.withRemaining(remaining, now));
+            }
+
+            if (entity.findComponent(NetworkComponent.class).isEmpty()) {
+                continue;
+            }
+            notifyAsync(entity, () -> lookAction.onReceive(entity.component(NetworkComponent.class).connection(), ""));
         }
     }
 
-    private void processIfDue(AbstractCharacter character, long now) {
-        switch (movementSystem.updatePosition(character, now)) {
-            case NO_MOVEMENT -> {
-            }
-            case STEPPED -> notifyMoved(character);
-            case FINISHED -> {
-                movingCharacters.remove(character.getId());
-                notifyMoved(character);
-            }
-            case BLOCKED_BY_BOUNDS -> {
-                movingCharacters.remove(character.getId());
-                notifyAsync(character, () -> networkSystem.send(character, new MovementBlockedByBounds()));
-            }
-            case BLOCKED_BY_OCCUPANT -> {
-                movingCharacters.remove(character.getId());
-                notifyAsync(character, () -> networkSystem.send(character, new MovementBlockedByOccupant()));
-            }
-        }
-    }
-
-    private void notifyMoved(AbstractCharacter character) {
-        if (character instanceof CharacterInstance player) {
-            notifyAsync(character,
-                    () -> lookAction.onReceive(player.component(NetworkComponent.class).connection(), ""));
-        }
-    }
-
-    private void notifyAsync(AbstractCharacter character, Runnable notification) {
-        pendingNotifications.compute(character.getId(), (id, previous) -> {
+    private void notifyAsync(AbstractObject entity, Runnable notification) {
+        pendingNotifications.compute(entity.getId(), (id, previous) -> {
             CompletableFuture<Void> previousStage = previous == null
                     ? CompletableFuture.completedFuture(null)
                     : previous;
-            return previousStage.thenRunAsync(() -> runSafely(character, notification), virtualThreadExecutor);
+            return previousStage.thenRunAsync(() -> runSafely(entity, notification), virtualThreadExecutor);
         });
     }
 
-    private void runSafely(AbstractCharacter character, Runnable notification) {
+    private void runSafely(AbstractObject character, Runnable notification) {
         try {
             notification.run();
         } catch (RuntimeException e) {

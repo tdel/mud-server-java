@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import fr.idev.mudserver.domain.actor.AbstractObject;
 import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import org.springframework.stereotype.Service;
 
@@ -22,25 +23,6 @@ public class MovementSystem {
 
     public static final int REFERENCE_SPEED = 5;
     public static final long REFERENCE_TIME_MS = 1000L;
-
-    public CellStepOutcome moveOneCell(AbstractCharacter character, HexDirection direction) {
-        PositionComponent position = character.component(PositionComponent.class);
-        RoomInstance room = position.currentRoom();
-        HexCoordinate currentCoord = position.hexCoordinate();
-        HexCoordinate nextCoord = currentCoord.neighbor(direction);
-
-        if (!room.isInBounds(nextCoord)) {
-            return new CellStepOutcome(false, true, false);
-        }
-        if (!room.tryClaimCell(nextCoord, character)) {
-            return new CellStepOutcome(false, false, true);
-        }
-
-        room.releaseCell(currentCoord, character);
-        character.updateComponent(PositionComponent.class, current -> new PositionComponent(room, nextCoord));
-
-        return new CellStepOutcome(true, false, false);
-    }
 
     public List<HexCoordinate> remainingPath(AbstractCharacter character) {
         Optional<MovementComponent> movement = character.findComponent(MovementComponent.class);
@@ -72,41 +54,4 @@ public class MovementSystem {
         DomainEventPublisher.publish(new CharacterStoppedMoving(character));
     }
 
-    public MovementStepOutcome updatePosition(AbstractCharacter character, long now) {
-        Optional<MovementComponent> movementComponent = character.findComponent(MovementComponent.class);
-        if (movementComponent.isEmpty()) {
-            return MovementStepOutcome.NO_MOVEMENT;
-        }
-        MovementComponent movement = movementComponent.get();
-        if (now - movement.lastStepAt() < getMillisPerCell(character)) {
-            return MovementStepOutcome.NO_MOVEMENT;
-        }
-
-        CellStepOutcome step = moveOneCell(character, movement.direction());
-        if (!step.moved()) {
-            character.detachComponent(MovementComponent.class);
-            return step.blockedByOccupant()
-                    ? MovementStepOutcome.BLOCKED_BY_OCCUPANT
-                    : MovementStepOutcome.BLOCKED_BY_BOUNDS;
-        }
-
-        int remaining = movement.cellsRemaining() - 1;
-        if (remaining <= 0) {
-            character.detachComponent(MovementComponent.class);
-            return MovementStepOutcome.FINISHED;
-        }
-        character.updateComponent(MovementComponent.class, current -> current.withRemaining(remaining, now));
-        return MovementStepOutcome.STEPPED;
-    }
-
-    private long getMillisPerCell(AbstractCharacter character) {
-        return REFERENCE_TIME_MS * REFERENCE_SPEED / Math.max(1, character.component(IdentityComponent.class).speed());
-    }
-
-    public record CellStepOutcome(boolean moved, boolean blockedByBounds, boolean blockedByOccupant) {
-    }
-
-    public enum MovementStepOutcome {
-        NO_MOVEMENT, STEPPED, FINISHED, BLOCKED_BY_BOUNDS, BLOCKED_BY_OCCUPANT
-    }
 }
