@@ -24,9 +24,10 @@ import fr.idev.mudserver.domain.world.RoomTemplate;
 import fr.idev.mudserver.domain.world.RoomTemplatePortal;
 import fr.idev.mudserver.domain.world.WorldTemplate;
 import fr.idev.mudserver.domain.world.WorldTemplateSummary;
-import fr.idev.mudserver.domain.actor.AbstractNpc;
-import fr.idev.mudserver.domain.actor.AbstractNpc.NpcDialogueOptionType;
-import fr.idev.mudserver.domain.actor.instance.NpcSellerInstance;
+import fr.idev.mudserver.domain.actor.component.DialogueComponent;
+import fr.idev.mudserver.domain.actor.component.DialogueComponent.DialogueOptionType;
+import fr.idev.mudserver.domain.actor.component.NpcDescriptorComponent;
+import fr.idev.mudserver.domain.actor.component.ShopComponent;
 import fr.idev.mudserver.domain.actor.template.NpcTemplate;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
@@ -229,12 +230,13 @@ public class WorldTemplateCatalog {
                         + " référence la room " + definition.roomId() + ", absente de ce monde");
             }
 
-            AbstractNpc.NpcDialogue dialogue = toDialogue(definition);
-            NpcSellerInstance.NpcShop shop = toShop(shortName, definition, itemTemplatesById);
+            DialogueComponent dialogue = toDialogue(definition);
+            ShopComponent shop = toShop(shortName, definition, itemTemplatesById);
+            NpcDescriptorComponent descriptor = new NpcDescriptorComponent(definition.description(),
+                    definition.level());
 
             NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), definition.roomId(),
-                    new HexCoordinate(definition.cell().q(), definition.cell().r()), definition.description(), dialogue,
-                    shop, definition.level());
+                    new HexCoordinate(definition.cell().q(), definition.cell().r()), descriptor, dialogue, shop);
             if (templates.putIfAbsent(template.id(), template) != null) {
                 throw new IllegalStateException("NPC " + definition.id() + " dupliqué dans le monde " + shortName);
             }
@@ -242,25 +244,25 @@ public class WorldTemplateCatalog {
         return Map.copyOf(templates);
     }
 
-    private AbstractNpc.NpcDialogue toDialogue(NpcDefinition definition) {
+    private DialogueComponent toDialogue(NpcDefinition definition) {
         DialogueDefinition dialogueDef = definition.dialogue();
         if (dialogueDef == null) {
             return null;
         }
 
-        List<AbstractNpc.NpcDialogueOption> options = dialogueDef.options().stream()
-                .map(o -> new AbstractNpc.NpcDialogueOption(o.label(), o.type(), o.response())).toList();
-        return new AbstractNpc.NpcDialogue(dialogueDef.greeting(), options);
+        List<DialogueComponent.DialogueOption> options = dialogueDef.options().stream()
+                .map(o -> new DialogueComponent.DialogueOption(o.label(), o.type(), o.response())).toList();
+        return new DialogueComponent(dialogueDef.greeting(), options);
     }
 
-    private NpcSellerInstance.NpcShop toShop(String shortName, NpcDefinition definition,
+    private ShopComponent toShop(String shortName, NpcDefinition definition,
             Map<UUID, ItemTemplate> itemTemplatesById) {
         DialogueDefinition dialogueDef = definition.dialogue();
         if (dialogueDef == null) {
             return null;
         }
 
-        boolean hasShopOption = dialogueDef.options().stream().anyMatch(o -> o.type() == NpcDialogueOptionType.SHOP);
+        boolean hasShopOption = dialogueDef.options().stream().anyMatch(o -> o.type() == DialogueOptionType.SHOP);
         if (!hasShopOption) {
             return null;
         }
@@ -271,7 +273,7 @@ public class WorldTemplateCatalog {
                     + " a une option SHOP mais aucun catalogue \"shop\"");
         }
 
-        List<NpcSellerInstance.NpcShopEntry> entries = new ArrayList<>();
+        List<ShopComponent.ShopEntry> entries = new ArrayList<>();
         for (ShopEntryDefinition entry : shopDef.items()) {
             ItemTemplate itemTemplate = itemTemplatesById.get(entry.itemTemplateId());
             if (itemTemplate == null) {
@@ -282,9 +284,9 @@ public class WorldTemplateCatalog {
                 throw new IllegalStateException("NPC " + definition.id() + " du monde " + shortName + " vend l'item "
                         + entry.itemTemplateId() + " à un prix invalide (" + entry.price() + ")");
             }
-            entries.add(new NpcSellerInstance.NpcShopEntry(itemTemplate, entry.price()));
+            entries.add(new ShopComponent.ShopEntry(itemTemplate, entry.price()));
         }
-        return new NpcSellerInstance.NpcShop(entries);
+        return new ShopComponent(entries);
     }
 
     private <T> T readJson(String shortName, String fileName, Class<T> type) {
@@ -352,7 +354,7 @@ public class WorldTemplateCatalog {
     record DialogueDefinition(String greeting, List<DialogueOptionDefinition> options, ShopDefinition shop) {
     }
 
-    record DialogueOptionDefinition(String label, NpcDialogueOptionType type, String response) {
+    record DialogueOptionDefinition(String label, DialogueOptionType type, String response) {
     }
 
     record ShopDefinition(List<ShopEntryDefinition> items) {

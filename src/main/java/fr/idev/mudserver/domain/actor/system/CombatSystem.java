@@ -16,6 +16,7 @@ import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
 import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
+import fr.idev.mudserver.domain.actor.component.MonsterCombatComponent;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.game.CombatResult;
 import fr.idev.mudserver.game.dice.DiceExpression;
@@ -186,7 +187,8 @@ public class CombatSystem {
     }
 
     private int monsterDamage(MonsterInstance attacker, int strengthModifier, boolean criticalHit) {
-        DiceExpression base = DiceExpression.parse(attacker.getNaturalDamageDice());
+        DiceExpression base = DiceExpression
+                .parse(attacker.component(MonsterCombatComponent.class).naturalDamageDice());
         int diceCount = criticalHit ? base.count() * 2 : base.count();
         return Math.max(0, DiceRoller.roll(new DiceExpression(diceCount, base.sides(), strengthModifier)).total());
     }

@@ -2,7 +2,6 @@
     {
         "id": "c1a6b8f0-3b3e-4b0a-9f0a-1e2d3c4b5a6f",
         "name": "Gobelin",
-        "description": "Une petite créature verte armée d'une dague rouillée.",
         "maxHealth": 7,
         "naturalArmorClass": 15,
         "xpReward": 50,
@@ -27,7 +26,6 @@
     {
         "id": "dcff9d89-1f33-41e2-8011-e5b3b7092f0d",
         "name": "Rat géant",
-        "description": "Un rongeur de la taille d'un chien, aux dents jaunies et acérées.",
         "maxHealth": 7,
         "naturalArmorClass": 12,
         "xpReward": 25,
@@ -49,7 +47,6 @@
     {
         "id": "e6caeb0d-f861-401b-b0c1-c88e315097c5",
         "name": "Loup",
-        "description": "Un loup gris au pelage hirsute, les babines retroussées.",
         "maxHealth": 11,
         "naturalArmorClass": 13,
         "xpReward": 50,
@@ -71,7 +68,6 @@
     {
         "id": "7dfe22be-6147-45b3-bd07-89711810791d",
         "name": "Squelette",
-        "description": "Un amas d'os articulés qui s'anime d'une lueur froide dans les orbites.",
         "maxHealth": 13,
         "naturalArmorClass": 13,
         "xpReward": 50,
@@ -96,7 +92,6 @@
     {
         "id": "f6630034-a160-4ffc-888e-eb2fee9d9428",
         "name": "Bandit",
-        "description": "Un vagabond patibulaire, la main posée sur le pommeau d'une épée courte.",
         "maxHealth": 11,
         "naturalArmorClass": 12,
         "xpReward": 25,
@@ -122,7 +117,6 @@
     {
         "id": "026ce1a2-091d-4179-b715-65006480cfbe",
         "name": "Araignée géante",
-        "description": "Une araignée de la taille d'un cheval, tissant une toile poisseuse entre les arbres.",
         "maxHealth": 26,
         "naturalArmorClass": 14,
         "xpReward": 200,
@@ -147,7 +141,6 @@
     {
         "id": "49e91691-3a13-4e2b-967f-bc1acf8cf03a",
         "name": "Ours noir",
-        "description": "Un ours massif au pelage sombre, dressé sur ses pattes arrière.",
         "maxHealth": 19,
         "naturalArmorClass": 11,
         "xpReward": 100,

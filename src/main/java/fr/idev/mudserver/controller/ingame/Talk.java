@@ -8,10 +8,13 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.actor.AbstractNpc;
+import fr.idev.mudserver.domain.actor.component.DialogueComponent;
 import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import fr.idev.mudserver.domain.actor.component.PositionComponent;
+import fr.idev.mudserver.domain.actor.component.ShopComponent;
 import fr.idev.mudserver.domain.actor.instance.NpcSellerInstance;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
+import fr.idev.mudserver.domain.actor.system.DialogueSystem;
 import fr.idev.mudserver.domain.actor.system.ShopSystem;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -30,9 +33,11 @@ import fr.idev.mudserver.network.message.ingame.TargetNotFound;
 public class Talk implements ControllerHandler {
 
     private final ShopSystem shopSystem;
+    private final DialogueSystem dialogueSystem;
 
-    public Talk(ShopSystem shopSystem) {
+    public Talk(ShopSystem shopSystem, DialogueSystem dialogueSystem) {
         this.shopSystem = shopSystem;
+        this.dialogueSystem = dialogueSystem;
     }
 
     @Override
@@ -61,7 +66,7 @@ public class Talk implements ControllerHandler {
             return;
         }
 
-        Optional<AbstractNpc.NpcDialogue> dialogue = npc.get().getDialogue();
+        Optional<DialogueComponent> dialogue = npc.get().findComponent(DialogueComponent.class);
         if (dialogue.isEmpty()) {
             connection.send(new NpcDescription(npc.get()));
             return;
@@ -71,10 +76,10 @@ public class Talk implements ControllerHandler {
     }
 
     private void promptDialogue(Connection connection, CharacterInstance character, AbstractNpc npc,
-            AbstractNpc.NpcDialogue dialogue) {
+            DialogueComponent dialogue) {
         connection.requestBlocking(new DialogueOptions(npc.getName(), dialogue.greeting(), dialogue.options()),
                 line -> {
-                    Optional<AbstractNpc.NpcDialogueOption> choice = dialogue.resolveOption(line);
+                    Optional<DialogueComponent.DialogueOption> choice = dialogueSystem.resolveOption(dialogue, line);
 
                     if (choice.isEmpty()) {
                         connection.send(new InvalidDialogueChoice(line.trim()));
@@ -98,8 +103,8 @@ public class Talk implements ControllerHandler {
     }
 
     private void promptShop(Connection connection, CharacterInstance character, NpcSellerInstance npc,
-            AbstractNpc.NpcDialogue dialogue) {
-        List<ShopCatalog.Entry> entries = npc.shop().items().stream()
+            DialogueComponent dialogue) {
+        List<ShopCatalog.Entry> entries = npc.component(ShopComponent.class).items().stream()
                 .map(entry -> new ShopCatalog.Entry(entry.itemTemplate().getName(), entry.itemTemplate().getRarity(),
                         entry.price()))
                 .toList();

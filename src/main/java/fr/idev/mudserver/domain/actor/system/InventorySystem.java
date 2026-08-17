@@ -12,6 +12,7 @@ import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
 import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.InventoryComponent;
+import fr.idev.mudserver.domain.actor.component.MonsterCombatComponent;
 import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
 import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
 import fr.idev.mudserver.domain.actor.event.CharacterSpentGold;
@@ -147,7 +148,7 @@ public class InventorySystem {
     }
 
     private int monsterArmorClass(MonsterInstance monster) {
-        Integer natural = monster.getTemplate().naturalArmorClass();
+        Integer natural = monster.component(MonsterCombatComponent.class).naturalArmorClass();
         return natural != null ? natural : baseArmorClass(monster);
     }
 

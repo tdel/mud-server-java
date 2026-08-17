@@ -7,9 +7,9 @@ import java.util.UUID;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.item.ItemTemplate;
 
-public record MonsterTemplate(UUID id, String name, String description, int maxHealth,
-        Map<Attribute, Integer> attributes, Integer naturalArmorClass, int xpReward, String naturalDamageDice,
-        int goldReward, List<LootTableEntry> lootTable, int aggroRadius, int speed, int level) {
+public record MonsterTemplate(UUID id, String name, int maxHealth, Map<Attribute, Integer> attributes,
+        Integer naturalArmorClass, int xpReward, String naturalDamageDice, int goldReward,
+        List<LootTableEntry> lootTable, int aggroRadius, int speed, int level) {
 
     public record LootTableEntry(ItemTemplate itemTemplate, double dropChance) {
     }
