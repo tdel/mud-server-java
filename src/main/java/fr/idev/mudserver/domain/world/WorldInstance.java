@@ -3,6 +3,7 @@ package fr.idev.mudserver.domain.world;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.CharacterClass;
+import fr.idev.mudserver.domain.actor.component.AccountComponent;
+import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
+import fr.idev.mudserver.domain.actor.component.AttributeComponent;
+import fr.idev.mudserver.domain.actor.component.CombatComponent;
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+import fr.idev.mudserver.domain.actor.component.InventoryComponent;
+import fr.idev.mudserver.domain.actor.component.LevelingComponent;
+import fr.idev.mudserver.domain.actor.component.MovementComponent;
+import fr.idev.mudserver.domain.actor.component.PositionComponent;
+import fr.idev.mudserver.domain.actor.component.RestComponent;
 import fr.idev.mudserver.domain.actor.component.WorldComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.Gender;
@@ -121,8 +132,19 @@ public class WorldInstance {
         CharacterClass.StartingGold startingGold = characterClass.startingGold();
         int gold = DiceRoller.roll(startingGold.dice()).total() * startingGold.multiplier();
 
-        CharacterInstance character = new CharacterInstance(UUID.randomUUID(), account, name, startingRoom, gender,
-                race, characterClass, 1, maxHealth, maxHealth, scores, 0, gold);
+        CharacterInstance character = new CharacterInstance(UUID.randomUUID());
+        character.attachComponent(new IdentityComponent(name));
+        character.attachComponent(new AttributeComponent(new EnumMap<>(scores)));
+        character.attachComponent(new CombatComponent(maxHealth, maxHealth, null, CombatComponent.DEFAULT_ACTIONS_MAX,
+                CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX, CombatComponent.DEFAULT_ACTIONS_MAX,
+                CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX));
+        character.attachComponent(new MovementComponent(race.speed()));
+        character.attachComponent(new AccountComponent(account));
+        character.attachComponent(new PositionComponent(startingRoom, null)); // missing hexCoordinate here !
+        character.attachComponent(new InventoryComponent(List.of(), gold));
+        character.attachComponent(new LevelingComponent(1, 0));
+        character.attachComponent(new RestComponent(0)); // nouveau personnage : aucun repos court encore pris
+        character.attachComponent(new AppearanceComponent(race, gender, characterClass));
         character.attachComponent(new WorldComponent(this));
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));

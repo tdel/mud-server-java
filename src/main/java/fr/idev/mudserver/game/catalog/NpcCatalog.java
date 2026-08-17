@@ -1,7 +1,9 @@
 package fr.idev.mudserver.game.catalog;
 
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,6 +14,12 @@ import org.springframework.stereotype.Service;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.world.WorldTemplate;
 import fr.idev.mudserver.domain.actor.AbstractNpc;
+import fr.idev.mudserver.domain.actor.Attribute;
+import fr.idev.mudserver.domain.actor.component.AttributeComponent;
+import fr.idev.mudserver.domain.actor.component.CombatComponent;
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+import fr.idev.mudserver.domain.actor.component.MovementComponent;
+import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import fr.idev.mudserver.domain.actor.instance.NpcSellerInstance;
 import fr.idev.mudserver.domain.actor.template.NpcTemplate;
 
@@ -19,6 +27,8 @@ import fr.idev.mudserver.domain.actor.template.NpcTemplate;
 public class NpcCatalog {
 
     private static final Logger log = LoggerFactory.getLogger(NpcCatalog.class);
+
+    private static final int NPC_NOMINAL_HEALTH = 1;
 
     public void warmNpcs(Collection<WorldTemplate> worldTemplates, Collection<RoomInstance> rooms) {
         Map<UUID, RoomInstance> roomsByTemplateId = new ConcurrentHashMap<>();
@@ -44,8 +54,32 @@ public class NpcCatalog {
 
     private void place(NpcTemplate template, RoomInstance room) {
         AbstractNpc npc = template.shop() != null
-                ? new NpcSellerInstance(template.id(), template, room)
-                : new AbstractNpc(template.id(), template, room);
+                ? new NpcSellerInstance(template.id())
+                : new AbstractNpc(template.id());
+
+        npc.attachComponent(new IdentityComponent(template.name()));
+        npc.attachComponent(new AttributeComponent(neutralAttributes()));
+        npc.attachComponent(new CombatComponent(NPC_NOMINAL_HEALTH, NPC_NOMINAL_HEALTH, null,
+                CombatComponent.DEFAULT_ACTIONS_MAX, CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX,
+                CombatComponent.DEFAULT_ACTIONS_MAX, CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX));
+        npc.attachComponent(new MovementComponent(0));
+        npc.attachComponent(new PositionComponent(room, template.cell()));
+        npc.attachComponent(template.descriptor());
+        if (template.dialogue() != null) {
+            npc.attachComponent(template.dialogue());
+        }
+        if (npc instanceof NpcSellerInstance) {
+            npc.attachComponent(Objects.requireNonNull(template.shop()));
+        }
+
         room.placeNpc(npc, template.cell());
+    }
+
+    private static Map<Attribute, Integer> neutralAttributes() {
+        Map<Attribute, Integer> attributes = new EnumMap<>(Attribute.class);
+        for (Attribute attribute : Attribute.values()) {
+            attributes.put(attribute, 10);
+        }
+        return attributes;
     }
 }

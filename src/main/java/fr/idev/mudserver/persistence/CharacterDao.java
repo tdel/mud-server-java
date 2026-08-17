@@ -5,6 +5,7 @@ import fr.idev.mudserver.domain.actor.component.IdentityComponent;
 import static fr.idev.mudserver.persistence.jooq.Tables.CHARACTER;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,6 +21,7 @@ import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
+import fr.idev.mudserver.domain.actor.component.MovementComponent;
 import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import fr.idev.mudserver.domain.actor.component.RestComponent;
 import fr.idev.mudserver.domain.actor.component.WorldComponent;
@@ -117,9 +119,19 @@ public class CharacterDao {
                 .or(instance::startingRoomInstance).orElseThrow(() -> new IllegalStateException(
                         "WorldInstance " + instance.getId() + " n'a aucune room de départ"));
 
-        CharacterInstance character = new CharacterInstance(record.getId(), account, record.getName(), room,
-                Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
-                record.getMaxHealth(), attributes, record.getXp(), record.getGold(), record.getShortRestCount());
+        CharacterInstance character = new CharacterInstance(record.getId());
+        character.attachComponent(new IdentityComponent(record.getName()));
+        character.attachComponent(new AttributeComponent(attributes));
+        character.attachComponent(new CombatComponent(record.getCurrentHealth(), record.getMaxHealth(), null,
+                CombatComponent.DEFAULT_ACTIONS_MAX, CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX,
+                CombatComponent.DEFAULT_ACTIONS_MAX, CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX));
+        character.attachComponent(new MovementComponent(race.speed()));
+        character.attachComponent(new AccountComponent(account));
+        character.attachComponent(new PositionComponent(room, null)); // missing hexCoordinate here !
+        character.attachComponent(new InventoryComponent(List.of(), record.getGold()));
+        character.attachComponent(new LevelingComponent(record.getLevel(), record.getXp()));
+        character.attachComponent(new RestComponent(record.getShortRestCount()));
+        character.attachComponent(new AppearanceComponent(race, Gender.valueOf(record.getGender()), characterClass));
         character.attachComponent(new WorldComponent(instance));
         return character;
     }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -14,6 +15,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.actor.Attribute;
+import fr.idev.mudserver.domain.actor.component.AggroComponent;
+import fr.idev.mudserver.domain.actor.component.AttributeComponent;
+import fr.idev.mudserver.domain.actor.component.BehaviorComponent;
+import fr.idev.mudserver.domain.actor.component.CombatComponent;
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+import fr.idev.mudserver.domain.actor.component.LootComponent;
+import fr.idev.mudserver.domain.actor.component.MonsterCombatComponent;
+import fr.idev.mudserver.domain.actor.component.MovementComponent;
+import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.actor.template.MonsterTemplate;
 import fr.idev.mudserver.domain.actor.template.MonsterTemplate.LootTableEntry;
@@ -62,7 +72,21 @@ public class MonsterCatalog {
                             + " référence le template " + spawn.templateId() + ", absent de " + MONSTERS_RESOURCE);
                 }
 
-                MonsterInstance monster = new MonsterInstance(spawn.id(), template, room);
+                MonsterInstance monster = new MonsterInstance(spawn.id());
+                monster.attachComponent(new IdentityComponent(template.name()));
+                monster.attachComponent(new AttributeComponent(new EnumMap<>(template.attributes())));
+                monster.attachComponent(new CombatComponent(template.maxHealth(), template.maxHealth(), null,
+                        CombatComponent.DEFAULT_ACTIONS_MAX, CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX,
+                        CombatComponent.DEFAULT_ACTIONS_MAX, CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX));
+                monster.attachComponent(new MovementComponent(template.speed()));
+                monster.attachComponent(BehaviorComponent.idle());
+                monster.attachComponent(
+                        new LootComponent(template.lootTable(), template.xpReward(), template.goldReward()));
+                monster.attachComponent(new AggroComponent(template.aggroRadius()));
+                monster.attachComponent(new PositionComponent(room, null)); // missing coordinate ??
+                monster.attachComponent(
+                        new MonsterCombatComponent(template.naturalDamageDice(), template.naturalArmorClass()));
+
                 room.placeMonster(monster, spawn.cell());
                 placedCount++;
             }

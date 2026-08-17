@@ -1,6 +1,5 @@
 package fr.idev.mudserver.domain.actor;
 
-import fr.idev.mudserver.domain.actor.component.IdentityComponent;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -13,9 +12,9 @@ public abstract class AbstractObject {
     private final UUID id;
     private final Map<Class<?>, Object> components = new ConcurrentHashMap<>();
 
-    protected AbstractObject(UUID id, String name) {
+    // Composant requis à attacher par l'appelant : IdentityComponent
+    protected AbstractObject(UUID id) {
         this.id = id;
-        attachComponent(new IdentityComponent(name));
     }
 
     public UUID getId() {
