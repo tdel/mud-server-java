@@ -147,9 +147,6 @@ public class InventorySystem {
     }
 
     private int monsterArmorClass(MonsterInstance monster) {
-        if (monster.getTemplate() == null) {
-            throw new IllegalStateException("MonsterInstance " + monster.getId() + " has no MonsterTemplate attached");
-        }
         Integer natural = monster.getTemplate().getNaturalArmorClass();
         return natural != null ? natural : baseArmorClass(monster);
     }

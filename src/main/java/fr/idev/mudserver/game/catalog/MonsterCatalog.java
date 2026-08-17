@@ -62,10 +62,7 @@ public class MonsterCatalog {
                             + " référence le template " + spawn.templateId() + ", absent de " + MONSTERS_RESOURCE);
                 }
 
-                MonsterInstance monster = new MonsterInstance(spawn.id(), template.getName(), template.getId(),
-                        room.getId(), template.getAttributes(), template.getMaxHealth());
-                monster.attachTemplate(template);
-                monster.setCurrentRoom(room);
+                MonsterInstance monster = new MonsterInstance(spawn.id(), template, room);
                 room.placeMonster(monster, spawn.cell());
                 placedCount++;
             }
