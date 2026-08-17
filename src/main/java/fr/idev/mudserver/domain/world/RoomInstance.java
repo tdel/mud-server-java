@@ -1,5 +1,7 @@
 package fr.idev.mudserver.domain.world;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -105,19 +107,19 @@ public class RoomInstance {
         clients.put(character.getId(), character);
         DomainEventPublisher.publish(new GamePlayerSpawnedToRoom(character, this));
 
-        broadcast(new GamePlayerJoinedRoom(character.getName()), character);
+        broadcast(new GamePlayerJoinedRoom(character.component(IdentityComponent.class).name()), character);
     }
 
     public void leave(CharacterInstance character) {
         clients.remove(character.getId());
         releaseCell(character.component(PositionComponent.class).hexCoordinate(), character);
-        broadcast(new GamePlayerLeftRoom(character.getName()), character);
+        broadcast(new GamePlayerLeftRoom(character.component(IdentityComponent.class).name()), character);
     }
 
     public void disconnect(CharacterInstance character) {
         clients.remove(character.getId());
         releaseCell(character.component(PositionComponent.class).hexCoordinate(), character);
-        broadcast(new GamePlayerDisconnected(character.getName()), character);
+        broadcast(new GamePlayerDisconnected(character.component(IdentityComponent.class).name()), character);
     }
 
     public Optional<AbstractCharacter> findOccupantByName(String name) {
@@ -125,7 +127,9 @@ public class RoomInstance {
         occupantsByName.addAll(clients.values());
         occupantsByName.addAll(monsters);
         occupantsByName.addAll(npcs);
-        return occupantsByName.stream().filter(occupant -> occupant.getName().equalsIgnoreCase(name)).findFirst();
+        return occupantsByName.stream()
+                .filter(occupant -> occupant.component(IdentityComponent.class).name().equalsIgnoreCase(name))
+                .findFirst();
     }
 
     public List<CharacterInstance> characters() {
@@ -146,7 +150,9 @@ public class RoomInstance {
     }
 
     public Optional<MonsterInstance> findMonsterByName(String name) {
-        return monsters.stream().filter(monster -> monster.getName().equalsIgnoreCase(name)).findFirst();
+        return monsters.stream()
+                .filter(monster -> monster.component(IdentityComponent.class).name().equalsIgnoreCase(name))
+                .findFirst();
     }
 
     public void setMonsters(List<MonsterInstance> monsters) {
@@ -184,7 +190,8 @@ public class RoomInstance {
     }
 
     public Optional<AbstractNpc> findNpcByName(String name) {
-        return npcs.stream().filter(npc -> npc.getName().equalsIgnoreCase(name)).findFirst();
+        return npcs.stream().filter(npc -> npc.component(IdentityComponent.class).name().equalsIgnoreCase(name))
+                .findFirst();
     }
 
     public List<RoomPortal> getPortals() {

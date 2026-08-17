@@ -1,5 +1,7 @@
 package fr.idev.mudserver.controller.ingame;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
@@ -36,8 +38,8 @@ public class Say implements ControllerHandler {
             return;
         }
 
-        character.component(WorldComponent.class).worldInstance().broadcast(new Chat(character.getName(), message),
-                character);
+        character.component(WorldComponent.class).worldInstance()
+                .broadcast(new Chat(character.component(IdentityComponent.class).name(), message), character);
         connection.send(new YouSaid(message));
     }
 }

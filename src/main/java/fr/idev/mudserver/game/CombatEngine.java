@@ -1,5 +1,7 @@
 package fr.idev.mudserver.game;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -141,10 +143,11 @@ public class CombatEngine {
 
         CombatResult result = combatSystem.tryAttack(attacker, target);
         networkSystem.send(attacker, new AttackResult(result));
-        target.component(PositionComponent.class).currentRoom()
-                .broadcast(new PlayerAttackBroadcast(attacker.getName(), result), attacker);
-        log.info("combat.attack_resolved attacker={} target={} hit={} critical={} damage={}", attacker.getName(),
-                target.getName(), result.hit(), result.criticalHit(), result.damage());
+        target.component(PositionComponent.class).currentRoom().broadcast(
+                new PlayerAttackBroadcast(attacker.component(IdentityComponent.class).name(), result), attacker);
+        log.info("combat.attack_resolved attacker={} target={} hit={} critical={} damage={}",
+                attacker.component(IdentityComponent.class).name(), target.component(IdentityComponent.class).name(),
+                result.hit(), result.criticalHit(), result.damage());
 
         if (result.hit() && combatSystem.applyDamage(target, result.damage(), attacker)) {
             // CombatEngine#onCharacterDied a déjà nettoyé encounter côté monstre ; côté
@@ -198,8 +201,9 @@ public class CombatEngine {
         synchronized (encounter) {
             encounter.joinBeforeInitiative(founder);
             encounter.joinBeforeInitiative(victim);
-            networkSystem.send(victim, new MonsterAggroTriggered(founder.getName()));
-            encounter.getRoom().broadcast(new MonsterAggroBroadcast(victim.getName(), founder.getName()), victim);
+            networkSystem.send(victim, new MonsterAggroTriggered(founder.component(IdentityComponent.class).name()));
+            encounter.getRoom().broadcast(new MonsterAggroBroadcast(victim.component(IdentityComponent.class).name(),
+                    founder.component(IdentityComponent.class).name()), victim);
             encounter.establishInitiativeOrder(diceSystem::rollInitiative);
             resolveFromCurrentTurn(encounter);
         }
@@ -214,9 +218,12 @@ public class CombatEngine {
             }
             CombatResult result = combatSystem.tryAttack(attacker, target);
             networkSystem.send(attacker, new AttackResult(result));
-            encounter.getRoom().broadcast(new PlayerAttackBroadcast(attacker.getName(), result), attacker);
-            log.info("combat.attack_resolved attacker={} target={} hit={} critical={} damage={}", attacker.getName(),
-                    target.getName(), result.hit(), result.criticalHit(), result.damage());
+            encounter.getRoom().broadcast(
+                    new PlayerAttackBroadcast(attacker.component(IdentityComponent.class).name(), result), attacker);
+            log.info("combat.attack_resolved attacker={} target={} hit={} critical={} damage={}",
+                    attacker.component(IdentityComponent.class).name(),
+                    target.component(IdentityComponent.class).name(), result.hit(), result.criticalHit(),
+                    result.damage());
             if (result.hit()) {
                 combatSystem.applyDamage(target, result.damage(), attacker);
             }
@@ -239,7 +246,7 @@ public class CombatEngine {
             insertOrQueue(encounter, joiner);
         }
         networkSystem.send(joiner, new YouJoinedCombat());
-        encounter.getRoom().broadcast(new CombatantJoined(joiner.getName()), joiner);
+        encounter.getRoom().broadcast(new CombatantJoined(joiner.component(IdentityComponent.class).name()), joiner);
     }
 
     private void mergeMonsterInto(CombatEncounter encounter, MonsterInstance joiner) {
@@ -252,7 +259,7 @@ public class CombatEngine {
         synchronized (encounter) {
             insertOrQueue(encounter, joiner);
         }
-        encounter.getRoom().broadcast(new CombatantJoined(joiner.getName()), null);
+        encounter.getRoom().broadcast(new CombatantJoined(joiner.component(IdentityComponent.class).name()), null);
     }
 
     private void insertOrQueue(CombatEncounter encounter, AbstractCharacter character) {
@@ -279,10 +286,13 @@ public class CombatEngine {
             CharacterInstance victim = aiSystem.chooseTarget(monster, livingPlayers);
 
             CombatResult result = combatSystem.tryAttack(monster, victim);
-            networkSystem.send(victim, new MonsterAttackResult(monster.getName(), result));
-            encounter.getRoom().broadcast(new MonsterAttackBroadcast(monster.getName(), result), victim);
-            log.info("combat.monster_attack_resolved monster={} victim={} hit={} damage={}", monster.getName(),
-                    victim.getName(), result.hit(), result.damage());
+            networkSystem.send(victim,
+                    new MonsterAttackResult(monster.component(IdentityComponent.class).name(), result));
+            encounter.getRoom().broadcast(
+                    new MonsterAttackBroadcast(monster.component(IdentityComponent.class).name(), result), victim);
+            log.info("combat.monster_attack_resolved monster={} victim={} hit={} damage={}",
+                    monster.component(IdentityComponent.class).name(), victim.component(IdentityComponent.class).name(),
+                    result.hit(), result.damage());
             if (result.hit()) {
                 combatSystem.applyDamage(victim, result.damage(), monster);
             }
@@ -314,7 +324,7 @@ public class CombatEngine {
         encounter.remove(monster);
         encounterSystem.leave(monster);
         aiSystem.clearTarget(monster);
-        log.debug("combat.encounter_monster_removed monster={}", monster.getName());
+        log.debug("combat.encounter_monster_removed monster={}", monster.component(IdentityComponent.class).name());
     }
 
     @EventListener
@@ -326,7 +336,7 @@ public class CombatEngine {
         }
         encounter.remove(player);
         encounterSystem.leave(player);
-        log.debug("combat.encounter_player_removed player={}", player.getName());
+        log.debug("combat.encounter_player_removed player={}", player.component(IdentityComponent.class).name());
     }
 
     @EventListener
@@ -345,8 +355,8 @@ public class CombatEngine {
             return;
         }
 
-        log.info("combat.aggro_triggered victim={} aggressors={}", victim.getName(),
-                aggressors.stream().map(MonsterInstance::getName).toList());
+        log.info("combat.aggro_triggered victim={} aggressors={}", victim.component(IdentityComponent.class).name(),
+                aggressors.stream().map(monster -> monster.component(IdentityComponent.class).name()).toList());
 
         Optional<MonsterInstance> alreadyFighting = aggressors.stream()
                 .filter(monster -> encounterSystem.getEncounter(monster) != null).findFirst();

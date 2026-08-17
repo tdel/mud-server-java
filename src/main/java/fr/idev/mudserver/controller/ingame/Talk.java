@@ -1,5 +1,7 @@
 package fr.idev.mudserver.controller.ingame;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -77,8 +79,8 @@ public class Talk implements ControllerHandler {
 
     private void promptDialogue(Connection connection, CharacterInstance character, AbstractNpc npc,
             DialogueComponent dialogue) {
-        connection.requestBlocking(new DialogueOptions(npc.getName(), dialogue.greeting(), dialogue.options()),
-                line -> {
+        connection.requestBlocking(new DialogueOptions(npc.component(IdentityComponent.class).name(),
+                dialogue.greeting(), dialogue.options()), line -> {
                     Optional<DialogueComponent.DialogueOption> choice = dialogueSystem.resolveOption(dialogue, line);
 
                     if (choice.isEmpty()) {
@@ -89,7 +91,8 @@ public class Talk implements ControllerHandler {
 
                     switch (choice.get().type()) {
                         case RESPONSE -> {
-                            connection.send(new NpcResponse(npc.getName(), choice.get().response()));
+                            connection.send(new NpcResponse(npc.component(IdentityComponent.class).name(),
+                                    choice.get().response()));
                             promptDialogue(connection, character, npc, dialogue);
                         }
                         case SHOP -> {
@@ -97,7 +100,7 @@ public class Talk implements ControllerHandler {
                                 promptShop(connection, character, seller, dialogue);
                             }
                         }
-                        case LEAVE -> connection.send(new DialogueEnded(npc.getName()));
+                        case LEAVE -> connection.send(new DialogueEnded(npc.component(IdentityComponent.class).name()));
                     }
                 });
     }
@@ -109,8 +112,8 @@ public class Talk implements ControllerHandler {
                         entry.price()))
                 .toList();
 
-        connection.requestBlocking(
-                new ShopCatalog(npc.getName(), entries, character.component(InventoryComponent.class).gold()), line -> {
+        connection.requestBlocking(new ShopCatalog(npc.component(IdentityComponent.class).name(), entries,
+                character.component(InventoryComponent.class).gold()), line -> {
                     String trimmed = line.trim();
                     if (trimmed.equals("0") || trimmed.equalsIgnoreCase("back") || trimmed.equalsIgnoreCase("retour")) {
                         promptDialogue(connection, character, npc, dialogue);

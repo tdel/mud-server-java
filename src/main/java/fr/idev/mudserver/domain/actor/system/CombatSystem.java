@@ -1,5 +1,7 @@
 package fr.idev.mudserver.domain.actor.system;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+
 import java.util.Optional;
 
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
@@ -147,12 +149,13 @@ public class CombatSystem {
         boolean hit = DiceRoller.resolveHit(naturalRoll, attackRoll.total(), armorClass);
 
         if (!hit) {
-            return new CombatResult(target.getName(), false, false, attackRoll.total(), armorClass, 0, disadvantage);
+            return new CombatResult(target.component(IdentityComponent.class).name(), false, false, attackRoll.total(),
+                    armorClass, 0, disadvantage);
         }
 
         int damage = playerDamage(weapon, strengthModifier, criticalHit);
-        return new CombatResult(target.getName(), true, criticalHit, attackRoll.total(), armorClass, damage,
-                disadvantage);
+        return new CombatResult(target.component(IdentityComponent.class).name(), true, criticalHit, attackRoll.total(),
+                armorClass, damage, disadvantage);
     }
 
     private int playerDamage(Optional<Item> weapon, int strengthModifier, boolean criticalHit) {
@@ -179,11 +182,13 @@ public class CombatSystem {
         boolean hit = DiceRoller.resolveHit(naturalRoll, attackRoll.total(), armorClass);
 
         if (!hit) {
-            return new CombatResult(target.getName(), false, false, attackRoll.total(), armorClass, 0, false);
+            return new CombatResult(target.component(IdentityComponent.class).name(), false, false, attackRoll.total(),
+                    armorClass, 0, false);
         }
 
         int damage = monsterDamage(attacker, strengthModifier, criticalHit);
-        return new CombatResult(target.getName(), true, criticalHit, attackRoll.total(), armorClass, damage, false);
+        return new CombatResult(target.component(IdentityComponent.class).name(), true, criticalHit, attackRoll.total(),
+                armorClass, damage, false);
     }
 
     private int monsterDamage(MonsterInstance attacker, int strengthModifier, boolean criticalHit) {

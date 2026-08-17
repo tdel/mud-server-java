@@ -1,5 +1,7 @@
 package fr.idev.mudserver.controller;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -34,7 +36,8 @@ public class ControllerDispatcher {
             CharacterInstance character = connection.character();
             if (character != null && encounterSystem.isInCombat(character)
                     && !COMBAT_ALLOWED_VERBS.contains(actionName)) {
-                log.debug("combat.action_blocked verb={} character={}", actionName, character.getName());
+                log.debug("combat.action_blocked verb={} character={}", actionName,
+                        character.component(IdentityComponent.class).name());
                 connection.send(new CombatActionRequired());
                 return;
             }

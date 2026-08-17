@@ -1,5 +1,7 @@
 package fr.idev.mudserver.controller.ingame;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+
 import java.util.Optional;
 import java.util.Set;
 
@@ -55,6 +57,6 @@ public class Select implements ControllerHandler {
         MonsterInstance target = targetQuery.get();
 
         combatSystem.setTarget(target, character);
-        connection.send(new TargetSelected(target.getName()));
+        connection.send(new TargetSelected(target.component(IdentityComponent.class).name()));
     }
 }

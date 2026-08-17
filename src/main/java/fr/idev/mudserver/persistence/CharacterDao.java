@@ -1,5 +1,7 @@
 package fr.idev.mudserver.persistence;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+
 import static fr.idev.mudserver.persistence.jooq.Tables.CHARACTER;
 
 import java.util.EnumMap;
@@ -49,7 +51,7 @@ public class CharacterDao {
                 CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA, CHARACTER.XP, CHARACTER.GOLD,
                 CHARACTER.SHORT_REST_COUNT, CHARACTER.WORLD_INSTANCE_ID)
                 .values(character.getId(), character.component(AccountComponent.class).account().getId(),
-                        character.getName(), currentRoomId,
+                        character.component(IdentityComponent.class).name(), currentRoomId,
                         character.component(AppearanceComponent.class).gender().name(),
                         character.component(AppearanceComponent.class).race().name(),
                         character.component(AppearanceComponent.class).characterClass().name(),

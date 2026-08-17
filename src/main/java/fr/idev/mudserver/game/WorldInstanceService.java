@@ -1,5 +1,7 @@
 package fr.idev.mudserver.game;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -134,7 +136,7 @@ public class WorldInstanceService {
         instance.addPlayer(player);
         accountDao.updateCurrentCharacter(player.component(AccountComponent.class).account().getId(), player.getId());
 
-        MDC.put("character", player.getName());
+        MDC.put("character", player.component(IdentityComponent.class).name());
     }
 
     public void exitGame(Connection connection) {
@@ -149,7 +151,8 @@ public class WorldInstanceService {
         characterDao.update(character);
         room.disconnect(character);
         instance.removePlayer(character);
-        log.info("character.session_ended character={} room={}", character.getName(), room.getName());
+        log.info("character.session_ended character={} room={}", character.component(IdentityComponent.class).name(),
+                room.getName());
         MDC.remove("character");
 
         if (instance.onlineCharacters().isEmpty()) {
@@ -164,17 +167,19 @@ public class WorldInstanceService {
     void onCharacterDied(CharacterDied event) {
         RoomInstance room = event.character().component(PositionComponent.class).currentRoom();
         room.removeMonster(event.character());
-        room.broadcast(new MonsterDefeated(event.character().getName()), null);
-        log.info("combat.monster_removed_from_room monster={} room={}", event.character().getName(), room.getName());
+        room.broadcast(new MonsterDefeated(event.character().component(IdentityComponent.class).name()), null);
+        log.info("combat.monster_removed_from_room monster={} room={}",
+                event.character().component(IdentityComponent.class).name(), room.getName());
     }
 
     @EventListener
     @Order(1)
     void onGamePlayerDied(GamePlayerDied event) {
         RoomInstance room = event.character().component(PositionComponent.class).currentRoom();
-        room.broadcast(new GamePlayerDefeated(event.character().getName(), event.killer().getName()),
-                event.character());
-        log.info("combat.player_defeated character={} killer={} room={}", event.character().getName(),
-                event.killer().getName(), room.getName());
+        room.broadcast(new GamePlayerDefeated(event.character().component(IdentityComponent.class).name(),
+                event.killer().component(IdentityComponent.class).name()), event.character());
+        log.info("combat.player_defeated character={} killer={} room={}",
+                event.character().component(IdentityComponent.class).name(),
+                event.killer().component(IdentityComponent.class).name(), room.getName());
     }
 }

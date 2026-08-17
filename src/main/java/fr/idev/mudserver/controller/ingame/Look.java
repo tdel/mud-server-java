@@ -3,6 +3,7 @@ package fr.idev.mudserver.controller.ingame;
 import java.util.List;
 import java.util.Set;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
 import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import org.springframework.stereotype.Component;
 
@@ -52,11 +53,12 @@ public class Look implements ControllerHandler {
         List<String> portalSummaries = room.getPortals().stream()
                 .map(portal -> portal.direction() + ": " + portal.targetRoom().getName()).toList();
         List<String> characterNames = nearby.stream().filter(CharacterInstance.class::isInstance)
-                .filter(other -> !other.getId().equals(character.getId())).map(AbstractCharacter::getName).toList();
+                .filter(other -> !other.getId().equals(character.getId()))
+                .map(other -> other.component(IdentityComponent.class).name()).toList();
         List<String> monsterNames = nearby.stream().filter(MonsterInstance.class::isInstance)
-                .map(AbstractCharacter::getName).toList();
-        List<String> npcNames = nearby.stream().filter(AbstractNpc.class::isInstance).map(AbstractCharacter::getName)
-                .toList();
+                .map(other -> other.component(IdentityComponent.class).name()).toList();
+        List<String> npcNames = nearby.stream().filter(AbstractNpc.class::isInstance)
+                .map(other -> other.component(IdentityComponent.class).name()).toList();
 
         return new RoomDescription(room.getName(), room.getDescription(), gridLines, HexGridRenderer.LEGEND,
                 portalSummaries, characterNames, monsterNames, npcNames);

@@ -1,5 +1,7 @@
 package fr.idev.mudserver.domain.combat;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -39,8 +41,8 @@ public final class CombatEncounter {
 
     public synchronized void joinBeforeInitiative(AbstractCharacter character) {
         if (initiativeRolled) {
-            throw new IllegalStateException(
-                    "Initiative déjà établie, " + character.getName() + " doit rejoindre via insertLatecomer");
+            throw new IllegalStateException("Initiative déjà établie, "
+                    + character.component(IdentityComponent.class).name() + " doit rejoindre via insertLatecomer");
         }
         pendingJoiners.add(character);
     }

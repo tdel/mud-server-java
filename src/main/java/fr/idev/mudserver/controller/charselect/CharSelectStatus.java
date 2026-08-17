@@ -1,5 +1,7 @@
 package fr.idev.mudserver.controller.charselect;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,7 +40,7 @@ public class CharSelectStatus {
         }
 
         CharacterInstance existing = character.get();
-        connection.send(new ExistingCharacterInWorld(worldName, existing.getName(),
+        connection.send(new ExistingCharacterInWorld(worldName, existing.component(IdentityComponent.class).name(),
                 existing.component(AppearanceComponent.class).characterClass(),
                 existing.component(LevelingComponent.class).level()));
     }

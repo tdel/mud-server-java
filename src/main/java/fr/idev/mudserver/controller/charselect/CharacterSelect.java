@@ -1,5 +1,7 @@
 package fr.idev.mudserver.controller.charselect;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+
 import java.util.Optional;
 import java.util.Set;
 
@@ -54,7 +56,7 @@ public class CharacterSelect implements ControllerHandler {
         connection.attachCharacter(loadedChar);
         worldInstanceService.enterGame(loadedChar);
 
-        connection.send(new NowPlaying(loadedChar.getName()));
+        connection.send(new NowPlaying(loadedChar.component(IdentityComponent.class).name()));
         lookAction.onReceive(connection, "");
     }
 }

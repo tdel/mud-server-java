@@ -1,5 +1,7 @@
 package fr.idev.mudserver.network.message.ingame;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+
 import java.util.stream.Collectors;
 
 import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
@@ -22,8 +24,8 @@ public record GamePlayerStats(CharacterInstance character, int armorClass, int p
         CombatComponent combat = c.component(CombatComponent.class);
         output.write(String.format(
                 "== %s (%s, Level %d %s) ==\nHealth: %d/%d\nArmor Class: %d\nProficiency: %+d\nStrength: %d (%+d)  Dexterity: %d (%+d)  Constitution: %d (%+d)\nIntelligence: %d (%+d)  Wisdom: %d (%+d)  Charisma: %d (%+d)\nPrimary Ability: %s\nSaving Throws: %s\nSkills: %s\n",
-                Ansi.player(c.getName()), c.component(AppearanceComponent.class).gender().label(),
-                c.component(LevelingComponent.class).level(),
+                Ansi.player(c.component(IdentityComponent.class).name()),
+                c.component(AppearanceComponent.class).gender().label(), c.component(LevelingComponent.class).level(),
                 c.component(AppearanceComponent.class).characterClass().label(), combat.currentHealth(),
                 combat.maxHealth(), armorClass, proficiencyBonus, strength, strengthModifier, dexterity,
                 dexterityModifier, constitution, constitutionModifier, intelligence, intelligenceModifier, wisdom,

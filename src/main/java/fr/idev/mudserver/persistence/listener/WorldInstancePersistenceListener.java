@@ -1,5 +1,7 @@
 package fr.idev.mudserver.persistence.listener;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -32,12 +34,14 @@ public class WorldInstancePersistenceListener {
     @EventListener
     void onGamePlayerMovedToRoom(GamePlayerMovedToRoom event) {
         characterDao.updateCurrentRoom(event.character().getId(), event.to().getTemplateId());
-        log.debug("room.player_moved character={} to={}", event.character().getName(), event.to().getName());
+        log.debug("room.player_moved character={} to={}", event.character().component(IdentityComponent.class).name(),
+                event.to().getName());
     }
 
     @EventListener
     void onGamePlayerSpawnedToRoom(GamePlayerSpawnedToRoom event) {
         characterDao.updateCurrentRoom(event.character().getId(), event.room().getTemplateId());
-        log.info("room.player_spawned character={} room={}", event.character().getName(), event.room().getName());
+        log.info("room.player_spawned character={} room={}",
+                event.character().component(IdentityComponent.class).name(), event.room().getName());
     }
 }

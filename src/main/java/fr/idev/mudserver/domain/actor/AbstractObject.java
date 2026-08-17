@@ -1,5 +1,6 @@
 package fr.idev.mudserver.domain.actor;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -10,20 +11,15 @@ import java.util.function.UnaryOperator;
 public abstract class AbstractObject {
 
     private final UUID id;
-    private final String name;
     private final Map<Class<?>, Object> components = new ConcurrentHashMap<>();
 
     protected AbstractObject(UUID id, String name) {
         this.id = id;
-        this.name = name;
+        attachComponent(new IdentityComponent(name));
     }
 
     public UUID getId() {
         return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public <C> void attachComponent(C component) {
@@ -67,6 +63,6 @@ public abstract class AbstractObject {
 
     @Override
     public String toString() {
-        return "AbstractObject[id=" + getId() + ", name=" + getName() + "]";
+        return "AbstractObject[id=" + getId() + "]";
     }
 }

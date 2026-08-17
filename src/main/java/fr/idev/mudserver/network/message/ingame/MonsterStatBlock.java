@@ -1,5 +1,7 @@
 package fr.idev.mudserver.network.message.ingame;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.telnet.Ansi;
@@ -17,8 +19,9 @@ public record MonsterStatBlock(MonsterInstance monster, int armorClass, int stre
         CombatComponent combat = m.component(CombatComponent.class);
         output.write(String.format(
                 "== %s ==\nHealth: %d/%d\nArmor Class: %d\nStrength: %d (%+d)  Dexterity: %d (%+d)  Constitution: %d (%+d)\nIntelligence: %d (%+d)  Wisdom: %d (%+d)  Charisma: %d (%+d)\n",
-                Ansi.monster(m.getName()), combat.currentHealth(), combat.maxHealth(), armorClass, strength,
-                strengthModifier, dexterity, dexterityModifier, constitution, constitutionModifier, intelligence,
-                intelligenceModifier, wisdom, wisdomModifier, charisma, charismaModifier));
+                Ansi.monster(m.component(IdentityComponent.class).name()), combat.currentHealth(), combat.maxHealth(),
+                armorClass, strength, strengthModifier, dexterity, dexterityModifier, constitution,
+                constitutionModifier, intelligence, intelligenceModifier, wisdom, wisdomModifier, charisma,
+                charismaModifier));
     }
 }

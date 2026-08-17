@@ -1,5 +1,7 @@
 package fr.idev.mudserver.controller;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -47,7 +49,7 @@ public class Logout implements ControllerHandler {
             worldInstanceService.exitGame(connection);
             connection.detachWorldInstance();
 
-            connection.send(new StoppedPlaying(character.getName()));
+            connection.send(new StoppedPlaying(character.component(IdentityComponent.class).name()));
             connection.send(new BackInLobby());
             return;
         }

@@ -1,5 +1,7 @@
 package fr.idev.mudserver.domain.actor.system;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+
 import fr.idev.mudserver.domain.actor.component.LootComponent;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.item.ItemTemplate;
@@ -52,7 +54,8 @@ public class LootSystem {
 
         if (loot.gold() > 0) {
             inventorySystem.receiveGold(killer, loot.gold());
-            log.info("loot.gold_dropped killer={} killed={} amount={}", killer.getName(), killed.getName(),
+            log.info("loot.gold_dropped killer={} killed={} amount={}",
+                    killer.component(IdentityComponent.class).name(), killed.component(IdentityComponent.class).name(),
                     loot.gold());
         }
 
@@ -60,8 +63,8 @@ public class LootSystem {
             // TODO: possible piste d'amélioration sur le suivi de l'UUID généré ici
             Item item = new Item(UUID.randomUUID(), itemTemplate, killer, null);
             inventorySystem.receiveLootItem(killer, item);
-            log.info("loot.item_dropped killer={} killed={} item={}", killer.getName(), killed.getName(),
-                    item.getName());
+            log.info("loot.item_dropped killer={} killed={} item={}", killer.component(IdentityComponent.class).name(),
+                    killed.component(IdentityComponent.class).name(), item.getName());
         }
     }
 

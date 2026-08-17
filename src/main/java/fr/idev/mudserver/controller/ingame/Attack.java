@@ -1,5 +1,7 @@
 package fr.idev.mudserver.controller.ingame;
 
+import fr.idev.mudserver.domain.actor.component.IdentityComponent;
+
 import java.util.Optional;
 import java.util.Set;
 
@@ -58,7 +60,7 @@ public class Attack implements ControllerHandler {
 
             if (!character.component(PositionComponent.class).currentRoom().getMonsters().contains(target)) {
                 combatSystem.setTarget(null, character);
-                connection.send(new TargetNotFound(target.getName()));
+                connection.send(new TargetNotFound(target.component(IdentityComponent.class).name()));
                 return;
             }
         } else {
