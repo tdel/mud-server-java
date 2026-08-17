@@ -20,6 +20,7 @@ import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.event.CharacterStartedMoving;
 import fr.idev.mudserver.domain.actor.event.CharacterStoppedMoving;
 import fr.idev.mudserver.domain.actor.system.MovementSystem;
+import fr.idev.mudserver.domain.actor.system.NetworkSystem;
 import fr.idev.mudserver.network.message.ingame.MovementBlockedByBounds;
 import fr.idev.mudserver.network.message.ingame.MovementBlockedByOccupant;
 
@@ -42,14 +43,17 @@ public class MovementEngine extends Thread {
     private final Look lookAction;
     private final ExecutorService virtualThreadExecutor;
     private final MovementSystem movementSystem;
+    private final NetworkSystem networkSystem;
     private final Map<UUID, AbstractCharacter> movingCharacters = new ConcurrentHashMap<>();
     private final Map<UUID, CompletableFuture<Void>> pendingNotifications = new ConcurrentHashMap<>();
 
-    public MovementEngine(Look lookAction, ExecutorService virtualThreadExecutor, MovementSystem movementSystem) {
+    public MovementEngine(Look lookAction, ExecutorService virtualThreadExecutor, MovementSystem movementSystem,
+            NetworkSystem networkSystem) {
         super("movement-ticker");
         this.lookAction = lookAction;
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.movementSystem = movementSystem;
+        this.networkSystem = networkSystem;
         setDaemon(true);
     }
 
@@ -97,11 +101,11 @@ public class MovementEngine extends Thread {
             }
             case BLOCKED_BY_BOUNDS -> {
                 movingCharacters.remove(character.getId());
-                notifyAsync(character, () -> character.send(new MovementBlockedByBounds()));
+                notifyAsync(character, () -> networkSystem.send(character, new MovementBlockedByBounds()));
             }
             case BLOCKED_BY_OCCUPANT -> {
                 movingCharacters.remove(character.getId());
-                notifyAsync(character, () -> character.send(new MovementBlockedByOccupant()));
+                notifyAsync(character, () -> networkSystem.send(character, new MovementBlockedByOccupant()));
             }
         }
     }

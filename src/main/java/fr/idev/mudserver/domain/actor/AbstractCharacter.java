@@ -7,8 +7,6 @@ import java.util.UUID;
 import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
 import fr.idev.mudserver.domain.actor.component.MovementComponent;
-import fr.idev.mudserver.domain.actor.component.NetworkComponent;
-import fr.idev.mudserver.network.OutputMessage;
 
 public abstract class AbstractCharacter extends AbstractObject {
 
@@ -20,10 +18,5 @@ public abstract class AbstractCharacter extends AbstractObject {
                 CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX, CombatComponent.DEFAULT_ACTIONS_MAX,
                 CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX));
         this.attachComponent(new MovementComponent(speed));
-    }
-
-    public void send(OutputMessage message) {
-        findComponent(NetworkComponent.class)
-                .ifPresent(networkComponent -> networkComponent.connection().send(message));
     }
 }

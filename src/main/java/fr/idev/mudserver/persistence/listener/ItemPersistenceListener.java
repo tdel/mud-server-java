@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
+import fr.idev.mudserver.domain.actor.system.NetworkSystem;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEquippedItem;
@@ -27,9 +28,11 @@ public class ItemPersistenceListener {
     private static final Logger log = LoggerFactory.getLogger(ItemPersistenceListener.class);
 
     private final ItemDao itemDao;
+    private final NetworkSystem networkSystem;
 
-    public ItemPersistenceListener(ItemDao itemDao) {
+    public ItemPersistenceListener(ItemDao itemDao, NetworkSystem networkSystem) {
         this.itemDao = itemDao;
+        this.networkSystem = networkSystem;
     }
 
     public List<Item> loadInventory(CharacterInstance character) {
@@ -63,14 +66,15 @@ public class ItemPersistenceListener {
     @EventListener
     void onCharacterLootedItem(CharacterLootedItem event) {
         itemDao.insert(event.item());
-        event.character().send(new EquipmentLooted(event.item().getName(), event.item().getRarity()));
+        networkSystem.send(event.character(), new EquipmentLooted(event.item().getName(), event.item().getRarity()));
         log.info("item.looted item={} character={}", event.item().getName(), event.character().getName());
     }
 
     @EventListener
     void onItemPurchased(ItemPurchased event) {
         itemDao.insert(event.item());
-        event.character().send(new ItemBought(event.item().getName(), event.item().getRarity(), event.price()));
+        networkSystem.send(event.character(),
+                new ItemBought(event.item().getName(), event.item().getRarity(), event.price()));
         log.info("item.purchased item={} character={} price={}", event.item().getName(), event.character().getName(),
                 event.price());
     }

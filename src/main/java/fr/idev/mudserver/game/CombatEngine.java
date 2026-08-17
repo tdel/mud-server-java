@@ -19,6 +19,7 @@ import fr.idev.mudserver.domain.actor.system.CombatSystem;
 import fr.idev.mudserver.domain.actor.system.DiceSystem;
 import fr.idev.mudserver.domain.actor.system.EncounterSystem;
 import fr.idev.mudserver.domain.actor.system.InventorySystem;
+import fr.idev.mudserver.domain.actor.system.NetworkSystem;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
@@ -50,14 +51,16 @@ public class CombatEngine {
     private final AiSystem aiSystem;
     private final InventorySystem inventorySystem;
     private final EncounterSystem encounterSystem;
+    private final NetworkSystem networkSystem;
 
     public CombatEngine(CombatSystem combatSystem, DiceSystem diceSystem, AiSystem aiSystem,
-            InventorySystem inventorySystem, EncounterSystem encounterSystem) {
+            InventorySystem inventorySystem, EncounterSystem encounterSystem, NetworkSystem networkSystem) {
         this.combatSystem = combatSystem;
         this.diceSystem = diceSystem;
         this.aiSystem = aiSystem;
         this.inventorySystem = inventorySystem;
         this.encounterSystem = encounterSystem;
+        this.networkSystem = networkSystem;
     }
 
     public void attack(CharacterInstance attacker, MonsterInstance target) {
@@ -68,7 +71,7 @@ public class CombatEngine {
             if (attackerEncounter == targetEncounter) {
                 performTurnAttack(attackerEncounter, attacker, target);
             } else {
-                attacker.send(new AlreadyInAnotherEncounter());
+                networkSystem.send(attacker, new AlreadyInAnotherEncounter());
             }
             return;
         }
@@ -87,7 +90,7 @@ public class CombatEngine {
 
     public void useItem(CharacterInstance user, Item item) {
         if (!(item.getTemplate() instanceof ConsumableItem consumable)) {
-            user.send(new ItemNotUsable(item.getName()));
+            networkSystem.send(user, new ItemNotUsable(item.getName()));
             return;
         }
 
@@ -99,7 +102,7 @@ public class CombatEngine {
 
         synchronized (encounter) {
             if (encounter.currentParticipant() != user || !combatSystem.trySpendAction(user)) {
-                user.send(new NotYourTurn());
+                networkSystem.send(user, new NotYourTurn());
             } else {
                 consumable.consume(user, item, combatSystem, inventorySystem);
                 continueOrEndTurn(encounter, user);
@@ -137,7 +140,7 @@ public class CombatEngine {
         }
 
         CombatResult result = combatSystem.tryAttack(attacker, target);
-        attacker.send(new AttackResult(result));
+        networkSystem.send(attacker, new AttackResult(result));
         target.component(PositionComponent.class).currentRoom()
                 .broadcast(new PlayerAttackBroadcast(attacker.getName(), result), attacker);
         log.info("combat.attack_resolved attacker={} target={} hit={} critical={} damage={}", attacker.getName(),
@@ -195,7 +198,7 @@ public class CombatEngine {
         synchronized (encounter) {
             encounter.joinBeforeInitiative(founder);
             encounter.joinBeforeInitiative(victim);
-            victim.send(new MonsterAggroTriggered(founder.getName()));
+            networkSystem.send(victim, new MonsterAggroTriggered(founder.getName()));
             encounter.getRoom().broadcast(new MonsterAggroBroadcast(victim.getName(), founder.getName()), victim);
             encounter.establishInitiativeOrder(diceSystem::rollInitiative);
             resolveFromCurrentTurn(encounter);
@@ -206,11 +209,11 @@ public class CombatEngine {
     private void performTurnAttack(CombatEncounter encounter, CharacterInstance attacker, MonsterInstance target) {
         synchronized (encounter) {
             if (encounter.currentParticipant() != attacker || !combatSystem.trySpendAction(attacker)) {
-                attacker.send(new NotYourTurn());
+                networkSystem.send(attacker, new NotYourTurn());
                 return;
             }
             CombatResult result = combatSystem.tryAttack(attacker, target);
-            attacker.send(new AttackResult(result));
+            networkSystem.send(attacker, new AttackResult(result));
             encounter.getRoom().broadcast(new PlayerAttackBroadcast(attacker.getName(), result), attacker);
             log.info("combat.attack_resolved attacker={} target={} hit={} critical={} damage={}", attacker.getName(),
                     target.getName(), result.hit(), result.criticalHit(), result.damage());
@@ -224,7 +227,7 @@ public class CombatEngine {
     private void continueOrEndTurn(CombatEncounter encounter, CharacterInstance actor) {
         if (combatSystem.hasActionRemaining(actor)) {
             CombatComponent combat = actor.component(CombatComponent.class);
-            actor.send(new ActionsRemaining(combat.actionsRemaining(), combat.extraActionsRemaining()));
+            networkSystem.send(actor, new ActionsRemaining(combat.actionsRemaining(), combat.extraActionsRemaining()));
         } else {
             cascade(encounter);
         }
@@ -235,7 +238,7 @@ public class CombatEngine {
             encounterSystem.join(joiner, encounter);
             insertOrQueue(encounter, joiner);
         }
-        joiner.send(new YouJoinedCombat());
+        networkSystem.send(joiner, new YouJoinedCombat());
         encounter.getRoom().broadcast(new CombatantJoined(joiner.getName()), joiner);
     }
 
@@ -276,7 +279,7 @@ public class CombatEngine {
             CharacterInstance victim = aiSystem.chooseTarget(monster, livingPlayers);
 
             CombatResult result = combatSystem.tryAttack(monster, victim);
-            victim.send(new MonsterAttackResult(monster.getName(), result));
+            networkSystem.send(victim, new MonsterAttackResult(monster.getName(), result));
             encounter.getRoom().broadcast(new MonsterAttackBroadcast(monster.getName(), result), victim);
             log.info("combat.monster_attack_resolved monster={} victim={} hit={} damage={}", monster.getName(),
                     victim.getName(), result.hit(), result.damage());
@@ -297,7 +300,7 @@ public class CombatEngine {
         } else if (encounter.currentParticipant() instanceof CharacterInstance nextPlayer) {
             combatSystem.resetForTurn(nextPlayer);
             CombatComponent combat = nextPlayer.component(CombatComponent.class);
-            nextPlayer.send(new YourTurn(combat.actionsRemaining(), combat.extraActionsRemaining()));
+            networkSystem.send(nextPlayer, new YourTurn(combat.actionsRemaining(), combat.extraActionsRemaining()));
         }
     }
 

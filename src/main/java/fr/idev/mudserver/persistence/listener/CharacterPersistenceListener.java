@@ -22,6 +22,7 @@ import fr.idev.mudserver.domain.actor.event.LongRestTaken;
 import fr.idev.mudserver.domain.actor.event.NewGamePlayerCreated;
 import fr.idev.mudserver.domain.actor.event.ShortRestTaken;
 import fr.idev.mudserver.domain.actor.system.LevelingSystem;
+import fr.idev.mudserver.domain.actor.system.NetworkSystem;
 import fr.idev.mudserver.domain.actor.system.PositionSystem;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.game.catalog.LevelCatalog;
@@ -46,14 +47,16 @@ public class CharacterPersistenceListener {
     private final CombatSystem combatSystem;
     private final LevelingSystem levelingSystem;
     private final PositionSystem positionSystem;
+    private final NetworkSystem networkSystem;
 
     public CharacterPersistenceListener(CharacterDao characterDao, LevelCatalog levelCatalog, CombatSystem combatSystem,
-            LevelingSystem levelingSystem, PositionSystem positionSystem) {
+            LevelingSystem levelingSystem, PositionSystem positionSystem, NetworkSystem networkSystem) {
         this.characterDao = characterDao;
         this.levelCatalog = levelCatalog;
         this.combatSystem = combatSystem;
         this.levelingSystem = levelingSystem;
         this.positionSystem = positionSystem;
+        this.networkSystem = networkSystem;
     }
 
     @EventListener
@@ -68,7 +71,7 @@ public class CharacterPersistenceListener {
     @EventListener
     void onCharacterGainedXp(CharacterGainedXp event) {
         CharacterInstance character = event.character();
-        character.send(new XpGained(event.amount()));
+        networkSystem.send(character, new XpGained(event.amount()));
 
         while (character.component(LevelingComponent.class).level() < levelCatalog.maxLevel()
                 && character.component(LevelingComponent.class).xp() >= levelCatalog
@@ -94,7 +97,7 @@ public class CharacterPersistenceListener {
     @EventListener
     void onCharacterReceivedGold(CharacterReceivedGold event) {
         characterDao.update(event.character());
-        event.character().send(new GoldLooted(event.amount()));
+        networkSystem.send(event.character(), new GoldLooted(event.amount()));
         log.info("character.gold_received character={} amount={} newGold={}", event.character().getName(),
                 event.amount(), event.character().component(InventoryComponent.class).gold());
     }
@@ -102,7 +105,7 @@ public class CharacterPersistenceListener {
     @EventListener
     void onCharacterSpentGold(CharacterSpentGold event) {
         characterDao.update(event.character());
-        event.character().send(new GoldSpent(event.amount()));
+        networkSystem.send(event.character(), new GoldSpent(event.amount()));
         log.info("character.gold_spent character={} amount={} newGold={}", event.character().getName(), event.amount(),
                 event.character().component(InventoryComponent.class).gold());
     }
@@ -129,7 +132,7 @@ public class CharacterPersistenceListener {
         positionSystem.moveToRoom(character, startingRoom);
         characterDao.update(character);
 
-        character.send(new PlayerRespawned(startingRoom.getName()));
+        networkSystem.send(character, new PlayerRespawned(startingRoom.getName()));
         log.info("character.respawned character={} room={}", character.getName(), startingRoom.getName());
     }
 
@@ -138,8 +141,8 @@ public class CharacterPersistenceListener {
         CharacterInstance character = event.character();
         characterDao.update(character);
         CombatComponent combat = character.component(CombatComponent.class);
-        character.send(new ItemUsed(event.item().getName(), event.item().getRarity(), event.healedAmount(),
-                combat.currentHealth(), combat.maxHealth()));
+        networkSystem.send(character, new ItemUsed(event.item().getName(), event.item().getRarity(),
+                event.healedAmount(), combat.currentHealth(), combat.maxHealth()));
         log.info("character.used_potion character={} item={} healedAmount={}", character.getName(),
                 event.item().getName(), event.healedAmount());
     }
@@ -150,7 +153,7 @@ public class CharacterPersistenceListener {
             CharacterInstance character = entry.getKey();
             characterDao.update(character);
             CombatComponent combat = character.component(CombatComponent.class);
-            character.send(new HpRestored(entry.getValue(), combat.currentHealth(), combat.maxHealth()));
+            networkSystem.send(character, new HpRestored(entry.getValue(), combat.currentHealth(), combat.maxHealth()));
         }
         event.initiator().component(WorldComponent.class).worldInstance()
                 .broadcast(new ShortRestAnnounced(event.initiator().getName()), null);
@@ -164,7 +167,7 @@ public class CharacterPersistenceListener {
             CharacterInstance character = entry.getKey();
             characterDao.update(character);
             CombatComponent combat = character.component(CombatComponent.class);
-            character.send(new HpRestored(entry.getValue(), combat.currentHealth(), combat.maxHealth()));
+            networkSystem.send(character, new HpRestored(entry.getValue(), combat.currentHealth(), combat.maxHealth()));
         }
         event.initiator().component(WorldComponent.class).worldInstance()
                 .broadcast(new LongRestAnnounced(event.initiator().getName()), null);
