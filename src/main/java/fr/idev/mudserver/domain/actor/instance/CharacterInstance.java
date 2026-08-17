@@ -11,7 +11,6 @@ import fr.idev.mudserver.domain.actor.*;
 import fr.idev.mudserver.domain.actor.component.*;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEnteredCell;
-import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.world.WorldInstance;
@@ -71,17 +70,6 @@ public final class CharacterInstance extends AbstractCharacter {
     public void setWorldInstance(WorldInstance worldInstance) {
         this.worldInstance = worldInstance;
         this.worldInstanceId = worldInstance.getId();
-    }
-
-    public void moveToRoom(RoomInstance destination) {
-        moveToRoom(destination, destination.getSpawnCell());
-    }
-
-    public void moveToRoom(RoomInstance destination, HexCoordinate targetCell) {
-        RoomInstance previous = component(PositionComponent.class).currentRoom();
-        previous.leave(this);
-        destination.join(this, targetCell);
-        DomainEventPublisher.publish(new GamePlayerMovedToRoom(this, previous, destination));
     }
 
     @Override

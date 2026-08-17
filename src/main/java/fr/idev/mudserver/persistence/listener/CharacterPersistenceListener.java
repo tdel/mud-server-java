@@ -22,6 +22,7 @@ import fr.idev.mudserver.domain.actor.event.LongRestTaken;
 import fr.idev.mudserver.domain.actor.event.NewGamePlayerCreated;
 import fr.idev.mudserver.domain.actor.event.ShortRestTaken;
 import fr.idev.mudserver.domain.actor.system.LevelingSystem;
+import fr.idev.mudserver.domain.actor.system.PositionSystem;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.game.catalog.LevelCatalog;
 import fr.idev.mudserver.network.message.ingame.GoldLooted;
@@ -44,13 +45,15 @@ public class CharacterPersistenceListener {
     private final LevelCatalog levelCatalog;
     private final CombatSystem combatSystem;
     private final LevelingSystem levelingSystem;
+    private final PositionSystem positionSystem;
 
     public CharacterPersistenceListener(CharacterDao characterDao, LevelCatalog levelCatalog, CombatSystem combatSystem,
-            LevelingSystem levelingSystem) {
+            LevelingSystem levelingSystem, PositionSystem positionSystem) {
         this.characterDao = characterDao;
         this.levelCatalog = levelCatalog;
         this.combatSystem = combatSystem;
         this.levelingSystem = levelingSystem;
+        this.positionSystem = positionSystem;
     }
 
     @EventListener
@@ -122,7 +125,7 @@ public class CharacterPersistenceListener {
                 .orElseThrow(() -> new IllegalStateException("Aucune starting room configurée"));
 
         combatSystem.heal(character, character.component(CombatComponent.class).maxHealth());
-        character.moveToRoom(startingRoom);
+        positionSystem.moveToRoom(character, startingRoom);
         characterDao.update(character);
 
         character.send(new PlayerRespawned(startingRoom.getName()));

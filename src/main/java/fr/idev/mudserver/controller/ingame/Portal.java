@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import fr.idev.mudserver.domain.actor.component.PositionComponent;
+import fr.idev.mudserver.domain.actor.system.PositionSystem;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
@@ -17,9 +18,11 @@ import fr.idev.mudserver.network.message.ingame.NoPortalHere;
 public class Portal implements ControllerHandler {
 
     private final Look lookAction;
+    private final PositionSystem positionSystem;
 
-    public Portal(Look lookAction) {
+    public Portal(Look lookAction, PositionSystem positionSystem) {
         this.lookAction = lookAction;
+        this.positionSystem = positionSystem;
     }
 
     @Override
@@ -43,7 +46,7 @@ public class Portal implements ControllerHandler {
         }
 
         RoomPortal portal = portalQuery.get();
-        character.moveToRoom(portal.targetRoom(), portal.targetCell()); // must be inside a System !
+        positionSystem.moveToRoom(character, portal.targetRoom(), portal.targetCell());
         lookAction.onReceive(connection, "");
     }
 }
