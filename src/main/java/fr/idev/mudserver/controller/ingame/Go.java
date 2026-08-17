@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.map.HexDirection;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
-import fr.idev.mudserver.domain.actor.system.MovementSystem;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -20,12 +19,6 @@ public class Go implements ControllerHandler {
 
     private static final int DEFAULT_STEP_COUNT = 1;
     private static final int MAX_STEP_COUNT = 20;
-
-    private final MovementSystem movementSystem;
-
-    public Go(MovementSystem movementSystem) {
-        this.movementSystem = movementSystem;
-    }
 
     @Override
     public String name() {
