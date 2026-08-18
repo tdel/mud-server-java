@@ -11,7 +11,7 @@ import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.component.AttributeComponent;
-import fr.idev.mudserver.domain.actor.component.CombatComponent;
+import fr.idev.mudserver.domain.actor.component.HealthComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 
@@ -124,7 +124,7 @@ public final class CombatEncounter {
     public synchronized List<CharacterInstance> livingPlayers() {
         return order.stream().map(InitiativeEntry::character)
                 .filter(character -> character instanceof CharacterInstance
-                        && character.component(CombatComponent.class).currentHealth > 0)
+                        && character.component(HealthComponent.class).currentHealth > 0)
                 .map(CharacterInstance.class::cast).toList();
     }
 

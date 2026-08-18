@@ -18,6 +18,7 @@ import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
 import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
+import fr.idev.mudserver.domain.actor.component.HealthComponent;
 import fr.idev.mudserver.domain.actor.component.MonsterCombatComponent;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.game.CombatResult;
@@ -45,18 +46,18 @@ public class CombatSystem {
     public int heal(AbstractCharacter character, int amount) {
         int healed;
         synchronized (character) {
-            CombatComponent combat = character.component(CombatComponent.class);
-            healed = Math.min(amount, combat.maxHealth - combat.currentHealth);
-            combat.currentHealth += healed;
+            HealthComponent health = character.component(HealthComponent.class);
+            healed = Math.min(amount, health.maxHealth - health.currentHealth);
+            health.currentHealth += healed;
         }
         return healed;
     }
 
     public void increaseMaxHealth(AbstractCharacter character, int amount) {
         synchronized (character) {
-            CombatComponent combat = character.component(CombatComponent.class);
-            combat.currentHealth += amount;
-            combat.maxHealth += amount;
+            HealthComponent health = character.component(HealthComponent.class);
+            health.currentHealth += amount;
+            health.maxHealth += amount;
         }
     }
 
@@ -99,12 +100,12 @@ public class CombatSystem {
     public boolean applyDamage(AbstractCharacter target, int amount, AbstractCharacter attacker) {
         boolean justDefeated;
         synchronized (target) {
-            CombatComponent combat = target.component(CombatComponent.class);
-            if (combat.currentHealth <= 0) {
+            HealthComponent health = target.component(HealthComponent.class);
+            if (health.currentHealth <= 0) {
                 return false;
             }
-            combat.currentHealth = Math.max(0, combat.currentHealth - amount);
-            justDefeated = combat.currentHealth <= 0;
+            health.currentHealth = Math.max(0, health.currentHealth - amount);
+            justDefeated = health.currentHealth <= 0;
         }
 
         if (justDefeated) {

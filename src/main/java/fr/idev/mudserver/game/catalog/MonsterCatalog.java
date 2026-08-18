@@ -19,6 +19,7 @@ import fr.idev.mudserver.domain.actor.component.AggroComponent;
 import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.BehaviorComponent;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
+import fr.idev.mudserver.domain.actor.component.HealthComponent;
 import fr.idev.mudserver.domain.actor.component.IdentityComponent;
 import fr.idev.mudserver.domain.actor.component.LootComponent;
 import fr.idev.mudserver.domain.actor.component.MonsterCombatComponent;
@@ -77,9 +78,10 @@ public class MonsterCatalog {
                 MonsterInstance monster = new MonsterInstance(spawn.id(), ecs);
                 monster.attachComponent(new IdentityComponent(template.name(), template.speed()));
                 monster.attachComponent(new AttributeComponent(new EnumMap<>(template.attributes())));
-                monster.attachComponent(new CombatComponent(template.maxHealth(), template.maxHealth(), null,
-                        CombatComponent.DEFAULT_ACTIONS_MAX, CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX,
-                        CombatComponent.DEFAULT_ACTIONS_MAX, CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX));
+                monster.attachComponent(new HealthComponent(template.maxHealth(), template.maxHealth()));
+                monster.attachComponent(new CombatComponent(null, CombatComponent.DEFAULT_ACTIONS_MAX,
+                        CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX, CombatComponent.DEFAULT_ACTIONS_MAX,
+                        CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX));
                 monster.attachComponent(BehaviorComponent.idle());
                 monster.attachComponent(
                         new LootComponent(template.lootTable(), template.xpReward(), template.goldReward()));

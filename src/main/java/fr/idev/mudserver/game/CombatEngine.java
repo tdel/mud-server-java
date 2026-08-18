@@ -13,6 +13,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
+import fr.idev.mudserver.domain.actor.component.HealthComponent;
 import fr.idev.mudserver.domain.actor.system.AiSystem;
 import fr.idev.mudserver.domain.item.ConsumableItem;
 import fr.idev.mudserver.domain.item.Item;
@@ -346,7 +347,7 @@ public class CombatEngine {
         }
 
         List<MonsterInstance> aggressors = victim.component(PositionComponent.class).currentRoom.getMonsters().stream()
-                .filter(monster -> monster.component(CombatComponent.class).currentHealth > 0)
+                .filter(monster -> monster.component(HealthComponent.class).currentHealth > 0)
                 .filter(monster -> monster.component(PositionComponent.class).hexCoordinate
                         .distanceTo(event.cell()) <= monster.component(AggroComponent.class).aggroRadius)
                 .toList();

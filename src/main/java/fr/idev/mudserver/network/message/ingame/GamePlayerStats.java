@@ -5,7 +5,7 @@ import fr.idev.mudserver.domain.actor.component.IdentityComponent;
 import java.util.stream.Collectors;
 
 import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
-import fr.idev.mudserver.domain.actor.component.CombatComponent;
+import fr.idev.mudserver.domain.actor.component.HealthComponent;
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.Skill;
@@ -21,12 +21,12 @@ public record GamePlayerStats(CharacterInstance character, int armorClass, int p
     @Override
     public void toTelnet(TelnetOutput output) {
         CharacterInstance c = character;
-        CombatComponent combat = c.component(CombatComponent.class);
+        HealthComponent health = c.component(HealthComponent.class);
         output.write(String.format(
                 "== %s (%s, Level %d %s) ==\nHealth: %d/%d\nArmor Class: %d\nProficiency: %+d\nStrength: %d (%+d)  Dexterity: %d (%+d)  Constitution: %d (%+d)\nIntelligence: %d (%+d)  Wisdom: %d (%+d)  Charisma: %d (%+d)\nPrimary Ability: %s\nSaving Throws: %s\nSkills: %s\n",
                 Ansi.player(c.component(IdentityComponent.class).name),
                 c.component(AppearanceComponent.class).gender.label(), c.component(LevelingComponent.class).level,
-                c.component(AppearanceComponent.class).characterClass.label(), combat.currentHealth, combat.maxHealth,
+                c.component(AppearanceComponent.class).characterClass.label(), health.currentHealth, health.maxHealth,
                 armorClass, proficiencyBonus, strength, strengthModifier, dexterity, dexterityModifier, constitution,
                 constitutionModifier, intelligence, intelligenceModifier, wisdom, wisdomModifier, charisma,
                 charismaModifier, c.component(AppearanceComponent.class).characterClass.primaryAbility().label(),

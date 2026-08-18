@@ -19,6 +19,7 @@ import fr.idev.mudserver.domain.actor.component.AccountComponent;
 import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
 import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
+import fr.idev.mudserver.domain.actor.component.HealthComponent;
 import fr.idev.mudserver.domain.actor.component.IdentityComponent;
 import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
@@ -135,7 +136,8 @@ public class WorldInstance {
         CharacterInstance character = new CharacterInstance(UUID.randomUUID(), ecs);
         character.attachComponent(new IdentityComponent(name, race.speed()));
         character.attachComponent(new AttributeComponent(new EnumMap<>(scores)));
-        character.attachComponent(new CombatComponent(maxHealth, maxHealth, null, CombatComponent.DEFAULT_ACTIONS_MAX,
+        character.attachComponent(new HealthComponent(maxHealth, maxHealth));
+        character.attachComponent(new CombatComponent(null, CombatComponent.DEFAULT_ACTIONS_MAX,
                 CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX, CombatComponent.DEFAULT_ACTIONS_MAX,
                 CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX));
         character.attachComponent(new AccountComponent(account));

@@ -19,6 +19,7 @@ import fr.idev.mudserver.domain.actor.component.AccountComponent;
 import fr.idev.mudserver.domain.actor.component.AppearanceComponent;
 import fr.idev.mudserver.domain.actor.component.AttributeComponent;
 import fr.idev.mudserver.domain.actor.component.CombatComponent;
+import fr.idev.mudserver.domain.actor.component.HealthComponent;
 import fr.idev.mudserver.domain.actor.component.InventoryComponent;
 import fr.idev.mudserver.domain.actor.component.LevelingComponent;
 import fr.idev.mudserver.domain.actor.component.PositionComponent;
@@ -47,7 +48,7 @@ public class CharacterDao {
     public void insert(CharacterInstance character) {
         UUID worldInstanceId = character.findComponent(WorldComponent.class)
                 .map(component -> component.worldInstance.getId()).orElse(WorldInstance.DEFAULT_ID);
-        CombatComponent combat = character.component(CombatComponent.class);
+        HealthComponent health = character.component(HealthComponent.class);
         UUID currentRoomId = character.component(PositionComponent.class).currentRoom.getTemplateId();
         dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_ROOM_ID,
                 CHARACTER.GENDER, CHARACTER.RACE, CHARACTER.CHARACTER_CLASS, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH,
@@ -59,7 +60,7 @@ public class CharacterDao {
                         character.component(AppearanceComponent.class).gender.name(),
                         character.component(AppearanceComponent.class).race.name(),
                         character.component(AppearanceComponent.class).characterClass.name(),
-                        character.component(LevelingComponent.class).level, combat.currentHealth, combat.maxHealth,
+                        character.component(LevelingComponent.class).level, health.currentHealth, health.maxHealth,
                         character.component(AttributeComponent.class).valueOf(Attribute.STRENGTH),
                         character.component(AttributeComponent.class).valueOf(Attribute.DEXTERITY),
                         character.component(AttributeComponent.class).valueOf(Attribute.CONSTITUTION),
@@ -91,11 +92,11 @@ public class CharacterDao {
 
     public void update(CharacterInstance character) {
         LevelingComponent leveling = character.component(LevelingComponent.class);
-        CombatComponent combat = character.component(CombatComponent.class);
+        HealthComponent health = character.component(HealthComponent.class);
         UUID currentRoomId = character.component(PositionComponent.class).currentRoom.getTemplateId();
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_ROOM_ID, currentRoomId)
-                .set(CHARACTER.CURRENT_HEALTH, combat.currentHealth).set(CHARACTER.XP, leveling.xp)
-                .set(CHARACTER.LEVEL, leveling.level).set(CHARACTER.MAX_HEALTH, combat.maxHealth)
+                .set(CHARACTER.CURRENT_HEALTH, health.currentHealth).set(CHARACTER.XP, leveling.xp)
+                .set(CHARACTER.LEVEL, leveling.level).set(CHARACTER.MAX_HEALTH, health.maxHealth)
                 .set(CHARACTER.GOLD, character.component(InventoryComponent.class).gold)
                 .set(CHARACTER.SHORT_REST_COUNT, character.component(RestComponent.class).shortRestCount)
                 .where(CHARACTER.ID.eq(character.getId())).execute();
@@ -124,9 +125,10 @@ public class CharacterDao {
         CharacterInstance character = new CharacterInstance(record.getId(), ecs);
         character.attachComponent(new IdentityComponent(record.getName(), race.speed()));
         character.attachComponent(new AttributeComponent(attributes));
-        character.attachComponent(new CombatComponent(record.getCurrentHealth(), record.getMaxHealth(), null,
-                CombatComponent.DEFAULT_ACTIONS_MAX, CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX,
-                CombatComponent.DEFAULT_ACTIONS_MAX, CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX));
+        character.attachComponent(new HealthComponent(record.getCurrentHealth(), record.getMaxHealth()));
+        character.attachComponent(new CombatComponent(null, CombatComponent.DEFAULT_ACTIONS_MAX,
+                CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX, CombatComponent.DEFAULT_ACTIONS_MAX,
+                CombatComponent.DEFAULT_EXTRA_ACTIONS_MAX));
         character.attachComponent(new AccountComponent(account));
         character.attachComponent(new PositionComponent(room, null)); // missing hexCoordinate here !
         character.attachComponent(new InventoryComponent(List.of(), record.getGold()));

@@ -9,7 +9,7 @@ public final class MonsterInstance extends AbstractCharacter {
 
     // Composants requis en plus (voir AbstractCharacter) : BehaviorComponent,
     // LootComponent, AggroComponent,
-    // PositionComponent, MonsterCombatComponent
+    // PositionComponent, MonsterCombatComponent, HealthComponent
     public MonsterInstance(UUID id, ECS ecs) {
         super(id, ecs);
     }
