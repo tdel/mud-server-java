@@ -30,6 +30,7 @@ import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.NewGamePlayerCreated;
+import fr.idev.mudserver.game.ECS;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.OutputMessage;
@@ -113,7 +114,7 @@ public class WorldInstance {
         return players.containsKey(characterId);
     }
 
-    public CharacterInstance createCharacter(Account account, String name, Gender gender, Race race,
+    public CharacterInstance createCharacter(ECS ecs, Account account, String name, Gender gender, Race race,
             CharacterClass characterClass) {
         RoomInstance startingRoom = startingRoomInstance()
                 .orElseThrow(() -> new IllegalStateException("WorldInstance " + id + " n'a aucune room de départ"));
@@ -131,7 +132,7 @@ public class WorldInstance {
         CharacterClass.StartingGold startingGold = characterClass.startingGold();
         int gold = DiceRoller.roll(startingGold.dice()).total() * startingGold.multiplier();
 
-        CharacterInstance character = new CharacterInstance(UUID.randomUUID());
+        CharacterInstance character = new CharacterInstance(UUID.randomUUID(), ecs);
         character.attachComponent(new IdentityComponent(name, race.speed()));
         character.attachComponent(new AttributeComponent(new EnumMap<>(scores)));
         character.attachComponent(new CombatComponent(maxHealth, maxHealth, null, CombatComponent.DEFAULT_ACTIONS_MAX,

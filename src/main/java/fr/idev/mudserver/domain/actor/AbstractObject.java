@@ -1,19 +1,20 @@
 package fr.idev.mudserver.domain.actor;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+
+import fr.idev.mudserver.game.ECS;
 
 public abstract class AbstractObject {
 
     private final UUID id;
-    private final Map<Class<?>, Object> components = new ConcurrentHashMap<>();
+    private final ECS ecs;
 
     // Composant requis à attacher par l'appelant : IdentityComponent
-    protected AbstractObject(UUID id) {
+    protected AbstractObject(UUID id, ECS ecs) {
         this.id = id;
+        this.ecs = ecs;
     }
 
     public UUID getId() {
@@ -21,15 +22,15 @@ public abstract class AbstractObject {
     }
 
     public <C> void attachComponent(C component) {
-        components.put(component.getClass(), component);
+        ecs.attach(this, component);
     }
 
     public <C> void detachComponent(Class<C> type) {
-        components.remove(type);
+        ecs.detach(this, type);
     }
 
     public <C> Optional<C> findComponent(Class<C> type) {
-        return Optional.ofNullable(type.cast(components.get(type)));
+        return ecs.find(this, type);
     }
 
     public <C> C component(Class<C> type) {

@@ -4,12 +4,13 @@ import java.util.UUID;
 
 import fr.idev.mudserver.domain.actor.AbstractNpc;
 import fr.idev.mudserver.domain.item.Item;
+import fr.idev.mudserver.game.ECS;
 
 public final class NpcSellerInstance extends AbstractNpc {
 
     // Composant requis en plus (voir AbstractNpc) : ShopComponent (non-nul)
-    public NpcSellerInstance(UUID id) {
-        super(id);
+    public NpcSellerInstance(UUID id, ECS ecs) {
+        super(id, ecs);
     }
 
     public sealed interface PurchaseOutcome {

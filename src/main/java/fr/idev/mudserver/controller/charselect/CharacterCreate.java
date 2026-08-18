@@ -19,6 +19,7 @@ import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.system.InventorySystem;
 import fr.idev.mudserver.domain.actor.system.LevelingSystem;
+import fr.idev.mudserver.game.ECS;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -39,13 +40,15 @@ public class CharacterCreate implements ControllerHandler {
     private final CharSelectStatus charSelectStatus;
     private final InventorySystem inventorySystem;
     private final LevelingSystem levelingSystem;
+    private final ECS ecs;
 
     public CharacterCreate(WorldInstanceService worldInstanceService, CharSelectStatus charSelectStatus,
-            InventorySystem inventorySystem, LevelingSystem levelingSystem) {
+            InventorySystem inventorySystem, LevelingSystem levelingSystem, ECS ecs) {
         this.worldInstanceService = worldInstanceService;
         this.charSelectStatus = charSelectStatus;
         this.inventorySystem = inventorySystem;
         this.levelingSystem = levelingSystem;
+        this.ecs = ecs;
     }
 
     @Override
@@ -163,7 +166,7 @@ public class CharacterCreate implements ControllerHandler {
 
     private void createCharacter(Connection connection, Account account, WorldInstance instance, String name,
             Gender gender, Race race, CharacterClass characterClass) {
-        CharacterInstance character = instance.createCharacter(account, name, gender, race, characterClass);
+        CharacterInstance character = instance.createCharacter(ecs, account, name, gender, race, characterClass);
 
         connection.send(new CharacterCreated(name));
         AttributeComponent attributes = character.component(AttributeComponent.class);

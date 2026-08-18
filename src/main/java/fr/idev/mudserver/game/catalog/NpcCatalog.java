@@ -60,8 +60,8 @@ public class NpcCatalog {
 
     private void place(NpcTemplate template, RoomInstance room) {
         AbstractNpc npc = template.shop() != null
-                ? new NpcSellerInstance(template.id())
-                : new AbstractNpc(template.id());
+                ? new NpcSellerInstance(template.id(), ecs)
+                : new AbstractNpc(template.id(), ecs);
 
         npc.attachComponent(new IdentityComponent(template.name(), 0));
         npc.attachComponent(new AttributeComponent(neutralAttributes()));

@@ -6,6 +6,7 @@ import fr.idev.mudserver.domain.actor.AbstractObject;
 import fr.idev.mudserver.domain.actor.component.PositionComponent;
 import fr.idev.mudserver.game.ECS;
 import fr.idev.mudserver.game.Query;
+import fr.idev.mudserver.game.QueryResult;
 import fr.idev.mudserver.network.message.ingame.MovementBlockedByBounds;
 import fr.idev.mudserver.network.message.ingame.MovementBlockedByOccupant;
 import fr.idev.mudserver.network.message.ingame.ViewAround;
@@ -40,11 +41,12 @@ public class MovementSystem {
         q.addRequirement(IdentityComponent.class);
         q.addRequirement(PositionComponent.class);
 
-        List<AbstractObject> entities = ecs.execute(q);
-        for (AbstractObject entity : entities) {
-            MovementComponent movementComponent = entity.component(MovementComponent.class);
-            IdentityComponent identityComponent = entity.component(IdentityComponent.class);
-            PositionComponent positionComponent = entity.component(PositionComponent.class);
+        List<QueryResult> results = ecs.execute(q);
+        for (QueryResult result : results) {
+            AbstractObject entity = result.entity();
+            MovementComponent movementComponent = result.component(MovementComponent.class);
+            IdentityComponent identityComponent = result.component(IdentityComponent.class);
+            PositionComponent positionComponent = result.component(PositionComponent.class);
 
             if (now - movementComponent.lastStepAt < identityComponent.cellSpeed()) {
                 continue;
@@ -54,28 +56,28 @@ public class MovementSystem {
             HexCoordinate nextCoord = currentCoord.neighbor(movementComponent.direction);
             RoomInstance room = positionComponent.currentRoom;
             if (!room.isInBounds(nextCoord)) {
-                entity.detachComponent(MovementComponent.class);
+                ecs.detach(entity, MovementComponent.class);
                 networkSystem.send(entity, new MovementBlockedByBounds());
                 continue;
             }
 
             if (!room.tryClaimCell(nextCoord, (AbstractCharacter) entity)) {
-                entity.detachComponent(MovementComponent.class);
+                ecs.detach(entity, MovementComponent.class);
                 networkSystem.send(entity, new MovementBlockedByOccupant());
                 continue;
             }
 
             room.releaseCell(currentCoord, (AbstractCharacter) entity); // not with an ECS system right now
-            synchronized (entity) {
+            synchronized (positionComponent) {
                 positionComponent.currentRoom = room;
                 positionComponent.hexCoordinate = nextCoord;
             }
 
             int remaining = movementComponent.cellsRemaining - 1;
             if (remaining <= 0) {
-                entity.detachComponent(MovementComponent.class);
+                ecs.detach(entity, MovementComponent.class);
             } else {
-                synchronized (entity) {
+                synchronized (movementComponent) {
                     movementComponent.cellsRemaining = remaining;
                     movementComponent.lastStepAt = now;
                 }

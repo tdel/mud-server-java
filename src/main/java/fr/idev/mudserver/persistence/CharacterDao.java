@@ -30,15 +30,18 @@ import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.world.WorldInstance;
+import fr.idev.mudserver.game.ECS;
 import fr.idev.mudserver.persistence.jooq.tables.records.CharacterRecord;
 
 @Repository
 public class CharacterDao {
 
     private final DSLContext dsl;
+    private final ECS ecs;
 
-    public CharacterDao(DSLContext dsl) {
+    public CharacterDao(DSLContext dsl, ECS ecs) {
         this.dsl = dsl;
+        this.ecs = ecs;
     }
 
     public void insert(CharacterInstance character) {
@@ -118,7 +121,7 @@ public class CharacterDao {
                 .or(instance::startingRoomInstance).orElseThrow(() -> new IllegalStateException(
                         "WorldInstance " + instance.getId() + " n'a aucune room de départ"));
 
-        CharacterInstance character = new CharacterInstance(record.getId());
+        CharacterInstance character = new CharacterInstance(record.getId(), ecs);
         character.attachComponent(new IdentityComponent(record.getName(), race.speed()));
         character.attachComponent(new AttributeComponent(attributes));
         character.attachComponent(new CombatComponent(record.getCurrentHealth(), record.getMaxHealth(), null,

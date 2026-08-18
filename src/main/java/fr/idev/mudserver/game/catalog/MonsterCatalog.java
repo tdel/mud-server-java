@@ -74,7 +74,7 @@ public class MonsterCatalog {
                             + " référence le template " + spawn.templateId() + ", absent de " + MONSTERS_RESOURCE);
                 }
 
-                MonsterInstance monster = new MonsterInstance(spawn.id());
+                MonsterInstance monster = new MonsterInstance(spawn.id(), ecs);
                 monster.attachComponent(new IdentityComponent(template.name(), template.speed()));
                 monster.attachComponent(new AttributeComponent(new EnumMap<>(template.attributes())));
                 monster.attachComponent(new CombatComponent(template.maxHealth(), template.maxHealth(), null,
