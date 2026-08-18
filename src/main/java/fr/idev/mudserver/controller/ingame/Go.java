@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import fr.idev.mudserver.domain.actor.component.MovementComponent;
+import fr.idev.mudserver.network.message.ingame.ViewAround;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
@@ -55,6 +56,8 @@ public class Go implements ControllerHandler {
 
         character.updateComponent(MovementComponent.class,
                 current -> new MovementComponent(direction.get(), cellsCount, System.currentTimeMillis()));
+
+        connection.send(new ViewAround(character));
     }
 
     private int parsePositiveInt(String token) {

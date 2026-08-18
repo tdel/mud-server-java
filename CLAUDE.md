@@ -79,7 +79,7 @@ Two kinds of data live in two different places, split by nature (static rules vs
 
 ## Recent features not yet reflected above
 
-- Movement was reworked from a classic room/exit graph to a **hexagonal grid** (`domain/HexCoordinate`, `RoomPortal`, `game/HexGridRenderer`); `RoomDescription` renders an ASCII hex viewport instead of a plain exit list.
+- Movement was reworked from a classic room/exit graph to a **hexagonal grid** (`domain/HexCoordinate`, `RoomPortal`, `game/HexGridRenderer`); `ViewAround` renders an ASCII hex viewport instead of a plain exit list.
 - Merchant NPCs (`domain/actor/GameNpcSeller`) sell from a shop catalog defined in `data/npcs.json`, denormalized against item templates at warm-up.
 - Monsters drop gold and items on death (`game/actor/LootService`, `@Order(3)` on `CharacterDied`).
 - Monsters have a presence/aggro zone that triggers combat when a player enters it (`GamePlayerEnteredCell` → `game/CombatEngine`).
