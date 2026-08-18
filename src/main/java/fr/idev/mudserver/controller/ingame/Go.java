@@ -3,6 +3,7 @@ package fr.idev.mudserver.controller.ingame;
 import java.util.Optional;
 import java.util.Set;
 
+import fr.idev.mudserver.game.MovementEngine;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
@@ -12,12 +13,19 @@ import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.ingame.NoSuchDirection;
+import fr.idev.mudserver.network.message.ingame.ViewAround;
 
 @Component
 public class Go implements ControllerHandler {
 
     private static final int DEFAULT_STEP_COUNT = 1;
     private static final int MAX_STEP_COUNT = 20;
+
+    private final MovementEngine movementEngine;
+
+    public Go(MovementEngine movementEngine) {
+        this.movementEngine = movementEngine;
+    }
 
     @Override
     public String name() {
@@ -52,7 +60,8 @@ public class Go implements ControllerHandler {
         }
         requestedCells = Math.min(requestedCells, MAX_STEP_COUNT);
 
-        character.getMovementSystem().startMovement(direction.get(), requestedCells);
+        movementEngine.startMovement(direction.get(), requestedCells, character);
+        connection.send(new ViewAround(character));
     }
 
     private int parsePositiveInt(String token) {

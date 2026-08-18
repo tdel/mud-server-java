@@ -2,61 +2,50 @@ package fr.idev.mudserver.game;
 
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 
+import fr.idev.mudserver.domain.map.HexCoordinate;
+import fr.idev.mudserver.domain.map.HexDirection;
+import fr.idev.mudserver.domain.world.RoomInstance;
 import jakarta.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import fr.idev.mudserver.controller.ingame.Look;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
-import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
-import fr.idev.mudserver.domain.actor.event.CharacterStartedMoving;
-import fr.idev.mudserver.domain.actor.event.CharacterStoppedMoving;
 import fr.idev.mudserver.network.message.ingame.MovementBlockedByBounds;
 import fr.idev.mudserver.network.message.ingame.MovementBlockedByOccupant;
+import fr.idev.mudserver.network.message.ingame.ViewAround;
 
-/**
- * Fait avancer tous les personnages en déplacement d'une case à la fois, au
- * rythme de leur propre vitesse. La logique métier du déplacement (décompte des
- * cases, blocage, fin de mouvement) vit sur GameCharacter#updatePosition ; ce
- * ticker se contente de savoir QUI est en train de bouger (via les événements
- * CharacterStartedMoving/CharacterStoppedMoving) et d'envoyer les notifications
- * réseau correspondantes sur le pool de threads virtuels, afin de ne jamais
- * faire d'I/O bloquant sur ce thread partagé par tous les joueurs.
- */
 @Component
-public class MovementTicker extends Thread {
+public class MovementEngine extends Thread {
 
-    private static final Logger log = LoggerFactory.getLogger(MovementTicker.class);
+    public static final int REFERENCE_SPEED = 5;
+    public static final long REFERENCE_TIME_MS = 1000L;
+
+    private static final Logger log = LoggerFactory.getLogger(MovementEngine.class);
 
     private static final long TICK_INTERVAL_MS = 100L;
 
-    private final Look lookAction;
-    private final ExecutorService virtualThreadExecutor;
     private final Map<UUID, AbstractCharacter> movingCharacters = new ConcurrentHashMap<>();
-    private final Map<UUID, CompletableFuture<Void>> pendingNotifications = new ConcurrentHashMap<>();
 
-    public MovementTicker(Look lookAction, ExecutorService virtualThreadExecutor) {
-        super("movement-ticker");
-        this.lookAction = lookAction;
-        this.virtualThreadExecutor = virtualThreadExecutor;
+    public MovementEngine() {
+        super("movement-engine");
         setDaemon(true);
     }
 
-    @EventListener
-    void onCharacterStartedMoving(CharacterStartedMoving event) {
-        movingCharacters.put(event.character().getId(), event.character());
+    public void startMovement(HexDirection direction, int cellsRequested, AbstractCharacter character) {
+        character.activeMovement = new ActiveMovement(direction, cellsRequested, System.currentTimeMillis());
+        movingCharacters.put(character.getId(), character);
     }
 
-    @EventListener
-    void onCharacterStoppedMoving(CharacterStoppedMoving event) {
-        movingCharacters.remove(event.character().getId());
+    public void stopMovement(AbstractCharacter character) {
+        if (character.activeMovement == null) {
+            return;
+        }
+        character.activeMovement = null;
+        movingCharacters.remove(character.getId());
     }
 
     @Override
@@ -76,56 +65,88 @@ public class MovementTicker extends Thread {
         }
     }
 
-    void tick(long now) {
+    private void tick(long now) {
         for (AbstractCharacter character : movingCharacters.values()) {
-            processIfDue(character, now);
+            switch (updatePosition(character, now)) {
+                case NO_MOVEMENT -> {
+                }
+                case STEPPED -> {
+                    character.send(new ViewAround(character));
+                }
+                case FINISHED -> {
+                    movingCharacters.remove(character.getId());
+                    character.send(new ViewAround(character));
+
+                }
+                case BLOCKED_BY_BOUNDS -> {
+                    movingCharacters.remove(character.getId());
+                    character.send(new MovementBlockedByBounds());
+                }
+                case BLOCKED_BY_OCCUPANT -> {
+                    movingCharacters.remove(character.getId());
+                    character.send(new MovementBlockedByOccupant());
+                }
+            }
+        }
+    }
+    private MovementStepOutcome updatePosition(AbstractCharacter character, long now) {
+        ActiveMovement movement = character.activeMovement;
+        if (movement == null || now - movement.lastStepAt() < getMillisPerCell(character)) {
+            return MovementStepOutcome.NO_MOVEMENT;
+        }
+
+        CellStepOutcome step = move(character, movement.direction());
+        if (!step.moved()) {
+            character.activeMovement = null;
+            return step.blockedByOccupant()
+                    ? MovementStepOutcome.BLOCKED_BY_OCCUPANT
+                    : MovementStepOutcome.BLOCKED_BY_BOUNDS;
+        }
+
+        int remaining = movement.cellsRemaining() - 1;
+        if (remaining <= 0) {
+            character.activeMovement = null;
+            return MovementStepOutcome.FINISHED;
+        }
+
+        character.activeMovement = movement.withRemaining(remaining, now);
+
+        return MovementStepOutcome.STEPPED;
+    }
+
+    private CellStepOutcome move(AbstractCharacter character, HexDirection direction) {
+        RoomInstance room = character.getCurrentRoom();
+        HexCoordinate current = character.getPosition();
+        HexCoordinate next = current.neighbor(direction);
+
+        if (!room.isInBounds(next)) {
+            return new CellStepOutcome(false, true, false);
+        }
+        if (!room.tryClaimCell(next, character)) {
+            return new CellStepOutcome(false, false, true);
+        }
+
+        room.releaseCell(current, character);
+        character.setPosition(next);
+
+        return new CellStepOutcome(true, false, false);
+    }
+
+    private long getMillisPerCell(AbstractCharacter character) {
+        return REFERENCE_TIME_MS * REFERENCE_SPEED / Math.max(1, character.getSpeed());
+    }
+
+    public record CellStepOutcome(boolean moved, boolean blockedByBounds, boolean blockedByOccupant) {
+    }
+
+    public record ActiveMovement(HexDirection direction, int cellsRemaining, long lastStepAt) {
+        ActiveMovement withRemaining(int newRemaining, long stepAt) {
+            return new ActiveMovement(direction, newRemaining, stepAt);
         }
     }
 
-    private void processIfDue(AbstractCharacter character, long now) {
-        switch (character.updatePosition(now)) {
-            case NO_MOVEMENT -> {
-            }
-            case STEPPED -> notifyMoved(character);
-            case FINISHED -> {
-                movingCharacters.remove(character.getId());
-                notifyMoved(character);
-            }
-            case BLOCKED_BY_BOUNDS -> {
-                movingCharacters.remove(character.getId());
-                notifyAsync(character, () -> character.send(new MovementBlockedByBounds()));
-            }
-            case BLOCKED_BY_OCCUPANT -> {
-                movingCharacters.remove(character.getId());
-                notifyAsync(character, () -> character.send(new MovementBlockedByOccupant()));
-            }
-        }
-    }
-
-    // Le rafraîchissement du "look" nécessite une Connection, donc n'a de sens
-    // que pour un GamePlayer ; pour un NPC/monstre en mouvement, ce serait un
-    // no-op ici plutôt qu'un appel à retirer plus tard.
-    private void notifyMoved(AbstractCharacter character) {
-        if (character instanceof CharacterInstance player) {
-            notifyAsync(character, () -> lookAction.onReceive(player.getConnection(), ""));
-        }
-    }
-
-    private void notifyAsync(AbstractCharacter character, Runnable notification) {
-        pendingNotifications.compute(character.getId(), (id, previous) -> {
-            CompletableFuture<Void> previousStage = previous == null
-                    ? CompletableFuture.completedFuture(null)
-                    : previous;
-            return previousStage.thenRunAsync(() -> runSafely(character, notification), virtualThreadExecutor);
-        });
-    }
-
-    private void runSafely(AbstractCharacter character, Runnable notification) {
-        try {
-            notification.run();
-        } catch (RuntimeException e) {
-            log.warn("Échec de l'envoi d'une notification de mouvement à {}", character.getId(), e);
-        }
+    public enum MovementStepOutcome {
+        NO_MOVEMENT, STEPPED, FINISHED, BLOCKED_BY_BOUNDS, BLOCKED_BY_OCCUPANT
     }
 
     @PreDestroy

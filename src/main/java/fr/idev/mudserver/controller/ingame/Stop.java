@@ -2,6 +2,7 @@ package fr.idev.mudserver.controller.ingame;
 
 import java.util.Set;
 
+import fr.idev.mudserver.game.MovementEngine;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.controller.ControllerHandler;
@@ -12,6 +13,12 @@ import fr.idev.mudserver.network.message.ingame.MovementStopped;
 
 @Component
 public class Stop implements ControllerHandler {
+
+    private final MovementEngine movementEngine;
+
+    public Stop(MovementEngine movementEngine) {
+        this.movementEngine = movementEngine;
+    }
 
     @Override
     public String name() {
@@ -26,7 +33,9 @@ public class Stop implements ControllerHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
-        character.getMovementSystem().stopMovement();
+
+        movementEngine.stopMovement(character);
+
         connection.send(new MovementStopped());
     }
 }

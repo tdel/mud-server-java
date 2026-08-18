@@ -8,6 +8,7 @@ import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.combat.ActionEconomy;
 import fr.idev.mudserver.domain.combat.CombatEncounter;
+import fr.idev.mudserver.game.MovementEngine;
 import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.OutputMessage;
@@ -15,8 +16,6 @@ import fr.idev.mudserver.network.OutputMessage;
 public abstract class AbstractCharacter extends AbstractObject {
 
     public static final int DEFAULT_SPEED = 6;
-    public static final int REFERENCE_SPEED = 5;
-    public static final long REFERENCE_TIME_MS = 1000L;
 
     private final Map<Attribute, Integer> attributes;
     private int currentHealth;
@@ -27,7 +26,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     protected int speed = DEFAULT_SPEED;
     private volatile CombatEncounter encounter;
     private final ActionEconomy actionEconomy = new ActionEconomy();
-    private final CharacterMovementSystem movementSystem = new CharacterMovementSystem(this);
+    public volatile MovementEngine.ActiveMovement activeMovement;
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
             int maxHealth) {
@@ -99,10 +98,6 @@ public abstract class AbstractCharacter extends AbstractObject {
         this.speed = speed;
     }
 
-    public long getMillisPerCell() {
-        return REFERENCE_TIME_MS * REFERENCE_SPEED / Math.max(1, getSpeed());
-    }
-
     public boolean isInCombat() {
         return encounter != null;
     }
@@ -119,10 +114,6 @@ public abstract class AbstractCharacter extends AbstractObject {
         return actionEconomy;
     }
 
-    public CharacterMovementSystem getMovementSystem() {
-        return movementSystem;
-    }
-
     public int rollInitiative() {
         return DiceRoller.roll(new DiceExpression(1, 20, getModifier(Attribute.DEXTERITY))).total();
     }
@@ -134,4 +125,5 @@ public abstract class AbstractCharacter extends AbstractObject {
     // No-op par défaut : seul GamePlayer a une Connection à notifier.
     public void send(OutputMessage message) {
     }
+
 }
