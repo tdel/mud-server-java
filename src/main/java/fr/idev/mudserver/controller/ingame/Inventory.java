@@ -29,8 +29,8 @@ public class Inventory implements ControllerHandler {
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
 
-        int gold = character.component(InventoryComponent.class).gold();
-        List<Item> items = character.component(InventoryComponent.class).items();
+        int gold = character.component(InventoryComponent.class).gold;
+        List<Item> items = character.component(InventoryComponent.class).items;
         List<fr.idev.mudserver.network.message.ingame.Inventory.Entry> entries = items.stream().map(
                 item -> new fr.idev.mudserver.network.message.ingame.Inventory.Entry(item.getName(), item.getRarity()))
                 .toList();

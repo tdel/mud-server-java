@@ -16,7 +16,7 @@ import fr.idev.mudserver.game.dice.DiceRoller;
 public class AiSystem {
 
     public Optional<UUID> currentTargetId(MonsterInstance monster) {
-        return Optional.ofNullable(component(monster).currentTargetId());
+        return Optional.ofNullable(component(monster).currentTargetId);
     }
 
     public CharacterInstance chooseTarget(MonsterInstance monster, List<CharacterInstance> livingPlayers) {
@@ -24,12 +24,16 @@ public class AiSystem {
                 ? livingPlayers.get(0)
                 : livingPlayers.get(DiceRoller.roll(new DiceExpression(1, livingPlayers.size(), 0)).total() - 1);
 
-        monster.updateComponent(BehaviorComponent.class, current -> new BehaviorComponent(target.getId()));
+        synchronized (monster) {
+            component(monster).currentTargetId = target.getId();
+        }
         return target;
     }
 
     public void clearTarget(MonsterInstance monster) {
-        monster.updateComponent(BehaviorComponent.class, current -> BehaviorComponent.idle());
+        synchronized (monster) {
+            component(monster).currentTargetId = null;
+        }
     }
 
     private BehaviorComponent component(MonsterInstance monster) {

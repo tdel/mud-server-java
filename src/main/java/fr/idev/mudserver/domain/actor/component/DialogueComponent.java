@@ -2,7 +2,15 @@ package fr.idev.mudserver.domain.actor.component;
 
 import java.util.List;
 
-public record DialogueComponent(String greeting, List<DialogueOption> options) {
+public class DialogueComponent {
+
+    public String greeting;
+    public List<DialogueOption> options;
+
+    public DialogueComponent(String greeting, List<DialogueOption> options) {
+        this.greeting = greeting;
+        this.options = options;
+    }
 
     public enum DialogueOptionType {
         RESPONSE, SHOP, LEAVE

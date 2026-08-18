@@ -37,60 +37,55 @@ public class CombatSystem {
     }
 
     public void setTarget(AbstractCharacter target, AbstractCharacter attacker) {
-        attacker.updateComponent(CombatComponent.class,
-                current -> new CombatComponent(current.currentHealth(), current.maxHealth(), target,
-                        current.actionsMax(), current.extraActionsMax(), current.actionsRemaining(),
-                        current.extraActionsRemaining()));
+        synchronized (attacker) {
+            attacker.component(CombatComponent.class).target = target;
+        }
     }
 
     public int heal(AbstractCharacter character, int amount) {
-        int[] healed = {0};
-        character.updateComponent(CombatComponent.class, current -> {
-            healed[0] = Math.min(amount, current.maxHealth() - current.currentHealth());
-            return new CombatComponent(current.currentHealth() + healed[0], current.maxHealth(), current.target(),
-                    current.actionsMax(), current.extraActionsMax(), current.actionsRemaining(),
-                    current.extraActionsRemaining());
-        });
-        return healed[0];
+        int healed;
+        synchronized (character) {
+            CombatComponent combat = character.component(CombatComponent.class);
+            healed = Math.min(amount, combat.maxHealth - combat.currentHealth);
+            combat.currentHealth += healed;
+        }
+        return healed;
     }
 
     public void increaseMaxHealth(AbstractCharacter character, int amount) {
-        character.updateComponent(CombatComponent.class,
-                current -> new CombatComponent(current.currentHealth() + amount, current.maxHealth() + amount,
-                        current.target(), current.actionsMax(), current.extraActionsMax(), current.actionsRemaining(),
-                        current.extraActionsRemaining()));
+        synchronized (character) {
+            CombatComponent combat = character.component(CombatComponent.class);
+            combat.currentHealth += amount;
+            combat.maxHealth += amount;
+        }
     }
 
     public boolean trySpendAction(AbstractCharacter character) {
-        boolean[] spent = {false};
-        character.updateComponent(CombatComponent.class, current -> {
-            if (current.actionsRemaining() > 0) {
-                spent[0] = true;
-                return new CombatComponent(current.currentHealth(), current.maxHealth(), current.target(),
-                        current.actionsMax(), current.extraActionsMax(), current.actionsRemaining() - 1,
-                        current.extraActionsRemaining());
+        synchronized (character) {
+            CombatComponent combat = character.component(CombatComponent.class);
+            if (combat.actionsRemaining > 0) {
+                combat.actionsRemaining -= 1;
+                return true;
             }
-            if (current.extraActionsRemaining() > 0) {
-                spent[0] = true;
-                return new CombatComponent(current.currentHealth(), current.maxHealth(), current.target(),
-                        current.actionsMax(), current.extraActionsMax(), current.actionsRemaining(),
-                        current.extraActionsRemaining() - 1);
+            if (combat.extraActionsRemaining > 0) {
+                combat.extraActionsRemaining -= 1;
+                return true;
             }
-            return current;
-        });
-        return spent[0];
+            return false;
+        }
     }
 
     public void resetForTurn(AbstractCharacter character) {
-        character.updateComponent(CombatComponent.class,
-                current -> new CombatComponent(current.currentHealth(), current.maxHealth(), current.target(),
-                        current.actionsMax(), current.extraActionsMax(), current.actionsMax(),
-                        current.extraActionsMax()));
+        synchronized (character) {
+            CombatComponent combat = character.component(CombatComponent.class);
+            combat.actionsRemaining = combat.actionsMax;
+            combat.extraActionsRemaining = combat.extraActionsMax;
+        }
     }
 
     public boolean hasActionRemaining(AbstractCharacter character) {
         CombatComponent current = character.component(CombatComponent.class);
-        return current.actionsRemaining() > 0 || current.extraActionsRemaining() > 0;
+        return current.actionsRemaining > 0 || current.extraActionsRemaining > 0;
     }
 
     public CombatResult tryAttack(AbstractCharacter attacker, AbstractCharacter target) {
@@ -102,23 +97,20 @@ public class CombatSystem {
     }
 
     public boolean applyDamage(AbstractCharacter target, int amount, AbstractCharacter attacker) {
-        boolean[] justDefeated = {false};
-        target.updateComponent(CombatComponent.class, current -> {
-            if (current.currentHealth() <= 0) {
-                return current;
+        boolean justDefeated;
+        synchronized (target) {
+            CombatComponent combat = target.component(CombatComponent.class);
+            if (combat.currentHealth <= 0) {
+                return false;
             }
-            int newHealth = Math.max(0, current.currentHealth() - amount);
-            if (newHealth <= 0) {
-                justDefeated[0] = true;
-            }
-            return new CombatComponent(newHealth, current.maxHealth(), current.target(), current.actionsMax(),
-                    current.extraActionsMax(), current.actionsRemaining(), current.extraActionsRemaining());
-        });
+            combat.currentHealth = Math.max(0, combat.currentHealth - amount);
+            justDefeated = combat.currentHealth <= 0;
+        }
 
-        if (justDefeated[0]) {
+        if (justDefeated) {
             publishDeath(target, attacker);
         }
-        return justDefeated[0];
+        return justDefeated;
     }
 
     private void publishDeath(AbstractCharacter target, AbstractCharacter attacker) {
@@ -134,7 +126,7 @@ public class CombatSystem {
     private CombatResult playerAttack(CharacterInstance attacker, AbstractCharacter target) {
         Optional<Item> weapon = inventorySystem.equippedWeapon(attacker);
         int weaponBonus = weapon.map(Item::getBonus).orElse(0);
-        boolean weaponProficient = weapon.map(item -> attacker.component(AppearanceComponent.class).characterClass()
+        boolean weaponProficient = weapon.map(item -> attacker.component(AppearanceComponent.class).characterClass
                 .weaponProficiencies().contains(item.getWeaponCategory())).orElse(true);
 
         int strengthModifier = attacker.component(AttributeComponent.class).modifier(Attribute.STRENGTH);
@@ -149,12 +141,12 @@ public class CombatSystem {
         boolean hit = DiceRoller.resolveHit(naturalRoll, attackRoll.total(), armorClass);
 
         if (!hit) {
-            return new CombatResult(target.component(IdentityComponent.class).name(), false, false, attackRoll.total(),
+            return new CombatResult(target.component(IdentityComponent.class).name, false, false, attackRoll.total(),
                     armorClass, 0, disadvantage);
         }
 
         int damage = playerDamage(weapon, strengthModifier, criticalHit);
-        return new CombatResult(target.component(IdentityComponent.class).name(), true, criticalHit, attackRoll.total(),
+        return new CombatResult(target.component(IdentityComponent.class).name, true, criticalHit, attackRoll.total(),
                 armorClass, damage, disadvantage);
     }
 
@@ -182,18 +174,17 @@ public class CombatSystem {
         boolean hit = DiceRoller.resolveHit(naturalRoll, attackRoll.total(), armorClass);
 
         if (!hit) {
-            return new CombatResult(target.component(IdentityComponent.class).name(), false, false, attackRoll.total(),
+            return new CombatResult(target.component(IdentityComponent.class).name, false, false, attackRoll.total(),
                     armorClass, 0, false);
         }
 
         int damage = monsterDamage(attacker, strengthModifier, criticalHit);
-        return new CombatResult(target.component(IdentityComponent.class).name(), true, criticalHit, attackRoll.total(),
+        return new CombatResult(target.component(IdentityComponent.class).name, true, criticalHit, attackRoll.total(),
                 armorClass, damage, false);
     }
 
     private int monsterDamage(MonsterInstance attacker, int strengthModifier, boolean criticalHit) {
-        DiceExpression base = DiceExpression
-                .parse(attacker.component(MonsterCombatComponent.class).naturalDamageDice());
+        DiceExpression base = DiceExpression.parse(attacker.component(MonsterCombatComponent.class).naturalDamageDice);
         int diceCount = criticalHit ? base.count() * 2 : base.count();
         return Math.max(0, DiceRoller.roll(new DiceExpression(diceCount, base.sides(), strengthModifier)).total());
     }

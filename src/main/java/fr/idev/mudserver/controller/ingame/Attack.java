@@ -48,7 +48,7 @@ public class Attack implements ControllerHandler {
 
         AbstractCharacter target;
         if (name.isEmpty()) {
-            target = character.component(CombatComponent.class).target();
+            target = character.component(CombatComponent.class).target;
             if (target == null) {
                 connection.send(new NoTargetSelected());
                 return;
@@ -58,13 +58,13 @@ public class Attack implements ControllerHandler {
                 return;
             }
 
-            if (!character.component(PositionComponent.class).currentRoom().getMonsters().contains(target)) {
+            if (!character.component(PositionComponent.class).currentRoom.getMonsters().contains(target)) {
                 combatSystem.setTarget(null, character);
-                connection.send(new TargetNotFound(target.component(IdentityComponent.class).name()));
+                connection.send(new TargetNotFound(target.component(IdentityComponent.class).name));
                 return;
             }
         } else {
-            Optional<MonsterInstance> found = character.component(PositionComponent.class).currentRoom()
+            Optional<MonsterInstance> found = character.component(PositionComponent.class).currentRoom
                     .findMonsterByName(name);
             if (found.isEmpty()) {
                 connection.send(new TargetNotFound(name));

@@ -56,7 +56,7 @@ public class Examine implements ControllerHandler {
             return;
         }
 
-        Optional<AbstractCharacter> target = character.component(PositionComponent.class).currentRoom()
+        Optional<AbstractCharacter> target = character.component(PositionComponent.class).currentRoom
                 .findOccupantByName(name);
 
         if (target.isEmpty()) {

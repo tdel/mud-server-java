@@ -45,7 +45,7 @@ public class ItemPersistenceListener {
     void onItemDiscarded(ItemDiscarded event) {
         itemDao.delete(event.item().getId());
         log.info("item.discarded item={} template={} character={}", event.item().getId(), event.item().getTemplateId(),
-                event.character().component(IdentityComponent.class).name());
+                event.character().component(IdentityComponent.class).name);
     }
 
     @EventListener
@@ -56,7 +56,7 @@ public class ItemPersistenceListener {
         }
         itemDao.updateSlot(event.item().getId(), event.slot());
         log.info("item.equipped item={} slot={} character={} previousOccupants={}", event.item().getName(),
-                event.slot(), event.character().component(IdentityComponent.class).name(),
+                event.slot(), event.character().component(IdentityComponent.class).name,
                 event.previousOccupants().size());
     }
 
@@ -64,7 +64,7 @@ public class ItemPersistenceListener {
     void onGamePlayerUnequippedItem(GamePlayerUnequippedItem event) {
         itemDao.updateSlot(event.item().getId(), null);
         log.info("item.unequipped item={} character={}", event.item().getName(),
-                event.character().component(IdentityComponent.class).name());
+                event.character().component(IdentityComponent.class).name);
     }
 
     @EventListener
@@ -72,7 +72,7 @@ public class ItemPersistenceListener {
         itemDao.insert(event.item());
         networkSystem.send(event.character(), new EquipmentLooted(event.item().getName(), event.item().getRarity()));
         log.info("item.looted item={} character={}", event.item().getName(),
-                event.character().component(IdentityComponent.class).name());
+                event.character().component(IdentityComponent.class).name);
     }
 
     @EventListener
@@ -81,14 +81,14 @@ public class ItemPersistenceListener {
         networkSystem.send(event.character(),
                 new ItemBought(event.item().getName(), event.item().getRarity(), event.price()));
         log.info("item.purchased item={} character={} price={}", event.item().getName(),
-                event.character().component(IdentityComponent.class).name(), event.price());
+                event.character().component(IdentityComponent.class).name, event.price());
     }
 
     @EventListener
     void onGamePlayerUsedPotion(GamePlayerUsedPotion event) {
         itemDao.delete(event.item().getId());
         log.info("item.consumed item={} character={} healedAmount={}", event.item().getId(),
-                event.character().component(IdentityComponent.class).name(), event.healedAmount());
+                event.character().component(IdentityComponent.class).name, event.healedAmount());
     }
 
     @EventListener
@@ -97,6 +97,6 @@ public class ItemPersistenceListener {
             itemDao.delete(food.getId());
         }
         log.info("item.provisions_consumed initiator={} count={}",
-                event.initiator().component(IdentityComponent.class).name(), event.consumedFood().size());
+                event.initiator().component(IdentityComponent.class).name, event.consumedFood().size());
     }
 }

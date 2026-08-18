@@ -31,21 +31,21 @@ public record ViewAround(AbstractObject character) implements OutputTelnetMessag
     @Override
     public void toTelnet(TelnetOutput output) {
 
-        RoomInstance room = character.component(PositionComponent.class).currentRoom();
+        RoomInstance room = character.component(PositionComponent.class).currentRoom;
 
         List<String> gridLines = render(room, character);
         List<AbstractCharacter> nearby = room
-                .occupantsWithin(character.component(PositionComponent.class).hexCoordinate(), VIEWPORT_RADIUS);
+                .occupantsWithin(character.component(PositionComponent.class).hexCoordinate, VIEWPORT_RADIUS);
 
         List<String> portalSummaries = room.getPortals().stream()
                 .map(portal -> portal.direction() + ": " + portal.targetRoom().getName()).toList();
         List<String> characterNames = nearby.stream().filter(CharacterInstance.class::isInstance)
                 .filter(other -> !other.getId().equals(character.getId()))
-                .map(other -> other.component(IdentityComponent.class).name()).toList();
+                .map(other -> other.component(IdentityComponent.class).name).toList();
         List<String> monsterNames = nearby.stream().filter(MonsterInstance.class::isInstance)
-                .map(other -> other.component(IdentityComponent.class).name()).toList();
+                .map(other -> other.component(IdentityComponent.class).name).toList();
         List<String> npcNames = nearby.stream().filter(AbstractNpc.class::isInstance)
-                .map(other -> other.component(IdentityComponent.class).name()).toList();
+                .map(other -> other.component(IdentityComponent.class).name).toList();
 
         String coloredGrid = gridLines.stream().map(Ansi::gridLine).collect(Collectors.joining("\n"));
         output.write(String.format(
@@ -65,7 +65,7 @@ public record ViewAround(AbstractObject character) implements OutputTelnetMessag
     }
 
     private List<String> render(RoomInstance room, AbstractObject viewer, int radius) {
-        HexCoordinate center = viewer.component(PositionComponent.class).hexCoordinate();
+        HexCoordinate center = viewer.component(PositionComponent.class).hexCoordinate;
         List<HexCoordinate> path = remainingPath(viewer);
         Set<HexCoordinate> pathCells = new HashSet<>(path);
         HexCoordinate destination = path.isEmpty() ? null : path.get(path.size() - 1);
@@ -94,7 +94,7 @@ public record ViewAround(AbstractObject character) implements OutputTelnetMessag
 
     private char glyphFor(RoomInstance room, AbstractObject viewer, HexCoordinate cell, Set<HexCoordinate> pathCells,
             HexCoordinate destination) {
-        if (cell.equals(viewer.component(PositionComponent.class).hexCoordinate())) {
+        if (cell.equals(viewer.component(PositionComponent.class).hexCoordinate)) {
             return '@';
         }
         if (!room.isInBounds(cell)) {
@@ -133,10 +133,10 @@ public record ViewAround(AbstractObject character) implements OutputTelnetMessag
         if (movement.isEmpty()) {
             return List.of();
         }
-        int cellsRemaining = movement.get().cellsRemaining();
-        HexDirection direction = movement.get().direction();
+        int cellsRemaining = movement.get().cellsRemaining;
+        HexDirection direction = movement.get().direction;
         List<HexCoordinate> path = new ArrayList<>(cellsRemaining);
-        HexCoordinate cursor = character.component(PositionComponent.class).hexCoordinate();
+        HexCoordinate cursor = character.component(PositionComponent.class).hexCoordinate;
         for (int i = 0; i < cellsRemaining; i++) {
             cursor = cursor.neighbor(direction);
             path.add(cursor);

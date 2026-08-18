@@ -148,7 +148,9 @@ public class TelnetConnection implements Connection, TelnetOutput {
     @Override
     public void attachCharacter(CharacterInstance character) {
         this.player = character;
-        character.updateComponent(NetworkComponent.class, networkComponent -> new NetworkComponent(this));
+        synchronized (character) {
+            character.component(NetworkComponent.class).connection = this;
+        }
         this.setState(ConnectionState.INGAME);
     }
 

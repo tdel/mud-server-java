@@ -35,15 +35,19 @@ public class RestSystem {
     }
 
     public boolean canTakeShortRest(CharacterInstance character) {
-        return component(character).shortRestCount() < CharacterInstance.MAX_SHORT_RESTS_BEFORE_LONG_REST;
+        return component(character).shortRestCount < CharacterInstance.MAX_SHORT_RESTS_BEFORE_LONG_REST;
     }
 
     public void incrementShortRestCount(CharacterInstance character) {
-        character.updateComponent(RestComponent.class, current -> new RestComponent(current.shortRestCount() + 1));
+        synchronized (character) {
+            component(character).shortRestCount += 1;
+        }
     }
 
     public void resetShortRestCount(CharacterInstance character) {
-        character.updateComponent(RestComponent.class, current -> new RestComponent(0));
+        synchronized (character) {
+            component(character).shortRestCount = 0;
+        }
     }
 
     public RestOutcome doShortRest(CharacterInstance initiator) {
@@ -55,8 +59,7 @@ public class RestSystem {
         }
 
         Map<CharacterInstance, Integer> healedAmounts = new LinkedHashMap<>();
-        for (CharacterInstance character : initiator.component(WorldComponent.class).worldInstance()
-                .onlineCharacters()) {
+        for (CharacterInstance character : initiator.component(WorldComponent.class).worldInstance.onlineCharacters()) {
             int amount = levelingSystem.hitDieRecovery(character);
             healedAmounts.put(character, combatSystem.heal(character, amount));
             incrementShortRestCount(character);
@@ -82,10 +85,9 @@ public class RestSystem {
         }
 
         Map<CharacterInstance, Integer> healedAmounts = new LinkedHashMap<>();
-        for (CharacterInstance character : initiator.component(WorldComponent.class).worldInstance()
-                .onlineCharacters()) {
+        for (CharacterInstance character : initiator.component(WorldComponent.class).worldInstance.onlineCharacters()) {
             healedAmounts.put(character,
-                    combatSystem.heal(character, character.component(CombatComponent.class).maxHealth()));
+                    combatSystem.heal(character, character.component(CombatComponent.class).maxHealth));
             resetShortRestCount(character);
         }
 

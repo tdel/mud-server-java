@@ -11,7 +11,7 @@ public class NetworkSystem {
 
     public void send(AbstractObject entity, OutputMessage message) {
         entity.findComponent(NetworkComponent.class)
-                .ifPresent(networkComponent -> networkComponent.connection().send(message));
+                .ifPresent(networkComponent -> networkComponent.connection.send(message));
     }
 
 }

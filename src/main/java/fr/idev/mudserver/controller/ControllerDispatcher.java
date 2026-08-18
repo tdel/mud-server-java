@@ -37,7 +37,7 @@ public class ControllerDispatcher {
             if (character != null && encounterSystem.isInCombat(character)
                     && !COMBAT_ALLOWED_VERBS.contains(actionName)) {
                 log.debug("combat.action_blocked verb={} character={}", actionName,
-                        character.component(IdentityComponent.class).name());
+                        character.component(IdentityComponent.class).name);
                 connection.send(new CombatActionRequired());
                 return;
             }

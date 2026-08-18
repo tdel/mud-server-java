@@ -43,29 +43,29 @@ public class CharacterDao {
 
     public void insert(CharacterInstance character) {
         UUID worldInstanceId = character.findComponent(WorldComponent.class)
-                .map(component -> component.worldInstance().getId()).orElse(WorldInstance.DEFAULT_ID);
+                .map(component -> component.worldInstance.getId()).orElse(WorldInstance.DEFAULT_ID);
         CombatComponent combat = character.component(CombatComponent.class);
-        UUID currentRoomId = character.component(PositionComponent.class).currentRoom().getTemplateId();
+        UUID currentRoomId = character.component(PositionComponent.class).currentRoom.getTemplateId();
         dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_ROOM_ID,
                 CHARACTER.GENDER, CHARACTER.RACE, CHARACTER.CHARACTER_CLASS, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH,
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
                 CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA, CHARACTER.XP, CHARACTER.GOLD,
                 CHARACTER.SHORT_REST_COUNT, CHARACTER.WORLD_INSTANCE_ID)
-                .values(character.getId(), character.component(AccountComponent.class).account().getId(),
-                        character.component(IdentityComponent.class).name(), currentRoomId,
-                        character.component(AppearanceComponent.class).gender().name(),
-                        character.component(AppearanceComponent.class).race().name(),
-                        character.component(AppearanceComponent.class).characterClass().name(),
-                        character.component(LevelingComponent.class).level(), combat.currentHealth(),
-                        combat.maxHealth(), character.component(AttributeComponent.class).valueOf(Attribute.STRENGTH),
+                .values(character.getId(), character.component(AccountComponent.class).account.getId(),
+                        character.component(IdentityComponent.class).name, currentRoomId,
+                        character.component(AppearanceComponent.class).gender.name(),
+                        character.component(AppearanceComponent.class).race.name(),
+                        character.component(AppearanceComponent.class).characterClass.name(),
+                        character.component(LevelingComponent.class).level, combat.currentHealth, combat.maxHealth,
+                        character.component(AttributeComponent.class).valueOf(Attribute.STRENGTH),
                         character.component(AttributeComponent.class).valueOf(Attribute.DEXTERITY),
                         character.component(AttributeComponent.class).valueOf(Attribute.CONSTITUTION),
                         character.component(AttributeComponent.class).valueOf(Attribute.INTELLIGENCE),
                         character.component(AttributeComponent.class).valueOf(Attribute.WISDOM),
                         character.component(AttributeComponent.class).valueOf(Attribute.CHARISMA),
-                        character.component(LevelingComponent.class).xp(),
-                        character.component(InventoryComponent.class).gold(),
-                        character.component(RestComponent.class).shortRestCount(), worldInstanceId)
+                        character.component(LevelingComponent.class).xp,
+                        character.component(InventoryComponent.class).gold,
+                        character.component(RestComponent.class).shortRestCount, worldInstanceId)
                 .execute();
     }
 
@@ -89,12 +89,12 @@ public class CharacterDao {
     public void update(CharacterInstance character) {
         LevelingComponent leveling = character.component(LevelingComponent.class);
         CombatComponent combat = character.component(CombatComponent.class);
-        UUID currentRoomId = character.component(PositionComponent.class).currentRoom().getTemplateId();
+        UUID currentRoomId = character.component(PositionComponent.class).currentRoom.getTemplateId();
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_ROOM_ID, currentRoomId)
-                .set(CHARACTER.CURRENT_HEALTH, combat.currentHealth()).set(CHARACTER.XP, leveling.xp())
-                .set(CHARACTER.LEVEL, leveling.level()).set(CHARACTER.MAX_HEALTH, combat.maxHealth())
-                .set(CHARACTER.GOLD, character.component(InventoryComponent.class).gold())
-                .set(CHARACTER.SHORT_REST_COUNT, character.component(RestComponent.class).shortRestCount())
+                .set(CHARACTER.CURRENT_HEALTH, combat.currentHealth).set(CHARACTER.XP, leveling.xp)
+                .set(CHARACTER.LEVEL, leveling.level).set(CHARACTER.MAX_HEALTH, combat.maxHealth)
+                .set(CHARACTER.GOLD, character.component(InventoryComponent.class).gold)
+                .set(CHARACTER.SHORT_REST_COUNT, character.component(RestComponent.class).shortRestCount)
                 .where(CHARACTER.ID.eq(character.getId())).execute();
     }
 

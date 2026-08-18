@@ -47,7 +47,7 @@ public class Select implements ControllerHandler {
             return;
         }
 
-        Optional<MonsterInstance> targetQuery = character.component(PositionComponent.class).currentRoom()
+        Optional<MonsterInstance> targetQuery = character.component(PositionComponent.class).currentRoom
                 .findMonsterByName(name);
         if (targetQuery.isEmpty()) {
             connection.send(new TargetNotFound(name));
@@ -57,6 +57,6 @@ public class Select implements ControllerHandler {
         MonsterInstance target = targetQuery.get();
 
         combatSystem.setTarget(target, character);
-        connection.send(new TargetSelected(target.component(IdentityComponent.class).name()));
+        connection.send(new TargetSelected(target.component(IdentityComponent.class).name));
     }
 }

@@ -1,4 +1,10 @@
 package fr.idev.mudserver.domain.actor.component;
 
-public record AggroComponent(int aggroRadius) {
+public class AggroComponent {
+
+    public int aggroRadius;
+
+    public AggroComponent(int aggroRadius) {
+        this.aggroRadius = aggroRadius;
+    }
 }

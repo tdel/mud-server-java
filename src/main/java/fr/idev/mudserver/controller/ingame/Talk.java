@@ -62,7 +62,7 @@ public class Talk implements ControllerHandler {
             return;
         }
 
-        Optional<AbstractNpc> npc = character.component(PositionComponent.class).currentRoom().findNpcByName(name);
+        Optional<AbstractNpc> npc = character.component(PositionComponent.class).currentRoom.findNpcByName(name);
         if (npc.isEmpty()) {
             connection.send(new TargetNotFound(name));
             return;
@@ -79,8 +79,9 @@ public class Talk implements ControllerHandler {
 
     private void promptDialogue(Connection connection, CharacterInstance character, AbstractNpc npc,
             DialogueComponent dialogue) {
-        connection.requestBlocking(new DialogueOptions(npc.component(IdentityComponent.class).name(),
-                dialogue.greeting(), dialogue.options()), line -> {
+        connection.requestBlocking(
+                new DialogueOptions(npc.component(IdentityComponent.class).name, dialogue.greeting, dialogue.options),
+                line -> {
                     Optional<DialogueComponent.DialogueOption> choice = dialogueSystem.resolveOption(dialogue, line);
 
                     if (choice.isEmpty()) {
@@ -91,7 +92,7 @@ public class Talk implements ControllerHandler {
 
                     switch (choice.get().type()) {
                         case RESPONSE -> {
-                            connection.send(new NpcResponse(npc.component(IdentityComponent.class).name(),
+                            connection.send(new NpcResponse(npc.component(IdentityComponent.class).name,
                                     choice.get().response()));
                             promptDialogue(connection, character, npc, dialogue);
                         }
@@ -100,20 +101,20 @@ public class Talk implements ControllerHandler {
                                 promptShop(connection, character, seller, dialogue);
                             }
                         }
-                        case LEAVE -> connection.send(new DialogueEnded(npc.component(IdentityComponent.class).name()));
+                        case LEAVE -> connection.send(new DialogueEnded(npc.component(IdentityComponent.class).name));
                     }
                 });
     }
 
     private void promptShop(Connection connection, CharacterInstance character, NpcSellerInstance npc,
             DialogueComponent dialogue) {
-        List<ShopCatalog.Entry> entries = npc.component(ShopComponent.class).items().stream()
+        List<ShopCatalog.Entry> entries = npc.component(ShopComponent.class).items.stream()
                 .map(entry -> new ShopCatalog.Entry(entry.itemTemplate().getName(), entry.itemTemplate().getRarity(),
                         entry.price()))
                 .toList();
 
-        connection.requestBlocking(new ShopCatalog(npc.component(IdentityComponent.class).name(), entries,
-                character.component(InventoryComponent.class).gold()), line -> {
+        connection.requestBlocking(new ShopCatalog(npc.component(IdentityComponent.class).name, entries,
+                character.component(InventoryComponent.class).gold), line -> {
                     String trimmed = line.trim();
                     if (trimmed.equals("0") || trimmed.equalsIgnoreCase("back") || trimmed.equalsIgnoreCase("retour")) {
                         promptDialogue(connection, character, npc, dialogue);

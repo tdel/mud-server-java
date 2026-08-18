@@ -46,13 +46,13 @@ public class MovementSystem {
             IdentityComponent identityComponent = entity.component(IdentityComponent.class);
             PositionComponent positionComponent = entity.component(PositionComponent.class);
 
-            if (now - movementComponent.lastStepAt() < identityComponent.cellSpeed()) {
+            if (now - movementComponent.lastStepAt < identityComponent.cellSpeed()) {
                 continue;
             }
 
-            HexCoordinate currentCoord = positionComponent.hexCoordinate();
-            HexCoordinate nextCoord = currentCoord.neighbor(movementComponent.direction());
-            RoomInstance room = positionComponent.currentRoom();
+            HexCoordinate currentCoord = positionComponent.hexCoordinate;
+            HexCoordinate nextCoord = currentCoord.neighbor(movementComponent.direction);
+            RoomInstance room = positionComponent.currentRoom;
             if (!room.isInBounds(nextCoord)) {
                 entity.detachComponent(MovementComponent.class);
                 networkSystem.send(entity, new MovementBlockedByBounds());
@@ -66,13 +66,19 @@ public class MovementSystem {
             }
 
             room.releaseCell(currentCoord, (AbstractCharacter) entity); // not with an ECS system right now
-            entity.updateComponent(PositionComponent.class, current -> new PositionComponent(room, nextCoord));
+            synchronized (entity) {
+                positionComponent.currentRoom = room;
+                positionComponent.hexCoordinate = nextCoord;
+            }
 
-            int remaining = movementComponent.cellsRemaining() - 1;
+            int remaining = movementComponent.cellsRemaining - 1;
             if (remaining <= 0) {
                 entity.detachComponent(MovementComponent.class);
             } else {
-                entity.updateComponent(MovementComponent.class, current -> current.withRemaining(remaining, now));
+                synchronized (entity) {
+                    movementComponent.cellsRemaining = remaining;
+                    movementComponent.lastStepAt = now;
+                }
             }
 
             networkSystem.send(entity, new ViewAround(entity));

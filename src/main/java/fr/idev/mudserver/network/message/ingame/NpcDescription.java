@@ -12,7 +12,7 @@ public record NpcDescription(AbstractNpc npc) implements OutputTelnetMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        String description = npc.component(NpcDescriptorComponent.class).description();
-        output.write("== " + Ansi.npc(npc.component(IdentityComponent.class).name()) + " ==\n" + description + "\n");
+        String description = npc.component(NpcDescriptorComponent.class).description;
+        output.write("== " + Ansi.npc(npc.component(IdentityComponent.class).name) + " ==\n" + description + "\n");
     }
 }

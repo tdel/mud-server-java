@@ -54,8 +54,12 @@ public class Go implements ControllerHandler {
         }
         final int cellsCount = Math.min(requestedCells, MAX_STEP_COUNT);
 
-        character.updateComponent(MovementComponent.class,
-                current -> new MovementComponent(direction.get(), cellsCount, System.currentTimeMillis()));
+        synchronized (character) {
+            MovementComponent movement = character.component(MovementComponent.class);
+            movement.direction = direction.get();
+            movement.cellsRemaining = cellsCount;
+            movement.lastStepAt = System.currentTimeMillis();
+        }
 
         connection.send(new ViewAround(character));
     }

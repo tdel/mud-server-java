@@ -56,7 +56,7 @@ public class CharacterSelect implements ControllerHandler {
         connection.attachCharacter(loadedChar);
         worldInstanceService.enterGame(loadedChar);
 
-        connection.send(new NowPlaying(loadedChar.component(IdentityComponent.class).name()));
+        connection.send(new NowPlaying(loadedChar.component(IdentityComponent.class).name));
         lookAction.onReceive(connection, "");
     }
 }

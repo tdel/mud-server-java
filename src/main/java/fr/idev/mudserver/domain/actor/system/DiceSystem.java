@@ -32,13 +32,13 @@ public class DiceSystem {
     }
 
     public CheckResult check(CharacterInstance character, Skill skill, int dc) {
-        boolean proficient = character.component(AppearanceComponent.class).characterClass().skillProficiencies()
+        boolean proficient = character.component(AppearanceComponent.class).characterClass.skillProficiencies()
                 .contains(skill);
         return checkOrSave(character, skill.getGoverningAttribute(), proficient, dc, skill.label());
     }
 
     public CheckResult save(CharacterInstance character, Attribute attribute, int dc) {
-        boolean proficient = character.component(AppearanceComponent.class).characterClass().savingThrowProficiencies()
+        boolean proficient = character.component(AppearanceComponent.class).characterClass.savingThrowProficiencies()
                 .contains(attribute);
         return checkOrSave(character, attribute, proficient, dc, attribute.label());
     }

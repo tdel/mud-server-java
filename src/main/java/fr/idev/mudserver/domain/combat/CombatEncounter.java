@@ -42,7 +42,7 @@ public final class CombatEncounter {
     public synchronized void joinBeforeInitiative(AbstractCharacter character) {
         if (initiativeRolled) {
             throw new IllegalStateException("Initiative déjà établie, "
-                    + character.component(IdentityComponent.class).name() + " doit rejoindre via insertLatecomer");
+                    + character.component(IdentityComponent.class).name + " doit rejoindre via insertLatecomer");
         }
         pendingJoiners.add(character);
     }
@@ -124,7 +124,7 @@ public final class CombatEncounter {
     public synchronized List<CharacterInstance> livingPlayers() {
         return order.stream().map(InitiativeEntry::character)
                 .filter(character -> character instanceof CharacterInstance
-                        && character.component(CombatComponent.class).currentHealth() > 0)
+                        && character.component(CombatComponent.class).currentHealth > 0)
                 .map(CharacterInstance.class::cast).toList();
     }
 

@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.UnaryOperator;
 
 public abstract class AbstractObject {
 
@@ -36,11 +35,6 @@ public abstract class AbstractObject {
     public <C> C component(Class<C> type) {
         return findComponent(type).orElseThrow(
                 () -> new IllegalStateException("No " + type.getSimpleName() + " attached to entity " + id));
-    }
-
-    @SuppressWarnings("unchecked")
-    public <C> C updateComponent(Class<C> type, UnaryOperator<C> mutator) {
-        return (C) components.compute(type, (t, current) -> mutator.apply((C) current));
     }
 
     @Override

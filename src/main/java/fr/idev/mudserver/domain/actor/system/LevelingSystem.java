@@ -21,21 +21,26 @@ public class LevelingSystem {
     }
 
     public void gainXp(CharacterInstance character, int amount) {
-        character.updateComponent(LevelingComponent.class,
-                current -> new LevelingComponent(current.level(), current.xp() + amount));
+        synchronized (character) {
+            character.component(LevelingComponent.class).xp += amount;
+        }
         DomainEventPublisher.publish(new CharacterGainedXp(character, amount));
     }
 
     public int hitDieRecovery(CharacterInstance character) {
-        int hitDie = character.component(AppearanceComponent.class).characterClass().hitDie();
+        int hitDie = character.component(AppearanceComponent.class).characterClass.hitDie();
         return Math.max(1,
                 hitDie / 2 + 1 + character.component(AttributeComponent.class).modifier(Attribute.CONSTITUTION));
     }
 
     public void applyLevelUp(CharacterInstance character) {
         int hpGain = hitDieRecovery(character);
-        int newLevel = character.updateComponent(LevelingComponent.class,
-                current -> new LevelingComponent(current.level() + 1, current.xp())).level();
+        int newLevel;
+        synchronized (character) {
+            LevelingComponent leveling = character.component(LevelingComponent.class);
+            leveling.level += 1;
+            newLevel = leveling.level;
+        }
         combatSystem.increaseMaxHealth(character, hpGain);
         DomainEventPublisher.publish(new CharacterLeveledUp(character, newLevel, hpGain));
     }

@@ -30,41 +30,38 @@ import fr.idev.mudserver.domain.item.Item;
 public class InventorySystem {
 
     public void addGold(CharacterInstance character, int amount) {
-        character.updateComponent(InventoryComponent.class,
-                current -> new InventoryComponent(current.items(), current.gold() + amount));
+        synchronized (character) {
+            character.component(InventoryComponent.class).gold += amount;
+        }
     }
 
     public boolean trySpendGold(CharacterInstance character, int amount) {
-        boolean[] spent = {false};
-        character.updateComponent(InventoryComponent.class, current -> {
-            if (current.gold() < amount) {
-                return current;
+        synchronized (character) {
+            InventoryComponent inventory = character.component(InventoryComponent.class);
+            if (inventory.gold < amount) {
+                return false;
             }
-            spent[0] = true;
-            return new InventoryComponent(current.items(), current.gold() - amount);
-        });
-        return spent[0];
+            inventory.gold -= amount;
+            return true;
+        }
     }
 
     public void addItem(CharacterInstance character, Item item) {
-        character.updateComponent(InventoryComponent.class, current -> {
-            List<Item> newItems = new ArrayList<>(current.items());
-            newItems.add(item);
-            return new InventoryComponent(List.copyOf(newItems), current.gold());
-        });
+        synchronized (character) {
+            character.component(InventoryComponent.class).items.add(item);
+        }
     }
 
     public void removeItem(CharacterInstance character, Item item) {
-        character.updateComponent(InventoryComponent.class, current -> {
-            List<Item> newItems = new ArrayList<>(current.items());
-            newItems.remove(item);
-            return new InventoryComponent(List.copyOf(newItems), current.gold());
-        });
+        synchronized (character) {
+            character.component(InventoryComponent.class).items.remove(item);
+        }
     }
 
     public void replaceItems(CharacterInstance character, List<Item> newItems) {
-        character.updateComponent(InventoryComponent.class,
-                current -> new InventoryComponent(List.copyOf(newItems), current.gold()));
+        synchronized (character) {
+            character.component(InventoryComponent.class).items = new ArrayList<>(newItems);
+        }
     }
 
     public void receiveGold(CharacterInstance character, int amount) {
@@ -128,9 +125,9 @@ public class InventorySystem {
     }
 
     public boolean isWearingNonProficientArmor(CharacterInstance character) {
-        return component(character).equippedItems().stream().map(this::requiredArmorProficiency)
-                .anyMatch(required -> required.isPresent() && !character.component(AppearanceComponent.class)
-                        .characterClass().armorProficiencies().contains(required.get()));
+        return component(character).equippedItems().stream().map(this::requiredArmorProficiency).anyMatch(
+                required -> required.isPresent() && !character.component(AppearanceComponent.class).characterClass
+                        .armorProficiencies().contains(required.get()));
     }
 
     public Optional<Item> equippedWeapon(CharacterInstance character) {
@@ -148,7 +145,7 @@ public class InventorySystem {
     }
 
     private int monsterArmorClass(MonsterInstance monster) {
-        Integer natural = monster.component(MonsterCombatComponent.class).naturalArmorClass();
+        Integer natural = monster.component(MonsterCombatComponent.class).naturalArmorClass;
         return natural != null ? natural : baseArmorClass(monster);
     }
 

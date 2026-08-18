@@ -121,7 +121,7 @@ public class CombatEngine {
                 encounter = existing;
                 foundedHere = false;
             } else {
-                encounter = encounterSystem.createEncounter(target.component(PositionComponent.class).currentRoom());
+                encounter = encounterSystem.createEncounter(target.component(PositionComponent.class).currentRoom);
                 encounterSystem.join(target, encounter);
                 encounterSystem.join(attacker, encounter);
                 foundedHere = true;
@@ -143,10 +143,10 @@ public class CombatEngine {
 
         CombatResult result = combatSystem.tryAttack(attacker, target);
         networkSystem.send(attacker, new AttackResult(result));
-        target.component(PositionComponent.class).currentRoom().broadcast(
-                new PlayerAttackBroadcast(attacker.component(IdentityComponent.class).name(), result), attacker);
+        target.component(PositionComponent.class).currentRoom.broadcast(
+                new PlayerAttackBroadcast(attacker.component(IdentityComponent.class).name, result), attacker);
         log.info("combat.attack_resolved attacker={} target={} hit={} critical={} damage={}",
-                attacker.component(IdentityComponent.class).name(), target.component(IdentityComponent.class).name(),
+                attacker.component(IdentityComponent.class).name, target.component(IdentityComponent.class).name,
                 result.hit(), result.criticalHit(), result.damage());
 
         if (result.hit() && combatSystem.applyDamage(target, result.damage(), attacker)) {
@@ -183,7 +183,7 @@ public class CombatEngine {
                 encounter = existing;
                 foundedHere = false;
             } else {
-                encounter = encounterSystem.createEncounter(founder.component(PositionComponent.class).currentRoom());
+                encounter = encounterSystem.createEncounter(founder.component(PositionComponent.class).currentRoom);
                 encounterSystem.join(founder, encounter);
                 foundedHere = true;
             }
@@ -201,9 +201,9 @@ public class CombatEngine {
         synchronized (encounter) {
             encounter.joinBeforeInitiative(founder);
             encounter.joinBeforeInitiative(victim);
-            networkSystem.send(victim, new MonsterAggroTriggered(founder.component(IdentityComponent.class).name()));
-            encounter.getRoom().broadcast(new MonsterAggroBroadcast(victim.component(IdentityComponent.class).name(),
-                    founder.component(IdentityComponent.class).name()), victim);
+            networkSystem.send(victim, new MonsterAggroTriggered(founder.component(IdentityComponent.class).name));
+            encounter.getRoom().broadcast(new MonsterAggroBroadcast(victim.component(IdentityComponent.class).name,
+                    founder.component(IdentityComponent.class).name), victim);
             encounter.establishInitiativeOrder(diceSystem::rollInitiative);
             resolveFromCurrentTurn(encounter);
         }
@@ -219,11 +219,10 @@ public class CombatEngine {
             CombatResult result = combatSystem.tryAttack(attacker, target);
             networkSystem.send(attacker, new AttackResult(result));
             encounter.getRoom().broadcast(
-                    new PlayerAttackBroadcast(attacker.component(IdentityComponent.class).name(), result), attacker);
+                    new PlayerAttackBroadcast(attacker.component(IdentityComponent.class).name, result), attacker);
             log.info("combat.attack_resolved attacker={} target={} hit={} critical={} damage={}",
-                    attacker.component(IdentityComponent.class).name(),
-                    target.component(IdentityComponent.class).name(), result.hit(), result.criticalHit(),
-                    result.damage());
+                    attacker.component(IdentityComponent.class).name, target.component(IdentityComponent.class).name,
+                    result.hit(), result.criticalHit(), result.damage());
             if (result.hit()) {
                 combatSystem.applyDamage(target, result.damage(), attacker);
             }
@@ -234,7 +233,7 @@ public class CombatEngine {
     private void continueOrEndTurn(CombatEncounter encounter, CharacterInstance actor) {
         if (combatSystem.hasActionRemaining(actor)) {
             CombatComponent combat = actor.component(CombatComponent.class);
-            networkSystem.send(actor, new ActionsRemaining(combat.actionsRemaining(), combat.extraActionsRemaining()));
+            networkSystem.send(actor, new ActionsRemaining(combat.actionsRemaining, combat.extraActionsRemaining));
         } else {
             cascade(encounter);
         }
@@ -246,7 +245,7 @@ public class CombatEngine {
             insertOrQueue(encounter, joiner);
         }
         networkSystem.send(joiner, new YouJoinedCombat());
-        encounter.getRoom().broadcast(new CombatantJoined(joiner.component(IdentityComponent.class).name()), joiner);
+        encounter.getRoom().broadcast(new CombatantJoined(joiner.component(IdentityComponent.class).name), joiner);
     }
 
     private void mergeMonsterInto(CombatEncounter encounter, MonsterInstance joiner) {
@@ -259,7 +258,7 @@ public class CombatEngine {
         synchronized (encounter) {
             insertOrQueue(encounter, joiner);
         }
-        encounter.getRoom().broadcast(new CombatantJoined(joiner.component(IdentityComponent.class).name()), null);
+        encounter.getRoom().broadcast(new CombatantJoined(joiner.component(IdentityComponent.class).name), null);
     }
 
     private void insertOrQueue(CombatEncounter encounter, AbstractCharacter character) {
@@ -287,11 +286,11 @@ public class CombatEngine {
 
             CombatResult result = combatSystem.tryAttack(monster, victim);
             networkSystem.send(victim,
-                    new MonsterAttackResult(monster.component(IdentityComponent.class).name(), result));
+                    new MonsterAttackResult(monster.component(IdentityComponent.class).name, result));
             encounter.getRoom().broadcast(
-                    new MonsterAttackBroadcast(monster.component(IdentityComponent.class).name(), result), victim);
+                    new MonsterAttackBroadcast(monster.component(IdentityComponent.class).name, result), victim);
             log.info("combat.monster_attack_resolved monster={} victim={} hit={} damage={}",
-                    monster.component(IdentityComponent.class).name(), victim.component(IdentityComponent.class).name(),
+                    monster.component(IdentityComponent.class).name, victim.component(IdentityComponent.class).name,
                     result.hit(), result.damage());
             if (result.hit()) {
                 combatSystem.applyDamage(victim, result.damage(), monster);
@@ -310,7 +309,7 @@ public class CombatEngine {
         } else if (encounter.currentParticipant() instanceof CharacterInstance nextPlayer) {
             combatSystem.resetForTurn(nextPlayer);
             CombatComponent combat = nextPlayer.component(CombatComponent.class);
-            networkSystem.send(nextPlayer, new YourTurn(combat.actionsRemaining(), combat.extraActionsRemaining()));
+            networkSystem.send(nextPlayer, new YourTurn(combat.actionsRemaining, combat.extraActionsRemaining));
         }
     }
 
@@ -324,7 +323,7 @@ public class CombatEngine {
         encounter.remove(monster);
         encounterSystem.leave(monster);
         aiSystem.clearTarget(monster);
-        log.debug("combat.encounter_monster_removed monster={}", monster.component(IdentityComponent.class).name());
+        log.debug("combat.encounter_monster_removed monster={}", monster.component(IdentityComponent.class).name);
     }
 
     @EventListener
@@ -336,7 +335,7 @@ public class CombatEngine {
         }
         encounter.remove(player);
         encounterSystem.leave(player);
-        log.debug("combat.encounter_player_removed player={}", player.component(IdentityComponent.class).name());
+        log.debug("combat.encounter_player_removed player={}", player.component(IdentityComponent.class).name);
     }
 
     @EventListener
@@ -346,17 +345,17 @@ public class CombatEngine {
             return;
         }
 
-        List<MonsterInstance> aggressors = victim.component(PositionComponent.class).currentRoom().getMonsters()
-                .stream().filter(monster -> monster.component(CombatComponent.class).currentHealth() > 0)
-                .filter(monster -> monster.component(PositionComponent.class).hexCoordinate()
-                        .distanceTo(event.cell()) <= monster.component(AggroComponent.class).aggroRadius())
+        List<MonsterInstance> aggressors = victim.component(PositionComponent.class).currentRoom.getMonsters().stream()
+                .filter(monster -> monster.component(CombatComponent.class).currentHealth > 0)
+                .filter(monster -> monster.component(PositionComponent.class).hexCoordinate
+                        .distanceTo(event.cell()) <= monster.component(AggroComponent.class).aggroRadius)
                 .toList();
         if (aggressors.isEmpty()) {
             return;
         }
 
-        log.info("combat.aggro_triggered victim={} aggressors={}", victim.component(IdentityComponent.class).name(),
-                aggressors.stream().map(monster -> monster.component(IdentityComponent.class).name()).toList());
+        log.info("combat.aggro_triggered victim={} aggressors={}", victim.component(IdentityComponent.class).name,
+                aggressors.stream().map(monster -> monster.component(IdentityComponent.class).name).toList());
 
         Optional<MonsterInstance> alreadyFighting = aggressors.stream()
                 .filter(monster -> encounterSystem.getEncounter(monster) != null).findFirst();

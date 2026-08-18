@@ -49,7 +49,7 @@ public class Logout implements ControllerHandler {
             worldInstanceService.exitGame(connection);
             connection.detachWorldInstance();
 
-            connection.send(new StoppedPlaying(character.component(IdentityComponent.class).name()));
+            connection.send(new StoppedPlaying(character.component(IdentityComponent.class).name));
             connection.send(new BackInLobby());
             return;
         }

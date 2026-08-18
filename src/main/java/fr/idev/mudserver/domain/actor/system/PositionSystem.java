@@ -17,7 +17,7 @@ public class PositionSystem {
     }
 
     public void moveToRoom(CharacterInstance character, RoomInstance destination, HexCoordinate targetCell) {
-        RoomInstance previous = character.component(PositionComponent.class).currentRoom();
+        RoomInstance previous = character.component(PositionComponent.class).currentRoom;
         previous.leave(character);
         destination.join(character, targetCell);
         DomainEventPublisher.publish(new GamePlayerMovedToRoom(character, previous, destination));

@@ -102,24 +102,28 @@ public class RoomInstance {
     }
 
     public void join(CharacterInstance character, HexCoordinate cell) {
-        character.updateComponent(PositionComponent.class,
-                current -> new PositionComponent(this, claimNearestFreeCell(cell, character)));
+        HexCoordinate claimedCell = claimNearestFreeCell(cell, character);
+        synchronized (character) {
+            PositionComponent position = character.component(PositionComponent.class);
+            position.currentRoom = this;
+            position.hexCoordinate = claimedCell;
+        }
         clients.put(character.getId(), character);
         DomainEventPublisher.publish(new GamePlayerSpawnedToRoom(character, this));
 
-        broadcast(new GamePlayerJoinedRoom(character.component(IdentityComponent.class).name()), character);
+        broadcast(new GamePlayerJoinedRoom(character.component(IdentityComponent.class).name), character);
     }
 
     public void leave(CharacterInstance character) {
         clients.remove(character.getId());
-        releaseCell(character.component(PositionComponent.class).hexCoordinate(), character);
-        broadcast(new GamePlayerLeftRoom(character.component(IdentityComponent.class).name()), character);
+        releaseCell(character.component(PositionComponent.class).hexCoordinate, character);
+        broadcast(new GamePlayerLeftRoom(character.component(IdentityComponent.class).name), character);
     }
 
     public void disconnect(CharacterInstance character) {
         clients.remove(character.getId());
-        releaseCell(character.component(PositionComponent.class).hexCoordinate(), character);
-        broadcast(new GamePlayerDisconnected(character.component(IdentityComponent.class).name()), character);
+        releaseCell(character.component(PositionComponent.class).hexCoordinate, character);
+        broadcast(new GamePlayerDisconnected(character.component(IdentityComponent.class).name), character);
     }
 
     public Optional<AbstractCharacter> findOccupantByName(String name) {
@@ -128,7 +132,7 @@ public class RoomInstance {
         occupantsByName.addAll(monsters);
         occupantsByName.addAll(npcs);
         return occupantsByName.stream()
-                .filter(occupant -> occupant.component(IdentityComponent.class).name().equalsIgnoreCase(name))
+                .filter(occupant -> occupant.component(IdentityComponent.class).name.equalsIgnoreCase(name))
                 .findFirst();
     }
 
@@ -146,13 +150,12 @@ public class RoomInstance {
 
     public void removeMonster(MonsterInstance monster) {
         monsters.remove(monster);
-        releaseCell(monster.component(PositionComponent.class).hexCoordinate(), monster);
+        releaseCell(monster.component(PositionComponent.class).hexCoordinate, monster);
     }
 
     public Optional<MonsterInstance> findMonsterByName(String name) {
         return monsters.stream()
-                .filter(monster -> monster.component(IdentityComponent.class).name().equalsIgnoreCase(name))
-                .findFirst();
+                .filter(monster -> monster.component(IdentityComponent.class).name.equalsIgnoreCase(name)).findFirst();
     }
 
     public void setMonsters(List<MonsterInstance> monsters) {
@@ -166,8 +169,10 @@ public class RoomInstance {
 
     public void placeMonster(MonsterInstance monster, HexCoordinate cell) {
         addMonster(monster);
-        monster.updateComponent(PositionComponent.class,
-                current -> new PositionComponent(current.currentRoom(), claimNearestFreeCell(cell, monster)));
+        HexCoordinate claimedCell = claimNearestFreeCell(cell, monster);
+        synchronized (monster) {
+            monster.component(PositionComponent.class).hexCoordinate = claimedCell;
+        }
     }
 
     public List<AbstractNpc> getNpcs() {
@@ -185,12 +190,14 @@ public class RoomInstance {
 
     public void placeNpc(AbstractNpc npc, HexCoordinate cell) {
         addNpc(npc);
-        npc.updateComponent(PositionComponent.class,
-                current -> new PositionComponent(current.currentRoom(), claimNearestFreeCell(cell, npc)));
+        HexCoordinate claimedCell = claimNearestFreeCell(cell, npc);
+        synchronized (npc) {
+            npc.component(PositionComponent.class).hexCoordinate = claimedCell;
+        }
     }
 
     public Optional<AbstractNpc> findNpcByName(String name) {
-        return npcs.stream().filter(npc -> npc.component(IdentityComponent.class).name().equalsIgnoreCase(name))
+        return npcs.stream().filter(npc -> npc.component(IdentityComponent.class).name.equalsIgnoreCase(name))
                 .findFirst();
     }
 
@@ -248,7 +255,7 @@ public class RoomInstance {
             if (character == exclude || character.findComponent(NetworkComponent.class).isEmpty()) {
                 continue;
             }
-            character.component(NetworkComponent.class).connection().send(message);
+            character.component(NetworkComponent.class).connection.send(message);
         }
     }
 

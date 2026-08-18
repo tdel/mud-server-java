@@ -38,8 +38,8 @@ public class Say implements ControllerHandler {
             return;
         }
 
-        character.component(WorldComponent.class).worldInstance()
-                .broadcast(new Chat(character.component(IdentityComponent.class).name(), message), character);
+        character.component(WorldComponent.class).worldInstance
+                .broadcast(new Chat(character.component(IdentityComponent.class).name, message), character);
         connection.send(new YouSaid(message));
     }
 }

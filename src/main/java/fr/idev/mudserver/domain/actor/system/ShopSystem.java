@@ -23,7 +23,7 @@ public class ShopSystem {
     }
 
     public Optional<ShopEntry> resolveEntry(NpcSellerInstance npc, String input) {
-        List<ShopEntry> items = npc.component(ShopComponent.class).items();
+        List<ShopEntry> items = npc.component(ShopComponent.class).items;
         String trimmed = input.trim();
         try {
             int index = Integer.parseInt(trimmed);

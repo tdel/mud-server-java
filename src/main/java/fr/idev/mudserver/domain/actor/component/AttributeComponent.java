@@ -4,7 +4,13 @@ import java.util.Map;
 
 import fr.idev.mudserver.domain.actor.Attribute;
 
-public record AttributeComponent(Map<Attribute, Integer> attributes) {
+public class AttributeComponent {
+
+    public Map<Attribute, Integer> attributes;
+
+    public AttributeComponent(Map<Attribute, Integer> attributes) {
+        this.attributes = attributes;
+    }
 
     public int valueOf(Attribute attribute) {
         return attributes.get(attribute);

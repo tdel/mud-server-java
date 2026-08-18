@@ -1,11 +1,20 @@
 package fr.idev.mudserver.domain.actor.component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import fr.idev.mudserver.domain.item.Item;
 
-public record InventoryComponent(List<Item> items, int gold) {
+public class InventoryComponent {
+
+    public List<Item> items;
+    public int gold;
+
+    public InventoryComponent(List<Item> items, int gold) {
+        this.items = new ArrayList<>(items);
+        this.gold = gold;
+    }
 
     public Optional<Item> findOneByName(String name) {
         return items.stream().filter(item -> item.getName().equalsIgnoreCase(name)).findFirst();

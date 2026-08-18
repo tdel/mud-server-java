@@ -1,4 +1,10 @@
 package fr.idev.mudserver.domain.actor.component;
 
-public record RestComponent(int shortRestCount) {
+public class RestComponent {
+
+    public int shortRestCount;
+
+    public RestComponent(int shortRestCount) {
+        this.shortRestCount = shortRestCount;
+    }
 }

@@ -23,8 +23,8 @@ public class EncounterSystem {
     }
 
     public CombatEncounter getEncounter(AbstractCharacter character) {
-        return character.findComponent(EncounterMembershipComponent.class)
-                .map(EncounterMembershipComponent::encounterId).map(encounters::get).orElse(null);
+        return character.findComponent(EncounterMembershipComponent.class).map(membership -> membership.encounterId)
+                .map(encounters::get).orElse(null);
     }
 
     public boolean isInCombat(AbstractCharacter character) {

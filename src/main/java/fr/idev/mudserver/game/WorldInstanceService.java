@@ -130,16 +130,16 @@ public class WorldInstanceService {
     }
 
     public void enterGame(CharacterInstance player) {
-        WorldInstance instance = player.component(WorldComponent.class).worldInstance();
+        WorldInstance instance = player.component(WorldComponent.class).worldInstance;
 
         inventorySystem.replaceItems(player, itemService.loadInventory(player));
-        player.component(PositionComponent.class).currentRoom().join(player);
+        player.component(PositionComponent.class).currentRoom.join(player);
 
         instance.addPlayer(player);
         ecs.register(player);
-        accountDao.updateCurrentCharacter(player.component(AccountComponent.class).account().getId(), player.getId());
+        accountDao.updateCurrentCharacter(player.component(AccountComponent.class).account.getId(), player.getId());
 
-        MDC.put("character", player.component(IdentityComponent.class).name());
+        MDC.put("character", player.component(IdentityComponent.class).name);
     }
 
     public void exitGame(Connection connection) {
@@ -148,14 +148,14 @@ public class WorldInstanceService {
         }
 
         CharacterInstance character = connection.character();
-        RoomInstance room = character.component(PositionComponent.class).currentRoom();
-        WorldInstance instance = character.component(WorldComponent.class).worldInstance();
+        RoomInstance room = character.component(PositionComponent.class).currentRoom;
+        WorldInstance instance = character.component(WorldComponent.class).worldInstance;
 
         characterDao.update(character);
         room.disconnect(character);
         instance.removePlayer(character);
         ecs.unregister(character);
-        log.info("character.session_ended character={} room={}", character.component(IdentityComponent.class).name(),
+        log.info("character.session_ended character={} room={}", character.component(IdentityComponent.class).name,
                 room.getName());
         MDC.remove("character");
 
@@ -169,22 +169,22 @@ public class WorldInstanceService {
     @EventListener
     @Order(1)
     void onCharacterDied(CharacterDied event) {
-        RoomInstance room = event.character().component(PositionComponent.class).currentRoom();
+        RoomInstance room = event.character().component(PositionComponent.class).currentRoom;
         room.removeMonster(event.character());
         ecs.unregister(event.character());
-        room.broadcast(new MonsterDefeated(event.character().component(IdentityComponent.class).name()), null);
+        room.broadcast(new MonsterDefeated(event.character().component(IdentityComponent.class).name), null);
         log.info("combat.monster_removed_from_room monster={} room={}",
-                event.character().component(IdentityComponent.class).name(), room.getName());
+                event.character().component(IdentityComponent.class).name, room.getName());
     }
 
     @EventListener
     @Order(1)
     void onGamePlayerDied(GamePlayerDied event) {
-        RoomInstance room = event.character().component(PositionComponent.class).currentRoom();
-        room.broadcast(new GamePlayerDefeated(event.character().component(IdentityComponent.class).name(),
-                event.killer().component(IdentityComponent.class).name()), event.character());
+        RoomInstance room = event.character().component(PositionComponent.class).currentRoom;
+        room.broadcast(new GamePlayerDefeated(event.character().component(IdentityComponent.class).name,
+                event.killer().component(IdentityComponent.class).name), event.character());
         log.info("combat.player_defeated character={} killer={} room={}",
-                event.character().component(IdentityComponent.class).name(),
-                event.killer().component(IdentityComponent.class).name(), room.getName());
+                event.character().component(IdentityComponent.class).name,
+                event.killer().component(IdentityComponent.class).name, room.getName());
     }
 }

@@ -40,9 +40,9 @@ public class CharSelectStatus {
         }
 
         CharacterInstance existing = character.get();
-        connection.send(new ExistingCharacterInWorld(worldName, existing.component(IdentityComponent.class).name(),
-                existing.component(AppearanceComponent.class).characterClass(),
-                existing.component(LevelingComponent.class).level()));
+        connection.send(new ExistingCharacterInWorld(worldName, existing.component(IdentityComponent.class).name,
+                existing.component(AppearanceComponent.class).characterClass,
+                existing.component(LevelingComponent.class).level));
     }
 
     private String worldName(UUID worldTemplateId) {

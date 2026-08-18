@@ -34,14 +34,14 @@ public class WorldInstancePersistenceListener {
     @EventListener
     void onGamePlayerMovedToRoom(GamePlayerMovedToRoom event) {
         characterDao.updateCurrentRoom(event.character().getId(), event.to().getTemplateId());
-        log.debug("room.player_moved character={} to={}", event.character().component(IdentityComponent.class).name(),
+        log.debug("room.player_moved character={} to={}", event.character().component(IdentityComponent.class).name,
                 event.to().getName());
     }
 
     @EventListener
     void onGamePlayerSpawnedToRoom(GamePlayerSpawnedToRoom event) {
         characterDao.updateCurrentRoom(event.character().getId(), event.room().getTemplateId());
-        log.info("room.player_spawned character={} room={}",
-                event.character().component(IdentityComponent.class).name(), event.room().getName());
+        log.info("room.player_spawned character={} room={}", event.character().component(IdentityComponent.class).name,
+                event.room().getName());
     }
 }

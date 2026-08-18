@@ -61,11 +61,10 @@ public class WorldsList implements ControllerHandler {
 
             entries.add(new fr.idev.mudserver.network.message.lobby.WorldsList.Entry(template.shortName(),
                     template.name(), template.description(), template.minPlayers(), template.maxPlayers(),
-                    existingCharacter.map(character -> character.component(IdentityComponent.class).name())
+                    existingCharacter.map(character -> character.component(IdentityComponent.class).name).orElse(null),
+                    existingCharacter.map(character -> character.component(AppearanceComponent.class).characterClass)
                             .orElse(null),
-                    existingCharacter.map(character -> character.component(AppearanceComponent.class).characterClass())
-                            .orElse(null),
-                    existingCharacter.map(character -> character.component(LevelingComponent.class).level())
+                    existingCharacter.map(character -> character.component(LevelingComponent.class).level)
                             .orElse(null)));
         }
 

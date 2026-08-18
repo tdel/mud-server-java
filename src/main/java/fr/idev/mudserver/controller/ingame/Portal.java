@@ -39,7 +39,7 @@ public class Portal implements ControllerHandler {
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
         PositionComponent position = character.component(PositionComponent.class);
-        Optional<RoomPortal> portalQuery = position.currentRoom().findPortalAt(position.hexCoordinate());
+        Optional<RoomPortal> portalQuery = position.currentRoom.findPortalAt(position.hexCoordinate);
         if (portalQuery.isEmpty()) {
             connection.send(new NoPortalHere());
             return;

@@ -13,8 +13,8 @@ public class DialogueSystem {
     public Optional<DialogueOption> resolveOption(DialogueComponent dialogue, String input) {
         try {
             int index = Integer.parseInt(input.trim());
-            return index >= 1 && index <= dialogue.options().size()
-                    ? Optional.of(dialogue.options().get(index - 1))
+            return index >= 1 && index <= dialogue.options.size()
+                    ? Optional.of(dialogue.options.get(index - 1))
                     : Optional.empty();
         } catch (NumberFormatException e) {
             return Optional.empty();

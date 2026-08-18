@@ -35,12 +35,12 @@ public class LootSystem {
 
     private LootResult rollLoot(MonsterInstance killed, CharacterInstance killer) {
         List<ItemTemplate> items = new ArrayList<>();
-        for (MonsterTemplate.LootTableEntry entry : killed.component(LootComponent.class).lootTable()) {
+        for (MonsterTemplate.LootTableEntry entry : killed.component(LootComponent.class).lootTable) {
             if (DiceRoller.rollChance(entry.dropChance())) {
                 items.add(entry.itemTemplate());
             }
         }
-        return new LootResult(killed.component(LootComponent.class).goldReward(), items);
+        return new LootResult(killed.component(LootComponent.class).goldReward, items);
     }
 
     @EventListener
@@ -54,17 +54,16 @@ public class LootSystem {
 
         if (loot.gold() > 0) {
             inventorySystem.receiveGold(killer, loot.gold());
-            log.info("loot.gold_dropped killer={} killed={} amount={}",
-                    killer.component(IdentityComponent.class).name(), killed.component(IdentityComponent.class).name(),
-                    loot.gold());
+            log.info("loot.gold_dropped killer={} killed={} amount={}", killer.component(IdentityComponent.class).name,
+                    killed.component(IdentityComponent.class).name, loot.gold());
         }
 
         for (ItemTemplate itemTemplate : loot.items()) {
             // TODO: possible piste d'amélioration sur le suivi de l'UUID généré ici
             Item item = new Item(UUID.randomUUID(), itemTemplate, killer, null);
             inventorySystem.receiveLootItem(killer, item);
-            log.info("loot.item_dropped killer={} killed={} item={}", killer.component(IdentityComponent.class).name(),
-                    killed.component(IdentityComponent.class).name(), item.getName());
+            log.info("loot.item_dropped killer={} killed={} item={}", killer.component(IdentityComponent.class).name,
+                    killed.component(IdentityComponent.class).name, item.getName());
         }
     }
 
