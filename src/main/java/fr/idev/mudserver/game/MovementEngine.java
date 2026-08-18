@@ -7,10 +7,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.map.HexDirection;
 import fr.idev.mudserver.domain.world.RoomInstance;
-import jakarta.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
@@ -19,7 +19,7 @@ import fr.idev.mudserver.network.message.ingame.MovementBlockedByOccupant;
 import fr.idev.mudserver.network.message.ingame.ViewAround;
 
 @Component
-public class MovementEngine extends Thread {
+public class MovementEngine {
 
     public static final int REFERENCE_SPEED = 5;
     public static final long REFERENCE_TIME_MS = 1000L;
@@ -29,11 +29,6 @@ public class MovementEngine extends Thread {
     private static final long TICK_INTERVAL_MS = 100L;
 
     private final Map<UUID, AbstractCharacter> movingCharacters = new ConcurrentHashMap<>();
-
-    public MovementEngine() {
-        super("movement-engine");
-        setDaemon(true);
-    }
 
     public void startMovement(HexDirection direction, int cellsRequested, AbstractCharacter character) {
         character.activeMovement = new ActiveMovement(direction, cellsRequested, System.currentTimeMillis());
@@ -48,24 +43,9 @@ public class MovementEngine extends Thread {
         movingCharacters.remove(character.getId());
     }
 
-    @Override
-    public void run() {
-        while (!isInterrupted()) {
-            long tickStart = System.currentTimeMillis();
-            tick(tickStart);
-            long sleepTime = TICK_INTERVAL_MS - (System.currentTimeMillis() - tickStart);
-            if (sleepTime > 0) {
-                try {
-                    Thread.sleep(sleepTime);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return;
-                }
-            }
-        }
-    }
-
-    private void tick(long now) {
+    @Scheduled(fixedRate = TICK_INTERVAL_MS)
+    void tick() {
+        long now = System.currentTimeMillis();
         for (AbstractCharacter character : movingCharacters.values()) {
             switch (updatePosition(character, now)) {
                 case NO_MOVEMENT -> {
@@ -147,10 +127,5 @@ public class MovementEngine extends Thread {
 
     public enum MovementStepOutcome {
         NO_MOVEMENT, STEPPED, FINISHED, BLOCKED_BY_BOUNDS, BLOCKED_BY_OCCUPANT
-    }
-
-    @PreDestroy
-    void shutdown() {
-        interrupt();
     }
 }
