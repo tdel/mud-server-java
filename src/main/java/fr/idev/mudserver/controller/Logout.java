@@ -49,17 +49,20 @@ public class Logout implements ControllerHandler {
 
             connection.send(new StoppedPlaying(character.getName()));
             connection.send(new BackInLobby());
+            authWorld.enterLobby(connection);
             return;
         }
 
         if (connection.state() == ConnectionState.CHARSELECT) {
             connection.detachWorldInstance();
             connection.send(new BackInLobby());
+            authWorld.enterLobby(connection);
             return;
         }
 
         if (connection.state() == ConnectionState.LOBBY) {
             Account account = connection.account();
+            authWorld.leaveLobby(connection);
             authWorld.exitWorld(connection);
             log.info("auth.logged_out account={}", account.getLogin());
             connection.send(new LoggedOut());

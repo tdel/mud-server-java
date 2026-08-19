@@ -80,6 +80,7 @@ public class TuiConnection implements Connection, JsonOutput {
     }
 
     public void handleClose() {
+        boolean wasInLobby = state == ConnectionState.LOBBY;
         try {
             worldInstanceService.exitGame(this);
         } catch (Exception e) {
@@ -89,6 +90,13 @@ public class TuiConnection implements Connection, JsonOutput {
             this.detachWorldInstance();
         } catch (Exception e) {
             log.error("tui.disconnect_cleanup_failed stage=charselect", e);
+        }
+        if (wasInLobby) {
+            try {
+                authWorld.leaveLobby(this);
+            } catch (Exception e) {
+                log.error("tui.disconnect_cleanup_failed stage=lobby_notify", e);
+            }
         }
         try {
             authWorld.exitWorld(this);

@@ -18,6 +18,9 @@ import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.OutputMessage;
+import fr.idev.mudserver.network.message.lobby.LobbyPlayerJoined;
+import fr.idev.mudserver.network.message.lobby.LobbyPlayerLeft;
+import fr.idev.mudserver.network.message.lobby.LobbyPlayersList;
 import fr.idev.mudserver.persistence.AccountDao;
 
 @Component
@@ -79,6 +82,7 @@ public class AuthWorld {
         connections.add(connection);
         connection.setState(ConnectionState.LOBBY);
         MDC.put("account", account.getLogin());
+        enterLobby(connection);
     }
 
     public void exitWorld(Connection connection) {
@@ -94,6 +98,17 @@ public class AuthWorld {
                 continue;
             connection.send(message);
         }
+    }
+
+    public void enterLobby(Connection connection) {
+        List<String> logins = connections.stream().filter(c -> c.state() == ConnectionState.LOBBY)
+                .map(c -> c.account().getLogin()).sorted(String.CASE_INSENSITIVE_ORDER).toList();
+        connection.send(new LobbyPlayersList(logins));
+        broadcastToLobby(new LobbyPlayerJoined(connection.account().getLogin()), connection);
+    }
+
+    public void leaveLobby(Connection connection) {
+        broadcastToLobby(new LobbyPlayerLeft(connection.account().getLogin()), connection);
     }
 
     public boolean isAlreadyConnected(UUID accountId) {

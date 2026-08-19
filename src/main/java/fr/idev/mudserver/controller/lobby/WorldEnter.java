@@ -97,6 +97,7 @@ public class WorldEnter implements ControllerHandler {
                 .orElseGet(() -> worldInstanceService.createInstance(template.id(), Set.of(account.getId()),
                         account.getId()));
 
+        authWorld.leaveLobby(connection);
         connection.attachWorldInstance(instance);
         charSelectStatus.show(connection, account, instance);
     }
@@ -134,6 +135,7 @@ public class WorldEnter implements ControllerHandler {
 
         for (Connection memberConnection : memberConnections) {
             Account memberAccount = memberConnection.account();
+            authWorld.leaveLobby(memberConnection);
             memberConnection.attachWorldInstance(instance);
             charSelectStatus.show(memberConnection, memberAccount, instance);
         }

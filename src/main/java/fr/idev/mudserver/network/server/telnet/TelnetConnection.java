@@ -77,6 +77,7 @@ public class TelnetConnection implements Connection, TelnetOutput {
     }
 
     public void handleClose() {
+        boolean wasInLobby = state == ConnectionState.LOBBY;
         try {
             worldInstanceService.exitGame(this);
         } catch (Exception e) {
@@ -86,6 +87,13 @@ public class TelnetConnection implements Connection, TelnetOutput {
             this.detachWorldInstance();
         } catch (Exception e) {
             log.error("telnet.disconnect_cleanup_failed stage=charselect", e);
+        }
+        if (wasInLobby) {
+            try {
+                authWorld.leaveLobby(this);
+            } catch (Exception e) {
+                log.error("telnet.disconnect_cleanup_failed stage=lobby_notify", e);
+            }
         }
         try {
             authWorld.exitWorld(this);
