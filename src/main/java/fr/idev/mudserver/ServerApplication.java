@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
 import fr.idev.mudserver.game.catalog.ItemTemplateCatalog;
@@ -23,7 +22,6 @@ public class ServerApplication {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "app.telnet", name = "enabled", havingValue = "true", matchIfMissing = true)
     public ApplicationRunner warmupRunner(ItemTemplateCatalog itemTemplateCatalog, LevelCatalog levelCatalog,
             MonsterCatalog monsterCatalog, WorldTemplateCatalog worldTemplateCatalog) {
         return args -> {

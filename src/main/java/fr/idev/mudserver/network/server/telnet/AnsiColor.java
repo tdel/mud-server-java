@@ -1,4 +1,4 @@
-package fr.idev.mudserver.telnet;
+package fr.idev.mudserver.network.server.telnet;
 
 enum AnsiColor {
 

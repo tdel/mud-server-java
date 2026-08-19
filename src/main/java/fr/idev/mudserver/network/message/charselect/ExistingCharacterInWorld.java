@@ -1,12 +1,13 @@
 package fr.idev.mudserver.network.message.charselect;
 
+import fr.idev.mudserver.network.OutputJsonMessage;
 import fr.idev.mudserver.domain.actor.CharacterClass;
-import fr.idev.mudserver.telnet.Ansi;
-import fr.idev.mudserver.telnet.OutputTelnetMessage;
-import fr.idev.mudserver.telnet.TelnetOutput;
+import fr.idev.mudserver.network.server.telnet.Ansi;
+import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
+import fr.idev.mudserver.network.server.telnet.TelnetOutput;
 
 public record ExistingCharacterInWorld(String worldName, String characterName, CharacterClass characterClass,
-        int level) implements OutputTelnetMessage {
+        int level) implements OutputTelnetMessage, OutputJsonMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {

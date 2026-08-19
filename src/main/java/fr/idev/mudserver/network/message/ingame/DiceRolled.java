@@ -3,13 +3,14 @@ package fr.idev.mudserver.network.message.ingame;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import fr.idev.mudserver.network.OutputJsonMessage;
 import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoll;
-import fr.idev.mudserver.telnet.Ansi;
-import fr.idev.mudserver.telnet.OutputTelnetMessage;
-import fr.idev.mudserver.telnet.TelnetOutput;
+import fr.idev.mudserver.network.server.telnet.Ansi;
+import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
+import fr.idev.mudserver.network.server.telnet.TelnetOutput;
 
-public record DiceRolled(DiceExpression expression, DiceRoll result) implements OutputTelnetMessage {
+public record DiceRolled(DiceExpression expression, DiceRoll result) implements OutputTelnetMessage, OutputJsonMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {

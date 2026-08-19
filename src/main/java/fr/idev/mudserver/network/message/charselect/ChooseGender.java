@@ -1,10 +1,11 @@
 package fr.idev.mudserver.network.message.charselect;
 
+import fr.idev.mudserver.network.OutputJsonMessage;
 import fr.idev.mudserver.domain.actor.Gender;
-import fr.idev.mudserver.telnet.OutputTelnetMessage;
-import fr.idev.mudserver.telnet.TelnetOutput;
+import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
+import fr.idev.mudserver.network.server.telnet.TelnetOutput;
 
-public record ChooseGender() implements OutputTelnetMessage {
+public record ChooseGender() implements OutputTelnetMessage, OutputJsonMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {

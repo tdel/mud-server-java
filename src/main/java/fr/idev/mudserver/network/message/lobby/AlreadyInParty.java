@@ -1,9 +1,10 @@
 package fr.idev.mudserver.network.message.lobby;
 
-import fr.idev.mudserver.telnet.OutputTelnetMessage;
-import fr.idev.mudserver.telnet.TelnetOutput;
+import fr.idev.mudserver.network.OutputJsonMessage;
+import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
+import fr.idev.mudserver.network.server.telnet.TelnetOutput;
 
-public record AlreadyInParty() implements OutputTelnetMessage {
+public record AlreadyInParty() implements OutputTelnetMessage, OutputJsonMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {

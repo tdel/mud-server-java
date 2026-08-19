@@ -2,11 +2,13 @@ package fr.idev.mudserver.network.message.ingame;
 
 import java.util.List;
 
-import fr.idev.mudserver.telnet.Ansi;
-import fr.idev.mudserver.telnet.OutputTelnetMessage;
-import fr.idev.mudserver.telnet.TelnetOutput;
+import fr.idev.mudserver.network.OutputJsonMessage;
+import fr.idev.mudserver.network.server.telnet.Ansi;
+import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
+import fr.idev.mudserver.network.server.telnet.TelnetOutput;
 
-public record ProvisionSelection(List<Entry> entries, int selectedValue, int threshold) implements OutputTelnetMessage {
+public record ProvisionSelection(List<Entry> entries, int selectedValue,
+        int threshold) implements OutputTelnetMessage, OutputJsonMessage {
 
     public record Entry(String itemName, int nutritionValue) {
     }

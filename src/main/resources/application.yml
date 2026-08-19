@@ -12,6 +12,9 @@ app:
   telnet:
     enabled: true
     port: 4001
+  tui:
+    enabled: true
+    port: 4002
 
 logging:
   level:

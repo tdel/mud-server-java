@@ -1,4 +1,4 @@
-package fr.idev.mudserver.telnet;
+package fr.idev.mudserver.network.server.telnet;
 
 public final class TelnetEcho {
 

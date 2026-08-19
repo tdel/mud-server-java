@@ -2,12 +2,13 @@ package fr.idev.mudserver.network.message.lobby;
 
 import java.util.List;
 
+import fr.idev.mudserver.network.OutputJsonMessage;
 import fr.idev.mudserver.domain.actor.CharacterClass;
-import fr.idev.mudserver.telnet.Ansi;
-import fr.idev.mudserver.telnet.OutputTelnetMessage;
-import fr.idev.mudserver.telnet.TelnetOutput;
+import fr.idev.mudserver.network.server.telnet.Ansi;
+import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
+import fr.idev.mudserver.network.server.telnet.TelnetOutput;
 
-public record WorldsList(List<Entry> worlds) implements OutputTelnetMessage {
+public record WorldsList(List<Entry> worlds) implements OutputTelnetMessage, OutputJsonMessage {
 
     public record Entry(String shortName, String name, String description, int minPlayers, int maxPlayers,
             String existingCharacterName, CharacterClass existingCharacterClass, Integer existingCharacterLevel) {

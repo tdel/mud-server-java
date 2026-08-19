@@ -2,10 +2,11 @@ package fr.idev.mudserver.network.message;
 
 import java.util.List;
 
-import fr.idev.mudserver.telnet.OutputTelnetMessage;
-import fr.idev.mudserver.telnet.TelnetOutput;
+import fr.idev.mudserver.network.OutputJsonMessage;
+import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
+import fr.idev.mudserver.network.server.telnet.TelnetOutput;
 
-public record Help(List<String> commands) implements OutputTelnetMessage {
+public record Help(List<String> commands) implements OutputTelnetMessage, OutputJsonMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {

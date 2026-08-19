@@ -1,4 +1,4 @@
-package fr.idev.mudserver.telnet;
+package fr.idev.mudserver.network.server.telnet;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

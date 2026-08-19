@@ -2,12 +2,14 @@ package fr.idev.mudserver.network.message.charselect;
 
 import java.util.Map;
 
+import fr.idev.mudserver.network.OutputJsonMessage;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.Race;
-import fr.idev.mudserver.telnet.OutputTelnetMessage;
-import fr.idev.mudserver.telnet.TelnetOutput;
+import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
+import fr.idev.mudserver.network.server.telnet.TelnetOutput;
 
-public record ChooseRace(Map<Race, Map<Attribute, Integer>> bonusesByRace) implements OutputTelnetMessage {
+public record ChooseRace(
+        Map<Race, Map<Attribute, Integer>> bonusesByRace) implements OutputTelnetMessage, OutputJsonMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {

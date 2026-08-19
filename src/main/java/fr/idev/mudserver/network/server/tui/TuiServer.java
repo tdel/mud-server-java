@@ -1,6 +1,8 @@
-package fr.idev.mudserver.telnet;
+package fr.idev.mudserver.network.server.tui;
 
 import java.util.concurrent.ExecutorService;
+
+import tools.jackson.databind.ObjectMapper;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -21,20 +23,23 @@ import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.WorldInstanceService;
 
 @Component
-@ConditionalOnProperty(prefix = "app.telnet", name = "enabled", havingValue = "true", matchIfMissing = true)
-public class TelnetServer {
+@ConditionalOnProperty(prefix = "app.tui", name = "enabled", havingValue = "true", matchIfMissing = true)
+public class TuiServer {
 
-    private static final Logger log = LoggerFactory.getLogger(TelnetServer.class);
+    private static final Logger log = LoggerFactory.getLogger(TuiServer.class);
 
     private final ExecutorService virtualThreadExecutor;
+    private final ObjectMapper objectMapper;
     private final ControllerDispatcher controllerDispatcher;
     private final AuthWorld authWorld;
     private final WorldInstanceService worldInstanceService;
     private final int port;
 
-    public TelnetServer(ExecutorService virtualThreadExecutor, ControllerDispatcher controllerDispatcher,
-            AuthWorld authWorld, WorldInstanceService worldInstanceService, @Value("${app.telnet.port}") int port) {
+    public TuiServer(ExecutorService virtualThreadExecutor, ObjectMapper objectMapper,
+            ControllerDispatcher controllerDispatcher, AuthWorld authWorld, WorldInstanceService worldInstanceService,
+            @Value("${app.tui.port}") int port) {
         this.virtualThreadExecutor = virtualThreadExecutor;
+        this.objectMapper = objectMapper;
         this.controllerDispatcher = controllerDispatcher;
         this.authWorld = authWorld;
         this.worldInstanceService = worldInstanceService;
@@ -42,17 +47,26 @@ public class TelnetServer {
     }
 
     @EventListener(ApplicationReadyEvent.class)
-    public void start() throws InterruptedException {
+    public void start() {
+        // Ne bloque pas le thread de dispatch d'ApplicationReadyEvent : TelnetServer a
+        // besoin du même événement, et Spring invoque les listeners d'un même événement
+        // séquentiellement sur un seul thread.
+        virtualThreadExecutor.execute(this::runServer);
+    }
+
+    private void runServer() {
         EventLoopGroup bossGroup = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
         EventLoopGroup workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
         try {
             ServerBootstrap bootstrap = new ServerBootstrap().group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class).childHandler(new TelnetServerInitializer(
-                            virtualThreadExecutor, controllerDispatcher, authWorld, worldInstanceService));
+                    .channel(NioServerSocketChannel.class).childHandler(new TuiServerInitializer(virtualThreadExecutor,
+                            objectMapper, controllerDispatcher, authWorld, worldInstanceService));
 
             Channel channel = bootstrap.bind(port).sync().channel();
-            log.info("Serveur telnet démarré sur le port {}", port);
+            log.info("Serveur TUI démarré sur le port {}", port);
             channel.closeFuture().sync();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         } finally {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
