@@ -13,7 +13,7 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 
-import fr.idev.mudserver.controller.ControllerDispatcher;
+import fr.idev.mudserver.network.CommandDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.WorldInstanceService;
 
@@ -23,15 +23,15 @@ public class TuiServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private final ExecutorService virtualThreadExecutor;
     private final ObjectMapper objectMapper;
-    private final ControllerDispatcher controllerDispatcher;
+    private final CommandDispatcher commandDispatcher;
     private final AuthWorld authWorld;
     private final WorldInstanceService worldInstanceService;
 
     public TuiServerInitializer(ExecutorService virtualThreadExecutor, ObjectMapper objectMapper,
-            ControllerDispatcher controllerDispatcher, AuthWorld authWorld, WorldInstanceService worldInstanceService) {
+            CommandDispatcher commandDispatcher, AuthWorld authWorld, WorldInstanceService worldInstanceService) {
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.objectMapper = objectMapper;
-        this.controllerDispatcher = controllerDispatcher;
+        this.commandDispatcher = commandDispatcher;
         this.authWorld = authWorld;
         this.worldInstanceService = worldInstanceService;
     }
@@ -42,7 +42,7 @@ public class TuiServerInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(new DelimiterBasedFrameDecoder(MAX_LINE_LENGTH, true, true, Delimiters.lineDelimiter()));
         pipeline.addLast(new StringDecoder(CharsetUtil.UTF_8));
         pipeline.addLast(new StringEncoder(CharsetUtil.UTF_8));
-        pipeline.addLast(new TuiSessionHandler(virtualThreadExecutor, objectMapper, controllerDispatcher, authWorld,
+        pipeline.addLast(new TuiSessionHandler(virtualThreadExecutor, objectMapper, commandDispatcher, authWorld,
                 worldInstanceService));
     }
 }

@@ -16,7 +16,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
 
-import fr.idev.mudserver.controller.ControllerDispatcher;
+import fr.idev.mudserver.network.CommandDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.WorldInstanceService;
 
@@ -33,15 +33,15 @@ public class TuiSessionHandler extends SimpleChannelInboundHandler<String> {
 
     private final ExecutorService virtualThreadExecutor;
     private final ObjectMapper objectMapper;
-    private final ControllerDispatcher controllerDispatcher;
+    private final CommandDispatcher commandDispatcher;
     private final AuthWorld authWorld;
     private final WorldInstanceService worldInstanceService;
 
     public TuiSessionHandler(ExecutorService virtualThreadExecutor, ObjectMapper objectMapper,
-            ControllerDispatcher controllerDispatcher, AuthWorld authWorld, WorldInstanceService worldInstanceService) {
+            CommandDispatcher commandDispatcher, AuthWorld authWorld, WorldInstanceService worldInstanceService) {
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.objectMapper = objectMapper;
-        this.controllerDispatcher = controllerDispatcher;
+        this.commandDispatcher = commandDispatcher;
         this.authWorld = authWorld;
         this.worldInstanceService = worldInstanceService;
     }
@@ -50,7 +50,7 @@ public class TuiSessionHandler extends SimpleChannelInboundHandler<String> {
     public void channelActive(ChannelHandlerContext ctx) {
         String connectionId = "tui-" + CONNECTION_SEQUENCE.incrementAndGet();
         log.info("tui.connection_opened remote={} connectionId={}", ctx.channel().remoteAddress(), connectionId);
-        TuiConnection connection = new TuiConnection(connectionId, ctx.channel(), objectMapper, controllerDispatcher,
+        TuiConnection connection = new TuiConnection(connectionId, ctx.channel(), objectMapper, commandDispatcher,
                 authWorld, worldInstanceService);
         BlockingQueue<String> inbox = new LinkedBlockingQueue<>();
         ctx.channel().attr(CONNECTION_KEY).set(connection);

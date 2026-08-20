@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 
-import fr.idev.mudserver.controller.ControllerDispatcher;
+import fr.idev.mudserver.network.CommandDispatcher;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
@@ -26,7 +26,7 @@ public class TelnetConnection implements Connection, TelnetOutput {
 
     private final String connectionId;
     private final Channel channel;
-    private final ControllerDispatcher controllerDispatcher;
+    private final CommandDispatcher commandDispatcher;
     private final AuthWorld authWorld;
     private final WorldInstanceService worldInstanceService;
 
@@ -37,11 +37,11 @@ public class TelnetConnection implements Connection, TelnetOutput {
     private Consumer<String> pendingLine;
     private boolean pendingLineSecure;
 
-    public TelnetConnection(String connectionId, Channel channel, ControllerDispatcher controllerDispatcher,
+    public TelnetConnection(String connectionId, Channel channel, CommandDispatcher commandDispatcher,
             AuthWorld authWorld, WorldInstanceService worldInstanceService) {
         this.connectionId = connectionId;
         this.channel = channel;
-        this.controllerDispatcher = controllerDispatcher;
+        this.commandDispatcher = commandDispatcher;
         this.authWorld = authWorld;
         this.worldInstanceService = worldInstanceService;
     }
@@ -69,7 +69,7 @@ public class TelnetConnection implements Connection, TelnetOutput {
             String argument = spaceIdx == -1 ? "" : line.substring(spaceIdx + 1);
 
             verb = name.toLowerCase();
-            controllerDispatcher.dispatch(this, verb, argument);
+            commandDispatcher.dispatch(this, verb, argument);
         } catch (Exception e) {
             log.error("telnet.command.failed verb={} line={}", verb, secureLine ? "[REDACTED]" : rawLine, e);
             write("Something went wrong processing that command. Please try again.\n");

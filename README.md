@@ -19,8 +19,8 @@ régénérer cette démo).
 ## Commandes
 
 Une commande par ligne, groupées par état de connexion — voir `network/ConnectionState`
-(`CONNECTED`, `LOBBY`, `CHARSELECT`, `INGAME`) et les classes `ControllerHandler` sous
-`controller/{connected,lobby,charselect,ingame}`.
+(`CONNECTED`, `LOBBY`, `CHARSELECT`, `INGAME`) et les classes `CommandHandler` sous
+`network/command/{connected,lobby,charselect,ingame}`.
 
 **Non connecté** (`CONNECTED`)
 

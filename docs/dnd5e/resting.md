@@ -19,7 +19,7 @@ Source: [D&D 5e SRD 5.1](https://5thsrd.org/adventuring/resting/) (CC-BY-4.0, Wi
 
 ## Notes for this project
 
-Implemented as `rest short`/`rest long` (`controller.ingame.Rest`, `game.actor.RestService`), as a deliberately simplified house rule rather than the RAW mechanic above — several assumed deviations:
+Implemented as `rest short`/`rest long` (`network.command.ingame.Rest`, `game.actor.RestService`), as a deliberately simplified house rule rather than the RAW mechanic above — several assumed deviations:
 
 - **No Hit Dice pool.** A short rest restores a flat `hitDie/2 + 1 + CON modifier` (minimum 1) per character — the same "average hit die" formula already used for HP-on-level-up (`CharacterService.onCharacterGainedXp`), rather than letting the player spend a variable number of real Hit Dice one roll at a time. A house-rule cap of `GamePlayer.MAX_SHORT_RESTS_BEFORE_LONG_REST` (2) short rests applies before a long rest becomes mandatory to reset the counter — not an SRD rule.
 - **Global scope, not per-character.** A short or long rest affects every `CharacterInstance` currently online (`GameWorld.onlineCharacters()`), not just the initiator — a deliberate simplification for a MUD without a party/grouping concept, rather than SRD's "each creature decides individually."

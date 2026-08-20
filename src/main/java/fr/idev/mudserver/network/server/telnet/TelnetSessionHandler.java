@@ -13,7 +13,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
 
-import fr.idev.mudserver.controller.ControllerDispatcher;
+import fr.idev.mudserver.network.CommandDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.WorldInstanceService;
 
@@ -31,14 +31,14 @@ public class TelnetSessionHandler extends SimpleChannelInboundHandler<String> {
     private static final String WELCOME = "Welcome to mud-server-java.\nType \"login <name>\" or \"register <name>\" to begin.\n";
 
     private final ExecutorService virtualThreadExecutor;
-    private final ControllerDispatcher controllerDispatcher;
+    private final CommandDispatcher commandDispatcher;
     private final AuthWorld authWorld;
     private final WorldInstanceService worldInstanceService;
 
-    public TelnetSessionHandler(ExecutorService virtualThreadExecutor, ControllerDispatcher controllerDispatcher,
+    public TelnetSessionHandler(ExecutorService virtualThreadExecutor, CommandDispatcher commandDispatcher,
             AuthWorld authWorld, WorldInstanceService worldInstanceService) {
         this.virtualThreadExecutor = virtualThreadExecutor;
-        this.controllerDispatcher = controllerDispatcher;
+        this.commandDispatcher = commandDispatcher;
         this.authWorld = authWorld;
         this.worldInstanceService = worldInstanceService;
     }
@@ -47,7 +47,7 @@ public class TelnetSessionHandler extends SimpleChannelInboundHandler<String> {
     public void channelActive(ChannelHandlerContext ctx) {
         String connectionId = "conn-" + CONNECTION_SEQUENCE.incrementAndGet();
         log.info("telnet.connection_opened remote={} connectionId={}", ctx.channel().remoteAddress(), connectionId);
-        TelnetConnection connection = new TelnetConnection(connectionId, ctx.channel(), controllerDispatcher, authWorld,
+        TelnetConnection connection = new TelnetConnection(connectionId, ctx.channel(), commandDispatcher, authWorld,
                 worldInstanceService);
         BlockingQueue<String> inbox = new LinkedBlockingQueue<>();
         ctx.channel().attr(CONNECTION_KEY).set(connection);

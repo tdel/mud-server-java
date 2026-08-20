@@ -77,7 +77,7 @@ Confirmé avec l'utilisateur : à inclure. Pur renommage (aucun impact sur la co
 ## Risques / comportements adjacents vérifiés
 
 - **GameMonster/GameNpc** : non impactés (pas d'usage de `activeMovement` aujourd'hui).
-- **`ControllerDispatcher`** bloque déjà `go` pendant le combat — orthogonal, inchangé.
+- **`CommandDispatcher`** bloque déjà `go` pendant le combat — orthogonal, inchangé.
 - **`stopMovement()` idempotent** : pas de double publication de `CharacterStoppedMoving` même si C et le garde de `updatePosition` se déclenchent dans le même enchaînement.
 - **Fin de combat** (`setEncounter(null)`) : le hook C ne se déclenche que sur `encounter != null`, donc la fin de combat n'appelle jamais `stopMovement()` par erreur.
 - Cas limite pré-existant hors scope : fenêtre de concurrence entre un `stop` manuel et le traitement du tick — déjà présente aujourd'hui, non liée à ce correctif.

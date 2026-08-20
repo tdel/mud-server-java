@@ -12,7 +12,7 @@ import tools.jackson.databind.ObjectMapper;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 
-import fr.idev.mudserver.controller.ControllerDispatcher;
+import fr.idev.mudserver.network.CommandDispatcher;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
@@ -31,7 +31,7 @@ public class TuiConnection implements Connection, JsonOutput {
     private final String connectionId;
     private final Channel channel;
     private final ObjectMapper objectMapper;
-    private final ControllerDispatcher controllerDispatcher;
+    private final CommandDispatcher commandDispatcher;
     private final AuthWorld authWorld;
     private final WorldInstanceService worldInstanceService;
 
@@ -43,11 +43,11 @@ public class TuiConnection implements Connection, JsonOutput {
     private boolean pendingLineSecure;
 
     public TuiConnection(String connectionId, Channel channel, ObjectMapper objectMapper,
-            ControllerDispatcher controllerDispatcher, AuthWorld authWorld, WorldInstanceService worldInstanceService) {
+            CommandDispatcher commandDispatcher, AuthWorld authWorld, WorldInstanceService worldInstanceService) {
         this.connectionId = connectionId;
         this.channel = channel;
         this.objectMapper = objectMapper;
-        this.controllerDispatcher = controllerDispatcher;
+        this.commandDispatcher = commandDispatcher;
         this.authWorld = authWorld;
         this.worldInstanceService = worldInstanceService;
     }
@@ -72,7 +72,7 @@ public class TuiConnection implements Connection, JsonOutput {
             TuiCommand command = objectMapper.readValue(rawLine, TuiCommand.class);
             String verb = command.verb() == null ? "" : command.verb().toLowerCase();
             String argument = command.argument() == null ? "" : command.argument();
-            controllerDispatcher.dispatch(this, verb, argument);
+            commandDispatcher.dispatch(this, verb, argument);
         } catch (Exception e) {
             log.error("tui.command.failed line={}", secureLine ? "[REDACTED]" : rawLine, e);
             write("Error", Map.of("message", "Something went wrong processing that command. Please try again."), false);

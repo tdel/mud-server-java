@@ -5,7 +5,7 @@
 Le combat (`CombatEngine`) résout aujourd'hui toute attaque sans jamais vérifier la distance hexagonale entre l'attaquant et sa cible, alors que joueurs et monstres occupent déjà des cases distinctes (`RoomInstance.occupants`) et que `HexCoordinate.distanceTo` est déjà utilisé pour l'aggro (`presenceRadius`). Les monstres n'ont par ailleurs aucune IA de déplacement — ils sont statiques après spawn. Le but est d'introduire une vraie notion de portée d'arme/attaque : une attaque hors de portée est refusée avec un message clair, le joueur doit se rapprocher (commande `go`, actuellement bloquée en combat), et le monstre doit pouvoir avancer vers sa cible pendant son tour.
 
 Confirmé en lisant le code (pas seulement supposé) :
-- `ControllerDispatcher.COMBAT_ALLOWED_VERBS` (`controller/ControllerDispatcher.java:20`) ne contient pas `"go"` → tout mouvement est bloqué en combat aujourd'hui (`CombatActionRequired`).
+- `CommandDispatcher.COMBAT_ALLOWED_VERBS` (`network/CommandDispatcher.java:20`) ne contient pas `"go"` → tout mouvement est bloqué en combat aujourd'hui (`CombatActionRequired`).
 - `speed` (JSON monstres/races) est déjà exprimé en **cases**, pas en pieds (`GameCharacter.REFERENCE_SPEED = 5`, `getMillisPerCell() = 1000 * 5 / speed` — humain 30ft/5=6, nain 25ft/5=5, cohérent avec les JSON existants).
 - `GameCharacter.moveOneCell(HexDirection)` (`domain/actor/GameCharacter.java:130-146`) gère déjà atomiquement bornes + `tryClaimCell`/`releaseCell` + `setPosition` — outil direct pour un déplacement synchrone du monstre.
 - `src/test` est vide (nettoyage volontaire antérieur) → **pas de tests à ajouter** pour cette fonctionnalité (confirmé avec l'utilisateur).
@@ -144,8 +144,8 @@ private boolean tryStepToward(GameMonster monster, HexCoordinate targetPosition)
 
 ## Étape 7 — Débloquer et plafonner le rapprochement du joueur
 
-- `controller/ControllerDispatcher.java:20` : ajouter `"go"` à `COMBAT_ALLOWED_VERBS`.
-- `controller/ingame/Go.java` (`onReceive`, L33-56) :
+- `network/CommandDispatcher.java:20` : ajouter `"go"` à `COMBAT_ALLOWED_VERBS`.
+- `network/command/ingame/Go.java` (`onReceive`, L33-56) :
   - Ajouter une garde de tour (symétrique à `performTurnAttack`), après récupération de `character` :
     ```java
     if (character.isInCombat() && character.getEncounter().currentParticipant() != character) {
@@ -177,7 +177,7 @@ Limite acceptée, pas dans le scope de cette demande : le mouvement du joueur re
 - `domain/ItemTemplate.java`, `domain/Item.java`, `domain/ConsumableItem.java`, `domain/FoodItem.java`
 - `domain/actor/MonsterTemplate.java`
 - `game/ItemTemplateService.java`, `game/actor/MonsterService.java`
-- `controller/ControllerDispatcher.java`, `controller/ingame/Go.java`
+- `network/CommandDispatcher.java`, `network/command/ingame/Go.java`
 - Nouveaux : `network/message/ingame/TargetOutOfRange.java`, `network/message/ingame/MonsterApproachedBroadcast.java`
 - `src/main/resources/data/items.json`, `src/main/resources/data/monsters.json`
 

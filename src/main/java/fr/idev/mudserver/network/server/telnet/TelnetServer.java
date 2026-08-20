@@ -16,7 +16,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import fr.idev.mudserver.controller.ControllerDispatcher;
+import fr.idev.mudserver.network.CommandDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.WorldInstanceService;
 
@@ -27,15 +27,15 @@ public class TelnetServer {
     private static final Logger log = LoggerFactory.getLogger(TelnetServer.class);
 
     private final ExecutorService virtualThreadExecutor;
-    private final ControllerDispatcher controllerDispatcher;
+    private final CommandDispatcher commandDispatcher;
     private final AuthWorld authWorld;
     private final WorldInstanceService worldInstanceService;
     private final int port;
 
-    public TelnetServer(ExecutorService virtualThreadExecutor, ControllerDispatcher controllerDispatcher,
-            AuthWorld authWorld, WorldInstanceService worldInstanceService, @Value("${app.telnet.port}") int port) {
+    public TelnetServer(ExecutorService virtualThreadExecutor, CommandDispatcher commandDispatcher, AuthWorld authWorld,
+            WorldInstanceService worldInstanceService, @Value("${app.telnet.port}") int port) {
         this.virtualThreadExecutor = virtualThreadExecutor;
-        this.controllerDispatcher = controllerDispatcher;
+        this.commandDispatcher = commandDispatcher;
         this.authWorld = authWorld;
         this.worldInstanceService = worldInstanceService;
         this.port = port;
@@ -56,7 +56,7 @@ public class TelnetServer {
         try {
             ServerBootstrap bootstrap = new ServerBootstrap().group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class).childHandler(new TelnetServerInitializer(
-                            virtualThreadExecutor, controllerDispatcher, authWorld, worldInstanceService));
+                            virtualThreadExecutor, commandDispatcher, authWorld, worldInstanceService));
 
             Channel channel = bootstrap.bind(port).sync().channel();
             log.info("Serveur telnet démarré sur le port {}", port);

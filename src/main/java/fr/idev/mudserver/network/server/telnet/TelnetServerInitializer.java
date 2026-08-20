@@ -11,7 +11,7 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 
-import fr.idev.mudserver.controller.ControllerDispatcher;
+import fr.idev.mudserver.network.CommandDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.WorldInstanceService;
 
@@ -20,14 +20,14 @@ public class TelnetServerInitializer extends ChannelInitializer<SocketChannel> {
     private static final int MAX_LINE_LENGTH = 1024;
 
     private final ExecutorService virtualThreadExecutor;
-    private final ControllerDispatcher controllerDispatcher;
+    private final CommandDispatcher commandDispatcher;
     private final AuthWorld authWorld;
     private final WorldInstanceService worldInstanceService;
 
-    public TelnetServerInitializer(ExecutorService virtualThreadExecutor, ControllerDispatcher controllerDispatcher,
+    public TelnetServerInitializer(ExecutorService virtualThreadExecutor, CommandDispatcher commandDispatcher,
             AuthWorld authWorld, WorldInstanceService worldInstanceService) {
         this.virtualThreadExecutor = virtualThreadExecutor;
-        this.controllerDispatcher = controllerDispatcher;
+        this.commandDispatcher = commandDispatcher;
         this.authWorld = authWorld;
         this.worldInstanceService = worldInstanceService;
     }
@@ -40,6 +40,6 @@ public class TelnetServerInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(new StringDecoder(CharsetUtil.UTF_8));
         pipeline.addLast(new StringEncoder(CharsetUtil.UTF_8));
         pipeline.addLast(
-                new TelnetSessionHandler(virtualThreadExecutor, controllerDispatcher, authWorld, worldInstanceService));
+                new TelnetSessionHandler(virtualThreadExecutor, commandDispatcher, authWorld, worldInstanceService));
     }
 }

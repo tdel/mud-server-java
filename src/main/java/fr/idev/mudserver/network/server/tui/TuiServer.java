@@ -18,7 +18,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import fr.idev.mudserver.controller.ControllerDispatcher;
+import fr.idev.mudserver.network.CommandDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.WorldInstanceService;
 
@@ -30,17 +30,17 @@ public class TuiServer {
 
     private final ExecutorService virtualThreadExecutor;
     private final ObjectMapper objectMapper;
-    private final ControllerDispatcher controllerDispatcher;
+    private final CommandDispatcher commandDispatcher;
     private final AuthWorld authWorld;
     private final WorldInstanceService worldInstanceService;
     private final int port;
 
     public TuiServer(ExecutorService virtualThreadExecutor, ObjectMapper objectMapper,
-            ControllerDispatcher controllerDispatcher, AuthWorld authWorld, WorldInstanceService worldInstanceService,
+            CommandDispatcher commandDispatcher, AuthWorld authWorld, WorldInstanceService worldInstanceService,
             @Value("${app.tui.port}") int port) {
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.objectMapper = objectMapper;
-        this.controllerDispatcher = controllerDispatcher;
+        this.commandDispatcher = commandDispatcher;
         this.authWorld = authWorld;
         this.worldInstanceService = worldInstanceService;
         this.port = port;
@@ -60,7 +60,7 @@ public class TuiServer {
         try {
             ServerBootstrap bootstrap = new ServerBootstrap().group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class).childHandler(new TuiServerInitializer(virtualThreadExecutor,
-                            objectMapper, controllerDispatcher, authWorld, worldInstanceService));
+                            objectMapper, commandDispatcher, authWorld, worldInstanceService));
 
             Channel channel = bootstrap.bind(port).sync().channel();
             log.info("Serveur TUI démarré sur le port {}", port);
