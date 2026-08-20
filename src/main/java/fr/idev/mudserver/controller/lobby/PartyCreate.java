@@ -1,5 +1,6 @@
 package fr.idev.mudserver.controller.lobby;
 
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.lobby.AlreadyInParty;
 import fr.idev.mudserver.network.message.lobby.PartyCreated;
+import fr.idev.mudserver.network.message.lobby.PartyMembersList;
 
 @Component
 public class PartyCreate implements ControllerHandler {
@@ -42,5 +44,6 @@ public class PartyCreate implements ControllerHandler {
 
         partyService.createParty(account.getId());
         connection.send(new PartyCreated());
+        connection.send(new PartyMembersList(List.of(account.getLogin())));
     }
 }

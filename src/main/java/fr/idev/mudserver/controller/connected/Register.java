@@ -79,6 +79,5 @@ public class Register implements ControllerHandler {
             return;
         }
 
-        connection.send(new AccountCreated(account.getLogin()));
     }
 }

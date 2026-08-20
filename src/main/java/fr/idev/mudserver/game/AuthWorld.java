@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import fr.idev.mudserver.network.message.connected.AccountCreated;
+import fr.idev.mudserver.network.message.connected.WelcomeBack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -71,6 +73,8 @@ public class AuthWorld {
             throw e;
         }
 
+        connection.send(new AccountCreated(account.getLogin()));
+
         enterWorld(connection, account);
         log.info("account.registered account={}", login);
 
@@ -82,6 +86,8 @@ public class AuthWorld {
         connections.add(connection);
         connection.setState(ConnectionState.LOBBY);
         MDC.put("account", account.getLogin());
+
+        connection.send(new WelcomeBack(account.getLogin()));
         enterLobby(connection);
     }
 

@@ -8,6 +8,6 @@ public record WelcomeBack(String login) implements OutputTelnetMessage, OutputJs
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        output.write("Welcome back, " + login + "!\n\n");
+        output.write("Logged as " + login + "!\n\n");
     }
 }

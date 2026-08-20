@@ -10,32 +10,27 @@ import fr.idev.mudserver.controller.ControllerHandler;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Party;
 import fr.idev.mudserver.domain.PartyMember;
-import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.PartyService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
-import fr.idev.mudserver.network.message.lobby.NoPendingInvite;
-import fr.idev.mudserver.network.message.lobby.PartyJoined;
-import fr.idev.mudserver.network.message.lobby.PartyMemberJoined;
+import fr.idev.mudserver.network.message.lobby.NotInParty;
 import fr.idev.mudserver.network.message.lobby.PartyMembersList;
 import fr.idev.mudserver.persistence.AccountDao;
 
 @Component
-public class PartyAccept implements ControllerHandler {
+public class PartyList implements ControllerHandler {
 
-    private final AuthWorld authWorld;
     private final PartyService partyService;
     private final AccountDao accountDao;
 
-    public PartyAccept(AuthWorld authWorld, PartyService partyService, AccountDao accountDao) {
-        this.authWorld = authWorld;
+    public PartyList(PartyService partyService, AccountDao accountDao) {
         this.partyService = partyService;
         this.accountDao = accountDao;
     }
 
     @Override
     public String name() {
-        return "party-accept";
+        return "party-list";
     }
 
     @Override
@@ -47,26 +42,13 @@ public class PartyAccept implements ControllerHandler {
     public void onReceive(Connection connection, String argument) {
         Account account = connection.account();
 
-        Optional<Party> partyOpt = partyService.pendingInviteFor(account.getId());
+        Optional<Party> partyOpt = partyService.partyOf(account.getId());
         if (partyOpt.isEmpty()) {
-            connection.send(new NoPendingInvite());
+            connection.send(new NotInParty());
             return;
         }
-        Party party = partyOpt.get();
 
-        partyService.accept(party, account.getId());
-
-        String leaderLogin = accountDao.findById(party.getLeaderAccountId()).map(Account::getLogin).orElse("?");
-        connection.send(new PartyJoined(leaderLogin, party.getMembers().size()));
-        connection.send(new PartyMembersList(loginsOf(party)));
-
-        for (PartyMember member : party.getMembers()) {
-            if (member.accountId().equals(account.getId())) {
-                continue;
-            }
-            authWorld.findConnectionByAccountId(member.accountId())
-                    .ifPresent(memberConnection -> memberConnection.send(new PartyMemberJoined(account.getLogin())));
-        }
+        connection.send(new PartyMembersList(loginsOf(partyOpt.get())));
     }
 
     private List<String> loginsOf(Party party) {

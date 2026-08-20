@@ -83,7 +83,5 @@ public class Login implements ControllerHandler {
 
         authWorld.enterWorld(connection, account);
         log.info("auth.login_succeeded account={}", login);
-
-        connection.send(new WelcomeBack(login));
     }
 }
