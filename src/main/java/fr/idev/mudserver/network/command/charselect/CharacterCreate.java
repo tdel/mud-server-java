@@ -26,6 +26,7 @@ import fr.idev.mudserver.network.message.charselect.ChooseGender;
 import fr.idev.mudserver.network.message.charselect.ChooseRace;
 import fr.idev.mudserver.network.message.charselect.InvalidClass;
 import fr.idev.mudserver.network.message.charselect.InvalidGender;
+import fr.idev.mudserver.network.message.charselect.CharacterNameTaken;
 import fr.idev.mudserver.network.message.charselect.InvalidRace;
 import fr.idev.mudserver.network.message.charselect.NowPlaying;
 import fr.idev.mudserver.network.message.ingame.GamePlayerStats;
@@ -66,8 +67,9 @@ public class CharacterCreate implements CommandHandler {
         Account account = connection.account();
         WorldInstance instance = connection.worldInstance();
 
-        if (worldInstanceService.findCharacterFor(account, instance).isPresent()) {
-            charSelectStatus.show(connection, account, instance);
+        if (worldInstanceService.findCharacterByName(account, name).isPresent()) {
+            connection.send(new CharacterNameTaken(name));
+            charSelectStatus.show(connection, account);
             return;
         }
 

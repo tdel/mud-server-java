@@ -80,7 +80,6 @@ public class TuiConnection implements Connection, JsonOutput {
     }
 
     public void handleClose() {
-        boolean wasInLobby = state == ConnectionState.LOBBY;
         try {
             worldInstanceService.exitGame(this);
         } catch (Exception e) {
@@ -90,13 +89,6 @@ public class TuiConnection implements Connection, JsonOutput {
             this.detachWorldInstance();
         } catch (Exception e) {
             log.error("tui.disconnect_cleanup_failed stage=charselect", e);
-        }
-        if (wasInLobby) {
-            try {
-                authWorld.leaveLobby(this);
-            } catch (Exception e) {
-                log.error("tui.disconnect_cleanup_failed stage=lobby_notify", e);
-            }
         }
         try {
             authWorld.exitWorld(this);
@@ -153,12 +145,6 @@ public class TuiConnection implements Connection, JsonOutput {
     }
 
     @Override
-    public void detachCharacter() {
-        this.player = null;
-        this.setState(ConnectionState.LOBBY);
-    }
-
-    @Override
     public CharacterInstance character() {
         if (state != ConnectionState.INGAME) {
             throw new IllegalStateException("Connection " + connectionId + " n'est pas en état INGAME (" + state + ")");
@@ -188,12 +174,12 @@ public class TuiConnection implements Connection, JsonOutput {
     @Override
     public void detachWorldInstance() {
         this.worldInstance = null;
-        this.setState(ConnectionState.LOBBY);
+        this.setState(ConnectionState.CONNECTED);
     }
 
     @Override
     public WorldInstance worldInstance() {
-        if (state == ConnectionState.CONNECTED || state == ConnectionState.LOBBY) {
+        if (state == ConnectionState.CONNECTED) {
             throw new IllegalStateException(
                     "Connection " + connectionId + " n'a pas de WorldInstance en état " + state);
         }

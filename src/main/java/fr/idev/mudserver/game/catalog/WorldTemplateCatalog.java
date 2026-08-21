@@ -3,7 +3,6 @@ package fr.idev.mudserver.game.catalog;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +40,6 @@ public class WorldTemplateCatalog {
     private static final String WORLDS_DIR_MARKER = "data/worlds/";
 
     private final Map<UUID, WorldTemplateSummary> summariesById = new ConcurrentHashMap<>();
-    private final Map<String, UUID> idByShortName = new ConcurrentHashMap<>();
     private final Map<UUID, WorldTemplate> loadedTemplatesById = new ConcurrentHashMap<>();
 
     private final ObjectMapper objectMapper;
@@ -62,12 +60,12 @@ public class WorldTemplateCatalog {
         } catch (IOException e) {
             throw new IllegalStateException("Impossible d'énumérer " + WORLDS_MANIFEST_PATTERN, e);
         }
-        if (manifests.length == 0) {
-            throw new IllegalStateException("Aucun monde trouvé sous " + WORLDS_MANIFEST_PATTERN);
+        if (manifests.length != 1) {
+            throw new IllegalStateException("Un seul monde est supporté (retour au monde unique) : " + manifests.length
+                    + " trouvé(s) sous " + WORLDS_MANIFEST_PATTERN);
         }
 
         Map<UUID, WorldTemplateSummary> loaded = new LinkedHashMap<>();
-        Map<String, UUID> loadedByShortName = new LinkedHashMap<>();
         for (Resource manifest : manifests) {
             String shortName = shortNameOf(manifest);
             WorldTemplateSummary summary = loadSummary(shortName);
@@ -75,13 +73,10 @@ public class WorldTemplateCatalog {
                 throw new IllegalStateException(
                         "Le monde " + shortName + " a un id " + summary.id() + " déjà utilisé par un autre monde");
             }
-            loadedByShortName.put(shortName, summary.id());
         }
 
         summariesById.clear();
         summariesById.putAll(loaded);
-        idByShortName.clear();
-        idByShortName.putAll(loadedByShortName);
         log.info("world.templates_loaded count={}", summariesById.size());
     }
 
@@ -309,17 +304,8 @@ public class WorldTemplateCatalog {
         return resourcePatternResolver.getResource("classpath:" + WORLDS_DIR_MARKER + shortName + "/" + fileName);
     }
 
-    public Collection<WorldTemplateSummary> allSummaries() {
-        return summariesById.values();
-    }
-
-    public Optional<WorldTemplateSummary> findSummaryById(UUID id) {
-        return Optional.ofNullable(summariesById.get(id));
-    }
-
-    public Optional<WorldTemplateSummary> findSummaryByShortName(String shortName) {
-        UUID id = idByShortName.get(shortName);
-        return id == null ? Optional.empty() : findSummaryById(id);
+    public WorldTemplateSummary theOnlyTemplate() {
+        return summariesById.values().iterator().next();
     }
 
     public Optional<WorldTemplate> findById(UUID id) {

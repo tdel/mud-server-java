@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,20 +29,15 @@ public class WorldInstance {
     private final UUID id;
     private final UUID worldTemplateId;
     private final Instant createdAt;
-    private final UUID partyLeaderAccountId;
-    private final Set<UUID> memberAccountIds;
 
     private Map<UUID, RoomInstance> roomInstances = Map.of();
 
     private final Map<UUID, CharacterInstance> players = new ConcurrentHashMap<>();
 
-    public WorldInstance(UUID id, UUID worldTemplateId, Instant createdAt, UUID partyLeaderAccountId,
-            Set<UUID> memberAccountIds) {
+    public WorldInstance(UUID id, UUID worldTemplateId, Instant createdAt) {
         this.id = id;
         this.worldTemplateId = worldTemplateId;
         this.createdAt = createdAt;
-        this.partyLeaderAccountId = partyLeaderAccountId;
-        this.memberAccountIds = Set.copyOf(memberAccountIds);
     }
 
     public UUID getId() {
@@ -56,14 +50,6 @@ public class WorldInstance {
 
     public Instant getCreatedAt() {
         return createdAt;
-    }
-
-    public Optional<UUID> getPartyLeaderAccountId() {
-        return Optional.ofNullable(partyLeaderAccountId);
-    }
-
-    public Set<UUID> getMemberAccountIds() {
-        return memberAccountIds;
     }
 
     public void setRoomInstances(Map<UUID, RoomInstance> roomInstances) {
@@ -158,7 +144,6 @@ public class WorldInstance {
 
     @Override
     public String toString() {
-        return "WorldInstance[id=" + id + ", worldTemplateId=" + worldTemplateId + ", createdAt=" + createdAt
-                + ", partyLeaderAccountId=" + partyLeaderAccountId + ", members=" + memberAccountIds.size() + "]";
+        return "WorldInstance[id=" + id + ", worldTemplateId=" + worldTemplateId + ", createdAt=" + createdAt + "]";
     }
 }

@@ -7,26 +7,17 @@ import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
 import fr.idev.mudserver.domain.actor.event.GamePlayerSpawnedToRoom;
-import fr.idev.mudserver.domain.actor.event.WorldInstanceCreated;
 import fr.idev.mudserver.persistence.CharacterDao;
-import fr.idev.mudserver.persistence.WorldInstanceDao;
 
 @Service
 public class WorldInstancePersistenceListener {
 
     private static final Logger log = LoggerFactory.getLogger(WorldInstancePersistenceListener.class);
 
-    private final WorldInstanceDao worldInstanceDao;
     private final CharacterDao characterDao;
 
-    public WorldInstancePersistenceListener(WorldInstanceDao worldInstanceDao, CharacterDao characterDao) {
-        this.worldInstanceDao = worldInstanceDao;
+    public WorldInstancePersistenceListener(CharacterDao characterDao) {
         this.characterDao = characterDao;
-    }
-
-    @EventListener
-    void onWorldInstanceCreated(WorldInstanceCreated event) {
-        worldInstanceDao.insert(event.instance());
     }
 
     @EventListener

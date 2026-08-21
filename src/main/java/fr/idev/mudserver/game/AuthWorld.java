@@ -19,10 +19,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.Connection;
-import fr.idev.mudserver.network.OutputMessage;
-import fr.idev.mudserver.network.message.lobby.LobbyPlayerJoined;
-import fr.idev.mudserver.network.message.lobby.LobbyPlayerLeft;
-import fr.idev.mudserver.network.message.lobby.LobbyPlayersList;
+import fr.idev.mudserver.network.command.charselect.CharSelectStatus;
 import fr.idev.mudserver.persistence.AccountDao;
 
 @Component
@@ -37,10 +34,15 @@ public class AuthWorld {
 
     private final AccountDao accountDao;
     private final PasswordEncoder passwordEncoder;
+    private final WorldInstanceService worldInstanceService;
+    private final CharSelectStatus charSelectStatus;
 
-    public AuthWorld(AccountDao accountDao, PasswordEncoder passwordEncoder) {
+    public AuthWorld(AccountDao accountDao, PasswordEncoder passwordEncoder, WorldInstanceService worldInstanceService,
+            CharSelectStatus charSelectStatus) {
         this.accountDao = accountDao;
         this.passwordEncoder = passwordEncoder;
+        this.worldInstanceService = worldInstanceService;
+        this.charSelectStatus = charSelectStatus;
     }
 
     public Optional<Account> findOneAccountByLogin(String login) {
@@ -84,11 +86,11 @@ public class AuthWorld {
     public void enterWorld(Connection connection, Account account) {
         connection.setAccount(account);
         connections.add(connection);
-        connection.setState(ConnectionState.LOBBY);
+        connection.attachWorldInstance(worldInstanceService.getDefaultInstance());
         MDC.put("account", account.getLogin());
 
         connection.send(new WelcomeBack(account.getLogin()));
-        enterLobby(connection);
+        charSelectStatus.show(connection, account);
     }
 
     public void exitWorld(Connection connection) {
@@ -98,35 +100,7 @@ public class AuthWorld {
         MDC.remove("account");
     }
 
-    public void broadcastToLobby(OutputMessage message, Connection exclude) {
-        for (Connection connection : connections) {
-            if (connection == exclude || connection.state() != ConnectionState.LOBBY)
-                continue;
-            connection.send(message);
-        }
-    }
-
-    public void enterLobby(Connection connection) {
-        List<String> logins = connections.stream().filter(c -> c.state() == ConnectionState.LOBBY)
-                .map(c -> c.account().getLogin()).sorted(String.CASE_INSENSITIVE_ORDER).toList();
-        connection.send(new LobbyPlayersList(logins));
-        broadcastToLobby(new LobbyPlayerJoined(connection.account().getLogin()), connection);
-    }
-
-    public void leaveLobby(Connection connection) {
-        broadcastToLobby(new LobbyPlayerLeft(connection.account().getLogin()), connection);
-    }
-
     public boolean isAlreadyConnected(UUID accountId) {
         return connections.stream().anyMatch(connection -> connection.account().getId().equals(accountId));
-    }
-
-    public Optional<Connection> findConnectionByLogin(String login) {
-        return connections.stream().filter(connection -> connection.account().getLogin().equalsIgnoreCase(login))
-                .findFirst();
-    }
-
-    public Optional<Connection> findConnectionByAccountId(UUID accountId) {
-        return connections.stream().filter(connection -> connection.account().getId().equals(accountId)).findFirst();
     }
 }

@@ -3,6 +3,7 @@ package fr.idev.mudserver.persistence;
 import static fr.idev.mudserver.persistence.jooq.Tables.CHARACTER;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,35 +31,28 @@ public class CharacterDao {
     }
 
     public void insert(CharacterInstance character) {
-        UUID worldInstanceId = character.getWorldInstanceId() != null
-                ? character.getWorldInstanceId()
-                : WorldInstance.DEFAULT_ID;
         dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_ROOM_ID,
                 CHARACTER.GENDER, CHARACTER.RACE, CHARACTER.CHARACTER_CLASS, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH,
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
                 CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA, CHARACTER.XP, CHARACTER.GOLD,
-                CHARACTER.SHORT_REST_COUNT, CHARACTER.WORLD_INSTANCE_ID)
+                CHARACTER.SHORT_REST_COUNT)
                 .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentRoomId(),
                         character.getGender().name(), character.getRace().name(), character.getCharacterClass().name(),
                         character.getLevel(), character.getCurrentHealth(), character.getMaxHealth(),
                         character.getAttribute(Attribute.STRENGTH), character.getAttribute(Attribute.DEXTERITY),
                         character.getAttribute(Attribute.CONSTITUTION), character.getAttribute(Attribute.INTELLIGENCE),
                         character.getAttribute(Attribute.WISDOM), character.getAttribute(Attribute.CHARISMA),
-                        character.getXp(), character.getInventory().getGold(), character.getShortRestCount(),
-                        worldInstanceId)
+                        character.getXp(), character.getInventory().getGold(), character.getShortRestCount())
                 .execute();
     }
 
-    public Optional<CharacterInstance> findByAccountAndWorldInstance(Account account, WorldInstance instance) {
-        return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(account.getId()))
-                .and(CHARACTER.WORLD_INSTANCE_ID.eq(instance.getId()))
-                .fetchOptional(record -> toDomain(record, account, instance));
+    public List<CharacterInstance> findAllByAccount(Account account, WorldInstance instance) {
+        return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(account.getId())).orderBy(CHARACTER.NAME)
+                .fetch(record -> toDomain(record, account, instance));
     }
 
-    public Optional<CharacterInstance> findByAccountAndWorldInstanceAndName(Account account, WorldInstance instance,
-            String name) {
-        return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(account.getId()))
-                .and(CHARACTER.WORLD_INSTANCE_ID.eq(instance.getId())).and(CHARACTER.NAME.eq(name))
+    public Optional<CharacterInstance> findByAccountAndName(Account account, WorldInstance instance, String name) {
+        return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(account.getId())).and(CHARACTER.NAME.eq(name))
                 .fetchOptional(record -> toDomain(record, account, instance));
     }
 

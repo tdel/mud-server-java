@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -38,8 +37,7 @@ class MonsterTemplateLootTest {
     }
 
     private CharacterInstance newKiller() {
-        WorldInstance world = new WorldInstance(UUID.randomUUID(), UUID.randomUUID(), Instant.now(), UUID.randomUUID(),
-                Set.of());
+        WorldInstance world = new WorldInstance(UUID.randomUUID(), UUID.randomUUID(), Instant.now());
         RoomTemplate roomTemplate = new RoomTemplate(UUID.randomUUID(), "Room", "desc", true, 3, 3,
                 new HexCoordinate(0, 0), List.of());
         RoomInstance room = new RoomInstance(UUID.randomUUID(), roomTemplate, world);

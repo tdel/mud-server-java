@@ -15,7 +15,6 @@ import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.LoggedOut;
 import fr.idev.mudserver.network.message.charselect.StoppedPlaying;
-import fr.idev.mudserver.network.message.lobby.BackInLobby;
 
 @Component
 public class Logout implements CommandHandler {
@@ -37,39 +36,22 @@ public class Logout implements CommandHandler {
 
     @Override
     public Set<ConnectionState> states() {
-        return Set.of(ConnectionState.LOBBY, ConnectionState.CHARSELECT, ConnectionState.INGAME);
+        return Set.of(ConnectionState.CHARSELECT, ConnectionState.INGAME);
     }
 
     @Override
     public void onReceive(Connection connection, String argument) {
+        Account account = connection.account();
+
         if (connection.state() == ConnectionState.INGAME) {
             CharacterInstance character = connection.character();
-
             worldInstanceService.exitGame(connection);
-            connection.detachWorldInstance();
-
             connection.send(new StoppedPlaying(character.getName()));
-            connection.send(new BackInLobby());
-            authWorld.enterLobby(connection);
-            return;
         }
 
-        if (connection.state() == ConnectionState.CHARSELECT) {
-            connection.detachWorldInstance();
-            connection.send(new BackInLobby());
-            authWorld.enterLobby(connection);
-            return;
-        }
-
-        if (connection.state() == ConnectionState.LOBBY) {
-            Account account = connection.account();
-            authWorld.leaveLobby(connection);
-            authWorld.exitWorld(connection);
-            log.info("auth.logged_out account={}", account.getLogin());
-            connection.send(new LoggedOut());
-            return;
-        }
-
-        throw new IllegalStateException("not handled!");
+        connection.detachWorldInstance();
+        authWorld.exitWorld(connection);
+        log.info("auth.logged_out account={}", account.getLogin());
+        connection.send(new LoggedOut());
     }
 }

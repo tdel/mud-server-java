@@ -45,7 +45,6 @@ import fr.idev.mudserver.network.OutputMessage;
 public final class CharacterInstance extends AbstractCharacter {
 
     private final Account account;
-    private UUID worldInstanceId;
     private WorldInstance worldInstance;
     private Gender gender;
     private Race race;
@@ -95,21 +94,12 @@ public final class CharacterInstance extends AbstractCharacter {
         return getCurrentRoom().getTemplateId();
     }
 
-    public UUID getWorldInstanceId() {
-        return worldInstanceId;
-    }
-
-    public void setWorldInstanceId(UUID worldInstanceId) {
-        this.worldInstanceId = worldInstanceId;
-    }
-
     public WorldInstance getWorldInstance() {
         return worldInstance;
     }
 
     public void setWorldInstance(WorldInstance worldInstance) {
         this.worldInstance = worldInstance;
-        this.worldInstanceId = worldInstance.getId();
     }
 
     public Gender getGender() {

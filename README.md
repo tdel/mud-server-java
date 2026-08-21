@@ -19,8 +19,8 @@ régénérer cette démo).
 ## Commandes
 
 Une commande par ligne, groupées par état de connexion — voir `network/ConnectionState`
-(`CONNECTED`, `LOBBY`, `CHARSELECT`, `INGAME`) et les classes `CommandHandler` sous
-`network/command/{connected,lobby,charselect,ingame}`.
+(`CONNECTED`, `CHARSELECT`, `INGAME`) et les classes `CommandHandler` sous
+`network/command/{connected,charselect,ingame}`.
 
 **Non connecté** (`CONNECTED`)
 
@@ -30,27 +30,15 @@ Une commande par ligne, groupées par état de connexion — voir `network/Conne
 | `login` | Se connecter à un compte existant |
 | `quit` | Fermer la connexion |
 
-**Salon multi-monde** (`LOBBY`, après login, avant d'entrer dans un monde)
+**Sélection de personnage** (`CHARSELECT`, juste après le login ; la liste des personnages
+du compte, s'il y en a, est affichée automatiquement en entrant)
 
 | Commande | Effet |
 | --- | --- |
-| `worlds-list` | Lister les mondes disponibles et le personnage existant sur chacun |
-| `world-enter` | Entrer dans un monde (`world-enter <short-name>`) — seul ou avec son groupe |
-| `say` | Parler aux autres joueurs du salon |
-| `party-create` | Créer un groupe (on en devient le leader) |
-| `party-invite` | Inviter un joueur du salon (`party-invite <login>`) |
-| `party-accept` | Accepter l'invitation de groupe en attente |
-| `party-kick` | Exclure un membre du groupe, leader uniquement (`party-kick <login>`) |
-| `party-leave` | Quitter son groupe |
-
-**Sélection de personnage** (`CHARSELECT`, après avoir choisi un monde ; le personnage
-existant sur ce monde, s'il y en a un, est affiché automatiquement en entrant)
-
-| Commande | Effet |
-| --- | --- |
+| `character-list` | Lister les personnages du compte |
 | `character-create` | Créer un personnage (nom, genre, race, classe) |
-| `character-select` | Incarner un personnage existant |
-| `character-delete` | Supprimer un personnage |
+| `character-select` | Incarner un personnage existant (`character-select <name>`) |
+| `character-delete` | Supprimer un personnage (`character-delete <name>`) |
 
 **En jeu** (`INGAME`)
 
@@ -75,7 +63,7 @@ existant sur ce monde, s'il y en a un, est affiché automatiquement en entrant)
 | `rest` | Repos court ou long, hors combat (`rest <short|long>`) |
 | `save` | Sauvegarder l'état du personnage |
 
-**Dans tout état authentifié** (`LOBBY`/`CHARSELECT`/`INGAME`)
+**Dans tout état authentifié** (`CHARSELECT`/`INGAME`)
 
 | Commande | Effet |
 | --- | --- |

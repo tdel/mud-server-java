@@ -5,9 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +19,10 @@ import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.world.RoomTemplate;
 import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.domain.world.WorldTemplate;
+import fr.idev.mudserver.domain.world.WorldTemplateSummary;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
-import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
-import fr.idev.mudserver.domain.actor.event.WorldInstanceCreated;
 import fr.idev.mudserver.game.catalog.MonsterCatalog;
 import fr.idev.mudserver.game.catalog.NpcCatalog;
 import fr.idev.mudserver.game.catalog.WorldTemplateCatalog;
@@ -35,32 +32,30 @@ import fr.idev.mudserver.network.message.ingame.GamePlayerDefeated;
 import fr.idev.mudserver.network.message.ingame.MonsterDefeated;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
-import fr.idev.mudserver.persistence.WorldInstanceDao;
 import fr.idev.mudserver.persistence.listener.ItemPersistenceListener;
 
-// La persistance de WorldInstanceCreated/GamePlayerMovedToRoom/GamePlayerSpawnedToRoom vit
-// dans persistence.listener.WorldInstancePersistenceListener — ici ne reste que
-// l'orchestration (matérialisation, entrée/sortie de partie, nettoyage de room).
+// La persistance de GamePlayerMovedToRoom/GamePlayerSpawnedToRoom vit dans
+// persistence.listener.WorldInstancePersistenceListener — ici ne reste que
+// l'orchestration (matérialisation du monde par défaut, entrée/sortie de partie,
+// nettoyage de room).
 @Service
 public class WorldInstanceService {
 
     private static final Logger log = LoggerFactory.getLogger(WorldInstanceService.class);
 
-    private final Map<UUID, WorldInstance> residentInstances = new ConcurrentHashMap<>();
-
     private final WorldTemplateCatalog worldTemplateService;
-    private final WorldInstanceDao worldInstanceDao;
     private final MonsterCatalog monsterService;
     private final NpcCatalog npcService;
     private final ItemPersistenceListener itemService;
     private final AccountDao accountDao;
     private final CharacterDao characterDao;
 
-    public WorldInstanceService(WorldTemplateCatalog worldTemplateService, WorldInstanceDao worldInstanceDao,
-            MonsterCatalog monsterService, NpcCatalog npcService, ItemPersistenceListener itemService,
-            AccountDao accountDao, CharacterDao characterDao) {
+    private WorldInstance defaultInstance;
+
+    public WorldInstanceService(WorldTemplateCatalog worldTemplateService, MonsterCatalog monsterService,
+            NpcCatalog npcService, ItemPersistenceListener itemService, AccountDao accountDao,
+            CharacterDao characterDao) {
         this.worldTemplateService = worldTemplateService;
-        this.worldInstanceDao = worldInstanceDao;
         this.monsterService = monsterService;
         this.npcService = npcService;
         this.itemService = itemService;
@@ -68,26 +63,12 @@ public class WorldInstanceService {
         this.characterDao = characterDao;
     }
 
-    public WorldInstance getOrMaterialize(UUID worldInstanceId) {
-        WorldInstance resident = residentInstances.get(worldInstanceId);
-        if (resident != null) {
-            return resident;
-        }
+    public WorldInstance materializeDefaultWorld() {
+        WorldTemplateSummary summary = worldTemplateService.theOnlyTemplate();
+        WorldTemplate template = worldTemplateService.findById(summary.id())
+                .orElseThrow(() -> new IllegalStateException("WorldTemplate " + summary.id() + " absent"));
 
-        WorldInstance instance = worldInstanceDao.findById(worldInstanceId)
-                .orElseThrow(() -> new IllegalStateException("WorldInstance " + worldInstanceId + " absente en base"));
-        return materialize(instance);
-    }
-
-    public WorldInstance materialize(WorldInstance instance) {
-        WorldInstance resident = residentInstances.get(instance.getId());
-        if (resident != null) {
-            return resident;
-        }
-
-        WorldTemplate template = worldTemplateService.findById(instance.getWorldTemplateId())
-                .orElseThrow(() -> new IllegalStateException("WorldTemplate " + instance.getWorldTemplateId()
-                        + " absent, requis par WorldInstance " + instance.getId()));
+        WorldInstance instance = new WorldInstance(WorldInstance.DEFAULT_ID, template.getId(), Instant.now());
 
         Map<UUID, RoomInstance> roomInstances = new LinkedHashMap<>();
         for (RoomTemplate roomTemplate : template.getRoomTemplates().values()) {
@@ -101,22 +82,25 @@ public class WorldInstanceService {
         long placementDurationMs = System.currentTimeMillis() - placementStart;
 
         instance.setRoomInstances(roomInstances);
-        residentInstances.put(instance.getId(), instance);
-        log.info("world_instance.materialized id={} worldTemplateId={} rooms={} placementDurationMs={}",
-                instance.getId(), instance.getWorldTemplateId(), roomInstances.size(), placementDurationMs);
+        this.defaultInstance = instance;
+        log.info("world.materialized id={} worldTemplateId={} rooms={} placementDurationMs={}", instance.getId(),
+                instance.getWorldTemplateId(), roomInstances.size(), placementDurationMs);
         return instance;
     }
 
-    public WorldInstance createInstance(UUID worldTemplateId, Set<UUID> memberAccountIds, UUID leaderAccountId) {
-        WorldInstance instance = new WorldInstance(UUID.randomUUID(), worldTemplateId, Instant.now(), leaderAccountId,
-                memberAccountIds);
-        materialize(instance);
-        DomainEventPublisher.publish(new WorldInstanceCreated(instance));
-        return instance;
+    public WorldInstance getDefaultInstance() {
+        if (defaultInstance == null) {
+            throw new IllegalStateException("Le monde par défaut n'est pas encore matérialisé");
+        }
+        return defaultInstance;
     }
 
-    public Optional<CharacterInstance> findCharacterFor(Account account, WorldInstance instance) {
-        return characterDao.findByAccountAndWorldInstance(account, instance);
+    public List<CharacterInstance> findCharactersFor(Account account) {
+        return characterDao.findAllByAccount(account, getDefaultInstance());
+    }
+
+    public Optional<CharacterInstance> findCharacterByName(Account account, String name) {
+        return characterDao.findByAccountAndName(account, getDefaultInstance(), name);
     }
 
     public void enterGame(CharacterInstance player) {
@@ -145,12 +129,6 @@ public class WorldInstanceService {
         instance.removePlayer(character);
         log.info("character.session_ended character={} room={}", character.getName(), room.getName());
         MDC.remove("character");
-
-        if (instance.onlineCharacters().isEmpty()) {
-            residentInstances.remove(instance.getId());
-            log.info("world_instance.evicted id={} worldTemplateId={}", instance.getId(),
-                    instance.getWorldTemplateId());
-        }
     }
 
     @EventListener

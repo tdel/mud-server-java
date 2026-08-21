@@ -8,11 +8,12 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.network.CommandHandler;
 import fr.idev.mudserver.network.command.ingame.Look;
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
+import fr.idev.mudserver.network.message.Usage;
+import fr.idev.mudserver.network.message.charselect.NoCharacterNamed;
 import fr.idev.mudserver.network.message.charselect.NowPlaying;
 
 @Component
@@ -41,12 +42,19 @@ public class CharacterSelect implements CommandHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        Account account = connection.account();
-        WorldInstance instance = connection.worldInstance();
+        String name = argument.trim();
 
-        Optional<CharacterInstance> character = worldInstanceService.findCharacterFor(account, instance);
+        if (name.isEmpty()) {
+            connection.send(new Usage("character-select <name>"));
+            return;
+        }
+
+        Account account = connection.account();
+
+        Optional<CharacterInstance> character = worldInstanceService.findCharacterByName(account, name);
         if (character.isEmpty()) {
-            charSelectStatus.show(connection, account, instance);
+            connection.send(new NoCharacterNamed(name));
+            charSelectStatus.show(connection, account);
             return;
         }
 

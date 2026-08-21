@@ -12,6 +12,7 @@ import fr.idev.mudserver.network.CommandHandler;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -26,11 +27,14 @@ public class CharacterDelete implements CommandHandler {
 
     private static final Logger log = LoggerFactory.getLogger(CharacterDelete.class);
 
+    private final WorldInstanceService worldInstanceService;
     private final CharacterDao characterDao;
     private final AccountDao accountDao;
     private final CharSelectStatus charSelectStatus;
 
-    public CharacterDelete(CharacterDao characterDao, AccountDao accountDao, CharSelectStatus charSelectStatus) {
+    public CharacterDelete(WorldInstanceService worldInstanceService, CharacterDao characterDao, AccountDao accountDao,
+            CharSelectStatus charSelectStatus) {
+        this.worldInstanceService = worldInstanceService;
         this.characterDao = characterDao;
         this.accountDao = accountDao;
         this.charSelectStatus = charSelectStatus;
@@ -58,11 +62,10 @@ public class CharacterDelete implements CommandHandler {
         Account account = connection.account();
         WorldInstance instance = connection.worldInstance();
 
-        Optional<CharacterInstance> character = characterDao.findByAccountAndWorldInstanceAndName(account, instance,
-                name);
+        Optional<CharacterInstance> character = worldInstanceService.findCharacterByName(account, name);
         if (character.isEmpty()) {
             connection.send(new NoCharacterNamed(name));
-            charSelectStatus.show(connection, account, instance);
+            charSelectStatus.show(connection, account);
             return;
         }
 
@@ -70,7 +73,7 @@ public class CharacterDelete implements CommandHandler {
 
         if (instance.isCharacterInGame(characterId)) {
             connection.send(new CharacterCurrentlyInGame(name));
-            charSelectStatus.show(connection, account, instance);
+            charSelectStatus.show(connection, account);
             return;
         }
 
@@ -82,6 +85,6 @@ public class CharacterDelete implements CommandHandler {
         log.info("character.deleted character={} account={}", name, account.getLogin());
 
         connection.send(new CharacterDeleted(name));
-        charSelectStatus.show(connection, account, instance);
+        charSelectStatus.show(connection, account);
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.game.catalog.ItemTemplateCatalog;
 import fr.idev.mudserver.game.catalog.LevelCatalog;
 import fr.idev.mudserver.game.catalog.MonsterCatalog;
@@ -23,7 +24,8 @@ public class ServerApplication {
 
     @Bean
     public ApplicationRunner warmupRunner(ItemTemplateCatalog itemTemplateCatalog, LevelCatalog levelCatalog,
-            MonsterCatalog monsterCatalog, WorldTemplateCatalog worldTemplateCatalog) {
+            MonsterCatalog monsterCatalog, WorldTemplateCatalog worldTemplateCatalog,
+            WorldInstanceService worldInstanceService) {
         return args -> {
             long start = System.currentTimeMillis();
             log.info("startup.warmup_started");
@@ -31,6 +33,7 @@ public class ServerApplication {
             worldTemplateCatalog.warmWorldTemplates();
             monsterCatalog.warmMonsterTemplates();
             levelCatalog.warmXpThresholds();
+            worldInstanceService.materializeDefaultWorld();
             log.info("startup.warmup_completed durationMs={}", System.currentTimeMillis() - start);
         };
     }

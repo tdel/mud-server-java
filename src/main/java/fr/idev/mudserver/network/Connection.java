@@ -19,7 +19,6 @@ public interface Connection {
     void close();
 
     void attachCharacter(CharacterInstance character);
-    void detachCharacter();
 
     CharacterInstance character();
 

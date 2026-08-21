@@ -1,13 +1,13 @@
-package fr.idev.mudserver.network.message.lobby;
+package fr.idev.mudserver.network.message.charselect;
 
 import fr.idev.mudserver.network.OutputJsonMessage;
 import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.network.server.telnet.TelnetOutput;
 
-public record PlayerNotOnline(String login) implements OutputTelnetMessage, OutputJsonMessage {
+public record CharacterNameTaken(String name) implements OutputTelnetMessage, OutputJsonMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        output.write(login + " is not online in the lobby.\n");
+        output.write("You already have a character named \"" + name + "\".\n");
     }
 }

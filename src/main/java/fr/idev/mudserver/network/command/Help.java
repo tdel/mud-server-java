@@ -25,8 +25,7 @@ public class Help implements CommandHandler {
 
     @Override
     public Set<ConnectionState> states() {
-        return Set.of(ConnectionState.CONNECTED, ConnectionState.LOBBY, ConnectionState.CHARSELECT,
-                ConnectionState.INGAME);
+        return Set.of(ConnectionState.CONNECTED, ConnectionState.CHARSELECT, ConnectionState.INGAME);
     }
 
     @Override

@@ -1,47 +1,38 @@
 package fr.idev.mudserver.network.command.charselect;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.Account;
-import fr.idev.mudserver.domain.world.WorldInstance;
-import fr.idev.mudserver.domain.world.WorldTemplateSummary;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.game.WorldInstanceService;
-import fr.idev.mudserver.game.catalog.WorldTemplateCatalog;
 import fr.idev.mudserver.network.Connection;
-import fr.idev.mudserver.network.message.charselect.ExistingCharacterInWorld;
-import fr.idev.mudserver.network.message.charselect.NoCharacterInWorld;
+import fr.idev.mudserver.network.message.charselect.CharacterList;
+import fr.idev.mudserver.network.message.charselect.NoCharacters;
 
 @Component
 public class CharSelectStatus {
 
     private final WorldInstanceService worldInstanceService;
-    private final WorldTemplateCatalog worldTemplateService;
 
-    public CharSelectStatus(WorldInstanceService worldInstanceService, WorldTemplateCatalog worldTemplateService) {
+    public CharSelectStatus(WorldInstanceService worldInstanceService) {
         this.worldInstanceService = worldInstanceService;
-        this.worldTemplateService = worldTemplateService;
     }
 
-    public void show(Connection connection, Account account, WorldInstance instance) {
-        String worldName = worldName(instance.getWorldTemplateId());
-        Optional<CharacterInstance> character = worldInstanceService.findCharacterFor(account, instance);
+    public void show(Connection connection, Account account) {
+        List<CharacterInstance> characters = worldInstanceService.findCharactersFor(account);
 
-        if (character.isEmpty()) {
-            connection.send(new NoCharacterInWorld(worldName));
+        if (characters.isEmpty()) {
+            connection.send(new NoCharacters());
             return;
         }
 
-        CharacterInstance existing = character.get();
-        connection.send(new ExistingCharacterInWorld(worldName, existing.getName(), existing.getCharacterClass(),
-                existing.getLevel()));
-    }
-
-    private String worldName(UUID worldTemplateId) {
-        return worldTemplateService.findSummaryById(worldTemplateId).map(WorldTemplateSummary::name)
-                .orElse("this world");
+        connection
+                .send(new CharacterList(
+                        characters
+                                .stream().map(character -> new CharacterList.Entry(character.getName(),
+                                        character.getRace(), character.getCharacterClass(), character.getLevel()))
+                                .toList()));
     }
 }
