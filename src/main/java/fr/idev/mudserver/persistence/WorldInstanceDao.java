@@ -3,7 +3,7 @@ package fr.idev.mudserver.persistence;
 import static fr.idev.mudserver.persistence.jooq.Tables.WORLD_INSTANCE;
 import static fr.idev.mudserver.persistence.jooq.Tables.WORLD_INSTANCE_MEMBER;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.Set;
@@ -29,7 +29,7 @@ public class WorldInstanceDao {
                 WORLD_INSTANCE.PARTY_LEADER_ACCOUNT_ID, WORLD_INSTANCE.CREATED_AT)
                 .values(instance.getId(), instance.getWorldTemplateId(),
                         instance.getPartyLeaderAccountId().orElse(null),
-                        OffsetDateTime.ofInstant(instance.getCreatedAt(), ZoneOffset.UTC))
+                        LocalDateTime.ofInstant(instance.getCreatedAt(), ZoneOffset.UTC))
                 .execute();
         for (UUID accountId : instance.getMemberAccountIds()) {
             dsl.insertInto(WORLD_INSTANCE_MEMBER, WORLD_INSTANCE_MEMBER.WORLD_INSTANCE_ID,
@@ -56,7 +56,7 @@ public class WorldInstanceDao {
     }
 
     private static WorldInstance toDomain(WorldInstanceRecord record, Set<UUID> members) {
-        return new WorldInstance(record.getId(), record.getWorldTemplateId(), record.getCreatedAt().toInstant(),
-                record.getPartyLeaderAccountId(), members);
+        return new WorldInstance(record.getId(), record.getWorldTemplateId(),
+                record.getCreatedAt().toInstant(ZoneOffset.UTC), record.getPartyLeaderAccountId(), members);
     }
 }

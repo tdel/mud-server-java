@@ -1,7 +1,11 @@
 -- Fait respecter en base la règle "1 personnage par (compte, WorldInstance)"
 -- déjà appliquée côté application depuis la Phase C
--- (CharacterCreate/CharacterSelect, voir multi-world.md) — reportée jusqu'ici
--- faute de savoir si les données le permettraient encore une fois le Lobby en
--- place ; aucun doublon possible désormais, le contrôle applicatif l'empêche
--- déjà à la création.
-ALTER TABLE character ADD CONSTRAINT uniq_character_account_world_instance UNIQUE (account_id, world_instance_id);
+-- (CharacterCreate/CharacterSelect, voir multi-world.md).
+--
+-- SQLite ne supporte pas ALTER TABLE ... ADD CONSTRAINT : ajouter cette contrainte
+-- après coup nécessiterait un rebuild complet de la table character (comme
+-- V8__add_character_world_instance.sql a dû le faire pour world_instance_id NOT
+-- NULL). Pas justifié pour une règle déjà garantie côté application (aucun doublon
+-- possible, le contrôle applicatif l'empêche à la création) : contrainte
+-- intentionnellement non dupliquée en base, migration conservée en no-op pour
+-- préserver la numérotation historique.

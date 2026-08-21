@@ -24,8 +24,8 @@ public class V9__RecomputeDefaultInstanceItemRoomIds extends BaseJavaMigration {
                 .prepareStatement("SELECT id, room_id FROM item WHERE room_id IS NOT NULL");
                 ResultSet rs = select.executeQuery()) {
             while (rs.next()) {
-                UUID itemId = (UUID) rs.getObject("id");
-                UUID oldRoomId = (UUID) rs.getObject("room_id");
+                UUID itemId = UUID.fromString(rs.getString("id"));
+                UUID oldRoomId = UUID.fromString(rs.getString("room_id"));
                 UUID newRoomId = RoomInstance.deterministicId(WorldInstance.DEFAULT_ID, oldRoomId);
                 updates.add(new Object[]{itemId, newRoomId});
             }
@@ -33,8 +33,8 @@ public class V9__RecomputeDefaultInstanceItemRoomIds extends BaseJavaMigration {
 
         try (PreparedStatement update = connection.prepareStatement("UPDATE item SET room_id = ? WHERE id = ?")) {
             for (Object[] row : updates) {
-                update.setObject(1, row[1]);
-                update.setObject(2, row[0]);
+                update.setString(1, row[1].toString());
+                update.setString(2, row[0].toString());
                 update.addBatch();
             }
             update.executeBatch();

@@ -6,7 +6,7 @@ CREATE TABLE world_instance (
     id                       UUID PRIMARY KEY,
     world_template_id       UUID NOT NULL,
     party_leader_account_id UUID NULL REFERENCES account(id),
-    created_at               TIMESTAMPTZ NOT NULL DEFAULT now()
+    created_at               TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Table de jointure plutôt qu'une colonne tableau : composition figée à la création

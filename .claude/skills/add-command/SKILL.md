@@ -20,6 +20,6 @@ Adding a new in-game command in this codebase means creating a matching pair of 
 
 5. **Concurrency**: shared mutable state is protected in-memory, not via DB locking — there is no more `@Transactional`/`SELECT ... FOR UPDATE` pattern on the hot path. Only add a `synchronized` block on the specific object being raced (see `GamePlayer.pickUpItem`'s `synchronized(item)`) if two virtual threads can genuinely reach the same mutation concurrently; most commands don't need this because a given connection's commands already run one at a time on its own virtual thread (see CLAUDE.md's "Virtual-thread architecture"). See `game/ItemRaceConditionTest` for how to write a concurrency-proof test if a new lock is needed.
 
-6. **Tests**: this project has no unit/integration split — new tests typically extend `AbstractIntegrationTest` (singleton Testcontainers Postgres) if they touch persistence, or are plain JUnit if they don't. `mvn test` requires Docker running.
+6. **Tests**: this project has no unit/integration split, and no Spring-context integration tests currently exist — only plain JUnit domain tests. Persistence is SQLite (a plain file), so a future test touching the DB needs no Testcontainers/Docker — see CLAUDE.md's "Test context gotcha".
 
 Follow the codebase's existing convention of French-language Javadoc on non-obvious classes.

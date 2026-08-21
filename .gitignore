@@ -6,6 +6,9 @@ logs/
 .vscode/
 .DS_Store
 docker/build/
+*.db
+*.db-wal
+*.db-shm
 .classpath
 .project
 .settings/

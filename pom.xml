@@ -20,8 +20,7 @@
     <properties>
         <java.version>25</java.version>
         <netty.version>4.2.16.Final</netty.version>
-        <postgresql.version>42.7.13</postgresql.version>
-        <testcontainers.version>2.0.5</testcontainers.version>
+        <sqlite-jdbc.version>3.53.2.1</sqlite-jdbc.version>
     </properties>
 
     <dependencyManagement>
@@ -30,13 +29,6 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-bom</artifactId>
                 <version>${netty.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>testcontainers-bom</artifactId>
-                <version>${testcontainers.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -77,23 +69,26 @@
             <artifactId>spring-boot-starter-jooq</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${postgresql.version}</version>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>${sqlite-jdbc.version}</version>
         </dependency>
 
         <!-- Migrations de schéma. Depuis Spring Boot 4, l'autoconfiguration Flyway a été
              extraite de spring-boot-autoconfigure (devenu minimal) vers ce starter dédié
              (module spring-boot-flyway) — un simple flyway-core sur le classpath ne suffit
-             plus à faire tourner les migrations au démarrage. flyway-database-postgresql
-             reste requis séparément (Flyway 10+ a sorti les dialectes de flyway-core). -->
+             plus à faire tourner les migrations au démarrage. flyway-database-nc-sqlite
+             reste requis séparément (Flyway 10+ a sorti les dialectes de flyway-core) ;
+             version épinglée manuellement car non gérée par le BOM Spring Boot (seuls les
+             dialectes commerciaux/historiques comme flyway-database-postgresql le sont). -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-flyway</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-database-postgresql</artifactId>
+            <artifactId>flyway-database-nc-sqlite</artifactId>
+            <version>12.4.0</version>
         </dependency>
 
         <!-- Transport telnet brut -->
@@ -126,21 +121,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-testcontainers</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers-junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers-postgresql</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

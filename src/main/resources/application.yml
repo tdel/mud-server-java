@@ -2,11 +2,19 @@ spring:
   application:
     name: mud-server-java
   datasource:
-    url: jdbc:postgresql://host.docker.internal:5433/mud-server-java
-    username: mud-server-java
-    password: mud-server-java
+    url: jdbc:sqlite:./mud-server.db
+    hikari:
+      maximum-pool-size: 1
+      connection-init-sql: "PRAGMA foreign_keys = ON"
+  jooq:
+    sql-dialect: SQLITE
   flyway:
     locations: classpath:db/migration
+    # SQLite refuse de changer PRAGMA foreign_keys à l'intérieur d'une transaction ;
+    # V8__add_character_world_instance.sql mélange donc des statements transactionnels
+    # et non-transactionnels dans le même fichier, ce que Flyway rejette par défaut
+    # (mixed=false).
+    mixed: true
 
 app:
   telnet:

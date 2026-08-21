@@ -18,8 +18,8 @@ l'enregistrement plutôt que de complexifier la synchronisation.
 
 ## Prérequis
 
-1. Le serveur doit tourner (port 4001) avec le Postgres de développement (`docker compose up
-   -d db`, puis `mvn spring-boot:run` via Docker — voir le README à la racine).
+1. Le serveur doit tourner (port 4001) : `mvn spring-boot:run` via Docker — voir le README à
+   la racine (SQLite, rien à démarrer à part le serveur lui-même).
 2. **Deux** personnages de démo doivent déjà exister, **hors enregistrement** (les scénarios
    vont droit à `world-enter`/`character-select` pour rester courts) :
    ```

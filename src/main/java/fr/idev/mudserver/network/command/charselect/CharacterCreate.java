@@ -8,6 +8,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.network.CommandHandler;
+import fr.idev.mudserver.network.command.ingame.Look;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.domain.actor.Attribute;
@@ -26,6 +27,7 @@ import fr.idev.mudserver.network.message.charselect.ChooseRace;
 import fr.idev.mudserver.network.message.charselect.InvalidClass;
 import fr.idev.mudserver.network.message.charselect.InvalidGender;
 import fr.idev.mudserver.network.message.charselect.InvalidRace;
+import fr.idev.mudserver.network.message.charselect.NowPlaying;
 import fr.idev.mudserver.network.message.ingame.GamePlayerStats;
 
 @Component
@@ -33,10 +35,13 @@ public class CharacterCreate implements CommandHandler {
 
     private final WorldInstanceService worldInstanceService;
     private final CharSelectStatus charSelectStatus;
+    private final Look lookAction;
 
-    public CharacterCreate(WorldInstanceService worldInstanceService, CharSelectStatus charSelectStatus) {
+    public CharacterCreate(WorldInstanceService worldInstanceService, CharSelectStatus charSelectStatus,
+            Look lookAction) {
         this.worldInstanceService = worldInstanceService;
         this.charSelectStatus = charSelectStatus;
+        this.lookAction = lookAction;
     }
 
     @Override
@@ -158,5 +163,11 @@ public class CharacterCreate implements CommandHandler {
 
         connection.send(new CharacterCreated(name));
         connection.send(new GamePlayerStats(character));
+
+        connection.attachCharacter(character);
+        worldInstanceService.enterGame(character);
+
+        connection.send(new NowPlaying(character.getName()));
+        lookAction.onReceive(connection, "");
     }
 }

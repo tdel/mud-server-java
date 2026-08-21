@@ -2,9 +2,11 @@
 -- côté PHP, consolidées ici en une seule puisqu'il s'agit d'un schéma neuf).
 -- UUID générés côté application (pas de DEFAULT gen_random_uuid()), comme en PHP.
 
--- account.current_character_id et character.account_id se référencent mutuellement ;
--- account est créée sans la FK vers character, ajoutée après coup une fois la table
--- character en place (même contournement que les migrations Doctrine côté PHP).
+-- account.current_character_id et character.account_id se référencent mutuellement.
+-- SQLite ne supporte pas ALTER TABLE ... ADD CONSTRAINT (seuls RENAME/ADD COLUMN/DROP
+-- COLUMN le sont), donc contrairement à la version Postgres la FK account→character
+-- n'est pas déclarée en base : référence validée côté application uniquement (même
+-- convention que current_room_id/template_id ci-dessous).
 CREATE TABLE account (
     id                    UUID PRIMARY KEY,
     login                 VARCHAR(255) NOT NULL UNIQUE,
@@ -34,24 +36,21 @@ CREATE TABLE character (
     charisma       INT NOT NULL DEFAULT 10
 );
 
-ALTER TABLE account
-    ADD CONSTRAINT fk_account_current_character
-    FOREIGN KEY (current_character_id) REFERENCES character(id);
-
 -- template_id n'est plus une FK vers une table item_template : les ItemTemplate sont
 -- chargés en mémoire depuis data/items.json (voir ItemService.warmItemTemplates()),
 -- pas persistés en DB. Validé côté application, comme character.race. room_id n'est
 -- plus une FK vers une table room, pour la même raison (voir current_room_id ci-dessus).
+--
+-- uniq_character_slot déclarée inline (SQLite ne supporte pas ALTER TABLE ... ADD
+-- CONSTRAINT) et sans DEFERRABLE (non supporté par SQLite sur une contrainte UNIQUE) :
+-- sûr sans report, car ItemPersistenceListener.onGamePlayerEquippedItem désassigne
+-- toujours l'ancien occupant du slot avant d'assigner le nouveau, donc aucun état
+-- transitoire ne peut violer la contrainte.
 CREATE TABLE item (
     id           UUID PRIMARY KEY,
     template_id  UUID NOT NULL,
     room_id      UUID NULL,
     character_id UUID NULL REFERENCES character(id),
-    slot         VARCHAR(20) NULL
+    slot         VARCHAR(20) NULL,
+    UNIQUE (character_id, slot)
 );
-
--- DEFERRABLE INITIALLY DEFERRED : le slot-swap d'equipItem fait deux UPDATE dans la
--- même transaction (déséquiper l'ancien occupant, équiper le nouveau) ; une contrainte
--- non différée échouerait sur l'état transitoire entre les deux.
-ALTER TABLE item
-    ADD CONSTRAINT uniq_character_slot UNIQUE (character_id, slot) DEFERRABLE INITIALLY DEFERRED;
