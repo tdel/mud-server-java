@@ -63,7 +63,7 @@ public class MonsterCatalog {
                 }
 
                 MonsterInstance monster = new MonsterInstance(spawn.id(), template.getName(), template.getId(),
-                        room.getId(), template.getAttributes(), template.getMaxHealth());
+                        room.getId(), template.getAttributes(), template.getMaxHealth(), spawn.cell());
                 monster.attachTemplate(template);
                 monster.setCurrentRoom(room);
                 room.placeMonster(monster, spawn.cell());

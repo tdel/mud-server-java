@@ -7,6 +7,8 @@ import java.util.stream.IntStream;
 
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.Attribute;
+import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
+import fr.idev.mudserver.domain.actor.event.MonsterAttacked;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.item.EquipmentSlot;
@@ -44,6 +46,10 @@ public final class CharacterCombat {
     }
 
     public AttackOutcome attack(AbstractCharacter defender) {
+        if (defender instanceof MonsterInstance monster) {
+            DomainEventPublisher.publish(new MonsterAttacked(monster, character));
+        }
+
         int strengthModifier = character.getModifier(Attribute.STRENGTH);
         Optional<Item> weapon = getEquippedWeapon();
         boolean proficient = weapon.map(item -> character.getWeaponProficiencies().contains(item.getWeaponCategory()))

@@ -3,25 +3,34 @@ package fr.idev.mudserver.domain.actor.instance;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.template.MonsterTemplate;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
+import fr.idev.mudserver.domain.map.HexCoordinate;
+import fr.idev.mudserver.game.MonsterAiEngine;
+import fr.idev.mudserver.game.dice.DiceRoll;
+import fr.idev.mudserver.game.dice.DiceRoller;
 
 public final class MonsterInstance extends AbstractCharacter {
 
     private final UUID templateId;
     private final UUID roomId;
+    private final HexCoordinate spawnCell;
 
     private MonsterTemplate template;
 
+    public volatile MonsterAiEngine.PursuitState pursuit;
+
     public MonsterInstance(UUID id, String name, UUID templateId, UUID roomId, Map<Attribute, Integer> attributes,
-            int maxHealth) {
+            int maxHealth, HexCoordinate spawnCell) {
         super(id, name, attributes, maxHealth, maxHealth);
         this.templateId = templateId;
         this.roomId = roomId;
+        this.spawnCell = spawnCell;
     }
 
     public boolean takeDamage(int amount, CharacterInstance attacker) {
@@ -37,6 +46,38 @@ public final class MonsterInstance extends AbstractCharacter {
             DomainEventPublisher.publish(new CharacterDied(this, attacker));
         }
         return defeated;
+    }
+
+    public MonsterAttackOutcome attack(CharacterInstance defender) {
+        int strengthModifier = getModifier(Attribute.STRENGTH);
+        DiceRoll attackRoll = DiceRoller.rollD20(strengthModifier, false);
+        int naturalRoll = attackRoll.rolls()[0];
+        boolean critical = naturalRoll == 20;
+        boolean hit = DiceRoller.resolveHit(naturalRoll, attackRoll.total(), defender.getArmorClass());
+
+        int damage = 0;
+        boolean defeated = false;
+        int healthAfter = defender.getCurrentHealth();
+
+        if (hit) {
+            int naturalDamage = rollNaturalDamage();
+            if (critical) {
+                naturalDamage += rollNaturalDamage();
+            }
+            damage = Math.max(0, naturalDamage + strengthModifier);
+            healthAfter = Math.max(0, defender.getCurrentHealth() - damage);
+            defeated = defender.takeDamage(damage, this);
+        }
+
+        return new MonsterAttackOutcome(hit, critical, damage, healthAfter, defender.getMaxHealth(), defeated);
+    }
+
+    private int rollNaturalDamage() {
+        return IntStream.of(DiceRoller.roll(getNaturalDamageDice()).rolls()).sum();
+    }
+
+    public record MonsterAttackOutcome(boolean hit, boolean critical, int damage, int targetHealthAfter,
+            int targetMaxHealth, boolean targetDefeated) {
     }
 
     public void attachTemplate(MonsterTemplate template) {
@@ -89,6 +130,10 @@ public final class MonsterInstance extends AbstractCharacter {
         return roomId;
     }
 
+    public HexCoordinate getSpawnCell() {
+        return spawnCell;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -100,18 +145,19 @@ public final class MonsterInstance extends AbstractCharacter {
         return getCurrentHealth() == other.getCurrentHealth() && getMaxHealth() == other.getMaxHealth()
                 && Objects.equals(getId(), other.getId()) && Objects.equals(getName(), other.getName())
                 && Objects.equals(templateId, other.templateId) && Objects.equals(roomId, other.roomId)
-                && Objects.equals(getAttributes(), other.getAttributes());
+                && Objects.equals(spawnCell, other.spawnCell) && Objects.equals(getAttributes(), other.getAttributes());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), templateId, roomId, getAttributes(), getCurrentHealth(),
+        return Objects.hash(getId(), getName(), templateId, roomId, spawnCell, getAttributes(), getCurrentHealth(),
                 getMaxHealth());
     }
 
     @Override
     public String toString() {
         return "GameMonster[id=" + getId() + ", name=" + getName() + ", templateId=" + templateId + ", roomId=" + roomId
-                + ", currentHealth=" + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + "]";
+                + ", spawnCell=" + spawnCell + ", currentHealth=" + getCurrentHealth() + ", maxHealth=" + getMaxHealth()
+                + "]";
     }
 }
