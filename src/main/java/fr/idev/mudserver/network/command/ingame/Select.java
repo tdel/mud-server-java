@@ -43,7 +43,7 @@ public class Select implements CommandHandler {
             return;
         }
 
-        character.setTarget(target.get());
+        character.getCombat().setTarget(target.get());
         connection.send(new TargetSelected(target.get().getName()));
     }
 }

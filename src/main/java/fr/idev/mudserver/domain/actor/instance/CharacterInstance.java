@@ -16,6 +16,7 @@ import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
 import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
 import fr.idev.mudserver.domain.actor.event.CharacterSpentGold;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
+import fr.idev.mudserver.domain.actor.event.GamePlayerDamaged;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEquippedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
@@ -46,7 +47,7 @@ public final class CharacterInstance extends AbstractCharacter {
 
     private Connection connection;
     private final PlayerInventory inventory;
-    private MonsterInstance target;
+    private final CharacterCombat combat;
     private int xp;
     private int shortRestCount;
 
@@ -72,6 +73,7 @@ public final class CharacterInstance extends AbstractCharacter {
         this.level = level;
         this.xp = xp;
         this.inventory = new PlayerInventory(gold);
+        this.combat = new CharacterCombat(this);
         this.shortRestCount = shortRestCount;
     }
 
@@ -210,12 +212,8 @@ public final class CharacterInstance extends AbstractCharacter {
         this.connection = connection;
     }
 
-    public MonsterInstance getTarget() {
-        return target;
-    }
-
-    public void setTarget(MonsterInstance target) {
-        this.target = target;
+    public CharacterCombat getCombat() {
+        return combat;
     }
 
     public int getXp() {
@@ -278,12 +276,13 @@ public final class CharacterInstance extends AbstractCharacter {
         return true;
     }
 
-    public boolean takeDamage(int amount, MonsterInstance attacker) {
+    public boolean takeDamage(int amount, AbstractCharacter attacker) {
         if (getCurrentHealth() <= 0) {
             return false;
         }
         setCurrentHealth(Math.max(0, getCurrentHealth() - amount));
         boolean defeated = getCurrentHealth() <= 0;
+        DomainEventPublisher.publish(new GamePlayerDamaged(this, attacker, amount));
         if (defeated) {
             DomainEventPublisher.publish(new GamePlayerDied(this, attacker));
         }

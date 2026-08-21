@@ -149,6 +149,16 @@ public class RoomInstance {
         return monsters.stream().filter(monster -> monster.getName().equalsIgnoreCase(name)).findFirst();
     }
 
+    public Optional<AbstractCharacter> findAttackableByName(String name, CharacterInstance requester) {
+        Optional<MonsterInstance> monster = findMonsterByName(name);
+        if (monster.isPresent()) {
+            return Optional.of(monster.get());
+        }
+        return clients.values().stream().filter(client -> !client.getId().equals(requester.getId()))
+                .filter(client -> client.getName().equalsIgnoreCase(name)).map(AbstractCharacter.class::cast)
+                .findFirst();
+    }
+
     public void setMonsters(List<MonsterInstance> monsters) {
         this.monsters.clear();
         this.monsters.addAll(monsters);
@@ -211,6 +221,10 @@ public class RoomInstance {
 
     public boolean tryClaimCell(HexCoordinate cell, AbstractCharacter character) {
         return occupants.putIfAbsent(cell, character) == null;
+    }
+
+    public boolean isOccupant(AbstractCharacter character) {
+        return occupants.containsValue(character);
     }
 
     public void releaseCell(HexCoordinate cell, AbstractCharacter character) {

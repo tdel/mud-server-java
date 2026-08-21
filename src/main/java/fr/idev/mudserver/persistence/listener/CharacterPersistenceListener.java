@@ -12,6 +12,7 @@ import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
 import fr.idev.mudserver.domain.actor.event.CharacterLeveledUp;
 import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
 import fr.idev.mudserver.domain.actor.event.CharacterSpentGold;
+import fr.idev.mudserver.domain.actor.event.GamePlayerDamaged;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUsedPotion;
 import fr.idev.mudserver.domain.actor.event.NewGamePlayerCreated;
@@ -90,9 +91,16 @@ public class CharacterPersistenceListener {
         CharacterInstance killer = event.killer();
         int xpReward = event.character().getTemplate().getXpReward();
         killer.gainXp(xpReward);
-        killer.setTarget(null);
+        killer.getCombat().setTarget(null);
         log.info("combat.kill_credited killer={} monster={} xpReward={}", killer.getName(), event.character().getName(),
                 xpReward);
+    }
+
+    @EventListener
+    void onGamePlayerDamaged(GamePlayerDamaged event) {
+        characterDao.update(event.character());
+        log.info("combat.damage_taken character={} attacker={} amount={} currentHealth={}", event.character().getName(),
+                event.attacker().getName(), event.amount(), event.character().getCurrentHealth());
     }
 
     @EventListener
