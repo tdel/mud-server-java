@@ -19,6 +19,7 @@ import fr.idev.mudserver.domain.actor.event.CharacterLearnedSpell;
 import fr.idev.mudserver.domain.actor.event.CharacterLeveledUp;
 import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
 import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
+import fr.idev.mudserver.domain.actor.event.CharacterRegenerated;
 import fr.idev.mudserver.domain.actor.event.CharacterSpentGold;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDamaged;
@@ -260,6 +261,18 @@ public final class CharacterInstance extends AbstractCharacter {
         int gained = Math.min(amount, maxMana - currentMana);
         currentMana += gained;
         return gained;
+    }
+
+    public int regenAmountPerTick() {
+        return 1 + level / 5;
+    }
+
+    public void regenerate(int hpAmount, int manaAmount) {
+        int healed = heal(hpAmount);
+        int manaGained = gainMana(manaAmount);
+        if (healed > 0 || manaGained > 0) {
+            DomainEventPublisher.publish(new CharacterRegenerated(this, healed, manaGained));
+        }
     }
 
     public SpellCasting.CastOutcome castSpell(Spell spell, AbstractCharacter target) {

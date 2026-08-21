@@ -11,6 +11,7 @@ import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
 import fr.idev.mudserver.domain.actor.event.CharacterLeveledUp;
 import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
+import fr.idev.mudserver.domain.actor.event.CharacterRegenerated;
 import fr.idev.mudserver.domain.actor.event.CharacterSpentGold;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDamaged;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
@@ -25,6 +26,7 @@ import fr.idev.mudserver.network.message.ingame.ItemUsed;
 import fr.idev.mudserver.network.message.ingame.ManaPotionUsed;
 import fr.idev.mudserver.network.message.ingame.PlayerLeveledUp;
 import fr.idev.mudserver.network.message.ingame.PlayerRespawned;
+import fr.idev.mudserver.network.message.ingame.RegenTick;
 import fr.idev.mudserver.network.message.ingame.XpGained;
 import fr.idev.mudserver.persistence.CharacterDao;
 
@@ -138,6 +140,16 @@ public class CharacterPersistenceListener {
                 character.getCurrentMana(), character.getMaxMana()));
         log.info("character.used_mana_potion character={} item={} restoredAmount={}", character.getName(),
                 event.item().getName(), event.restoredAmount());
+    }
+
+    @EventListener
+    void onCharacterRegenerated(CharacterRegenerated event) {
+        CharacterInstance character = event.character();
+        characterDao.update(character);
+        character.send(new RegenTick(event.hpRestored(), event.manaRestored(), character.getCurrentHealth(),
+                character.getMaxHealth(), character.getCurrentMana(), character.getMaxMana()));
+        log.info("character.regenerated character={} hpRestored={} manaRestored={}", character.getName(),
+                event.hpRestored(), event.manaRestored());
     }
 
 }
