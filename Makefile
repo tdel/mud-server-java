@@ -40,7 +40,8 @@ test: ## Lance la suite de tests (Testcontainers Postgres)
 	$(MVN_RUN) mvn test
 
 run: start ## Démarre le serveur telnet (mvn spring-boot:run)
-	docker run --rm --network host -v "$(CURDIR)":/app -w /app \
+	docker run --rm -p 4001:4001 -p 4002:4002 -p 8081:8081 --add-host=host.docker.internal:host-gateway \
+		-v "$(CURDIR)":/app -w /app \
 		-v /var/run/docker.sock:/var/run/docker.sock -v $(HOME)/.m2:/root/.m2 $(MVN_IMAGE) mvn spring-boot:run
 
 format: ## Formate le code (spotless:apply)

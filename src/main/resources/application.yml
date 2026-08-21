@@ -2,7 +2,7 @@ spring:
   application:
     name: mud-server-java
   datasource:
-    url: jdbc:postgresql://localhost:5433/mud-server-java
+    url: jdbc:postgresql://host.docker.internal:5433/mud-server-java
     username: mud-server-java
     password: mud-server-java
   flyway:
