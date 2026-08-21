@@ -48,6 +48,18 @@
         "effectDice": "10d4+20"
     },
     {
+        "id": "3a4a5836-051e-4641-aef8-7b6e6792322e",
+        "name": "Potion de mana",
+        "type": "POTION",
+        "weight": 1,
+        "baseAc": 0,
+        "price": 60,
+        "rarity": "COMMON",
+        "bonus": 0,
+        "consumableEffect": "MANA_RESTORE",
+        "effectDice": "2d4+2"
+    },
+    {
         "id": "019fa0a5-80c0-7035-9c2d-113b09a275df",
         "name": "Epée courte",
         "type": "WEAPON",

@@ -1,0 +1,75 @@
+package fr.idev.mudserver.game.catalog;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import fr.idev.mudserver.domain.Spell;
+import fr.idev.mudserver.domain.SpellEffectType;
+import fr.idev.mudserver.domain.actor.CharacterClass;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+
+@Service
+public class SpellCatalog {
+
+    private static final Logger log = LoggerFactory.getLogger(SpellCatalog.class);
+
+    private static final String SPELL_RESOURCE = "/data/spells.json";
+
+    private final Map<UUID, Spell> spells = new ConcurrentHashMap<>();
+
+    private final ObjectMapper objectMapper;
+
+    public SpellCatalog(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    public void warmSpells() {
+        try (InputStream in = getClass().getResourceAsStream(SPELL_RESOURCE)) {
+            List<SpellDefinition> definitions = objectMapper.readValue(in, new TypeReference<List<SpellDefinition>>() {
+            });
+            for (SpellDefinition definition : definitions) {
+                Spell spell = new Spell(definition.id(), definition.name(), definition.description(),
+                        definition.requiredLevel(), definition.manaCost(), definition.cooldownSeconds(),
+                        definition.range(), definition.effect(), definition.effectDice(),
+                        Set.copyOf(definition.classes()));
+                spells.put(spell.id(), spell);
+            }
+            log.info("spell.templates_loaded count={}", spells.size());
+        } catch (IOException | JacksonException e) {
+            throw new IllegalStateException("Impossible de charger " + SPELL_RESOURCE, e);
+        }
+    }
+
+    public Spell getById(UUID spellId) {
+        Spell spell = spells.get(spellId);
+        if (spell == null) {
+            throw new IllegalStateException("Spell " + spellId + " absent du cache — warmSpells() a-t-il été appelé ?");
+        }
+        return spell;
+    }
+
+    public Collection<Spell> allSpells() {
+        return List.copyOf(spells.values());
+    }
+
+    public List<Spell> spellsLearnableAt(CharacterClass characterClass, int level) {
+        return spells.values().stream()
+                .filter(spell -> spell.requiredLevel() == level && spell.classes().contains(characterClass)).toList();
+    }
+
+    private record SpellDefinition(UUID id, String name, String description, int requiredLevel, int manaCost,
+            int cooldownSeconds, int range, SpellEffectType effect, String effectDice, List<CharacterClass> classes) {
+    }
+}

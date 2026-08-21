@@ -9,10 +9,13 @@ import java.util.Set;
 import java.util.UUID;
 
 import fr.idev.mudserver.domain.Account;
+import fr.idev.mudserver.domain.Spell;
 import fr.idev.mudserver.domain.actor.*;
 import fr.idev.mudserver.domain.actor.component.CharacterCombat;
 import fr.idev.mudserver.domain.actor.component.PlayerInventory;
+import fr.idev.mudserver.domain.actor.component.SpellCasting;
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
+import fr.idev.mudserver.domain.actor.event.CharacterLearnedSpell;
 import fr.idev.mudserver.domain.actor.event.CharacterLeveledUp;
 import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
 import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
@@ -25,12 +28,14 @@ import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUnequippedItem;
 import fr.idev.mudserver.domain.actor.event.ItemDiscarded;
 import fr.idev.mudserver.domain.actor.event.ItemPurchased;
+import fr.idev.mudserver.domain.actor.event.SpellCast;
 import fr.idev.mudserver.domain.item.EquipmentSlot;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.item.WeaponCategory;
 import fr.idev.mudserver.domain.world.WorldInstance;
+import fr.idev.mudserver.game.catalog.SpellCatalogHolder;
 import fr.idev.mudserver.game.dice.CheckResult;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
@@ -49,8 +54,11 @@ public final class CharacterInstance extends AbstractCharacter {
     private Connection connection;
     private final PlayerInventory inventory;
     private final CharacterCombat combat;
+    private final SpellCasting spellCasting;
     private int xp;
     private int shortRestCount;
+    private int maxMana;
+    private int currentMana;
 
     public static final int MAX_SHORT_RESTS_BEFORE_LONG_REST = 2;
 
@@ -58,12 +66,12 @@ public final class CharacterInstance extends AbstractCharacter {
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold) {
         this(id, account, name, room, gender, race, characterClass, level, currentHealth, maxHealth, attributes, xp,
-                gold, 0);
+                gold, 0, 0, 0);
     }
 
     public CharacterInstance(UUID id, Account account, String name, RoomInstance room, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
-            Map<Attribute, Integer> attributes, int xp, int gold, int shortRestCount) {
+            Map<Attribute, Integer> attributes, int xp, int gold, int shortRestCount, int maxMana, int currentMana) {
         super(id, name, attributes, currentHealth, maxHealth);
         this.account = account;
         setCurrentRoom(room);
@@ -75,7 +83,10 @@ public final class CharacterInstance extends AbstractCharacter {
         this.xp = xp;
         this.inventory = new PlayerInventory(gold);
         this.combat = new CharacterCombat(this);
+        this.spellCasting = new SpellCasting(this);
         this.shortRestCount = shortRestCount;
+        this.maxMana = maxMana;
+        this.currentMana = currentMana;
     }
 
     public Account getAccount() {
@@ -217,6 +228,49 @@ public final class CharacterInstance extends AbstractCharacter {
         return combat;
     }
 
+    public SpellCasting getSpellCasting() {
+        return spellCasting;
+    }
+
+    public int getMaxMana() {
+        return maxMana;
+    }
+
+    public void setMaxMana(int maxMana) {
+        this.maxMana = maxMana;
+    }
+
+    public int getCurrentMana() {
+        return currentMana;
+    }
+
+    public void setCurrentMana(int currentMana) {
+        this.currentMana = currentMana;
+    }
+
+    public boolean trySpendMana(int amount) {
+        if (currentMana < amount) {
+            return false;
+        }
+        currentMana -= amount;
+        return true;
+    }
+
+    public int gainMana(int amount) {
+        int gained = Math.min(amount, maxMana - currentMana);
+        currentMana += gained;
+        return gained;
+    }
+
+    public SpellCasting.CastOutcome castSpell(Spell spell, AbstractCharacter target) {
+        if (!trySpendMana(spell.manaCost())) {
+            throw new IllegalStateException("Mana insuffisante pour lancer " + spell.name());
+        }
+        SpellCasting.CastOutcome outcome = spellCasting.cast(spell, target);
+        DomainEventPublisher.publish(new SpellCast(this, spell, target, outcome.amount(), outcome.targetDefeated()));
+        return outcome;
+    }
+
     public int getXp() {
         return xp;
     }
@@ -236,7 +290,18 @@ public final class CharacterInstance extends AbstractCharacter {
         level++;
         setMaxHealth(getMaxHealth() + hpGain);
         setCurrentHealth(getCurrentHealth() + hpGain);
+
+        int manaGain = characterClass.manaGainPerLevel();
+        maxMana += manaGain;
+        currentMana += manaGain;
+
         DomainEventPublisher.publish(new CharacterLeveledUp(this, level, hpGain));
+
+        for (Spell spell : SpellCatalogHolder.spellsLearnableAt(characterClass, level)) {
+            if (spellCasting.learn(spell.id())) {
+                DomainEventPublisher.publish(new CharacterLearnedSpell(this, spell));
+            }
+        }
     }
 
     public int getShortRestCount() {

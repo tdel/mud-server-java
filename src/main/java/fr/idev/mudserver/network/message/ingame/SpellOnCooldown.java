@@ -5,10 +5,12 @@ import fr.idev.mudserver.network.server.telnet.Ansi;
 import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.network.server.telnet.TelnetOutput;
 
-public record ItemNotUsable(String name) implements OutputTelnetMessage, OutputJsonMessage {
+public record SpellOnCooldown(String spellName,
+        long remainingMillis) implements OutputTelnetMessage, OutputJsonMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        output.write(Ansi.error("You can't use \"" + name + "\".") + "\n");
+        double remainingSeconds = Math.ceil(remainingMillis / 1000.0);
+        output.write(Ansi.error(spellName + " isn't ready yet (" + (int) remainingSeconds + "s left).") + "\n");
     }
 }

@@ -1,5 +1,5 @@
 package fr.idev.mudserver.domain;
 
 public enum ConsumableEffect {
-    HEALING
+    HEALING, MANA_RESTORE
 }

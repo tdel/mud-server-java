@@ -58,6 +58,10 @@ public enum CharacterClass {
         return definition.armorProficiencies();
     }
 
+    public int manaGainPerLevel() {
+        return definition.manaGainPerLevel();
+    }
+
     public String label() {
         return switch (this) {
             case BARBARIAN -> "Barbarian";
@@ -79,17 +83,17 @@ public enum CharacterClass {
     }
 
     private record Definition(int hitDie, StartingGold startingGold, Set<Attribute> savingThrows, Set<Skill> skills,
-            Attribute primaryAbility, Set<WeaponCategory> weaponProficiencies,
-            Set<ArmorProficiency> armorProficiencies) {
+            Attribute primaryAbility, Set<WeaponCategory> weaponProficiencies, Set<ArmorProficiency> armorProficiencies,
+            int manaGainPerLevel) {
     }
 
     private record Json(CharacterClass name, int hitDie, String startingGoldDice, int startingGoldMultiplier,
             List<Attribute> savingThrows, List<Skill> skills, Attribute primaryAbility,
-            List<WeaponCategory> weaponProficiencies, List<ArmorProficiency> armorProficiencies) {
+            List<WeaponCategory> weaponProficiencies, List<ArmorProficiency> armorProficiencies, int manaGainPerLevel) {
         Definition toDefinition() {
             return new Definition(hitDie, new StartingGold(startingGoldDice, startingGoldMultiplier),
                     Set.copyOf(savingThrows), Set.copyOf(skills), primaryAbility, Set.copyOf(weaponProficiencies),
-                    Set.copyOf(armorProficiencies));
+                    Set.copyOf(armorProficiencies), manaGainPerLevel);
         }
     }
 }

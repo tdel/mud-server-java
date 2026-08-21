@@ -27,6 +27,9 @@ import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.world.RoomTemplate;
 import fr.idev.mudserver.domain.world.WorldInstance;
+import fr.idev.mudserver.game.catalog.SpellCatalog;
+import fr.idev.mudserver.game.catalog.SpellCatalogHolder;
+import tools.jackson.databind.ObjectMapper;
 
 class MonsterTemplateLootTest {
 
@@ -34,6 +37,7 @@ class MonsterTemplateLootTest {
     void setUpEventPublisher() {
         DomainEventPublisher.initialize(event -> {
         });
+        SpellCatalogHolder.initialize(new SpellCatalog(new ObjectMapper()));
     }
 
     private CharacterInstance newKiller() {

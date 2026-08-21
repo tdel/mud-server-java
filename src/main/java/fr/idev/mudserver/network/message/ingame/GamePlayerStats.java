@@ -18,9 +18,10 @@ public record GamePlayerStats(CharacterInstance character) implements OutputTeln
     }
 
     public record Payload(String name, String gender, int level, String characterClass, int currentHealth,
-            int maxHealth, int armorClass, int proficiencyBonus, AttributeScore strength, AttributeScore dexterity,
-            AttributeScore constitution, AttributeScore intelligence, AttributeScore wisdom, AttributeScore charisma,
-            String primaryAbility, List<String> savingThrowProficiencies, List<String> skillProficiencies) {
+            int maxHealth, int currentMana, int maxMana, int armorClass, int proficiencyBonus, AttributeScore strength,
+            AttributeScore dexterity, AttributeScore constitution, AttributeScore intelligence, AttributeScore wisdom,
+            AttributeScore charisma, String primaryAbility, List<String> savingThrowProficiencies,
+            List<String> skillProficiencies) {
     }
 
     @Override
@@ -28,11 +29,11 @@ public record GamePlayerStats(CharacterInstance character) implements OutputTeln
         CharacterInstance c = character;
         output.write("GamePlayerStats",
                 new Payload(c.getName(), c.getGender().label(), c.getLevel(), c.getCharacterClass().label(),
-                        c.getCurrentHealth(), c.getMaxHealth(), c.getArmorClass(), c.getProficiencyBonus(),
-                        attributeScore(c, Attribute.STRENGTH), attributeScore(c, Attribute.DEXTERITY),
-                        attributeScore(c, Attribute.CONSTITUTION), attributeScore(c, Attribute.INTELLIGENCE),
-                        attributeScore(c, Attribute.WISDOM), attributeScore(c, Attribute.CHARISMA),
-                        c.getPrimaryAbility().label(),
+                        c.getCurrentHealth(), c.getMaxHealth(), c.getCurrentMana(), c.getMaxMana(), c.getArmorClass(),
+                        c.getProficiencyBonus(), attributeScore(c, Attribute.STRENGTH),
+                        attributeScore(c, Attribute.DEXTERITY), attributeScore(c, Attribute.CONSTITUTION),
+                        attributeScore(c, Attribute.INTELLIGENCE), attributeScore(c, Attribute.WISDOM),
+                        attributeScore(c, Attribute.CHARISMA), c.getPrimaryAbility().label(),
                         c.getSavingThrowProficiencies().stream().sorted().map(Attribute::label).toList(),
                         c.getSkillProficiencies().stream().sorted().map(Skill::label).toList()),
                 false);
@@ -46,10 +47,10 @@ public record GamePlayerStats(CharacterInstance character) implements OutputTeln
     public void toTelnet(TelnetOutput output) {
         CharacterInstance c = character;
         output.write(String.format(
-                "== %s (%s, Level %d %s) ==\nHealth: %d/%d\nArmor Class: %d\nProficiency: %+d\nStrength: %d (%+d)  Dexterity: %d (%+d)  Constitution: %d (%+d)\nIntelligence: %d (%+d)  Wisdom: %d (%+d)  Charisma: %d (%+d)\nPrimary Ability: %s\nSaving Throws: %s\nSkills: %s\n",
+                "== %s (%s, Level %d %s) ==\nHealth: %d/%d\nMana: %d/%d\nArmor Class: %d\nProficiency: %+d\nStrength: %d (%+d)  Dexterity: %d (%+d)  Constitution: %d (%+d)\nIntelligence: %d (%+d)  Wisdom: %d (%+d)  Charisma: %d (%+d)\nPrimary Ability: %s\nSaving Throws: %s\nSkills: %s\n",
                 Ansi.player(c.getName()), c.getGender().label(), c.getLevel(), c.getCharacterClass().label(),
-                c.getCurrentHealth(), c.getMaxHealth(), c.getArmorClass(), c.getProficiencyBonus(),
-                c.getAttribute(Attribute.STRENGTH), c.getModifier(Attribute.STRENGTH),
+                c.getCurrentHealth(), c.getMaxHealth(), c.getCurrentMana(), c.getMaxMana(), c.getArmorClass(),
+                c.getProficiencyBonus(), c.getAttribute(Attribute.STRENGTH), c.getModifier(Attribute.STRENGTH),
                 c.getAttribute(Attribute.DEXTERITY), c.getModifier(Attribute.DEXTERITY),
                 c.getAttribute(Attribute.CONSTITUTION), c.getModifier(Attribute.CONSTITUTION),
                 c.getAttribute(Attribute.INTELLIGENCE), c.getModifier(Attribute.INTELLIGENCE),

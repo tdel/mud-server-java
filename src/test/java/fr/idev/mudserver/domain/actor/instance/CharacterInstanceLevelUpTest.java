@@ -13,16 +13,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import fr.idev.mudserver.domain.Account;
+import fr.idev.mudserver.domain.Spell;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
+import fr.idev.mudserver.domain.actor.event.CharacterLearnedSpell;
 import fr.idev.mudserver.domain.actor.event.CharacterLeveledUp;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.world.RoomTemplate;
 import fr.idev.mudserver.domain.world.WorldInstance;
+import fr.idev.mudserver.game.catalog.SpellCatalog;
+import fr.idev.mudserver.game.catalog.SpellCatalogHolder;
+import tools.jackson.databind.ObjectMapper;
 
 class CharacterInstanceLevelUpTest {
 
@@ -32,6 +37,7 @@ class CharacterInstanceLevelUpTest {
     void setUpEventPublisher() {
         publishedEvents.clear();
         DomainEventPublisher.initialize(publishedEvents::add);
+        SpellCatalogHolder.initialize(new SpellCatalog(new ObjectMapper()));
     }
 
     private CharacterInstance newFighter(int level, int currentHealth, int maxHealth) {
@@ -48,6 +54,22 @@ class CharacterInstanceLevelUpTest {
 
         return new CharacterInstance(UUID.randomUUID(), account, "Hero", room, Gender.MAN, Race.HUMAN,
                 CharacterClass.FIGHTER, level, currentHealth, maxHealth, attributes, 0, 0);
+    }
+
+    private CharacterInstance newSorcerer(int level, int currentHealth, int maxHealth) {
+        WorldInstance world = new WorldInstance(UUID.randomUUID(), UUID.randomUUID(), Instant.now());
+        RoomTemplate roomTemplate = new RoomTemplate(UUID.randomUUID(), "Room", "desc", true, 3, 3,
+                new HexCoordinate(0, 0), List.of());
+        RoomInstance room = new RoomInstance(UUID.randomUUID(), roomTemplate, world);
+        Account account = new Account(UUID.randomUUID(), "login", "hash", null);
+
+        Map<Attribute, Integer> attributes = new EnumMap<>(Attribute.class);
+        for (Attribute attribute : Attribute.values()) {
+            attributes.put(attribute, 14);
+        }
+
+        return new CharacterInstance(UUID.randomUUID(), account, "Mage", room, Gender.WOMAN, Race.HUMAN,
+                CharacterClass.SORCERER, level, currentHealth, maxHealth, attributes, 0, 0);
     }
 
     @Test
@@ -84,5 +106,44 @@ class CharacterInstanceLevelUpTest {
 
         assertThat(character.getLevel()).isEqualTo(3);
         assertThat(publishedEvents).hasSize(2);
+    }
+
+    @Test
+    void applyLevelUpDoesNotIncrementManaForNonCasterClass() {
+        CharacterInstance character = newFighter(1, 10, 10);
+
+        character.applyLevelUp();
+
+        assertThat(character.getMaxMana()).isZero();
+        assertThat(character.getCurrentMana()).isZero();
+    }
+
+    @Test
+    void applyLevelUpIncrementsManaForCasterClass() {
+        CharacterInstance character = newSorcerer(1, 10, 10);
+
+        character.applyLevelUp();
+
+        assertThat(character.getMaxMana()).isEqualTo(CharacterClass.SORCERER.manaGainPerLevel());
+        assertThat(character.getCurrentMana()).isEqualTo(CharacterClass.SORCERER.manaGainPerLevel());
+    }
+
+    @Test
+    void applyLevelUpLearnsSpellsAtRequiredLevelAndPublishesEvent() {
+        SpellCatalog catalog = new SpellCatalog(new ObjectMapper());
+        catalog.warmSpells();
+        SpellCatalogHolder.initialize(catalog);
+        Spell scorchingRay = catalog.allSpells().stream().filter(spell -> spell.name().equals("Scorching Ray"))
+                .findFirst().orElseThrow();
+
+        CharacterInstance character = newSorcerer(1, 10, 10);
+
+        character.applyLevelUp(); // niveau 2 : aucun sort de niveau 2 dans spells.json
+        character.applyLevelUp(); // niveau 3 : Scorching Ray devient accessible
+
+        assertThat(character.getSpellCasting().knows(scorchingRay.id())).isTrue();
+        assertThat(publishedEvents)
+                .anySatisfy(event -> assertThat(event).isInstanceOfSatisfying(CharacterLearnedSpell.class,
+                        learned -> assertThat(learned.spell().name()).isEqualTo("Scorching Ray")));
     }
 }

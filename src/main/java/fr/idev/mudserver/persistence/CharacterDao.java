@@ -35,14 +35,15 @@ public class CharacterDao {
                 CHARACTER.GENDER, CHARACTER.RACE, CHARACTER.CHARACTER_CLASS, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH,
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
                 CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA, CHARACTER.XP, CHARACTER.GOLD,
-                CHARACTER.SHORT_REST_COUNT)
+                CHARACTER.SHORT_REST_COUNT, CHARACTER.MAX_MANA, CHARACTER.CURRENT_MANA)
                 .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentRoomId(),
                         character.getGender().name(), character.getRace().name(), character.getCharacterClass().name(),
                         character.getLevel(), character.getCurrentHealth(), character.getMaxHealth(),
                         character.getAttribute(Attribute.STRENGTH), character.getAttribute(Attribute.DEXTERITY),
                         character.getAttribute(Attribute.CONSTITUTION), character.getAttribute(Attribute.INTELLIGENCE),
                         character.getAttribute(Attribute.WISDOM), character.getAttribute(Attribute.CHARISMA),
-                        character.getXp(), character.getInventory().getGold(), character.getShortRestCount())
+                        character.getXp(), character.getInventory().getGold(), character.getShortRestCount(),
+                        character.getMaxMana(), character.getCurrentMana())
                 .execute();
     }
 
@@ -66,6 +67,7 @@ public class CharacterDao {
                 .set(CHARACTER.LEVEL, character.getLevel()).set(CHARACTER.MAX_HEALTH, character.getMaxHealth())
                 .set(CHARACTER.GOLD, character.getInventory().getGold())
                 .set(CHARACTER.SHORT_REST_COUNT, character.getShortRestCount())
+                .set(CHARACTER.MAX_MANA, character.getMaxMana()).set(CHARACTER.CURRENT_MANA, character.getCurrentMana())
                 .where(CHARACTER.ID.eq(character.getId())).execute();
     }
 
@@ -91,7 +93,8 @@ public class CharacterDao {
 
         CharacterInstance character = new CharacterInstance(record.getId(), account, record.getName(), room,
                 Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
-                record.getMaxHealth(), attributes, record.getXp(), record.getGold(), record.getShortRestCount());
+                record.getMaxHealth(), attributes, record.getXp(), record.getGold(), record.getShortRestCount(),
+                record.getMaxMana(), record.getCurrentMana());
         character.setWorldInstance(instance);
         return character;
     }

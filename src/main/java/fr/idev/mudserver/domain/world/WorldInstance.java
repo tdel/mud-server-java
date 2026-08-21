@@ -11,13 +11,16 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import fr.idev.mudserver.domain.Account;
+import fr.idev.mudserver.domain.Spell;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
+import fr.idev.mudserver.domain.actor.event.CharacterLearnedSpell;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.NewGamePlayerCreated;
+import fr.idev.mudserver.game.catalog.SpellCatalogHolder;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.OutputMessage;
@@ -106,12 +109,20 @@ public class WorldInstance {
         CharacterClass.StartingGold startingGold = characterClass.startingGold();
         int gold = DiceRoller.roll(startingGold.dice()).total() * startingGold.multiplier();
 
+        int startingMana = characterClass.manaGainPerLevel();
+
         CharacterInstance character = new CharacterInstance(UUID.randomUUID(), account, name, startingRoom, gender,
-                race, characterClass, 1, maxHealth, maxHealth, scores, 0, gold);
+                race, characterClass, 1, maxHealth, maxHealth, scores, 0, gold, 0, startingMana, startingMana);
         character.setWorldInstance(this);
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));
         character.setCurrentRoom(startingRoom);
+
+        for (Spell spell : SpellCatalogHolder.spellsLearnableAt(characterClass, 1)) {
+            if (character.getSpellCasting().learn(spell.id())) {
+                DomainEventPublisher.publish(new CharacterLearnedSpell(character, spell));
+            }
+        }
 
         return character;
     }

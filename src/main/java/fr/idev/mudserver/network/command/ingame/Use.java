@@ -7,11 +7,13 @@ import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.network.CommandHandler;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
+import fr.idev.mudserver.domain.item.ConsumableItem;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.ingame.ItemNotCarried;
+import fr.idev.mudserver.network.message.ingame.ItemNotUsable;
 
 @Component
 public class Use implements CommandHandler {
@@ -42,6 +44,11 @@ public class Use implements CommandHandler {
             return;
         }
 
-        // do nothing now
+        Item resolved = item.get();
+        if (resolved.getTemplate() instanceof ConsumableItem consumable) {
+            consumable.consume(character, resolved);
+        } else {
+            connection.send(new ItemNotUsable(resolved.getName()));
+        }
     }
 }

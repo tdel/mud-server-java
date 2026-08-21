@@ -13,6 +13,7 @@ import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEquippedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUnequippedItem;
+import fr.idev.mudserver.domain.actor.event.GamePlayerUsedManaPotion;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUsedPotion;
 import fr.idev.mudserver.domain.actor.event.ItemDiscarded;
 import fr.idev.mudserver.domain.actor.event.ItemPurchased;
@@ -79,5 +80,12 @@ public class ItemPersistenceListener {
         itemDao.delete(event.item().getId());
         log.info("item.consumed item={} character={} healedAmount={}", event.item().getId(),
                 event.character().getName(), event.healedAmount());
+    }
+
+    @EventListener
+    void onGamePlayerUsedManaPotion(GamePlayerUsedManaPotion event) {
+        itemDao.delete(event.item().getId());
+        log.info("item.consumed item={} character={} restoredAmount={}", event.item().getId(),
+                event.character().getName(), event.restoredAmount());
     }
 }

@@ -33,6 +33,7 @@ import fr.idev.mudserver.network.message.ingame.MonsterDefeated;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 import fr.idev.mudserver.persistence.listener.ItemPersistenceListener;
+import fr.idev.mudserver.persistence.listener.SpellPersistenceListener;
 
 // La persistance de GamePlayerMovedToRoom/GamePlayerSpawnedToRoom vit dans
 // persistence.listener.WorldInstancePersistenceListener — ici ne reste que
@@ -47,18 +48,20 @@ public class WorldInstanceService {
     private final MonsterCatalog monsterService;
     private final NpcCatalog npcService;
     private final ItemPersistenceListener itemService;
+    private final SpellPersistenceListener spellService;
     private final AccountDao accountDao;
     private final CharacterDao characterDao;
 
     private WorldInstance defaultInstance;
 
     public WorldInstanceService(WorldTemplateCatalog worldTemplateService, MonsterCatalog monsterService,
-            NpcCatalog npcService, ItemPersistenceListener itemService, AccountDao accountDao,
-            CharacterDao characterDao) {
+            NpcCatalog npcService, ItemPersistenceListener itemService, SpellPersistenceListener spellService,
+            AccountDao accountDao, CharacterDao characterDao) {
         this.worldTemplateService = worldTemplateService;
         this.monsterService = monsterService;
         this.npcService = npcService;
         this.itemService = itemService;
+        this.spellService = spellService;
         this.accountDao = accountDao;
         this.characterDao = characterDao;
     }
@@ -107,6 +110,7 @@ public class WorldInstanceService {
         WorldInstance instance = player.getWorldInstance();
 
         player.getInventory().replaceItems(itemService.loadInventory(player));
+        spellService.loadLearnedSpellIds(player).forEach(player.getSpellCasting()::learn);
         player.getCurrentRoom().join(player);
 
         instance.addPlayer(player);

@@ -5,10 +5,10 @@ import fr.idev.mudserver.network.server.telnet.Ansi;
 import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.network.server.telnet.TelnetOutput;
 
-public record ItemNotUsable(String name) implements OutputTelnetMessage, OutputJsonMessage {
+public record SpellOutOfRange(String spellName, String targetName) implements OutputTelnetMessage, OutputJsonMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        output.write(Ansi.error("You can't use \"" + name + "\".") + "\n");
+        output.write(Ansi.error(targetName + " is out of range for " + spellName + ".") + "\n");
     }
 }
