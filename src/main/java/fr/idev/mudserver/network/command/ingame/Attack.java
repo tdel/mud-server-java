@@ -6,7 +6,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
-import fr.idev.mudserver.domain.actor.instance.CharacterCombat;
+import fr.idev.mudserver.domain.actor.component.CharacterCombat;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.network.CommandHandler;
 import fr.idev.mudserver.network.Connection;

@@ -1,4 +1,4 @@
-package fr.idev.mudserver.domain.actor.instance;
+package fr.idev.mudserver.domain.actor.component;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -7,6 +7,8 @@ import java.util.stream.IntStream;
 
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.Attribute;
+import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
+import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.item.EquipmentSlot;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.game.dice.DiceRoll;

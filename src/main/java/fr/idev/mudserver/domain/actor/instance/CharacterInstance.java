@@ -10,6 +10,8 @@ import java.util.UUID;
 
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.*;
+import fr.idev.mudserver.domain.actor.component.CharacterCombat;
+import fr.idev.mudserver.domain.actor.component.PlayerInventory;
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
 import fr.idev.mudserver.domain.actor.event.CharacterLeveledUp;
 import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
@@ -24,7 +26,6 @@ import fr.idev.mudserver.domain.actor.event.GamePlayerUnequippedItem;
 import fr.idev.mudserver.domain.actor.event.ItemDiscarded;
 import fr.idev.mudserver.domain.actor.event.ItemPurchased;
 import fr.idev.mudserver.domain.item.EquipmentSlot;
-import fr.idev.mudserver.domain.item.FoodItem;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.world.RoomInstance;

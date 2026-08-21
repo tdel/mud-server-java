@@ -1,4 +1,4 @@
-package fr.idev.mudserver.domain.actor;
+package fr.idev.mudserver.domain.actor.component;
 
 import java.util.List;
 import java.util.Optional;
