@@ -6,8 +6,6 @@ import java.util.UUID;
 
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.world.RoomInstance;
-import fr.idev.mudserver.domain.combat.ActionEconomy;
-import fr.idev.mudserver.domain.combat.CombatEncounter;
 import fr.idev.mudserver.game.MovementEngine;
 import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoller;
@@ -24,8 +22,6 @@ public abstract class AbstractCharacter extends AbstractObject {
     private volatile RoomInstance currentRoom;
     private volatile HexCoordinate position;
     protected int speed = DEFAULT_SPEED;
-    private volatile CombatEncounter encounter;
-    private final ActionEconomy actionEconomy = new ActionEconomy();
     public volatile MovementEngine.ActiveMovement activeMovement;
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
@@ -98,28 +94,8 @@ public abstract class AbstractCharacter extends AbstractObject {
         this.speed = speed;
     }
 
-    public boolean isInCombat() {
-        return encounter != null;
-    }
-
-    public CombatEncounter getEncounter() {
-        return encounter;
-    }
-
-    public void setEncounter(CombatEncounter encounter) {
-        this.encounter = encounter;
-    }
-
-    public ActionEconomy getActionEconomy() {
-        return actionEconomy;
-    }
-
     public int rollInitiative() {
         return DiceRoller.roll(new DiceExpression(1, 20, getModifier(Attribute.DEXTERITY))).total();
-    }
-
-    public boolean onEnteredCell(HexCoordinate cell) {
-        return false;
     }
 
     // No-op par défaut : seul GamePlayer a une Connection à notifier.

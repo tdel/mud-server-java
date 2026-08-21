@@ -16,7 +16,6 @@ import fr.idev.mudserver.domain.actor.event.GamePlayerUnequippedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUsedPotion;
 import fr.idev.mudserver.domain.actor.event.ItemDiscarded;
 import fr.idev.mudserver.domain.actor.event.ItemPurchased;
-import fr.idev.mudserver.domain.actor.event.LongRestTaken;
 import fr.idev.mudserver.network.message.ingame.EquipmentLooted;
 import fr.idev.mudserver.network.message.ingame.ItemBought;
 import fr.idev.mudserver.persistence.ItemDao;
@@ -80,14 +79,5 @@ public class ItemPersistenceListener {
         itemDao.delete(event.item().getId());
         log.info("item.consumed item={} character={} healedAmount={}", event.item().getId(),
                 event.character().getName(), event.healedAmount());
-    }
-
-    @EventListener
-    void onLongRestTaken(LongRestTaken event) {
-        for (Item food : event.consumedFood()) {
-            itemDao.delete(food.getId());
-        }
-        log.info("item.provisions_consumed initiator={} count={}", event.initiator().getName(),
-                event.consumedFood().size());
     }
 }

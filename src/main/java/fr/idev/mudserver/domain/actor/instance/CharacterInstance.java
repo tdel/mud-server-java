@@ -1,7 +1,6 @@
 package fr.idev.mudserver.domain.actor.instance;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -9,7 +8,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import fr.idev.mudserver.config.GameConfig;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.*;
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
@@ -19,14 +17,11 @@ import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
 import fr.idev.mudserver.domain.actor.event.CharacterSpentGold;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
-import fr.idev.mudserver.domain.actor.event.GamePlayerEnteredCell;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEquippedItem;
 import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUnequippedItem;
 import fr.idev.mudserver.domain.actor.event.ItemDiscarded;
 import fr.idev.mudserver.domain.actor.event.ItemPurchased;
-import fr.idev.mudserver.domain.actor.event.LongRestTaken;
-import fr.idev.mudserver.domain.actor.event.ShortRestTaken;
 import fr.idev.mudserver.domain.item.EquipmentSlot;
 import fr.idev.mudserver.domain.item.FoodItem;
 import fr.idev.mudserver.domain.map.HexCoordinate;
@@ -34,9 +29,7 @@ import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.item.WeaponCategory;
 import fr.idev.mudserver.domain.world.WorldInstance;
-import fr.idev.mudserver.game.CombatResult;
 import fr.idev.mudserver.game.dice.CheckResult;
-import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.Connection;
@@ -209,45 +202,6 @@ public final class CharacterInstance extends AbstractCharacter {
         };
     }
 
-    public CombatResult tryAttack(MonsterInstance target) {
-        Optional<Item> weapon = inventory.getEquippedItems().stream()
-                .filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
-        int weaponBonus = weapon.map(Item::getBonus).orElse(0);
-        boolean weaponProficient = weapon.map(item -> getWeaponProficiencies().contains(item.getWeaponCategory()))
-                .orElse(true);
-
-        int strengthModifier = getModifier(Attribute.STRENGTH);
-        int attackBonus = strengthModifier + (weaponProficient ? getProficiencyBonus() : 0) + weaponBonus;
-        boolean disadvantage = isWearingNonProficientArmor();
-
-        DiceRoll attackRoll = DiceRoller.rollD20(attackBonus, disadvantage);
-        int naturalRoll = attackRoll.rolls()[0];
-        boolean criticalHit = naturalRoll == 20;
-        int armorClass = target.getArmorClass();
-        boolean hit = DiceRoller.resolveHit(naturalRoll, attackRoll.total(), armorClass);
-
-        if (!hit) {
-            return new CombatResult(target.getName(), false, false, attackRoll.total(), armorClass, 0, disadvantage);
-        }
-
-        int damage = rollDamage(weapon, strengthModifier, criticalHit);
-        return new CombatResult(target.getName(), true, criticalHit, attackRoll.total(), armorClass, damage,
-                disadvantage);
-    }
-
-    private int rollDamage(Optional<Item> weapon, int strengthModifier, boolean criticalHit) {
-        if (weapon.isEmpty()) {
-            // Attaque à mains nues (SRD) : 1 + modificateur de FOR, pas de dé donc rien à
-            // doubler en cas de critique.
-            return Math.max(0, 1 + strengthModifier);
-        }
-
-        DiceExpression base = DiceExpression.parse(weapon.get().getDamageDice());
-        int diceCount = criticalHit ? base.count() * 2 : base.count();
-        int modifier = strengthModifier + weapon.get().getBonus();
-        return Math.max(0, DiceRoller.roll(new DiceExpression(diceCount, base.sides(), modifier)).total());
-    }
-
     public Connection getConnection() {
         return connection;
     }
@@ -302,50 +256,6 @@ public final class CharacterInstance extends AbstractCharacter {
         shortRestCount = 0;
     }
 
-    public RestOutcome doShortRest() {
-        if (isInCombat()) {
-            return new RestOutcome.InCombat();
-        }
-        if (!canTakeShortRest()) {
-            return new RestOutcome.NoShortRestLeft();
-        }
-
-        Map<CharacterInstance, Integer> healedAmounts = new LinkedHashMap<>();
-        for (CharacterInstance character : worldInstance.onlineCharacters()) {
-            int amount = character.hitDieRecovery();
-            healedAmounts.put(character, character.heal(amount));
-            character.incrementShortRestCount();
-        }
-
-        DomainEventPublisher.publish(new ShortRestTaken(this, healedAmounts));
-        return new RestOutcome.Rested(healedAmounts);
-    }
-
-    public RestOutcome doLongRest(List<Item> selectedFood) {
-        if (isInCombat()) {
-            return new RestOutcome.InCombat();
-        }
-
-        int totalValue = selectedFood.stream().mapToInt(item -> ((FoodItem) item.getTemplate()).getNutritionValue())
-                .sum();
-        if (totalValue < GameConfig.LONG_REST_PROVISION_THRESHOLD) {
-            return new RestOutcome.NotEnoughProvisions(totalValue);
-        }
-
-        for (Item food : selectedFood) {
-            inventory.removeItem(food);
-        }
-
-        Map<CharacterInstance, Integer> healedAmounts = new LinkedHashMap<>();
-        for (CharacterInstance character : worldInstance.onlineCharacters()) {
-            healedAmounts.put(character, character.heal(character.getMaxHealth()));
-            character.resetShortRestCount();
-        }
-
-        DomainEventPublisher.publish(new LongRestTaken(this, healedAmounts, selectedFood));
-        return new RestOutcome.Rested(healedAmounts);
-    }
-
     public void receiveGold(int amount) {
         inventory.addGold(amount);
         DomainEventPublisher.publish(new CharacterReceivedGold(this, amount));
@@ -389,15 +299,6 @@ public final class CharacterInstance extends AbstractCharacter {
         previous.leave(this);
         destination.join(this, targetCell);
         DomainEventPublisher.publish(new GamePlayerMovedToRoom(this, previous, destination));
-    }
-
-    @Override
-    public boolean onEnteredCell(HexCoordinate cell) {
-        if (isInCombat()) {
-            return false;
-        }
-        DomainEventPublisher.publish(new GamePlayerEnteredCell(this, cell));
-        return isInCombat();
     }
 
     public Optional<EquipmentSlot> equipItem(Item item) {

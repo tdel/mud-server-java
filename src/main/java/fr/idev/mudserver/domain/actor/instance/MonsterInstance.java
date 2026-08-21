@@ -9,10 +9,6 @@ import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.template.MonsterTemplate;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
-import fr.idev.mudserver.game.CombatResult;
-import fr.idev.mudserver.game.dice.DiceExpression;
-import fr.idev.mudserver.game.dice.DiceRoll;
-import fr.idev.mudserver.game.dice.DiceRoller;
 
 public final class MonsterInstance extends AbstractCharacter {
 
@@ -41,30 +37,6 @@ public final class MonsterInstance extends AbstractCharacter {
             DomainEventPublisher.publish(new CharacterDied(this, attacker));
         }
         return defeated;
-    }
-
-    public CombatResult tryAttack(CharacterInstance target) {
-        int strengthModifier = getModifier(Attribute.STRENGTH);
-        int attackBonus = strengthModifier + 2;
-
-        DiceRoll attackRoll = DiceRoller.roll(new DiceExpression(1, 20, attackBonus));
-        int naturalRoll = attackRoll.rolls()[0];
-        boolean criticalHit = naturalRoll == 20;
-        int armorClass = target.getArmorClass();
-        boolean hit = DiceRoller.resolveHit(naturalRoll, attackRoll.total(), armorClass);
-
-        if (!hit) {
-            return new CombatResult(target.getName(), false, false, attackRoll.total(), armorClass, 0, false);
-        }
-
-        int damage = rollDamage(strengthModifier, criticalHit);
-        return new CombatResult(target.getName(), true, criticalHit, attackRoll.total(), armorClass, damage, false);
-    }
-
-    private int rollDamage(int strengthModifier, boolean criticalHit) {
-        DiceExpression base = DiceExpression.parse(getNaturalDamageDice());
-        int diceCount = criticalHit ? base.count() * 2 : base.count();
-        return Math.max(0, DiceRoller.roll(new DiceExpression(diceCount, base.sides(), strengthModifier)).total());
     }
 
     public void attachTemplate(MonsterTemplate template) {

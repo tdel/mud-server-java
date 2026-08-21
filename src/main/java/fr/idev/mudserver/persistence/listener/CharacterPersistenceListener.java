@@ -1,7 +1,5 @@
 package fr.idev.mudserver.persistence.listener;
 
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -16,19 +14,14 @@ import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
 import fr.idev.mudserver.domain.actor.event.CharacterSpentGold;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUsedPotion;
-import fr.idev.mudserver.domain.actor.event.LongRestTaken;
 import fr.idev.mudserver.domain.actor.event.NewGamePlayerCreated;
-import fr.idev.mudserver.domain.actor.event.ShortRestTaken;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.game.catalog.LevelCatalog;
 import fr.idev.mudserver.network.message.ingame.GoldLooted;
 import fr.idev.mudserver.network.message.ingame.GoldSpent;
-import fr.idev.mudserver.network.message.ingame.HpRestored;
 import fr.idev.mudserver.network.message.ingame.ItemUsed;
-import fr.idev.mudserver.network.message.ingame.LongRestAnnounced;
 import fr.idev.mudserver.network.message.ingame.PlayerLeveledUp;
 import fr.idev.mudserver.network.message.ingame.PlayerRespawned;
-import fr.idev.mudserver.network.message.ingame.ShortRestAnnounced;
 import fr.idev.mudserver.network.message.ingame.XpGained;
 import fr.idev.mudserver.persistence.CharacterDao;
 
@@ -125,30 +118,6 @@ public class CharacterPersistenceListener {
                 character.getCurrentHealth(), character.getMaxHealth()));
         log.info("character.used_potion character={} item={} healedAmount={}", character.getName(),
                 event.item().getName(), event.healedAmount());
-    }
-
-    @EventListener
-    void onShortRestTaken(ShortRestTaken event) {
-        for (Map.Entry<CharacterInstance, Integer> entry : event.healedAmounts().entrySet()) {
-            CharacterInstance character = entry.getKey();
-            characterDao.update(character);
-            character.send(new HpRestored(entry.getValue(), character.getCurrentHealth(), character.getMaxHealth()));
-        }
-        event.initiator().getWorldInstance().broadcast(new ShortRestAnnounced(event.initiator().getName()), null);
-        log.info("character.short_rest_taken initiator={} affected={}", event.initiator().getName(),
-                event.healedAmounts().size());
-    }
-
-    @EventListener
-    void onLongRestTaken(LongRestTaken event) {
-        for (Map.Entry<CharacterInstance, Integer> entry : event.healedAmounts().entrySet()) {
-            CharacterInstance character = entry.getKey();
-            characterDao.update(character);
-            character.send(new HpRestored(entry.getValue(), character.getCurrentHealth(), character.getMaxHealth()));
-        }
-        event.initiator().getWorldInstance().broadcast(new LongRestAnnounced(event.initiator().getName()), null);
-        log.info("character.long_rest_taken initiator={} affected={} provisionsConsumed={}",
-                event.initiator().getName(), event.healedAmounts().size(), event.consumedFood().size());
     }
 
 }

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.network.CommandHandler;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
-import fr.idev.mudserver.game.CombatEngine;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ingame.NoTargetSelected;
@@ -16,12 +15,6 @@ import fr.idev.mudserver.network.message.ingame.TargetNotFound;
 
 @Component
 public class Attack implements CommandHandler {
-
-    private final CombatEngine combatEngine;
-
-    public Attack(CombatEngine combatEngine) {
-        this.combatEngine = combatEngine;
-    }
 
     @Override
     public String name() {
@@ -60,6 +53,6 @@ public class Attack implements CommandHandler {
             character.setTarget(target);
         }
 
-        combatEngine.attack(character, target);
+        // do nothing now
     }
 }

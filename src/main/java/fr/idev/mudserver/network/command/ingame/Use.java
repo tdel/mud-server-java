@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.network.CommandHandler;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.item.Item;
-import fr.idev.mudserver.game.CombatEngine;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -16,12 +15,6 @@ import fr.idev.mudserver.network.message.ingame.ItemNotCarried;
 
 @Component
 public class Use implements CommandHandler {
-
-    private final CombatEngine combatEngine;
-
-    public Use(CombatEngine combatEngine) {
-        this.combatEngine = combatEngine;
-    }
 
     @Override
     public String name() {
@@ -49,6 +42,6 @@ public class Use implements CommandHandler {
             return;
         }
 
-        combatEngine.useItem(character, item.get());
+        // do nothing now
     }
 }
