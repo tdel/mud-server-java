@@ -9,19 +9,21 @@ import fr.idev.mudserver.domain.actor.event.SpellCast;
 @Component
 public class RegenTriggerListener {
 
-    private final RegenEngine regenEngine;
+    private final RegenHealthEngine regenHealthEngine;
+    private final RegenManaEngine regenManaEngine;
 
-    public RegenTriggerListener(RegenEngine regenEngine) {
-        this.regenEngine = regenEngine;
+    public RegenTriggerListener(RegenHealthEngine regenHealthEngine, RegenManaEngine regenManaEngine) {
+        this.regenHealthEngine = regenHealthEngine;
+        this.regenManaEngine = regenManaEngine;
     }
 
     @EventListener
     void onGamePlayerDamaged(GamePlayerDamaged event) {
-        regenEngine.register(event.character());
+        regenHealthEngine.register(event.character());
     }
 
     @EventListener
     void onSpellCast(SpellCast event) {
-        regenEngine.register(event.caster());
+        regenManaEngine.register(event.caster());
     }
 }

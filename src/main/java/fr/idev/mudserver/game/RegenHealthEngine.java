@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 
 @Component
-public class RegenEngine {
+public class RegenHealthEngine {
 
     private static final long REGEN_INTERVAL_MS = 10_000L;
     private static final long TICK_INTERVAL_MS = 1_000L;
@@ -32,8 +32,7 @@ public class RegenEngine {
                 continue;
             }
             CharacterInstance character = state.character();
-            int amount = character.regenAmountPerTick();
-            character.regenerate(amount, amount);
+            character.regenerate(character.healthRegenAmountPerTick(), 0);
 
             if (isFull(character)) {
                 regenerating.remove(character.getId());
@@ -44,8 +43,7 @@ public class RegenEngine {
     }
 
     private boolean isFull(CharacterInstance character) {
-        return character.getCurrentHealth() >= character.getMaxHealth()
-                && character.getCurrentMana() >= character.getMaxMana();
+        return character.getCurrentHealth() >= character.getMaxHealth();
     }
 
     private record RegenState(CharacterInstance character, long lastRegenAt) {
