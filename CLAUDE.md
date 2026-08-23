@@ -12,13 +12,13 @@ This project is a game. It is built around DnD5e (Dungeon and Dragon 5th edition
 
 ## Build, test, run
 
-Neither Java nor Maven is installed on the host — Maven runs through Docker instead, using the locally-pulled `maven:3.9.16-eclipse-temurin-25` image:
+Java 25 (Temurin) and Maven are installed on the host directly (e.g. via SDKMAN: `sdk install java 25-tem`, `sdk install maven`) — no Docker involved:
 
 ```
-docker run --rm -v "$(pwd)":/app -w /app -v ~/.m2:/root/.m2 maven:3.9.16-eclipse-temurin-25 mvn <goal>
+mvn <goal>
 ```
 
-Docker here is only a stand-in for a missing local JDK/Maven — the database itself is a single SQLite file (`./mud-server.db`, created/opened on first run), so no Docker socket mount and no sibling container are needed for either the app or the tests. Substitute `<goal>` with:
+Substitute `<goal>` with:
 
 - `package` — build
 - `spring-boot:run` (or run the packaged jar directly) — run the app

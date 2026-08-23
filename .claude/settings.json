@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 -c \"import sys,json; d=json.load(sys.stdin); f=(d.get('tool_input') or {}).get('file_path') or (d.get('tool_response') or {}).get('filePath') or ''; print(f)\" | { read -r f; case \"$f\" in *.java) docker run --rm -v \"$(git rev-parse --show-toplevel)\":/app -w /app -v /var/run/docker.sock:/var/run/docker.sock -v ~/.m2:/root/.m2 maven:3.9.16-eclipse-temurin-25 mvn -q spotless:apply ;; esac; } 2>/dev/null || true",
+            "command": "python3 -c \"import sys,json; d=json.load(sys.stdin); f=(d.get('tool_input') or {}).get('file_path') or (d.get('tool_response') or {}).get('filePath') or ''; print(f)\" | { read -r f; case \"$f\" in *.java) (cd \"$(git rev-parse --show-toplevel)\" && mvn -q spotless:apply) ;; esac; } 2>/dev/null || true",
             "timeout": 60,
             "statusMessage": "Formatting with Spotless..."
           }

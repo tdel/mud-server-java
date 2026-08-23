@@ -143,21 +143,19 @@ En cas d'erreur de parsing ou d'exécution, le serveur répond avec `{"type": "E
 
 ## Lancer le projet
 
-Ni Java ni Maven ne sont nécessaires sur la machine hôte : tout passe par Docker (uniquement
-pour faire tourner Maven — la base SQLite est un simple fichier local, rien à démarrer).
+Prérequis : Java 25 (Temurin recommandé) et Maven installés sur la machine hôte — par exemple
+via [SDKMAN](https://sdkman.io/) (`sdk install java 25-tem`, `sdk install maven`). La base
+SQLite est un simple fichier local, rien d'autre à démarrer.
 
 ```bash
 # Build
-docker run --rm -v "$(pwd)":/app -w /app -v ~/.m2:/root/.m2 \
-  maven:3.9.16-eclipse-temurin-25 mvn package
+mvn package
 
 # Tests
-docker run --rm -v "$(pwd)":/app -w /app -v ~/.m2:/root/.m2 \
-  maven:3.9.16-eclipse-temurin-25 mvn test
+mvn test
 
 # Lancer le serveur (crée/ouvre ./mud-server.db à la racine du projet)
-docker run --rm -v "$(pwd)":/app -w /app -v ~/.m2:/root/.m2 \
-  maven:3.9.16-eclipse-temurin-25 mvn spring-boot:run
+mvn spring-boot:run
 ```
 
 Le serveur telnet écoute sur le port **4001**, le transport JSON (voir ci-dessous) sur le
