@@ -129,12 +129,20 @@ public class WorldTemplateCatalog {
         List<ParsedZone> zones = new ArrayList<>();
         for (Resource file : files) {
             try (InputStream in = file.getInputStream()) {
-                zones.add(TiledZoneLoader.parse(TiledZoneLoader.readMap(in)));
+                zones.add(TiledZoneLoader.parse(TiledZoneLoader.readMap(in), this::openZoneTilesetResource));
             } catch (IOException e) {
                 throw new IllegalStateException("Impossible de charger la zone Tiled " + file, e);
             }
         }
         return zones;
+    }
+
+    private InputStream openZoneTilesetResource(String relativeSource) {
+        try {
+            return worldFile("zones/" + relativeSource).getInputStream();
+        } catch (IOException e) {
+            throw new IllegalStateException("Impossible de charger le tileset " + relativeSource, e);
+        }
     }
 
     Map<UUID, ZoneTemplate> buildZoneTemplates(String shortName, List<ParsedZone> parsedZones) {

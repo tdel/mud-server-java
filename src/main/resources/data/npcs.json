@@ -2,9 +2,9 @@
     {
         "id": "a3c8d0f2-5d5f-4d2c-9f2c-3f4e5d6c7b8a",
         "name": "Aubergiste",
-        "zoneId": "e1da77bd-f0b3-4d5a-95da-e8765c4fc973",
-        "cell": { "q": 4, "r": 4 },
-        "description": "Un aubergiste jovial essuie un verre derrière son comptoir.",
+        "zoneId": "5e4ada37-37e1-438c-9233-581f10c055c7",
+        "cell": { "q": 14, "r": 6 },
+        "description": "Un aubergiste jovial essuie un verre derrière son comptoir, contre le rempart est.",
         "dialogue": {
             "greeting": "Bonjour, je vends plusieurs choses intéressantes, veux-tu voir ?",
             "options": [
@@ -32,11 +32,63 @@
         "level": 1
     },
     {
+        "id": "dcb67f1e-b178-4062-8393-26abca9b0d66",
+        "name": "Forgeron",
+        "zoneId": "5e4ada37-37e1-438c-9233-581f10c055c7",
+        "cell": { "q": 0, "r": 6 },
+        "description": "Un forgeron trapu martèle une pièce de métal rougeoyante, contre le rempart ouest.",
+        "dialogue": {
+            "greeting": "Une arme, une armure ? J'ai ce qu'il te faut.",
+            "options": [
+                { "label": "Voir ce que tu vends", "type": "SHOP" },
+                {
+                    "label": "Depuis quand forges-tu ?",
+                    "type": "RESPONSE",
+                    "response": "Depuis que je sais tenir un marteau. Mon père avait la forge avant moi."
+                },
+                { "label": "Au revoir", "type": "LEAVE" }
+            ],
+            "shop": {
+                "items": [
+                    { "itemTemplateId": "019fa0a5-80c0-7035-9c2d-113b09a275df", "price": 10 },
+                    { "itemTemplateId": "ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd", "price": 2 },
+                    { "itemTemplateId": "019faec6-116d-723d-b04c-76d51a2a2cb7", "price": 10 },
+                    { "itemTemplateId": "019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518", "price": 10 },
+                    { "itemTemplateId": "019fcf0d-1f8c-7d43-9e98-a9944b4ccefe", "price": 50 },
+                    { "itemTemplateId": "019fcf0d-1f8d-7c4c-9275-33c4af4410a8", "price": 1500 },
+                    { "itemTemplateId": "019fcf0d-1f8f-7d01-8e4f-fd592812a1a7", "price": 10 },
+                    { "itemTemplateId": "019fe3f6-b1ee-78f8-a681-d288c7f87511", "price": 500 }
+                ]
+            }
+        },
+        "level": 1
+    },
+    {
         "id": "b0362279-5a46-4461-9672-6f4e0b2cf7e0",
         "name": "Garde du village",
         "zoneId": "5e4ada37-37e1-438c-9233-581f10c055c7",
-        "cell": { "q": 2, "r": 2 },
-        "description": "Un garde en armure de cuir surveille la place d'un œil sévère.",
+        "cell": { "q": 3, "r": 11 },
+        "description": "Un garde en armure de cuir surveille la porte d'un œil sévère, lance à la main.",
+        "dialogue": {
+            "greeting": "Halte ! ... C'est bon, circule.",
+            "options": [
+                { "label": "Au revoir", "type": "LEAVE" }
+            ]
+        },
+        "level": 2
+    },
+    {
+        "id": "318a4b28-4aae-46fa-ab99-2bc62738f1c3",
+        "name": "Garde de la porte",
+        "zoneId": "5e4ada37-37e1-438c-9233-581f10c055c7",
+        "cell": { "q": 7, "r": 11 },
+        "description": "Un second garde, posté de l'autre côté de la porte, scrute la route au loin.",
+        "dialogue": {
+            "greeting": "Rien à signaler par ici. Passe ton chemin.",
+            "options": [
+                { "label": "Au revoir", "type": "LEAVE" }
+            ]
+        },
         "level": 2
     }
 ]

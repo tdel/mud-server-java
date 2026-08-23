@@ -6,8 +6,8 @@
     "renderorder": "right-down",
     "compressionlevel": -1,
     "infinite": false,
-    "width": 19,
-    "height": 8,
+    "width": 17,
+    "height": 9,
     "tilewidth": 32,
     "tileheight": 28,
     "hexsidelength": 8,
@@ -29,7 +29,7 @@
         {
             "name": "description",
             "type": "string",
-            "value": "Une clairière baignée de soleil, au cœur de la forêt."
+            "value": "Une trouée de lumière au coeur de la forêt, où l'herbe pousse haute et où des bruits inquiétants se font parfois entendre."
         },
         {
             "name": "isStartingZone",
@@ -40,38 +40,7 @@
     "tilesets": [
         {
             "firstgid": 1,
-            "name": "hex-terrain",
-            "image": "assets/hex-terrain.png",
-            "imagewidth": 64,
-            "imageheight": 28,
-            "columns": 2,
-            "margin": 0,
-            "spacing": 0,
-            "tilecount": 2,
-            "tilewidth": 32,
-            "tileheight": 28,
-            "tiles": [
-                {
-                    "id": 0,
-                    "properties": [
-                        {
-                            "name": "walkable",
-                            "type": "bool",
-                            "value": true
-                        }
-                    ]
-                },
-                {
-                    "id": 1,
-                    "properties": [
-                        {
-                            "name": "walkable",
-                            "type": "bool",
-                            "value": false
-                        }
-                    ]
-                }
-            ]
+            "source": "shared/hex-terrain.tsx"
         }
     ],
     "layers": [
@@ -81,11 +50,29 @@
             "name": "terrain",
             "x": 0,
             "y": 0,
-            "width": 19,
-            "height": 8,
+            "width": 17,
+            "height": 9,
             "opacity": 1,
             "visible": true,
             "data": [
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
                 1,
                 1,
                 1,
@@ -101,10 +88,9 @@
                 1,
                 1,
                 1,
+                2,
+                2,
                 1,
-                0,
-                0,
-                0,
                 1,
                 1,
                 1,
@@ -115,21 +101,34 @@
                 1,
                 1,
                 1,
+                3,
+                3,
+                10,
                 1,
+                2,
+                2,
                 1,
                 1,
                 1,
                 1,
                 1,
-                0,
-                0,
-                0,
-                0,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
                 1,
                 1,
                 1,
                 1,
+                2,
+                2,
                 1,
+                10,
+                3,
+                3,
+                3,
                 1,
                 1,
                 1,
@@ -140,10 +139,9 @@
                 1,
                 1,
                 1,
+                2,
+                2,
                 1,
-                0,
-                0,
-                0,
                 1,
                 1,
                 1,
@@ -158,12 +156,10 @@
                 1,
                 1,
                 1,
+                2,
+                2,
                 1,
                 1,
-                0,
-                0,
-                0,
-                0,
                 1,
                 1,
                 1,
@@ -177,12 +173,11 @@
                 1,
                 1,
                 1,
+                2,
+                2,
                 1,
                 1,
                 1,
-                0,
-                0,
-                0,
                 1,
                 1,
                 1,
@@ -195,49 +190,24 @@
                 1,
                 1,
                 1,
-                1,
-                1,
-                1,
-                1,
-                0,
-                0,
-                0,
-                0,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                0,
-                0,
-                0,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
             ]
         },
         {
@@ -254,8 +224,8 @@
                     "id": 1,
                     "name": "playerSpawn",
                     "type": "playerSpawn",
-                    "x": 336.0,
-                    "y": 86.0,
+                    "x": 288.0,
+                    "y": 104.0,
                     "width": 0,
                     "height": 0,
                     "visible": true,
@@ -263,57 +233,6 @@
                 },
                 {
                     "id": 2,
-                    "name": "monsterSpawn",
-                    "type": "monsterSpawn",
-                    "x": 176.0,
-                    "y": 50.0,
-                    "width": 0,
-                    "height": 0,
-                    "visible": true,
-                    "properties": [
-                        {
-                            "name": "templateId",
-                            "type": "string",
-                            "value": "c1a6b8f0-3b3e-4b0a-9f0a-1e2d3c4b5a6f"
-                        }
-                    ]
-                },
-                {
-                    "id": 3,
-                    "name": "monsterSpawn",
-                    "type": "monsterSpawn",
-                    "x": 432.0,
-                    "y": 50.0,
-                    "width": 0,
-                    "height": 0,
-                    "visible": true,
-                    "properties": [
-                        {
-                            "name": "templateId",
-                            "type": "string",
-                            "value": "7dfe22be-6147-45b3-bd07-89711810791d"
-                        }
-                    ]
-                },
-                {
-                    "id": 4,
-                    "name": "monsterSpawn",
-                    "type": "monsterSpawn",
-                    "x": 368.0,
-                    "y": 122.0,
-                    "width": 0,
-                    "height": 0,
-                    "visible": true,
-                    "properties": [
-                        {
-                            "name": "templateId",
-                            "type": "string",
-                            "value": "49e91691-3a13-4e2b-967f-bc1acf8cf03a"
-                        }
-                    ]
-                },
-                {
-                    "id": 5,
                     "name": "portal",
                     "type": "portal",
                     "x": 80.0,
@@ -335,7 +254,7 @@
                         {
                             "name": "targetCellQ",
                             "type": "int",
-                            "value": 15
+                            "value": 11
                         },
                         {
                             "name": "targetCellR",
@@ -345,11 +264,11 @@
                     ]
                 },
                 {
-                    "id": 6,
+                    "id": 3,
                     "name": "portal",
                     "type": "portal",
-                    "x": 496.0,
-                    "y": 14.0,
+                    "x": 464.0,
+                    "y": 50.0,
                     "width": 0,
                     "height": 0,
                     "visible": true,
@@ -367,12 +286,63 @@
                         {
                             "name": "targetCellQ",
                             "type": "int",
-                            "value": 0
+                            "value": -1
                         },
                         {
                             "name": "targetCellR",
                             "type": "int",
-                            "value": 7
+                            "value": 6
+                        }
+                    ]
+                },
+                {
+                    "id": 4,
+                    "name": "monsterSpawn",
+                    "type": "monsterSpawn",
+                    "x": 224.0,
+                    "y": 68.0,
+                    "width": 0,
+                    "height": 0,
+                    "visible": true,
+                    "properties": [
+                        {
+                            "name": "templateId",
+                            "type": "string",
+                            "value": "c1a6b8f0-3b3e-4b0a-9f0a-1e2d3c4b5a6f"
+                        }
+                    ]
+                },
+                {
+                    "id": 5,
+                    "name": "monsterSpawn",
+                    "type": "monsterSpawn",
+                    "x": 336.0,
+                    "y": 122.0,
+                    "width": 0,
+                    "height": 0,
+                    "visible": true,
+                    "properties": [
+                        {
+                            "name": "templateId",
+                            "type": "string",
+                            "value": "7dfe22be-6147-45b3-bd07-89711810791d"
+                        }
+                    ]
+                },
+                {
+                    "id": 6,
+                    "name": "monsterSpawn",
+                    "type": "monsterSpawn",
+                    "x": 272.0,
+                    "y": 50.0,
+                    "width": 0,
+                    "height": 0,
+                    "visible": true,
+                    "properties": [
+                        {
+                            "name": "templateId",
+                            "type": "string",
+                            "value": "49e91691-3a13-4e2b-967f-bc1acf8cf03a"
                         }
                     ]
                 }

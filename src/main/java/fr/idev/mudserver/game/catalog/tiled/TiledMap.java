@@ -23,7 +23,7 @@ public record TiledMap(String orientation, int width, int height, int tilewidth,
     public record TiledObjectDef(int id, String name, String type, double x, double y, List<TiledProperty> properties) {
     }
 
-    public record TiledTileset(int firstgid, List<TiledTile> tiles) {
+    public record TiledTileset(int firstgid, String source, List<TiledTile> tiles) {
     }
 
     public record TiledTile(int id, List<TiledProperty> properties) {

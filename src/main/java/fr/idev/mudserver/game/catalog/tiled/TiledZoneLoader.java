@@ -8,6 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import fr.idev.mudserver.domain.MonsterSpawn;
 import fr.idev.mudserver.domain.map.HexCoordinate;
@@ -65,13 +72,13 @@ public final class TiledZoneLoader {
     public record PortalDraft(HexCoordinate cell, String direction, UUID targetZoneId, HexCoordinate targetCell) {
     }
 
-    public static ParsedZone parse(TiledMap map) {
+    public static ParsedZone parse(TiledMap map, Function<String, InputStream> externalTilesetResolver) {
         UUID id = UUID.fromString(requireStringProperty(map.properties(), "id"));
         String name = requireStringProperty(map.properties(), "name");
         String description = requireStringProperty(map.properties(), "description");
         boolean isStartingZone = booleanProperty(map.properties(), "isStartingZone", false);
 
-        Map<Integer, TileType> tileTypeByGid = buildTileTypeByGid(map);
+        Map<Integer, TileType> tileTypeByGid = buildTileTypeByGid(map, externalTilesetResolver);
         Map<HexCoordinate, TileType> terrain = parseTerrain(map, tileTypeByGid, id);
 
         HexCoordinate[] spawnCellHolder = new HexCoordinate[1];
@@ -87,18 +94,56 @@ public final class TiledZoneLoader {
                 List.copyOf(monsterSpawns), List.copyOf(portals));
     }
 
-    private static Map<Integer, TileType> buildTileTypeByGid(TiledMap map) {
+    private static Map<Integer, TileType> buildTileTypeByGid(TiledMap map,
+            Function<String, InputStream> externalTilesetResolver) {
         Map<Integer, TileType> byGid = new HashMap<>();
         for (TiledTileset tileset : map.tilesets()) {
-            if (tileset.tiles() == null) {
-                continue;
-            }
-            for (TiledTile tile : tileset.tiles()) {
+            List<TiledTile> tiles = tileset.tiles() != null
+                    ? tileset.tiles()
+                    : readExternalTileset(tileset.source(), externalTilesetResolver);
+            for (TiledTile tile : tiles) {
                 boolean walkable = booleanProperty(tile.properties(), "walkable", true);
                 byGid.put(tileset.firstgid() + tile.id(), walkable ? TileType.FLOOR : TileType.WALL);
             }
         }
         return byGid;
+    }
+
+    // Tileset externe partagé entre zones (data/zones/shared/*.tsx), au format
+    // Tiled XML natif
+    // (ouvrable tel quel dans Tiled Map Editor) — on n'en extrait que les
+    // <tile>/<properties>
+    // utiles, le reste (image, colonnes, etc.) n'étant pas exploité côté serveur.
+    private static List<TiledTile> readExternalTileset(String source,
+            Function<String, InputStream> externalTilesetResolver) {
+        try (InputStream in = externalTilesetResolver.apply(source)) {
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            NodeList tileNodes = builder.parse(in).getElementsByTagName("tile");
+            List<TiledTile> tiles = new ArrayList<>();
+            for (int i = 0; i < tileNodes.getLength(); i++) {
+                Element tileElement = (Element) tileNodes.item(i);
+                int id = Integer.parseInt(tileElement.getAttribute("id"));
+                tiles.add(new TiledTile(id, readXmlProperties(tileElement)));
+            }
+            return tiles;
+        } catch (Exception e) {
+            throw new IllegalStateException("Impossible de charger le tileset externe " + source, e);
+        }
+    }
+
+    private static List<TiledProperty> readXmlProperties(Element tileElement) {
+        List<TiledProperty> properties = new ArrayList<>();
+        NodeList propertyNodes = tileElement.getElementsByTagName("property");
+        for (int i = 0; i < propertyNodes.getLength(); i++) {
+            Element propertyElement = (Element) propertyNodes.item(i);
+            String name = propertyElement.getAttribute("name");
+            String type = propertyElement.hasAttribute("type") ? propertyElement.getAttribute("type") : "string";
+            Object value = "bool".equals(type)
+                    ? Boolean.valueOf(propertyElement.getAttribute("value"))
+                    : propertyElement.getAttribute("value");
+            properties.add(new TiledProperty(name, type, value));
+        }
+        return properties;
     }
 
     private static Map<HexCoordinate, TileType> parseTerrain(TiledMap map, Map<Integer, TileType> tileTypeByGid,

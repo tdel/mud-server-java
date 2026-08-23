@@ -2,6 +2,9 @@ package fr.idev.mudserver.game.catalog.tiled;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,7 +31,7 @@ class TiledZoneLoaderTest {
         UUID targetZoneId = UUID.randomUUID();
         UUID monsterTemplateId = UUID.randomUUID();
 
-        TiledTileset tileset = new TiledTileset(1,
+        TiledTileset tileset = new TiledTileset(1, null,
                 List.of(new TiledTile(0, List.of(new TiledProperty("walkable", "bool", true))),
                         new TiledTile(1, List.of(new TiledProperty("walkable", "bool", false)))));
 
@@ -53,7 +56,9 @@ class TiledZoneLoaderTest {
                         new TiledProperty("description", "string", "Une zone pour les tests"),
                         new TiledProperty("isStartingZone", "bool", true)));
 
-        ParsedZone parsed = TiledZoneLoader.parse(map);
+        ParsedZone parsed = TiledZoneLoader.parse(map, source -> {
+            throw new IllegalStateException("tileset embarqué : aucune résolution externe attendue");
+        });
 
         assertThat(parsed.id()).isEqualTo(zoneId);
         assertThat(parsed.name()).isEqualTo("Zone de test");
@@ -76,6 +81,42 @@ class TiledZoneLoaderTest {
         MonsterSpawn spawn = parsed.monsterSpawns().get(0);
         assertThat(spawn.templateId()).isEqualTo(monsterTemplateId);
         assertThat(spawn.cell()).isEqualTo(HexTiledCoordinateMapper.offsetToAxial(0, 1));
+    }
+
+    @Test
+    void resolvesTileTypesFromAnExternalTsxTileset() {
+        UUID zoneId = UUID.randomUUID();
+        TiledTileset tileset = new TiledTileset(1, "shared/hex-terrain.tsx", null);
+
+        // (0,0) et (1,0) sol, (0,1) mur, (1,1) hors grille.
+        TiledLayer terrain = new TiledLayer("tilelayer", "terrain", 2, 2, List.of(1, 1, 2, 0), null, null);
+        TiledObjectDef spawnObject = objectAt("playerSpawn", 0, 0, List.of());
+        TiledLayer objects = new TiledLayer("objectgroup", "objects", null, null, null, List.of(spawnObject), null);
+
+        TiledMap map = new TiledMap("hexagonal", 2, 2, TILE_WIDTH, TILE_HEIGHT, HEX_SIDE_LENGTH, "y", "odd",
+                List.of(terrain, objects), List.of(tileset),
+                List.of(new TiledProperty("id", "string", zoneId.toString()),
+                        new TiledProperty("name", "string", "Zone de test"),
+                        new TiledProperty("description", "string", "Une zone pour les tests"),
+                        new TiledProperty("isStartingZone", "bool", true)));
+
+        String tsx = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <tileset name="hex-terrain" tilewidth="32" tileheight="28" tilecount="2" columns="2">
+                 <image source="hex-terrain.png" width="64" height="28"/>
+                 <tile id="0"><properties><property name="walkable" type="bool" value="true"/></properties></tile>
+                 <tile id="1"><properties><property name="walkable" type="bool" value="false"/></properties></tile>
+                </tileset>
+                """;
+
+        ParsedZone parsed = TiledZoneLoader.parse(map, source -> {
+            assertThat(source).isEqualTo("shared/hex-terrain.tsx");
+            InputStream in = new ByteArrayInputStream(tsx.getBytes(StandardCharsets.UTF_8));
+            return in;
+        });
+
+        assertThat(parsed.terrain().get(HexTiledCoordinateMapper.offsetToAxial(0, 0))).isEqualTo(TileType.FLOOR);
+        assertThat(parsed.terrain().get(HexTiledCoordinateMapper.offsetToAxial(0, 1))).isEqualTo(TileType.WALL);
     }
 
     private static TiledObjectDef objectAt(String type, int col, int row, List<TiledProperty> properties) {
