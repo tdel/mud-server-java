@@ -236,12 +236,12 @@
                         {
                             "name": "targetCellQ",
                             "type": "int",
-                            "value": 4
+                            "value": -4
                         },
                         {
                             "name": "targetCellR",
                             "type": "int",
-                            "value": 11
+                            "value": 16
                         }
                     ]
                 },
