@@ -84,7 +84,8 @@ class SpellLearningEngineTest {
 
         engine.onNewGamePlayerCreated(new NewGamePlayerCreated(character));
 
-        assertThat(publishedEvents).anySatisfy(event -> assertThat(event).isInstanceOfSatisfying(
-                CharacterLearnedSpell.class, learned -> assertThat(learned.spell().requiredLevel()).isEqualTo(1)));
+        assertThat(publishedEvents)
+                .anySatisfy(event -> assertThat(event).isInstanceOfSatisfying(CharacterLearnedSpell.class,
+                        learned -> assertThat(learned.spell().requiredLevel()).isEqualTo(1)));
     }
 }
