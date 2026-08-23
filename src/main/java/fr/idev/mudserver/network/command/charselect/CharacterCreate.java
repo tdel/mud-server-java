@@ -30,6 +30,7 @@ import fr.idev.mudserver.network.message.charselect.CharacterNameTaken;
 import fr.idev.mudserver.network.message.charselect.InvalidRace;
 import fr.idev.mudserver.network.message.charselect.NowPlaying;
 import fr.idev.mudserver.network.message.ingame.GamePlayerStats;
+import fr.idev.mudserver.network.message.ingame.ZoneMap;
 
 @Component
 public class CharacterCreate implements CommandHandler {
@@ -170,6 +171,7 @@ public class CharacterCreate implements CommandHandler {
         worldInstanceService.enterGame(character);
 
         connection.send(new NowPlaying(character.getName()));
+        connection.send(new ZoneMap(character.getCurrentZone()));
         lookAction.onReceive(connection, "");
     }
 }

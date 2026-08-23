@@ -1,0 +1,331 @@
+{
+    "type": "map",
+    "version": "1.10",
+    "tiledversion": "1.11.0",
+    "orientation": "hexagonal",
+    "renderorder": "right-down",
+    "compressionlevel": -1,
+    "infinite": false,
+    "width": 19,
+    "height": 8,
+    "tilewidth": 32,
+    "tileheight": 28,
+    "hexsidelength": 8,
+    "staggeraxis": "y",
+    "staggerindex": "odd",
+    "nextlayerid": 3,
+    "nextobjectid": 4,
+    "properties": [
+        {
+            "name": "id",
+            "type": "string",
+            "value": "8203e5a0-9fa2-4799-a6d8-398b11292c17"
+        },
+        {
+            "name": "name",
+            "type": "string",
+            "value": "Sentier broussailleux"
+        },
+        {
+            "name": "description",
+            "type": "string",
+            "value": "Les ronces griffent les mollets tandis que la canopée se referme au-dessus du chemin."
+        },
+        {
+            "name": "isStartingZone",
+            "type": "bool",
+            "value": false
+        }
+    ],
+    "tilesets": [
+        {
+            "firstgid": 1,
+            "name": "hex-terrain",
+            "image": "hex-terrain.png",
+            "imagewidth": 64,
+            "imageheight": 28,
+            "columns": 2,
+            "margin": 0,
+            "spacing": 0,
+            "tilecount": 2,
+            "tilewidth": 32,
+            "tileheight": 28,
+            "tiles": [
+                {
+                    "id": 0,
+                    "properties": [
+                        {
+                            "name": "walkable",
+                            "type": "bool",
+                            "value": true
+                        }
+                    ]
+                },
+                {
+                    "id": 1,
+                    "properties": [
+                        {
+                            "name": "walkable",
+                            "type": "bool",
+                            "value": false
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "layers": [
+        {
+            "type": "tilelayer",
+            "id": 1,
+            "name": "terrain",
+            "x": 0,
+            "y": 0,
+            "width": 19,
+            "height": 8,
+            "opacity": 1,
+            "visible": true,
+            "data": [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+            ]
+        },
+        {
+            "type": "objectgroup",
+            "id": 2,
+            "name": "objects",
+            "x": 0,
+            "y": 0,
+            "opacity": 1,
+            "visible": true,
+            "draworder": "topdown",
+            "objects": [
+                {
+                    "id": 1,
+                    "name": "playerSpawn",
+                    "type": "playerSpawn",
+                    "x": 336.0,
+                    "y": 86.0,
+                    "width": 0,
+                    "height": 0,
+                    "visible": true,
+                    "properties": []
+                },
+                {
+                    "id": 2,
+                    "name": "portal",
+                    "type": "portal",
+                    "x": 128.0,
+                    "y": 140.0,
+                    "width": 0,
+                    "height": 0,
+                    "visible": true,
+                    "properties": [
+                        {
+                            "name": "direction",
+                            "type": "string",
+                            "value": "SW"
+                        },
+                        {
+                            "name": "targetZoneId",
+                            "type": "string",
+                            "value": "7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5"
+                        },
+                        {
+                            "name": "targetCellQ",
+                            "type": "int",
+                            "value": 15
+                        },
+                        {
+                            "name": "targetCellR",
+                            "type": "int",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "id": 3,
+                    "name": "portal",
+                    "type": "portal",
+                    "x": 560.0,
+                    "y": 86.0,
+                    "width": 0,
+                    "height": 0,
+                    "visible": true,
+                    "properties": [
+                        {
+                            "name": "direction",
+                            "type": "string",
+                            "value": "E"
+                        },
+                        {
+                            "name": "targetZoneId",
+                            "type": "string",
+                            "value": "6aade027-6918-4521-925d-86529ac4657e"
+                        },
+                        {
+                            "name": "targetCellQ",
+                            "type": "int",
+                            "value": 0
+                        },
+                        {
+                            "name": "targetCellR",
+                            "type": "int",
+                            "value": 4
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

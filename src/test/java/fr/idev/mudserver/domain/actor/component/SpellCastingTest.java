@@ -27,6 +27,7 @@ import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.world.ZoneInstance;
 import fr.idev.mudserver.domain.world.ZoneTemplate;
+import fr.idev.mudserver.domain.world.TileType;
 import fr.idev.mudserver.domain.world.WorldInstance;
 
 class SpellCastingTest {
@@ -40,7 +41,7 @@ class SpellCastingTest {
     private CharacterInstance newCharacter(String name, CharacterClass characterClass, int currentHealth,
             int maxHealth) {
         WorldInstance world = new WorldInstance(UUID.randomUUID(), UUID.randomUUID(), Instant.now());
-        ZoneTemplate zoneTemplate = new ZoneTemplate(UUID.randomUUID(), "Zone", "desc", true, 3, 3,
+        ZoneTemplate zoneTemplate = new ZoneTemplate(UUID.randomUUID(), "Zone", "desc", true, flatTerrain(3, 3),
                 new HexCoordinate(0, 0), List.of());
         ZoneInstance zone = new ZoneInstance(UUID.randomUUID(), zoneTemplate, world);
         Account account = new Account(UUID.randomUUID(), "login", "hash", null);
@@ -149,5 +150,14 @@ class SpellCastingTest {
 
         assertThat(caster.getSpellCasting().isReady(spell.id())).isFalse();
         assertThat(caster.getSpellCasting().remainingCooldown(spell.id())).isGreaterThan(Duration.ZERO);
+    }
+    private static Map<HexCoordinate, TileType> flatTerrain(int width, int height) {
+        Map<HexCoordinate, TileType> terrain = new java.util.HashMap<>();
+        for (int q = 0; q < width; q++) {
+            for (int r = 0; r < height; r++) {
+                terrain.put(new HexCoordinate(q, r), TileType.FLOOR);
+            }
+        }
+        return terrain;
     }
 }

@@ -24,6 +24,7 @@ import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.world.ZoneInstance;
 import fr.idev.mudserver.domain.world.ZoneTemplate;
+import fr.idev.mudserver.domain.world.TileType;
 import fr.idev.mudserver.domain.world.WorldInstance;
 
 class ConsumableItemTest {
@@ -38,7 +39,7 @@ class ConsumableItemTest {
 
     private CharacterInstance newCharacter() {
         WorldInstance world = new WorldInstance(UUID.randomUUID(), UUID.randomUUID(), Instant.now());
-        ZoneTemplate zoneTemplate = new ZoneTemplate(UUID.randomUUID(), "Zone", "desc", true, 3, 3,
+        ZoneTemplate zoneTemplate = new ZoneTemplate(UUID.randomUUID(), "Zone", "desc", true, flatTerrain(3, 3),
                 new HexCoordinate(0, 0), List.of());
         ZoneInstance zone = new ZoneInstance(UUID.randomUUID(), zoneTemplate, world);
         Account account = new Account(UUID.randomUUID(), "login", "hash", null);
@@ -85,5 +86,14 @@ class ConsumableItemTest {
         assertThat(character.getCurrentMana()).isEqualTo(character.getMaxMana());
         assertThat(publishedEvents.get(0)).isInstanceOfSatisfying(GamePlayerUsedManaPotion.class,
                 event -> assertThat(event.restoredAmount()).isEqualTo(6));
+    }
+    private static Map<HexCoordinate, TileType> flatTerrain(int width, int height) {
+        Map<HexCoordinate, TileType> terrain = new java.util.HashMap<>();
+        for (int q = 0; q < width; q++) {
+            for (int r = 0; r < height; r++) {
+                terrain.put(new HexCoordinate(q, r), TileType.FLOOR);
+            }
+        }
+        return terrain;
     }
 }

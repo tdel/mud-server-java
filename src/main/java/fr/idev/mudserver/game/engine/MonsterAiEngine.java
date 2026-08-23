@@ -145,7 +145,7 @@ public class MonsterAiEngine {
 
         for (HexDirection direction : HexDirection.values()) {
             HexCoordinate candidate = current.neighbor(direction);
-            if (!zone.isInBounds(candidate)) {
+            if (!zone.isWalkable(candidate)) {
                 continue;
             }
             int candidateDistance = candidate.distanceTo(destination);

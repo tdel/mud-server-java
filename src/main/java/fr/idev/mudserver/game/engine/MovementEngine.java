@@ -99,7 +99,7 @@ public class MovementEngine {
         HexCoordinate current = character.getPosition();
         HexCoordinate next = current.neighbor(direction);
 
-        if (!zone.isInBounds(next)) {
+        if (!zone.isWalkable(next)) {
             return new CellStepOutcome(false, true, false);
         }
         if (!zone.tryClaimCell(next, character)) {

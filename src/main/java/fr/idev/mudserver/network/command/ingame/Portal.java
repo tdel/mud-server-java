@@ -11,6 +11,7 @@ import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.ingame.NoPortalHere;
+import fr.idev.mudserver.network.message.ingame.ZoneMap;
 
 @Component
 public class Portal implements CommandHandler {
@@ -41,6 +42,7 @@ public class Portal implements CommandHandler {
         }
 
         character.moveToZone(portal.get().targetZone(), portal.get().targetCell());
+        connection.send(new ZoneMap(character.getCurrentZone()));
         lookAction.onReceive(connection, "");
     }
 }

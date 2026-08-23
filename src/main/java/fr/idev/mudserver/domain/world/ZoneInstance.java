@@ -73,24 +73,20 @@ public class ZoneInstance {
         return template.isStartingZone();
     }
 
-    public int getWidth() {
-        return template.getWidth();
-    }
-
-    public int getHeight() {
-        return template.getHeight();
+    public Map<HexCoordinate, TileType> getTerrain() {
+        return template.getTerrain();
     }
 
     public HexCoordinate getSpawnCell() {
         return template.getSpawnCell();
     }
 
-    public boolean isInBounds(HexCoordinate cell) {
-        return template.isInBounds(cell);
+    public boolean containsCell(HexCoordinate cell) {
+        return template.containsCell(cell);
     }
 
-    public boolean isBorderCell(HexCoordinate cell) {
-        return template.isBorderCell(cell);
+    public boolean isWalkable(HexCoordinate cell) {
+        return template.isWalkable(cell);
     }
 
     public void join(CharacterInstance character) {
@@ -238,7 +234,7 @@ public class ZoneInstance {
             return desired;
         }
         List<HexCoordinate> candidates = desired.withinRadius(3).stream()
-                .filter(cell -> !cell.equals(desired) && isInBounds(cell))
+                .filter(cell -> !cell.equals(desired) && isWalkable(cell))
                 .sorted(Comparator.comparingInt(desired::distanceTo)).toList();
         for (HexCoordinate candidate : candidates) {
             if (tryClaimCell(candidate, character)) {

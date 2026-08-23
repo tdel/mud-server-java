@@ -1,0 +1,395 @@
+{
+    "type": "map",
+    "version": "1.10",
+    "tiledversion": "1.11.0",
+    "orientation": "hexagonal",
+    "renderorder": "right-down",
+    "compressionlevel": -1,
+    "infinite": false,
+    "width": 19,
+    "height": 8,
+    "tilewidth": 32,
+    "tileheight": 28,
+    "hexsidelength": 8,
+    "staggeraxis": "y",
+    "staggerindex": "odd",
+    "nextlayerid": 3,
+    "nextobjectid": 6,
+    "properties": [
+        {
+            "name": "id",
+            "type": "string",
+            "value": "5e4ada37-37e1-438c-9233-581f10c055c7"
+        },
+        {
+            "name": "name",
+            "type": "string",
+            "value": "Place du village"
+        },
+        {
+            "name": "description",
+            "type": "string",
+            "value": "Une place pavée au centre du village. Une fontaine gargouille en son centre."
+        },
+        {
+            "name": "isStartingZone",
+            "type": "bool",
+            "value": true
+        }
+    ],
+    "tilesets": [
+        {
+            "firstgid": 1,
+            "name": "hex-terrain",
+            "image": "hex-terrain.png",
+            "imagewidth": 64,
+            "imageheight": 28,
+            "columns": 2,
+            "margin": 0,
+            "spacing": 0,
+            "tilecount": 2,
+            "tilewidth": 32,
+            "tileheight": 28,
+            "tiles": [
+                {
+                    "id": 0,
+                    "properties": [
+                        {
+                            "name": "walkable",
+                            "type": "bool",
+                            "value": true
+                        }
+                    ]
+                },
+                {
+                    "id": 1,
+                    "properties": [
+                        {
+                            "name": "walkable",
+                            "type": "bool",
+                            "value": false
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "layers": [
+        {
+            "type": "tilelayer",
+            "id": 1,
+            "name": "terrain",
+            "x": 0,
+            "y": 0,
+            "width": 19,
+            "height": 8,
+            "opacity": 1,
+            "visible": true,
+            "data": [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+            ]
+        },
+        {
+            "type": "objectgroup",
+            "id": 2,
+            "name": "objects",
+            "x": 0,
+            "y": 0,
+            "opacity": 1,
+            "visible": true,
+            "draworder": "topdown",
+            "objects": [
+                {
+                    "id": 1,
+                    "name": "playerSpawn",
+                    "type": "playerSpawn",
+                    "x": 336.0,
+                    "y": 86.0,
+                    "width": 0,
+                    "height": 0,
+                    "visible": true,
+                    "properties": []
+                },
+                {
+                    "id": 2,
+                    "name": "portal",
+                    "type": "portal",
+                    "x": 496.0,
+                    "y": 14.0,
+                    "width": 0,
+                    "height": 0,
+                    "visible": true,
+                    "properties": [
+                        {
+                            "name": "direction",
+                            "type": "string",
+                            "value": "NE"
+                        },
+                        {
+                            "name": "targetZoneId",
+                            "type": "string",
+                            "value": "9a884ac7-b954-4cd6-ab67-c677d472cb0f"
+                        },
+                        {
+                            "name": "targetCellQ",
+                            "type": "int",
+                            "value": 0
+                        },
+                        {
+                            "name": "targetCellR",
+                            "type": "int",
+                            "value": 7
+                        }
+                    ]
+                },
+                {
+                    "id": 3,
+                    "name": "portal",
+                    "type": "portal",
+                    "x": 560.0,
+                    "y": 86.0,
+                    "width": 0,
+                    "height": 0,
+                    "visible": true,
+                    "properties": [
+                        {
+                            "name": "direction",
+                            "type": "string",
+                            "value": "E"
+                        },
+                        {
+                            "name": "targetZoneId",
+                            "type": "string",
+                            "value": "e1da77bd-f0b3-4d5a-95da-e8765c4fc973"
+                        },
+                        {
+                            "name": "targetCellQ",
+                            "type": "int",
+                            "value": 0
+                        },
+                        {
+                            "name": "targetCellR",
+                            "type": "int",
+                            "value": 4
+                        }
+                    ]
+                },
+                {
+                    "id": 4,
+                    "name": "portal",
+                    "type": "portal",
+                    "x": 80.0,
+                    "y": 86.0,
+                    "width": 0,
+                    "height": 0,
+                    "visible": true,
+                    "properties": [
+                        {
+                            "name": "direction",
+                            "type": "string",
+                            "value": "W"
+                        },
+                        {
+                            "name": "targetZoneId",
+                            "type": "string",
+                            "value": "82affabe-27e7-425c-87aa-e63f9b826513"
+                        },
+                        {
+                            "name": "targetCellQ",
+                            "type": "int",
+                            "value": 15
+                        },
+                        {
+                            "name": "targetCellR",
+                            "type": "int",
+                            "value": 4
+                        }
+                    ]
+                },
+                {
+                    "id": 5,
+                    "name": "portal",
+                    "type": "portal",
+                    "x": 128.0,
+                    "y": 140.0,
+                    "width": 0,
+                    "height": 0,
+                    "visible": true,
+                    "properties": [
+                        {
+                            "name": "direction",
+                            "type": "string",
+                            "value": "SW"
+                        },
+                        {
+                            "name": "targetZoneId",
+                            "type": "string",
+                            "value": "4dae9974-45f7-46c9-8e66-12cdac759860"
+                        },
+                        {
+                            "name": "targetCellQ",
+                            "type": "int",
+                            "value": 15
+                        },
+                        {
+                            "name": "targetCellR",
+                            "type": "int",
+                            "value": 0
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

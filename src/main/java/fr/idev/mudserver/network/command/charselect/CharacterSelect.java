@@ -15,6 +15,7 @@ import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.charselect.NoCharacterNamed;
 import fr.idev.mudserver.network.message.charselect.NowPlaying;
+import fr.idev.mudserver.network.message.ingame.ZoneMap;
 
 @Component
 public class CharacterSelect implements CommandHandler {
@@ -63,6 +64,7 @@ public class CharacterSelect implements CommandHandler {
         worldInstanceService.enterGame(loadedChar);
 
         connection.send(new NowPlaying(loadedChar.getName()));
+        connection.send(new ZoneMap(loadedChar.getCurrentZone()));
         lookAction.onReceive(connection, "");
     }
 }

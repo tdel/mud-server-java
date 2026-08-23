@@ -22,7 +22,7 @@ public record ViewAround(AbstractCharacter character) implements OutputTelnetMes
     public static final int VIEWPORT_RADIUS = 5;
 
     public static final String LEGEND = "@ = you   p = other player   m = monster   n = npc   # = portal   "
-            + ". = floor   ~ = out of bounds   X = destination   - = path";
+            + ". = floor   % = wall   ~ = out of bounds   X = destination   - = path";
 
     private static final String MAP_HEADER = "──────── Map ────────";
 
@@ -78,8 +78,11 @@ public record ViewAround(AbstractCharacter character) implements OutputTelnetMes
         if (cell.equals(viewer.getPosition())) {
             return "self";
         }
-        if (!zone.isInBounds(cell)) {
+        if (!zone.containsCell(cell)) {
             return "outOfBounds";
+        }
+        if (!zone.isWalkable(cell)) {
+            return "blocked";
         }
 
         Optional<AbstractCharacter> occupant = zone.occupantAt(cell);
@@ -170,8 +173,11 @@ public record ViewAround(AbstractCharacter character) implements OutputTelnetMes
         if (cell.equals(viewer.getPosition())) {
             return '@';
         }
-        if (!zone.isInBounds(cell)) {
+        if (!zone.containsCell(cell)) {
             return '~';
+        }
+        if (!zone.isWalkable(cell)) {
+            return '%';
         }
 
         Optional<AbstractCharacter> occupant = zone.occupantAt(cell);
