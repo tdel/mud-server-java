@@ -39,8 +39,9 @@ public class WorldTemplateCatalog {
 
     private static final Logger log = LoggerFactory.getLogger(WorldTemplateCatalog.class);
 
-    private static final String WORLDS_MANIFEST_PATTERN = "classpath*:data/worlds/*/world.json";
-    private static final String WORLDS_DIR_MARKER = "data/worlds/";
+    private static final String WORLD_MANIFEST_PATTERN = "classpath*:data/world.json";
+    private static final String DATA_DIR = "data/";
+    private static final String DEFAULT_SHORT_NAME = "default";
 
     private final Map<UUID, WorldTemplateSummary> summariesById = new ConcurrentHashMap<>();
     private final Map<UUID, WorldTemplate> loadedTemplatesById = new ConcurrentHashMap<>();
@@ -59,51 +60,23 @@ public class WorldTemplateCatalog {
     public void warmWorldTemplates() {
         Resource[] manifests;
         try {
-            manifests = resourcePatternResolver.getResources(WORLDS_MANIFEST_PATTERN);
+            manifests = resourcePatternResolver.getResources(WORLD_MANIFEST_PATTERN);
         } catch (IOException e) {
-            throw new IllegalStateException("Impossible d'énumérer " + WORLDS_MANIFEST_PATTERN, e);
+            throw new IllegalStateException("Impossible d'énumérer " + WORLD_MANIFEST_PATTERN, e);
         }
         if (manifests.length != 1) {
             throw new IllegalStateException("Un seul monde est supporté (retour au monde unique) : " + manifests.length
-                    + " trouvé(s) sous " + WORLDS_MANIFEST_PATTERN);
+                    + " trouvé(s) sous " + WORLD_MANIFEST_PATTERN);
         }
 
-        Map<UUID, WorldTemplateSummary> loaded = new LinkedHashMap<>();
-        for (Resource manifest : manifests) {
-            String shortName = shortNameOf(manifest);
-            WorldTemplateSummary summary = loadSummary(shortName);
-            if (loaded.putIfAbsent(summary.id(), summary) != null) {
-                throw new IllegalStateException(
-                        "Le monde " + shortName + " a un id " + summary.id() + " déjà utilisé par un autre monde");
-            }
-        }
-
+        WorldTemplateSummary summary = loadSummary(DEFAULT_SHORT_NAME);
         summariesById.clear();
-        summariesById.putAll(loaded);
+        summariesById.put(summary.id(), summary);
         log.info("world.templates_loaded count={}", summariesById.size());
     }
 
-    private String shortNameOf(Resource manifest) {
-        String uri;
-        try {
-            uri = manifest.getURI().toString();
-        } catch (IOException e) {
-            throw new IllegalStateException("Impossible de résoudre l'URI de " + manifest, e);
-        }
-        int markerIndex = uri.indexOf(WORLDS_DIR_MARKER);
-        if (markerIndex == -1) {
-            throw new IllegalStateException("Ressource " + uri + " hors de " + WORLDS_DIR_MARKER);
-        }
-        String rest = uri.substring(markerIndex + WORLDS_DIR_MARKER.length());
-        int slashIndex = rest.indexOf('/');
-        if (slashIndex == -1) {
-            throw new IllegalStateException("Impossible d'extraire le nom court du monde depuis " + uri);
-        }
-        return rest.substring(0, slashIndex);
-    }
-
     private WorldTemplateSummary loadSummary(String shortName) {
-        WorldManifestDefinition manifest = readJson(shortName, "world.json", WorldManifestDefinition.class);
+        WorldManifestDefinition manifest = readJson("world.json", WorldManifestDefinition.class);
         if (manifest.minPlayers() < 1) {
             throw new IllegalStateException(
                     "Le monde " + shortName + " a un minPlayers invalide (" + manifest.minPlayers() + ")");
@@ -126,12 +99,11 @@ public class WorldTemplateCatalog {
 
     private WorldTemplate loadWorldTemplate(WorldTemplateSummary summary, Map<UUID, ItemTemplate> itemTemplatesById) {
         String shortName = summary.shortName();
-        List<ParsedZone> parsedZones = readZoneFiles(shortName);
+        List<ParsedZone> parsedZones = readZoneFiles();
         Map<UUID, ZoneTemplate> zoneTemplates = buildZoneTemplates(shortName, parsedZones);
 
-        List<NpcDefinition> npcDefinitions = readJsonList(shortName, "npcs.json",
-                new TypeReference<List<NpcDefinition>>() {
-                });
+        List<NpcDefinition> npcDefinitions = readJsonList("npcs.json", new TypeReference<List<NpcDefinition>>() {
+        });
         Map<UUID, NpcTemplate> npcTemplates = buildNpcTemplates(shortName, npcDefinitions, zoneTemplates,
                 itemTemplatesById);
 
@@ -143,8 +115,8 @@ public class WorldTemplateCatalog {
         return template;
     }
 
-    private List<ParsedZone> readZoneFiles(String shortName) {
-        String pattern = "classpath*:" + WORLDS_DIR_MARKER + shortName + "/zones/*.json";
+    private List<ParsedZone> readZoneFiles() {
+        String pattern = "classpath*:" + DATA_DIR + "zones/*.json";
         Resource[] files;
         try {
             files = resourcePatternResolver.getResources(pattern);
@@ -294,26 +266,24 @@ public class WorldTemplateCatalog {
         return new NpcSellerInstance.NpcShop(entries);
     }
 
-    private <T> T readJson(String shortName, String fileName, Class<T> type) {
-        try (InputStream in = worldFile(shortName, fileName).getInputStream()) {
+    private <T> T readJson(String fileName, Class<T> type) {
+        try (InputStream in = worldFile(fileName).getInputStream()) {
             return objectMapper.readValue(in, type);
         } catch (IOException | JacksonException e) {
-            throw new IllegalStateException("Impossible de charger " + WORLDS_DIR_MARKER + shortName + "/" + fileName,
-                    e);
+            throw new IllegalStateException("Impossible de charger " + DATA_DIR + fileName, e);
         }
     }
 
-    private <T> T readJsonList(String shortName, String fileName, TypeReference<T> typeReference) {
-        try (InputStream in = worldFile(shortName, fileName).getInputStream()) {
+    private <T> T readJsonList(String fileName, TypeReference<T> typeReference) {
+        try (InputStream in = worldFile(fileName).getInputStream()) {
             return objectMapper.readValue(in, typeReference);
         } catch (IOException | JacksonException e) {
-            throw new IllegalStateException("Impossible de charger " + WORLDS_DIR_MARKER + shortName + "/" + fileName,
-                    e);
+            throw new IllegalStateException("Impossible de charger " + DATA_DIR + fileName, e);
         }
     }
 
-    private Resource worldFile(String shortName, String fileName) {
-        return resourcePatternResolver.getResource("classpath:" + WORLDS_DIR_MARKER + shortName + "/" + fileName);
+    private Resource worldFile(String fileName) {
+        return resourcePatternResolver.getResource("classpath:" + DATA_DIR + fileName);
     }
 
     public WorldTemplateSummary theOnlyTemplate() {

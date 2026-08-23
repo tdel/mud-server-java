@@ -14,22 +14,22 @@
     "staggeraxis": "y",
     "staggerindex": "odd",
     "nextlayerid": 3,
-    "nextobjectid": 4,
+    "nextobjectid": 6,
     "properties": [
         {
             "name": "id",
             "type": "string",
-            "value": "e1da77bd-f0b3-4d5a-95da-e8765c4fc973"
+            "value": "9a884ac7-b954-4cd6-ab67-c677d472cb0f"
         },
         {
             "name": "name",
             "type": "string",
-            "value": "Taverne du Sanglier Roux"
+            "value": "Orée de la forêt"
         },
         {
             "name": "description",
             "type": "string",
-            "value": "Une salle enfumée, chaleureuse, où résonnent quelques rires avinés."
+            "value": "Les arbres se resserrent au nord, la lumière du village faiblit derrière vous."
         },
         {
             "name": "isStartingZone",
@@ -41,7 +41,7 @@
         {
             "firstgid": 1,
             "name": "hex-terrain",
-            "image": "hex-terrain.png",
+            "image": "assets/hex-terrain.png",
             "imagewidth": 64,
             "imageheight": 28,
             "columns": 2,
@@ -265,8 +265,8 @@
                     "id": 2,
                     "name": "monsterSpawn",
                     "type": "monsterSpawn",
-                    "x": 496.0,
-                    "y": 122.0,
+                    "x": 176.0,
+                    "y": 50.0,
                     "width": 0,
                     "height": 0,
                     "visible": true,
@@ -274,16 +274,33 @@
                         {
                             "name": "templateId",
                             "type": "string",
-                            "value": "dcff9d89-1f33-41e2-8011-e5b3b7092f0d"
+                            "value": "e6caeb0d-f861-401b-b0c1-c88e315097c5"
                         }
                     ]
                 },
                 {
                     "id": 3,
+                    "name": "monsterSpawn",
+                    "type": "monsterSpawn",
+                    "x": 432.0,
+                    "y": 50.0,
+                    "width": 0,
+                    "height": 0,
+                    "visible": true,
+                    "properties": [
+                        {
+                            "name": "templateId",
+                            "type": "string",
+                            "value": "026ce1a2-091d-4179-b715-65006480cfbe"
+                        }
+                    ]
+                },
+                {
+                    "id": 4,
                     "name": "portal",
                     "type": "portal",
-                    "x": 80.0,
-                    "y": 86.0,
+                    "x": 128.0,
+                    "y": 140.0,
                     "width": 0,
                     "height": 0,
                     "visible": true,
@@ -291,7 +308,7 @@
                         {
                             "name": "direction",
                             "type": "string",
-                            "value": "W"
+                            "value": "SW"
                         },
                         {
                             "name": "targetZoneId",
@@ -302,6 +319,38 @@
                             "name": "targetCellQ",
                             "type": "int",
                             "value": 15
+                        },
+                        {
+                            "name": "targetCellR",
+                            "type": "int",
+                            "value": 0
+                        }
+                    ]
+                },
+                {
+                    "id": 5,
+                    "name": "portal",
+                    "type": "portal",
+                    "x": 560.0,
+                    "y": 86.0,
+                    "width": 0,
+                    "height": 0,
+                    "visible": true,
+                    "properties": [
+                        {
+                            "name": "direction",
+                            "type": "string",
+                            "value": "E"
+                        },
+                        {
+                            "name": "targetZoneId",
+                            "type": "string",
+                            "value": "7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5"
+                        },
+                        {
+                            "name": "targetCellQ",
+                            "type": "int",
+                            "value": 0
                         },
                         {
                             "name": "targetCellR",

@@ -41,7 +41,7 @@
         {
             "firstgid": 1,
             "name": "hex-terrain",
-            "image": "hex-terrain.png",
+            "image": "assets/hex-terrain.png",
             "imagewidth": 64,
             "imageheight": 28,
             "columns": 2,
