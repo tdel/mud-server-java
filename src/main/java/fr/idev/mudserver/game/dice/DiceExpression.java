@@ -6,9 +6,15 @@ import java.util.regex.Pattern;
 public record DiceExpression(int count, int sides, int modifier) {
 
     private static final Pattern NOTATION = Pattern.compile("^(\\d*)d(\\d+)([+-]\\d+)?$");
+    private static final Pattern FLAT_NOTATION = Pattern.compile("^[+-]?\\d+$");
 
     public static DiceExpression parse(String notation) {
         String normalized = notation.strip().toLowerCase();
+
+        if (FLAT_NOTATION.matcher(normalized).matches()) {
+            return new DiceExpression(0, 1, Integer.parseInt(normalized));
+        }
+
         Matcher matcher = NOTATION.matcher(normalized);
         if (!matcher.matches()) {
             throw new IllegalArgumentException("Invalid dice notation: \"" + notation + "\".");

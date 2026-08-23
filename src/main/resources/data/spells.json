@@ -250,5 +250,47 @@
         "effect": "HEALING",
         "effectDice": "3d8+8",
         "classes": ["CLERIC", "DRUID"]
+    },
+    {
+        "id": "2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f",
+        "name": "Bless",
+        "description": "You bless up to three creatures of your choice within range, granting a bonus to attack rolls.",
+        "requiredLevel": 1,
+        "manaCost": 5,
+        "cooldownSeconds": 6,
+        "range": 5,
+        "effect": "BUFF",
+        "effectDice": "1d4",
+        "classes": ["CLERIC", "PALADIN", "BARD"],
+        "modifiedStat": "ATTACK_ROLL",
+        "durationSeconds": 60
+    },
+    {
+        "id": "8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e",
+        "name": "Bane",
+        "description": "Up to three creatures of your choice within range must make a saving throw or take a penalty to attack rolls.",
+        "requiredLevel": 1,
+        "manaCost": 5,
+        "cooldownSeconds": 6,
+        "range": 5,
+        "effect": "DEBUFF",
+        "effectDice": "1d4",
+        "classes": ["CLERIC", "BARD", "WARLOCK"],
+        "modifiedStat": "ATTACK_ROLL",
+        "durationSeconds": 60
+    },
+    {
+        "id": "5c3b9e1d-7a4f-4b8c-9d2e-6f1a3c8b5d0e",
+        "name": "Shield of Faith",
+        "description": "A shimmering field appears and surrounds a creature of your choice within range, granting a bonus to AC.",
+        "requiredLevel": 1,
+        "manaCost": 5,
+        "cooldownSeconds": 6,
+        "range": 5,
+        "effect": "BUFF",
+        "effectDice": "2",
+        "classes": ["CLERIC", "PALADIN"],
+        "modifiedStat": "ARMOR_CLASS",
+        "durationSeconds": 60
     }
 ]

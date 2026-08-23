@@ -5,14 +5,20 @@ import fr.idev.mudserver.network.server.telnet.Ansi;
 import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.network.server.telnet.TelnetOutput;
 
-public record CastResult(String spellName, String targetName, boolean selfHeal, int amount, int targetCurrentHealth,
-        int targetMaxHealth, boolean targetDefeated) implements OutputTelnetMessage, OutputJsonMessage {
+public record CastResult(String spellName, String targetName, boolean selfHeal, boolean hit, int amount,
+        int targetCurrentHealth, int targetMaxHealth,
+        boolean targetDefeated) implements OutputTelnetMessage, OutputJsonMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
         if (selfHeal) {
             output.write("You cast " + spellName + " and recover " + Ansi.heal(amount) + " HP (" + targetCurrentHealth
                     + "/" + targetMaxHealth + ").\n");
+            return;
+        }
+
+        if (!hit) {
+            output.write("You cast " + spellName + " at " + targetName + " but miss!\n");
             return;
         }
 

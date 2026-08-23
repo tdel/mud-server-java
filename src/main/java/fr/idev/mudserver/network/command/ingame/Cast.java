@@ -20,6 +20,7 @@ import fr.idev.mudserver.network.message.ingame.CastReceived;
 import fr.idev.mudserver.network.message.ingame.CastResult;
 import fr.idev.mudserver.network.message.ingame.NoTargetSelected;
 import fr.idev.mudserver.network.message.ingame.NotEnoughMana;
+import fr.idev.mudserver.network.message.ingame.SpellModifierAnnounced;
 import fr.idev.mudserver.network.message.ingame.SpellNotKnown;
 import fr.idev.mudserver.network.message.ingame.SpellOnCooldown;
 import fr.idev.mudserver.network.message.ingame.SpellOutOfRange;
@@ -62,8 +63,11 @@ public class Cast implements CommandHandler {
         Spell spell = resolved.get();
         String targetName = trimmed.substring(spell.name().length()).trim();
 
+        boolean selfTargetedByDefault = spell.effect() == SpellEffectType.HEALING
+                || spell.effect() == SpellEffectType.BUFF;
+
         AbstractCharacter target;
-        if (spell.effect() == SpellEffectType.HEALING && targetName.isEmpty()) {
+        if (selfTargetedByDefault && targetName.isEmpty()) {
             target = character;
         } else if (!targetName.isEmpty()) {
             Optional<AbstractCharacter> found = character.getCurrentRoom().findAttackableByName(targetName, character);
@@ -98,10 +102,19 @@ public class Cast implements CommandHandler {
 
         SpellCasting.CastOutcome outcome = character.castSpell(spell, target);
 
-        connection.send(new CastResult(spell.name(), target.getName(), outcome.selfHeal(), outcome.amount(),
-                outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()));
+        if (spell.effect() == SpellEffectType.BUFF || spell.effect() == SpellEffectType.DEBUFF) {
+            boolean beneficial = spell.effect() == SpellEffectType.BUFF;
+            character.getCurrentRoom().broadcast(
+                    new SpellModifierAnnounced(character.getName(), spell.name(), target.getName(), target == character,
+                            beneficial, outcome.hit(), spell.modifiedStat(), outcome.amount(), spell.durationSeconds()),
+                    null);
+            return;
+        }
+
+        connection.send(new CastResult(spell.name(), target.getName(), outcome.selfHeal(), outcome.hit(),
+                outcome.amount(), outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()));
         if (target != character) {
-            target.send(new CastReceived(character.getName(), spell.name(), outcome.amount(),
+            target.send(new CastReceived(character.getName(), spell.name(), outcome.hit(), outcome.amount(),
                     outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()));
         }
         if (outcome.targetDefeated()) {

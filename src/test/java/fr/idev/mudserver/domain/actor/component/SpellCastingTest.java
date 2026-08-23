@@ -16,9 +16,11 @@ import org.junit.jupiter.api.Test;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Spell;
 import fr.idev.mudserver.domain.SpellEffectType;
+import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
+import fr.idev.mudserver.domain.actor.ModifiedStat;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
@@ -54,12 +56,33 @@ class SpellCastingTest {
 
     private Spell damageSpell() {
         return new Spell(UUID.randomUUID(), "Fire Bolt", "desc", 1, 3, 3, 6, SpellEffectType.DAMAGE, "1d1",
-                Set.of(CharacterClass.WIZARD));
+                Set.of(CharacterClass.WIZARD), null, 0);
     }
 
     private Spell healingSpell() {
         return new Spell(UUID.randomUUID(), "Cure Wounds", "desc", 1, 5, 6, 0, SpellEffectType.HEALING, "1d1+3",
-                Set.of(CharacterClass.CLERIC));
+                Set.of(CharacterClass.CLERIC), null, 0);
+    }
+
+    private Spell buffSpell() {
+        return new Spell(UUID.randomUUID(), "Bless", "desc", 1, 5, 6, 5, SpellEffectType.BUFF, "1d1",
+                Set.of(CharacterClass.CLERIC), ModifiedStat.ATTACK_ROLL, 60);
+    }
+
+    private Spell debuffSpell() {
+        return new Spell(UUID.randomUUID(), "Bane", "desc", 1, 5, 6, 5, SpellEffectType.DEBUFF, "1d1",
+                Set.of(CharacterClass.CLERIC), ModifiedStat.ATTACK_ROLL, 60);
+    }
+
+    // Le jet d'attaque de sort peut rater sur un jet naturel de 1 quel que soit le
+    // bonus : on relance jusqu'au premier coup pour tester le cas "touché" sans
+    // dépendre d'un mock de dé.
+    private SpellCasting.CastOutcome castUntilHit(CharacterInstance caster, Spell spell, AbstractCharacter target) {
+        SpellCasting.CastOutcome outcome;
+        do {
+            outcome = caster.getSpellCasting().cast(spell, target);
+        } while (!outcome.hit());
+        return outcome;
     }
 
     @Test
@@ -68,13 +91,38 @@ class SpellCastingTest {
         CharacterInstance target = newCharacter("Enemy", CharacterClass.FIGHTER, 10, 10);
         Spell spell = damageSpell();
 
-        SpellCasting.CastOutcome outcome = caster.getSpellCasting().cast(spell, target);
+        SpellCasting.CastOutcome outcome = castUntilHit(caster, spell, target);
 
         assertThat(outcome.selfHeal()).isFalse();
         assertThat(outcome.amount()).isEqualTo(1);
         assertThat(target.getCurrentHealth()).isEqualTo(9);
         assertThat(outcome.targetHealthAfter()).isEqualTo(9);
         assertThat(outcome.targetDefeated()).isFalse();
+    }
+
+    @Test
+    void castBuffSpellAppliesPositiveModifierToTarget() {
+        CharacterInstance caster = newCharacter("Cleric", CharacterClass.CLERIC, 10, 10);
+        Spell spell = buffSpell();
+
+        SpellCasting.CastOutcome outcome = caster.getSpellCasting().cast(spell, caster);
+
+        assertThat(outcome.hit()).isTrue();
+        assertThat(outcome.amount()).isEqualTo(1);
+        assertThat(outcome.effectExpiresAt()).isNotNull();
+        assertThat(caster.getActiveEffects().totalModifier(ModifiedStat.ATTACK_ROLL)).isEqualTo(1);
+    }
+
+    @Test
+    void castDebuffSpellThatHitsAppliesNegativeModifierToTarget() {
+        CharacterInstance caster = newCharacter("Cleric", CharacterClass.CLERIC, 10, 10);
+        CharacterInstance target = newCharacter("Enemy", CharacterClass.FIGHTER, 10, 10);
+        Spell spell = debuffSpell();
+
+        SpellCasting.CastOutcome outcome = castUntilHit(caster, spell, target);
+
+        assertThat(outcome.amount()).isEqualTo(-1);
+        assertThat(target.getActiveEffects().totalModifier(ModifiedStat.ATTACK_ROLL)).isEqualTo(-1);
     }
 
     @Test

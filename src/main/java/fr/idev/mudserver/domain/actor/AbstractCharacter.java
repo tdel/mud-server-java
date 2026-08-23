@@ -4,6 +4,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.UUID;
 
+import fr.idev.mudserver.domain.actor.component.ActiveEffects;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.game.MovementEngine;
@@ -16,6 +17,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     public static final int DEFAULT_SPEED = 6;
 
     private final Map<Attribute, Integer> attributes;
+    private final ActiveEffects activeEffects = new ActiveEffects();
     private int currentHealth;
     private int maxHealth;
 
@@ -42,6 +44,14 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public int getArmorClass() {
         return 10 + getModifier(Attribute.DEXTERITY);
+    }
+
+    public final int getEffectiveArmorClass() {
+        return getArmorClass() + activeEffects.totalModifier(ModifiedStat.ARMOR_CLASS);
+    }
+
+    public ActiveEffects getActiveEffects() {
+        return activeEffects;
     }
 
     public Map<Attribute, Integer> getAttributes() {

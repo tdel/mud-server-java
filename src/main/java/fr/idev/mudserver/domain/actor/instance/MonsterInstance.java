@@ -7,6 +7,7 @@ import java.util.stream.IntStream;
 
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
+import fr.idev.mudserver.domain.actor.ModifiedStat;
 import fr.idev.mudserver.domain.actor.template.MonsterTemplate;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
@@ -50,10 +51,11 @@ public final class MonsterInstance extends AbstractCharacter {
 
     public MonsterAttackOutcome attack(CharacterInstance defender) {
         int strengthModifier = getModifier(Attribute.STRENGTH);
-        DiceRoll attackRoll = DiceRoller.rollD20(strengthModifier, false);
+        int attackModifier = strengthModifier + getActiveEffects().totalModifier(ModifiedStat.ATTACK_ROLL);
+        DiceRoll attackRoll = DiceRoller.rollD20(attackModifier, false);
         int naturalRoll = attackRoll.rolls()[0];
         boolean critical = naturalRoll == 20;
-        boolean hit = DiceRoller.resolveHit(naturalRoll, attackRoll.total(), defender.getArmorClass());
+        boolean hit = DiceRoller.resolveHit(naturalRoll, attackRoll.total(), defender.getEffectiveArmorClass());
 
         int damage = 0;
         boolean defeated = false;

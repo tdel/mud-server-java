@@ -166,6 +166,10 @@ public final class CharacterInstance extends AbstractCharacter {
         return 2 + Math.floorDiv(level - 1, 4);
     }
 
+    public int getSpellAttackBonus() {
+        return getProficiencyBonus() + getModifier(characterClass.primaryAbility());
+    }
+
     public CheckResult check(Skill skill, int dc) {
         boolean proficient = getSkillProficiencies().contains(skill);
         return checkOrSave(skill.getGoverningAttribute(), proficient, dc, skill.label());
@@ -284,7 +288,8 @@ public final class CharacterInstance extends AbstractCharacter {
             throw new IllegalStateException("Mana insuffisante pour lancer " + spell.name());
         }
         SpellCasting.CastOutcome outcome = spellCasting.cast(spell, target);
-        DomainEventPublisher.publish(new SpellCast(this, spell, target, outcome.amount(), outcome.targetDefeated()));
+        DomainEventPublisher.publish(new SpellCast(this, spell, target, outcome.amount(), outcome.targetDefeated(),
+                outcome.hit(), outcome.effectExpiresAt()));
         return outcome;
     }
 

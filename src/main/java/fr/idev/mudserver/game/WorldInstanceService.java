@@ -32,6 +32,7 @@ import fr.idev.mudserver.network.message.ingame.GamePlayerDefeated;
 import fr.idev.mudserver.network.message.ingame.MonsterDefeated;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
+import fr.idev.mudserver.persistence.listener.ActiveEffectPersistenceListener;
 import fr.idev.mudserver.persistence.listener.ItemPersistenceListener;
 import fr.idev.mudserver.persistence.listener.SpellPersistenceListener;
 
@@ -49,6 +50,8 @@ public class WorldInstanceService {
     private final NpcCatalog npcService;
     private final ItemPersistenceListener itemService;
     private final SpellPersistenceListener spellService;
+    private final ActiveEffectPersistenceListener activeEffectService;
+    private final BuffExpiryEngine buffExpiryEngine;
     private final AccountDao accountDao;
     private final CharacterDao characterDao;
 
@@ -56,12 +59,15 @@ public class WorldInstanceService {
 
     public WorldInstanceService(WorldTemplateCatalog worldTemplateService, MonsterCatalog monsterService,
             NpcCatalog npcService, ItemPersistenceListener itemService, SpellPersistenceListener spellService,
+            ActiveEffectPersistenceListener activeEffectService, BuffExpiryEngine buffExpiryEngine,
             AccountDao accountDao, CharacterDao characterDao) {
         this.worldTemplateService = worldTemplateService;
         this.monsterService = monsterService;
         this.npcService = npcService;
         this.itemService = itemService;
         this.spellService = spellService;
+        this.activeEffectService = activeEffectService;
+        this.buffExpiryEngine = buffExpiryEngine;
         this.accountDao = accountDao;
         this.characterDao = characterDao;
     }
@@ -111,6 +117,10 @@ public class WorldInstanceService {
 
         player.getInventory().replaceItems(itemService.loadInventory(player));
         spellService.loadLearnedSpellIds(player).forEach(player.getSpellCasting()::learn);
+        activeEffectService.loadActiveEffects(player).forEach(effect -> {
+            player.getActiveEffects().apply(effect);
+            buffExpiryEngine.register(player);
+        });
         player.getCurrentRoom().join(player);
 
         instance.addPlayer(player);

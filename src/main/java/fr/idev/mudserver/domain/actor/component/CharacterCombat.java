@@ -7,6 +7,7 @@ import java.util.stream.IntStream;
 
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.Attribute;
+import fr.idev.mudserver.domain.actor.ModifiedStat;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.MonsterAttacked;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
@@ -54,12 +55,13 @@ public final class CharacterCombat {
         Optional<Item> weapon = getEquippedWeapon();
         boolean proficient = weapon.map(item -> character.getWeaponProficiencies().contains(item.getWeaponCategory()))
                 .orElse(true);
-        int attackModifier = strengthModifier + (proficient ? character.getProficiencyBonus() : 0);
+        int attackModifier = strengthModifier + (proficient ? character.getProficiencyBonus() : 0)
+                + character.getActiveEffects().totalModifier(ModifiedStat.ATTACK_ROLL);
 
         DiceRoll attackRoll = DiceRoller.rollD20(attackModifier, false);
         int naturalRoll = attackRoll.rolls()[0];
         boolean critical = naturalRoll == 20;
-        boolean hit = DiceRoller.resolveHit(naturalRoll, attackRoll.total(), defender.getArmorClass());
+        boolean hit = DiceRoller.resolveHit(naturalRoll, attackRoll.total(), defender.getEffectiveArmorClass());
 
         int damage = 0;
         boolean defeated = false;

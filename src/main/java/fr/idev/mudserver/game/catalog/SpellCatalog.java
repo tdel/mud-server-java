@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import fr.idev.mudserver.domain.Spell;
 import fr.idev.mudserver.domain.SpellEffectType;
 import fr.idev.mudserver.domain.actor.CharacterClass;
+import fr.idev.mudserver.domain.actor.ModifiedStat;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -43,7 +44,8 @@ public class SpellCatalog {
                 Spell spell = new Spell(definition.id(), definition.name(), definition.description(),
                         definition.requiredLevel(), definition.manaCost(), definition.cooldownSeconds(),
                         definition.range(), definition.effect(), definition.effectDice(),
-                        Set.copyOf(definition.classes()));
+                        Set.copyOf(definition.classes()), definition.modifiedStat(),
+                        definition.durationSeconds() == null ? 0 : definition.durationSeconds());
                 spells.put(spell.id(), spell);
             }
             log.info("spell.templates_loaded count={}", spells.size());
@@ -70,6 +72,7 @@ public class SpellCatalog {
     }
 
     private record SpellDefinition(UUID id, String name, String description, int requiredLevel, int manaCost,
-            int cooldownSeconds, int range, SpellEffectType effect, String effectDice, List<CharacterClass> classes) {
+            int cooldownSeconds, int range, SpellEffectType effect, String effectDice, List<CharacterClass> classes,
+            ModifiedStat modifiedStat, Integer durationSeconds) {
     }
 }
