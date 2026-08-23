@@ -17,24 +17,24 @@ import fr.idev.mudserver.game.dice.DiceRoller;
 
 public final class SpellCasting {
 
-    private final CharacterInstance character;
-    private final Set<UUID> knownSpellIds = ConcurrentHashMap.newKeySet();
+    private final AbstractCharacter character;
+    private final Set<Spell> knownSpells = ConcurrentHashMap.newKeySet();
     private final Map<UUID, Instant> nextCastAt = new ConcurrentHashMap<>();
 
-    public SpellCasting(CharacterInstance character) {
+    public SpellCasting(AbstractCharacter character) {
         this.character = character;
     }
 
     public boolean knows(UUID spellId) {
-        return knownSpellIds.contains(spellId);
+        return knownSpells.stream().anyMatch(spell -> spell.id().equals(spellId));
     }
 
-    public boolean learn(UUID spellId) {
-        return knownSpellIds.add(spellId);
+    public boolean learn(Spell spell) {
+        return knownSpells.add(spell);
     }
 
-    public Set<UUID> knownSpellIds() {
-        return Set.copyOf(knownSpellIds);
+    public Set<Spell> knownSpells() {
+        return Set.copyOf(knownSpells);
     }
 
     public boolean isReady(UUID spellId) {
@@ -96,8 +96,8 @@ public final class SpellCasting {
         if (defender instanceof CharacterInstance targetPlayer) {
             return targetPlayer.takeDamage(damage, character);
         }
-        if (defender instanceof MonsterInstance targetMonster) {
-            return targetMonster.takeDamage(damage, character);
+        if (defender instanceof MonsterInstance targetMonster && character instanceof CharacterInstance casterPlayer) {
+            return targetMonster.takeDamage(damage, casterPlayer);
         }
         throw new IllegalStateException("Cible de sort non supportée : " + defender.getClass());
     }

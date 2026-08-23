@@ -1,8 +1,5 @@
 package fr.idev.mudserver.persistence.listener;
 
-import java.time.Instant;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -24,12 +21,6 @@ public class ActiveEffectPersistenceListener {
 
     public ActiveEffectPersistenceListener(CharacterActiveEffectDao characterActiveEffectDao) {
         this.characterActiveEffectDao = characterActiveEffectDao;
-    }
-
-    public List<ActiveEffect> loadActiveEffects(CharacterInstance character) {
-        Instant now = Instant.now();
-        return characterActiveEffectDao.findByCharacterId(character.getId()).stream()
-                .filter(effect -> effect.expiresAt().isAfter(now)).toList();
     }
 
     @EventListener

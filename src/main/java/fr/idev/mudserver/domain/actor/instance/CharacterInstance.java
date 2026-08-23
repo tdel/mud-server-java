@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Spell;
 import fr.idev.mudserver.domain.actor.*;
+import fr.idev.mudserver.domain.actor.component.ActiveEffect;
 import fr.idev.mudserver.domain.actor.component.CharacterCombat;
 import fr.idev.mudserver.domain.actor.component.PlayerInventory;
 import fr.idev.mudserver.domain.actor.component.SpellCasting;
@@ -54,7 +55,6 @@ public final class CharacterInstance extends AbstractCharacter {
     private Connection connection;
     private final PlayerInventory inventory;
     private final CharacterCombat combat;
-    private final SpellCasting spellCasting;
     private int xp;
     private int shortRestCount;
     private int maxMana;
@@ -72,6 +72,14 @@ public final class CharacterInstance extends AbstractCharacter {
     public CharacterInstance(UUID id, Account account, String name, ZoneInstance zone, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold, int shortRestCount, int maxMana, int currentMana) {
+        this(id, account, name, zone, gender, race, characterClass, level, currentHealth, maxHealth, attributes, xp,
+                gold, shortRestCount, maxMana, currentMana, Set.of(), List.of());
+    }
+
+    public CharacterInstance(UUID id, Account account, String name, ZoneInstance zone, Gender gender, Race race,
+            CharacterClass characterClass, int level, int currentHealth, int maxHealth,
+            Map<Attribute, Integer> attributes, int xp, int gold, int shortRestCount, int maxMana, int currentMana,
+            Set<Spell> knownSpells, List<ActiveEffect> activeEffects) {
         super(id, name, attributes, currentHealth, maxHealth);
         this.account = account;
         setCurrentZone(zone);
@@ -83,10 +91,11 @@ public final class CharacterInstance extends AbstractCharacter {
         this.xp = xp;
         this.inventory = new PlayerInventory(gold);
         this.combat = new CharacterCombat(this);
-        this.spellCasting = new SpellCasting(this);
         this.shortRestCount = shortRestCount;
         this.maxMana = maxMana;
         this.currentMana = currentMana;
+        knownSpells.forEach(getSpellCasting()::learn);
+        activeEffects.forEach(getActiveEffects()::apply);
     }
 
     public Account getAccount() {
@@ -165,6 +174,7 @@ public final class CharacterInstance extends AbstractCharacter {
         return 2 + Math.floorDiv(level - 1, 4);
     }
 
+    @Override
     public int getSpellAttackBonus() {
         return getProficiencyBonus() + getModifier(characterClass.primaryAbility());
     }
@@ -232,10 +242,6 @@ public final class CharacterInstance extends AbstractCharacter {
         return combat;
     }
 
-    public SpellCasting getSpellCasting() {
-        return spellCasting;
-    }
-
     public Set<Spell> getGrantedSpells() {
         return inventory.getEquippedItems().stream().flatMap(item -> item.getTemplate().getGrantedSpells().stream())
                 .collect(Collectors.toSet());
@@ -291,7 +297,7 @@ public final class CharacterInstance extends AbstractCharacter {
         if (!trySpendMana(spell.manaCost())) {
             throw new IllegalStateException("Mana insuffisante pour lancer " + spell.name());
         }
-        SpellCasting.CastOutcome outcome = spellCasting.cast(spell, target);
+        SpellCasting.CastOutcome outcome = getSpellCasting().cast(spell, target);
         DomainEventPublisher.publish(new SpellCast(this, spell, target, outcome.amount(), outcome.targetDefeated(),
                 outcome.hit(), outcome.effectExpiresAt()));
         return outcome;

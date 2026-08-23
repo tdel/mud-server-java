@@ -15,11 +15,12 @@ import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.component.ActiveEffect;
 import fr.idev.mudserver.domain.actor.event.CharacterEffectExpired;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
+import fr.idev.mudserver.domain.actor.event.PlayerLoadedInWorld;
 import fr.idev.mudserver.domain.actor.event.SpellCast;
 import fr.idev.mudserver.network.message.ingame.SpellModifierExpired;
 
 @Component
-public class BuffExpiryEngine {
+public class ActiveEffectEngine {
 
     private static final long TICK_INTERVAL_MS = 1_000L;
 
@@ -38,6 +39,13 @@ public class BuffExpiryEngine {
     void onCharacterEffectExpired(CharacterEffectExpired event) {
         event.character().getCurrentZone()
                 .broadcast(new SpellModifierExpired(event.character().getName(), event.effect().spellName()), null);
+    }
+
+    @EventListener
+    void onPlayerLoadedInWorld(PlayerLoadedInWorld event) {
+        if (!event.character().getActiveEffects().isEmpty()) {
+            register(event.character());
+        }
     }
 
     public void register(AbstractCharacter character) {

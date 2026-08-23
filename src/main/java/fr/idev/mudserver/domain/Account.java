@@ -8,13 +8,11 @@ public class Account {
     private UUID id;
     private String login;
     private String password;
-    private UUID currentCharacterId;
 
-    public Account(UUID id, String login, String password, UUID currentCharacterId) {
+    public Account(UUID id, String login, String password) {
         this.id = id;
         this.login = login;
         this.password = password;
-        this.currentCharacterId = currentCharacterId;
     }
 
     public UUID getId() {
@@ -41,14 +39,6 @@ public class Account {
         this.password = password;
     }
 
-    public UUID getCurrentCharacterId() {
-        return currentCharacterId;
-    }
-
-    public void setCurrentCharacterId(UUID currentCharacterId) {
-        this.currentCharacterId = currentCharacterId;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -58,17 +48,16 @@ public class Account {
             return false;
         }
         return Objects.equals(id, other.id) && Objects.equals(login, other.login)
-                && Objects.equals(password, other.password)
-                && Objects.equals(currentCharacterId, other.currentCharacterId);
+                && Objects.equals(password, other.password);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, login, password, currentCharacterId);
+        return Objects.hash(id, login, password);
     }
 
     @Override
     public String toString() {
-        return "Account[id=" + id + ", login=" + login + ", currentCharacterId=" + currentCharacterId + "]";
+        return "Account[id=" + id + ", login=" + login + "]";
     }
 }

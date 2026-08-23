@@ -2,32 +2,45 @@ package fr.idev.mudserver.persistence;
 
 import static fr.idev.mudserver.persistence.jooq.Tables.CHARACTER;
 
+import java.time.Instant;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
 import fr.idev.mudserver.domain.Account;
+import fr.idev.mudserver.domain.Spell;
 import fr.idev.mudserver.domain.actor.Attribute;
+import fr.idev.mudserver.domain.actor.component.ActiveEffect;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.world.ZoneInstance;
 import fr.idev.mudserver.domain.world.WorldInstance;
+import fr.idev.mudserver.game.catalog.SpellCatalog;
 import fr.idev.mudserver.persistence.jooq.tables.records.CharacterRecord;
 
 @Repository
 public class CharacterDao {
 
     private final DSLContext dsl;
+    private final CharacterSpellDao characterSpellDao;
+    private final CharacterActiveEffectDao characterActiveEffectDao;
+    private final SpellCatalog spellCatalog;
 
-    public CharacterDao(DSLContext dsl) {
+    public CharacterDao(DSLContext dsl, CharacterSpellDao characterSpellDao,
+            CharacterActiveEffectDao characterActiveEffectDao, SpellCatalog spellCatalog) {
         this.dsl = dsl;
+        this.characterSpellDao = characterSpellDao;
+        this.characterActiveEffectDao = characterActiveEffectDao;
+        this.spellCatalog = spellCatalog;
     }
 
     public void insert(CharacterInstance character) {
@@ -48,13 +61,17 @@ public class CharacterDao {
     }
 
     public List<CharacterInstance> findAllByAccount(Account account, WorldInstance instance) {
-        return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(account.getId())).orderBy(CHARACTER.NAME)
-                .fetch(record -> toDomain(record, account, instance));
+        // toDomain déclenche des requêtes imbriquées (sorts/effets) : .fetch() sans
+        // mapper
+        // matérialise le Result et libère la connexion avant le mapping, indispensable
+        // avec le pool HikariCP à 1 connexion (sinon deadlock).
+        return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(account.getId())).orderBy(CHARACTER.NAME).fetch()
+                .stream().map(record -> toDomain(record, account, instance)).toList();
     }
 
     public Optional<CharacterInstance> findByAccountAndName(Account account, WorldInstance instance, String name) {
         return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(account.getId())).and(CHARACTER.NAME.eq(name))
-                .fetchOptional(record -> toDomain(record, account, instance));
+                .fetchOptional().map(record -> toDomain(record, account, instance));
     }
 
     public void updateCurrentZone(UUID characterId, UUID zoneId) {
@@ -91,10 +108,16 @@ public class CharacterDao {
                 .or(instance::startingZoneInstance).orElseThrow(() -> new IllegalStateException(
                         "WorldInstance " + instance.getId() + " n'a aucune zone de départ"));
 
+        Set<Spell> knownSpells = characterSpellDao.findSpellIdsByCharacter(record.getId()).stream()
+                .map(spellCatalog::getById).collect(Collectors.toSet());
+        Instant now = Instant.now();
+        List<ActiveEffect> activeEffects = characterActiveEffectDao.findByCharacterId(record.getId()).stream()
+                .filter(effect -> effect.expiresAt().isAfter(now)).toList();
+
         CharacterInstance character = new CharacterInstance(record.getId(), account, record.getName(), zone,
                 Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
                 record.getMaxHealth(), attributes, record.getXp(), record.getGold(), record.getShortRestCount(),
-                record.getMaxMana(), record.getCurrentMana());
+                record.getMaxMana(), record.getCurrentMana(), knownSpells, activeEffects);
         character.setWorldInstance(instance);
         return character;
     }

@@ -18,6 +18,7 @@ import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.NewGamePlayerCreated;
+import fr.idev.mudserver.domain.actor.event.PlayerLoadedInWorld;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.OutputMessage;
@@ -72,8 +73,10 @@ public class WorldInstance {
         return zoneInstances.values().stream().filter(zone -> Boolean.TRUE.equals(zone.isStartingZone())).findFirst();
     }
 
-    public void addPlayer(CharacterInstance character) {
+    public void loadPlayer(CharacterInstance character) {
+        character.getCurrentZone().join(character);
         players.put(character.getId(), character);
+        DomainEventPublisher.publish(new PlayerLoadedInWorld(character));
     }
 
     public void removePlayer(CharacterInstance character) {

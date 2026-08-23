@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import fr.idev.mudserver.domain.actor.component.ActiveEffects;
+import fr.idev.mudserver.domain.actor.component.SpellCasting;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.world.ZoneInstance;
 import fr.idev.mudserver.game.engine.MovementEngine;
@@ -18,6 +19,7 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     private final Map<Attribute, Integer> attributes;
     private final ActiveEffects activeEffects = new ActiveEffects();
+    private final SpellCasting spellCasting = new SpellCasting(this);
     private int currentHealth;
     private int maxHealth;
 
@@ -52,6 +54,17 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public ActiveEffects getActiveEffects() {
         return activeEffects;
+    }
+
+    public SpellCasting getSpellCasting() {
+        return spellCasting;
+    }
+
+    // Défaut neutre pour les sous-classes qui ne lancent pas encore de sorts
+    // (MonsterInstance, AbstractNpc) ; CharacterInstance surcharge avec le calcul
+    // DnD5e réel.
+    public int getSpellAttackBonus() {
+        return 0;
     }
 
     public Map<Attribute, Integer> getAttributes() {

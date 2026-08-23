@@ -19,7 +19,6 @@ import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.charselect.CharacterCurrentlyInGame;
 import fr.idev.mudserver.network.message.charselect.CharacterDeleted;
 import fr.idev.mudserver.network.message.charselect.NoCharacterNamed;
-import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 
 @Component
@@ -29,14 +28,12 @@ public class CharacterDelete implements CommandHandler {
 
     private final WorldInstanceService worldInstanceService;
     private final CharacterDao characterDao;
-    private final AccountDao accountDao;
     private final CharSelectStatus charSelectStatus;
 
-    public CharacterDelete(WorldInstanceService worldInstanceService, CharacterDao characterDao, AccountDao accountDao,
+    public CharacterDelete(WorldInstanceService worldInstanceService, CharacterDao characterDao,
             CharSelectStatus charSelectStatus) {
         this.worldInstanceService = worldInstanceService;
         this.characterDao = characterDao;
-        this.accountDao = accountDao;
         this.charSelectStatus = charSelectStatus;
     }
 
@@ -75,10 +72,6 @@ public class CharacterDelete implements CommandHandler {
             connection.send(new CharacterCurrentlyInGame(name));
             charSelectStatus.show(connection, account);
             return;
-        }
-
-        if (characterId.equals(account.getCurrentCharacterId())) {
-            accountDao.updateCurrentCharacter(account.getId(), null);
         }
 
         characterDao.deleteById(characterId);

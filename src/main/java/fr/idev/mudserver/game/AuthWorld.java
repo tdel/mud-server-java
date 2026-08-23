@@ -67,7 +67,7 @@ public class AuthWorld {
     }
 
     public Account registerAccount(Connection connection, String login, String password) {
-        Account account = new Account(UUID.randomUUID(), login, passwordEncoder.encode(password), null);
+        Account account = new Account(UUID.randomUUID(), login, passwordEncoder.encode(password));
         try {
             accountDao.insert(account);
         } catch (DuplicateKeyException e) {

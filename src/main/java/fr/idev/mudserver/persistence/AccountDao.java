@@ -21,9 +21,8 @@ public class AccountDao {
     }
 
     public void insert(Account account) {
-        dsl.insertInto(ACCOUNT, ACCOUNT.ID, ACCOUNT.LOGIN, ACCOUNT.PASSWORD, ACCOUNT.CURRENT_CHARACTER_ID)
-                .values(account.getId(), account.getLogin(), account.getPassword(), account.getCurrentCharacterId())
-                .execute();
+        dsl.insertInto(ACCOUNT, ACCOUNT.ID, ACCOUNT.LOGIN, ACCOUNT.PASSWORD)
+                .values(account.getId(), account.getLogin(), account.getPassword()).execute();
     }
 
     public Optional<Account> findById(UUID id) {
@@ -34,11 +33,7 @@ public class AccountDao {
         return dsl.selectFrom(ACCOUNT).where(ACCOUNT.LOGIN.eq(login)).fetchOptional(AccountDao::toDomain);
     }
 
-    public void updateCurrentCharacter(UUID accountId, UUID characterId) {
-        dsl.update(ACCOUNT).set(ACCOUNT.CURRENT_CHARACTER_ID, characterId).where(ACCOUNT.ID.eq(accountId)).execute();
-    }
-
     private static Account toDomain(AccountRecord record) {
-        return new Account(record.getId(), record.getLogin(), record.getPassword(), record.getCurrentCharacterId());
+        return new Account(record.getId(), record.getLogin(), record.getPassword());
     }
 }

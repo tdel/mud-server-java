@@ -12,7 +12,6 @@ import fr.idev.mudserver.domain.SpellEffectType;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.component.SpellCasting;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
-import fr.idev.mudserver.game.catalog.SpellCatalog;
 import fr.idev.mudserver.network.CommandHandler;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -29,12 +28,6 @@ import fr.idev.mudserver.network.message.ingame.TargetNotFound;
 
 @Component
 public class Cast implements CommandHandler {
-
-    private final SpellCatalog spellCatalog;
-
-    public Cast(SpellCatalog spellCatalog) {
-        this.spellCatalog = spellCatalog;
-    }
 
     @Override
     public String name() {
@@ -125,7 +118,7 @@ public class Cast implements CommandHandler {
 
     private Optional<Spell> resolveKnownSpell(CharacterInstance character, String argument) {
         String lower = argument.toLowerCase();
-        Stream<Spell> known = character.getSpellCasting().knownSpellIds().stream().map(spellCatalog::getById);
+        Stream<Spell> known = character.getSpellCasting().knownSpells().stream();
         Stream<Spell> granted = character.getGrantedSpells().stream();
         return Stream.concat(known, granted).distinct().filter(spell -> lower.startsWith(spell.name().toLowerCase()))
                 .max(Comparator.comparingInt(spell -> spell.name().length()));

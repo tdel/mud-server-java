@@ -30,7 +30,7 @@ public class SpellLearningEngine {
 
     private void learnSpellsAt(CharacterInstance character, int level) {
         for (Spell spell : SpellCatalogHolder.spellsLearnableAt(character.getCharacterClass(), level)) {
-            if (character.getSpellCasting().learn(spell.id())) {
+            if (character.getSpellCasting().learn(spell)) {
                 DomainEventPublisher.publish(new CharacterLearnedSpell(character, spell));
                 log.info("character.spell_autolearned character={} spell={} level={}", character.getName(),
                         spell.name(), level);

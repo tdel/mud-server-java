@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.network.CommandHandler;
@@ -31,17 +32,20 @@ import fr.idev.mudserver.network.message.charselect.InvalidRace;
 import fr.idev.mudserver.network.message.charselect.NowPlaying;
 import fr.idev.mudserver.network.message.ingame.GamePlayerStats;
 import fr.idev.mudserver.network.message.ingame.ZoneMap;
+import fr.idev.mudserver.persistence.listener.ItemPersistenceListener;
 
 @Component
 public class CharacterCreate implements CommandHandler {
 
     private final WorldInstanceService worldInstanceService;
+    private final ItemPersistenceListener itemService;
     private final CharSelectStatus charSelectStatus;
     private final Look lookAction;
 
-    public CharacterCreate(WorldInstanceService worldInstanceService, CharSelectStatus charSelectStatus,
-            Look lookAction) {
+    public CharacterCreate(WorldInstanceService worldInstanceService, ItemPersistenceListener itemService,
+            CharSelectStatus charSelectStatus, Look lookAction) {
         this.worldInstanceService = worldInstanceService;
+        this.itemService = itemService;
         this.charSelectStatus = charSelectStatus;
         this.lookAction = lookAction;
     }
@@ -168,7 +172,9 @@ public class CharacterCreate implements CommandHandler {
         connection.send(new GamePlayerStats(character));
 
         connection.attachCharacter(character);
-        worldInstanceService.enterGame(character);
+        character.getInventory().replaceItems(itemService.loadInventory(character));
+        character.getWorldInstance().loadPlayer(character);
+        MDC.put("character", character.getName());
 
         connection.send(new NowPlaying(character.getName()));
         connection.send(new ZoneMap(character.getCurrentZone()));

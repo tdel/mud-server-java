@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import fr.idev.mudserver.game.engine.BuffExpiryEngine;
 import fr.idev.mudserver.game.engine.MovementEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +25,7 @@ import fr.idev.mudserver.game.catalog.NpcCatalog;
 import fr.idev.mudserver.game.catalog.WorldTemplateCatalog;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
-import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
-import fr.idev.mudserver.persistence.listener.ActiveEffectPersistenceListener;
-import fr.idev.mudserver.persistence.listener.ItemPersistenceListener;
-import fr.idev.mudserver.persistence.listener.SpellPersistenceListener;
 
 @Service
 public class WorldInstanceService {
@@ -40,29 +35,17 @@ public class WorldInstanceService {
     private final WorldTemplateCatalog worldTemplateService;
     private final MonsterCatalog monsterService;
     private final NpcCatalog npcService;
-    private final ItemPersistenceListener itemService;
-    private final SpellPersistenceListener spellService;
-    private final ActiveEffectPersistenceListener activeEffectService;
-    private final BuffExpiryEngine buffExpiryEngine;
     private final MovementEngine movementEngine;
-    private final AccountDao accountDao;
     private final CharacterDao characterDao;
 
     private WorldInstance defaultInstance;
 
     public WorldInstanceService(WorldTemplateCatalog worldTemplateService, MonsterCatalog monsterService,
-            NpcCatalog npcService, ItemPersistenceListener itemService, SpellPersistenceListener spellService,
-            ActiveEffectPersistenceListener activeEffectService, BuffExpiryEngine buffExpiryEngine,
-            MovementEngine movementEngine, AccountDao accountDao, CharacterDao characterDao) {
+            NpcCatalog npcService, MovementEngine movementEngine, CharacterDao characterDao) {
         this.worldTemplateService = worldTemplateService;
         this.monsterService = monsterService;
         this.npcService = npcService;
-        this.itemService = itemService;
-        this.spellService = spellService;
-        this.activeEffectService = activeEffectService;
-        this.buffExpiryEngine = buffExpiryEngine;
         this.movementEngine = movementEngine;
-        this.accountDao = accountDao;
         this.characterDao = characterDao;
     }
 
@@ -104,23 +87,6 @@ public class WorldInstanceService {
 
     public Optional<CharacterInstance> findCharacterByName(Account account, String name) {
         return characterDao.findByAccountAndName(account, getDefaultInstance(), name);
-    }
-
-    public void enterGame(CharacterInstance player) {
-        WorldInstance instance = player.getWorldInstance();
-
-        player.getInventory().replaceItems(itemService.loadInventory(player));
-        spellService.loadLearnedSpellIds(player).forEach(player.getSpellCasting()::learn);
-        activeEffectService.loadActiveEffects(player).forEach(effect -> {
-            player.getActiveEffects().apply(effect);
-            buffExpiryEngine.register(player);
-        });
-        player.getCurrentZone().join(player);
-
-        instance.addPlayer(player);
-        accountDao.updateCurrentCharacter(player.getAccountId(), player.getId());
-
-        MDC.put("character", player.getName());
     }
 
     public void exitGame(Connection connection) {

@@ -3,6 +3,7 @@ package fr.idev.mudserver.network.command.charselect;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.network.CommandHandler;
@@ -16,17 +17,20 @@ import fr.idev.mudserver.network.message.Usage;
 import fr.idev.mudserver.network.message.charselect.NoCharacterNamed;
 import fr.idev.mudserver.network.message.charselect.NowPlaying;
 import fr.idev.mudserver.network.message.ingame.ZoneMap;
+import fr.idev.mudserver.persistence.listener.ItemPersistenceListener;
 
 @Component
 public class CharacterSelect implements CommandHandler {
 
     private final WorldInstanceService worldInstanceService;
+    private final ItemPersistenceListener itemService;
     private final CharSelectStatus charSelectStatus;
     private final Look lookAction;
 
-    public CharacterSelect(WorldInstanceService worldInstanceService, CharSelectStatus charSelectStatus,
-            Look lookAction) {
+    public CharacterSelect(WorldInstanceService worldInstanceService, ItemPersistenceListener itemService,
+            CharSelectStatus charSelectStatus, Look lookAction) {
         this.worldInstanceService = worldInstanceService;
+        this.itemService = itemService;
         this.charSelectStatus = charSelectStatus;
         this.lookAction = lookAction;
     }
@@ -61,7 +65,9 @@ public class CharacterSelect implements CommandHandler {
 
         CharacterInstance loadedChar = character.get();
         connection.attachCharacter(loadedChar);
-        worldInstanceService.enterGame(loadedChar);
+        loadedChar.getInventory().replaceItems(itemService.loadInventory(loadedChar));
+        loadedChar.getWorldInstance().loadPlayer(loadedChar);
+        MDC.put("character", loadedChar.getName());
 
         connection.send(new NowPlaying(loadedChar.getName()));
         connection.send(new ZoneMap(loadedChar.getCurrentZone()));

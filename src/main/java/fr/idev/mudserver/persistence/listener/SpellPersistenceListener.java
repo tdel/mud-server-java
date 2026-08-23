@@ -1,8 +1,5 @@
 package fr.idev.mudserver.persistence.listener;
 
-import java.util.List;
-import java.util.UUID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -26,10 +23,6 @@ public class SpellPersistenceListener {
     public SpellPersistenceListener(CharacterSpellDao characterSpellDao, CharacterDao characterDao) {
         this.characterSpellDao = characterSpellDao;
         this.characterDao = characterDao;
-    }
-
-    public List<UUID> loadLearnedSpellIds(CharacterInstance character) {
-        return characterSpellDao.findSpellIdsByCharacter(character.getId());
     }
 
     @EventListener

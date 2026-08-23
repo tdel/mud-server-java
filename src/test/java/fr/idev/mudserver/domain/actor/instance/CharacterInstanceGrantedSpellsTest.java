@@ -43,7 +43,7 @@ class CharacterInstanceGrantedSpellsTest {
         ZoneTemplate zoneTemplate = new ZoneTemplate(UUID.randomUUID(), "Zone", "desc", true, flatTerrain(3, 3),
                 new HexCoordinate(0, 0), List.of());
         ZoneInstance zone = new ZoneInstance(UUID.randomUUID(), zoneTemplate, world);
-        Account account = new Account(UUID.randomUUID(), "login", "hash", null);
+        Account account = new Account(UUID.randomUUID(), "login", "hash");
 
         Map<Attribute, Integer> attributes = new EnumMap<>(Attribute.class);
         for (Attribute attribute : Attribute.values()) {
