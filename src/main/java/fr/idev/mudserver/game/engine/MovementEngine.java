@@ -47,25 +47,34 @@ public class MovementEngine {
     void tick() {
         long now = System.currentTimeMillis();
         for (AbstractCharacter character : movingCharacters.values()) {
-            switch (updatePosition(character, now)) {
-                case NO_MOVEMENT -> {
-                }
-                case STEPPED -> {
-                    character.send(new ViewAround(character));
-                }
-                case FINISHED -> {
-                    movingCharacters.remove(character.getId());
-                    character.send(new ViewAround(character));
+            try {
+                switch (updatePosition(character, now)) {
+                    case NO_MOVEMENT -> {
+                    }
+                    case STEPPED -> {
+                        character.send(new ViewAround(character));
+                    }
+                    case FINISHED -> {
+                        movingCharacters.remove(character.getId());
+                        character.send(new ViewAround(character));
 
+                    }
+                    case BLOCKED_BY_BOUNDS -> {
+                        movingCharacters.remove(character.getId());
+                        character.send(new MovementBlockedByBounds());
+                    }
+                    case BLOCKED_BY_OCCUPANT -> {
+                        movingCharacters.remove(character.getId());
+                        character.send(new MovementBlockedByOccupant());
+                    }
                 }
-                case BLOCKED_BY_BOUNDS -> {
-                    movingCharacters.remove(character.getId());
-                    character.send(new MovementBlockedByBounds());
-                }
-                case BLOCKED_BY_OCCUPANT -> {
-                    movingCharacters.remove(character.getId());
-                    character.send(new MovementBlockedByOccupant());
-                }
+            } catch (Exception e) {
+                // Le personnage a pu être déconnecté (position remise à null) sans que son
+                // mouvement en cours ait été arrêté ; on l'enlève pour éviter de replanter
+                // à chaque tick, plutôt que de laisser l'exception interrompre la boucle
+                // pour les autres personnages en mouvement.
+                movingCharacters.remove(character.getId());
+                log.error("movement.tick_failed character={}", character.getId(), e);
             }
         }
     }

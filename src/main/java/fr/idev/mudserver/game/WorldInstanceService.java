@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import fr.idev.mudserver.game.engine.BuffExpiryEngine;
+import fr.idev.mudserver.game.engine.MovementEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -43,6 +44,7 @@ public class WorldInstanceService {
     private final SpellPersistenceListener spellService;
     private final ActiveEffectPersistenceListener activeEffectService;
     private final BuffExpiryEngine buffExpiryEngine;
+    private final MovementEngine movementEngine;
     private final AccountDao accountDao;
     private final CharacterDao characterDao;
 
@@ -51,7 +53,7 @@ public class WorldInstanceService {
     public WorldInstanceService(WorldTemplateCatalog worldTemplateService, MonsterCatalog monsterService,
             NpcCatalog npcService, ItemPersistenceListener itemService, SpellPersistenceListener spellService,
             ActiveEffectPersistenceListener activeEffectService, BuffExpiryEngine buffExpiryEngine,
-            AccountDao accountDao, CharacterDao characterDao) {
+            MovementEngine movementEngine, AccountDao accountDao, CharacterDao characterDao) {
         this.worldTemplateService = worldTemplateService;
         this.monsterService = monsterService;
         this.npcService = npcService;
@@ -59,6 +61,7 @@ public class WorldInstanceService {
         this.spellService = spellService;
         this.activeEffectService = activeEffectService;
         this.buffExpiryEngine = buffExpiryEngine;
+        this.movementEngine = movementEngine;
         this.accountDao = accountDao;
         this.characterDao = characterDao;
     }
@@ -130,6 +133,7 @@ public class WorldInstanceService {
         WorldInstance instance = character.getWorldInstance();
 
         characterDao.update(character);
+        movementEngine.stopMovement(character);
         zone.disconnect(character);
         instance.removePlayer(character);
         log.info("world.session_ended character={} zone={}", character.getName(), zone.getName());
