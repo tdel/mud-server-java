@@ -44,6 +44,7 @@ public class CharacterPersistenceListener {
     }
 
     @EventListener
+    @Order(1)
     void onNewGamePlayerCreated(NewGamePlayerCreated event) {
         characterDao.insert(event.character());
         log.info("character.created character={} accountId={} race={} class={}", event.character().getName(),

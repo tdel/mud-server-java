@@ -15,7 +15,6 @@ import fr.idev.mudserver.domain.actor.component.CharacterCombat;
 import fr.idev.mudserver.domain.actor.component.PlayerInventory;
 import fr.idev.mudserver.domain.actor.component.SpellCasting;
 import fr.idev.mudserver.domain.actor.event.CharacterGainedXp;
-import fr.idev.mudserver.domain.actor.event.CharacterLearnedSpell;
 import fr.idev.mudserver.domain.actor.event.CharacterLeveledUp;
 import fr.idev.mudserver.domain.actor.event.CharacterLootedItem;
 import fr.idev.mudserver.domain.actor.event.CharacterReceivedGold;
@@ -36,7 +35,6 @@ import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.item.WeaponCategory;
 import fr.idev.mudserver.domain.world.WorldInstance;
-import fr.idev.mudserver.game.catalog.SpellCatalogHolder;
 import fr.idev.mudserver.game.dice.CheckResult;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
@@ -318,12 +316,6 @@ public final class CharacterInstance extends AbstractCharacter {
         currentMana += manaGain;
 
         DomainEventPublisher.publish(new CharacterLeveledUp(this, level, hpGain));
-
-        for (Spell spell : SpellCatalogHolder.spellsLearnableAt(characterClass, level)) {
-            if (spellCasting.learn(spell.id())) {
-                DomainEventPublisher.publish(new CharacterLearnedSpell(this, spell));
-            }
-        }
     }
 
     public int getShortRestCount() {
