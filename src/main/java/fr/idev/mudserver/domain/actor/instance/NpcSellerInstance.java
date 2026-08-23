@@ -9,12 +9,12 @@ import fr.idev.mudserver.domain.actor.AbstractNpc;
 import fr.idev.mudserver.domain.actor.template.NpcTemplate;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.item.ItemTemplate;
-import fr.idev.mudserver.domain.world.RoomInstance;
+import fr.idev.mudserver.domain.world.ZoneInstance;
 
 public final class NpcSellerInstance extends AbstractNpc {
 
-    public NpcSellerInstance(UUID id, NpcTemplate template, RoomInstance room) {
-        super(id, template, room);
+    public NpcSellerInstance(UUID id, NpcTemplate template, ZoneInstance zone) {
+        super(id, template, zone);
         Objects.requireNonNull(template.shop());
     }
 

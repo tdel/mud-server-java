@@ -4,10 +4,10 @@ import fr.idev.mudserver.network.OutputJsonMessage;
 import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.network.server.telnet.TelnetOutput;
 
-public record NoStartingRoom() implements OutputTelnetMessage, OutputJsonMessage {
+public record NoStartingZone() implements OutputTelnetMessage, OutputJsonMessage {
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        output.write("No starting room is configured. Contact the administrator (room-create).\n");
+        output.write("No starting zone is configured. Contact the administrator (zone-create).\n");
     }
 }

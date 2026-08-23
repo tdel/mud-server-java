@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
-import fr.idev.mudserver.domain.actor.event.GamePlayerSpawnedToRoom;
+import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToZone;
+import fr.idev.mudserver.domain.actor.event.GamePlayerSpawnedToZone;
 import fr.idev.mudserver.persistence.CharacterDao;
 
 @Service
@@ -21,14 +21,14 @@ public class WorldInstancePersistenceListener {
     }
 
     @EventListener
-    void onGamePlayerMovedToRoom(GamePlayerMovedToRoom event) {
-        characterDao.updateCurrentRoom(event.character().getId(), event.to().getTemplateId());
-        log.debug("room.player_moved character={} to={}", event.character().getName(), event.to().getName());
+    void onGamePlayerMovedToZone(GamePlayerMovedToZone event) {
+        characterDao.updateCurrentZone(event.character().getId(), event.to().getTemplateId());
+        log.debug("zone.player_moved character={} to={}", event.character().getName(), event.to().getName());
     }
 
     @EventListener
-    void onGamePlayerSpawnedToRoom(GamePlayerSpawnedToRoom event) {
-        characterDao.updateCurrentRoom(event.character().getId(), event.room().getTemplateId());
-        log.info("room.player_spawned character={} room={}", event.character().getName(), event.room().getName());
+    void onGamePlayerSpawnedToZone(GamePlayerSpawnedToZone event) {
+        characterDao.updateCurrentZone(event.character().getId(), event.zone().getTemplateId());
+        log.info("zone.player_spawned character={} zone={}", event.character().getName(), event.zone().getName());
     }
 }

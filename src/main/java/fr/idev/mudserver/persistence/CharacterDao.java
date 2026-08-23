@@ -17,7 +17,7 @@ import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.CharacterClass;
 import fr.idev.mudserver.domain.actor.Gender;
 import fr.idev.mudserver.domain.actor.Race;
-import fr.idev.mudserver.domain.world.RoomInstance;
+import fr.idev.mudserver.domain.world.ZoneInstance;
 import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.persistence.jooq.tables.records.CharacterRecord;
 
@@ -31,12 +31,12 @@ public class CharacterDao {
     }
 
     public void insert(CharacterInstance character) {
-        dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_ROOM_ID,
+        dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_ZONE_ID,
                 CHARACTER.GENDER, CHARACTER.RACE, CHARACTER.CHARACTER_CLASS, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH,
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
                 CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA, CHARACTER.XP, CHARACTER.GOLD,
                 CHARACTER.SHORT_REST_COUNT, CHARACTER.MAX_MANA, CHARACTER.CURRENT_MANA)
-                .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentRoomId(),
+                .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentZoneId(),
                         character.getGender().name(), character.getRace().name(), character.getCharacterClass().name(),
                         character.getLevel(), character.getCurrentHealth(), character.getMaxHealth(),
                         character.getAttribute(Attribute.STRENGTH), character.getAttribute(Attribute.DEXTERITY),
@@ -57,12 +57,12 @@ public class CharacterDao {
                 .fetchOptional(record -> toDomain(record, account, instance));
     }
 
-    public void updateCurrentRoom(UUID characterId, UUID roomId) {
-        dsl.update(CHARACTER).set(CHARACTER.CURRENT_ROOM_ID, roomId).where(CHARACTER.ID.eq(characterId)).execute();
+    public void updateCurrentZone(UUID characterId, UUID zoneId) {
+        dsl.update(CHARACTER).set(CHARACTER.CURRENT_ZONE_ID, zoneId).where(CHARACTER.ID.eq(characterId)).execute();
     }
 
     public void update(CharacterInstance character) {
-        dsl.update(CHARACTER).set(CHARACTER.CURRENT_ROOM_ID, character.getCurrentRoomId())
+        dsl.update(CHARACTER).set(CHARACTER.CURRENT_ZONE_ID, character.getCurrentZoneId())
                 .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).set(CHARACTER.XP, character.getXp())
                 .set(CHARACTER.LEVEL, character.getLevel()).set(CHARACTER.MAX_HEALTH, character.getMaxHealth())
                 .set(CHARACTER.GOLD, character.getInventory().getGold())
@@ -87,11 +87,11 @@ public class CharacterDao {
         CharacterClass characterClass = CharacterClass.valueOf(record.getCharacterClass());
         Race race = Race.valueOf(record.getRace());
 
-        RoomInstance room = instance.roomInstanceForTemplate(record.getCurrentRoomId())
-                .or(instance::startingRoomInstance).orElseThrow(() -> new IllegalStateException(
-                        "WorldInstance " + instance.getId() + " n'a aucune room de départ"));
+        ZoneInstance zone = instance.zoneInstanceForTemplate(record.getCurrentZoneId())
+                .or(instance::startingZoneInstance).orElseThrow(() -> new IllegalStateException(
+                        "WorldInstance " + instance.getId() + " n'a aucune zone de départ"));
 
-        CharacterInstance character = new CharacterInstance(record.getId(), account, record.getName(), room,
+        CharacterInstance character = new CharacterInstance(record.getId(), account, record.getName(), zone,
                 Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
                 record.getMaxHealth(), attributes, record.getXp(), record.getGold(), record.getShortRestCount(),
                 record.getMaxMana(), record.getCurrentMana());

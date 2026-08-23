@@ -2,8 +2,6 @@ package fr.idev.mudserver.domain.world;
 
 import fr.idev.mudserver.domain.map.HexCoordinate;
 
-import java.util.UUID;
-
-public record RoomTemplatePortal(HexCoordinate cell, String direction, UUID targetRoomTemplateId,
+public record ZonePortal(HexCoordinate cell, String direction, ZoneInstance sourceZone, ZoneInstance targetZone,
         HexCoordinate targetCell) {
 }

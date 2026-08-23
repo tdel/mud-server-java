@@ -46,7 +46,7 @@ public class Talk implements CommandHandler {
             return;
         }
 
-        Optional<AbstractNpc> npc = character.getCurrentRoom().findNpcByName(name);
+        Optional<AbstractNpc> npc = character.getCurrentZone().findNpcByName(name);
         if (npc.isEmpty()) {
             connection.send(new TargetNotFound(name));
             return;

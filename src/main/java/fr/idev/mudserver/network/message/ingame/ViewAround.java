@@ -10,7 +10,7 @@ import fr.idev.mudserver.domain.actor.AbstractNpc;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.map.HexCoordinate;
-import fr.idev.mudserver.domain.world.RoomInstance;
+import fr.idev.mudserver.domain.world.ZoneInstance;
 import fr.idev.mudserver.game.engine.MovementEngine;
 import fr.idev.mudserver.network.server.telnet.Ansi;
 import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
@@ -29,20 +29,20 @@ public record ViewAround(AbstractCharacter character) implements OutputTelnetMes
     public record CellView(int q, int r, String kind) {
     }
 
-    public record PortalView(String direction, String targetRoomName) {
+    public record PortalView(String direction, String targetZoneName) {
     }
 
-    public record Payload(String roomName, String roomDescription, List<CellView> cells, List<PortalView> portals,
+    public record Payload(String zoneName, String zoneDescription, List<CellView> cells, List<PortalView> portals,
             List<String> charactersNearby, List<String> monstersNearby, List<String> npcsNearby) {
     }
 
     @Override
     public void toJson(JsonOutput output) {
-        RoomInstance room = character.getCurrentRoom();
-        List<AbstractCharacter> nearby = room.occupantsWithin(character.getPosition(), VIEWPORT_RADIUS);
+        ZoneInstance zone = character.getCurrentZone();
+        List<AbstractCharacter> nearby = zone.occupantsWithin(character.getPosition(), VIEWPORT_RADIUS);
 
-        List<PortalView> portals = room.getPortals().stream()
-                .map(portal -> new PortalView(portal.direction().toString(), portal.targetRoom().getName())).toList();
+        List<PortalView> portals = zone.getPortals().stream()
+                .map(portal -> new PortalView(portal.direction().toString(), portal.targetZone().getName())).toList();
         List<String> characterNames = nearby.stream().filter(CharacterInstance.class::isInstance)
                 .filter(other -> !other.getId().equals(character.getId())).map(AbstractCharacter::getName).toList();
         List<String> monsterNames = nearby.stream().filter(MonsterInstance.class::isInstance)
@@ -50,11 +50,11 @@ public record ViewAround(AbstractCharacter character) implements OutputTelnetMes
         List<String> npcNames = nearby.stream().filter(AbstractNpc.class::isInstance).map(AbstractCharacter::getName)
                 .toList();
 
-        output.write("ViewAround", new Payload(room.getName(), room.getDescription(), renderCells(room, character),
+        output.write("ViewAround", new Payload(zone.getName(), zone.getDescription(), renderCells(zone, character),
                 portals, characterNames, monsterNames, npcNames), false);
     }
 
-    private List<CellView> renderCells(RoomInstance room, AbstractCharacter viewer) {
+    private List<CellView> renderCells(ZoneInstance zone, AbstractCharacter viewer) {
         HexCoordinate center = viewer.getPosition();
         List<HexCoordinate> path = remainingPath(viewer);
         Set<HexCoordinate> pathCells = new HashSet<>(path);
@@ -67,22 +67,22 @@ public record ViewAround(AbstractCharacter character) implements OutputTelnetMes
             int dqMax = Math.min(VIEWPORT_RADIUS, -dr + VIEWPORT_RADIUS);
             for (int dq = dqMin; dq <= dqMax; dq++) {
                 HexCoordinate cell = new HexCoordinate(center.q() + dq, r);
-                cells.add(new CellView(cell.q(), cell.r(), kindFor(room, viewer, cell, pathCells, destination)));
+                cells.add(new CellView(cell.q(), cell.r(), kindFor(zone, viewer, cell, pathCells, destination)));
             }
         }
         return cells;
     }
 
-    private String kindFor(RoomInstance room, AbstractCharacter viewer, HexCoordinate cell,
+    private String kindFor(ZoneInstance zone, AbstractCharacter viewer, HexCoordinate cell,
             Set<HexCoordinate> pathCells, HexCoordinate destination) {
         if (cell.equals(viewer.getPosition())) {
             return "self";
         }
-        if (!room.isInBounds(cell)) {
+        if (!zone.isInBounds(cell)) {
             return "outOfBounds";
         }
 
-        Optional<AbstractCharacter> occupant = room.occupantAt(cell);
+        Optional<AbstractCharacter> occupant = zone.occupantAt(cell);
         if (occupant.isPresent()) {
             return switch (occupant.get()) {
                 case CharacterInstance ignored -> "player";
@@ -93,12 +93,12 @@ public record ViewAround(AbstractCharacter character) implements OutputTelnetMes
         }
 
         if (cell.equals(destination)) {
-            return room.findPortalAt(cell).isPresent() ? "portalDestination" : "destination";
+            return zone.findPortalAt(cell).isPresent() ? "portalDestination" : "destination";
         }
         if (pathCells.contains(cell)) {
             return "path";
         }
-        if (room.findPortalAt(cell).isPresent()) {
+        if (zone.findPortalAt(cell).isPresent()) {
             return "portal";
         }
         return "floor";
@@ -106,13 +106,13 @@ public record ViewAround(AbstractCharacter character) implements OutputTelnetMes
 
     @Override
     public void toTelnet(TelnetOutput output) {
-        RoomInstance room = character.getCurrentRoom();
+        ZoneInstance zone = character.getCurrentZone();
 
-        List<String> gridLines = render(room, character);
-        List<AbstractCharacter> nearby = room.occupantsWithin(character.getPosition(), VIEWPORT_RADIUS);
+        List<String> gridLines = render(zone, character);
+        List<AbstractCharacter> nearby = zone.occupantsWithin(character.getPosition(), VIEWPORT_RADIUS);
 
-        List<String> portalSummaries = room.getPortals().stream()
-                .map(portal -> portal.direction() + ": " + portal.targetRoom().getName()).toList();
+        List<String> portalSummaries = zone.getPortals().stream()
+                .map(portal -> portal.direction() + ": " + portal.targetZone().getName()).toList();
         List<String> characterNames = nearby.stream().filter(CharacterInstance.class::isInstance)
                 .filter(other -> !other.getId().equals(character.getId())).map(AbstractCharacter::getName).toList();
         List<String> monsterNames = nearby.stream().filter(MonsterInstance.class::isInstance)
@@ -123,7 +123,7 @@ public record ViewAround(AbstractCharacter character) implements OutputTelnetMes
         String coloredGrid = gridLines.stream().map(Ansi::gridLine).collect(Collectors.joining("\n"));
         output.write(String.format(
                 "== %s ==\n%s\n\n%s\n%s\n\n%s\n\nPortals: %s\nCharacters here: %s\nMonsters: %s\nNPCs: %s\n",
-                Ansi.room(room.getName()), room.getDescription(), Ansi.room(MAP_HEADER), coloredGrid,
+                Ansi.zone(zone.getName()), zone.getDescription(), Ansi.zone(MAP_HEADER), coloredGrid,
                 Ansi.gridLegend(LEGEND), portalSummaries.isEmpty() ? "none." : String.join(", ", portalSummaries),
                 joinColored(characterNames, Ansi::player, "no one else."),
                 joinColored(monsterNames, Ansi::monster, "none."), joinColored(npcNames, Ansi::npc, "none.")));
@@ -133,11 +133,11 @@ public record ViewAround(AbstractCharacter character) implements OutputTelnetMes
         return values.isEmpty() ? whenEmpty : values.stream().map(colorize).collect(Collectors.joining(", "));
     }
 
-    private List<String> render(RoomInstance room, AbstractCharacter viewer) {
-        return render(room, viewer, VIEWPORT_RADIUS);
+    private List<String> render(ZoneInstance zone, AbstractCharacter viewer) {
+        return render(zone, viewer, VIEWPORT_RADIUS);
     }
 
-    private List<String> render(RoomInstance room, AbstractCharacter viewer, int radius) {
+    private List<String> render(ZoneInstance zone, AbstractCharacter viewer, int radius) {
         HexCoordinate center = viewer.getPosition();
         List<HexCoordinate> path = remainingPath(viewer);
         Set<HexCoordinate> pathCells = new HashSet<>(path);
@@ -158,23 +158,23 @@ public record ViewAround(AbstractCharacter character) implements OutputTelnetMes
                 if (dq > dqMin) {
                     line.append(' ');
                 }
-                line.append(glyphFor(room, viewer, cell, pathCells, destination));
+                line.append(glyphFor(zone, viewer, cell, pathCells, destination));
             }
             lines.add(line.toString());
         }
         return lines;
     }
 
-    private char glyphFor(RoomInstance room, AbstractCharacter viewer, HexCoordinate cell, Set<HexCoordinate> pathCells,
+    private char glyphFor(ZoneInstance zone, AbstractCharacter viewer, HexCoordinate cell, Set<HexCoordinate> pathCells,
             HexCoordinate destination) {
         if (cell.equals(viewer.getPosition())) {
             return '@';
         }
-        if (!room.isInBounds(cell)) {
+        if (!zone.isInBounds(cell)) {
             return '~';
         }
 
-        Optional<AbstractCharacter> occupant = room.occupantAt(cell);
+        Optional<AbstractCharacter> occupant = zone.occupantAt(cell);
         if (occupant.isPresent()) {
             return switch (occupant.get()) {
                 case CharacterInstance ignored -> 'p';
@@ -188,13 +188,13 @@ public record ViewAround(AbstractCharacter character) implements OutputTelnetMes
             // '*' est un glyphe interne, jamais affiché tel quel : Ansi.gridLine le
             // traduit en 'X' coloré comme un portail, pour que la case d'arrivée
             // reste cohérente visuellement quand elle est elle-même un portail.
-            return room.findPortalAt(cell).isPresent() ? '*' : 'X';
+            return zone.findPortalAt(cell).isPresent() ? '*' : 'X';
         }
         if (pathCells.contains(cell)) {
             return '-';
         }
 
-        if (room.findPortalAt(cell).isPresent()) {
+        if (zone.findPortalAt(cell).isPresent()) {
             return '#';
         }
 

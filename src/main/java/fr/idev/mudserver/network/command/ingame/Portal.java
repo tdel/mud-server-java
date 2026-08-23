@@ -6,7 +6,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.network.CommandHandler;
-import fr.idev.mudserver.domain.world.RoomPortal;
+import fr.idev.mudserver.domain.world.ZonePortal;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -34,13 +34,13 @@ public class Portal implements CommandHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
-        Optional<RoomPortal> portal = character.getCurrentRoom().findPortalAt(character.getPosition());
+        Optional<ZonePortal> portal = character.getCurrentZone().findPortalAt(character.getPosition());
         if (portal.isEmpty()) {
             connection.send(new NoPortalHere());
             return;
         }
 
-        character.moveToRoom(portal.get().targetRoom(), portal.get().targetCell());
+        character.moveToZone(portal.get().targetZone(), portal.get().targetCell());
         lookAction.onReceive(connection, "");
     }
 }

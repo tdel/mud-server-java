@@ -19,7 +19,7 @@ import fr.idev.mudserver.domain.actor.template.MonsterTemplate;
 import fr.idev.mudserver.domain.actor.template.MonsterTemplate.LootTableEntry;
 import fr.idev.mudserver.domain.item.ItemTemplate;
 import fr.idev.mudserver.domain.MonsterSpawn;
-import fr.idev.mudserver.domain.world.RoomInstance;
+import fr.idev.mudserver.domain.world.ZoneInstance;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -52,21 +52,21 @@ public class MonsterCatalog {
         }
     }
 
-    public void placeMonsters(Collection<RoomInstance> rooms) {
+    public void placeMonsters(Collection<ZoneInstance> zones) {
         int placedCount = 0;
-        for (RoomInstance room : rooms) {
-            for (MonsterSpawn spawn : room.getMonsterSpawns()) {
+        for (ZoneInstance zone : zones) {
+            for (MonsterSpawn spawn : zone.getMonsterSpawns()) {
                 MonsterTemplate template = templates.get(spawn.templateId());
                 if (template == null) {
-                    throw new IllegalStateException("Spawn " + spawn.id() + " de la room " + room.getId()
+                    throw new IllegalStateException("Spawn " + spawn.id() + " de la zone " + zone.getId()
                             + " référence le template " + spawn.templateId() + ", absent de " + MONSTERS_RESOURCE);
                 }
 
                 MonsterInstance monster = new MonsterInstance(spawn.id(), template.getName(), template.getId(),
-                        room.getId(), template.getAttributes(), template.getMaxHealth(), spawn.cell());
+                        zone.getId(), template.getAttributes(), template.getMaxHealth(), spawn.cell());
                 monster.attachTemplate(template);
-                monster.setCurrentRoom(room);
-                room.placeMonster(monster, spawn.cell());
+                monster.setCurrentZone(zone);
+                zone.placeMonster(monster, spawn.cell());
                 placedCount++;
             }
         }

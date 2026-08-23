@@ -39,7 +39,7 @@ public final class Ansi {
         };
     }
 
-    public static String room(String name) {
+    public static String zone(String name) {
         return wrap(name, AnsiColor.BOLD, AnsiColor.BLUE);
     }
 
@@ -88,8 +88,8 @@ public final class Ansi {
                 case 'p' -> player(String.valueOf(c));
                 case 'm' -> monster(String.valueOf(c));
                 case 'n' -> npc(String.valueOf(c));
-                case '#' -> room(String.valueOf(c));
-                case '*' -> room(String.valueOf('X')); // case d'arrivée sur un portail : même couleur qu'un portail
+                case '#' -> zone(String.valueOf(c));
+                case '*' -> zone(String.valueOf('X')); // case d'arrivée sur un portail : même couleur qu'un portail
                 default -> String.valueOf(c);
             });
         }
@@ -106,7 +106,7 @@ public final class Ansi {
                 case "p" -> player(glyph);
                 case "m" -> monster(glyph);
                 case "n" -> npc(glyph);
-                case "#" -> room(glyph);
+                case "#" -> zone(glyph);
                 default -> glyph;
             };
             matcher.appendReplacement(result, Matcher.quoteReplacement(colored + " = "));

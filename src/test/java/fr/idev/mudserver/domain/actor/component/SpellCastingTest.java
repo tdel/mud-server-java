@@ -25,8 +25,8 @@ import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.map.HexCoordinate;
-import fr.idev.mudserver.domain.world.RoomInstance;
-import fr.idev.mudserver.domain.world.RoomTemplate;
+import fr.idev.mudserver.domain.world.ZoneInstance;
+import fr.idev.mudserver.domain.world.ZoneTemplate;
 import fr.idev.mudserver.domain.world.WorldInstance;
 
 class SpellCastingTest {
@@ -40,9 +40,9 @@ class SpellCastingTest {
     private CharacterInstance newCharacter(String name, CharacterClass characterClass, int currentHealth,
             int maxHealth) {
         WorldInstance world = new WorldInstance(UUID.randomUUID(), UUID.randomUUID(), Instant.now());
-        RoomTemplate roomTemplate = new RoomTemplate(UUID.randomUUID(), "Room", "desc", true, 3, 3,
+        ZoneTemplate zoneTemplate = new ZoneTemplate(UUID.randomUUID(), "Zone", "desc", true, 3, 3,
                 new HexCoordinate(0, 0), List.of());
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), roomTemplate, world);
+        ZoneInstance zone = new ZoneInstance(UUID.randomUUID(), zoneTemplate, world);
         Account account = new Account(UUID.randomUUID(), "login", "hash", null);
 
         Map<Attribute, Integer> attributes = new EnumMap<>(Attribute.class);
@@ -50,7 +50,7 @@ class SpellCastingTest {
             attributes.put(attribute, 14);
         }
 
-        return new CharacterInstance(UUID.randomUUID(), account, name, room, Gender.MAN, Race.HUMAN, characterClass, 1,
+        return new CharacterInstance(UUID.randomUUID(), account, name, zone, Gender.MAN, Race.HUMAN, characterClass, 1,
                 currentHealth, maxHealth, attributes, 0, 0);
     }
 

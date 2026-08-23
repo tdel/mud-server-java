@@ -42,7 +42,7 @@ public class Examine implements CommandHandler {
             return;
         }
 
-        Optional<AbstractCharacter> target = character.getCurrentRoom().findOccupantByName(name);
+        Optional<AbstractCharacter> target = character.getCurrentZone().findOccupantByName(name);
 
         if (target.isEmpty()) {
             connection.send(new TargetNotFound(name));

@@ -30,7 +30,7 @@ public class WorldInstance {
     private final UUID worldTemplateId;
     private final Instant createdAt;
 
-    private Map<UUID, RoomInstance> roomInstances = Map.of();
+    private Map<UUID, ZoneInstance> zoneInstances = Map.of();
 
     private final Map<UUID, CharacterInstance> players = new ConcurrentHashMap<>();
 
@@ -52,24 +52,24 @@ public class WorldInstance {
         return createdAt;
     }
 
-    public void setRoomInstances(Map<UUID, RoomInstance> roomInstances) {
-        this.roomInstances = Map.copyOf(roomInstances);
+    public void setZoneInstances(Map<UUID, ZoneInstance> zoneInstances) {
+        this.zoneInstances = Map.copyOf(zoneInstances);
     }
 
     public boolean isMaterialized() {
-        return !roomInstances.isEmpty();
+        return !zoneInstances.isEmpty();
     }
 
-    public Collection<RoomInstance> roomInstances() {
-        return roomInstances.values();
+    public Collection<ZoneInstance> zoneInstances() {
+        return zoneInstances.values();
     }
 
-    public Optional<RoomInstance> roomInstanceForTemplate(UUID roomTemplateId) {
-        return Optional.ofNullable(roomInstances.get(roomTemplateId));
+    public Optional<ZoneInstance> zoneInstanceForTemplate(UUID zoneTemplateId) {
+        return Optional.ofNullable(zoneInstances.get(zoneTemplateId));
     }
 
-    public Optional<RoomInstance> startingRoomInstance() {
-        return roomInstances.values().stream().filter(room -> Boolean.TRUE.equals(room.isStartingRoom())).findFirst();
+    public Optional<ZoneInstance> startingZoneInstance() {
+        return zoneInstances.values().stream().filter(zone -> Boolean.TRUE.equals(zone.isStartingZone())).findFirst();
     }
 
     public void addPlayer(CharacterInstance character) {
@@ -90,8 +90,8 @@ public class WorldInstance {
 
     public CharacterInstance createCharacter(Account account, String name, Gender gender, Race race,
             CharacterClass characterClass) {
-        RoomInstance startingRoom = startingRoomInstance()
-                .orElseThrow(() -> new IllegalStateException("WorldInstance " + id + " n'a aucune room de départ"));
+        ZoneInstance startingZone = startingZoneInstance()
+                .orElseThrow(() -> new IllegalStateException("WorldInstance " + id + " n'a aucune zone de départ"));
 
         Map<Attribute, Integer> scores = rollAttributeScores();
         for (Map.Entry<Attribute, Integer> bonus : race.attributeScoreBonuses().entrySet()) {
@@ -108,7 +108,7 @@ public class WorldInstance {
 
         int startingMana = characterClass.manaGainPerLevel();
 
-        CharacterInstance character = new CharacterInstance(UUID.randomUUID(), account, name, startingRoom, gender,
+        CharacterInstance character = new CharacterInstance(UUID.randomUUID(), account, name, startingZone, gender,
                 race, characterClass, 1, maxHealth, maxHealth, scores, 0, gold, 0, startingMana, startingMana);
         character.setWorldInstance(this);
 
@@ -118,8 +118,8 @@ public class WorldInstance {
     }
 
     public void broadcast(OutputMessage message, CharacterInstance exclude) {
-        for (RoomInstance room : this.roomInstances()) {
-            room.broadcast(message, exclude);
+        for (ZoneInstance zone : this.zoneInstances()) {
+            zone.broadcast(message, exclude);
         }
     }
 

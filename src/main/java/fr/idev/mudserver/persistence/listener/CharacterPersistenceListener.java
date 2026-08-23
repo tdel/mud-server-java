@@ -18,7 +18,7 @@ import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUsedManaPotion;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUsedPotion;
 import fr.idev.mudserver.domain.actor.event.NewGamePlayerCreated;
-import fr.idev.mudserver.domain.world.RoomInstance;
+import fr.idev.mudserver.domain.world.ZoneInstance;
 import fr.idev.mudserver.game.catalog.LevelCatalog;
 import fr.idev.mudserver.network.message.ingame.GoldLooted;
 import fr.idev.mudserver.network.message.ingame.GoldSpent;
@@ -69,7 +69,7 @@ public class CharacterPersistenceListener {
     @EventListener
     void onCharacterLeveledUp(CharacterLeveledUp event) {
         CharacterInstance character = event.character();
-        character.getCurrentRoom().broadcast(new PlayerLeveledUp(character.getName(), event.newLevel()), null);
+        character.getCurrentZone().broadcast(new PlayerLeveledUp(character.getName(), event.newLevel()), null);
         log.info("character.leveled_up character={} newLevel={} hpGained={}", character.getName(), event.newLevel(),
                 event.hpGained());
     }
@@ -112,15 +112,15 @@ public class CharacterPersistenceListener {
     @Order(2)
     void onGamePlayerDied(GamePlayerDied event) {
         CharacterInstance character = event.character();
-        RoomInstance startingRoom = character.getWorldInstance().startingRoomInstance()
-                .orElseThrow(() -> new IllegalStateException("Aucune starting room configurée"));
+        ZoneInstance startingZone = character.getWorldInstance().startingZoneInstance()
+                .orElseThrow(() -> new IllegalStateException("Aucune starting zone configurée"));
 
         character.setCurrentHealth(character.getMaxHealth());
-        character.moveToRoom(startingRoom);
+        character.moveToZone(startingZone);
         characterDao.update(character);
 
-        character.send(new PlayerRespawned(startingRoom.getName()));
-        log.info("character.respawned character={} room={}", character.getName(), startingRoom.getName());
+        character.send(new PlayerRespawned(startingZone.getName()));
+        log.info("character.respawned character={} zone={}", character.getName(), startingZone.getName());
     }
 
     @EventListener

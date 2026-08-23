@@ -24,8 +24,8 @@ import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.NewGamePlayerCreated;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.map.HexCoordinate;
-import fr.idev.mudserver.domain.world.RoomInstance;
-import fr.idev.mudserver.domain.world.RoomTemplate;
+import fr.idev.mudserver.domain.world.ZoneInstance;
+import fr.idev.mudserver.domain.world.ZoneTemplate;
 import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.game.catalog.SpellCatalog;
 import fr.idev.mudserver.game.catalog.SpellCatalogHolder;
@@ -49,9 +49,9 @@ class SpellLearningEngineTest {
 
     private CharacterInstance newSorcerer(int level) {
         WorldInstance world = new WorldInstance(UUID.randomUUID(), UUID.randomUUID(), Instant.now());
-        RoomTemplate roomTemplate = new RoomTemplate(UUID.randomUUID(), "Room", "desc", true, 3, 3,
+        ZoneTemplate zoneTemplate = new ZoneTemplate(UUID.randomUUID(), "Zone", "desc", true, 3, 3,
                 new HexCoordinate(0, 0), List.of());
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), roomTemplate, world);
+        ZoneInstance zone = new ZoneInstance(UUID.randomUUID(), zoneTemplate, world);
         Account account = new Account(UUID.randomUUID(), "login", "hash", null);
 
         Map<Attribute, Integer> attributes = new EnumMap<>(Attribute.class);
@@ -59,7 +59,7 @@ class SpellLearningEngineTest {
             attributes.put(attribute, 14);
         }
 
-        return new CharacterInstance(UUID.randomUUID(), account, "Mage", room, Gender.WOMAN, Race.HUMAN,
+        return new CharacterInstance(UUID.randomUUID(), account, "Mage", zone, Gender.WOMAN, Race.HUMAN,
                 CharacterClass.SORCERER, level, 10, 10, attributes, 0, 0);
     }
 

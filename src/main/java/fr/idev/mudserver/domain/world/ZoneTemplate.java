@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class RoomTemplate {
+public class ZoneTemplate {
 
     public static final int DEFAULT_WIDTH = 16;
     public static final int DEFAULT_HEIGHT = 8;
@@ -15,19 +15,19 @@ public class RoomTemplate {
     private final UUID id;
     private final String name;
     private final String description;
-    private final Boolean isStartingRoom;
+    private final Boolean isStartingZone;
     private final int width;
     private final int height;
     private final HexCoordinate spawnCell;
     private final List<MonsterSpawn> monsterSpawns;
-    private List<RoomTemplatePortal> portals = List.of();
+    private List<ZoneTemplatePortal> portals = List.of();
 
-    public RoomTemplate(UUID id, String name, String description, Boolean isStartingRoom, int width, int height,
+    public ZoneTemplate(UUID id, String name, String description, Boolean isStartingZone, int width, int height,
             HexCoordinate spawnCell, List<MonsterSpawn> monsterSpawns) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.isStartingRoom = isStartingRoom;
+        this.isStartingZone = isStartingZone;
         this.width = width;
         this.height = height;
         this.spawnCell = spawnCell;
@@ -46,8 +46,8 @@ public class RoomTemplate {
         return description;
     }
 
-    public Boolean isStartingRoom() {
-        return isStartingRoom;
+    public Boolean isStartingZone() {
+        return isStartingZone;
     }
 
     public int getWidth() {
@@ -66,11 +66,11 @@ public class RoomTemplate {
         return monsterSpawns;
     }
 
-    public List<RoomTemplatePortal> getPortals() {
+    public List<ZoneTemplatePortal> getPortals() {
         return portals;
     }
 
-    public void setPortals(List<RoomTemplatePortal> portals) {
+    public void setPortals(List<ZoneTemplatePortal> portals) {
         this.portals = List.copyOf(portals);
     }
 
@@ -87,7 +87,7 @@ public class RoomTemplate {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof RoomTemplate other)) {
+        if (!(o instanceof ZoneTemplate other)) {
             return false;
         }
         return Objects.equals(id, other.id);
@@ -100,7 +100,7 @@ public class RoomTemplate {
 
     @Override
     public String toString() {
-        return "RoomTemplate[id=" + id + ", name=" + name + ", isStartingRoom=" + isStartingRoom + ", width=" + width
+        return "ZoneTemplate[id=" + id + ", name=" + name + ", isStartingZone=" + isStartingZone + ", width=" + width
                 + ", height=" + height + ", spawnCell=" + spawnCell + "]";
     }
 }

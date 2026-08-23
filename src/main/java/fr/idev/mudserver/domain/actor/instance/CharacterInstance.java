@@ -25,7 +25,7 @@ import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDamaged;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerEquippedItem;
-import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToRoom;
+import fr.idev.mudserver.domain.actor.event.GamePlayerMovedToZone;
 import fr.idev.mudserver.domain.actor.event.GamePlayerUnequippedItem;
 import fr.idev.mudserver.domain.actor.event.ItemDiscarded;
 import fr.idev.mudserver.domain.actor.event.ItemPurchased;
@@ -33,7 +33,7 @@ import fr.idev.mudserver.domain.actor.event.SpellCast;
 import fr.idev.mudserver.domain.item.EquipmentSlot;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.item.Item;
-import fr.idev.mudserver.domain.world.RoomInstance;
+import fr.idev.mudserver.domain.world.ZoneInstance;
 import fr.idev.mudserver.domain.item.WeaponCategory;
 import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.game.dice.CheckResult;
@@ -62,19 +62,19 @@ public final class CharacterInstance extends AbstractCharacter {
 
     public static final int MAX_SHORT_RESTS_BEFORE_LONG_REST = 2;
 
-    public CharacterInstance(UUID id, Account account, String name, RoomInstance room, Gender gender, Race race,
+    public CharacterInstance(UUID id, Account account, String name, ZoneInstance zone, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold) {
-        this(id, account, name, room, gender, race, characterClass, level, currentHealth, maxHealth, attributes, xp,
+        this(id, account, name, zone, gender, race, characterClass, level, currentHealth, maxHealth, attributes, xp,
                 gold, 0, 0, 0);
     }
 
-    public CharacterInstance(UUID id, Account account, String name, RoomInstance room, Gender gender, Race race,
+    public CharacterInstance(UUID id, Account account, String name, ZoneInstance zone, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold, int shortRestCount, int maxMana, int currentMana) {
         super(id, name, attributes, currentHealth, maxHealth);
         this.account = account;
-        setCurrentRoom(room);
+        setCurrentZone(zone);
         this.gender = gender;
         this.race = race;
         this.speed = race.speed();
@@ -97,8 +97,8 @@ public final class CharacterInstance extends AbstractCharacter {
         return account.getId();
     }
 
-    public UUID getCurrentRoomId() {
-        return getCurrentRoom().getTemplateId();
+    public UUID getCurrentZoneId() {
+        return getCurrentZone().getTemplateId();
     }
 
     public WorldInstance getWorldInstance() {
@@ -375,15 +375,15 @@ public final class CharacterInstance extends AbstractCharacter {
         return defeated;
     }
 
-    public void moveToRoom(RoomInstance destination) {
-        moveToRoom(destination, destination.getSpawnCell());
+    public void moveToZone(ZoneInstance destination) {
+        moveToZone(destination, destination.getSpawnCell());
     }
 
-    public void moveToRoom(RoomInstance destination, HexCoordinate targetCell) {
-        RoomInstance previous = getCurrentRoom();
+    public void moveToZone(ZoneInstance destination, HexCoordinate targetCell) {
+        ZoneInstance previous = getCurrentZone();
         previous.leave(this);
         destination.join(this, targetCell);
-        DomainEventPublisher.publish(new GamePlayerMovedToRoom(this, previous, destination));
+        DomainEventPublisher.publish(new GamePlayerMovedToZone(this, previous, destination));
     }
 
     public Optional<EquipmentSlot> equipItem(Item item) {
@@ -439,21 +439,21 @@ public final class CharacterInstance extends AbstractCharacter {
                 && getCurrentHealth() == other.getCurrentHealth() && getMaxHealth() == other.getMaxHealth()
                 && shortRestCount == other.shortRestCount && Objects.equals(getId(), other.getId())
                 && Objects.equals(getAccountId(), other.getAccountId()) && Objects.equals(getName(), other.getName())
-                && Objects.equals(getCurrentRoomId(), other.getCurrentRoomId()) && gender == other.gender
+                && Objects.equals(getCurrentZoneId(), other.getCurrentZoneId()) && gender == other.gender
                 && race == other.race && characterClass == other.characterClass
                 && Objects.equals(getAttributes(), other.getAttributes());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getAccountId(), getName(), getCurrentRoomId(), gender, race, characterClass, level,
+        return Objects.hash(getId(), getAccountId(), getName(), getCurrentZoneId(), gender, race, characterClass, level,
                 xp, inventory.getGold(), getCurrentHealth(), getMaxHealth(), shortRestCount, getAttributes());
     }
 
     @Override
     public String toString() {
-        return "GamePlayer[id=" + getId() + ", accountId=" + getAccountId() + ", name=" + getName() + ", currentRoomId="
-                + getCurrentRoomId() + ", gender=" + gender + ", race=" + race + ", characterClass=" + characterClass
+        return "GamePlayer[id=" + getId() + ", accountId=" + getAccountId() + ", name=" + getName() + ", currentZoneId="
+                + getCurrentZoneId() + ", gender=" + gender + ", race=" + race + ", characterClass=" + characterClass
                 + ", level=" + level + ", xp=" + xp + ", gold=" + inventory.getGold() + ", currentHealth="
                 + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + ", shortRestCount=" + shortRestCount
                 + ", attributes=" + getAttributes() + "]";

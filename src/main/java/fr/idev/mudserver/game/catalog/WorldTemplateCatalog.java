@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.item.ItemTemplate;
 import fr.idev.mudserver.domain.MonsterSpawn;
-import fr.idev.mudserver.domain.world.RoomTemplate;
-import fr.idev.mudserver.domain.world.RoomTemplatePortal;
+import fr.idev.mudserver.domain.world.ZoneTemplate;
+import fr.idev.mudserver.domain.world.ZoneTemplatePortal;
 import fr.idev.mudserver.domain.world.WorldTemplate;
 import fr.idev.mudserver.domain.world.WorldTemplateSummary;
 import fr.idev.mudserver.domain.actor.AbstractNpc;
@@ -123,56 +123,56 @@ public class WorldTemplateCatalog {
 
     private WorldTemplate loadWorldTemplate(WorldTemplateSummary summary, Map<UUID, ItemTemplate> itemTemplatesById) {
         String shortName = summary.shortName();
-        List<RoomDefinition> roomDefinitions = readJsonList(shortName, "rooms.json",
-                new TypeReference<List<RoomDefinition>>() {
+        List<ZoneDefinition> zoneDefinitions = readJsonList(shortName, "zones.json",
+                new TypeReference<List<ZoneDefinition>>() {
                 });
-        Map<UUID, RoomTemplate> roomTemplates = buildRoomTemplates(shortName, roomDefinitions);
+        Map<UUID, ZoneTemplate> zoneTemplates = buildZoneTemplates(shortName, zoneDefinitions);
 
         List<NpcDefinition> npcDefinitions = readJsonList(shortName, "npcs.json",
                 new TypeReference<List<NpcDefinition>>() {
                 });
-        Map<UUID, NpcTemplate> npcTemplates = buildNpcTemplates(shortName, npcDefinitions, roomTemplates,
+        Map<UUID, NpcTemplate> npcTemplates = buildNpcTemplates(shortName, npcDefinitions, zoneTemplates,
                 itemTemplatesById);
 
         WorldTemplate template = new WorldTemplate(summary.id(), shortName, summary.name(), summary.description(),
-                summary.minPlayers(), summary.maxPlayers(), roomTemplates, npcTemplates);
+                summary.minPlayers(), summary.maxPlayers(), zoneTemplates, npcTemplates);
 
-        log.info("world.template_loaded shortName={} id={} rooms={} npcs={}", shortName, template.getId(),
-                roomTemplates.size(), npcTemplates.size());
+        log.info("world.template_loaded shortName={} id={} zones={} npcs={}", shortName, template.getId(),
+                zoneTemplates.size(), npcTemplates.size());
         return template;
     }
 
-    Map<UUID, RoomTemplate> buildRoomTemplates(String shortName, List<RoomDefinition> definitions) {
-        long startingRoomCount = definitions.stream().filter(d -> Boolean.TRUE.equals(d.isStartingRoom())).count();
-        if (startingRoomCount != 1) {
-            throw new IllegalStateException("Le monde " + shortName + " doit avoir exactement une room isStartingRoom"
-                    + " (trouvé " + startingRoomCount + ")");
+    Map<UUID, ZoneTemplate> buildZoneTemplates(String shortName, List<ZoneDefinition> definitions) {
+        long startingZoneCount = definitions.stream().filter(d -> Boolean.TRUE.equals(d.isStartingZone())).count();
+        if (startingZoneCount != 1) {
+            throw new IllegalStateException("Le monde " + shortName + " doit avoir exactement une zone isStartingZone"
+                    + " (trouvé " + startingZoneCount + ")");
         }
 
-        Map<UUID, RoomTemplate> templates = new LinkedHashMap<>();
-        for (RoomDefinition definition : definitions) {
+        Map<UUID, ZoneTemplate> templates = new LinkedHashMap<>();
+        for (ZoneDefinition definition : definitions) {
             HexCoordinate spawnCell = new HexCoordinate(definition.spawnCell().q(), definition.spawnCell().r());
             if (definition.width() <= 0 || definition.height() <= 0) {
-                throw new IllegalStateException("Room " + definition.id() + " du monde " + shortName
+                throw new IllegalStateException("Zone " + definition.id() + " du monde " + shortName
                         + " a une grille invalide (" + definition.width() + "x" + definition.height() + ")");
             }
-            RoomTemplate template = new RoomTemplate(definition.id(), definition.name(), definition.description(),
-                    definition.isStartingRoom(), definition.width(), definition.height(), spawnCell,
+            ZoneTemplate template = new ZoneTemplate(definition.id(), definition.name(), definition.description(),
+                    definition.isStartingZone(), definition.width(), definition.height(), spawnCell,
                     definition.monsterSpawns().stream().map(spawn -> new MonsterSpawn(spawn.id(), spawn.templateId(),
                             new HexCoordinate(spawn.cell().q(), spawn.cell().r()))).toList());
             if (!template.isInBounds(spawnCell)) {
-                throw new IllegalStateException("Room " + definition.id() + " du monde " + shortName
+                throw new IllegalStateException("Zone " + definition.id() + " du monde " + shortName
                         + " a une case de spawn " + spawnCell + " hors des bornes de sa grille (" + definition.width()
                         + "x" + definition.height() + ")");
             }
             if (templates.putIfAbsent(template.getId(), template) != null) {
-                throw new IllegalStateException("Room " + definition.id() + " dupliquée dans le monde " + shortName);
+                throw new IllegalStateException("Zone " + definition.id() + " dupliquée dans le monde " + shortName);
             }
         }
 
-        for (RoomDefinition definition : definitions) {
-            RoomTemplate source = templates.get(definition.id());
-            List<RoomTemplatePortal> portals = definition.portals().stream()
+        for (ZoneDefinition definition : definitions) {
+            ZoneTemplate source = templates.get(definition.id());
+            List<ZoneTemplatePortal> portals = definition.portals().stream()
                     .map(portal -> resolvePortal(shortName, definition, source, portal, templates)).toList();
             checkNoDuplicatePortalCell(shortName, definition, portals);
             source.setPortals(portals);
@@ -181,53 +181,53 @@ public class WorldTemplateCatalog {
         return Map.copyOf(templates);
     }
 
-    private RoomTemplatePortal resolvePortal(String shortName, RoomDefinition definition, RoomTemplate source,
-            PortalDefinition portal, Map<UUID, RoomTemplate> templates) {
-        RoomTemplate target = templates.get(portal.targetRoomId());
+    private ZoneTemplatePortal resolvePortal(String shortName, ZoneDefinition definition, ZoneTemplate source,
+            PortalDefinition portal, Map<UUID, ZoneTemplate> templates) {
+        ZoneTemplate target = templates.get(portal.targetZoneId());
         if (target == null) {
-            throw new IllegalStateException("Room " + definition.id() + " du monde " + shortName + " a un portail '"
-                    + portal.direction() + "' vers " + portal.targetRoomId() + ", absente de ce monde");
+            throw new IllegalStateException("Zone " + definition.id() + " du monde " + shortName + " a un portail '"
+                    + portal.direction() + "' vers " + portal.targetZoneId() + ", absente de ce monde");
         }
 
         HexCoordinate cell = new HexCoordinate(portal.cell().q(), portal.cell().r());
         if (!source.isBorderCell(cell)) {
-            throw new IllegalStateException("Room " + definition.id() + " du monde " + shortName + " a un portail en "
+            throw new IllegalStateException("Zone " + definition.id() + " du monde " + shortName + " a un portail en "
                     + cell + " hors des bords de sa grille (" + source.getWidth() + "x" + source.getHeight() + ")");
         }
 
         HexCoordinate targetCell = new HexCoordinate(portal.targetCell().q(), portal.targetCell().r());
         if (!target.isInBounds(targetCell)) {
-            throw new IllegalStateException("Room " + definition.id() + " du monde " + shortName + " a un portail vers "
-                    + targetCell + " hors des bornes de la grille de la room cible " + portal.targetRoomId() + " ("
+            throw new IllegalStateException("Zone " + definition.id() + " du monde " + shortName + " a un portail vers "
+                    + targetCell + " hors des bornes de la grille de la zone cible " + portal.targetZoneId() + " ("
                     + target.getWidth() + "x" + target.getHeight() + ")");
         }
 
-        return new RoomTemplatePortal(cell, portal.direction(), target.getId(), targetCell);
+        return new ZoneTemplatePortal(cell, portal.direction(), target.getId(), targetCell);
     }
 
-    private void checkNoDuplicatePortalCell(String shortName, RoomDefinition definition,
-            List<RoomTemplatePortal> portals) {
-        long distinctCells = portals.stream().map(RoomTemplatePortal::cell).distinct().count();
+    private void checkNoDuplicatePortalCell(String shortName, ZoneDefinition definition,
+            List<ZoneTemplatePortal> portals) {
+        long distinctCells = portals.stream().map(ZoneTemplatePortal::cell).distinct().count();
         if (distinctCells != portals.size()) {
             throw new IllegalStateException(
-                    "Room " + definition.id() + " du monde " + shortName + " a plusieurs portails sur la même case");
+                    "Zone " + definition.id() + " du monde " + shortName + " a plusieurs portails sur la même case");
         }
     }
 
     Map<UUID, NpcTemplate> buildNpcTemplates(String shortName, List<NpcDefinition> definitions,
-            Map<UUID, RoomTemplate> roomTemplates, Map<UUID, ItemTemplate> itemTemplatesById) {
+            Map<UUID, ZoneTemplate> zoneTemplates, Map<UUID, ItemTemplate> itemTemplatesById) {
         Map<UUID, NpcTemplate> templates = new LinkedHashMap<>();
         for (NpcDefinition definition : definitions) {
-            RoomTemplate room = roomTemplates.get(definition.roomId());
-            if (room == null) {
+            ZoneTemplate zone = zoneTemplates.get(definition.zoneId());
+            if (zone == null) {
                 throw new IllegalStateException("NPC " + definition.id() + " du monde " + shortName
-                        + " référence la room " + definition.roomId() + ", absente de ce monde");
+                        + " référence la zone " + definition.zoneId() + ", absente de ce monde");
             }
 
             AbstractNpc.NpcDialogue dialogue = toDialogue(definition);
             NpcSellerInstance.NpcShop shop = toShop(shortName, definition, itemTemplatesById);
 
-            NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), definition.roomId(),
+            NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), definition.zoneId(),
                     new HexCoordinate(definition.cell().q(), definition.cell().r()), definition.description(), dialogue,
                     shop, definition.level());
             if (templates.putIfAbsent(template.id(), template) != null) {
@@ -318,7 +318,7 @@ public class WorldTemplateCatalog {
     record WorldManifestDefinition(UUID id, String name, String description, int minPlayers, int maxPlayers) {
     }
 
-    record RoomDefinition(UUID id, String name, String description, Boolean isStartingRoom, int width, int height,
+    record ZoneDefinition(UUID id, String name, String description, Boolean isStartingZone, int width, int height,
             CellDefinition spawnCell, List<PortalDefinition> portals, List<MonsterSpawnDefinition> monsterSpawns) {
     }
 
@@ -328,10 +328,10 @@ public class WorldTemplateCatalog {
     record MonsterSpawnDefinition(UUID id, UUID templateId, CellDefinition cell) {
     }
 
-    record PortalDefinition(CellDefinition cell, String direction, UUID targetRoomId, CellDefinition targetCell) {
+    record PortalDefinition(CellDefinition cell, String direction, UUID targetZoneId, CellDefinition targetCell) {
     }
 
-    record NpcDefinition(UUID id, String name, UUID roomId, CellDefinition cell, String description,
+    record NpcDefinition(UUID id, String name, UUID zoneId, CellDefinition cell, String description,
             DialogueDefinition dialogue, int level) {
     }
 

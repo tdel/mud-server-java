@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import fr.idev.mudserver.domain.actor.component.ActiveEffects;
 import fr.idev.mudserver.domain.map.HexCoordinate;
-import fr.idev.mudserver.domain.world.RoomInstance;
+import fr.idev.mudserver.domain.world.ZoneInstance;
 import fr.idev.mudserver.game.engine.MovementEngine;
 import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoller;
@@ -21,7 +21,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     private int currentHealth;
     private int maxHealth;
 
-    private volatile RoomInstance currentRoom;
+    private volatile ZoneInstance currentZone;
     private volatile HexCoordinate position;
     protected int speed = DEFAULT_SPEED;
     public volatile MovementEngine.ActiveMovement activeMovement;
@@ -80,12 +80,12 @@ public abstract class AbstractCharacter extends AbstractObject {
         return healed;
     }
 
-    public RoomInstance getCurrentRoom() {
-        return currentRoom;
+    public ZoneInstance getCurrentZone() {
+        return currentZone;
     }
 
-    public void setCurrentRoom(RoomInstance currentRoom) {
-        this.currentRoom = currentRoom;
+    public void setCurrentZone(ZoneInstance currentZone) {
+        this.currentZone = currentZone;
     }
 
     public HexCoordinate getPosition() {

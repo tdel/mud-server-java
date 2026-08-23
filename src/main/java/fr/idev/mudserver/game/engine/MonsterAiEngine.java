@@ -17,7 +17,7 @@ import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.map.HexDirection;
-import fr.idev.mudserver.domain.world.RoomInstance;
+import fr.idev.mudserver.domain.world.ZoneInstance;
 import fr.idev.mudserver.network.message.ingame.AttackReceived;
 import fr.idev.mudserver.network.message.ingame.MonsterGaveUpChase;
 import fr.idev.mudserver.network.message.ingame.MonsterStartedChasing;
@@ -81,9 +81,9 @@ public class MonsterAiEngine {
 
     private void tickChasing(MonsterInstance monster, PursuitState state, long now) {
         CharacterInstance target = state.target();
-        RoomInstance room = monster.getCurrentRoom();
+        ZoneInstance zone = monster.getCurrentZone();
 
-        if (target == null || target.getCurrentHealth() <= 0 || !room.isOccupant(target)) {
+        if (target == null || target.getCurrentHealth() <= 0 || !zone.isOccupant(target)) {
             giveUpChase(monster, target);
             return;
         }
@@ -138,14 +138,14 @@ public class MonsterAiEngine {
     }
 
     private boolean stepToward(MonsterInstance monster, HexCoordinate destination) {
-        RoomInstance room = monster.getCurrentRoom();
+        ZoneInstance zone = monster.getCurrentZone();
         HexCoordinate current = monster.getPosition();
         int bestDistance = current.distanceTo(destination);
         HexDirection bestDirection = null;
 
         for (HexDirection direction : HexDirection.values()) {
             HexCoordinate candidate = current.neighbor(direction);
-            if (!room.isInBounds(candidate)) {
+            if (!zone.isInBounds(candidate)) {
                 continue;
             }
             int candidateDistance = candidate.distanceTo(destination);
@@ -160,10 +160,10 @@ public class MonsterAiEngine {
         }
 
         HexCoordinate next = current.neighbor(bestDirection);
-        if (!room.tryClaimCell(next, monster)) {
+        if (!zone.tryClaimCell(next, monster)) {
             return false;
         }
-        room.releaseCell(current, monster);
+        zone.releaseCell(current, monster);
         monster.setPosition(next);
         return true;
     }

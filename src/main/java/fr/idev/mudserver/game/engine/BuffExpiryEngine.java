@@ -36,7 +36,7 @@ public class BuffExpiryEngine {
 
     @EventListener
     void onCharacterEffectExpired(CharacterEffectExpired event) {
-        event.character().getCurrentRoom()
+        event.character().getCurrentZone()
                 .broadcast(new SpellModifierExpired(event.character().getName(), event.effect().spellName()), null);
     }
 

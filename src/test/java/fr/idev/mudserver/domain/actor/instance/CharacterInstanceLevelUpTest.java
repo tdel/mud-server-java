@@ -20,8 +20,8 @@ import fr.idev.mudserver.domain.actor.Race;
 import fr.idev.mudserver.domain.actor.event.CharacterLeveledUp;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.map.HexCoordinate;
-import fr.idev.mudserver.domain.world.RoomInstance;
-import fr.idev.mudserver.domain.world.RoomTemplate;
+import fr.idev.mudserver.domain.world.ZoneInstance;
+import fr.idev.mudserver.domain.world.ZoneTemplate;
 import fr.idev.mudserver.domain.world.WorldInstance;
 
 class CharacterInstanceLevelUpTest {
@@ -36,9 +36,9 @@ class CharacterInstanceLevelUpTest {
 
     private CharacterInstance newFighter(int level, int currentHealth, int maxHealth) {
         WorldInstance world = new WorldInstance(UUID.randomUUID(), UUID.randomUUID(), Instant.now());
-        RoomTemplate roomTemplate = new RoomTemplate(UUID.randomUUID(), "Room", "desc", true, 3, 3,
+        ZoneTemplate zoneTemplate = new ZoneTemplate(UUID.randomUUID(), "Zone", "desc", true, 3, 3,
                 new HexCoordinate(0, 0), List.of());
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), roomTemplate, world);
+        ZoneInstance zone = new ZoneInstance(UUID.randomUUID(), zoneTemplate, world);
         Account account = new Account(UUID.randomUUID(), "login", "hash", null);
 
         Map<Attribute, Integer> attributes = new EnumMap<>(Attribute.class);
@@ -46,15 +46,15 @@ class CharacterInstanceLevelUpTest {
             attributes.put(attribute, 14);
         }
 
-        return new CharacterInstance(UUID.randomUUID(), account, "Hero", room, Gender.MAN, Race.HUMAN,
+        return new CharacterInstance(UUID.randomUUID(), account, "Hero", zone, Gender.MAN, Race.HUMAN,
                 CharacterClass.FIGHTER, level, currentHealth, maxHealth, attributes, 0, 0);
     }
 
     private CharacterInstance newSorcerer(int level, int currentHealth, int maxHealth) {
         WorldInstance world = new WorldInstance(UUID.randomUUID(), UUID.randomUUID(), Instant.now());
-        RoomTemplate roomTemplate = new RoomTemplate(UUID.randomUUID(), "Room", "desc", true, 3, 3,
+        ZoneTemplate zoneTemplate = new ZoneTemplate(UUID.randomUUID(), "Zone", "desc", true, 3, 3,
                 new HexCoordinate(0, 0), List.of());
-        RoomInstance room = new RoomInstance(UUID.randomUUID(), roomTemplate, world);
+        ZoneInstance zone = new ZoneInstance(UUID.randomUUID(), zoneTemplate, world);
         Account account = new Account(UUID.randomUUID(), "login", "hash", null);
 
         Map<Attribute, Integer> attributes = new EnumMap<>(Attribute.class);
@@ -62,7 +62,7 @@ class CharacterInstanceLevelUpTest {
             attributes.put(attribute, 14);
         }
 
-        return new CharacterInstance(UUID.randomUUID(), account, "Mage", room, Gender.WOMAN, Race.HUMAN,
+        return new CharacterInstance(UUID.randomUUID(), account, "Mage", zone, Gender.WOMAN, Race.HUMAN,
                 CharacterClass.SORCERER, level, currentHealth, maxHealth, attributes, 0, 0);
     }
 

@@ -44,13 +44,13 @@ public class Attack implements CommandHandler {
                 connection.send(new NoTargetSelected());
                 return;
             }
-            if (!character.getCurrentRoom().isOccupant(target)) {
+            if (!character.getCurrentZone().isOccupant(target)) {
                 combat.setTarget(null);
                 connection.send(new TargetNotFound(target.getName()));
                 return;
             }
         } else {
-            Optional<AbstractCharacter> found = character.getCurrentRoom().findAttackableByName(name, character);
+            Optional<AbstractCharacter> found = character.getCurrentZone().findAttackableByName(name, character);
             if (found.isEmpty()) {
                 connection.send(new TargetNotFound(name));
                 return;

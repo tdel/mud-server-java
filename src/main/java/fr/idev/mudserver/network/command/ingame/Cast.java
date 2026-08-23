@@ -71,7 +71,7 @@ public class Cast implements CommandHandler {
         if (selfTargetedByDefault && targetName.isEmpty()) {
             target = character;
         } else if (!targetName.isEmpty()) {
-            Optional<AbstractCharacter> found = character.getCurrentRoom().findAttackableByName(targetName, character);
+            Optional<AbstractCharacter> found = character.getCurrentZone().findAttackableByName(targetName, character);
             if (found.isEmpty()) {
                 connection.send(new TargetNotFound(targetName));
                 return;
@@ -105,7 +105,7 @@ public class Cast implements CommandHandler {
 
         if (spell.effect() == SpellEffectType.BUFF || spell.effect() == SpellEffectType.DEBUFF) {
             boolean beneficial = spell.effect() == SpellEffectType.BUFF;
-            character.getCurrentRoom().broadcast(
+            character.getCurrentZone().broadcast(
                     new SpellModifierAnnounced(character.getName(), spell.name(), target.getName(), target == character,
                             beneficial, outcome.hit(), spell.modifiedStat(), outcome.amount(), spell.durationSeconds()),
                     null);

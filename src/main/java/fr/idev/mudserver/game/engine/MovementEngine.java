@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.map.HexDirection;
-import fr.idev.mudserver.domain.world.RoomInstance;
+import fr.idev.mudserver.domain.world.ZoneInstance;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,18 +95,18 @@ public class MovementEngine {
     }
 
     private CellStepOutcome move(AbstractCharacter character, HexDirection direction) {
-        RoomInstance room = character.getCurrentRoom();
+        ZoneInstance zone = character.getCurrentZone();
         HexCoordinate current = character.getPosition();
         HexCoordinate next = current.neighbor(direction);
 
-        if (!room.isInBounds(next)) {
+        if (!zone.isInBounds(next)) {
             return new CellStepOutcome(false, true, false);
         }
-        if (!room.tryClaimCell(next, character)) {
+        if (!zone.tryClaimCell(next, character)) {
             return new CellStepOutcome(false, false, true);
         }
 
-        room.releaseCell(current, character);
+        zone.releaseCell(current, character);
         character.setPosition(next);
 
         return new CellStepOutcome(true, false, false);

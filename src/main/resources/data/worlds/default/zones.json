@@ -3,16 +3,16 @@
         "id": "5e4ada37-37e1-438c-9233-581f10c055c7",
         "name": "Place du village",
         "description": "Une place pavée au centre du village. Une fontaine gargouille en son centre.",
-        "isStartingRoom": true,
+        "isStartingZone": true,
         "width": 16,
         "height": 8,
         "spawnCell": { "q": 8, "r": 4 },
         "monsterSpawns": [],
         "portals": [
-            { "cell": {"q":15,"r":0}, "direction": "NE", "targetRoomId": "9a884ac7-b954-4cd6-ab67-c677d472cb0f", "targetCell": {"q":0,"r":7} },
-            { "cell": {"q":15,"r":4}, "direction": "E", "targetRoomId": "e1da77bd-f0b3-4d5a-95da-e8765c4fc973", "targetCell": {"q":0,"r":4} },
-            { "cell": {"q":0,"r":4}, "direction": "W", "targetRoomId": "82affabe-27e7-425c-87aa-e63f9b826513", "targetCell": {"q":15,"r":4} },
-            { "cell": {"q":0,"r":7}, "direction": "SW", "targetRoomId": "4dae9974-45f7-46c9-8e66-12cdac759860", "targetCell": {"q":15,"r":0} }
+            { "cell": {"q":15,"r":0}, "direction": "NE", "targetZoneId": "9a884ac7-b954-4cd6-ab67-c677d472cb0f", "targetCell": {"q":0,"r":7} },
+            { "cell": {"q":15,"r":4}, "direction": "E", "targetZoneId": "e1da77bd-f0b3-4d5a-95da-e8765c4fc973", "targetCell": {"q":0,"r":4} },
+            { "cell": {"q":0,"r":4}, "direction": "W", "targetZoneId": "82affabe-27e7-425c-87aa-e63f9b826513", "targetCell": {"q":15,"r":4} },
+            { "cell": {"q":0,"r":7}, "direction": "SW", "targetZoneId": "4dae9974-45f7-46c9-8e66-12cdac759860", "targetCell": {"q":15,"r":0} }
         ]
     },
     {
@@ -27,8 +27,8 @@
             { "id": "4f1d327c-afc6-4986-998e-06cfed4f61d8", "templateId": "026ce1a2-091d-4179-b715-65006480cfbe", "cell": { "q": 12, "r": 2 } }
         ],
         "portals": [
-            { "cell": {"q":0,"r":7}, "direction": "SW", "targetRoomId": "5e4ada37-37e1-438c-9233-581f10c055c7", "targetCell": {"q":15,"r":0} },
-            { "cell": {"q":15,"r":4}, "direction": "E", "targetRoomId": "7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5", "targetCell": {"q":0,"r":4} }
+            { "cell": {"q":0,"r":7}, "direction": "SW", "targetZoneId": "5e4ada37-37e1-438c-9233-581f10c055c7", "targetCell": {"q":15,"r":0} },
+            { "cell": {"q":15,"r":4}, "direction": "E", "targetZoneId": "7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5", "targetCell": {"q":0,"r":4} }
         ]
     },
     {
@@ -42,7 +42,7 @@
             { "id": "e4f86247-f78c-4e4d-be31-5b2c6e959c2d", "templateId": "dcff9d89-1f33-41e2-8011-e5b3b7092f0d", "cell": { "q": 12, "r": 6 } }
         ],
         "portals": [
-            { "cell": {"q":0,"r":4}, "direction": "W", "targetRoomId": "5e4ada37-37e1-438c-9233-581f10c055c7", "targetCell": {"q":15,"r":4} }
+            { "cell": {"q":0,"r":4}, "direction": "W", "targetZoneId": "5e4ada37-37e1-438c-9233-581f10c055c7", "targetCell": {"q":15,"r":4} }
         ]
     },
     {
@@ -58,8 +58,8 @@
             { "id": "2a3e9829-d00b-444e-a2a7-d7750beecfb8", "templateId": "49e91691-3a13-4e2b-967f-bc1acf8cf03a", "cell": { "q": 8, "r": 6 } }
         ],
         "portals": [
-            { "cell": {"q":0,"r":4}, "direction": "W", "targetRoomId": "9a884ac7-b954-4cd6-ab67-c677d472cb0f", "targetCell": {"q":15,"r":4} },
-            { "cell": {"q":15,"r":0}, "direction": "NE", "targetRoomId": "8203e5a0-9fa2-4799-a6d8-398b11292c17", "targetCell": {"q":0,"r":7} }
+            { "cell": {"q":0,"r":4}, "direction": "W", "targetZoneId": "9a884ac7-b954-4cd6-ab67-c677d472cb0f", "targetCell": {"q":15,"r":4} },
+            { "cell": {"q":15,"r":0}, "direction": "NE", "targetZoneId": "8203e5a0-9fa2-4799-a6d8-398b11292c17", "targetCell": {"q":0,"r":7} }
         ]
     },
     {
@@ -71,8 +71,8 @@
         "spawnCell": { "q": 8, "r": 4 },
         "monsterSpawns": [],
         "portals": [
-            { "cell": {"q":15,"r":4}, "direction": "E", "targetRoomId": "5e4ada37-37e1-438c-9233-581f10c055c7", "targetCell": {"q":0,"r":4} },
-            { "cell": {"q":15,"r":0}, "direction": "NE", "targetRoomId": "21a9aa96-286e-4ea7-ac3b-9e6ab58b323c", "targetCell": {"q":0,"r":7} }
+            { "cell": {"q":15,"r":4}, "direction": "E", "targetZoneId": "5e4ada37-37e1-438c-9233-581f10c055c7", "targetCell": {"q":0,"r":4} },
+            { "cell": {"q":15,"r":0}, "direction": "NE", "targetZoneId": "21a9aa96-286e-4ea7-ac3b-9e6ab58b323c", "targetCell": {"q":0,"r":7} }
         ]
     },
     {
@@ -84,7 +84,7 @@
         "spawnCell": { "q": 8, "r": 4 },
         "monsterSpawns": [],
         "portals": [
-            { "cell": {"q":0,"r":7}, "direction": "SW", "targetRoomId": "82affabe-27e7-425c-87aa-e63f9b826513", "targetCell": {"q":15,"r":0} }
+            { "cell": {"q":0,"r":7}, "direction": "SW", "targetZoneId": "82affabe-27e7-425c-87aa-e63f9b826513", "targetCell": {"q":15,"r":0} }
         ]
     },
     {
@@ -98,8 +98,8 @@
             { "id": "7c799ffd-da9d-423e-a835-501c496059bb", "templateId": "f6630034-a160-4ffc-888e-eb2fee9d9428", "cell": { "q": 4, "r": 6 } }
         ],
         "portals": [
-            { "cell": {"q":15,"r":0}, "direction": "NE", "targetRoomId": "5e4ada37-37e1-438c-9233-581f10c055c7", "targetCell": {"q":0,"r":7} },
-            { "cell": {"q":0,"r":7}, "direction": "SW", "targetRoomId": "a73e8fb0-c05b-4aa8-9c57-4b097644cd0d", "targetCell": {"q":15,"r":0} }
+            { "cell": {"q":15,"r":0}, "direction": "NE", "targetZoneId": "5e4ada37-37e1-438c-9233-581f10c055c7", "targetCell": {"q":0,"r":7} },
+            { "cell": {"q":0,"r":7}, "direction": "SW", "targetZoneId": "a73e8fb0-c05b-4aa8-9c57-4b097644cd0d", "targetCell": {"q":15,"r":0} }
         ]
     },
     {
@@ -111,7 +111,7 @@
         "spawnCell": { "q": 8, "r": 4 },
         "monsterSpawns": [],
         "portals": [
-            { "cell": {"q":15,"r":0}, "direction": "NE", "targetRoomId": "4dae9974-45f7-46c9-8e66-12cdac759860", "targetCell": {"q":0,"r":7} }
+            { "cell": {"q":15,"r":0}, "direction": "NE", "targetZoneId": "4dae9974-45f7-46c9-8e66-12cdac759860", "targetCell": {"q":0,"r":7} }
         ]
     },
     {
@@ -123,8 +123,8 @@
         "spawnCell": { "q": 8, "r": 4 },
         "monsterSpawns": [],
         "portals": [
-            { "cell": {"q":0,"r":7}, "direction": "SW", "targetRoomId": "7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5", "targetCell": {"q":15,"r":0} },
-            { "cell": {"q":15,"r":4}, "direction": "E", "targetRoomId": "6aade027-6918-4521-925d-86529ac4657e", "targetCell": {"q":0,"r":4} }
+            { "cell": {"q":0,"r":7}, "direction": "SW", "targetZoneId": "7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5", "targetCell": {"q":15,"r":0} },
+            { "cell": {"q":15,"r":4}, "direction": "E", "targetZoneId": "6aade027-6918-4521-925d-86529ac4657e", "targetCell": {"q":0,"r":4} }
         ]
     },
     {
@@ -136,7 +136,7 @@
         "spawnCell": { "q": 8, "r": 4 },
         "monsterSpawns": [],
         "portals": [
-            { "cell": {"q":0,"r":4}, "direction": "W", "targetRoomId": "8203e5a0-9fa2-4799-a6d8-398b11292c17", "targetCell": {"q":15,"r":4} }
+            { "cell": {"q":0,"r":4}, "direction": "W", "targetZoneId": "8203e5a0-9fa2-4799-a6d8-398b11292c17", "targetCell": {"q":15,"r":4} }
         ]
     }
 ]

@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import fr.idev.mudserver.domain.world.RoomInstance;
+import fr.idev.mudserver.domain.world.ZoneInstance;
 import fr.idev.mudserver.domain.actor.template.NpcTemplate;
 
 public class AbstractNpc extends AbstractCharacter {
@@ -16,10 +16,10 @@ public class AbstractNpc extends AbstractCharacter {
 
     private final NpcTemplate template;
 
-    public AbstractNpc(UUID id, NpcTemplate template, RoomInstance room) {
+    public AbstractNpc(UUID id, NpcTemplate template, ZoneInstance zone) {
         super(id, template.name(), neutralAttributes(), NOMINAL_HEALTH, NOMINAL_HEALTH);
         this.template = Objects.requireNonNull(template);
-        setCurrentRoom(Objects.requireNonNull(room));
+        setCurrentZone(Objects.requireNonNull(zone));
         this.speed = 0;
     }
 
@@ -56,17 +56,17 @@ public class AbstractNpc extends AbstractCharacter {
             return false;
         }
         return Objects.equals(getId(), other.getId()) && Objects.equals(getName(), other.getName())
-                && Objects.equals(getCurrentRoom(), other.getCurrentRoom());
+                && Objects.equals(getCurrentZone(), other.getCurrentZone());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getCurrentRoom());
+        return Objects.hash(getId(), getName(), getCurrentZone());
     }
 
     @Override
     public String toString() {
-        return "GameNpc[id=" + getId() + ", name=" + getName() + ", roomId=" + getCurrentRoom().getId() + "]";
+        return "GameNpc[id=" + getId() + ", name=" + getName() + ", zoneId=" + getCurrentZone().getId() + "]";
     }
 
     public enum NpcDialogueOptionType {

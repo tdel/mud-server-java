@@ -19,18 +19,18 @@ import fr.idev.mudserver.game.dice.DiceRoller;
 public final class MonsterInstance extends AbstractCharacter {
 
     private final UUID templateId;
-    private final UUID roomId;
+    private final UUID zoneId;
     private final HexCoordinate spawnCell;
 
     private MonsterTemplate template;
 
     public volatile MonsterAiEngine.PursuitState pursuit;
 
-    public MonsterInstance(UUID id, String name, UUID templateId, UUID roomId, Map<Attribute, Integer> attributes,
+    public MonsterInstance(UUID id, String name, UUID templateId, UUID zoneId, Map<Attribute, Integer> attributes,
             int maxHealth, HexCoordinate spawnCell) {
         super(id, name, attributes, maxHealth, maxHealth);
         this.templateId = templateId;
-        this.roomId = roomId;
+        this.zoneId = zoneId;
         this.spawnCell = spawnCell;
     }
 
@@ -128,8 +128,8 @@ public final class MonsterInstance extends AbstractCharacter {
         return templateId;
     }
 
-    public UUID getRoomId() {
-        return roomId;
+    public UUID getZoneId() {
+        return zoneId;
     }
 
     public HexCoordinate getSpawnCell() {
@@ -146,19 +146,19 @@ public final class MonsterInstance extends AbstractCharacter {
         }
         return getCurrentHealth() == other.getCurrentHealth() && getMaxHealth() == other.getMaxHealth()
                 && Objects.equals(getId(), other.getId()) && Objects.equals(getName(), other.getName())
-                && Objects.equals(templateId, other.templateId) && Objects.equals(roomId, other.roomId)
+                && Objects.equals(templateId, other.templateId) && Objects.equals(zoneId, other.zoneId)
                 && Objects.equals(spawnCell, other.spawnCell) && Objects.equals(getAttributes(), other.getAttributes());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), templateId, roomId, spawnCell, getAttributes(), getCurrentHealth(),
+        return Objects.hash(getId(), getName(), templateId, zoneId, spawnCell, getAttributes(), getCurrentHealth(),
                 getMaxHealth());
     }
 
     @Override
     public String toString() {
-        return "GameMonster[id=" + getId() + ", name=" + getName() + ", templateId=" + templateId + ", roomId=" + roomId
+        return "GameMonster[id=" + getId() + ", name=" + getName() + ", templateId=" + templateId + ", zoneId=" + zoneId
                 + ", spawnCell=" + spawnCell + ", currentHealth=" + getCurrentHealth() + ", maxHealth=" + getMaxHealth()
                 + "]";
     }

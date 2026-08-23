@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
-import fr.idev.mudserver.domain.world.RoomInstance;
+import fr.idev.mudserver.domain.world.ZoneInstance;
 import fr.idev.mudserver.network.message.ingame.GamePlayerDefeated;
 import fr.idev.mudserver.network.message.ingame.MonsterDefeated;
 import org.slf4j.Logger;
@@ -66,21 +66,21 @@ public class RegenHealthEngine {
     @EventListener
     @Transactional
     void onCharacterDied(CharacterDied event) {
-        RoomInstance room = event.character().getCurrentRoom();
-        room.removeMonster(event.character());
-        room.broadcast(new MonsterDefeated(event.character().getName()), null);
-        log.info("regenhp.monster_removed_from_room monster={} room={}", event.character().getName(), room.getName());
+        ZoneInstance zone = event.character().getCurrentZone();
+        zone.removeMonster(event.character());
+        zone.broadcast(new MonsterDefeated(event.character().getName()), null);
+        log.info("regenhp.monster_removed_from_zone monster={} zone={}", event.character().getName(), zone.getName());
 
         event.character().getTemplate().grantLootTo(event.killer());
     }
 
     @EventListener
     void onGamePlayerDied(GamePlayerDied event) {
-        RoomInstance room = event.character().getCurrentRoom();
-        room.broadcast(new GamePlayerDefeated(event.character().getName(), event.killer().getName()),
+        ZoneInstance zone = event.character().getCurrentZone();
+        zone.broadcast(new GamePlayerDefeated(event.character().getName(), event.killer().getName()),
                 event.character());
-        log.info("regenhp.player_defeated character={} killer={} room={}", event.character().getName(),
-                event.killer().getName(), room.getName());
+        log.info("regenhp.player_defeated character={} killer={} zone={}", event.character().getName(),
+                event.killer().getName(), zone.getName());
     }
 
     private record RegenState(CharacterInstance character, long lastRegenAt) {

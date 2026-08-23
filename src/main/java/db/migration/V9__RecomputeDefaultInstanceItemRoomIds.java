@@ -10,8 +10,8 @@ import java.util.UUID;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
-import fr.idev.mudserver.domain.world.RoomInstance;
 import fr.idev.mudserver.domain.world.WorldInstance;
+import fr.idev.mudserver.domain.world.ZoneInstance;
 
 public class V9__RecomputeDefaultInstanceItemRoomIds extends BaseJavaMigration {
 
@@ -26,7 +26,7 @@ public class V9__RecomputeDefaultInstanceItemRoomIds extends BaseJavaMigration {
             while (rs.next()) {
                 UUID itemId = UUID.fromString(rs.getString("id"));
                 UUID oldRoomId = UUID.fromString(rs.getString("room_id"));
-                UUID newRoomId = RoomInstance.deterministicId(WorldInstance.DEFAULT_ID, oldRoomId);
+                UUID newRoomId = ZoneInstance.deterministicId(WorldInstance.DEFAULT_ID, oldRoomId);
                 updates.add(new Object[]{itemId, newRoomId});
             }
         }

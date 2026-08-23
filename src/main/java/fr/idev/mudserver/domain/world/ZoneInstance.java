@@ -17,21 +17,21 @@ import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.actor.AbstractNpc;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
-import fr.idev.mudserver.domain.actor.event.GamePlayerSpawnedToRoom;
+import fr.idev.mudserver.domain.actor.event.GamePlayerSpawnedToZone;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.network.OutputMessage;
 import fr.idev.mudserver.network.message.ingame.GamePlayerDisconnected;
-import fr.idev.mudserver.network.message.ingame.GamePlayerJoinedRoom;
-import fr.idev.mudserver.network.message.ingame.GamePlayerLeftRoom;
+import fr.idev.mudserver.network.message.ingame.GamePlayerJoinedZone;
+import fr.idev.mudserver.network.message.ingame.GamePlayerLeftZone;
 
-public class RoomInstance {
+public class ZoneInstance {
 
-    public static UUID deterministicId(UUID worldInstanceId, UUID roomTemplateId) {
-        return UUID.nameUUIDFromBytes((worldInstanceId + ":" + roomTemplateId).getBytes(StandardCharsets.UTF_8));
+    public static UUID deterministicId(UUID worldInstanceId, UUID zoneTemplateId) {
+        return UUID.nameUUIDFromBytes((worldInstanceId + ":" + zoneTemplateId).getBytes(StandardCharsets.UTF_8));
     }
 
     private final UUID id;
-    private final RoomTemplate template;
+    private final ZoneTemplate template;
     private final WorldInstance worldInstance;
 
     private final Map<UUID, CharacterInstance> clients = new ConcurrentHashMap<>();
@@ -39,7 +39,7 @@ public class RoomInstance {
     private final List<AbstractNpc> npcs = new CopyOnWriteArrayList<>();
     private final Map<HexCoordinate, AbstractCharacter> occupants = new ConcurrentHashMap<>();
 
-    public RoomInstance(UUID id, RoomTemplate template, WorldInstance worldInstance) {
+    public ZoneInstance(UUID id, ZoneTemplate template, WorldInstance worldInstance) {
         this.id = id;
         this.template = template;
         this.worldInstance = worldInstance;
@@ -69,8 +69,8 @@ public class RoomInstance {
         return template.getDescription();
     }
 
-    public Boolean isStartingRoom() {
-        return template.isStartingRoom();
+    public Boolean isStartingZone() {
+        return template.isStartingZone();
     }
 
     public int getWidth() {
@@ -98,19 +98,19 @@ public class RoomInstance {
     }
 
     public void join(CharacterInstance character, HexCoordinate cell) {
-        character.setCurrentRoom(this);
+        character.setCurrentZone(this);
         character.setPosition(claimNearestFreeCell(cell, character));
         clients.put(character.getId(), character);
-        DomainEventPublisher.publish(new GamePlayerSpawnedToRoom(character, this));
+        DomainEventPublisher.publish(new GamePlayerSpawnedToZone(character, this));
 
-        broadcast(new GamePlayerJoinedRoom(character.getName()), character);
+        broadcast(new GamePlayerJoinedZone(character.getName()), character);
     }
 
     public void leave(CharacterInstance character) {
         clients.remove(character.getId());
         releaseCell(character.getPosition(), character);
         character.setPosition(null);
-        broadcast(new GamePlayerLeftRoom(character.getName()), character);
+        broadcast(new GamePlayerLeftZone(character.getName()), character);
     }
 
     public void disconnect(CharacterInstance character) {
@@ -195,20 +195,20 @@ public class RoomInstance {
         return npcs.stream().filter(npc -> npc.getName().equalsIgnoreCase(name)).findFirst();
     }
 
-    public List<RoomPortal> getPortals() {
-        return template.getPortals().stream().map(this::toRoomPortal).toList();
+    public List<ZonePortal> getPortals() {
+        return template.getPortals().stream().map(this::toZonePortal).toList();
     }
 
-    public Optional<RoomPortal> findPortalAt(HexCoordinate cell) {
+    public Optional<ZonePortal> findPortalAt(HexCoordinate cell) {
         return template.getPortals().stream().filter(portal -> portal.cell().equals(cell)).findFirst()
-                .map(this::toRoomPortal);
+                .map(this::toZonePortal);
     }
 
-    private RoomPortal toRoomPortal(RoomTemplatePortal portal) {
-        RoomInstance target = worldInstance.roomInstanceForTemplate(portal.targetRoomTemplateId())
+    private ZonePortal toZonePortal(ZoneTemplatePortal portal) {
+        ZoneInstance target = worldInstance.zoneInstanceForTemplate(portal.targetZoneTemplateId())
                 .orElseThrow(() -> new IllegalStateException("Portail de " + id + " vers "
-                        + portal.targetRoomTemplateId() + ", absente de " + worldInstance.getId()));
-        return new RoomPortal(portal.cell(), portal.direction(), this, target, portal.targetCell());
+                        + portal.targetZoneTemplateId() + ", absente de " + worldInstance.getId()));
+        return new ZonePortal(portal.cell(), portal.direction(), this, target, portal.targetCell());
     }
 
     public Optional<AbstractCharacter> occupantAt(HexCoordinate cell) {
@@ -262,7 +262,7 @@ public class RoomInstance {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof RoomInstance other)) {
+        if (!(o instanceof ZoneInstance other)) {
             return false;
         }
         return Objects.equals(id, other.id);
@@ -275,7 +275,7 @@ public class RoomInstance {
 
     @Override
     public String toString() {
-        return "RoomInstance[id=" + id + ", templateId=" + template.getId() + ", worldInstanceId="
+        return "ZoneInstance[id=" + id + ", templateId=" + template.getId() + ", worldInstanceId="
                 + worldInstance.getId() + "]";
     }
 }

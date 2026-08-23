@@ -37,7 +37,7 @@ public class Select implements CommandHandler {
             return;
         }
 
-        Optional<MonsterInstance> target = character.getCurrentRoom().findMonsterByName(name);
+        Optional<MonsterInstance> target = character.getCurrentZone().findMonsterByName(name);
         if (target.isEmpty()) {
             connection.send(new TargetNotFound(name));
             return;
