@@ -1,5 +1,6 @@
 package fr.idev.mudserver.domain.item;
 
+import java.util.List;
 import java.util.UUID;
 
 import fr.idev.mudserver.domain.*;
@@ -16,9 +17,9 @@ public class ConsumableItem extends ItemTemplate {
 
     public ConsumableItem(UUID id, String name, String description, ItemType type, int weight,
             ArmorCategory armorCategory, int baseAc, String damageDice, WeaponCategory weaponCategory, int price,
-            Rarity rarity, int bonus, ConsumableEffect effect, String effectDice) {
+            Rarity rarity, int bonus, List<Spell> grantedSpells, ConsumableEffect effect, String effectDice) {
         super(id, name, description, type, weight, armorCategory, baseAc, damageDice, weaponCategory, price, rarity,
-                bonus);
+                bonus, grantedSpells);
         this.effect = effect;
         this.effectDice = effectDice;
     }

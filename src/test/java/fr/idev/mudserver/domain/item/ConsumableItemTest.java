@@ -54,7 +54,7 @@ class ConsumableItemTest {
 
     private ConsumableItem manaPotion(String effectDice) {
         return new ConsumableItem(UUID.randomUUID(), "Potion de mana", "desc", ItemType.POTION, 1, null, 0, null, null,
-                60, Rarity.COMMON, 0, ConsumableEffect.MANA_RESTORE, effectDice);
+                60, Rarity.COMMON, 0, List.of(), ConsumableEffect.MANA_RESTORE, effectDice);
     }
 
     @Test

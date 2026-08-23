@@ -23,11 +23,14 @@ public class ServerApplication {
         SpringApplication.run(ServerApplication.class, args);
     }
 
-    // Ordre significatif : les item templates doivent être chargées avant les sorts
-    // (même famille de données statiques), et les sorts avant
-    // materializeDefaultWorld()
-    // puisque la création de personnage (WorldInstance.createCharacter) apprend les
-    // sorts de niveau 1 via SpellCatalogHolder dès la création du monde par défaut.
+    // Ordre significatif : les sorts doivent être chargés avant les item templates,
+    // car ItemTemplateCatalog dénormalise les grantedSpellIds d'items.json en
+    // objets
+    // Spell via SpellCatalog.getById dès le chargement (armes/armures magiques
+    // octroyant un sort à l'équipement). Les item templates doivent ensuite être
+    // chargées avant materializeDefaultWorld(), puisque la création de personnage
+    // (WorldInstance.createCharacter) apprend les sorts de niveau 1 via
+    // SpellCatalogHolder dès la création du monde par défaut.
     @Bean
     public ApplicationRunner warmupRunner(ItemTemplateCatalog itemTemplateCatalog, SpellCatalog spellCatalog,
             LevelCatalog levelCatalog, MonsterCatalog monsterCatalog, WorldTemplateCatalog worldTemplateCatalog,
@@ -35,8 +38,8 @@ public class ServerApplication {
         return args -> {
             long start = System.currentTimeMillis();
             log.info("startup.warmup_started");
-            itemTemplateCatalog.warmItemTemplates();
             spellCatalog.warmSpells();
+            itemTemplateCatalog.warmItemTemplates();
             worldTemplateCatalog.warmWorldTemplates();
             monsterCatalog.warmMonsterTemplates();
             levelCatalog.warmXpThresholds();

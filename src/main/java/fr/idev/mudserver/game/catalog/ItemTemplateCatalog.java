@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.item.ArmorCategory;
 import fr.idev.mudserver.domain.ConsumableEffect;
+import fr.idev.mudserver.domain.Spell;
 import fr.idev.mudserver.domain.item.ConsumableItem;
 import fr.idev.mudserver.domain.item.FoodItem;
 import fr.idev.mudserver.domain.item.ItemTemplate;
@@ -33,9 +34,11 @@ public class ItemTemplateCatalog {
     private final Map<UUID, ItemTemplate> templates = new ConcurrentHashMap<>();
 
     private final ObjectMapper objectMapper;
+    private final SpellCatalog spellCatalog;
 
-    public ItemTemplateCatalog(ObjectMapper objectMapper) {
+    public ItemTemplateCatalog(ObjectMapper objectMapper, SpellCatalog spellCatalog) {
         this.objectMapper = objectMapper;
+        this.spellCatalog = spellCatalog;
     }
 
     public void warmItemTemplates() {
@@ -54,21 +57,26 @@ public class ItemTemplateCatalog {
     }
 
     private ItemTemplate toTemplate(ItemTemplateDefinition definition) {
+        List<Spell> grantedSpells = definition.grantedSpellIds() == null
+                ? List.of()
+                : definition.grantedSpellIds().stream().map(spellCatalog::getById).toList();
+
         if (definition.consumableEffect() != null) {
             return new ConsumableItem(definition.id(), definition.name(), definition.description(), definition.type(),
                     definition.weight(), definition.armorCategory(), definition.baseAc(), definition.damageDice(),
                     definition.weaponCategory(), definition.price(), definition.rarity(), definition.bonus(),
-                    definition.consumableEffect(), definition.effectDice());
+                    grantedSpells, definition.consumableEffect(), definition.effectDice());
         }
         if (definition.nutritionValue() != null) {
             return new FoodItem(definition.id(), definition.name(), definition.description(), definition.type(),
                     definition.weight(), definition.armorCategory(), definition.baseAc(), definition.damageDice(),
                     definition.weaponCategory(), definition.price(), definition.rarity(), definition.bonus(),
-                    definition.nutritionValue());
+                    grantedSpells, definition.nutritionValue());
         }
         return new ItemTemplate(definition.id(), definition.name(), definition.description(), definition.type(),
                 definition.weight(), definition.armorCategory(), definition.baseAc(), definition.damageDice(),
-                definition.weaponCategory(), definition.price(), definition.rarity(), definition.bonus());
+                definition.weaponCategory(), definition.price(), definition.rarity(), definition.bonus(),
+                grantedSpells);
     }
 
     public Map<UUID, ItemTemplate> templatesById() {
@@ -86,6 +94,7 @@ public class ItemTemplateCatalog {
 
     private record ItemTemplateDefinition(UUID id, String name, String description, ItemType type, int weight,
             ArmorCategory armorCategory, int baseAc, String damageDice, WeaponCategory weaponCategory, int price,
-            Rarity rarity, int bonus, ConsumableEffect consumableEffect, String effectDice, Integer nutritionValue) {
+            Rarity rarity, int bonus, List<UUID> grantedSpellIds, ConsumableEffect consumableEffect, String effectDice,
+            Integer nutritionValue) {
     }
 }

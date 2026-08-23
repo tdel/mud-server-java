@@ -1,6 +1,9 @@
 package fr.idev.mudserver.domain.item;
 
+import java.util.List;
 import java.util.UUID;
+
+import fr.idev.mudserver.domain.Spell;
 
 public class FoodItem extends ItemTemplate {
 
@@ -8,9 +11,9 @@ public class FoodItem extends ItemTemplate {
 
     public FoodItem(UUID id, String name, String description, ItemType type, int weight, ArmorCategory armorCategory,
             int baseAc, String damageDice, WeaponCategory weaponCategory, int price, Rarity rarity, int bonus,
-            int nutritionValue) {
+            List<Spell> grantedSpells, int nutritionValue) {
         super(id, name, description, type, weight, armorCategory, baseAc, damageDice, weaponCategory, price, rarity,
-                bonus);
+                bonus, grantedSpells);
         this.nutritionValue = nutritionValue;
     }
 

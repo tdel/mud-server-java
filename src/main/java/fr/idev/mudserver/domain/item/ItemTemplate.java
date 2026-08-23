@@ -1,7 +1,10 @@
 package fr.idev.mudserver.domain.item;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
+import fr.idev.mudserver.domain.Spell;
 
 public class ItemTemplate {
 
@@ -17,10 +20,11 @@ public class ItemTemplate {
     private int price;
     private Rarity rarity;
     private int bonus;
+    private List<Spell> grantedSpells;
 
     public ItemTemplate(UUID id, String name, String description, ItemType type, int weight,
             ArmorCategory armorCategory, int baseAc, String damageDice, WeaponCategory weaponCategory, int price,
-            Rarity rarity, int bonus) {
+            Rarity rarity, int bonus, List<Spell> grantedSpells) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -33,6 +37,7 @@ public class ItemTemplate {
         this.price = price;
         this.rarity = rarity;
         this.bonus = bonus;
+        this.grantedSpells = grantedSpells == null ? List.of() : grantedSpells;
     }
 
     public UUID getId() {
@@ -131,6 +136,14 @@ public class ItemTemplate {
         this.bonus = bonus;
     }
 
+    public List<Spell> getGrantedSpells() {
+        return grantedSpells;
+    }
+
+    public void setGrantedSpells(List<Spell> grantedSpells) {
+        this.grantedSpells = grantedSpells == null ? List.of() : grantedSpells;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -143,13 +156,14 @@ public class ItemTemplate {
                 && Objects.equals(id, other.id) && Objects.equals(name, other.name)
                 && Objects.equals(description, other.description) && type == other.type
                 && armorCategory == other.armorCategory && Objects.equals(damageDice, other.damageDice)
-                && weaponCategory == other.weaponCategory && rarity == other.rarity;
+                && weaponCategory == other.weaponCategory && rarity == other.rarity
+                && Objects.equals(grantedSpells, other.grantedSpells);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, name, description, type, weight, armorCategory, baseAc, damageDice, weaponCategory,
-                price, rarity, bonus);
+                price, rarity, bonus, grantedSpells);
     }
 
     @Override
@@ -157,6 +171,6 @@ public class ItemTemplate {
         return "ItemTemplate[id=" + id + ", name=" + name + ", description=" + description + ", type=" + type
                 + ", weight=" + weight + ", armorCategory=" + armorCategory + ", baseAc=" + baseAc + ", damageDice="
                 + damageDice + ", weaponCategory=" + weaponCategory + ", price=" + price + ", rarity=" + rarity
-                + ", bonus=" + bonus + "]";
+                + ", bonus=" + bonus + ", grantedSpells=" + grantedSpells + "]";
     }
 }

@@ -3,6 +3,7 @@ package fr.idev.mudserver.network.command.ingame;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Component;
 
@@ -124,8 +125,9 @@ public class Cast implements CommandHandler {
 
     private Optional<Spell> resolveKnownSpell(CharacterInstance character, String argument) {
         String lower = argument.toLowerCase();
-        return character.getSpellCasting().knownSpellIds().stream().map(spellCatalog::getById)
-                .filter(spell -> lower.startsWith(spell.name().toLowerCase()))
+        Stream<Spell> known = character.getSpellCasting().knownSpellIds().stream().map(spellCatalog::getById);
+        Stream<Spell> granted = character.getGrantedSpells().stream();
+        return Stream.concat(known, granted).distinct().filter(spell -> lower.startsWith(spell.name().toLowerCase()))
                 .max(Comparator.comparingInt(spell -> spell.name().length()));
     }
 }

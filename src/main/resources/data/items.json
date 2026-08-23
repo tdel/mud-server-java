@@ -245,5 +245,58 @@
         "rarity": "COMMON",
         "bonus": 0,
         "nutritionValue": 15
+    },
+    {
+        "id": "6f1c2a3e-8b4d-4e7a-9c2f-1a3d5e7b9c1f",
+        "name": "Baguette de flammes",
+        "description": "Une baguette gravée de runes ardentes ; l'empoigner permet d'invoquer un trait de feu.",
+        "type": "WEAPON",
+        "weight": 1,
+        "baseAc": 0,
+        "damageDice": "1d4",
+        "weaponCategory": "SIMPLE",
+        "price": 100,
+        "rarity": "UNCOMMON",
+        "bonus": 0,
+        "grantedSpellIds": ["2127fbac-35aa-4897-a07d-bd619c4ec5b0"]
+    },
+    {
+        "id": "7a2d3b4f-9c5e-4f8b-8d3a-2b4e6f8a0c2d",
+        "name": "Bâton de soins",
+        "description": "Un bâton de bois blanc qui canalise une énergie curative au contact.",
+        "type": "WEAPON",
+        "weight": 2,
+        "baseAc": 0,
+        "damageDice": "1d6",
+        "weaponCategory": "SIMPLE",
+        "price": 150,
+        "rarity": "UNCOMMON",
+        "bonus": 0,
+        "grantedSpellIds": ["e287e606-621f-48c5-b8dc-613fa98709d3"]
+    },
+    {
+        "id": "8b3e4c5a-0d6f-4a9c-9e4b-3c5f7a9b1d3e",
+        "name": "Armure du zélote",
+        "description": "Une armure légère bénie qui insuffle sa ferveur à quiconque la porte.",
+        "type": "ARMOR",
+        "weight": 5,
+        "armorCategory": "LIGHT",
+        "baseAc": 11,
+        "price": 200,
+        "rarity": "UNCOMMON",
+        "bonus": 0,
+        "grantedSpellIds": ["2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f"]
+    },
+    {
+        "id": "9c4f5d6b-1e7a-4b0d-8f5c-4d6a8b0c2e4f",
+        "name": "Heaume de la terreur",
+        "description": "Un heaume orné de crocs qui répand la malédiction sur les ennemis à sa portée.",
+        "type": "HELMET",
+        "weight": 2,
+        "baseAc": 0,
+        "price": 200,
+        "rarity": "UNCOMMON",
+        "bonus": 0,
+        "grantedSpellIds": ["8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e"]
     }
 ]

@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.Spell;
@@ -233,6 +234,11 @@ public final class CharacterInstance extends AbstractCharacter {
 
     public SpellCasting getSpellCasting() {
         return spellCasting;
+    }
+
+    public Set<Spell> getGrantedSpells() {
+        return inventory.getEquippedItems().stream().flatMap(item -> item.getTemplate().getGrantedSpells().stream())
+                .collect(Collectors.toSet());
     }
 
     public int getMaxMana() {
