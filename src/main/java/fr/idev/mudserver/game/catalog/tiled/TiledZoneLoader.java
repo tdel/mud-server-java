@@ -17,6 +17,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import fr.idev.mudserver.domain.MonsterSpawn;
+import fr.idev.mudserver.domain.NpcSpawn;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.world.TileType;
 import fr.idev.mudserver.game.catalog.tiled.TiledMap.TiledLayer;
@@ -44,6 +45,7 @@ public final class TiledZoneLoader {
     private static final String TYPE_PLAYER_SPAWN = "playerSpawn";
     private static final String TYPE_PORTAL = "portal";
     private static final String TYPE_MONSTER_SPAWN = "monsterSpawn";
+    private static final String TYPE_NPC_SPAWN = "npcSpawn";
 
     // Un export Tiled porte des champs standards (version, tiledversion, infinite,
     // renderorder, image du tileset, etc.) qu'on ne modélise pas dans TiledMap :
@@ -66,7 +68,7 @@ public final class TiledZoneLoader {
 
     public record ParsedZone(UUID id, String name, String description, boolean isStartingZone,
             Map<HexCoordinate, TileType> terrain, HexCoordinate spawnCell, List<MonsterSpawn> monsterSpawns,
-            List<PortalDraft> portals) {
+            List<NpcSpawn> npcSpawns, List<PortalDraft> portals) {
     }
 
     public record PortalDraft(HexCoordinate cell, String direction, UUID targetZoneId, HexCoordinate targetCell) {
@@ -83,15 +85,16 @@ public final class TiledZoneLoader {
 
         HexCoordinate[] spawnCellHolder = new HexCoordinate[1];
         List<MonsterSpawn> monsterSpawns = new ArrayList<>();
+        List<NpcSpawn> npcSpawns = new ArrayList<>();
         List<PortalDraft> portals = new ArrayList<>();
-        parseObjects(map, id, spawnCellHolder, monsterSpawns, portals);
+        parseObjects(map, id, spawnCellHolder, monsterSpawns, npcSpawns, portals);
 
         if (spawnCellHolder[0] == null) {
             throw new IllegalStateException("Zone " + id + " (" + name + ") n'a aucun objet playerSpawn");
         }
 
         return new ParsedZone(id, name, description, isStartingZone, terrain, spawnCellHolder[0],
-                List.copyOf(monsterSpawns), List.copyOf(portals));
+                List.copyOf(monsterSpawns), List.copyOf(npcSpawns), List.copyOf(portals));
     }
 
     private static Map<Integer, TileType> buildTileTypeByGid(TiledMap map,
@@ -164,7 +167,7 @@ public final class TiledZoneLoader {
     }
 
     private static void parseObjects(TiledMap map, UUID id, HexCoordinate[] spawnCellHolder,
-            List<MonsterSpawn> monsterSpawns, List<PortalDraft> portals) {
+            List<MonsterSpawn> monsterSpawns, List<NpcSpawn> npcSpawns, List<PortalDraft> portals) {
         TiledLayer layer = findLayer(map, id, OBJECTS_LAYER, "objectgroup");
         for (TiledObjectDef object : layer.objects()) {
             HexCoordinate cell = HexTiledCoordinateMapper.pixelToAxial(object.x(), object.y(), map.tilewidth(),
@@ -179,6 +182,9 @@ public final class TiledZoneLoader {
                 case TYPE_MONSTER_SPAWN -> monsterSpawns.add(new MonsterSpawn(
                         UUID.nameUUIDFromBytes((id + ":" + object.id()).getBytes(StandardCharsets.UTF_8)),
                         UUID.fromString(requireStringProperty(object.properties(), "templateId")), cell));
+                case TYPE_NPC_SPAWN -> npcSpawns.add(new NpcSpawn(
+                        UUID.nameUUIDFromBytes((id + ":" + object.id()).getBytes(StandardCharsets.UTF_8)),
+                        UUID.fromString(requireStringProperty(object.properties(), "npcId")), cell));
                 default -> throw new IllegalStateException(
                         "Objet Tiled " + object.id() + " a un type inconnu : " + object.type());
             }

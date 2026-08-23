@@ -1,6 +1,7 @@
 package fr.idev.mudserver.domain.world;
 
 import fr.idev.mudserver.domain.MonsterSpawn;
+import fr.idev.mudserver.domain.NpcSpawn;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 
 import java.util.Map;
@@ -17,10 +18,12 @@ public class ZoneTemplate {
     private final Map<HexCoordinate, TileType> terrain;
     private final HexCoordinate spawnCell;
     private final List<MonsterSpawn> monsterSpawns;
+    private final List<NpcSpawn> npcSpawns;
     private List<ZoneTemplatePortal> portals = List.of();
 
     public ZoneTemplate(UUID id, String name, String description, Boolean isStartingZone,
-            Map<HexCoordinate, TileType> terrain, HexCoordinate spawnCell, List<MonsterSpawn> monsterSpawns) {
+            Map<HexCoordinate, TileType> terrain, HexCoordinate spawnCell, List<MonsterSpawn> monsterSpawns,
+            List<NpcSpawn> npcSpawns) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -28,6 +31,7 @@ public class ZoneTemplate {
         this.terrain = Map.copyOf(terrain);
         this.spawnCell = spawnCell;
         this.monsterSpawns = List.copyOf(monsterSpawns);
+        this.npcSpawns = List.copyOf(npcSpawns);
     }
 
     public UUID getId() {
@@ -56,6 +60,10 @@ public class ZoneTemplate {
 
     public List<MonsterSpawn> getMonsterSpawns() {
         return monsterSpawns;
+    }
+
+    public List<NpcSpawn> getNpcSpawns() {
+        return npcSpawns;
     }
 
     public List<ZoneTemplatePortal> getPortals() {

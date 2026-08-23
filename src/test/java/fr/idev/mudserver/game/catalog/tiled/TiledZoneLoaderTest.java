@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 import fr.idev.mudserver.domain.MonsterSpawn;
+import fr.idev.mudserver.domain.NpcSpawn;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.world.TileType;
 import fr.idev.mudserver.game.catalog.tiled.TiledMap.TiledLayer;
@@ -30,6 +31,7 @@ class TiledZoneLoaderTest {
         UUID zoneId = UUID.randomUUID();
         UUID targetZoneId = UUID.randomUUID();
         UUID monsterTemplateId = UUID.randomUUID();
+        UUID npcId = UUID.randomUUID();
 
         TiledTileset tileset = new TiledTileset(1, null,
                 List.of(new TiledTile(0, List.of(new TiledProperty("walkable", "bool", true))),
@@ -45,9 +47,11 @@ class TiledZoneLoaderTest {
                         new TiledProperty("targetCellQ", "int", 0), new TiledProperty("targetCellR", "int", 0)));
         TiledObjectDef monsterSpawnObject = objectAt("monsterSpawn", 0, 1,
                 List.of(new TiledProperty("templateId", "string", monsterTemplateId.toString())));
+        TiledObjectDef npcSpawnObject = objectAt("npcSpawn", 1, 1,
+                List.of(new TiledProperty("npcId", "string", npcId.toString())));
 
         TiledLayer objects = new TiledLayer("objectgroup", "objects", null, null, null,
-                List.of(spawnObject, portalObject, monsterSpawnObject), null);
+                List.of(spawnObject, portalObject, monsterSpawnObject, npcSpawnObject), null);
 
         TiledMap map = new TiledMap("hexagonal", 2, 2, TILE_WIDTH, TILE_HEIGHT, HEX_SIDE_LENGTH, "y", "odd",
                 List.of(terrain, objects), List.of(tileset),
@@ -81,6 +85,11 @@ class TiledZoneLoaderTest {
         MonsterSpawn spawn = parsed.monsterSpawns().get(0);
         assertThat(spawn.templateId()).isEqualTo(monsterTemplateId);
         assertThat(spawn.cell()).isEqualTo(HexTiledCoordinateMapper.offsetToAxial(0, 1));
+
+        assertThat(parsed.npcSpawns()).hasSize(1);
+        NpcSpawn npcSpawn = parsed.npcSpawns().get(0);
+        assertThat(npcSpawn.npcId()).isEqualTo(npcId);
+        assertThat(npcSpawn.cell()).isEqualTo(wallCell);
     }
 
     @Test

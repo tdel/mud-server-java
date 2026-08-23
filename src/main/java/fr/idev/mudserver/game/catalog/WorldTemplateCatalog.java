@@ -16,6 +16,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
+import fr.idev.mudserver.domain.NpcSpawn;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.item.ItemTemplate;
 import fr.idev.mudserver.domain.world.ZoneTemplate;
@@ -102,9 +103,15 @@ public class WorldTemplateCatalog {
         List<ParsedZone> parsedZones = readZoneFiles();
         Map<UUID, ZoneTemplate> zoneTemplates = buildZoneTemplates(shortName, parsedZones);
 
-        List<NpcDefinition> npcDefinitions = readJsonList("npcs.json", new TypeReference<List<NpcDefinition>>() {
+        List<NpcDefinition> npcDefinitionList = readJsonList("npcs.json", new TypeReference<List<NpcDefinition>>() {
         });
-        Map<UUID, NpcTemplate> npcTemplates = buildNpcTemplates(shortName, npcDefinitions, zoneTemplates,
+        Map<UUID, NpcDefinition> npcDefinitionsById = new LinkedHashMap<>();
+        for (NpcDefinition definition : npcDefinitionList) {
+            if (npcDefinitionsById.putIfAbsent(definition.id(), definition) != null) {
+                throw new IllegalStateException("NPC " + definition.id() + " dupliqué dans data/npcs.json");
+            }
+        }
+        Map<UUID, NpcTemplate> npcTemplates = buildNpcTemplates(shortName, npcDefinitionsById, zoneTemplates,
                 itemTemplatesById);
 
         WorldTemplate template = new WorldTemplate(summary.id(), shortName, summary.name(), summary.description(),
@@ -155,7 +162,7 @@ public class WorldTemplateCatalog {
         Map<UUID, ZoneTemplate> templates = new LinkedHashMap<>();
         for (ParsedZone zone : parsedZones) {
             ZoneTemplate template = new ZoneTemplate(zone.id(), zone.name(), zone.description(), zone.isStartingZone(),
-                    zone.terrain(), zone.spawnCell(), zone.monsterSpawns());
+                    zone.terrain(), zone.spawnCell(), zone.monsterSpawns(), zone.npcSpawns());
             if (!template.isWalkable(zone.spawnCell())) {
                 throw new IllegalStateException("Zone " + zone.id() + " du monde " + shortName + " a une case de spawn "
                         + zone.spawnCell() + " absente ou non praticable de sa carte");
@@ -206,24 +213,26 @@ public class WorldTemplateCatalog {
         }
     }
 
-    Map<UUID, NpcTemplate> buildNpcTemplates(String shortName, List<NpcDefinition> definitions,
+    Map<UUID, NpcTemplate> buildNpcTemplates(String shortName, Map<UUID, NpcDefinition> definitionsById,
             Map<UUID, ZoneTemplate> zoneTemplates, Map<UUID, ItemTemplate> itemTemplatesById) {
         Map<UUID, NpcTemplate> templates = new LinkedHashMap<>();
-        for (NpcDefinition definition : definitions) {
-            ZoneTemplate zone = zoneTemplates.get(definition.zoneId());
-            if (zone == null) {
-                throw new IllegalStateException("NPC " + definition.id() + " du monde " + shortName
-                        + " référence la zone " + definition.zoneId() + ", absente de ce monde");
-            }
+        for (ZoneTemplate zone : zoneTemplates.values()) {
+            for (NpcSpawn spawn : zone.getNpcSpawns()) {
+                NpcDefinition definition = definitionsById.get(spawn.npcId());
+                if (definition == null) {
+                    throw new IllegalStateException("Spawn " + spawn.id() + " de la zone " + zone.getId()
+                            + " du monde " + shortName + " référence le NPC " + spawn.npcId()
+                            + ", absent de data/npcs.json");
+                }
 
-            AbstractNpc.NpcDialogue dialogue = toDialogue(definition);
-            NpcSellerInstance.NpcShop shop = toShop(shortName, definition, itemTemplatesById);
+                AbstractNpc.NpcDialogue dialogue = toDialogue(definition);
+                NpcSellerInstance.NpcShop shop = toShop(shortName, definition, itemTemplatesById);
 
-            NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), definition.zoneId(),
-                    new HexCoordinate(definition.cell().q(), definition.cell().r()), definition.description(), dialogue,
-                    shop, definition.level());
-            if (templates.putIfAbsent(template.id(), template) != null) {
-                throw new IllegalStateException("NPC " + definition.id() + " dupliqué dans le monde " + shortName);
+                NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), zone.getId(), spawn.cell(),
+                        definition.description(), dialogue, shop, definition.level());
+                if (templates.putIfAbsent(template.id(), template) != null) {
+                    throw new IllegalStateException("NPC " + definition.id() + " dupliqué dans le monde " + shortName);
+                }
             }
         }
         return Map.copyOf(templates);
@@ -308,11 +317,7 @@ public class WorldTemplateCatalog {
     record WorldManifestDefinition(UUID id, String name, String description, int minPlayers, int maxPlayers) {
     }
 
-    record CellDefinition(int q, int r) {
-    }
-
-    record NpcDefinition(UUID id, String name, UUID zoneId, CellDefinition cell, String description,
-            DialogueDefinition dialogue, int level) {
+    record NpcDefinition(UUID id, String name, String description, DialogueDefinition dialogue, int level) {
     }
 
     record DialogueDefinition(String greeting, List<DialogueOptionDefinition> options, ShopDefinition shop) {

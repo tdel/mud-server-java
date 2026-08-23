@@ -41,7 +41,7 @@ class CharacterInstanceGrantedSpellsTest {
     private CharacterInstance newCharacter() {
         WorldInstance world = new WorldInstance(UUID.randomUUID(), UUID.randomUUID(), Instant.now());
         ZoneTemplate zoneTemplate = new ZoneTemplate(UUID.randomUUID(), "Zone", "desc", true, flatTerrain(3, 3),
-                new HexCoordinate(0, 0), List.of());
+                new HexCoordinate(0, 0), List.of(), List.of());
         ZoneInstance zone = new ZoneInstance(UUID.randomUUID(), zoneTemplate, world);
         Account account = new Account(UUID.randomUUID(), "login", "hash");
 
