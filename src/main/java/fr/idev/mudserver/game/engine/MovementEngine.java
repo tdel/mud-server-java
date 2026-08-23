@@ -1,4 +1,4 @@
-package fr.idev.mudserver.game;
+package fr.idev.mudserver.game.engine;
 
 import java.util.Map;
 import java.util.UUID;

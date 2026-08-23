@@ -11,7 +11,7 @@ import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.world.RoomInstance;
-import fr.idev.mudserver.game.MovementEngine;
+import fr.idev.mudserver.game.engine.MovementEngine;
 import fr.idev.mudserver.network.server.telnet.Ansi;
 import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
 import fr.idev.mudserver.network.server.telnet.TelnetOutput;

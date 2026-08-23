@@ -3,7 +3,7 @@ package fr.idev.mudserver.network.command.ingame;
 import java.util.Optional;
 import java.util.Set;
 
-import fr.idev.mudserver.game.MovementEngine;
+import fr.idev.mudserver.game.engine.MovementEngine;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.network.CommandHandler;

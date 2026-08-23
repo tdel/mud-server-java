@@ -7,7 +7,7 @@ import java.util.UUID;
 import fr.idev.mudserver.domain.actor.component.ActiveEffects;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.world.RoomInstance;
-import fr.idev.mudserver.game.MovementEngine;
+import fr.idev.mudserver.game.engine.MovementEngine;
 import fr.idev.mudserver.game.dice.DiceExpression;
 import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.OutputMessage;

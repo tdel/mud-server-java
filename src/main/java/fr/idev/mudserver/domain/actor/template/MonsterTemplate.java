@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.item.Item;
@@ -13,6 +16,8 @@ import fr.idev.mudserver.domain.item.ItemTemplate;
 import fr.idev.mudserver.game.dice.DiceRoller;
 
 public class MonsterTemplate {
+
+    private static final Logger log = LoggerFactory.getLogger(MonsterTemplate.class);
 
     private UUID id;
     private String name;
@@ -158,6 +163,22 @@ public class MonsterTemplate {
             }
         }
         return new LootResult(goldReward, items);
+    }
+
+    public LootResult grantLootTo(CharacterInstance killer) {
+        LootResult loot = rollLoot(killer);
+
+        if (loot.gold() > 0) {
+            killer.receiveGold(loot.gold());
+            log.info("loot.gold_dropped killer={} amount={}", killer.getName(), loot.gold());
+        }
+
+        for (Item item : loot.items()) {
+            killer.receiveLootItem(item);
+            log.info("loot.item_dropped killer={} item={}", killer.getName(), item.getName());
+        }
+
+        return loot;
     }
 
     @Override

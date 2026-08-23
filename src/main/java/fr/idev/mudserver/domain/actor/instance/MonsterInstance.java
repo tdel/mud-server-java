@@ -12,7 +12,7 @@ import fr.idev.mudserver.domain.actor.template.MonsterTemplate;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.map.HexCoordinate;
-import fr.idev.mudserver.game.MonsterAiEngine;
+import fr.idev.mudserver.game.engine.MonsterAiEngine;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 

@@ -7,11 +7,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import fr.idev.mudserver.game.engine.BuffExpiryEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.Account;
@@ -21,25 +20,17 @@ import fr.idev.mudserver.domain.world.WorldInstance;
 import fr.idev.mudserver.domain.world.WorldTemplate;
 import fr.idev.mudserver.domain.world.WorldTemplateSummary;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
-import fr.idev.mudserver.domain.actor.event.CharacterDied;
-import fr.idev.mudserver.domain.actor.event.GamePlayerDied;
 import fr.idev.mudserver.game.catalog.MonsterCatalog;
 import fr.idev.mudserver.game.catalog.NpcCatalog;
 import fr.idev.mudserver.game.catalog.WorldTemplateCatalog;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
-import fr.idev.mudserver.network.message.ingame.GamePlayerDefeated;
-import fr.idev.mudserver.network.message.ingame.MonsterDefeated;
 import fr.idev.mudserver.persistence.AccountDao;
 import fr.idev.mudserver.persistence.CharacterDao;
 import fr.idev.mudserver.persistence.listener.ActiveEffectPersistenceListener;
 import fr.idev.mudserver.persistence.listener.ItemPersistenceListener;
 import fr.idev.mudserver.persistence.listener.SpellPersistenceListener;
 
-// La persistance de GamePlayerMovedToRoom/GamePlayerSpawnedToRoom vit dans
-// persistence.listener.WorldInstancePersistenceListener — ici ne reste que
-// l'orchestration (matérialisation du monde par défaut, entrée/sortie de partie,
-// nettoyage de room).
 @Service
 public class WorldInstanceService {
 
@@ -141,26 +132,8 @@ public class WorldInstanceService {
         characterDao.update(character);
         room.disconnect(character);
         instance.removePlayer(character);
-        log.info("character.session_ended character={} room={}", character.getName(), room.getName());
+        log.info("world.session_ended character={} room={}", character.getName(), room.getName());
         MDC.remove("character");
     }
 
-    @EventListener
-    @Order(1)
-    void onCharacterDied(CharacterDied event) {
-        RoomInstance room = event.character().getCurrentRoom();
-        room.removeMonster(event.character());
-        room.broadcast(new MonsterDefeated(event.character().getName()), null);
-        log.info("combat.monster_removed_from_room monster={} room={}", event.character().getName(), room.getName());
-    }
-
-    @EventListener
-    @Order(1)
-    void onGamePlayerDied(GamePlayerDied event) {
-        RoomInstance room = event.character().getCurrentRoom();
-        room.broadcast(new GamePlayerDefeated(event.character().getName(), event.killer().getName()),
-                event.character());
-        log.info("combat.player_defeated character={} killer={} room={}", event.character().getName(),
-                event.killer().getName(), room.getName());
-    }
 }

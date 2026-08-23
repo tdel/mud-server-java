@@ -1,16 +1,18 @@
-package fr.idev.mudserver.game;
+package fr.idev.mudserver.game.engine;
 
-import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.actor.component.CharacterCombat;
+import fr.idev.mudserver.domain.actor.event.CharacterDied;
+import fr.idev.mudserver.domain.actor.event.MonsterAttacked;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.map.HexCoordinate;
@@ -30,6 +32,16 @@ public class MonsterAiEngine {
     private static final long TICK_INTERVAL_MS = 250L;
 
     private final Map<UUID, MonsterInstance> pursuing = new ConcurrentHashMap<>();
+
+    @EventListener
+    void onMonsterAttacked(MonsterAttacked event) {
+        aggro(event.monster(), event.attacker());
+    }
+
+    @EventListener
+    void onCharacterDied(CharacterDied event) {
+        forget(event.character());
+    }
 
     public void aggro(MonsterInstance monster, CharacterInstance attacker) {
         PursuitState current = monster.pursuit;
