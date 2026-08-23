@@ -4,9 +4,7 @@ import java.util.List;
 
 import fr.idev.mudserver.domain.world.ZoneInstance;
 import fr.idev.mudserver.network.OutputJsonMessage;
-import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
-import fr.idev.mudserver.network.server.telnet.TelnetOutput;
-import fr.idev.mudserver.network.server.tui.JsonOutput;
+import fr.idev.mudserver.network.server.tcpjson.TcpJsonOutput;
 
 /**
  * Carte statique complète d'une zone (terrain praticable/bloqué + portails),
@@ -15,7 +13,7 @@ import fr.idev.mudserver.network.server.tui.JsonOutput;
  * rejouée à chaque tick avec uniquement le viewport dynamique (occupants,
  * chemin) autour du joueur.
  */
-public record ZoneMap(ZoneInstance zone) implements OutputTelnetMessage, OutputJsonMessage {
+public record ZoneMap(ZoneInstance zone) implements OutputJsonMessage {
 
     public record CellView(int q, int r, boolean walkable) {
     }
@@ -27,7 +25,7 @@ public record ZoneMap(ZoneInstance zone) implements OutputTelnetMessage, OutputJ
     }
 
     @Override
-    public void toJson(JsonOutput output) {
+    public void toJson(TcpJsonOutput output) {
         List<CellView> cells = zone.getTerrain().entrySet().stream()
                 .map(entry -> new CellView(entry.getKey().q(), entry.getKey().r(), entry.getValue().isWalkable()))
                 .toList();
@@ -35,12 +33,5 @@ public record ZoneMap(ZoneInstance zone) implements OutputTelnetMessage, OutputJ
                 portal.cell().r(), portal.direction(), portal.targetZone().getName())).toList();
 
         output.write("ZoneMap", new Payload(zone.getId().toString(), zone.getName(), cells, portals), false);
-    }
-
-    @Override
-    public void toTelnet(TelnetOutput output) {
-        long blocked = zone.getTerrain().values().stream().filter(tile -> !tile.isWalkable()).count();
-        output.write(String.format("Carte de zone chargée : %d cases (%d bloquées), %d portails.%n",
-                zone.getTerrain().size(), blocked, zone.getPortals().size()));
     }
 }

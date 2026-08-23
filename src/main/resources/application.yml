@@ -17,10 +17,7 @@ spring:
     mixed: true
 
 app:
-  telnet:
-    enabled: true
-    port: 4001
-  tui:
+  tcpjson:
     enabled: true
     port: 4002
 
@@ -29,7 +26,7 @@ logging:
     root: INFO
   pattern:
     # %mdc affiche automatiquement connectionId/account/character quand connus
-    # (posés par TelnetSessionHandler/AuthWorld), vide sinon.
+    # (posés par TcpJsonSessionHandler/AuthWorld), vide sinon.
     console: "%d{HH:mm:ss.SSS} %-5level %logger{36} %mdc - %msg%n%wEx"
   file:
     name: logs/mud-server.log
@@ -58,7 +55,7 @@ management:
         # Auto-enabled by Spring Boot when it detects it's running in a
         # container, which drags root /actuator/health status into the
         # readiness probe. Readiness never flips to ACCEPTING_TRAFFIC here:
-        # TelnetServer.start() runs as the ApplicationReadyEvent listener and
+        # TcpJsonServer.start() runs as the ApplicationReadyEvent listener and
         # blocks the main thread for the process lifetime (its designed job),
         # so the framework's own readiness-event step right after that never
         # runs. Not a Kubernetes deployment, so disable probes rather than

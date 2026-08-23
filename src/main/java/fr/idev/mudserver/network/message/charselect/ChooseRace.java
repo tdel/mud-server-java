@@ -5,21 +5,8 @@ import java.util.Map;
 import fr.idev.mudserver.network.OutputJsonMessage;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.Race;
-import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
-import fr.idev.mudserver.network.server.telnet.TelnetOutput;
 
-public record ChooseRace(
-        Map<Race, Map<Attribute, Integer>> bonusesByRace) implements OutputTelnetMessage, OutputJsonMessage {
-
-    @Override
-    public void toTelnet(TelnetOutput output) {
-        StringBuilder text = new StringBuilder("Choose your character's race:");
-        for (Race race : Race.values()) {
-            text.append("\n  ").append(race.label()).append(" - ").append(describeBonuses(race));
-        }
-        text.append("\n");
-        output.write(text.toString());
-    }
+public record ChooseRace(Map<Race, Map<Attribute, Integer>> bonusesByRace) implements OutputJsonMessage {
 
     private String describeBonuses(Race race) {
         Map<Attribute, Integer> bonuses = bonusesByRace.get(race);

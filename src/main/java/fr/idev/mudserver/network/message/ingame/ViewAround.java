@@ -1,8 +1,6 @@
 package fr.idev.mudserver.network.message.ingame;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import fr.idev.mudserver.network.OutputJsonMessage;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
@@ -12,19 +10,11 @@ import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
 import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.world.ZoneInstance;
 import fr.idev.mudserver.game.engine.MovementEngine;
-import fr.idev.mudserver.network.server.telnet.Ansi;
-import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
-import fr.idev.mudserver.network.server.telnet.TelnetOutput;
-import fr.idev.mudserver.network.server.tui.JsonOutput;
+import fr.idev.mudserver.network.server.tcpjson.TcpJsonOutput;
 
-public record ViewAround(AbstractCharacter character) implements OutputTelnetMessage, OutputJsonMessage {
+public record ViewAround(AbstractCharacter character) implements OutputJsonMessage {
 
     public static final int VIEWPORT_RADIUS = 5;
-
-    public static final String LEGEND = "@ = you   p = other player   m = monster   n = npc   # = portal   "
-            + ". = floor   % = wall   ~ = out of bounds   X = destination   - = path";
-
-    private static final String MAP_HEADER = "──────── Map ────────";
 
     public record CellView(int q, int r, String kind) {
     }
@@ -37,7 +27,7 @@ public record ViewAround(AbstractCharacter character) implements OutputTelnetMes
     }
 
     @Override
-    public void toJson(JsonOutput output) {
+    public void toJson(TcpJsonOutput output) {
         ZoneInstance zone = character.getCurrentZone();
         List<AbstractCharacter> nearby = zone.occupantsWithin(character.getPosition(), VIEWPORT_RADIUS);
 
@@ -105,106 +95,6 @@ public record ViewAround(AbstractCharacter character) implements OutputTelnetMes
             return "portal";
         }
         return "floor";
-    }
-
-    @Override
-    public void toTelnet(TelnetOutput output) {
-        ZoneInstance zone = character.getCurrentZone();
-
-        List<String> gridLines = render(zone, character);
-        List<AbstractCharacter> nearby = zone.occupantsWithin(character.getPosition(), VIEWPORT_RADIUS);
-
-        List<String> portalSummaries = zone.getPortals().stream()
-                .map(portal -> portal.direction() + ": " + portal.targetZone().getName()).toList();
-        List<String> characterNames = nearby.stream().filter(CharacterInstance.class::isInstance)
-                .filter(other -> !other.getId().equals(character.getId())).map(AbstractCharacter::getName).toList();
-        List<String> monsterNames = nearby.stream().filter(MonsterInstance.class::isInstance)
-                .map(AbstractCharacter::getName).toList();
-        List<String> npcNames = nearby.stream().filter(AbstractNpc.class::isInstance).map(AbstractCharacter::getName)
-                .toList();
-
-        String coloredGrid = gridLines.stream().map(Ansi::gridLine).collect(Collectors.joining("\n"));
-        output.write(String.format(
-                "== %s ==\n%s\n\n%s\n%s\n\n%s\n\nPortals: %s\nCharacters here: %s\nMonsters: %s\nNPCs: %s\n",
-                Ansi.zone(zone.getName()), zone.getDescription(), Ansi.zone(MAP_HEADER), coloredGrid,
-                Ansi.gridLegend(LEGEND), portalSummaries.isEmpty() ? "none." : String.join(", ", portalSummaries),
-                joinColored(characterNames, Ansi::player, "no one else."),
-                joinColored(monsterNames, Ansi::monster, "none."), joinColored(npcNames, Ansi::npc, "none.")));
-    }
-
-    private static <T> String joinColored(List<T> values, Function<T, String> colorize, String whenEmpty) {
-        return values.isEmpty() ? whenEmpty : values.stream().map(colorize).collect(Collectors.joining(", "));
-    }
-
-    private List<String> render(ZoneInstance zone, AbstractCharacter viewer) {
-        return render(zone, viewer, VIEWPORT_RADIUS);
-    }
-
-    private List<String> render(ZoneInstance zone, AbstractCharacter viewer, int radius) {
-        HexCoordinate center = viewer.getPosition();
-        List<HexCoordinate> path = remainingPath(viewer);
-        Set<HexCoordinate> pathCells = new HashSet<>(path);
-        HexCoordinate destination = path.isEmpty() ? null : path.getLast();
-        List<String> lines = new ArrayList<>();
-
-        for (int r = center.r() - radius; r <= center.r() + radius; r++) {
-            int dr = r - center.r();
-            int dqMin = Math.max(-radius, -dr - radius);
-            int dqMax = Math.min(radius, -dr + radius);
-
-            StringBuilder line = new StringBuilder();
-            if (Math.floorMod(r, 2) == 1) {
-                line.append(' ');
-            }
-            for (int dq = dqMin; dq <= dqMax; dq++) {
-                HexCoordinate cell = new HexCoordinate(center.q() + dq, r);
-                if (dq > dqMin) {
-                    line.append(' ');
-                }
-                line.append(glyphFor(zone, viewer, cell, pathCells, destination));
-            }
-            lines.add(line.toString());
-        }
-        return lines;
-    }
-
-    private char glyphFor(ZoneInstance zone, AbstractCharacter viewer, HexCoordinate cell, Set<HexCoordinate> pathCells,
-            HexCoordinate destination) {
-        if (cell.equals(viewer.getPosition())) {
-            return '@';
-        }
-        if (!zone.containsCell(cell)) {
-            return '~';
-        }
-        if (!zone.isWalkable(cell)) {
-            return '%';
-        }
-
-        Optional<AbstractCharacter> occupant = zone.occupantAt(cell);
-        if (occupant.isPresent()) {
-            return switch (occupant.get()) {
-                case CharacterInstance ignored -> 'p';
-                case MonsterInstance ignored -> 'm';
-                case AbstractNpc ignored -> 'n';
-                default -> throw new IllegalStateException("Type d'occupant inattendu : " + occupant.get().getClass());
-            };
-        }
-
-        if (cell.equals(destination)) {
-            // '*' est un glyphe interne, jamais affiché tel quel : Ansi.gridLine le
-            // traduit en 'X' coloré comme un portail, pour que la case d'arrivée
-            // reste cohérente visuellement quand elle est elle-même un portail.
-            return zone.findPortalAt(cell).isPresent() ? '*' : 'X';
-        }
-        if (pathCells.contains(cell)) {
-            return '-';
-        }
-
-        if (zone.findPortalAt(cell).isPresent()) {
-            return '#';
-        }
-
-        return '.';
     }
 
     private List<HexCoordinate> remainingPath(AbstractCharacter viewer) {

@@ -1,20 +1,10 @@
 # mud-server-java
 
-Portage Java/Spring Boot d'un serveur MUD telnet (initialement en PHP/Swoole), avec des
-règles de jeu inspirées de DnD5e : combat au tour par tour, personnages avec caractéristiques,
-classes et compétences maîtrisées, déplacement sur grille hexagonale, objets/équipement,
-monstres avec butin et zones d'agressivité, PNJ marchands.
-
-## Démo
-
-![Démo de deux sessions telnet en parallèle : deux joueurs qui discutent puis affrontent un monstre ensemble](docs/demo/demo.svg)
-
-Deux joueurs connectés simultanément (Aldric et Elowen, chacun dans son panneau tmux),
-déplacement sur la grille hexagonale, achat auprès d'un PNJ marchand, discussion entre les
-deux via `say`, combat déclenché automatiquement à l'approche d'un monstre puis rejoint par
-le second joueur en cours de route, et butin récupéré à sa mort — deux vraies sessions
-telnet enregistrées côte à côte contre le serveur (voir [`docs/demo/`](docs/demo/) pour
-régénérer cette démo).
+Portage Java/Spring Boot d'un serveur MUD (initialement en PHP/Swoole), avec des règles de
+jeu inspirées de DnD5e : combat au tour par tour, personnages avec caractéristiques, classes
+et compétences maîtrisées, déplacement sur grille hexagonale, objets/équipement, monstres
+avec butin et zones d'agressivité, PNJ marchands. Le protocole de jeu est du JSON pur sur
+socket TCP brute (voir ci-dessous).
 
 ## Commandes
 
@@ -75,11 +65,10 @@ du compte, s'il y en a, est affichée automatiquement en entrant)
 | --- | --- |
 | `help` | Lister les commandes disponibles dans l'état courant |
 
-## Protocole TUI (JSON)
+## Protocole (JSON)
 
-En parallèle du telnet (port 4001, texte brut), le serveur expose un transport JSON sur
-socket TCP brute, port **4002**, destiné à un futur client TUI. Une ligne = un message JSON,
-terminé par `\n`.
+Le serveur expose un transport JSON pur sur socket TCP brute, port **4002**. Une ligne = un
+message JSON, terminé par `\n`.
 
 **Entrée (client → serveur)** — une commande :
 
@@ -112,13 +101,17 @@ champs comme `payload` :
 {"type": "Chat", "payload": {"speakerLogin": "aldric", "text": "salut"}, "secure": false}
 ```
 
-Trois messages construisent un `payload` dédié plutôt que de sérialiser l'objet
+Quatre messages construisent un `payload` dédié plutôt que de sérialiser l'objet
 domaine brut :
 
-- `ViewAround` — la room et sa grille hexagonale : `roomName`, `roomDescription`,
-  `cells` (liste de `{q, r, kind}`, `kind` ∈ `self/floor/path/destination/portal/
-  portalDestination/player/monster/npc/outOfBounds`), `portals`
-  (`{direction, targetRoomName}`), `charactersNearby`, `monstersNearby`, `npcsNearby`.
+- `ViewAround` — le viewport dynamique autour du joueur, rejoué à chaque déplacement :
+  `zoneName`, `zoneDescription`, `cells` (liste de `{q, r, kind}`, `kind` ∈
+  `self/floor/path/destination/portal/portalDestination/player/monster/npc/outOfBounds`),
+  `portals` (`{direction, targetZoneName}`), `charactersNearby`, `monstersNearby`,
+  `npcsNearby`.
+- `ZoneMap` — la carte statique complète de la zone (terrain + portails), envoyée une fois à
+  l'entrée dans la zone : `zoneId`, `zoneName`, `cells` (liste de `{q, r, walkable}`),
+  `portals` (`{q, r, direction, targetZoneName}`).
 - `GamePlayerStats` — fiche de personnage : `name`, `gender`, `level`,
   `characterClass`, `currentHealth`, `maxHealth`, `armorClass`, `proficiencyBonus`,
   les six caractéristiques (`strength`, `dexterity`, ... en `{score, modifier}`),
@@ -137,8 +130,8 @@ En cas d'erreur de parsing ou d'exécution, le serveur répond avec `{"type": "E
 - **Flyway** comme source de vérité du schéma ; les classes jOOQ sont générées à la
   compilation directement depuis les migrations Flyway (aucune connexion DB requise pour la
   génération)
-- **Netty** pour le serveur telnet, avec un **virtual thread par connexion** (JDK 25) plutôt
-  qu'un pool de threads partagé
+- **Netty** pour le transport TCP/JSON, avec un **virtual thread par connexion** (JDK 25)
+  plutôt qu'un pool de threads partagé
 - **SQLite** — fichier unique local, aucun serveur de base de données à faire tourner
 
 ## Lancer le projet
@@ -158,11 +151,11 @@ mvn test
 mvn spring-boot:run
 ```
 
-Le serveur telnet écoute sur le port **4001**, le transport JSON (voir ci-dessous) sur le
-port **4002**.
+Le serveur écoute sur le port **4002** (protocole JSON, voir ci-dessus). Pour s'y connecter
+en ligne de commande :
 
 ```bash
-telnet localhost 4001
+nc localhost 4002
 ```
 
 ## Pour aller plus loin

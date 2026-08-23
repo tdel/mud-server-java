@@ -3,13 +3,7 @@ package fr.idev.mudserver.network.message;
 import java.util.List;
 
 import fr.idev.mudserver.network.OutputJsonMessage;
-import fr.idev.mudserver.network.server.telnet.OutputTelnetMessage;
-import fr.idev.mudserver.network.server.telnet.TelnetOutput;
 
-public record Help(List<String> commands) implements OutputTelnetMessage, OutputJsonMessage {
+public record Help(List<String> commands) implements OutputJsonMessage {
 
-    @Override
-    public void toTelnet(TelnetOutput output) {
-        output.write("Available commands: " + String.join(", ", commands) + "\n");
-    }
 }

@@ -1,4 +1,4 @@
-package fr.idev.mudserver.network.server.tui;
+package fr.idev.mudserver.network.server.tcpjson;
 
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -20,12 +20,12 @@ import fr.idev.mudserver.network.CommandDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.WorldInstanceService;
 
-public class TuiSessionHandler extends SimpleChannelInboundHandler<String> {
+public class TcpJsonSessionHandler extends SimpleChannelInboundHandler<String> {
 
-    private static final Logger log = LoggerFactory.getLogger(TuiSessionHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(TcpJsonSessionHandler.class);
 
-    private static final AttributeKey<TuiConnection> CONNECTION_KEY = AttributeKey.valueOf("tuiConnection");
-    private static final AttributeKey<BlockingQueue<String>> INBOX_KEY = AttributeKey.valueOf("tuiInbox");
+    private static final AttributeKey<TcpJsonConnection> CONNECTION_KEY = AttributeKey.valueOf("tcpJsonConnection");
+    private static final AttributeKey<BlockingQueue<String>> INBOX_KEY = AttributeKey.valueOf("tcpJsonInbox");
     private static final String POISON_PILL = new String();
     private static final String MDC_CONNECTION_ID = "connectionId";
 
@@ -37,7 +37,7 @@ public class TuiSessionHandler extends SimpleChannelInboundHandler<String> {
     private final AuthWorld authWorld;
     private final WorldInstanceService worldInstanceService;
 
-    public TuiSessionHandler(ExecutorService virtualThreadExecutor, ObjectMapper objectMapper,
+    public TcpJsonSessionHandler(ExecutorService virtualThreadExecutor, ObjectMapper objectMapper,
             CommandDispatcher commandDispatcher, AuthWorld authWorld, WorldInstanceService worldInstanceService) {
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.objectMapper = objectMapper;
@@ -48,10 +48,10 @@ public class TuiSessionHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        String connectionId = "tui-" + CONNECTION_SEQUENCE.incrementAndGet();
-        log.info("tui.connection_opened remote={} connectionId={}", ctx.channel().remoteAddress(), connectionId);
-        TuiConnection connection = new TuiConnection(connectionId, ctx.channel(), objectMapper, commandDispatcher,
-                authWorld, worldInstanceService);
+        String connectionId = "tcpjson-" + CONNECTION_SEQUENCE.incrementAndGet();
+        log.info("tcpjson.connection_opened remote={} connectionId={}", ctx.channel().remoteAddress(), connectionId);
+        TcpJsonConnection connection = new TcpJsonConnection(connectionId, ctx.channel(), objectMapper,
+                commandDispatcher, authWorld, worldInstanceService);
         BlockingQueue<String> inbox = new LinkedBlockingQueue<>();
         ctx.channel().attr(CONNECTION_KEY).set(connection);
         ctx.channel().attr(INBOX_KEY).set(inbox);
@@ -65,14 +65,14 @@ public class TuiSessionHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        log.info("tui.connection_closed remote={}", ctx.channel().remoteAddress());
+        log.info("tcpjson.connection_closed remote={}", ctx.channel().remoteAddress());
         BlockingQueue<String> inbox = ctx.channel().attr(INBOX_KEY).get();
         if (inbox != null) {
             inbox.add(POISON_PILL);
         }
     }
 
-    private void runConnectionLoop(TuiConnection connection, BlockingQueue<String> inbox) {
+    private void runConnectionLoop(TcpJsonConnection connection, BlockingQueue<String> inbox) {
         MDC.put(MDC_CONNECTION_ID, connection.getConnectionId());
         connection.write("Welcome",
                 Map.of("message", "Welcome to mud-server-java. Send {\"verb\":\"login\",\"argument\":\"<name>\"} "

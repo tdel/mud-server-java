@@ -7,8 +7,8 @@ import java.util.List;
  * hexagonale) réellement exploité par {@link TiledZoneLoader}. Les autres
  * champs standards d'un export Tiled (version, tiledversion, infinite,
  * renderorder, nextlayerid, nextobjectid, image du tileset, etc.) restent
- * présents dans les fichiers authorés sous {@code data/zones/*.json}
- * pour rester ouvrables tels quels dans Tiled, mais ne sont pas modélisés ici :
+ * présents dans les fichiers authorés sous {@code data/zones/*.json} pour
+ * rester ouvrables tels quels dans Tiled, mais ne sont pas modélisés ici :
  * {@link TiledZoneLoader} lit ces fichiers avec un mapper tolérant aux
  * propriétés inconnues.
  */

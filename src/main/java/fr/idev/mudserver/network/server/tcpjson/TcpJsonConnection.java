@@ -1,10 +1,13 @@
-package fr.idev.mudserver.network.server.telnet;
+package fr.idev.mudserver.network.server.tcpjson;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import tools.jackson.databind.ObjectMapper;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -17,15 +20,17 @@ import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.WorldInstanceService;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
+import fr.idev.mudserver.network.OutputJsonMessage;
 import fr.idev.mudserver.network.OutputMessage;
 import fr.idev.mudserver.network.SecureOutputMessage;
 
-public class TelnetConnection implements Connection, TelnetOutput {
+public class TcpJsonConnection implements Connection, TcpJsonOutput {
 
-    private static final Logger log = LoggerFactory.getLogger(TelnetConnection.class);
+    private static final Logger log = LoggerFactory.getLogger(TcpJsonConnection.class);
 
     private final String connectionId;
     private final Channel channel;
+    private final ObjectMapper objectMapper;
     private final CommandDispatcher commandDispatcher;
     private final AuthWorld authWorld;
     private final WorldInstanceService worldInstanceService;
@@ -37,10 +42,11 @@ public class TelnetConnection implements Connection, TelnetOutput {
     private Consumer<String> pendingLine;
     private boolean pendingLineSecure;
 
-    public TelnetConnection(String connectionId, Channel channel, CommandDispatcher commandDispatcher,
-            AuthWorld authWorld, WorldInstanceService worldInstanceService) {
+    public TcpJsonConnection(String connectionId, Channel channel, ObjectMapper objectMapper,
+            CommandDispatcher commandDispatcher, AuthWorld authWorld, WorldInstanceService worldInstanceService) {
         this.connectionId = connectionId;
         this.channel = channel;
+        this.objectMapper = objectMapper;
         this.commandDispatcher = commandDispatcher;
         this.authWorld = authWorld;
         this.worldInstanceService = worldInstanceService;
@@ -52,27 +58,24 @@ public class TelnetConnection implements Connection, TelnetOutput {
 
     public void handleLine(String rawLine) {
         boolean secureLine = false;
-        String verb = null;
         try {
             if (pendingLine != null) {
                 Consumer<String> handler = pendingLine;
                 secureLine = pendingLineSecure;
                 pendingLine = null;
                 pendingLineSecure = false;
-                handler.accept(rawLine);
+                TcpJsonReply reply = objectMapper.readValue(rawLine, TcpJsonReply.class);
+                handler.accept(reply.reply());
                 return;
             }
 
-            String line = rawLine.trim();
-            int spaceIdx = line.indexOf(' ');
-            String name = spaceIdx == -1 ? line : line.substring(0, spaceIdx);
-            String argument = spaceIdx == -1 ? "" : line.substring(spaceIdx + 1);
-
-            verb = name.toLowerCase();
+            TcpJsonCommand command = objectMapper.readValue(rawLine, TcpJsonCommand.class);
+            String verb = command.verb() == null ? "" : command.verb().toLowerCase();
+            String argument = command.argument() == null ? "" : command.argument();
             commandDispatcher.dispatch(this, verb, argument);
         } catch (Exception e) {
-            log.error("telnet.command.failed verb={} line={}", verb, secureLine ? "[REDACTED]" : rawLine, e);
-            write("Something went wrong processing that command. Please try again.\n");
+            log.error("tcpjson.command.failed line={}", secureLine ? "[REDACTED]" : rawLine, e);
+            write("Error", Map.of("message", "Something went wrong processing that command. Please try again."), false);
         }
     }
 
@@ -80,53 +83,43 @@ public class TelnetConnection implements Connection, TelnetOutput {
         try {
             worldInstanceService.exitGame(this);
         } catch (Exception e) {
-            log.error("telnet.disconnect_cleanup_failed stage=game", e);
+            log.error("tcpjson.disconnect_cleanup_failed stage=game", e);
         }
         try {
             this.detachWorldInstance();
         } catch (Exception e) {
-            log.error("telnet.disconnect_cleanup_failed stage=charselect", e);
+            log.error("tcpjson.disconnect_cleanup_failed stage=charselect", e);
         }
         try {
             authWorld.exitWorld(this);
         } catch (Exception e) {
-            log.error("telnet.disconnect_cleanup_failed stage=auth", e);
+            log.error("tcpjson.disconnect_cleanup_failed stage=auth", e);
         }
     }
 
     @Override
     public void requestBlocking(OutputMessage message, Consumer<String> handler) {
         this.send(message);
-        if (message instanceof SecureOutputMessage) {
-            writeRaw(TelnetEcho.OFF);
-            this.pendingLineSecure = true;
-            this.pendingLine = line -> {
-                writeRaw(TelnetEcho.ON);
-                write("\n");
-                handler.accept(line);
-            };
-        } else {
-            this.pendingLineSecure = false;
-            this.pendingLine = handler;
-        }
+        this.pendingLineSecure = message instanceof SecureOutputMessage;
+        this.pendingLine = handler;
     }
 
     @Override
     public void send(OutputMessage message) {
-        if (!(message instanceof OutputTelnetMessage telnetMessage)) {
-            throw new IllegalArgumentException("Message non supporté par le transport telnet : " + message);
+        if (!(message instanceof OutputJsonMessage jsonMessage)) {
+            throw new IllegalArgumentException("Message non supporté par le transport TCP/JSON : " + message);
         }
-        telnetMessage.toTelnet(this);
-        write("> ");
+        jsonMessage.toJson(this);
     }
 
     @Override
-    public void write(String text) {
-        channel.writeAndFlush(Unpooled.copiedBuffer(text, StandardCharsets.UTF_8));
-    }
-
-    private void writeRaw(byte[] bytes) {
-        channel.writeAndFlush(Unpooled.wrappedBuffer(bytes));
+    public void write(String type, Object payload, boolean secure) {
+        try {
+            String json = objectMapper.writeValueAsString(new TcpJsonEnvelope(type, payload, secure));
+            channel.writeAndFlush(Unpooled.copiedBuffer(json + "\n", StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            log.error("tcpjson.serialize_failed type={}", type, e);
+        }
     }
 
     @Override

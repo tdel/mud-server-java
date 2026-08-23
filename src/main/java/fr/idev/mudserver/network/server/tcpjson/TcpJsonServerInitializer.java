@@ -1,4 +1,4 @@
-package fr.idev.mudserver.network.server.tui;
+package fr.idev.mudserver.network.server.tcpjson;
 
 import java.util.concurrent.ExecutorService;
 
@@ -17,7 +17,7 @@ import fr.idev.mudserver.network.CommandDispatcher;
 import fr.idev.mudserver.game.AuthWorld;
 import fr.idev.mudserver.game.WorldInstanceService;
 
-public class TuiServerInitializer extends ChannelInitializer<SocketChannel> {
+public class TcpJsonServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private static final int MAX_LINE_LENGTH = 65536;
 
@@ -27,7 +27,7 @@ public class TuiServerInitializer extends ChannelInitializer<SocketChannel> {
     private final AuthWorld authWorld;
     private final WorldInstanceService worldInstanceService;
 
-    public TuiServerInitializer(ExecutorService virtualThreadExecutor, ObjectMapper objectMapper,
+    public TcpJsonServerInitializer(ExecutorService virtualThreadExecutor, ObjectMapper objectMapper,
             CommandDispatcher commandDispatcher, AuthWorld authWorld, WorldInstanceService worldInstanceService) {
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.objectMapper = objectMapper;
@@ -42,7 +42,7 @@ public class TuiServerInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(new DelimiterBasedFrameDecoder(MAX_LINE_LENGTH, true, true, Delimiters.lineDelimiter()));
         pipeline.addLast(new StringDecoder(CharsetUtil.UTF_8));
         pipeline.addLast(new StringEncoder(CharsetUtil.UTF_8));
-        pipeline.addLast(new TuiSessionHandler(virtualThreadExecutor, objectMapper, commandDispatcher, authWorld,
+        pipeline.addLast(new TcpJsonSessionHandler(virtualThreadExecutor, objectMapper, commandDispatcher, authWorld,
                 worldInstanceService));
     }
 }
