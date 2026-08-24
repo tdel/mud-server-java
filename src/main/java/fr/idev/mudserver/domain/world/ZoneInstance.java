@@ -10,6 +10,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.idev.mudserver.domain.MonsterSpawn;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.instance.MonsterInstance;
@@ -24,6 +27,8 @@ import fr.idev.mudserver.network.message.ingame.GamePlayerJoinedZone;
 import fr.idev.mudserver.network.message.ingame.GamePlayerLeftZone;
 
 public class ZoneInstance {
+
+    private static final Logger log = LoggerFactory.getLogger(ZoneInstance.class);
 
     public static UUID deterministicId(UUID worldInstanceId, UUID zoneTemplateId) {
         return UUID.nameUUIDFromBytes((worldInstanceId + ":" + zoneTemplateId).getBytes(StandardCharsets.UTF_8));
@@ -95,6 +100,8 @@ public class ZoneInstance {
         character.setCurrentZone(this);
         character.setPosition(position);
         clients.put(character.getId(), character);
+        log.info("zone.joined thread={} zoneId={} character={} position={}", Thread.currentThread().getName(), id,
+                character.getId(), position);
         DomainEventPublisher.publish(new GamePlayerSpawnedToZone(character, this));
 
         broadcast(new GamePlayerJoinedZone(character.getName()), character);
@@ -103,12 +110,15 @@ public class ZoneInstance {
     public void leave(CharacterInstance character) {
         clients.remove(character.getId());
         character.setPosition(null);
+        log.info("zone.left thread={} zoneId={} character={}", Thread.currentThread().getName(), id, character.getId());
         broadcast(new GamePlayerLeftZone(character.getName()), character);
     }
 
     public void disconnect(CharacterInstance character) {
         clients.remove(character.getId());
         character.setPosition(null);
+        log.info("zone.disconnected thread={} zoneId={} character={}", Thread.currentThread().getName(), id,
+                character.getId());
         broadcast(new GamePlayerDisconnected(character.getName()), character);
     }
 

@@ -41,6 +41,8 @@ public class MovementEngine {
         }
         character.activeMovement = new ActiveMovement(List.copyOf(waypoints), System.nanoTime());
         movingCharacters.put(character.getId(), character);
+        log.debug("movement.started thread={} character={} waypoints={}", Thread.currentThread().getName(),
+                character.getId(), waypoints.size());
     }
 
     public void stopMovement(AbstractCharacter character) {
@@ -49,6 +51,7 @@ public class MovementEngine {
         }
         character.activeMovement = null;
         movingCharacters.remove(character.getId());
+        log.debug("movement.stopped thread={} character={}", Thread.currentThread().getName(), character.getId());
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
@@ -63,10 +66,14 @@ public class MovementEngine {
                         character.send(new PositionUpdated(character.getPosition().x(), character.getPosition().y()));
                     case FINISHED -> {
                         movingCharacters.remove(character.getId());
+                        log.debug("movement.finished thread={} character={}", Thread.currentThread().getName(),
+                                character.getId());
                         character.send(new MovementFinished(character.getPosition().x(), character.getPosition().y()));
                     }
                     case BLOCKED_BY_BOUNDS -> {
                         movingCharacters.remove(character.getId());
+                        log.debug("movement.blocked thread={} character={}", Thread.currentThread().getName(),
+                                character.getId());
                         character.send(new MovementBlockedByBounds());
                     }
                 }

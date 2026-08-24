@@ -53,7 +53,8 @@ public class MonsterAiEngine {
         pursuing.put(monster.getId(), monster);
 
         if (startingChase) {
-            log.info("monster.ai.aggro monsterId={} attackerId={}", monster.getId(), attacker.getId());
+            log.info("monster.ai.aggro thread={} monsterId={} attackerId={}", Thread.currentThread().getName(),
+                    monster.getId(), attacker.getId());
             attacker.send(new MonsterStartedChasing(monster.getName()));
         }
     }
@@ -129,7 +130,7 @@ public class MonsterAiEngine {
     }
 
     private void giveUpChase(MonsterInstance monster, CharacterInstance target) {
-        log.info("monster.ai.give_up monsterId={}", monster.getId());
+        log.info("monster.ai.give_up thread={} monsterId={}", Thread.currentThread().getName(), monster.getId());
         monster.pursuit = new PursuitState(State.RETURNING, null, System.nanoTime(), 0L);
         if (target != null) {
             target.send(new MonsterGaveUpChase(monster.getName()));

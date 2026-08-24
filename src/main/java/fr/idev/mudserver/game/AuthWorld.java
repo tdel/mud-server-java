@@ -88,6 +88,7 @@ public class AuthWorld {
         connections.add(connection);
         connection.attachWorldInstance(worldInstanceService.getDefaultInstance());
         MDC.put("account", account.getLogin());
+        log.info("auth.entered_world thread={} account={}", Thread.currentThread().getName(), account.getLogin());
 
         connection.send(new WelcomeBack(account.getLogin()));
         charSelectStatus.show(connection, account);
@@ -95,12 +96,20 @@ public class AuthWorld {
 
     public void exitWorld(Connection connection) {
         connections.remove(connection);
+        String login = connection.account() != null ? connection.account().getLogin() : null;
         connection.setAccount(null);
         connection.setState(ConnectionState.CONNECTED);
+        log.info("auth.exited_world thread={} account={}", Thread.currentThread().getName(), login);
         MDC.remove("account");
     }
 
     public boolean isAlreadyConnected(UUID accountId) {
-        return connections.stream().anyMatch(connection -> connection.account().getId().equals(accountId));
+        boolean alreadyConnected = connections.stream()
+                .anyMatch(connection -> connection.account().getId().equals(accountId));
+        if (alreadyConnected) {
+            log.warn("auth.duplicate_connection_detected thread={} accountId={}", Thread.currentThread().getName(),
+                    accountId);
+        }
+        return alreadyConnected;
     }
 }

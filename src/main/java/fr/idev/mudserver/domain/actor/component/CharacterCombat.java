@@ -5,6 +5,9 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.ModifiedStat;
@@ -18,6 +21,8 @@ import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 
 public final class CharacterCombat {
+
+    private static final Logger log = LoggerFactory.getLogger(CharacterCombat.class);
 
     public static final Duration ATTACK_COOLDOWN = Duration.ofSeconds(2);
 
@@ -78,6 +83,11 @@ public final class CharacterCombat {
         }
 
         nextAttackAt = Instant.now().plus(ATTACK_COOLDOWN);
+
+        log.info(
+                "combat.attack_resolved attacker={} defender={} hit={} critical={} damage={} defenderHealthAfter={} defeated={}",
+                character.getId(), defender.getId(), hit, critical, damage, healthAfter, defeated);
+
         return new AttackOutcome(hit, critical, damage, healthAfter, defender.getMaxHealth(), defeated);
     }
 

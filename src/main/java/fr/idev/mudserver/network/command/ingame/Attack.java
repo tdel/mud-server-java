@@ -3,6 +3,8 @@ package fr.idev.mudserver.network.command.ingame;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
@@ -21,6 +23,8 @@ import fr.idev.mudserver.network.message.ingame.TargetNotFound;
 
 @Component
 public class Attack implements CommandHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(Attack.class);
 
     @Override
     public String name() {
@@ -53,6 +57,7 @@ public class Attack implements CommandHandler {
         } else {
             Optional<AbstractCharacter> found = character.getCurrentZone().findAttackableByName(name, character);
             if (found.isEmpty()) {
+                log.debug("attack.rejected character={} reason=target_not_found target={}", character.getId(), name);
                 connection.send(new TargetNotFound(name));
                 return;
             }
@@ -61,11 +66,13 @@ public class Attack implements CommandHandler {
         }
 
         if (character.getPosition().distanceTo(target.getPosition()) > MonsterAiEngine.ATTACK_RANGE) {
+            log.debug("attack.rejected character={} reason=out_of_range target={}", character.getId(), target.getId());
             connection.send(new AttackOutOfRange(target.getName()));
             return;
         }
 
         if (!combat.isReady()) {
+            log.debug("attack.rejected character={} reason=on_cooldown target={}", character.getId(), target.getId());
             connection.send(new AttackOnCooldown(combat.remainingCooldown().toMillis()));
             return;
         }

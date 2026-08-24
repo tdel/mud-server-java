@@ -10,6 +10,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.CharacterClass;
@@ -24,6 +27,8 @@ import fr.idev.mudserver.game.dice.DiceRoller;
 import fr.idev.mudserver.network.OutputMessage;
 
 public class WorldInstance {
+
+    private static final Logger log = LoggerFactory.getLogger(WorldInstance.class);
 
     public static final UUID DEFAULT_ID = UUID.fromString("a8e98a8e-73c1-43dd-b36e-a2f67f00ff48");
 
@@ -76,11 +81,15 @@ public class WorldInstance {
     public void loadPlayer(CharacterInstance character) {
         character.getCurrentZone().join(character);
         players.put(character.getId(), character);
+        log.info("world.player_loaded thread={} worldId={} character={}", Thread.currentThread().getName(), id,
+                character.getId());
         DomainEventPublisher.publish(new PlayerLoadedInWorld(character));
     }
 
     public void removePlayer(CharacterInstance character) {
         players.remove(character.getId());
+        log.info("world.player_removed thread={} worldId={} character={}", Thread.currentThread().getName(), id,
+                character.getId());
     }
 
     public Collection<CharacterInstance> onlineCharacters() {

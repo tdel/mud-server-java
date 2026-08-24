@@ -18,10 +18,12 @@ public class CommandDispatcher {
     }
 
     public void dispatch(Connection connection, String actionName, String argument) {
-        registry.find(connection.state(), actionName).ifPresentOrElse(action -> action.onReceive(connection, argument),
-                () -> {
-                    log.debug("command.unknown verb={} state={}", actionName, connection.state());
-                    connection.send(new ActionNotFound());
-                });
+        registry.find(connection.state(), actionName).ifPresentOrElse(action -> {
+            log.info("command.received verb={} state={}", actionName, connection.state());
+            action.onReceive(connection, argument);
+        }, () -> {
+            log.debug("command.unknown verb={} state={}", actionName, connection.state());
+            connection.send(new ActionNotFound());
+        });
     }
 }

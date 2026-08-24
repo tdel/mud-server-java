@@ -5,6 +5,9 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.idev.mudserver.domain.actor.Attribute;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.ModifiedStat;
@@ -17,6 +20,8 @@ import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
 
 public final class MonsterInstance extends AbstractCharacter {
+
+    private static final Logger log = LoggerFactory.getLogger(MonsterInstance.class);
 
     private final UUID templateId;
     private final UUID zoneId;
@@ -36,13 +41,17 @@ public final class MonsterInstance extends AbstractCharacter {
 
     public boolean takeDamage(int amount, CharacterInstance attacker) {
         boolean defeated;
+        int healthAfter;
         synchronized (this) {
             if (getCurrentHealth() <= 0) {
                 return false;
             }
             setCurrentHealth(Math.max(0, getCurrentHealth() - amount));
             defeated = getCurrentHealth() <= 0;
+            healthAfter = getCurrentHealth();
         }
+        log.debug("monster.take_damage thread={} monsterId={} attacker={} amount={} healthAfter={}",
+                Thread.currentThread().getName(), getId(), attacker.getId(), amount, healthAfter);
         if (defeated) {
             DomainEventPublisher.publish(new CharacterDied(this, attacker));
         }
@@ -70,6 +79,10 @@ public final class MonsterInstance extends AbstractCharacter {
             healthAfter = Math.max(0, defender.getCurrentHealth() - damage);
             defeated = defender.takeDamage(damage, this);
         }
+
+        log.info(
+                "combat.attack_resolved attacker={} defender={} hit={} critical={} damage={} defenderHealthAfter={} defeated={}",
+                getId(), defender.getId(), hit, critical, damage, healthAfter, defeated);
 
         return new MonsterAttackOutcome(hit, critical, damage, healthAfter, defender.getMaxHealth(), defeated);
     }

@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
@@ -20,6 +22,8 @@ import fr.idev.mudserver.network.message.ingame.ViewAround;
 
 @Component
 public class Goto implements CommandHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(Goto.class);
 
     private final MovementEngine movementEngine;
 
@@ -59,11 +63,14 @@ public class Goto implements CommandHandler {
                 character.getCurrentZone().getCollisionGrid());
 
         if (path.isEmpty()) {
+            log.debug("movement.no_path character={} target=({},{})", character.getId(), target.x(), target.y());
             connection.send(new NoPathToDestination(target.x(), target.y()));
             return;
         }
 
         List<Position> waypoints = path.get();
+        log.info("movement.requested character={} target=({},{}) waypoints={}", character.getId(), target.x(),
+                target.y(), waypoints.size());
         movementEngine.startMovement(waypoints, character);
         if (waypoints.isEmpty()) {
             connection.send(new ViewAround(character));

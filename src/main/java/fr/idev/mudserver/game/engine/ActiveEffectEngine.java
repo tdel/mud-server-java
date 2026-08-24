@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -21,6 +23,8 @@ import fr.idev.mudserver.network.message.ingame.SpellModifierExpired;
 
 @Component
 public class ActiveEffectEngine {
+
+    private static final Logger log = LoggerFactory.getLogger(ActiveEffectEngine.class);
 
     private static final long TICK_INTERVAL_MS = 1_000L;
 
@@ -50,6 +54,7 @@ public class ActiveEffectEngine {
 
     public void register(AbstractCharacter character) {
         tracked.putIfAbsent(character.getId(), character);
+        log.debug("effect.tracking_started character={}", character.getId());
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
@@ -62,6 +67,7 @@ public class ActiveEffectEngine {
             }
             if (character.getActiveEffects().isEmpty()) {
                 tracked.remove(character.getId());
+                log.debug("effect.tracking_stopped character={}", character.getId());
             }
         }
     }
