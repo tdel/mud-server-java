@@ -2,9 +2,8 @@ package fr.idev.mudserver.domain.world;
 
 import fr.idev.mudserver.domain.MonsterSpawn;
 import fr.idev.mudserver.domain.NpcSpawn;
-import fr.idev.mudserver.domain.map.HexCoordinate;
+import fr.idev.mudserver.domain.map.Position;
 
-import java.util.Map;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -15,21 +14,20 @@ public class ZoneTemplate {
     private final String name;
     private final String description;
     private final Boolean isStartingZone;
-    private final Map<HexCoordinate, TileType> terrain;
-    private final HexCoordinate spawnCell;
+    private final CollisionGrid collisionGrid;
+    private final Position spawnPosition;
     private final List<MonsterSpawn> monsterSpawns;
     private final List<NpcSpawn> npcSpawns;
     private List<ZoneTemplatePortal> portals = List.of();
 
-    public ZoneTemplate(UUID id, String name, String description, Boolean isStartingZone,
-            Map<HexCoordinate, TileType> terrain, HexCoordinate spawnCell, List<MonsterSpawn> monsterSpawns,
-            List<NpcSpawn> npcSpawns) {
+    public ZoneTemplate(UUID id, String name, String description, Boolean isStartingZone, CollisionGrid collisionGrid,
+            Position spawnPosition, List<MonsterSpawn> monsterSpawns, List<NpcSpawn> npcSpawns) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.isStartingZone = isStartingZone;
-        this.terrain = Map.copyOf(terrain);
-        this.spawnCell = spawnCell;
+        this.collisionGrid = collisionGrid;
+        this.spawnPosition = spawnPosition;
         this.monsterSpawns = List.copyOf(monsterSpawns);
         this.npcSpawns = List.copyOf(npcSpawns);
     }
@@ -50,12 +48,12 @@ public class ZoneTemplate {
         return isStartingZone;
     }
 
-    public Map<HexCoordinate, TileType> getTerrain() {
-        return terrain;
+    public CollisionGrid getCollisionGrid() {
+        return collisionGrid;
     }
 
-    public HexCoordinate getSpawnCell() {
-        return spawnCell;
+    public Position getSpawnPosition() {
+        return spawnPosition;
     }
 
     public List<MonsterSpawn> getMonsterSpawns() {
@@ -74,13 +72,12 @@ public class ZoneTemplate {
         this.portals = List.copyOf(portals);
     }
 
-    public boolean containsCell(HexCoordinate cell) {
-        return terrain.containsKey(cell);
+    public boolean containsPosition(Position position) {
+        return collisionGrid.containsPosition(position);
     }
 
-    public boolean isWalkable(HexCoordinate cell) {
-        TileType tile = terrain.get(cell);
-        return tile != null && tile.isWalkable();
+    public boolean isWalkable(Position position) {
+        return collisionGrid.isWalkable(position);
     }
 
     @Override
@@ -101,7 +98,7 @@ public class ZoneTemplate {
 
     @Override
     public String toString() {
-        return "ZoneTemplate[id=" + id + ", name=" + name + ", isStartingZone=" + isStartingZone + ", cells="
-                + terrain.size() + ", spawnCell=" + spawnCell + "]";
+        return "ZoneTemplate[id=" + id + ", name=" + name + ", isStartingZone=" + isStartingZone + ", spawnPosition="
+                + spawnPosition + "]";
     }
 }

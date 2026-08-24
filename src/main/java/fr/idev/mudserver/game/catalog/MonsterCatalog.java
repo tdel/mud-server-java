@@ -63,10 +63,10 @@ public class MonsterCatalog {
                 }
 
                 MonsterInstance monster = new MonsterInstance(spawn.id(), template.getName(), template.getId(),
-                        zone.getId(), template.getAttributes(), template.getMaxHealth(), spawn.cell());
+                        zone.getId(), template.getAttributes(), template.getMaxHealth(), spawn.position());
                 monster.attachTemplate(template);
                 monster.setCurrentZone(zone);
-                zone.placeMonster(monster, spawn.cell());
+                zone.placeMonster(monster, spawn.position());
                 placedCount++;
             }
         }

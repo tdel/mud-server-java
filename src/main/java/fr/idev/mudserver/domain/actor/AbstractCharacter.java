@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import fr.idev.mudserver.domain.actor.component.ActiveEffects;
 import fr.idev.mudserver.domain.actor.component.SpellCasting;
-import fr.idev.mudserver.domain.map.HexCoordinate;
+import fr.idev.mudserver.domain.map.Position;
 import fr.idev.mudserver.domain.world.ZoneInstance;
 import fr.idev.mudserver.game.engine.MovementEngine;
 import fr.idev.mudserver.game.dice.DiceExpression;
@@ -24,7 +24,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     private int maxHealth;
 
     private volatile ZoneInstance currentZone;
-    private volatile HexCoordinate position;
+    private volatile Position position;
     protected int speed = DEFAULT_SPEED;
     public volatile MovementEngine.ActiveMovement activeMovement;
 
@@ -101,11 +101,11 @@ public abstract class AbstractCharacter extends AbstractObject {
         this.currentZone = currentZone;
     }
 
-    public HexCoordinate getPosition() {
+    public Position getPosition() {
         return position;
     }
 
-    public void setPosition(HexCoordinate position) {
+    public void setPosition(Position position) {
         this.position = position;
     }
 

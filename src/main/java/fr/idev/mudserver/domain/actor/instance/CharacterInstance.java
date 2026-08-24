@@ -32,7 +32,7 @@ import fr.idev.mudserver.domain.actor.event.ItemDiscarded;
 import fr.idev.mudserver.domain.actor.event.ItemPurchased;
 import fr.idev.mudserver.domain.actor.event.SpellCast;
 import fr.idev.mudserver.domain.item.EquipmentSlot;
-import fr.idev.mudserver.domain.map.HexCoordinate;
+import fr.idev.mudserver.domain.map.Position;
 import fr.idev.mudserver.domain.item.Item;
 import fr.idev.mudserver.domain.world.ZoneInstance;
 import fr.idev.mudserver.domain.item.WeaponCategory;
@@ -382,13 +382,13 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     public void moveToZone(ZoneInstance destination) {
-        moveToZone(destination, destination.getSpawnCell());
+        moveToZone(destination, destination.getSpawnPosition());
     }
 
-    public void moveToZone(ZoneInstance destination, HexCoordinate targetCell) {
+    public void moveToZone(ZoneInstance destination, Position targetPosition) {
         ZoneInstance previous = getCurrentZone();
         previous.leave(this);
-        destination.join(this, targetCell);
+        destination.join(this, targetPosition);
         DomainEventPublisher.publish(new GamePlayerMovedToZone(this, previous, destination));
     }
 

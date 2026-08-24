@@ -2,17 +2,14 @@
     "type": "map",
     "version": "1.10",
     "tiledversion": "1.11.0",
-    "orientation": "hexagonal",
+    "orientation": "orthogonal",
     "renderorder": "right-down",
     "compressionlevel": -1,
     "infinite": false,
     "width": 15,
     "height": 9,
     "tilewidth": 32,
-    "tileheight": 28,
-    "hexsidelength": 8,
-    "staggeraxis": "y",
-    "staggerindex": "odd",
+    "tileheight": 32,
     "nextlayerid": 3,
     "nextobjectid": 5,
     "properties": [
@@ -40,37 +37,77 @@
     "tilesets": [
         {
             "firstgid": 1,
-            "source": "shared/hex-terrain.tsx"
+            "tiles": [
+                {
+                    "id": 0,
+                    "properties": [
+                        {
+                            "name": "walkable",
+                            "type": "bool",
+                            "value": false
+                        },
+                        {
+                            "name": "terrain",
+                            "type": "string",
+                            "value": "denseTallGrass"
+                        }
+                    ]
+                },
+                {
+                    "id": 1,
+                    "properties": [
+                        {
+                            "name": "walkable",
+                            "type": "bool",
+                            "value": true
+                        },
+                        {
+                            "name": "terrain",
+                            "type": "string",
+                            "value": "dirtPath"
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "properties": [
+                        {
+                            "name": "walkable",
+                            "type": "bool",
+                            "value": true
+                        },
+                        {
+                            "name": "terrain",
+                            "type": "string",
+                            "value": "tallGrassPatch"
+                        }
+                    ]
+                },
+                {
+                    "id": 3,
+                    "properties": [
+                        {
+                            "name": "walkable",
+                            "type": "bool",
+                            "value": true
+                        },
+                        {
+                            "name": "terrain",
+                            "type": "string",
+                            "value": "ironGate"
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "layers": [
         {
             "type": "tilelayer",
-            "id": 1,
             "name": "terrain",
-            "x": 0,
-            "y": 0,
             "width": 15,
             "height": 9,
-            "opacity": 1,
-            "visible": true,
             "data": [
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
                 1,
                 1,
                 1,
@@ -82,96 +119,39 @@
                 1,
                 1,
                 1,
-                10,
+                1,
+                1,
+                1,
+                1,
                 1,
                 2,
-                2,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
                 3,
                 3,
-                1,
-                1,
-                2,
-                2,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
                 3,
                 3,
-                1,
-                1,
-                1,
-                1,
-                2,
-                2,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                3,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                2,
-                2,
-                1,
-                1,
-                1,
-                1,
                 3,
                 3,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                2,
-                2,
-                1,
-                1,
                 3,
                 3,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
+                3,
+                3,
+                3,
+                2,
                 1,
                 1,
                 2,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
                 2,
-                1,
-                10,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
                 1,
                 1,
                 2,
@@ -187,46 +167,107 @@
                 2,
                 2,
                 2,
+                1,
+                1,
                 2,
                 2,
-                2
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                4,
+                1,
+                1,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                1,
+                1,
+                2,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                2,
+                1,
+                1,
+                2,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                2,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
             ]
         },
         {
             "type": "objectgroup",
-            "id": 2,
             "name": "objects",
-            "x": 0,
-            "y": 0,
-            "opacity": 1,
-            "visible": true,
-            "draworder": "topdown",
             "objects": [
                 {
                     "id": 1,
                     "name": "playerSpawn",
                     "type": "playerSpawn",
                     "x": 240.0,
-                    "y": 86.0,
-                    "width": 0,
-                    "height": 0,
-                    "visible": true,
+                    "y": 144.0,
                     "properties": []
                 },
                 {
                     "id": 2,
-                    "name": "portal",
+                    "name": "portail-ouest",
                     "type": "portal",
-                    "x": 416.0,
-                    "y": 32.0,
-                    "width": 0,
-                    "height": 0,
-                    "visible": true,
+                    "x": 48.0,
+                    "y": 144.0,
                     "properties": [
                         {
                             "name": "direction",
                             "type": "string",
-                            "value": "NE"
+                            "value": "O"
                         },
                         {
                             "name": "targetZoneId",
@@ -234,31 +275,28 @@
                             "value": "5e4ada37-37e1-438c-9233-581f10c055c7"
                         },
                         {
-                            "name": "targetCellQ",
-                            "type": "int",
-                            "value": 10
+                            "name": "targetX",
+                            "type": "float",
+                            "value": 528.0
                         },
                         {
-                            "name": "targetCellR",
-                            "type": "int",
-                            "value": 16
+                            "name": "targetY",
+                            "type": "float",
+                            "value": 432.0
                         }
                     ]
                 },
                 {
                     "id": 3,
-                    "name": "portal",
+                    "name": "portail-est",
                     "type": "portal",
-                    "x": 96.0,
-                    "y": 140.0,
-                    "width": 0,
-                    "height": 0,
-                    "visible": true,
+                    "x": 432.0,
+                    "y": 144.0,
                     "properties": [
                         {
                             "name": "direction",
                             "type": "string",
-                            "value": "SW"
+                            "value": "E"
                         },
                         {
                             "name": "targetZoneId",
@@ -266,26 +304,23 @@
                             "value": "a73e8fb0-c05b-4aa8-9c57-4b097644cd0d"
                         },
                         {
-                            "name": "targetCellQ",
-                            "type": "int",
-                            "value": 10
+                            "name": "targetX",
+                            "type": "float",
+                            "value": 48.0
                         },
                         {
-                            "name": "targetCellR",
-                            "type": "int",
-                            "value": 1
+                            "name": "targetY",
+                            "type": "float",
+                            "value": 144.0
                         }
                     ]
                 },
                 {
                     "id": 4,
-                    "name": "monsterSpawn",
+                    "name": "monstre",
                     "type": "monsterSpawn",
                     "x": 304.0,
-                    "y": 50.0,
-                    "width": 0,
-                    "height": 0,
-                    "visible": true,
+                    "y": 112.0,
                     "properties": [
                         {
                             "name": "templateId",

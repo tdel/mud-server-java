@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Sous-ensemble du format JSON exporté par Tiled Map Editor (orientation
- * hexagonale) réellement exploité par {@link TiledZoneLoader}. Les autres
+ * orthogonale) réellement exploité par {@link TiledZoneLoader}. Les autres
  * champs standards d'un export Tiled (version, tiledversion, infinite,
  * renderorder, nextlayerid, nextobjectid, image du tileset, etc.) restent
  * présents dans les fichiers authorés sous {@code data/zones/*.json} pour
@@ -12,9 +12,8 @@ import java.util.List;
  * {@link TiledZoneLoader} lit ces fichiers avec un mapper tolérant aux
  * propriétés inconnues.
  */
-public record TiledMap(String orientation, int width, int height, int tilewidth, int tileheight, int hexsidelength,
-        String staggeraxis, String staggerindex, List<TiledLayer> layers, List<TiledTileset> tilesets,
-        List<TiledProperty> properties) {
+public record TiledMap(String orientation, int width, int height, int tilewidth, int tileheight,
+        List<TiledLayer> layers, List<TiledTileset> tilesets, List<TiledProperty> properties) {
 
     public record TiledLayer(String type, String name, Integer width, Integer height, List<Integer> data,
             List<TiledObjectDef> objects, List<TiledProperty> properties) {

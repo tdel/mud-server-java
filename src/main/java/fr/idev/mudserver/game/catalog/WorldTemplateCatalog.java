@@ -17,7 +17,6 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
 import fr.idev.mudserver.domain.NpcSpawn;
-import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.item.ItemTemplate;
 import fr.idev.mudserver.domain.world.ZoneTemplate;
 import fr.idev.mudserver.domain.world.ZoneTemplatePortal;
@@ -162,10 +161,10 @@ public class WorldTemplateCatalog {
         Map<UUID, ZoneTemplate> templates = new LinkedHashMap<>();
         for (ParsedZone zone : parsedZones) {
             ZoneTemplate template = new ZoneTemplate(zone.id(), zone.name(), zone.description(), zone.isStartingZone(),
-                    zone.terrain(), zone.spawnCell(), zone.monsterSpawns(), zone.npcSpawns());
-            if (!template.isWalkable(zone.spawnCell())) {
-                throw new IllegalStateException("Zone " + zone.id() + " du monde " + shortName + " a une case de spawn "
-                        + zone.spawnCell() + " absente ou non praticable de sa carte");
+                    zone.terrain(), zone.spawnPosition(), zone.monsterSpawns(), zone.npcSpawns());
+            if (!template.isWalkable(zone.spawnPosition())) {
+                throw new IllegalStateException("Zone " + zone.id() + " du monde " + shortName + " a une position de "
+                        + "spawn " + zone.spawnPosition() + " non praticable de sa carte");
             }
             if (templates.putIfAbsent(template.getId(), template) != null) {
                 throw new IllegalStateException("Zone " + zone.id() + " dupliquée dans le monde " + shortName);
@@ -176,7 +175,7 @@ public class WorldTemplateCatalog {
             ZoneTemplate source = templates.get(zone.id());
             List<ZoneTemplatePortal> portals = zone.portals().stream()
                     .map(portal -> resolvePortal(shortName, zone, source, portal, templates)).toList();
-            checkNoDuplicatePortalCell(shortName, zone, portals);
+            checkNoOverlappingPortals(shortName, zone, portals);
             source.setPortals(portals);
         }
 
@@ -191,25 +190,31 @@ public class WorldTemplateCatalog {
                     + portal.direction() + "' vers " + portal.targetZoneId() + ", absente de ce monde");
         }
 
-        if (!source.isWalkable(portal.cell())) {
+        if (!source.isWalkable(portal.position())) {
             throw new IllegalStateException("Zone " + zone.id() + " du monde " + shortName + " a un portail en "
-                    + portal.cell() + " absente ou non praticable de sa carte");
+                    + portal.position() + " non praticable de sa carte");
         }
 
-        if (!target.isWalkable(portal.targetCell())) {
+        if (!target.isWalkable(portal.targetPosition())) {
             throw new IllegalStateException(
-                    "Zone " + zone.id() + " du monde " + shortName + " a un portail vers " + portal.targetCell()
-                            + " absente ou non praticable de la carte de la zone cible " + portal.targetZoneId());
+                    "Zone " + zone.id() + " du monde " + shortName + " a un portail vers " + portal.targetPosition()
+                            + " non praticable de la carte de la zone cible " + portal.targetZoneId());
         }
 
-        return new ZoneTemplatePortal(portal.cell(), portal.direction(), target.getId(), portal.targetCell());
+        return new ZoneTemplatePortal(portal.position(), portal.direction(), target.getId(), portal.targetPosition(),
+                portal.triggerRadius());
     }
 
-    private void checkNoDuplicatePortalCell(String shortName, ParsedZone zone, List<ZoneTemplatePortal> portals) {
-        long distinctCells = portals.stream().map(ZoneTemplatePortal::cell).distinct().count();
-        if (distinctCells != portals.size()) {
-            throw new IllegalStateException(
-                    "Zone " + zone.id() + " du monde " + shortName + " a plusieurs portails sur la même case");
+    private void checkNoOverlappingPortals(String shortName, ParsedZone zone, List<ZoneTemplatePortal> portals) {
+        for (int i = 0; i < portals.size(); i++) {
+            for (int j = i + 1; j < portals.size(); j++) {
+                ZoneTemplatePortal a = portals.get(i);
+                ZoneTemplatePortal b = portals.get(j);
+                if (a.position().distanceTo(b.position()) < a.triggerRadius() + b.triggerRadius()) {
+                    throw new IllegalStateException("Zone " + zone.id() + " du monde " + shortName
+                            + " a des portails qui se chevauchent en " + a.position() + " et " + b.position());
+                }
+            }
         }
     }
 
@@ -227,8 +232,8 @@ public class WorldTemplateCatalog {
                 AbstractNpc.NpcDialogue dialogue = toDialogue(definition);
                 NpcSellerInstance.NpcShop shop = toShop(shortName, definition, itemTemplatesById);
 
-                NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), zone.getId(), spawn.cell(),
-                        definition.description(), dialogue, shop, definition.level());
+                NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), zone.getId(),
+                        spawn.position(), definition.description(), dialogue, shop, definition.level());
                 if (templates.putIfAbsent(template.id(), template) != null) {
                     throw new IllegalStateException("NPC " + definition.id() + " dupliqué dans le monde " + shortName);
                 }

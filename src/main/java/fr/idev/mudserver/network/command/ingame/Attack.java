@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.domain.actor.component.CharacterCombat;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
+import fr.idev.mudserver.game.engine.MonsterAiEngine;
 import fr.idev.mudserver.network.CommandHandler;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
@@ -44,7 +45,7 @@ public class Attack implements CommandHandler {
                 connection.send(new NoTargetSelected());
                 return;
             }
-            if (!character.getCurrentZone().isOccupant(target)) {
+            if (!character.getCurrentZone().isPresent(target)) {
                 combat.setTarget(null);
                 connection.send(new TargetNotFound(target.getName()));
                 return;
@@ -59,7 +60,7 @@ public class Attack implements CommandHandler {
             combat.setTarget(target);
         }
 
-        if (character.getPosition().distanceTo(target.getPosition()) > 1) {
+        if (character.getPosition().distanceTo(target.getPosition()) > MonsterAiEngine.ATTACK_RANGE) {
             connection.send(new AttackOutOfRange(target.getName()));
             return;
         }

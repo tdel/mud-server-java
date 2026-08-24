@@ -41,7 +41,7 @@ public class Portal implements CommandHandler {
             return;
         }
 
-        character.moveToZone(portal.get().targetZone(), portal.get().targetCell());
+        character.moveToZone(portal.get().targetZone(), portal.get().targetPosition());
         connection.send(new ZoneMap(character.getCurrentZone()));
         lookAction.onReceive(connection, "");
     }

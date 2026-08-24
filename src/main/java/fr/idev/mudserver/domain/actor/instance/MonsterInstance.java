@@ -11,7 +11,7 @@ import fr.idev.mudserver.domain.actor.ModifiedStat;
 import fr.idev.mudserver.domain.actor.template.MonsterTemplate;
 import fr.idev.mudserver.domain.actor.event.CharacterDied;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
-import fr.idev.mudserver.domain.map.HexCoordinate;
+import fr.idev.mudserver.domain.map.Position;
 import fr.idev.mudserver.game.engine.MonsterAiEngine;
 import fr.idev.mudserver.game.dice.DiceRoll;
 import fr.idev.mudserver.game.dice.DiceRoller;
@@ -20,18 +20,18 @@ public final class MonsterInstance extends AbstractCharacter {
 
     private final UUID templateId;
     private final UUID zoneId;
-    private final HexCoordinate spawnCell;
+    private final Position spawnPosition;
 
     private MonsterTemplate template;
 
     public volatile MonsterAiEngine.PursuitState pursuit;
 
     public MonsterInstance(UUID id, String name, UUID templateId, UUID zoneId, Map<Attribute, Integer> attributes,
-            int maxHealth, HexCoordinate spawnCell) {
+            int maxHealth, Position spawnPosition) {
         super(id, name, attributes, maxHealth, maxHealth);
         this.templateId = templateId;
         this.zoneId = zoneId;
-        this.spawnCell = spawnCell;
+        this.spawnPosition = spawnPosition;
     }
 
     public boolean takeDamage(int amount, CharacterInstance attacker) {
@@ -132,8 +132,8 @@ public final class MonsterInstance extends AbstractCharacter {
         return zoneId;
     }
 
-    public HexCoordinate getSpawnCell() {
-        return spawnCell;
+    public Position getSpawnPosition() {
+        return spawnPosition;
     }
 
     @Override
@@ -147,19 +147,20 @@ public final class MonsterInstance extends AbstractCharacter {
         return getCurrentHealth() == other.getCurrentHealth() && getMaxHealth() == other.getMaxHealth()
                 && Objects.equals(getId(), other.getId()) && Objects.equals(getName(), other.getName())
                 && Objects.equals(templateId, other.templateId) && Objects.equals(zoneId, other.zoneId)
-                && Objects.equals(spawnCell, other.spawnCell) && Objects.equals(getAttributes(), other.getAttributes());
+                && Objects.equals(spawnPosition, other.spawnPosition)
+                && Objects.equals(getAttributes(), other.getAttributes());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), templateId, zoneId, spawnCell, getAttributes(), getCurrentHealth(),
+        return Objects.hash(getId(), getName(), templateId, zoneId, spawnPosition, getAttributes(), getCurrentHealth(),
                 getMaxHealth());
     }
 
     @Override
     public String toString() {
         return "GameMonster[id=" + getId() + ", name=" + getName() + ", templateId=" + templateId + ", zoneId=" + zoneId
-                + ", spawnCell=" + spawnCell + ", currentHealth=" + getCurrentHealth() + ", maxHealth=" + getMaxHealth()
-                + "]";
+                + ", spawnPosition=" + spawnPosition + ", currentHealth=" + getCurrentHealth() + ", maxHealth="
+                + getMaxHealth() + "]";
     }
 }

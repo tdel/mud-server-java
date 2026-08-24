@@ -46,6 +46,6 @@ public class NpcCatalog {
         AbstractNpc npc = template.shop() != null
                 ? new NpcSellerInstance(template.id(), template, zone)
                 : new AbstractNpc(template.id(), template, zone);
-        zone.placeNpc(npc, template.cell());
+        zone.placeNpc(npc, template.position());
     }
 }

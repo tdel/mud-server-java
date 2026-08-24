@@ -2,7 +2,6 @@ package fr.idev.mudserver.domain.world;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -18,7 +17,7 @@ import fr.idev.mudserver.domain.actor.AbstractNpc;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
 import fr.idev.mudserver.domain.actor.event.GamePlayerSpawnedToZone;
-import fr.idev.mudserver.domain.map.HexCoordinate;
+import fr.idev.mudserver.domain.map.Position;
 import fr.idev.mudserver.network.OutputMessage;
 import fr.idev.mudserver.network.message.ingame.GamePlayerDisconnected;
 import fr.idev.mudserver.network.message.ingame.GamePlayerJoinedZone;
@@ -37,7 +36,6 @@ public class ZoneInstance {
     private final Map<UUID, CharacterInstance> clients = new ConcurrentHashMap<>();
     private final List<MonsterInstance> monsters = new CopyOnWriteArrayList<>();
     private final List<AbstractNpc> npcs = new CopyOnWriteArrayList<>();
-    private final Map<HexCoordinate, AbstractCharacter> occupants = new ConcurrentHashMap<>();
 
     public ZoneInstance(UUID id, ZoneTemplate template, WorldInstance worldInstance) {
         this.id = id;
@@ -73,29 +71,29 @@ public class ZoneInstance {
         return template.isStartingZone();
     }
 
-    public Map<HexCoordinate, TileType> getTerrain() {
-        return template.getTerrain();
+    public CollisionGrid getCollisionGrid() {
+        return template.getCollisionGrid();
     }
 
-    public HexCoordinate getSpawnCell() {
-        return template.getSpawnCell();
+    public Position getSpawnPosition() {
+        return template.getSpawnPosition();
     }
 
-    public boolean containsCell(HexCoordinate cell) {
-        return template.containsCell(cell);
+    public boolean containsPosition(Position position) {
+        return template.containsPosition(position);
     }
 
-    public boolean isWalkable(HexCoordinate cell) {
-        return template.isWalkable(cell);
+    public boolean isWalkable(Position position) {
+        return template.isWalkable(position);
     }
 
     public void join(CharacterInstance character) {
-        join(character, getSpawnCell());
+        join(character, getSpawnPosition());
     }
 
-    public void join(CharacterInstance character, HexCoordinate cell) {
+    public void join(CharacterInstance character, Position position) {
         character.setCurrentZone(this);
-        character.setPosition(claimNearestFreeCell(cell, character));
+        character.setPosition(position);
         clients.put(character.getId(), character);
         DomainEventPublisher.publish(new GamePlayerSpawnedToZone(character, this));
 
@@ -104,14 +102,12 @@ public class ZoneInstance {
 
     public void leave(CharacterInstance character) {
         clients.remove(character.getId());
-        releaseCell(character.getPosition(), character);
         character.setPosition(null);
         broadcast(new GamePlayerLeftZone(character.getName()), character);
     }
 
     public void disconnect(CharacterInstance character) {
         clients.remove(character.getId());
-        releaseCell(character.getPosition(), character);
         character.setPosition(null);
         broadcast(new GamePlayerDisconnected(character.getName()), character);
     }
@@ -138,7 +134,6 @@ public class ZoneInstance {
 
     public void removeMonster(MonsterInstance monster) {
         monsters.remove(monster);
-        releaseCell(monster.getPosition(), monster);
     }
 
     public Optional<MonsterInstance> findMonsterByName(String name) {
@@ -164,9 +159,9 @@ public class ZoneInstance {
         return template.getMonsterSpawns();
     }
 
-    public void placeMonster(MonsterInstance monster, HexCoordinate cell) {
+    public void placeMonster(MonsterInstance monster, Position position) {
         addMonster(monster);
-        monster.setPosition(claimNearestFreeCell(cell, monster));
+        monster.setPosition(position);
     }
 
     public List<AbstractNpc> getNpcs() {
@@ -182,9 +177,9 @@ public class ZoneInstance {
         this.npcs.addAll(npcs);
     }
 
-    public void placeNpc(AbstractNpc npc, HexCoordinate cell) {
+    public void placeNpc(AbstractNpc npc, Position position) {
         addNpc(npc);
-        npc.setPosition(claimNearestFreeCell(cell, npc));
+        npc.setPosition(position);
     }
 
     public Optional<AbstractNpc> findNpcByName(String name) {
@@ -195,8 +190,9 @@ public class ZoneInstance {
         return template.getPortals().stream().map(this::toZonePortal).toList();
     }
 
-    public Optional<ZonePortal> findPortalAt(HexCoordinate cell) {
-        return template.getPortals().stream().filter(portal -> portal.cell().equals(cell)).findFirst()
+    public Optional<ZonePortal> findPortalAt(Position position) {
+        return template.getPortals().stream()
+                .filter(portal -> portal.position().distanceTo(position) <= portal.triggerRadius()).findFirst()
                 .map(this::toZonePortal);
     }
 
@@ -204,44 +200,37 @@ public class ZoneInstance {
         ZoneInstance target = worldInstance.zoneInstanceForTemplate(portal.targetZoneTemplateId())
                 .orElseThrow(() -> new IllegalStateException("Portail de " + id + " vers "
                         + portal.targetZoneTemplateId() + ", absente de " + worldInstance.getId()));
-        return new ZonePortal(portal.cell(), portal.direction(), this, target, portal.targetCell());
+        return new ZonePortal(portal.position(), portal.direction(), this, target, portal.targetPosition(),
+                portal.triggerRadius());
     }
 
-    public Optional<AbstractCharacter> occupantAt(HexCoordinate cell) {
-        return Optional.ofNullable(occupants.get(cell));
+    public boolean isPresent(AbstractCharacter character) {
+        return switch (character) {
+            case CharacterInstance c -> clients.containsKey(c.getId());
+            case MonsterInstance m -> monsters.contains(m);
+            case AbstractNpc n -> npcs.contains(n);
+            default -> false;
+        };
     }
 
-    public List<AbstractCharacter> occupantsWithin(HexCoordinate center, int radius) {
-        return center.withinRadius(radius).stream().map(occupants::get).filter(Objects::nonNull).toList();
-    }
-
-    public boolean tryClaimCell(HexCoordinate cell, AbstractCharacter character) {
-        return occupants.putIfAbsent(cell, character) == null;
-    }
-
-    public boolean isOccupant(AbstractCharacter character) {
-        return occupants.containsValue(character);
-    }
-
-    public void releaseCell(HexCoordinate cell, AbstractCharacter character) {
-        if (cell != null) {
-            occupants.remove(cell, character);
-        }
-    }
-
-    private HexCoordinate claimNearestFreeCell(HexCoordinate desired, AbstractCharacter character) {
-        if (tryClaimCell(desired, character)) {
-            return desired;
-        }
-        List<HexCoordinate> candidates = desired.withinRadius(3).stream()
-                .filter(cell -> !cell.equals(desired) && isWalkable(cell))
-                .sorted(Comparator.comparingInt(desired::distanceTo)).toList();
-        for (HexCoordinate candidate : candidates) {
-            if (tryClaimCell(candidate, character)) {
-                return candidate;
+    public List<AbstractCharacter> occupantsWithin(Position center, double radius) {
+        List<AbstractCharacter> nearby = new ArrayList<>();
+        for (CharacterInstance client : clients.values()) {
+            if (client.getPosition() != null && client.getPosition().distanceTo(center) <= radius) {
+                nearby.add(client);
             }
         }
-        return desired;
+        for (MonsterInstance monster : monsters) {
+            if (monster.getPosition() != null && monster.getPosition().distanceTo(center) <= radius) {
+                nearby.add(monster);
+            }
+        }
+        for (AbstractNpc npc : npcs) {
+            if (npc.getPosition() != null && npc.getPosition().distanceTo(center) <= radius) {
+                nearby.add(npc);
+            }
+        }
+        return nearby;
     }
 
     public void broadcast(OutputMessage message, CharacterInstance exclude) {

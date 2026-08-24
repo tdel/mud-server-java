@@ -3,6 +3,7 @@ package fr.idev.mudserver.game.catalog.tiled;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,8 @@ import org.w3c.dom.NodeList;
 
 import fr.idev.mudserver.domain.MonsterSpawn;
 import fr.idev.mudserver.domain.NpcSpawn;
-import fr.idev.mudserver.domain.map.HexCoordinate;
+import fr.idev.mudserver.domain.map.Position;
+import fr.idev.mudserver.domain.world.CollisionGrid;
 import fr.idev.mudserver.domain.world.TileType;
 import fr.idev.mudserver.game.catalog.tiled.TiledMap.TiledLayer;
 import fr.idev.mudserver.game.catalog.tiled.TiledMap.TiledObjectDef;
@@ -32,7 +34,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Convertit un {@link TiledMap} (arbre JSON Jackson reflétant un export Tiled
- * Map Editor, orientation hexagonale) en données de zone exploitables par
+ * Map Editor, orientation orthogonale) en données de zone exploitables par
  * {@code WorldTemplateCatalog}. Un fichier par zone : un calque de tuiles nommé
  * "terrain" porte le terrain praticable/bloqué (propriété custom booléenne
  * "walkable" sur chaque tuile du tileset), un calque d'objets nommé "objects"
@@ -46,6 +48,8 @@ public final class TiledZoneLoader {
     private static final String TYPE_PORTAL = "portal";
     private static final String TYPE_MONSTER_SPAWN = "monsterSpawn";
     private static final String TYPE_NPC_SPAWN = "npcSpawn";
+    private static final double DEFAULT_PORTAL_TRIGGER_RADIUS = 0.6;
+    private static final double COLLISION_CELL_SIZE = 1.0;
 
     // Un export Tiled porte des champs standards (version, tiledversion, infinite,
     // renderorder, image du tileset, etc.) qu'on ne modélise pas dans TiledMap :
@@ -66,12 +70,13 @@ public final class TiledZoneLoader {
         }
     }
 
-    public record ParsedZone(UUID id, String name, String description, boolean isStartingZone,
-            Map<HexCoordinate, TileType> terrain, HexCoordinate spawnCell, List<MonsterSpawn> monsterSpawns,
-            List<NpcSpawn> npcSpawns, List<PortalDraft> portals) {
+    public record ParsedZone(UUID id, String name, String description, boolean isStartingZone, CollisionGrid terrain,
+            Position spawnPosition, List<MonsterSpawn> monsterSpawns, List<NpcSpawn> npcSpawns,
+            List<PortalDraft> portals) {
     }
 
-    public record PortalDraft(HexCoordinate cell, String direction, UUID targetZoneId, HexCoordinate targetCell) {
+    public record PortalDraft(Position position, String direction, UUID targetZoneId, Position targetPosition,
+            double triggerRadius) {
     }
 
     public static ParsedZone parse(TiledMap map, Function<String, InputStream> externalTilesetResolver) {
@@ -81,19 +86,19 @@ public final class TiledZoneLoader {
         boolean isStartingZone = booleanProperty(map.properties(), "isStartingZone", false);
 
         Map<Integer, TileType> tileTypeByGid = buildTileTypeByGid(map, externalTilesetResolver);
-        Map<HexCoordinate, TileType> terrain = parseTerrain(map, tileTypeByGid, id);
+        CollisionGrid terrain = parseTerrain(map, tileTypeByGid, id);
 
-        HexCoordinate[] spawnCellHolder = new HexCoordinate[1];
+        Position[] spawnPositionHolder = new Position[1];
         List<MonsterSpawn> monsterSpawns = new ArrayList<>();
         List<NpcSpawn> npcSpawns = new ArrayList<>();
         List<PortalDraft> portals = new ArrayList<>();
-        parseObjects(map, id, spawnCellHolder, monsterSpawns, npcSpawns, portals);
+        parseObjects(map, id, spawnPositionHolder, monsterSpawns, npcSpawns, portals);
 
-        if (spawnCellHolder[0] == null) {
+        if (spawnPositionHolder[0] == null) {
             throw new IllegalStateException("Zone " + id + " (" + name + ") n'a aucun objet playerSpawn");
         }
 
-        return new ParsedZone(id, name, description, isStartingZone, terrain, spawnCellHolder[0],
+        return new ParsedZone(id, name, description, isStartingZone, terrain, spawnPositionHolder[0],
                 List.copyOf(monsterSpawns), List.copyOf(npcSpawns), List.copyOf(portals));
     }
 
@@ -149,42 +154,40 @@ public final class TiledZoneLoader {
         return properties;
     }
 
-    private static Map<HexCoordinate, TileType> parseTerrain(TiledMap map, Map<Integer, TileType> tileTypeByGid,
-            UUID id) {
+    private static CollisionGrid parseTerrain(TiledMap map, Map<Integer, TileType> tileTypeByGid, UUID id) {
         TiledLayer layer = findLayer(map, id, TERRAIN_LAYER, "tilelayer");
-        Map<HexCoordinate, TileType> terrain = new HashMap<>();
-        for (int row = 0; row < layer.height(); row++) {
-            for (int col = 0; col < layer.width(); col++) {
-                int gid = layer.data().get(row * layer.width() + col);
-                if (gid == 0) {
-                    continue;
-                }
-                TileType tileType = tileTypeByGid.getOrDefault(gid, TileType.FLOOR);
-                terrain.put(HexTiledCoordinateMapper.offsetToAxial(col, row), tileType);
+        int width = layer.width();
+        int height = layer.height();
+        BitSet walkable = new BitSet(width * height);
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
+                int gid = layer.data().get(row * width + col);
+                TileType tileType = gid == 0 ? TileType.WALL : tileTypeByGid.getOrDefault(gid, TileType.FLOOR);
+                walkable.set(row * width + col, tileType.isWalkable());
             }
         }
-        return terrain;
+        return new CollisionGrid(width, height, COLLISION_CELL_SIZE, walkable);
     }
 
-    private static void parseObjects(TiledMap map, UUID id, HexCoordinate[] spawnCellHolder,
+    private static void parseObjects(TiledMap map, UUID id, Position[] spawnPositionHolder,
             List<MonsterSpawn> monsterSpawns, List<NpcSpawn> npcSpawns, List<PortalDraft> portals) {
         TiledLayer layer = findLayer(map, id, OBJECTS_LAYER, "objectgroup");
         for (TiledObjectDef object : layer.objects()) {
-            HexCoordinate cell = HexTiledCoordinateMapper.pixelToAxial(object.x(), object.y(), map.tilewidth(),
-                    map.tileheight(), map.hexsidelength());
+            Position position = TiledCoordinateMapper.pixelToWorld(object.x(), object.y());
             switch (object.type()) {
-                case TYPE_PLAYER_SPAWN -> spawnCellHolder[0] = cell;
+                case TYPE_PLAYER_SPAWN -> spawnPositionHolder[0] = position;
                 case TYPE_PORTAL ->
-                    portals.add(new PortalDraft(cell, requireStringProperty(object.properties(), "direction"),
+                    portals.add(new PortalDraft(position, requireStringProperty(object.properties(), "direction"),
                             UUID.fromString(requireStringProperty(object.properties(), "targetZoneId")),
-                            new HexCoordinate(intProperty(object.properties(), "targetCellQ"),
-                                    intProperty(object.properties(), "targetCellR"))));
+                            TiledCoordinateMapper.pixelToWorld(doubleProperty(object.properties(), "targetX"),
+                                    doubleProperty(object.properties(), "targetY")),
+                            doubleProperty(object.properties(), "triggerRadius", DEFAULT_PORTAL_TRIGGER_RADIUS)));
                 case TYPE_MONSTER_SPAWN -> monsterSpawns.add(new MonsterSpawn(
                         UUID.nameUUIDFromBytes((id + ":" + object.id()).getBytes(StandardCharsets.UTF_8)),
-                        UUID.fromString(requireStringProperty(object.properties(), "templateId")), cell));
+                        UUID.fromString(requireStringProperty(object.properties(), "templateId")), position));
                 case TYPE_NPC_SPAWN -> npcSpawns.add(
                         new NpcSpawn(UUID.nameUUIDFromBytes((id + ":" + object.id()).getBytes(StandardCharsets.UTF_8)),
-                                UUID.fromString(requireStringProperty(object.properties(), "npcId")), cell));
+                                UUID.fromString(requireStringProperty(object.properties(), "npcId")), position));
                 default -> throw new IllegalStateException(
                         "Objet Tiled " + object.id() + " a un type inconnu : " + object.type());
             }
@@ -217,8 +220,16 @@ public final class TiledZoneLoader {
                 .orElse(defaultValue);
     }
 
-    private static int intProperty(List<TiledProperty> properties, String name) {
-        return properties.stream().filter(p -> p.name().equals(name)).map(p -> ((Number) p.value()).intValue())
+    private static double doubleProperty(List<TiledProperty> properties, String name) {
+        return properties.stream().filter(p -> p.name().equals(name)).map(p -> ((Number) p.value()).doubleValue())
                 .findFirst().orElseThrow(() -> new IllegalStateException("Propriété Tiled \"" + name + "\" manquante"));
+    }
+
+    private static double doubleProperty(List<TiledProperty> properties, String name, double defaultValue) {
+        if (properties == null) {
+            return defaultValue;
+        }
+        return properties.stream().filter(p -> p.name().equals(name)).map(p -> ((Number) p.value()).doubleValue())
+                .findFirst().orElse(defaultValue);
     }
 }

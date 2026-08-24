@@ -2,17 +2,14 @@
     "type": "map",
     "version": "1.10",
     "tiledversion": "1.11.0",
-    "orientation": "hexagonal",
+    "orientation": "orthogonal",
     "renderorder": "right-down",
     "compressionlevel": -1,
     "infinite": false,
     "width": 11,
     "height": 9,
     "tilewidth": 32,
-    "tileheight": 28,
-    "hexsidelength": 8,
-    "staggeraxis": "y",
-    "staggerindex": "odd",
+    "tileheight": 32,
     "nextlayerid": 3,
     "nextobjectid": 4,
     "properties": [
@@ -40,33 +37,96 @@
     "tilesets": [
         {
             "firstgid": 1,
-            "source": "shared/hex-terrain.tsx"
+            "tiles": [
+                {
+                    "id": 0,
+                    "properties": [
+                        {
+                            "name": "walkable",
+                            "type": "bool",
+                            "value": false
+                        },
+                        {
+                            "name": "terrain",
+                            "type": "string",
+                            "value": "rockWall"
+                        }
+                    ]
+                },
+                {
+                    "id": 1,
+                    "properties": [
+                        {
+                            "name": "walkable",
+                            "type": "bool",
+                            "value": true
+                        },
+                        {
+                            "name": "terrain",
+                            "type": "string",
+                            "value": "caveFloor"
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "properties": [
+                        {
+                            "name": "walkable",
+                            "type": "bool",
+                            "value": false
+                        },
+                        {
+                            "name": "terrain",
+                            "type": "string",
+                            "value": "rubble"
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "layers": [
         {
             "type": "tilelayer",
-            "id": 1,
             "name": "terrain",
-            "x": 0,
-            "y": 0,
             "width": 11,
             "height": 9,
-            "opacity": 1,
-            "visible": true,
             "data": [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
                 2,
+                3,
+                3,
                 2,
                 2,
                 2,
+                3,
+                3,
                 2,
+                1,
+                1,
                 2,
                 2,
                 2,
                 2,
+                3,
+                3,
                 2,
                 2,
                 2,
+                1,
+                1,
                 2,
                 2,
                 2,
@@ -76,25 +136,21 @@
                 2,
                 2,
                 2,
+                1,
+                1,
                 2,
                 2,
                 2,
-                9,
-                9,
-                9,
-                9,
-                9,
                 2,
                 2,
                 2,
                 2,
                 2,
                 2,
-                9,
-                9,
+                1,
+                1,
                 2,
                 2,
-                9,
                 2,
                 2,
                 2,
@@ -102,95 +158,65 @@
                 2,
                 2,
                 2,
+                1,
+                1,
                 2,
                 2,
+                3,
+                3,
                 2,
-                9,
-                9,
-                9,
-                10,
                 2,
                 2,
+                3,
                 2,
+                1,
+                1,
                 2,
+                3,
                 2,
                 2,
                 2,
+                3,
+                3,
                 2,
                 2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
             ]
         },
         {
             "type": "objectgroup",
-            "id": 2,
             "name": "objects",
-            "x": 0,
-            "y": 0,
-            "opacity": 1,
-            "visible": true,
-            "draworder": "topdown",
             "objects": [
                 {
                     "id": 1,
                     "name": "playerSpawn",
                     "type": "playerSpawn",
-                    "x": 272.0,
-                    "y": 86.0,
-                    "width": 0,
-                    "height": 0,
-                    "visible": true,
+                    "x": 176.0,
+                    "y": 144.0,
                     "properties": []
                 },
                 {
                     "id": 2,
-                    "name": "portal",
+                    "name": "portail-est",
                     "type": "portal",
                     "x": 304.0,
-                    "y": 86.0,
-                    "width": 0,
-                    "height": 0,
-                    "visible": true,
+                    "y": 144.0,
                     "properties": [
                         {
                             "name": "direction",
                             "type": "string",
-                            "value": "W"
+                            "value": "E"
                         },
                         {
                             "name": "targetZoneId",
@@ -198,26 +224,23 @@
                             "value": "8203e5a0-9fa2-4799-a6d8-398b11292c17"
                         },
                         {
-                            "name": "targetCellQ",
-                            "type": "int",
-                            "value": 11
+                            "name": "targetX",
+                            "type": "float",
+                            "value": 48.0
                         },
                         {
-                            "name": "targetCellR",
-                            "type": "int",
-                            "value": 4
+                            "name": "targetY",
+                            "type": "float",
+                            "value": 112.0
                         }
                     ]
                 },
                 {
                     "id": 3,
-                    "name": "monsterSpawn",
+                    "name": "monstre",
                     "type": "monsterSpawn",
-                    "x": 96.0,
-                    "y": 68.0,
-                    "width": 0,
-                    "height": 0,
-                    "visible": true,
+                    "x": 144.0,
+                    "y": 112.0,
                     "properties": [
                         {
                             "name": "templateId",

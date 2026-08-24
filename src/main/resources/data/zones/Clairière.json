@@ -2,17 +2,14 @@
     "type": "map",
     "version": "1.10",
     "tiledversion": "1.11.0",
-    "orientation": "hexagonal",
+    "orientation": "orthogonal",
     "renderorder": "right-down",
     "compressionlevel": -1,
     "infinite": false,
     "width": 17,
     "height": 9,
     "tilewidth": 32,
-    "tileheight": 28,
-    "hexsidelength": 8,
-    "staggeraxis": "y",
-    "staggerindex": "odd",
+    "tileheight": 32,
     "nextlayerid": 3,
     "nextobjectid": 7,
     "properties": [
@@ -40,39 +37,65 @@
     "tilesets": [
         {
             "firstgid": 1,
-            "source": "shared/hex-terrain.tsx"
+            "tiles": [
+                {
+                    "id": 0,
+                    "properties": [
+                        {
+                            "name": "walkable",
+                            "type": "bool",
+                            "value": false
+                        },
+                        {
+                            "name": "terrain",
+                            "type": "string",
+                            "value": "tree"
+                        }
+                    ]
+                },
+                {
+                    "id": 1,
+                    "properties": [
+                        {
+                            "name": "walkable",
+                            "type": "bool",
+                            "value": true
+                        },
+                        {
+                            "name": "terrain",
+                            "type": "string",
+                            "value": "clearingGrass"
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "properties": [
+                        {
+                            "name": "walkable",
+                            "type": "bool",
+                            "value": true
+                        },
+                        {
+                            "name": "terrain",
+                            "type": "string",
+                            "value": "tallGrass"
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "layers": [
         {
             "type": "tilelayer",
-            "id": 1,
             "name": "terrain",
-            "x": 0,
-            "y": 0,
             "width": 17,
             "height": 9,
-            "opacity": 1,
-            "visible": true,
             "data": [
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
+                1,
+                1,
+                1,
                 1,
                 1,
                 1,
@@ -92,24 +115,17 @@
                 2,
                 1,
                 1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                3,
-                3,
-                10,
-                1,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
                 2,
                 2,
                 1,
                 1,
-                1,
+                2,
                 1,
                 1,
                 3,
@@ -118,25 +134,96 @@
                 3,
                 3,
                 3,
-                1,
-                1,
-                1,
-                1,
-                2,
-                2,
-                1,
-                10,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
                 3,
                 3,
                 3,
                 1,
                 1,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
                 1,
                 1,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
                 1,
                 1,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
                 1,
                 1,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                3,
+                1,
+                1,
+                2,
+                2,
+                1,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
                 1,
                 1,
                 2,
@@ -156,127 +243,34 @@
                 1,
                 1,
                 1,
-                2,
-                2,
                 1,
                 1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                2,
-                2,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2,
-                2
+                1
             ]
         },
         {
             "type": "objectgroup",
-            "id": 2,
             "name": "objects",
-            "x": 0,
-            "y": 0,
-            "opacity": 1,
-            "visible": true,
-            "draworder": "topdown",
             "objects": [
                 {
                     "id": 1,
                     "name": "playerSpawn",
                     "type": "playerSpawn",
-                    "x": 288.0,
-                    "y": 104.0,
-                    "width": 0,
-                    "height": 0,
-                    "visible": true,
+                    "x": 272.0,
+                    "y": 144.0,
                     "properties": []
                 },
                 {
                     "id": 2,
-                    "name": "portal",
+                    "name": "portail-ouest",
                     "type": "portal",
-                    "x": 80.0,
-                    "y": 86.0,
-                    "width": 0,
-                    "height": 0,
-                    "visible": true,
+                    "x": 48.0,
+                    "y": 144.0,
                     "properties": [
                         {
                             "name": "direction",
                             "type": "string",
-                            "value": "W"
-                        },
-                        {
-                            "name": "targetZoneId",
-                            "type": "string",
-                            "value": "9a884ac7-b954-4cd6-ab67-c677d472cb0f"
-                        },
-                        {
-                            "name": "targetCellQ",
-                            "type": "int",
-                            "value": 11
-                        },
-                        {
-                            "name": "targetCellR",
-                            "type": "int",
-                            "value": 4
-                        }
-                    ]
-                },
-                {
-                    "id": 3,
-                    "name": "portal",
-                    "type": "portal",
-                    "x": 464.0,
-                    "y": 50.0,
-                    "width": 0,
-                    "height": 0,
-                    "visible": true,
-                    "properties": [
-                        {
-                            "name": "direction",
-                            "type": "string",
-                            "value": "NE"
+                            "value": "O"
                         },
                         {
                             "name": "targetZoneId",
@@ -284,26 +278,52 @@
                             "value": "8203e5a0-9fa2-4799-a6d8-398b11292c17"
                         },
                         {
-                            "name": "targetCellQ",
-                            "type": "int",
-                            "value": -1
+                            "name": "targetX",
+                            "type": "float",
+                            "value": 432.0
                         },
                         {
-                            "name": "targetCellR",
-                            "type": "int",
-                            "value": 6
+                            "name": "targetY",
+                            "type": "float",
+                            "value": 112.0
+                        }
+                    ]
+                },
+                {
+                    "id": 3,
+                    "name": "portail-est",
+                    "type": "portal",
+                    "x": 496.0,
+                    "y": 144.0,
+                    "properties": [
+                        {
+                            "name": "direction",
+                            "type": "string",
+                            "value": "E"
+                        },
+                        {
+                            "name": "targetZoneId",
+                            "type": "string",
+                            "value": "9a884ac7-b954-4cd6-ab67-c677d472cb0f"
+                        },
+                        {
+                            "name": "targetX",
+                            "type": "float",
+                            "value": 48.0
+                        },
+                        {
+                            "name": "targetY",
+                            "type": "float",
+                            "value": 144.0
                         }
                     ]
                 },
                 {
                     "id": 4,
-                    "name": "monsterSpawn",
+                    "name": "monstre",
                     "type": "monsterSpawn",
-                    "x": 224.0,
-                    "y": 68.0,
-                    "width": 0,
-                    "height": 0,
-                    "visible": true,
+                    "x": 176.0,
+                    "y": 80.0,
                     "properties": [
                         {
                             "name": "templateId",
@@ -314,13 +334,10 @@
                 },
                 {
                     "id": 5,
-                    "name": "monsterSpawn",
+                    "name": "monstre",
                     "type": "monsterSpawn",
                     "x": 336.0,
-                    "y": 122.0,
-                    "width": 0,
-                    "height": 0,
-                    "visible": true,
+                    "y": 208.0,
                     "properties": [
                         {
                             "name": "templateId",
@@ -331,13 +348,10 @@
                 },
                 {
                     "id": 6,
-                    "name": "monsterSpawn",
+                    "name": "monstre",
                     "type": "monsterSpawn",
-                    "x": 272.0,
-                    "y": 50.0,
-                    "width": 0,
-                    "height": 0,
-                    "visible": true,
+                    "x": 400.0,
+                    "y": 112.0,
                     "properties": [
                         {
                             "name": "templateId",
