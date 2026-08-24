@@ -26,4 +26,9 @@ public class CharacterSpellDao {
         dsl.insertInto(CHARACTER_SPELL, CHARACTER_SPELL.CHARACTER_ID, CHARACTER_SPELL.SPELL_ID)
                 .values(characterId, spellId).execute();
     }
+
+    public void deleteByCharacterAndSpell(UUID characterId, UUID spellId) {
+        dsl.deleteFrom(CHARACTER_SPELL).where(CHARACTER_SPELL.CHARACTER_ID.eq(characterId))
+                .and(CHARACTER_SPELL.SPELL_ID.eq(spellId)).execute();
+    }
 }

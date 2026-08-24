@@ -3,6 +3,7 @@ package fr.idev.mudserver.domain.actor.component;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,8 +30,22 @@ public final class SpellCasting {
         return knownSpells.stream().anyMatch(spell -> spell.id().equals(spellId));
     }
 
-    public boolean learn(Spell spell) {
-        return knownSpells.add(spell);
+    public LearnResult learn(Spell spell) {
+        Optional<Spell> existing = knownSpells.stream().filter(known -> known.name().equals(spell.name())).findFirst();
+        if (existing.isEmpty()) {
+            knownSpells.add(spell);
+            return LearnResult.NEW;
+        }
+        if (existing.get().id().equals(spell.id())) {
+            return LearnResult.ALREADY_KNOWN;
+        }
+        knownSpells.remove(existing.get());
+        knownSpells.add(spell);
+        return LearnResult.UPGRADED;
+    }
+
+    public enum LearnResult {
+        NEW, UPGRADED, ALREADY_KNOWN
     }
 
     public Set<Spell> knownSpells() {

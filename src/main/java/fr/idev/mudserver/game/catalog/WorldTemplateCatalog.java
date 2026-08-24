@@ -220,9 +220,8 @@ public class WorldTemplateCatalog {
             for (NpcSpawn spawn : zone.getNpcSpawns()) {
                 NpcDefinition definition = definitionsById.get(spawn.npcId());
                 if (definition == null) {
-                    throw new IllegalStateException("Spawn " + spawn.id() + " de la zone " + zone.getId()
-                            + " du monde " + shortName + " référence le NPC " + spawn.npcId()
-                            + ", absent de data/npcs.json");
+                    throw new IllegalStateException("Spawn " + spawn.id() + " de la zone " + zone.getId() + " du monde "
+                            + shortName + " référence le NPC " + spawn.npcId() + ", absent de data/npcs.json");
                 }
 
                 AbstractNpc.NpcDialogue dialogue = toDialogue(definition);

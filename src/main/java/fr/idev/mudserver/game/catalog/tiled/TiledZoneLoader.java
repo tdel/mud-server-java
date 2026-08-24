@@ -182,9 +182,9 @@ public final class TiledZoneLoader {
                 case TYPE_MONSTER_SPAWN -> monsterSpawns.add(new MonsterSpawn(
                         UUID.nameUUIDFromBytes((id + ":" + object.id()).getBytes(StandardCharsets.UTF_8)),
                         UUID.fromString(requireStringProperty(object.properties(), "templateId")), cell));
-                case TYPE_NPC_SPAWN -> npcSpawns.add(new NpcSpawn(
-                        UUID.nameUUIDFromBytes((id + ":" + object.id()).getBytes(StandardCharsets.UTF_8)),
-                        UUID.fromString(requireStringProperty(object.properties(), "npcId")), cell));
+                case TYPE_NPC_SPAWN -> npcSpawns.add(
+                        new NpcSpawn(UUID.nameUUIDFromBytes((id + ":" + object.id()).getBytes(StandardCharsets.UTF_8)),
+                                UUID.fromString(requireStringProperty(object.properties(), "npcId")), cell));
                 default -> throw new IllegalStateException(
                         "Objet Tiled " + object.id() + " a un type inconnu : " + object.type());
             }

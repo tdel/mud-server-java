@@ -1,5 +1,7 @@
 package fr.idev.mudserver.game.engine;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,7 +18,8 @@ import org.springframework.stereotype.Component;
 import fr.idev.mudserver.domain.actor.AbstractCharacter;
 import fr.idev.mudserver.network.message.ingame.MovementBlockedByBounds;
 import fr.idev.mudserver.network.message.ingame.MovementBlockedByOccupant;
-import fr.idev.mudserver.network.message.ingame.ViewAround;
+import fr.idev.mudserver.network.message.ingame.MovementFinished;
+import fr.idev.mudserver.network.message.ingame.PositionUpdated;
 
 @Component
 public class MovementEngine {
@@ -30,9 +33,22 @@ public class MovementEngine {
 
     private final Map<UUID, AbstractCharacter> movingCharacters = new ConcurrentHashMap<>();
 
-    public void startMovement(HexDirection direction, int cellsRequested, AbstractCharacter character) {
-        character.activeMovement = new ActiveMovement(direction, cellsRequested, System.currentTimeMillis());
+    public void startMovement(List<HexCoordinate> path, AbstractCharacter character) {
+        if (path.isEmpty()) {
+            return;
+        }
+        character.activeMovement = new ActiveMovement(List.copyOf(path), System.currentTimeMillis());
         movingCharacters.put(character.getId(), character);
+    }
+
+    public void startMovement(HexDirection direction, int cellsRequested, AbstractCharacter character) {
+        List<HexCoordinate> path = new ArrayList<>(cellsRequested);
+        HexCoordinate cursor = character.getPosition();
+        for (int i = 0; i < cellsRequested; i++) {
+            cursor = cursor.neighbor(direction);
+            path.add(cursor);
+        }
+        startMovement(path, character);
     }
 
     public void stopMovement(AbstractCharacter character) {
@@ -51,13 +67,11 @@ public class MovementEngine {
                 switch (updatePosition(character, now)) {
                     case NO_MOVEMENT -> {
                     }
-                    case STEPPED -> {
-                        character.send(new ViewAround(character));
-                    }
+                    case STEPPED ->
+                        character.send(new PositionUpdated(character.getPosition().q(), character.getPosition().r()));
                     case FINISHED -> {
                         movingCharacters.remove(character.getId());
-                        character.send(new ViewAround(character));
-
+                        character.send(new MovementFinished(character.getPosition().q(), character.getPosition().r()));
                     }
                     case BLOCKED_BY_BOUNDS -> {
                         movingCharacters.remove(character.getId());
@@ -84,7 +98,7 @@ public class MovementEngine {
             return MovementStepOutcome.NO_MOVEMENT;
         }
 
-        CellStepOutcome step = move(character, movement.direction());
+        CellStepOutcome step = move(character, movement.nextCell());
         if (!step.moved()) {
             character.activeMovement = null;
             return step.blockedByOccupant()
@@ -92,21 +106,20 @@ public class MovementEngine {
                     : MovementStepOutcome.BLOCKED_BY_BOUNDS;
         }
 
-        int remaining = movement.cellsRemaining() - 1;
-        if (remaining <= 0) {
+        List<HexCoordinate> remaining = movement.remainingPath().subList(1, movement.remainingPath().size());
+        if (remaining.isEmpty()) {
             character.activeMovement = null;
             return MovementStepOutcome.FINISHED;
         }
 
-        character.activeMovement = movement.withRemaining(remaining, now);
+        character.activeMovement = movement.withRemaining(List.copyOf(remaining), now);
 
         return MovementStepOutcome.STEPPED;
     }
 
-    private CellStepOutcome move(AbstractCharacter character, HexDirection direction) {
+    private CellStepOutcome move(AbstractCharacter character, HexCoordinate next) {
         ZoneInstance zone = character.getCurrentZone();
         HexCoordinate current = character.getPosition();
-        HexCoordinate next = current.neighbor(direction);
 
         if (!zone.isWalkable(next)) {
             return new CellStepOutcome(false, true, false);
@@ -128,9 +141,13 @@ public class MovementEngine {
     public record CellStepOutcome(boolean moved, boolean blockedByBounds, boolean blockedByOccupant) {
     }
 
-    public record ActiveMovement(HexDirection direction, int cellsRemaining, long lastStepAt) {
-        ActiveMovement withRemaining(int newRemaining, long stepAt) {
-            return new ActiveMovement(direction, newRemaining, stepAt);
+    public record ActiveMovement(List<HexCoordinate> remainingPath, long lastStepAt) {
+        HexCoordinate nextCell() {
+            return remainingPath.get(0);
+        }
+
+        ActiveMovement withRemaining(List<HexCoordinate> newRemaining, long stepAt) {
+            return new ActiveMovement(newRemaining, stepAt);
         }
     }
 

@@ -6,6 +6,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.domain.Spell;
+import fr.idev.mudserver.domain.actor.component.SpellCasting.LearnResult;
 import fr.idev.mudserver.domain.actor.event.CharacterLearnedSpell;
 import fr.idev.mudserver.domain.actor.event.CharacterLeveledUp;
 import fr.idev.mudserver.domain.actor.event.DomainEventPublisher;
@@ -30,11 +31,21 @@ public class SpellLearningEngine {
 
     private void learnSpellsAt(CharacterInstance character, int level) {
         for (Spell spell : SpellCatalogHolder.spellsLearnableAt(character.getCharacterClass(), level)) {
-            if (character.getSpellCasting().learn(spell)) {
-                DomainEventPublisher.publish(new CharacterLearnedSpell(character, spell));
-                log.info("character.spell_autolearned character={} spell={} level={}", character.getName(),
-                        spell.name(), level);
+            Spell previousTier = character.getSpellCasting().knownSpells().stream()
+                    .filter(known -> known.name().equals(spell.name())).findFirst().orElse(null);
+            LearnResult result = character.getSpellCasting().learn(spell);
+            if (result == LearnResult.NEW || result == LearnResult.UPGRADED) {
+                DomainEventPublisher.publish(new CharacterLearnedSpell(character, spell,
+                        result == LearnResult.UPGRADED ? previousTier : null));
+                log.info("character.spell_autolearned character={} spell={} tier={} level={} result={}",
+                        character.getName(), spell.name(), spell.tier(), level, result);
             }
+        }
+    }
+
+    public void reconcile(CharacterInstance character) {
+        for (int level = 1; level <= character.getLevel(); level++) {
+            learnSpellsAt(character, level);
         }
     }
 }

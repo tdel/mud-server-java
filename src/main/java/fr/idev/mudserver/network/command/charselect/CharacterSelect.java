@@ -11,6 +11,7 @@ import fr.idev.mudserver.network.command.ingame.Look;
 import fr.idev.mudserver.domain.Account;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.game.WorldInstanceService;
+import fr.idev.mudserver.game.engine.SpellLearningEngine;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
@@ -26,13 +27,15 @@ public class CharacterSelect implements CommandHandler {
     private final ItemPersistenceListener itemService;
     private final CharSelectStatus charSelectStatus;
     private final Look lookAction;
+    private final SpellLearningEngine spellLearningEngine;
 
     public CharacterSelect(WorldInstanceService worldInstanceService, ItemPersistenceListener itemService,
-            CharSelectStatus charSelectStatus, Look lookAction) {
+            CharSelectStatus charSelectStatus, Look lookAction, SpellLearningEngine spellLearningEngine) {
         this.worldInstanceService = worldInstanceService;
         this.itemService = itemService;
         this.charSelectStatus = charSelectStatus;
         this.lookAction = lookAction;
+        this.spellLearningEngine = spellLearningEngine;
     }
 
     @Override
@@ -65,6 +68,7 @@ public class CharacterSelect implements CommandHandler {
 
         CharacterInstance loadedChar = character.get();
         connection.attachCharacter(loadedChar);
+        spellLearningEngine.reconcile(loadedChar);
         loadedChar.getInventory().replaceItems(itemService.loadInventory(loadedChar));
         loadedChar.getWorldInstance().loadPlayer(loadedChar);
         MDC.put("character", loadedChar.getName());

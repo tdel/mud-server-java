@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import fr.idev.mudserver.domain.actor.event.CharacterLearnedSpell;
 import fr.idev.mudserver.domain.actor.event.SpellCast;
@@ -26,10 +27,16 @@ public class SpellPersistenceListener {
     }
 
     @EventListener
+    @Transactional
     void onCharacterLearnedSpell(CharacterLearnedSpell event) {
+        if (event.previousTier() != null) {
+            characterSpellDao.deleteByCharacterAndSpell(event.character().getId(), event.previousTier().id());
+        }
         characterSpellDao.insert(event.character().getId(), event.spell().id());
-        event.character().send(new SpellLearned(event.spell().name()));
-        log.info("character.learned_spell character={} spell={}", event.character().getName(), event.spell().name());
+        event.character()
+                .send(new SpellLearned(event.spell().name(), event.spell().tier(), event.previousTier() != null));
+        log.info("character.learned_spell character={} spell={} tier={} upgraded={}", event.character().getName(),
+                event.spell().name(), event.spell().tier(), event.previousTier() != null);
     }
 
     @EventListener

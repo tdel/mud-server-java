@@ -2,12 +2,15 @@ package fr.idev.mudserver.game.catalog;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,13 +44,20 @@ public class SpellCatalog {
             List<SpellDefinition> definitions = objectMapper.readValue(in, new TypeReference<List<SpellDefinition>>() {
             });
             for (SpellDefinition definition : definitions) {
-                Spell spell = new Spell(definition.id(), definition.name(), definition.description(),
+                Spell spell = new Spell(definition.id(), definition.name(),
+                        definition.tier() == null ? 1 : definition.tier(), definition.description(),
                         definition.requiredLevel(), definition.manaCost(), definition.cooldownSeconds(),
                         definition.range(), definition.effect(), definition.effectDice(),
                         Set.copyOf(definition.classes()), definition.modifiedStat(),
                         definition.durationSeconds() == null ? 0 : definition.durationSeconds());
+                if (spells.containsKey(spell.id())) {
+                    throw new IllegalStateException("Spell " + spell.id() + " (" + spell.name() + " tier "
+                            + spell.tier() + ") a un id déjà utilisé par " + spells.get(spell.id()).name() + " tier "
+                            + spells.get(spell.id()).tier() + " dans " + SPELL_RESOURCE);
+                }
                 spells.put(spell.id(), spell);
             }
+            validateTierFamilies(spells.values());
             log.info("spell.templates_loaded count={}", spells.size());
         } catch (IOException | JacksonException e) {
             throw new IllegalStateException("Impossible de charger " + SPELL_RESOURCE, e);
@@ -71,8 +81,30 @@ public class SpellCatalog {
                 .filter(spell -> spell.requiredLevel() == level && spell.classes().contains(characterClass)).toList();
     }
 
-    private record SpellDefinition(UUID id, String name, String description, int requiredLevel, int manaCost,
-            int cooldownSeconds, int range, SpellEffectType effect, String effectDice, List<CharacterClass> classes,
-            ModifiedStat modifiedStat, Integer durationSeconds) {
+    static void validateTierFamilies(Collection<Spell> allSpells) {
+        Map<String, List<Spell>> families = allSpells.stream().collect(Collectors.groupingBy(Spell::name));
+        for (Map.Entry<String, List<Spell>> family : families.entrySet()) {
+            List<Spell> tiers = new ArrayList<>(family.getValue());
+            tiers.sort(Comparator.comparingInt(Spell::tier));
+            for (int i = 0; i < tiers.size(); i++) {
+                int expectedTier = i + 1;
+                if (tiers.get(i).tier() != expectedTier) {
+                    throw new IllegalStateException(
+                            "Sort '" + family.getKey() + "' a des tiers non contigus dans " + SPELL_RESOURCE + " (tier "
+                                    + expectedTier + " attendu, trouvé " + tiers.get(i).tier() + ")");
+                }
+                if (i > 0 && tiers.get(i).requiredLevel() <= tiers.get(i - 1).requiredLevel()) {
+                    throw new IllegalStateException("Sort '" + family.getKey() + "' tier " + tiers.get(i).tier()
+                            + " a un requiredLevel=" + tiers.get(i).requiredLevel()
+                            + " qui n'est pas strictement supérieur à celui du tier " + tiers.get(i - 1).tier() + " ("
+                            + tiers.get(i - 1).requiredLevel() + ") dans " + SPELL_RESOURCE);
+                }
+            }
+        }
+    }
+
+    private record SpellDefinition(UUID id, String name, Integer tier, String description, int requiredLevel,
+            int manaCost, int cooldownSeconds, int range, SpellEffectType effect, String effectDice,
+            List<CharacterClass> classes, ModifiedStat modifiedStat, Integer durationSeconds) {
     }
 }

@@ -7,13 +7,14 @@ import fr.idev.mudserver.game.engine.MovementEngine;
 import org.springframework.stereotype.Component;
 
 import fr.idev.mudserver.network.CommandHandler;
+import fr.idev.mudserver.domain.map.HexCoordinate;
 import fr.idev.mudserver.domain.map.HexDirection;
 import fr.idev.mudserver.domain.actor.instance.CharacterInstance;
 import fr.idev.mudserver.network.Connection;
 import fr.idev.mudserver.network.ConnectionState;
 import fr.idev.mudserver.network.message.Usage;
+import fr.idev.mudserver.network.message.ingame.MovementStarted;
 import fr.idev.mudserver.network.message.ingame.NoSuchDirection;
-import fr.idev.mudserver.network.message.ingame.ViewAround;
 
 @Component
 public class Go implements CommandHandler {
@@ -61,7 +62,8 @@ public class Go implements CommandHandler {
         requestedCells = Math.min(requestedCells, MAX_STEP_COUNT);
 
         movementEngine.startMovement(direction.get(), requestedCells, character);
-        connection.send(new ViewAround(character));
+        HexCoordinate destination = character.activeMovement.remainingPath().getLast();
+        connection.send(new MovementStarted(destination.q(), destination.r()));
     }
 
     private int parsePositiveInt(String token) {

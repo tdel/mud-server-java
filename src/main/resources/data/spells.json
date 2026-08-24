@@ -2,6 +2,7 @@
     {
         "id": "2127fbac-35aa-4897-a07d-bd619c4ec5b0",
         "name": "Fire Bolt",
+        "tier": 1,
         "description": "You hurl a mote of fire at a creature within range.",
         "requiredLevel": 1,
         "manaCost": 3,
@@ -9,11 +10,79 @@
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "1d10",
-        "classes": ["SORCERER", "WIZARD"]
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "63320d1f-c96c-442a-bfc6-868ab16bf0ff",
+        "name": "Fire Bolt",
+        "tier": 2,
+        "description": "You hurl a mote of fire at a creature within range.",
+        "requiredLevel": 5,
+        "manaCost": 4,
+        "cooldownSeconds": 3,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "2d10",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "9db36d78-1ccc-44fc-9695-fab691cd8280",
+        "name": "Fire Bolt",
+        "tier": 3,
+        "description": "You hurl a mote of fire at a creature within range.",
+        "requiredLevel": 9,
+        "manaCost": 5,
+        "cooldownSeconds": 2,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "3d10",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "c0f0b101-ef07-4563-b95d-3b212a721ee4",
+        "name": "Fire Bolt",
+        "tier": 4,
+        "description": "You hurl a mote of fire at a creature within range.",
+        "requiredLevel": 13,
+        "manaCost": 6,
+        "cooldownSeconds": 2,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "4d10",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "7b7f0c75-bf98-4d15-bfb4-35dc2e9a7627",
+        "name": "Fire Bolt",
+        "tier": 5,
+        "description": "You hurl a mote of fire at a creature within range.",
+        "requiredLevel": 17,
+        "manaCost": 7,
+        "cooldownSeconds": 2,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "5d10",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
     },
     {
         "id": "7717627b-c34d-4380-bc61-566d1f719871",
         "name": "Ray of Frost",
+        "tier": 1,
         "description": "A frigid beam of blue-white light streaks toward a creature within range.",
         "requiredLevel": 1,
         "manaCost": 3,
@@ -21,11 +90,79 @@
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "1d8",
-        "classes": ["SORCERER", "WIZARD"]
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "89c53121-1bdc-4f4d-956b-ef7eaaf92edd",
+        "name": "Ray of Frost",
+        "tier": 2,
+        "description": "A frigid beam of blue-white light streaks toward a creature within range.",
+        "requiredLevel": 5,
+        "manaCost": 4,
+        "cooldownSeconds": 3,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "2d8",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "d0b1b57b-9240-4360-8959-e97ee9c3d716",
+        "name": "Ray of Frost",
+        "tier": 3,
+        "description": "A frigid beam of blue-white light streaks toward a creature within range.",
+        "requiredLevel": 9,
+        "manaCost": 5,
+        "cooldownSeconds": 2,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "3d8",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "bd7b43bd-2a00-4b6c-836c-09e81f202741",
+        "name": "Ray of Frost",
+        "tier": 4,
+        "description": "A frigid beam of blue-white light streaks toward a creature within range.",
+        "requiredLevel": 13,
+        "manaCost": 6,
+        "cooldownSeconds": 2,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "4d8",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "1c3c6d26-9e6c-4c0f-a7ae-15cbfdbd41ce",
+        "name": "Ray of Frost",
+        "tier": 5,
+        "description": "A frigid beam of blue-white light streaks toward a creature within range.",
+        "requiredLevel": 17,
+        "manaCost": 7,
+        "cooldownSeconds": 2,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "5d8",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
     },
     {
         "id": "7feb8d4f-e47b-45d0-b6eb-b1bfa49f121f",
         "name": "Sacred Flame",
+        "tier": 1,
         "description": "Flame-like radiance descends on a creature that you can see within range.",
         "requiredLevel": 1,
         "manaCost": 3,
@@ -33,11 +170,74 @@
         "range": 5,
         "effect": "DAMAGE",
         "effectDice": "1d8",
-        "classes": ["CLERIC"]
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "291ecd8d-ca27-4ac8-8ef3-1166d5723c91",
+        "name": "Sacred Flame",
+        "tier": 2,
+        "description": "Flame-like radiance descends on a creature that you can see within range.",
+        "requiredLevel": 5,
+        "manaCost": 4,
+        "cooldownSeconds": 3,
+        "range": 5,
+        "effect": "DAMAGE",
+        "effectDice": "2d8",
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "871be6ee-6086-4995-bcfe-574b25d0a1ce",
+        "name": "Sacred Flame",
+        "tier": 3,
+        "description": "Flame-like radiance descends on a creature that you can see within range.",
+        "requiredLevel": 9,
+        "manaCost": 5,
+        "cooldownSeconds": 2,
+        "range": 5,
+        "effect": "DAMAGE",
+        "effectDice": "3d8",
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "8e61a38f-dda4-46b3-9b65-0f6f08eb7239",
+        "name": "Sacred Flame",
+        "tier": 4,
+        "description": "Flame-like radiance descends on a creature that you can see within range.",
+        "requiredLevel": 13,
+        "manaCost": 6,
+        "cooldownSeconds": 2,
+        "range": 5,
+        "effect": "DAMAGE",
+        "effectDice": "4d8",
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "6d832904-8b9b-4605-864b-4746be4c40af",
+        "name": "Sacred Flame",
+        "tier": 5,
+        "description": "Flame-like radiance descends on a creature that you can see within range.",
+        "requiredLevel": 17,
+        "manaCost": 7,
+        "cooldownSeconds": 2,
+        "range": 5,
+        "effect": "DAMAGE",
+        "effectDice": "5d8",
+        "classes": [
+            "CLERIC"
+        ]
     },
     {
         "id": "20390df7-0fb5-43bd-a48a-65d9a6abd360",
         "name": "Vicious Mockery",
+        "tier": 1,
         "description": "You unleash a string of insults laced with subtle enchantments at a creature you can see within range.",
         "requiredLevel": 1,
         "manaCost": 2,
@@ -45,11 +245,74 @@
         "range": 5,
         "effect": "DAMAGE",
         "effectDice": "1d4",
-        "classes": ["BARD"]
+        "classes": [
+            "BARD"
+        ]
+    },
+    {
+        "id": "0d703106-2b51-4ffd-adc6-ac940bb660cb",
+        "name": "Vicious Mockery",
+        "tier": 2,
+        "description": "You unleash a string of insults laced with subtle enchantments at a creature you can see within range.",
+        "requiredLevel": 5,
+        "manaCost": 2,
+        "cooldownSeconds": 3,
+        "range": 5,
+        "effect": "DAMAGE",
+        "effectDice": "2d4",
+        "classes": [
+            "BARD"
+        ]
+    },
+    {
+        "id": "2b7ff6c9-d88a-4fc1-9bf6-20b907b9bbb1",
+        "name": "Vicious Mockery",
+        "tier": 3,
+        "description": "You unleash a string of insults laced with subtle enchantments at a creature you can see within range.",
+        "requiredLevel": 9,
+        "manaCost": 3,
+        "cooldownSeconds": 2,
+        "range": 5,
+        "effect": "DAMAGE",
+        "effectDice": "3d4",
+        "classes": [
+            "BARD"
+        ]
+    },
+    {
+        "id": "c7738ce9-04a9-49b0-bb33-aae4a6bbb396",
+        "name": "Vicious Mockery",
+        "tier": 4,
+        "description": "You unleash a string of insults laced with subtle enchantments at a creature you can see within range.",
+        "requiredLevel": 13,
+        "manaCost": 4,
+        "cooldownSeconds": 2,
+        "range": 5,
+        "effect": "DAMAGE",
+        "effectDice": "4d4",
+        "classes": [
+            "BARD"
+        ]
+    },
+    {
+        "id": "91c30b08-18be-4fd5-9fd3-74e37e85c881",
+        "name": "Vicious Mockery",
+        "tier": 5,
+        "description": "You unleash a string of insults laced with subtle enchantments at a creature you can see within range.",
+        "requiredLevel": 17,
+        "manaCost": 5,
+        "cooldownSeconds": 2,
+        "range": 5,
+        "effect": "DAMAGE",
+        "effectDice": "5d4",
+        "classes": [
+            "BARD"
+        ]
     },
     {
         "id": "d804529c-dbd6-4f82-aa22-2e5ff6fad190",
         "name": "Eldritch Blast",
+        "tier": 1,
         "description": "A beam of crackling energy streaks toward a creature within range.",
         "requiredLevel": 1,
         "manaCost": 3,
@@ -57,11 +320,74 @@
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "1d10",
-        "classes": ["WARLOCK"]
+        "classes": [
+            "WARLOCK"
+        ]
+    },
+    {
+        "id": "19a64bef-13ed-41f1-a8e0-f8efe3a8aa3d",
+        "name": "Eldritch Blast",
+        "tier": 2,
+        "description": "A beam of crackling energy streaks toward a creature within range.",
+        "requiredLevel": 5,
+        "manaCost": 4,
+        "cooldownSeconds": 3,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "2d10",
+        "classes": [
+            "WARLOCK"
+        ]
+    },
+    {
+        "id": "13733896-c433-4c84-a5ca-b112a73835eb",
+        "name": "Eldritch Blast",
+        "tier": 3,
+        "description": "A beam of crackling energy streaks toward a creature within range.",
+        "requiredLevel": 9,
+        "manaCost": 5,
+        "cooldownSeconds": 2,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "3d10",
+        "classes": [
+            "WARLOCK"
+        ]
+    },
+    {
+        "id": "b505763c-e26e-4bc4-8cd9-37a181cd0098",
+        "name": "Eldritch Blast",
+        "tier": 4,
+        "description": "A beam of crackling energy streaks toward a creature within range.",
+        "requiredLevel": 13,
+        "manaCost": 6,
+        "cooldownSeconds": 2,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "4d10",
+        "classes": [
+            "WARLOCK"
+        ]
+    },
+    {
+        "id": "7cf4e153-a0ea-4f66-9558-d48911fad487",
+        "name": "Eldritch Blast",
+        "tier": 5,
+        "description": "A beam of crackling energy streaks toward a creature within range.",
+        "requiredLevel": 17,
+        "manaCost": 7,
+        "cooldownSeconds": 2,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "5d10",
+        "classes": [
+            "WARLOCK"
+        ]
     },
     {
         "id": "a94a11cb-c67c-4c28-aec4-155446234aa7",
         "name": "Chill Touch",
+        "tier": 1,
         "description": "You create a ghostly, skeletal hand in the space of a creature within range.",
         "requiredLevel": 1,
         "manaCost": 3,
@@ -69,11 +395,84 @@
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "1d8",
-        "classes": ["SORCERER", "WIZARD", "WARLOCK"]
+        "classes": [
+            "SORCERER",
+            "WIZARD",
+            "WARLOCK"
+        ]
+    },
+    {
+        "id": "8a725862-ae3f-4311-ac7e-fb4126991e3b",
+        "name": "Chill Touch",
+        "tier": 2,
+        "description": "You create a ghostly, skeletal hand in the space of a creature within range.",
+        "requiredLevel": 5,
+        "manaCost": 4,
+        "cooldownSeconds": 3,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "2d8",
+        "classes": [
+            "SORCERER",
+            "WIZARD",
+            "WARLOCK"
+        ]
+    },
+    {
+        "id": "abc7d25a-11c1-493f-a3f2-5ce921d0cf0c",
+        "name": "Chill Touch",
+        "tier": 3,
+        "description": "You create a ghostly, skeletal hand in the space of a creature within range.",
+        "requiredLevel": 9,
+        "manaCost": 5,
+        "cooldownSeconds": 2,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "3d8",
+        "classes": [
+            "SORCERER",
+            "WIZARD",
+            "WARLOCK"
+        ]
+    },
+    {
+        "id": "bfbfcb54-f9df-4945-bd0a-0581c826f91c",
+        "name": "Chill Touch",
+        "tier": 4,
+        "description": "You create a ghostly, skeletal hand in the space of a creature within range.",
+        "requiredLevel": 13,
+        "manaCost": 6,
+        "cooldownSeconds": 2,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "4d8",
+        "classes": [
+            "SORCERER",
+            "WIZARD",
+            "WARLOCK"
+        ]
+    },
+    {
+        "id": "a8fd3b47-0007-4689-b657-5225829520e1",
+        "name": "Chill Touch",
+        "tier": 5,
+        "description": "You create a ghostly, skeletal hand in the space of a creature within range.",
+        "requiredLevel": 17,
+        "manaCost": 7,
+        "cooldownSeconds": 2,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "5d8",
+        "classes": [
+            "SORCERER",
+            "WIZARD",
+            "WARLOCK"
+        ]
     },
     {
         "id": "6a4d130e-c349-4419-8fa9-5e23f5395907",
         "name": "Produce Flame",
+        "tier": 1,
         "description": "A flickering flame appears in your hand, which you can hurl at a creature within range.",
         "requiredLevel": 1,
         "manaCost": 3,
@@ -81,11 +480,74 @@
         "range": 4,
         "effect": "DAMAGE",
         "effectDice": "1d8",
-        "classes": ["DRUID"]
+        "classes": [
+            "DRUID"
+        ]
+    },
+    {
+        "id": "10428d58-2396-4968-9cef-817e95f448fb",
+        "name": "Produce Flame",
+        "tier": 2,
+        "description": "A flickering flame appears in your hand, which you can hurl at a creature within range.",
+        "requiredLevel": 5,
+        "manaCost": 4,
+        "cooldownSeconds": 3,
+        "range": 4,
+        "effect": "DAMAGE",
+        "effectDice": "2d8",
+        "classes": [
+            "DRUID"
+        ]
+    },
+    {
+        "id": "fe36a48a-7f1a-4294-adfd-96590a3983f9",
+        "name": "Produce Flame",
+        "tier": 3,
+        "description": "A flickering flame appears in your hand, which you can hurl at a creature within range.",
+        "requiredLevel": 9,
+        "manaCost": 5,
+        "cooldownSeconds": 2,
+        "range": 4,
+        "effect": "DAMAGE",
+        "effectDice": "3d8",
+        "classes": [
+            "DRUID"
+        ]
+    },
+    {
+        "id": "2f654062-135d-4ff5-9f18-1d8e18165986",
+        "name": "Produce Flame",
+        "tier": 4,
+        "description": "A flickering flame appears in your hand, which you can hurl at a creature within range.",
+        "requiredLevel": 13,
+        "manaCost": 6,
+        "cooldownSeconds": 2,
+        "range": 4,
+        "effect": "DAMAGE",
+        "effectDice": "4d8",
+        "classes": [
+            "DRUID"
+        ]
+    },
+    {
+        "id": "17eb95e4-32ce-40f8-a1ae-6766677090a2",
+        "name": "Produce Flame",
+        "tier": 5,
+        "description": "A flickering flame appears in your hand, which you can hurl at a creature within range.",
+        "requiredLevel": 17,
+        "manaCost": 7,
+        "cooldownSeconds": 2,
+        "range": 4,
+        "effect": "DAMAGE",
+        "effectDice": "5d8",
+        "classes": [
+            "DRUID"
+        ]
     },
     {
         "id": "27c1916a-c142-46e4-b936-8eba2f58c58e",
         "name": "Toll the Dead",
+        "tier": 1,
         "description": "You point at a creature within range, and doom rings in its ears.",
         "requiredLevel": 1,
         "manaCost": 3,
@@ -93,11 +555,84 @@
         "range": 5,
         "effect": "DAMAGE",
         "effectDice": "1d8",
-        "classes": ["CLERIC", "WARLOCK", "WIZARD"]
+        "classes": [
+            "CLERIC",
+            "WARLOCK",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "1d548ad5-3fc4-46a6-937e-0e225577c57d",
+        "name": "Toll the Dead",
+        "tier": 2,
+        "description": "You point at a creature within range, and doom rings in its ears.",
+        "requiredLevel": 5,
+        "manaCost": 4,
+        "cooldownSeconds": 3,
+        "range": 5,
+        "effect": "DAMAGE",
+        "effectDice": "2d8",
+        "classes": [
+            "CLERIC",
+            "WARLOCK",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "72b233b3-6480-4c69-a388-92cd0864cc12",
+        "name": "Toll the Dead",
+        "tier": 3,
+        "description": "You point at a creature within range, and doom rings in its ears.",
+        "requiredLevel": 9,
+        "manaCost": 5,
+        "cooldownSeconds": 2,
+        "range": 5,
+        "effect": "DAMAGE",
+        "effectDice": "3d8",
+        "classes": [
+            "CLERIC",
+            "WARLOCK",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "55c2235b-d886-4516-8995-f06edd4bf98e",
+        "name": "Toll the Dead",
+        "tier": 4,
+        "description": "You point at a creature within range, and doom rings in its ears.",
+        "requiredLevel": 13,
+        "manaCost": 6,
+        "cooldownSeconds": 2,
+        "range": 5,
+        "effect": "DAMAGE",
+        "effectDice": "4d8",
+        "classes": [
+            "CLERIC",
+            "WARLOCK",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "3fe7733d-9383-45d8-b455-69179a573af2",
+        "name": "Toll the Dead",
+        "tier": 5,
+        "description": "You point at a creature within range, and doom rings in its ears.",
+        "requiredLevel": 17,
+        "manaCost": 7,
+        "cooldownSeconds": 2,
+        "range": 5,
+        "effect": "DAMAGE",
+        "effectDice": "5d8",
+        "classes": [
+            "CLERIC",
+            "WARLOCK",
+            "WIZARD"
+        ]
     },
     {
         "id": "46fd364d-c034-4a36-9398-66d2f898efa9",
         "name": "Magic Missile",
+        "tier": 1,
         "description": "You create three glowing darts of magical force that automatically hit a creature within range.",
         "requiredLevel": 1,
         "manaCost": 6,
@@ -105,11 +640,79 @@
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "3d4+3",
-        "classes": ["SORCERER", "WIZARD"]
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "b0547f32-d7b2-4e9c-a3dd-e6b7b4681a96",
+        "name": "Magic Missile",
+        "tier": 2,
+        "description": "You create three glowing darts of magical force that automatically hit a creature within range.",
+        "requiredLevel": 5,
+        "manaCost": 8,
+        "cooldownSeconds": 7,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "4d4+3",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "3be4a1ec-00e6-4c5b-a4ca-c0c7221ced71",
+        "name": "Magic Missile",
+        "tier": 3,
+        "description": "You create three glowing darts of magical force that automatically hit a creature within range.",
+        "requiredLevel": 9,
+        "manaCost": 9,
+        "cooldownSeconds": 6,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "5d4+3",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "b7d94351-a77f-4672-8c3e-40eb96edadce",
+        "name": "Magic Missile",
+        "tier": 4,
+        "description": "You create three glowing darts of magical force that automatically hit a creature within range.",
+        "requiredLevel": 13,
+        "manaCost": 12,
+        "cooldownSeconds": 5,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "6d4+3",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "3ce038ee-0354-46c3-a9ac-6811697c3117",
+        "name": "Magic Missile",
+        "tier": 5,
+        "description": "You create three glowing darts of magical force that automatically hit a creature within range.",
+        "requiredLevel": 17,
+        "manaCost": 15,
+        "cooldownSeconds": 5,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "7d4+3",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
     },
     {
         "id": "f678b845-c85a-4b79-8451-ff51299108cd",
         "name": "Burning Hands",
+        "tier": 1,
         "description": "A thin sheet of flames shoots forth from your outstretched fingertips.",
         "requiredLevel": 1,
         "manaCost": 6,
@@ -117,11 +720,79 @@
         "range": 2,
         "effect": "DAMAGE",
         "effectDice": "3d6",
-        "classes": ["SORCERER", "WIZARD"]
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "22428f16-d773-40a7-a108-3bac0d491e48",
+        "name": "Burning Hands",
+        "tier": 2,
+        "description": "A thin sheet of flames shoots forth from your outstretched fingertips.",
+        "requiredLevel": 5,
+        "manaCost": 8,
+        "cooldownSeconds": 7,
+        "range": 2,
+        "effect": "DAMAGE",
+        "effectDice": "4d6",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "41708c9c-f615-477b-a5fd-55297e268994",
+        "name": "Burning Hands",
+        "tier": 3,
+        "description": "A thin sheet of flames shoots forth from your outstretched fingertips.",
+        "requiredLevel": 9,
+        "manaCost": 9,
+        "cooldownSeconds": 6,
+        "range": 2,
+        "effect": "DAMAGE",
+        "effectDice": "5d6",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "377fb1fb-bbe9-41b2-842f-2802b03b759f",
+        "name": "Burning Hands",
+        "tier": 4,
+        "description": "A thin sheet of flames shoots forth from your outstretched fingertips.",
+        "requiredLevel": 13,
+        "manaCost": 12,
+        "cooldownSeconds": 5,
+        "range": 2,
+        "effect": "DAMAGE",
+        "effectDice": "6d6",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "cb20a267-cdba-4430-8a94-5833d9b54947",
+        "name": "Burning Hands",
+        "tier": 5,
+        "description": "A thin sheet of flames shoots forth from your outstretched fingertips.",
+        "requiredLevel": 17,
+        "manaCost": 15,
+        "cooldownSeconds": 5,
+        "range": 2,
+        "effect": "DAMAGE",
+        "effectDice": "7d6",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
     },
     {
         "id": "82368a30-27ff-4323-ad1f-90e6aa01d31e",
         "name": "Guiding Bolt",
+        "tier": 1,
         "description": "A flash of light streaks toward a creature of your choice within range.",
         "requiredLevel": 1,
         "manaCost": 6,
@@ -129,11 +800,74 @@
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "4d6",
-        "classes": ["CLERIC"]
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "429e724c-b1af-4b74-87a8-991931a746e8",
+        "name": "Guiding Bolt",
+        "tier": 2,
+        "description": "A flash of light streaks toward a creature of your choice within range.",
+        "requiredLevel": 5,
+        "manaCost": 8,
+        "cooldownSeconds": 7,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "5d6",
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "4a92e397-2b7f-4c11-b9e8-db58ef67ac6e",
+        "name": "Guiding Bolt",
+        "tier": 3,
+        "description": "A flash of light streaks toward a creature of your choice within range.",
+        "requiredLevel": 9,
+        "manaCost": 9,
+        "cooldownSeconds": 6,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "6d6",
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "1e0d279b-d3c0-4951-9d22-cff4fd0355eb",
+        "name": "Guiding Bolt",
+        "tier": 4,
+        "description": "A flash of light streaks toward a creature of your choice within range.",
+        "requiredLevel": 13,
+        "manaCost": 12,
+        "cooldownSeconds": 5,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "7d6",
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "e2254aba-6f45-499e-a8e1-a45c8987a3e2",
+        "name": "Guiding Bolt",
+        "tier": 5,
+        "description": "A flash of light streaks toward a creature of your choice within range.",
+        "requiredLevel": 17,
+        "manaCost": 15,
+        "cooldownSeconds": 5,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "8d6",
+        "classes": [
+            "CLERIC"
+        ]
     },
     {
         "id": "047d30c2-ddfc-43fb-af30-c0722ae1c671",
         "name": "Inflict Wounds",
+        "tier": 1,
         "description": "Make a melee attack against a creature you can reach, channeling negative energy.",
         "requiredLevel": 1,
         "manaCost": 6,
@@ -141,11 +875,74 @@
         "range": 1,
         "effect": "DAMAGE",
         "effectDice": "3d10",
-        "classes": ["CLERIC"]
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "ab2b17a9-c6d3-468e-b474-b8535a6d49c2",
+        "name": "Inflict Wounds",
+        "tier": 2,
+        "description": "Make a melee attack against a creature you can reach, channeling negative energy.",
+        "requiredLevel": 5,
+        "manaCost": 8,
+        "cooldownSeconds": 7,
+        "range": 1,
+        "effect": "DAMAGE",
+        "effectDice": "4d10",
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "6fd5348e-1117-4d8d-984f-ad7a824742e4",
+        "name": "Inflict Wounds",
+        "tier": 3,
+        "description": "Make a melee attack against a creature you can reach, channeling negative energy.",
+        "requiredLevel": 9,
+        "manaCost": 9,
+        "cooldownSeconds": 6,
+        "range": 1,
+        "effect": "DAMAGE",
+        "effectDice": "5d10",
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "4560bfcd-3521-4806-84b5-9d14ce5b50f0",
+        "name": "Inflict Wounds",
+        "tier": 4,
+        "description": "Make a melee attack against a creature you can reach, channeling negative energy.",
+        "requiredLevel": 13,
+        "manaCost": 12,
+        "cooldownSeconds": 5,
+        "range": 1,
+        "effect": "DAMAGE",
+        "effectDice": "6d10",
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "14f428b4-d5b5-4f8a-9a3a-707aa18af92b",
+        "name": "Inflict Wounds",
+        "tier": 5,
+        "description": "Make a melee attack against a creature you can reach, channeling negative energy.",
+        "requiredLevel": 17,
+        "manaCost": 15,
+        "cooldownSeconds": 5,
+        "range": 1,
+        "effect": "DAMAGE",
+        "effectDice": "7d10",
+        "classes": [
+            "CLERIC"
+        ]
     },
     {
         "id": "c29b787b-b208-43b4-b3d9-a64682b385de",
         "name": "Thunderwave",
+        "tier": 1,
         "description": "A wave of thunderous force sweeps out from you.",
         "requiredLevel": 1,
         "manaCost": 6,
@@ -153,11 +950,89 @@
         "range": 1,
         "effect": "DAMAGE",
         "effectDice": "2d8",
-        "classes": ["SORCERER", "WIZARD", "BARD", "DRUID"]
+        "classes": [
+            "SORCERER",
+            "WIZARD",
+            "BARD",
+            "DRUID"
+        ]
+    },
+    {
+        "id": "d43372ba-9130-4adf-88e7-658bdbe97935",
+        "name": "Thunderwave",
+        "tier": 2,
+        "description": "A wave of thunderous force sweeps out from you.",
+        "requiredLevel": 5,
+        "manaCost": 8,
+        "cooldownSeconds": 7,
+        "range": 1,
+        "effect": "DAMAGE",
+        "effectDice": "3d8",
+        "classes": [
+            "SORCERER",
+            "WIZARD",
+            "BARD",
+            "DRUID"
+        ]
+    },
+    {
+        "id": "f23b7f99-fedb-4545-9738-fe9fb38b5402",
+        "name": "Thunderwave",
+        "tier": 3,
+        "description": "A wave of thunderous force sweeps out from you.",
+        "requiredLevel": 9,
+        "manaCost": 9,
+        "cooldownSeconds": 6,
+        "range": 1,
+        "effect": "DAMAGE",
+        "effectDice": "4d8",
+        "classes": [
+            "SORCERER",
+            "WIZARD",
+            "BARD",
+            "DRUID"
+        ]
+    },
+    {
+        "id": "eaebd81c-653e-43f2-8f98-67c0c4f070ad",
+        "name": "Thunderwave",
+        "tier": 4,
+        "description": "A wave of thunderous force sweeps out from you.",
+        "requiredLevel": 13,
+        "manaCost": 12,
+        "cooldownSeconds": 5,
+        "range": 1,
+        "effect": "DAMAGE",
+        "effectDice": "5d8",
+        "classes": [
+            "SORCERER",
+            "WIZARD",
+            "BARD",
+            "DRUID"
+        ]
+    },
+    {
+        "id": "12fced91-8d35-4e7b-aa0a-00ce1b623df8",
+        "name": "Thunderwave",
+        "tier": 5,
+        "description": "A wave of thunderous force sweeps out from you.",
+        "requiredLevel": 17,
+        "manaCost": 15,
+        "cooldownSeconds": 5,
+        "range": 1,
+        "effect": "DAMAGE",
+        "effectDice": "6d8",
+        "classes": [
+            "SORCERER",
+            "WIZARD",
+            "BARD",
+            "DRUID"
+        ]
     },
     {
         "id": "e287e606-621f-48c5-b8dc-613fa98709d3",
         "name": "Cure Wounds",
+        "tier": 1,
         "description": "A creature you touch regains a number of hit points.",
         "requiredLevel": 1,
         "manaCost": 5,
@@ -165,11 +1040,94 @@
         "range": 0,
         "effect": "HEALING",
         "effectDice": "1d8+3",
-        "classes": ["CLERIC", "DRUID", "BARD", "PALADIN", "RANGER"]
+        "classes": [
+            "CLERIC",
+            "DRUID",
+            "BARD",
+            "PALADIN",
+            "RANGER"
+        ]
+    },
+    {
+        "id": "610d5db5-8cfe-4ad7-8445-b3e89ca20aab",
+        "name": "Cure Wounds",
+        "tier": 2,
+        "description": "A creature you touch regains a number of hit points.",
+        "requiredLevel": 5,
+        "manaCost": 6,
+        "cooldownSeconds": 5,
+        "range": 0,
+        "effect": "HEALING",
+        "effectDice": "2d8+3",
+        "classes": [
+            "CLERIC",
+            "DRUID",
+            "BARD",
+            "PALADIN",
+            "RANGER"
+        ]
+    },
+    {
+        "id": "04bce7c1-b936-49ad-a082-9c4eb7a0c378",
+        "name": "Cure Wounds",
+        "tier": 3,
+        "description": "A creature you touch regains a number of hit points.",
+        "requiredLevel": 9,
+        "manaCost": 8,
+        "cooldownSeconds": 5,
+        "range": 0,
+        "effect": "HEALING",
+        "effectDice": "3d8+3",
+        "classes": [
+            "CLERIC",
+            "DRUID",
+            "BARD",
+            "PALADIN",
+            "RANGER"
+        ]
+    },
+    {
+        "id": "914f2ffb-2616-412d-a41d-bb400d39125f",
+        "name": "Cure Wounds",
+        "tier": 4,
+        "description": "A creature you touch regains a number of hit points.",
+        "requiredLevel": 13,
+        "manaCost": 10,
+        "cooldownSeconds": 4,
+        "range": 0,
+        "effect": "HEALING",
+        "effectDice": "4d8+3",
+        "classes": [
+            "CLERIC",
+            "DRUID",
+            "BARD",
+            "PALADIN",
+            "RANGER"
+        ]
+    },
+    {
+        "id": "074499ff-7569-4f20-baf6-e70414877b48",
+        "name": "Cure Wounds",
+        "tier": 5,
+        "description": "A creature you touch regains a number of hit points.",
+        "requiredLevel": 17,
+        "manaCost": 12,
+        "cooldownSeconds": 4,
+        "range": 0,
+        "effect": "HEALING",
+        "effectDice": "5d8+3",
+        "classes": [
+            "CLERIC",
+            "DRUID",
+            "BARD",
+            "PALADIN",
+            "RANGER"
+        ]
     },
     {
         "id": "51b0b7ee-d091-4057-9eb6-17ebd60bda79",
         "name": "Healing Word",
+        "tier": 1,
         "description": "A creature of your choice that you can see regains hit points.",
         "requiredLevel": 1,
         "manaCost": 4,
@@ -177,11 +1135,84 @@
         "range": 0,
         "effect": "HEALING",
         "effectDice": "1d4+3",
-        "classes": ["CLERIC", "BARD", "DRUID"]
+        "classes": [
+            "CLERIC",
+            "BARD",
+            "DRUID"
+        ]
+    },
+    {
+        "id": "bcb918ec-46ab-4732-9b78-d0611a084509",
+        "name": "Healing Word",
+        "tier": 2,
+        "description": "A creature of your choice that you can see regains hit points.",
+        "requiredLevel": 5,
+        "manaCost": 5,
+        "cooldownSeconds": 5,
+        "range": 0,
+        "effect": "HEALING",
+        "effectDice": "2d4+3",
+        "classes": [
+            "CLERIC",
+            "BARD",
+            "DRUID"
+        ]
+    },
+    {
+        "id": "b0b50974-4d4b-4e6b-8339-1b52e95270ab",
+        "name": "Healing Word",
+        "tier": 3,
+        "description": "A creature of your choice that you can see regains hit points.",
+        "requiredLevel": 9,
+        "manaCost": 6,
+        "cooldownSeconds": 5,
+        "range": 0,
+        "effect": "HEALING",
+        "effectDice": "3d4+3",
+        "classes": [
+            "CLERIC",
+            "BARD",
+            "DRUID"
+        ]
+    },
+    {
+        "id": "c5279868-5d41-4991-b987-07d1cf11b933",
+        "name": "Healing Word",
+        "tier": 4,
+        "description": "A creature of your choice that you can see regains hit points.",
+        "requiredLevel": 13,
+        "manaCost": 8,
+        "cooldownSeconds": 4,
+        "range": 0,
+        "effect": "HEALING",
+        "effectDice": "4d4+3",
+        "classes": [
+            "CLERIC",
+            "BARD",
+            "DRUID"
+        ]
+    },
+    {
+        "id": "4ab89288-6548-4a45-91da-2a2dd5c16dd0",
+        "name": "Healing Word",
+        "tier": 5,
+        "description": "A creature of your choice that you can see regains hit points.",
+        "requiredLevel": 17,
+        "manaCost": 10,
+        "cooldownSeconds": 4,
+        "range": 0,
+        "effect": "HEALING",
+        "effectDice": "5d4+3",
+        "classes": [
+            "CLERIC",
+            "BARD",
+            "DRUID"
+        ]
     },
     {
         "id": "abb1d97f-b2be-42de-a9fc-2ee9ee57677c",
         "name": "Scorching Ray",
+        "tier": 1,
         "description": "You create three rays of fire and hurl them at targets within range.",
         "requiredLevel": 3,
         "manaCost": 12,
@@ -189,11 +1220,79 @@
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "6d6",
-        "classes": ["SORCERER", "WIZARD"]
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "cf3efb23-9760-4f76-8903-6d1700dcc874",
+        "name": "Scorching Ray",
+        "tier": 2,
+        "description": "You create three rays of fire and hurl them at targets within range.",
+        "requiredLevel": 7,
+        "manaCost": 15,
+        "cooldownSeconds": 13,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "7d6",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "89fff8e9-11b2-4e0b-b807-4f889e2131d5",
+        "name": "Scorching Ray",
+        "tier": 3,
+        "description": "You create three rays of fire and hurl them at targets within range.",
+        "requiredLevel": 11,
+        "manaCost": 19,
+        "cooldownSeconds": 11,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "8d6",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "46d09987-1238-4e41-95f5-450f894a3a4a",
+        "name": "Scorching Ray",
+        "tier": 4,
+        "description": "You create three rays of fire and hurl them at targets within range.",
+        "requiredLevel": 15,
+        "manaCost": 23,
+        "cooldownSeconds": 10,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "9d6",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "67413a39-f2fe-4c2a-9be4-17256bd64fb8",
+        "name": "Scorching Ray",
+        "tier": 5,
+        "description": "You create three rays of fire and hurl them at targets within range.",
+        "requiredLevel": 19,
+        "manaCost": 29,
+        "cooldownSeconds": 9,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "10d6",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
     },
     {
         "id": "ee1e1714-147d-4ce5-ae95-d54e546e65e2",
         "name": "Spiritual Weapon",
+        "tier": 1,
         "description": "You create a floating, spectral weapon that lashes out at a creature within range.",
         "requiredLevel": 3,
         "manaCost": 12,
@@ -201,11 +1300,74 @@
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "3d8",
-        "classes": ["CLERIC"]
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "97d62a57-f2aa-42ad-8fdf-7f54a8a960ab",
+        "name": "Spiritual Weapon",
+        "tier": 2,
+        "description": "You create a floating, spectral weapon that lashes out at a creature within range.",
+        "requiredLevel": 7,
+        "manaCost": 15,
+        "cooldownSeconds": 13,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "4d8",
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "aa859202-0c92-4949-b086-683d1285ccf7",
+        "name": "Spiritual Weapon",
+        "tier": 3,
+        "description": "You create a floating, spectral weapon that lashes out at a creature within range.",
+        "requiredLevel": 11,
+        "manaCost": 19,
+        "cooldownSeconds": 11,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "5d8",
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "3977bdd4-27fe-4bc5-bd5b-3a5a837deafa",
+        "name": "Spiritual Weapon",
+        "tier": 4,
+        "description": "You create a floating, spectral weapon that lashes out at a creature within range.",
+        "requiredLevel": 15,
+        "manaCost": 23,
+        "cooldownSeconds": 10,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "6d8",
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "68797f89-aded-4ff0-9a47-8737ef861c38",
+        "name": "Spiritual Weapon",
+        "tier": 5,
+        "description": "You create a floating, spectral weapon that lashes out at a creature within range.",
+        "requiredLevel": 19,
+        "manaCost": 29,
+        "cooldownSeconds": 9,
+        "range": 6,
+        "effect": "DAMAGE",
+        "effectDice": "7d8",
+        "classes": [
+            "CLERIC"
+        ]
     },
     {
         "id": "d406e7fa-a756-4f31-a00c-9842e91e4ffd",
         "name": "Prayer of Healing",
+        "tier": 1,
         "description": "Up to several creatures of your choice regain a significant number of hit points.",
         "requiredLevel": 3,
         "manaCost": 12,
@@ -213,11 +1375,74 @@
         "range": 0,
         "effect": "HEALING",
         "effectDice": "2d8+5",
-        "classes": ["CLERIC"]
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "bdfc4f35-d7d0-4763-aa7d-e0ba08e32bb6",
+        "name": "Prayer of Healing",
+        "tier": 2,
+        "description": "Up to several creatures of your choice regain a significant number of hit points.",
+        "requiredLevel": 7,
+        "manaCost": 15,
+        "cooldownSeconds": 18,
+        "range": 0,
+        "effect": "HEALING",
+        "effectDice": "3d8+5",
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "3d6ed398-dd64-47ef-b37b-a7f0bb1b1aff",
+        "name": "Prayer of Healing",
+        "tier": 3,
+        "description": "Up to several creatures of your choice regain a significant number of hit points.",
+        "requiredLevel": 11,
+        "manaCost": 19,
+        "cooldownSeconds": 15,
+        "range": 0,
+        "effect": "HEALING",
+        "effectDice": "4d8+5",
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "30ad1292-2f33-40fa-9bda-ce4268db0376",
+        "name": "Prayer of Healing",
+        "tier": 4,
+        "description": "Up to several creatures of your choice regain a significant number of hit points.",
+        "requiredLevel": 15,
+        "manaCost": 23,
+        "cooldownSeconds": 13,
+        "range": 0,
+        "effect": "HEALING",
+        "effectDice": "5d8+5",
+        "classes": [
+            "CLERIC"
+        ]
+    },
+    {
+        "id": "74ef8a72-752e-4a01-83d9-36864e826f84",
+        "name": "Prayer of Healing",
+        "tier": 5,
+        "description": "Up to several creatures of your choice regain a significant number of hit points.",
+        "requiredLevel": 19,
+        "manaCost": 29,
+        "cooldownSeconds": 12,
+        "range": 0,
+        "effect": "HEALING",
+        "effectDice": "6d8+5",
+        "classes": [
+            "CLERIC"
+        ]
     },
     {
         "id": "4d7f43d8-85b6-49d2-92e8-765f8c4a2089",
         "name": "Fireball",
+        "tier": 1,
         "description": "A bright streak flashes to a point you choose and blossoms into a roaring explosion of flame.",
         "requiredLevel": 5,
         "manaCost": 20,
@@ -225,11 +1450,63 @@
         "range": 8,
         "effect": "DAMAGE",
         "effectDice": "8d6",
-        "classes": ["SORCERER", "WIZARD"]
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "14e8be32-1958-484d-b7fa-ff9b773b1921",
+        "name": "Fireball",
+        "tier": 2,
+        "description": "A bright streak flashes to a point you choose and blossoms into a roaring explosion of flame.",
+        "requiredLevel": 9,
+        "manaCost": 25,
+        "cooldownSeconds": 26,
+        "range": 8,
+        "effect": "DAMAGE",
+        "effectDice": "9d6",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "92674a27-100d-40be-b8de-824572cb78ab",
+        "name": "Fireball",
+        "tier": 3,
+        "description": "A bright streak flashes to a point you choose and blossoms into a roaring explosion of flame.",
+        "requiredLevel": 13,
+        "manaCost": 31,
+        "cooldownSeconds": 23,
+        "range": 8,
+        "effect": "DAMAGE",
+        "effectDice": "10d6",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "b58e1d80-b215-4c40-a975-18e8185c9736",
+        "name": "Fireball",
+        "tier": 4,
+        "description": "A bright streak flashes to a point you choose and blossoms into a roaring explosion of flame.",
+        "requiredLevel": 17,
+        "manaCost": 39,
+        "cooldownSeconds": 20,
+        "range": 8,
+        "effect": "DAMAGE",
+        "effectDice": "11d6",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
     },
     {
         "id": "9a2e669f-1d7b-4a4b-80d6-d9db478d06c3",
         "name": "Lightning Bolt",
+        "tier": 1,
         "description": "A stroke of lightning forming a line springs from your hand.",
         "requiredLevel": 5,
         "manaCost": 20,
@@ -237,11 +1514,63 @@
         "range": 8,
         "effect": "DAMAGE",
         "effectDice": "8d6",
-        "classes": ["SORCERER", "WIZARD"]
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "190382c3-1496-4ed1-b84a-1a49fe94a6a2",
+        "name": "Lightning Bolt",
+        "tier": 2,
+        "description": "A stroke of lightning forming a line springs from your hand.",
+        "requiredLevel": 9,
+        "manaCost": 25,
+        "cooldownSeconds": 26,
+        "range": 8,
+        "effect": "DAMAGE",
+        "effectDice": "9d6",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "e5936b0f-01c3-4393-9ed6-6052aae184ce",
+        "name": "Lightning Bolt",
+        "tier": 3,
+        "description": "A stroke of lightning forming a line springs from your hand.",
+        "requiredLevel": 13,
+        "manaCost": 31,
+        "cooldownSeconds": 23,
+        "range": 8,
+        "effect": "DAMAGE",
+        "effectDice": "10d6",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
+    },
+    {
+        "id": "c293c05e-f792-4463-9731-d31bda53d413",
+        "name": "Lightning Bolt",
+        "tier": 4,
+        "description": "A stroke of lightning forming a line springs from your hand.",
+        "requiredLevel": 17,
+        "manaCost": 39,
+        "cooldownSeconds": 20,
+        "range": 8,
+        "effect": "DAMAGE",
+        "effectDice": "11d6",
+        "classes": [
+            "SORCERER",
+            "WIZARD"
+        ]
     },
     {
         "id": "b91dade1-471b-480e-850a-040f9c486d0b",
         "name": "Mass Cure Wounds",
+        "tier": 1,
         "description": "A wave of healing energy washes out from a point of your choice, restoring hit points.",
         "requiredLevel": 5,
         "manaCost": 20,
@@ -249,11 +1578,63 @@
         "range": 0,
         "effect": "HEALING",
         "effectDice": "3d8+8",
-        "classes": ["CLERIC", "DRUID"]
+        "classes": [
+            "CLERIC",
+            "DRUID"
+        ]
+    },
+    {
+        "id": "9de929be-6a0c-4f1d-b87b-7afd40b319e8",
+        "name": "Mass Cure Wounds",
+        "tier": 2,
+        "description": "A wave of healing energy washes out from a point of your choice, restoring hit points.",
+        "requiredLevel": 9,
+        "manaCost": 25,
+        "cooldownSeconds": 26,
+        "range": 0,
+        "effect": "HEALING",
+        "effectDice": "4d8+8",
+        "classes": [
+            "CLERIC",
+            "DRUID"
+        ]
+    },
+    {
+        "id": "b4f5fc00-c52b-4a1c-8897-a877403442e4",
+        "name": "Mass Cure Wounds",
+        "tier": 3,
+        "description": "A wave of healing energy washes out from a point of your choice, restoring hit points.",
+        "requiredLevel": 13,
+        "manaCost": 31,
+        "cooldownSeconds": 23,
+        "range": 0,
+        "effect": "HEALING",
+        "effectDice": "5d8+8",
+        "classes": [
+            "CLERIC",
+            "DRUID"
+        ]
+    },
+    {
+        "id": "25ccdae2-4025-49e7-a6ca-fc9afa267edd",
+        "name": "Mass Cure Wounds",
+        "tier": 4,
+        "description": "A wave of healing energy washes out from a point of your choice, restoring hit points.",
+        "requiredLevel": 17,
+        "manaCost": 39,
+        "cooldownSeconds": 20,
+        "range": 0,
+        "effect": "HEALING",
+        "effectDice": "6d8+8",
+        "classes": [
+            "CLERIC",
+            "DRUID"
+        ]
     },
     {
         "id": "2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f",
         "name": "Bless",
+        "tier": 1,
         "description": "You bless up to three creatures of your choice within range, granting a bonus to attack rolls.",
         "requiredLevel": 1,
         "manaCost": 5,
@@ -261,13 +1642,94 @@
         "range": 5,
         "effect": "BUFF",
         "effectDice": "1d4",
-        "classes": ["CLERIC", "PALADIN", "BARD"],
+        "classes": [
+            "CLERIC",
+            "PALADIN",
+            "BARD"
+        ],
+        "modifiedStat": "ATTACK_ROLL",
+        "durationSeconds": 60
+    },
+    {
+        "id": "cb7fd1e3-d229-4f9b-b17b-f139cf16ff1c",
+        "name": "Bless",
+        "tier": 2,
+        "description": "You bless up to three creatures of your choice within range, granting a bonus to attack rolls.",
+        "requiredLevel": 5,
+        "manaCost": 6,
+        "cooldownSeconds": 5,
+        "range": 5,
+        "effect": "BUFF",
+        "effectDice": "2d4",
+        "classes": [
+            "CLERIC",
+            "PALADIN",
+            "BARD"
+        ],
+        "modifiedStat": "ATTACK_ROLL",
+        "durationSeconds": 60
+    },
+    {
+        "id": "cc9b6857-47a0-4501-8558-5efa47f63fa9",
+        "name": "Bless",
+        "tier": 3,
+        "description": "You bless up to three creatures of your choice within range, granting a bonus to attack rolls.",
+        "requiredLevel": 9,
+        "manaCost": 8,
+        "cooldownSeconds": 5,
+        "range": 5,
+        "effect": "BUFF",
+        "effectDice": "3d4",
+        "classes": [
+            "CLERIC",
+            "PALADIN",
+            "BARD"
+        ],
+        "modifiedStat": "ATTACK_ROLL",
+        "durationSeconds": 60
+    },
+    {
+        "id": "ac4d3098-bbe1-4406-9e92-485c08b04e66",
+        "name": "Bless",
+        "tier": 4,
+        "description": "You bless up to three creatures of your choice within range, granting a bonus to attack rolls.",
+        "requiredLevel": 13,
+        "manaCost": 10,
+        "cooldownSeconds": 4,
+        "range": 5,
+        "effect": "BUFF",
+        "effectDice": "4d4",
+        "classes": [
+            "CLERIC",
+            "PALADIN",
+            "BARD"
+        ],
+        "modifiedStat": "ATTACK_ROLL",
+        "durationSeconds": 60
+    },
+    {
+        "id": "639a2793-b84d-4117-b348-d7bb0085eb6c",
+        "name": "Bless",
+        "tier": 5,
+        "description": "You bless up to three creatures of your choice within range, granting a bonus to attack rolls.",
+        "requiredLevel": 17,
+        "manaCost": 12,
+        "cooldownSeconds": 4,
+        "range": 5,
+        "effect": "BUFF",
+        "effectDice": "5d4",
+        "classes": [
+            "CLERIC",
+            "PALADIN",
+            "BARD"
+        ],
         "modifiedStat": "ATTACK_ROLL",
         "durationSeconds": 60
     },
     {
         "id": "8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e",
         "name": "Bane",
+        "tier": 1,
         "description": "Up to three creatures of your choice within range must make a saving throw or take a penalty to attack rolls.",
         "requiredLevel": 1,
         "manaCost": 5,
@@ -275,13 +1737,94 @@
         "range": 5,
         "effect": "DEBUFF",
         "effectDice": "1d4",
-        "classes": ["CLERIC", "BARD", "WARLOCK"],
+        "classes": [
+            "CLERIC",
+            "BARD",
+            "WARLOCK"
+        ],
+        "modifiedStat": "ATTACK_ROLL",
+        "durationSeconds": 60
+    },
+    {
+        "id": "32f35af9-020f-4375-a6ee-e178d3cc3ba3",
+        "name": "Bane",
+        "tier": 2,
+        "description": "Up to three creatures of your choice within range must make a saving throw or take a penalty to attack rolls.",
+        "requiredLevel": 5,
+        "manaCost": 6,
+        "cooldownSeconds": 5,
+        "range": 5,
+        "effect": "DEBUFF",
+        "effectDice": "2d4",
+        "classes": [
+            "CLERIC",
+            "BARD",
+            "WARLOCK"
+        ],
+        "modifiedStat": "ATTACK_ROLL",
+        "durationSeconds": 60
+    },
+    {
+        "id": "20a5fd97-759e-422d-b01a-a27c3f2b18e2",
+        "name": "Bane",
+        "tier": 3,
+        "description": "Up to three creatures of your choice within range must make a saving throw or take a penalty to attack rolls.",
+        "requiredLevel": 9,
+        "manaCost": 8,
+        "cooldownSeconds": 5,
+        "range": 5,
+        "effect": "DEBUFF",
+        "effectDice": "3d4",
+        "classes": [
+            "CLERIC",
+            "BARD",
+            "WARLOCK"
+        ],
+        "modifiedStat": "ATTACK_ROLL",
+        "durationSeconds": 60
+    },
+    {
+        "id": "44fd98d5-816d-4620-99d0-4c71759dfec3",
+        "name": "Bane",
+        "tier": 4,
+        "description": "Up to three creatures of your choice within range must make a saving throw or take a penalty to attack rolls.",
+        "requiredLevel": 13,
+        "manaCost": 10,
+        "cooldownSeconds": 4,
+        "range": 5,
+        "effect": "DEBUFF",
+        "effectDice": "4d4",
+        "classes": [
+            "CLERIC",
+            "BARD",
+            "WARLOCK"
+        ],
+        "modifiedStat": "ATTACK_ROLL",
+        "durationSeconds": 60
+    },
+    {
+        "id": "ff8f1333-3a2d-4ee2-a2dd-b38054944db8",
+        "name": "Bane",
+        "tier": 5,
+        "description": "Up to three creatures of your choice within range must make a saving throw or take a penalty to attack rolls.",
+        "requiredLevel": 17,
+        "manaCost": 12,
+        "cooldownSeconds": 4,
+        "range": 5,
+        "effect": "DEBUFF",
+        "effectDice": "5d4",
+        "classes": [
+            "CLERIC",
+            "BARD",
+            "WARLOCK"
+        ],
         "modifiedStat": "ATTACK_ROLL",
         "durationSeconds": 60
     },
     {
         "id": "5c3b9e1d-7a4f-4b8c-9d2e-6f1a3c8b5d0e",
         "name": "Shield of Faith",
+        "tier": 1,
         "description": "A shimmering field appears and surrounds a creature of your choice within range, granting a bonus to AC.",
         "requiredLevel": 1,
         "manaCost": 5,
@@ -289,7 +1832,82 @@
         "range": 5,
         "effect": "BUFF",
         "effectDice": "2",
-        "classes": ["CLERIC", "PALADIN"],
+        "classes": [
+            "CLERIC",
+            "PALADIN"
+        ],
+        "modifiedStat": "ARMOR_CLASS",
+        "durationSeconds": 60
+    },
+    {
+        "id": "e4123c21-208b-4060-9b58-7d80107ab7c8",
+        "name": "Shield of Faith",
+        "tier": 2,
+        "description": "A shimmering field appears and surrounds a creature of your choice within range, granting a bonus to AC.",
+        "requiredLevel": 5,
+        "manaCost": 6,
+        "cooldownSeconds": 5,
+        "range": 5,
+        "effect": "BUFF",
+        "effectDice": "3",
+        "classes": [
+            "CLERIC",
+            "PALADIN"
+        ],
+        "modifiedStat": "ARMOR_CLASS",
+        "durationSeconds": 60
+    },
+    {
+        "id": "cf52f92c-aa1b-4905-b8fa-de83e29fe2eb",
+        "name": "Shield of Faith",
+        "tier": 3,
+        "description": "A shimmering field appears and surrounds a creature of your choice within range, granting a bonus to AC.",
+        "requiredLevel": 9,
+        "manaCost": 8,
+        "cooldownSeconds": 5,
+        "range": 5,
+        "effect": "BUFF",
+        "effectDice": "4",
+        "classes": [
+            "CLERIC",
+            "PALADIN"
+        ],
+        "modifiedStat": "ARMOR_CLASS",
+        "durationSeconds": 60
+    },
+    {
+        "id": "8e49d6ad-c0ea-4922-98e3-6df6110ca885",
+        "name": "Shield of Faith",
+        "tier": 4,
+        "description": "A shimmering field appears and surrounds a creature of your choice within range, granting a bonus to AC.",
+        "requiredLevel": 13,
+        "manaCost": 10,
+        "cooldownSeconds": 4,
+        "range": 5,
+        "effect": "BUFF",
+        "effectDice": "5",
+        "classes": [
+            "CLERIC",
+            "PALADIN"
+        ],
+        "modifiedStat": "ARMOR_CLASS",
+        "durationSeconds": 60
+    },
+    {
+        "id": "3c235ad7-e35f-4afb-b785-23f15511bc01",
+        "name": "Shield of Faith",
+        "tier": 5,
+        "description": "A shimmering field appears and surrounds a creature of your choice within range, granting a bonus to AC.",
+        "requiredLevel": 17,
+        "manaCost": 12,
+        "cooldownSeconds": 4,
+        "range": 5,
+        "effect": "BUFF",
+        "effectDice": "6",
+        "classes": [
+            "CLERIC",
+            "PALADIN"
+        ],
         "modifiedStat": "ARMOR_CLASS",
         "durationSeconds": 60
     }

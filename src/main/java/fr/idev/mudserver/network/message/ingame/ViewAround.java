@@ -99,17 +99,6 @@ public record ViewAround(AbstractCharacter character) implements OutputJsonMessa
 
     private List<HexCoordinate> remainingPath(AbstractCharacter viewer) {
         MovementEngine.ActiveMovement movement = viewer.activeMovement;
-        if (movement == null) {
-            return List.of();
-        }
-
-        List<HexCoordinate> path = new ArrayList<>(movement.cellsRemaining());
-        HexCoordinate cursor = viewer.getPosition();
-        for (int i = 0; i < movement.cellsRemaining(); i++) {
-            cursor = cursor.neighbor(movement.direction());
-            path.add(cursor);
-        }
-
-        return path;
+        return movement == null ? List.of() : movement.remainingPath();
     }
 }
