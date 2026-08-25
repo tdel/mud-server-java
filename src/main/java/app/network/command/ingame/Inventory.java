@@ -30,7 +30,9 @@ public class Inventory implements CommandHandler {
 
         List<Item> items = character.getInventory().getItems();
         List<app.network.message.ingame.Inventory.Entry> entries = items.stream()
-                .map(item -> new app.network.message.ingame.Inventory.Entry(item.getName(), item.getRarity())).toList();
+                .map(item -> new app.network.message.ingame.Inventory.Entry(item.getName(), item.getRarity(),
+                        item.getSlot()))
+                .toList();
 
         connection.send(new app.network.message.ingame.Inventory(entries, character.getInventory().getGold()));
     }

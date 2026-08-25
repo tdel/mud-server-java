@@ -50,6 +50,7 @@ public final class TiledZoneLoader {
     private static final String TYPE_NPC_SPAWN = "npcSpawn";
     private static final double DEFAULT_PORTAL_TRIGGER_RADIUS = 0.6;
     private static final double COLLISION_CELL_SIZE = 1.0;
+    private static final double MIN_SPAWN_PORTAL_DISTANCE = 2.0;
 
     // Un export Tiled porte des champs standards (version, tiledversion, infinite,
     // renderorder, image du tileset, etc.) qu'on ne modélise pas dans TiledMap :
@@ -96,6 +97,15 @@ public final class TiledZoneLoader {
 
         if (spawnPositionHolder[0] == null) {
             throw new IllegalStateException("Zone " + id + " (" + name + ") n'a aucun objet playerSpawn");
+        }
+
+        for (PortalDraft portal : portals) {
+            double distance = portal.position().distanceTo(spawnPositionHolder[0]);
+            if (distance < MIN_SPAWN_PORTAL_DISTANCE) {
+                throw new IllegalStateException(
+                        "Zone " + id + " (" + name + ") : le playerSpawn est trop proche (" + distance + " < "
+                                + MIN_SPAWN_PORTAL_DISTANCE + ") du portail direction " + portal.direction());
+            }
         }
 
         return new ParsedZone(id, name, description, isStartingZone, terrain, spawnPositionHolder[0],

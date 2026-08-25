@@ -11,16 +11,11 @@ import app.domain.actor.instance.CharacterInstance;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.ingame.NoPortalHere;
+import app.network.message.ingame.ViewAround;
 import app.network.message.ingame.ZoneMap;
 
 @Component
 public class Portal implements CommandHandler {
-
-    private final Look lookAction;
-
-    public Portal(Look lookAction) {
-        this.lookAction = lookAction;
-    }
 
     @Override
     public String name() {
@@ -43,6 +38,6 @@ public class Portal implements CommandHandler {
 
         character.moveToZone(portal.get().targetZone(), portal.get().targetPosition());
         connection.send(new ZoneMap(character.getCurrentZone()));
-        lookAction.onReceive(connection, "");
+        connection.send(new ViewAround(character));
     }
 }
