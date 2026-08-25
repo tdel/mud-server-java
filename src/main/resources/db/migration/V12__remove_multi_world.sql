@@ -1,6 +1,6 @@
 -- Retour à un monde unique : suppression du lobby/party/sélection de World. Un seul
 -- WorldInstance existe désormais, construite en mémoire au démarrage (id fixe
--- fr.idev.mudserver.domain.world.WorldInstance.DEFAULT_ID) et plus jamais persistée.
+-- app.domain.world.WorldInstance.DEFAULT_ID) et plus jamais persistée.
 -- world_instance_member et character.world_instance_id n'ont donc plus aucun lecteur/
 -- écrivain applicatif ; world_instance elle-même n'est plus lue qu'en mémoire.
 --

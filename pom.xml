@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>fr.idev</groupId>
+    <groupId>app</groupId>
     <artifactId>mud-server-java</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <name>mud-server-java</name>
@@ -184,7 +184,7 @@
                             </properties>
                         </database>
                         <target>
-                            <packageName>fr.idev.mudserver.persistence.jooq</packageName>
+                            <packageName>app.persistence.jooq</packageName>
                             <directory>target/generated-sources/jooq</directory>
                         </target>
                     </generator>

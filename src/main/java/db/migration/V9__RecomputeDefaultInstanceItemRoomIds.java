@@ -10,8 +10,8 @@ import java.util.UUID;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
-import fr.idev.mudserver.domain.world.WorldInstance;
-import fr.idev.mudserver.domain.world.ZoneInstance;
+import app.domain.world.WorldInstance;
+import app.domain.world.ZoneInstance;
 
 public class V9__RecomputeDefaultInstanceItemRoomIds extends BaseJavaMigration {
 
