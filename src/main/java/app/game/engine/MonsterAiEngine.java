@@ -19,6 +19,7 @@ import app.domain.actor.instance.MonsterInstance;
 import app.domain.map.Position;
 import app.domain.world.CollisionGrid;
 import app.domain.world.ZoneInstance;
+import app.network.message.ingame.AttackObserved;
 import app.network.message.ingame.AttackReceived;
 import app.network.message.ingame.MonsterGaveUpChase;
 import app.network.message.ingame.MonsterStartedChasing;
@@ -104,6 +105,8 @@ public class MonsterAiEngine {
             MonsterInstance.MonsterAttackOutcome outcome = monster.attack(target);
             target.send(new AttackReceived(monster.getName(), outcome.hit(), outcome.critical(), outcome.damage(),
                     outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()));
+            zone.broadcast(new AttackObserved(monster.getName(), target.getName(), outcome.hit(), outcome.critical(),
+                    outcome.damage(), outcome.targetDefeated()), null);
             monster.pursuit = state.withNextAttackAt(nowMillis + CharacterCombat.ATTACK_COOLDOWN.toMillis());
             return;
         }

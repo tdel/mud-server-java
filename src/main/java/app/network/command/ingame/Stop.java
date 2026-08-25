@@ -9,6 +9,7 @@ import app.network.CommandHandler;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.Connection;
 import app.network.ConnectionState;
+import app.network.message.ingame.CharacterMovementStopped;
 import app.network.message.ingame.MovementStopped;
 
 @Component
@@ -37,5 +38,6 @@ public class Stop implements CommandHandler {
         movementEngine.stopMovement(character);
 
         connection.send(new MovementStopped());
+        character.getCurrentZone().broadcast(new CharacterMovementStopped(character.getName()), character);
     }
 }

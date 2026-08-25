@@ -16,6 +16,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import app.domain.actor.AbstractCharacter;
+import app.domain.actor.instance.CharacterInstance;
+import app.network.message.ingame.CharacterMovementBlocked;
+import app.network.message.ingame.CharacterMovementFinished;
+import app.network.message.ingame.CharacterPositionUpdated;
 import app.network.message.ingame.MovementBlockedByBounds;
 import app.network.message.ingame.MovementFinished;
 import app.network.message.ingame.PositionUpdated;
@@ -62,19 +66,32 @@ public class MovementEngine {
                 switch (updatePosition(character, now)) {
                     case NO_MOVEMENT -> {
                     }
-                    case STEPPED ->
+                    case STEPPED -> {
                         character.send(new PositionUpdated(character.getPosition().x(), character.getPosition().y()));
+                        if (character instanceof CharacterInstance player) {
+                            character.getCurrentZone().broadcast(new CharacterPositionUpdated(character.getName(),
+                                    character.getPosition().x(), character.getPosition().y()), player);
+                        }
+                    }
                     case FINISHED -> {
                         movingCharacters.remove(character.getId());
                         log.debug("movement.finished thread={} character={}", Thread.currentThread().getName(),
                                 character.getId());
                         character.send(new MovementFinished(character.getPosition().x(), character.getPosition().y()));
+                        if (character instanceof CharacterInstance player) {
+                            character.getCurrentZone().broadcast(new CharacterMovementFinished(character.getName(),
+                                    character.getPosition().x(), character.getPosition().y()), player);
+                        }
                     }
                     case BLOCKED_BY_BOUNDS -> {
                         movingCharacters.remove(character.getId());
                         log.debug("movement.blocked thread={} character={}", Thread.currentThread().getName(),
                                 character.getId());
                         character.send(new MovementBlockedByBounds());
+                        if (character instanceof CharacterInstance player) {
+                            character.getCurrentZone().broadcast(new CharacterMovementBlocked(character.getName()),
+                                    player);
+                        }
                     }
                 }
             } catch (Exception e) {

@@ -21,6 +21,7 @@ import app.network.message.ingame.CastResult;
 import app.network.message.ingame.NoTargetSelected;
 import app.network.message.ingame.NotEnoughMana;
 import app.network.message.ingame.SpellModifierAnnounced;
+import app.network.message.ingame.SpellCastObserved;
 import app.network.message.ingame.SpellNotKnown;
 import app.network.message.ingame.SpellOnCooldown;
 import app.network.message.ingame.SpellOutOfRange;
@@ -111,6 +112,8 @@ public class Cast implements CommandHandler {
             target.send(new CastReceived(character.getName(), spell.name(), outcome.hit(), outcome.amount(),
                     outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()));
         }
+        character.getCurrentZone().broadcast(new SpellCastObserved(character.getName(), spell.name(), target.getName(),
+                outcome.selfHeal(), outcome.hit(), outcome.amount(), outcome.targetDefeated()), null);
         if (outcome.targetDefeated()) {
             character.getCombat().setTarget(null);
         }

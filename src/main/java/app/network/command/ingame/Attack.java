@@ -14,6 +14,7 @@ import app.game.engine.MonsterAiEngine;
 import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
+import app.network.message.ingame.AttackObserved;
 import app.network.message.ingame.AttackOnCooldown;
 import app.network.message.ingame.AttackOutOfRange;
 import app.network.message.ingame.AttackReceived;
@@ -83,6 +84,8 @@ public class Attack implements CommandHandler {
                 outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()));
         target.send(new AttackReceived(character.getName(), outcome.hit(), outcome.critical(), outcome.damage(),
                 outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()));
+        character.getCurrentZone().broadcast(new AttackObserved(character.getName(), target.getName(), outcome.hit(),
+                outcome.critical(), outcome.damage(), outcome.targetDefeated()), null);
 
         if (outcome.targetDefeated()) {
             combat.setTarget(null);
