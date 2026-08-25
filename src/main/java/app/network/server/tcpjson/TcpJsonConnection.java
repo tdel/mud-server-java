@@ -86,14 +86,14 @@ public class TcpJsonConnection implements Connection, TcpJsonOutput {
             log.error("tcpjson.disconnect_cleanup_failed stage=game", e);
         }
         try {
-            this.detachWorldInstance();
-        } catch (Exception e) {
-            log.error("tcpjson.disconnect_cleanup_failed stage=charselect", e);
-        }
-        try {
             authWorld.exitWorld(this);
         } catch (Exception e) {
             log.error("tcpjson.disconnect_cleanup_failed stage=auth", e);
+        }
+        try {
+            this.detachWorldInstance();
+        } catch (Exception e) {
+            log.error("tcpjson.disconnect_cleanup_failed stage=charselect", e);
         }
     }
 
