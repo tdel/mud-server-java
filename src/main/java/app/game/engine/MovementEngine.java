@@ -19,10 +19,8 @@ import app.domain.actor.AbstractCharacter;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.message.ingame.CharacterMovementBlocked;
 import app.network.message.ingame.CharacterMovementFinished;
-import app.network.message.ingame.CharacterPositionUpdated;
 import app.network.message.ingame.MovementBlockedByBounds;
 import app.network.message.ingame.MovementFinished;
-import app.network.message.ingame.PositionUpdated;
 
 @Component
 public class MovementEngine {
@@ -67,11 +65,11 @@ public class MovementEngine {
                     case NO_MOVEMENT -> {
                     }
                     case STEPPED -> {
-                        character.send(new PositionUpdated(character.getPosition().x(), character.getPosition().y()));
-                        if (character instanceof CharacterInstance player) {
-                            character.getCurrentZone().broadcast(new CharacterPositionUpdated(character.getName(),
-                                    character.getPosition().x(), character.getPosition().y()), player);
-                        }
+                        // Plus d'envoi de position à chaque tick (~100ms) : le client interpole
+                        // localement son propre déplacement et celui des autres personnages de la
+                        // zone à partir de la cible (CharacterMovementStarted/MovementStarted) et de
+                        // sa vitesse, et corrige la dérive via la commande "position" à la demande
+                        // (voir Position.java) plutôt que via un flux poussé par le serveur.
                     }
                     case FINISHED -> {
                         movingCharacters.remove(character.getId());
@@ -87,10 +85,11 @@ public class MovementEngine {
                         movingCharacters.remove(character.getId());
                         log.debug("movement.blocked thread={} character={}", Thread.currentThread().getName(),
                                 character.getId());
-                        character.send(new MovementBlockedByBounds());
+                        character.send(new MovementBlockedByBounds(character.getPosition().x(),
+                                character.getPosition().y()));
                         if (character instanceof CharacterInstance player) {
-                            character.getCurrentZone().broadcast(new CharacterMovementBlocked(character.getName()),
-                                    player);
+                            character.getCurrentZone().broadcast(new CharacterMovementBlocked(character.getName(),
+                                    character.getPosition().x(), character.getPosition().y()), player);
                         }
                     }
                 }

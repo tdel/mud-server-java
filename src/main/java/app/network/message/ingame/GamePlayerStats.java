@@ -6,6 +6,7 @@ import app.network.OutputJsonMessage;
 import app.domain.actor.Attribute;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.Skill;
+import app.game.engine.MovementEngine;
 import app.network.server.tcpjson.TcpJsonOutput;
 
 public record GamePlayerStats(CharacterInstance character) implements OutputJsonMessage {
@@ -17,7 +18,7 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
             int maxHealth, int currentMana, int maxMana, int armorClass, int proficiencyBonus, AttributeScore strength,
             AttributeScore dexterity, AttributeScore constitution, AttributeScore intelligence, AttributeScore wisdom,
             AttributeScore charisma, String primaryAbility, List<String> savingThrowProficiencies,
-            List<String> skillProficiencies) {
+            List<String> skillProficiencies, double speed) {
     }
 
     @Override
@@ -31,7 +32,8 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
                         attributeScore(c, Attribute.INTELLIGENCE), attributeScore(c, Attribute.WISDOM),
                         attributeScore(c, Attribute.CHARISMA), c.getPrimaryAbility().label(),
                         c.getSavingThrowProficiencies().stream().sorted().map(Attribute::label).toList(),
-                        c.getSkillProficiencies().stream().sorted().map(Skill::label).toList()),
+                        c.getSkillProficiencies().stream().sorted().map(Skill::label).toList(),
+                        MovementEngine.unitsPerSecond(c.getSpeed())),
                 false);
     }
 

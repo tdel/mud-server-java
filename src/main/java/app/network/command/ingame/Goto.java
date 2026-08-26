@@ -16,6 +16,7 @@ import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
+import app.network.message.ingame.CharacterMovementStarted;
 import app.network.message.ingame.MovementStarted;
 import app.network.message.ingame.NoPathToDestination;
 import app.network.message.ingame.ViewAround;
@@ -76,6 +77,8 @@ public class Goto implements CommandHandler {
             connection.send(new ViewAround(character));
         } else {
             connection.send(new MovementStarted(target.x(), target.y()));
+            character.getCurrentZone().broadcast(
+                    new CharacterMovementStarted(character.getName(), target.x(), target.y()), character);
         }
     }
 

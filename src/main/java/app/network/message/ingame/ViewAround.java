@@ -11,7 +11,7 @@ import app.network.server.tcpjson.TcpJsonOutput;
 
 public record ViewAround(AbstractCharacter character) implements OutputJsonMessage {
 
-    public record EntityView(String name, double x, double y) {
+    public record EntityView(String name, double x, double y, double speed) {
     }
 
     public record PortalView(double x, double y, String direction, String targetZoneName) {
@@ -45,7 +45,8 @@ public record ViewAround(AbstractCharacter character) implements OutputJsonMessa
     }
 
     private EntityView toEntityView(AbstractCharacter other) {
-        return new EntityView(other.getName(), other.getPosition().x(), other.getPosition().y());
+        return new EntityView(other.getName(), other.getPosition().x(), other.getPosition().y(),
+                MovementEngine.unitsPerSecond(other.getSpeed()));
     }
 
     private List<Position> remainingWaypoints() {
