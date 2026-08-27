@@ -104,7 +104,8 @@ public class ZoneInstance {
                 character.getId(), position);
         DomainEventPublisher.publish(new GamePlayerSpawnedToZone(character, this));
 
-        broadcast(new GamePlayerJoinedZone(character.getName()), character);
+        broadcast(new GamePlayerJoinedZone(character.getId(), character.getName(), position.x(), position.y()),
+                character);
     }
 
     public void leave(CharacterInstance character) {
