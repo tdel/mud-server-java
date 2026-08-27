@@ -11,6 +11,7 @@ import app.domain.actor.AbstractCharacter;
 import app.domain.actor.component.CharacterCombat;
 import app.domain.actor.instance.CharacterInstance;
 import app.game.engine.MonsterAiEngine;
+import app.game.engine.MovementEngine;
 import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
@@ -19,6 +20,8 @@ import app.network.message.ingame.AttackOnCooldown;
 import app.network.message.ingame.AttackOutOfRange;
 import app.network.message.ingame.AttackReceived;
 import app.network.message.ingame.AttackResult;
+import app.network.message.ingame.CharacterMovementStopped;
+import app.network.message.ingame.MovementStopped;
 import app.network.message.ingame.NoTargetSelected;
 import app.network.message.ingame.TargetNotFound;
 
@@ -26,6 +29,12 @@ import app.network.message.ingame.TargetNotFound;
 public class Attack implements CommandHandler {
 
     private static final Logger log = LoggerFactory.getLogger(Attack.class);
+
+    private final MovementEngine movementEngine;
+
+    public Attack(MovementEngine movementEngine) {
+        this.movementEngine = movementEngine;
+    }
 
     @Override
     public String name() {
@@ -76,6 +85,18 @@ public class Attack implements CommandHandler {
             log.debug("attack.rejected character={} reason=on_cooldown target={}", character.getId(), target.getId());
             connection.send(new AttackOnCooldown(combat.remainingCooldown().toMillis()));
             return;
+        }
+
+        // Toutes les vérifications (cible, portée, cooldown) sont passées : l'attaque va
+        // effectivement avoir lieu, on arrête donc le déplacement en cours juste avant de
+        // la calculer — on ne combat pas en marchant.
+        if (character.activeMovement != null) {
+            movementEngine.stopMovement(character);
+            connection.send(new MovementStopped(character.getPosition().x(), character.getPosition().y()));
+            character.getCurrentZone().broadcast(
+                    new CharacterMovementStopped(character.getName(), character.getPosition().x(),
+                            character.getPosition().y()),
+                    character);
         }
 
         CharacterCombat.AttackOutcome outcome = combat.attack(target);

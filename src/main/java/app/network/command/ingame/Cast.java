@@ -12,12 +12,15 @@ import app.domain.SpellEffectType;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.component.SpellCasting;
 import app.domain.actor.instance.CharacterInstance;
+import app.game.engine.MovementEngine;
 import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
 import app.network.message.ingame.CastReceived;
 import app.network.message.ingame.CastResult;
+import app.network.message.ingame.CharacterMovementStopped;
+import app.network.message.ingame.MovementStopped;
 import app.network.message.ingame.NoTargetSelected;
 import app.network.message.ingame.NotEnoughMana;
 import app.network.message.ingame.SpellModifierAnnounced;
@@ -29,6 +32,12 @@ import app.network.message.ingame.TargetNotFound;
 
 @Component
 public class Cast implements CommandHandler {
+
+    private final MovementEngine movementEngine;
+
+    public Cast(MovementEngine movementEngine) {
+        this.movementEngine = movementEngine;
+    }
 
     @Override
     public String name() {
@@ -93,6 +102,18 @@ public class Cast implements CommandHandler {
         if (character.getCurrentMana() < spell.manaCost()) {
             connection.send(new NotEnoughMana(spell.name(), spell.manaCost(), character.getCurrentMana()));
             return;
+        }
+
+        // Toutes les vérifications (sort connu, cible, portée, cooldown, mana) sont
+        // passées : le sort va effectivement être lancé, on arrête donc le déplacement en
+        // cours juste avant de le calculer — on ne combat pas en marchant.
+        if (character.activeMovement != null) {
+            movementEngine.stopMovement(character);
+            connection.send(new MovementStopped(character.getPosition().x(), character.getPosition().y()));
+            character.getCurrentZone().broadcast(
+                    new CharacterMovementStopped(character.getName(), character.getPosition().x(),
+                            character.getPosition().y()),
+                    character);
         }
 
         SpellCasting.CastOutcome outcome = character.castSpell(spell, target);
