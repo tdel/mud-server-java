@@ -2,6 +2,7 @@ package app.domain.actor.component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import app.domain.item.Item;
@@ -35,8 +36,8 @@ public final class PlayerInventory {
         return List.copyOf(items);
     }
 
-    public Optional<Item> findOneByName(String name) {
-        return items.stream().filter(item -> item.getName().equalsIgnoreCase(name)).findFirst();
+    public Optional<Item> findOneById(UUID id) {
+        return items.stream().filter(item -> item.getId().equals(id)).findFirst();
     }
 
     public List<Item> getCarriedItems() {

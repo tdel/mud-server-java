@@ -30,7 +30,14 @@ public final class NpcSellerInstance extends AbstractNpc {
                 return Optional.of(shop().items().get(index - 1));
             }
         } catch (NumberFormatException ignored) {
-            // pas un index numérique : recherche par nom ci-dessous
+            // pas un index numérique : recherche par uuid ou nom ci-dessous
+        }
+        try {
+            UUID itemTemplateId = UUID.fromString(trimmed);
+            return shop().items().stream().filter(entry -> entry.itemTemplate().getId().equals(itemTemplateId))
+                    .findFirst();
+        } catch (IllegalArgumentException ignored) {
+            // pas un uuid : recherche par nom ci-dessous
         }
         return shop().items().stream().filter(entry -> entry.itemTemplate().getName().equalsIgnoreCase(trimmed))
                 .findFirst();

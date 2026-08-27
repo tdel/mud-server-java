@@ -1,5 +1,7 @@
 package app.network.message.ingame;
 
+import java.util.UUID;
+
 import app.network.OutputJsonMessage;
 import app.domain.actor.Attribute;
 import app.domain.actor.instance.MonsterInstance;
@@ -10,7 +12,7 @@ public record MonsterStatBlock(MonsterInstance monster) implements OutputJsonMes
     public record AttributeScore(int score, int modifier) {
     }
 
-    public record Payload(String name, String description, int currentHealth, int maxHealth, int armorClass,
+    public record Payload(UUID id, String name, String description, int currentHealth, int maxHealth, int armorClass,
             AttributeScore strength, AttributeScore dexterity, AttributeScore constitution, AttributeScore intelligence,
             AttributeScore wisdom, AttributeScore charisma) {
     }
@@ -19,10 +21,11 @@ public record MonsterStatBlock(MonsterInstance monster) implements OutputJsonMes
     public void toJson(TcpJsonOutput output) {
         MonsterInstance m = monster;
         output.write("MonsterStatBlock",
-                new Payload(m.getName(), m.getDescription(), m.getCurrentHealth(), m.getMaxHealth(), m.getArmorClass(),
-                        attributeScore(m, Attribute.STRENGTH), attributeScore(m, Attribute.DEXTERITY),
-                        attributeScore(m, Attribute.CONSTITUTION), attributeScore(m, Attribute.INTELLIGENCE),
-                        attributeScore(m, Attribute.WISDOM), attributeScore(m, Attribute.CHARISMA)),
+                new Payload(m.getId(), m.getName(), m.getDescription(), m.getCurrentHealth(), m.getMaxHealth(),
+                        m.getArmorClass(), attributeScore(m, Attribute.STRENGTH),
+                        attributeScore(m, Attribute.DEXTERITY), attributeScore(m, Attribute.CONSTITUTION),
+                        attributeScore(m, Attribute.INTELLIGENCE), attributeScore(m, Attribute.WISDOM),
+                        attributeScore(m, Attribute.CHARISMA)),
                 false);
     }
 

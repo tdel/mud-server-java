@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import app.network.CommandArguments;
 import app.network.CommandHandler;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.instance.CharacterInstance;
@@ -30,23 +31,25 @@ public class Select implements CommandHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
-        String name = argument.trim();
+        String raw = argument.trim();
 
-        if (name.isEmpty()) {
+        if (raw.isEmpty()) {
             character.getCombat().setTarget(null);
             connection.send(new TargetDeselected());
             return;
         }
 
         // Monstre, joueur ou PNJ : la sélection sert aussi bien à cibler un sort/une
-        // attaque (monstre, joueur) qu'à préparer une interaction (PNJ, commerce/quête).
-        Optional<AbstractCharacter> target = character.getCurrentZone().findOccupantByName(name);
+        // attaque (monstre, joueur) qu'à préparer une interaction (PNJ,
+        // commerce/quête).
+        Optional<AbstractCharacter> target = CommandArguments.tryParseUuid(raw)
+                .flatMap(id -> character.getCurrentZone().findOccupantById(id));
         if (target.isEmpty()) {
-            connection.send(new TargetNotFound(name));
+            connection.send(new TargetNotFound(raw));
             return;
         }
 
         character.getCombat().setTarget(target.get());
-        connection.send(new TargetSelected(target.get().getName()));
+        connection.send(new TargetSelected(target.get().getId(), target.get().getName()));
     }
 }

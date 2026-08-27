@@ -122,12 +122,16 @@ public class ZoneInstance {
         broadcast(new GamePlayerDisconnected(character.getName()), character);
     }
 
-    public Optional<AbstractCharacter> findOccupantByName(String name) {
-        List<AbstractCharacter> occupantsByName = new ArrayList<>();
-        occupantsByName.addAll(clients.values());
-        occupantsByName.addAll(monsters);
-        occupantsByName.addAll(npcs);
-        return occupantsByName.stream().filter(occupant -> occupant.getName().equalsIgnoreCase(name)).findFirst();
+    public Optional<AbstractCharacter> findOccupantById(UUID id) {
+        CharacterInstance client = clients.get(id);
+        if (client != null) {
+            return Optional.of(client);
+        }
+        Optional<MonsterInstance> monster = findMonsterById(id);
+        if (monster.isPresent()) {
+            return Optional.of(monster.get());
+        }
+        return findNpcById(id).map(AbstractCharacter.class::cast);
     }
 
     public List<CharacterInstance> characters() {
@@ -146,18 +150,20 @@ public class ZoneInstance {
         monsters.remove(monster);
     }
 
-    public Optional<MonsterInstance> findMonsterByName(String name) {
-        return monsters.stream().filter(monster -> monster.getName().equalsIgnoreCase(name)).findFirst();
+    public Optional<MonsterInstance> findMonsterById(UUID id) {
+        return monsters.stream().filter(monster -> monster.getId().equals(id)).findFirst();
     }
 
-    public Optional<AbstractCharacter> findAttackableByName(String name, CharacterInstance requester) {
-        Optional<MonsterInstance> monster = findMonsterByName(name);
+    public Optional<AbstractCharacter> findAttackableById(UUID id, CharacterInstance requester) {
+        Optional<MonsterInstance> monster = findMonsterById(id);
         if (monster.isPresent()) {
             return Optional.of(monster.get());
         }
-        return clients.values().stream().filter(client -> !client.getId().equals(requester.getId()))
-                .filter(client -> client.getName().equalsIgnoreCase(name)).map(AbstractCharacter.class::cast)
-                .findFirst();
+        CharacterInstance client = clients.get(id);
+        if (client != null && !client.getId().equals(requester.getId())) {
+            return Optional.of(client);
+        }
+        return Optional.empty();
     }
 
     public void setMonsters(List<MonsterInstance> monsters) {
@@ -192,8 +198,8 @@ public class ZoneInstance {
         npc.setPosition(position);
     }
 
-    public Optional<AbstractNpc> findNpcByName(String name) {
-        return npcs.stream().filter(npc -> npc.getName().equalsIgnoreCase(name)).findFirst();
+    public Optional<AbstractNpc> findNpcById(UUID id) {
+        return npcs.stream().filter(npc -> npc.getId().equals(id)).findFirst();
     }
 
     public List<ZonePortal> getPortals() {

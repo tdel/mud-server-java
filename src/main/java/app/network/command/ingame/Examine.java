@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import app.network.CommandArguments;
 import app.network.CommandHandler;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.instance.MonsterInstance;
@@ -35,17 +36,18 @@ public class Examine implements CommandHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
-        String name = argument.trim();
+        String raw = argument.trim();
 
-        if (name.isEmpty()) {
-            connection.send(new Usage("examine <name>"));
+        if (raw.isEmpty()) {
+            connection.send(new Usage("examine <uuid>"));
             return;
         }
 
-        Optional<AbstractCharacter> target = character.getCurrentZone().findOccupantByName(name);
+        Optional<AbstractCharacter> target = CommandArguments.tryParseUuid(raw)
+                .flatMap(id -> character.getCurrentZone().findOccupantById(id));
 
         if (target.isEmpty()) {
-            connection.send(new TargetNotFound(name));
+            connection.send(new TargetNotFound(raw));
             return;
         }
 

@@ -103,10 +103,11 @@ public class MonsterAiEngine {
                 return;
             }
             MonsterInstance.MonsterAttackOutcome outcome = monster.attack(target);
-            target.send(new AttackReceived(monster.getName(), outcome.hit(), outcome.critical(), outcome.damage(),
-                    outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()));
-            zone.broadcast(new AttackObserved(monster.getName(), target.getName(), outcome.hit(), outcome.critical(),
-                    outcome.damage(), outcome.targetDefeated()), null);
+            target.send(new AttackReceived(monster.getId(), monster.getName(), outcome.hit(), outcome.critical(),
+                    outcome.damage(), outcome.targetHealthAfter(), outcome.targetMaxHealth(),
+                    outcome.targetDefeated()));
+            zone.broadcast(new AttackObserved(monster.getId(), monster.getName(), target.getId(), target.getName(),
+                    outcome.hit(), outcome.critical(), outcome.damage(), outcome.targetDefeated()), null);
             monster.pursuit = state.withNextAttackAt(nowMillis + CharacterCombat.ATTACK_COOLDOWN.toMillis());
             return;
         }

@@ -13,6 +13,7 @@ import app.domain.actor.component.CharacterCombat;
 import app.domain.actor.instance.CharacterInstance;
 import app.game.engine.MonsterAiEngine;
 import app.game.engine.MovementEngine;
+import app.network.CommandArguments;
 import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
@@ -51,10 +52,10 @@ public class Attack implements CommandHandler {
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
         CharacterCombat combat = character.getCombat();
-        String name = argument.trim();
+        String raw = argument.trim();
 
         AbstractCharacter target;
-        if (name.isEmpty()) {
+        if (raw.isEmpty()) {
             target = combat.getTarget();
             if (target == null) {
                 connection.send(new NoTargetSelected());
@@ -62,14 +63,15 @@ public class Attack implements CommandHandler {
             }
             if (!character.getCurrentZone().isPresent(target)) {
                 combat.setTarget(null);
-                connection.send(new TargetNotFound(target.getName()));
+                connection.send(new TargetNotFound(target.getId().toString()));
                 return;
             }
         } else {
-            Optional<AbstractCharacter> found = character.getCurrentZone().findAttackableByName(name, character);
+            Optional<AbstractCharacter> found = CommandArguments.tryParseUuid(raw)
+                    .flatMap(id -> character.getCurrentZone().findAttackableById(id, character));
             if (found.isEmpty()) {
-                log.debug("attack.rejected character={} reason=target_not_found target={}", character.getId(), name);
-                connection.send(new TargetNotFound(name));
+                log.debug("attack.rejected character={} reason=target_not_found target={}", character.getId(), raw);
+                connection.send(new TargetNotFound(raw));
                 return;
             }
             target = found.get();
@@ -78,12 +80,13 @@ public class Attack implements CommandHandler {
 
         // "select" (voir Select.java) permet aussi de cibler un PNJ (interaction, pas
         // combat) : un PNJ sélectionné puis attaqué via une commande "attack" sans nom
-        // finirait ici avec une cible non attaquable (CharacterCombat.attack ne gère que
+        // finirait ici avec une cible non attaquable (CharacterCombat.attack ne gère
+        // que
         // MonsterInstance/CharacterInstance).
         if (target instanceof AbstractNpc) {
             log.debug("attack.rejected character={} reason=target_not_attackable target={}", character.getId(),
                     target.getId());
-            connection.send(new TargetNotFound(target.getName()));
+            connection.send(new TargetNotFound(target.getId().toString()));
             return;
         }
 
@@ -99,26 +102,26 @@ public class Attack implements CommandHandler {
             return;
         }
 
-        // Toutes les vérifications (cible, portée, cooldown) sont passées : l'attaque va
-        // effectivement avoir lieu, on arrête donc le déplacement en cours juste avant de
+        // Toutes les vérifications (cible, portée, cooldown) sont passées : l'attaque
+        // va
+        // effectivement avoir lieu, on arrête donc le déplacement en cours juste avant
+        // de
         // la calculer — on ne combat pas en marchant.
         if (character.activeMovement != null) {
             movementEngine.stopMovement(character);
             connection.send(new MovementStopped(character.getPosition().x(), character.getPosition().y()));
-            character.getCurrentZone().broadcast(
-                    new CharacterMovementStopped(character.getName(), character.getPosition().x(),
-                            character.getPosition().y()),
-                    character);
+            character.getCurrentZone().broadcast(new CharacterMovementStopped(character.getName(),
+                    character.getPosition().x(), character.getPosition().y()), character);
         }
 
         CharacterCombat.AttackOutcome outcome = combat.attack(target);
 
-        connection.send(new AttackResult(target.getName(), outcome.hit(), outcome.critical(), outcome.damage(),
-                outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()));
-        target.send(new AttackReceived(character.getName(), outcome.hit(), outcome.critical(), outcome.damage(),
-                outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()));
-        character.getCurrentZone().broadcast(new AttackObserved(character.getName(), target.getName(), outcome.hit(),
-                outcome.critical(), outcome.damage(), outcome.targetDefeated()), null);
+        connection.send(new AttackResult(target.getId(), target.getName(), outcome.hit(), outcome.critical(),
+                outcome.damage(), outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()));
+        target.send(new AttackReceived(character.getId(), character.getName(), outcome.hit(), outcome.critical(),
+                outcome.damage(), outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()));
+        character.getCurrentZone().broadcast(new AttackObserved(character.getId(), character.getName(), target.getId(),
+                target.getName(), outcome.hit(), outcome.critical(), outcome.damage(), outcome.targetDefeated()), null);
 
         if (outcome.targetDefeated()) {
             combat.setTarget(null);

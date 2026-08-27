@@ -35,21 +35,21 @@ du compte, s'il y en a, est affichée automatiquement en entrant)
 | Commande | Effet |
 | --- | --- |
 | `look` | Décrire la room et la grille hexagonale courantes |
-| `examine` | Examiner un objet, un PNJ ou un monstre (`examine <name>`) |
+| `examine` | Examiner un objet, un PNJ ou un monstre (`examine <uuid>`) |
 | `go` | Se déplacer de 1 à N cases dans une direction (`go <direction> [nombre]`) |
 | `stop` | Interrompre un déplacement en cours |
 | `portal` | Emprunter le portail présent sur la case courante |
 | `say` | Parler aux autres joueurs de la room |
-| `talk` | Engager le dialogue avec un PNJ (peut ouvrir sa boutique) (`talk <npc>`) |
-| `drop` | Détruire définitivement un objet de l'inventaire (`drop <name>`) |
-| `equip` / `unequip` | Équiper / retirer un objet (`equip <name>` / `unequip <name>`) |
+| `talk` | Engager le dialogue avec un PNJ (peut ouvrir sa boutique) (`talk <uuid>`) |
+| `drop` | Détruire définitivement un objet de l'inventaire (`drop <uuid>`) |
+| `equip` / `unequip` | Équiper / retirer un objet (`equip <uuid>` / `unequip <uuid>`) |
 | `inventory` | Lister son inventaire et son équipement |
-| `use` | Utiliser un objet consommable (`use <item name>`) |
+| `use` | Utiliser un objet consommable (`use <uuid>`) |
 | `stats` | Afficher sa fiche de personnage |
 | `roll` | Lancer un dé |
 | `check` | Faire un jet de compétence ou de sauvegarde contre une difficulté |
-| `select` | Choisir sa cible de combat (`select <monster name>`) |
-| `attack` | Attaquer sa cible sélectionnée |
+| `select` | Choisir sa cible de combat (`select <uuid>`) |
+| `attack` | Attaquer sa cible sélectionnée (`attack [uuid]`) |
 | `rest` | Repos court ou long, hors combat (`rest <short|long>`) |
 | `save` | Sauvegarder l'état du personnage |
 

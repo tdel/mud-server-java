@@ -1,6 +1,7 @@
 package app.network.message.ingame;
 
 import java.util.List;
+import java.util.UUID;
 
 import app.network.OutputJsonMessage;
 import app.domain.actor.AbstractCharacter;
@@ -11,7 +12,7 @@ import app.network.server.tcpjson.TcpJsonOutput;
 
 public record ViewAround(AbstractCharacter character) implements OutputJsonMessage {
 
-    public record EntityView(String name, double x, double y, double speed) {
+    public record EntityView(UUID id, String name, double x, double y, double speed) {
     }
 
     public record PortalView(double x, double y, String direction, String targetZoneName) {
@@ -45,7 +46,7 @@ public record ViewAround(AbstractCharacter character) implements OutputJsonMessa
     }
 
     private EntityView toEntityView(AbstractCharacter other) {
-        return new EntityView(other.getName(), other.getPosition().x(), other.getPosition().y(),
+        return new EntityView(other.getId(), other.getName(), other.getPosition().x(), other.getPosition().y(),
                 MovementEngine.unitsPerSecond(other.getSpeed()));
     }
 

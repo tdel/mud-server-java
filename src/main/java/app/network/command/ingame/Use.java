@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import app.network.CommandArguments;
 import app.network.CommandHandler;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.item.ConsumableItem;
@@ -31,16 +32,16 @@ public class Use implements CommandHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
-        String name = argument.trim();
+        String raw = argument.trim();
 
-        if (name.isEmpty()) {
-            connection.send(new Usage("use <item name>"));
+        if (raw.isEmpty()) {
+            connection.send(new Usage("use <uuid>"));
             return;
         }
 
-        Optional<Item> item = character.getInventory().findOneByName(name);
+        Optional<Item> item = CommandArguments.tryParseUuid(raw).flatMap(character.getInventory()::findOneById);
         if (item.isEmpty()) {
-            connection.send(new ItemNotCarried(name));
+            connection.send(new ItemNotCarried(raw));
             return;
         }
 

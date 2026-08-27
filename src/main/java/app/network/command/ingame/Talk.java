@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import app.network.CommandArguments;
 import app.network.CommandHandler;
 import app.domain.actor.AbstractNpc;
 import app.domain.actor.instance.NpcSellerInstance;
@@ -39,16 +40,17 @@ public class Talk implements CommandHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
-        String name = argument.trim();
+        String raw = argument.trim();
 
-        if (name.isEmpty()) {
-            connection.send(new Usage("talk <npc>"));
+        if (raw.isEmpty()) {
+            connection.send(new Usage("talk <uuid>"));
             return;
         }
 
-        Optional<AbstractNpc> npc = character.getCurrentZone().findNpcByName(name);
+        Optional<AbstractNpc> npc = CommandArguments.tryParseUuid(raw)
+                .flatMap(id -> character.getCurrentZone().findNpcById(id));
         if (npc.isEmpty()) {
-            connection.send(new TargetNotFound(name));
+            connection.send(new TargetNotFound(raw));
             return;
         }
 
@@ -63,8 +65,8 @@ public class Talk implements CommandHandler {
 
     private void promptDialogue(Connection connection, CharacterInstance character, AbstractNpc npc,
             AbstractNpc.NpcDialogue dialogue) {
-        connection.requestBlocking(new DialogueOptions(npc.getName(), dialogue.greeting(), dialogue.options()),
-                line -> {
+        connection.requestBlocking(
+                new DialogueOptions(npc.getId(), npc.getName(), dialogue.greeting(), dialogue.options()), line -> {
                     Optional<AbstractNpc.NpcDialogueOption> choice = dialogue.resolveOption(line);
 
                     if (choice.isEmpty()) {
@@ -75,7 +77,7 @@ public class Talk implements CommandHandler {
 
                     switch (choice.get().type()) {
                         case RESPONSE -> {
-                            connection.send(new NpcResponse(npc.getName(), choice.get().response()));
+                            connection.send(new NpcResponse(npc.getId(), npc.getName(), choice.get().response()));
                             promptDialogue(connection, character, npc, dialogue);
                         }
                         case SHOP -> {
@@ -83,7 +85,7 @@ public class Talk implements CommandHandler {
                                 promptShop(connection, character, seller, dialogue);
                             }
                         }
-                        case LEAVE -> connection.send(new DialogueEnded(npc.getName()));
+                        case LEAVE -> connection.send(new DialogueEnded(npc.getId(), npc.getName()));
                     }
                 });
     }
@@ -91,12 +93,12 @@ public class Talk implements CommandHandler {
     private void promptShop(Connection connection, CharacterInstance character, NpcSellerInstance npc,
             AbstractNpc.NpcDialogue dialogue) {
         List<ShopCatalog.Entry> entries = npc.shop().items().stream()
-                .map(entry -> new ShopCatalog.Entry(entry.itemTemplate().getName(), entry.itemTemplate().getRarity(),
-                        entry.price()))
+                .map(entry -> new ShopCatalog.Entry(entry.itemTemplate().getId(), entry.itemTemplate().getName(),
+                        entry.itemTemplate().getRarity(), entry.price()))
                 .toList();
 
-        connection.requestBlocking(new ShopCatalog(npc.getName(), entries, character.getInventory().getGold()),
-                line -> {
+        connection.requestBlocking(
+                new ShopCatalog(npc.getId(), npc.getName(), entries, character.getInventory().getGold()), line -> {
                     String trimmed = line.trim();
                     if (trimmed.equals("0") || trimmed.equalsIgnoreCase("back") || trimmed.equalsIgnoreCase("retour")) {
                         promptDialogue(connection, character, npc, dialogue);

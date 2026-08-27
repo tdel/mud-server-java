@@ -35,11 +35,9 @@ public class Spells implements CommandHandler {
         // ce cas on ne garde que l'entrée "appris" (granted=false), qui reste valable
         // même après un déséquipement, plutôt que d'afficher le sort deux fois.
         Map<String, KnownSpells.Entry> entriesByName = new LinkedHashMap<>();
-        character.getGrantedSpells().stream()
-                .map(spell -> toEntry(spell, true))
+        character.getGrantedSpells().stream().map(spell -> toEntry(spell, true))
                 .forEach(entry -> entriesByName.put(entry.name(), entry));
-        character.getSpellCasting().knownSpells().stream()
-                .map(spell -> toEntry(spell, false))
+        character.getSpellCasting().knownSpells().stream().map(spell -> toEntry(spell, false))
                 .forEach(entry -> entriesByName.put(entry.name(), entry));
 
         List<KnownSpells.Entry> entries = List.copyOf(entriesByName.values());
@@ -48,7 +46,7 @@ public class Spells implements CommandHandler {
     }
 
     private KnownSpells.Entry toEntry(Spell spell, boolean granted) {
-        return new KnownSpells.Entry(spell.name(), spell.tier(), spell.description(), spell.manaCost(),
+        return new KnownSpells.Entry(spell.id(), spell.name(), spell.tier(), spell.description(), spell.manaCost(),
                 spell.cooldownSeconds(), spell.range(), spell.effect(), spell.durationSeconds(), granted);
     }
 }
