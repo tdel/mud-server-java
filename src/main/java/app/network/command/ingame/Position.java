@@ -12,9 +12,9 @@ import app.network.message.ingame.PositionUpdated;
 
 /**
  * Le serveur ne pousse plus la position du personnage à chaque tick de
- * déplacement (voir MovementEngine) : le client interpole localement et
- * appelle cette commande à intervalle régulier (ex. 1x/s) pour corriger toute
- * dérive, plutôt que de recevoir un flux poussé.
+ * déplacement (voir MovementEngine) : le client interpole localement et appelle
+ * cette commande à intervalle régulier (ex. 1x/s) pour corriger toute dérive,
+ * plutôt que de recevoir un flux poussé.
  */
 @Component
 public class Position implements CommandHandler {

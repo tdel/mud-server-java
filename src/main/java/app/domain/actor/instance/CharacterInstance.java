@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import app.domain.Account;
 import app.domain.Spell;
+import app.domain.SpellEffectType;
 import app.domain.actor.*;
 import app.domain.actor.component.ActiveEffect;
 import app.domain.actor.component.CharacterCombat;
@@ -42,6 +43,15 @@ import app.game.dice.DiceRoll;
 import app.game.dice.DiceRoller;
 import app.network.Connection;
 import app.network.OutputMessage;
+import app.network.message.ingame.CastResult;
+import app.network.message.ingame.NoTargetSelected;
+import app.network.message.ingame.NotEnoughMana;
+import app.network.message.ingame.SpellCastAnnounced;
+import app.network.message.ingame.SpellModifierAnnounced;
+import app.network.message.ingame.SpellNotKnown;
+import app.network.message.ingame.SpellOnCooldown;
+import app.network.message.ingame.SpellOutOfRange;
+import app.network.message.ingame.TargetNotFound;
 
 public final class CharacterInstance extends AbstractCharacter {
 
@@ -242,6 +252,7 @@ public final class CharacterInstance extends AbstractCharacter {
         return combat;
     }
 
+    @Override
     public Set<Spell> getGrantedSpells() {
         return inventory.getEquippedItems().stream().flatMap(item -> item.getTemplate().getGrantedSpells().stream())
                 .collect(Collectors.toSet());
@@ -293,14 +304,60 @@ public final class CharacterInstance extends AbstractCharacter {
         }
     }
 
-    public SpellCasting.CastOutcome castSpell(Spell spell, AbstractCharacter target) {
-        if (!trySpendMana(spell.manaCost())) {
-            throw new IllegalStateException("Mana insuffisante pour lancer " + spell.name());
+    // "select" (voir Select.java) permet aussi de cibler un PNJ (interaction, pas
+    // combat) : un
+    // sort à dégâts lancé sans nom explicite sur un PNJ sélectionné finirait avec
+    // une cible non
+    // attaquable (SpellCasting.applyDamage ne gère que
+    // MonsterInstance/CharacterInstance) ;
+    // BUFF/DEBUFF n'ont pas ce problème mais autant rester cohérent.
+    public void castSpell(Spell spell, AbstractCharacter target) {
+        if (!hasSpell(spell)) {
+            send(new SpellNotKnown(spell.name()));
+            return;
         }
+        if (target == null) {
+            send(new NoTargetSelected());
+            return;
+        }
+        if (target instanceof AbstractNpc && spell.effect() == SpellEffectType.DAMAGE) {
+            send(new TargetNotFound(target.getId().toString()));
+            return;
+        }
+        if (spell.range() > 0 && getPosition().distanceTo(target.getPosition()) > spell.range()) {
+            send(new SpellOutOfRange(spell.name(), target.getName()));
+            return;
+        }
+        if (!getSpellCasting().isReady(spell.id())) {
+            send(new SpellOnCooldown(spell.name(), getSpellCasting().remainingCooldown(spell.id()).toMillis()));
+            return;
+        }
+        if (!trySpendMana(spell.manaCost())) {
+            send(new NotEnoughMana(spell.name(), spell.manaCost(), getCurrentMana()));
+            return;
+        }
+
         SpellCasting.CastOutcome outcome = getSpellCasting().cast(spell, target);
         DomainEventPublisher.publish(new SpellCast(this, spell, target, outcome.amount(), outcome.targetDefeated(),
                 outcome.hit(), outcome.effectExpiresAt()));
-        return outcome;
+
+        if (spell.effect() == SpellEffectType.BUFF || spell.effect() == SpellEffectType.DEBUFF) {
+            boolean beneficial = spell.effect() == SpellEffectType.BUFF;
+            getCurrentZone().broadcast(new SpellModifierAnnounced(getId(), getName(), spell.id(), spell.name(),
+                    target.getId(), target.getName(), target == this, beneficial, outcome.hit(), spell.modifiedStat(),
+                    outcome.amount(), spell.durationSeconds(), spell.manaCost(), getCurrentMana(), getMaxMana()), null);
+            return;
+        }
+
+        send(new CastResult(spell.id(), spell.name(), target.getId(), target.getName(), outcome.selfHeal(),
+                outcome.hit(), outcome.amount(), outcome.targetHealthAfter(), outcome.targetMaxHealth(),
+                outcome.targetDefeated(), spell.manaCost(), getCurrentMana(), getMaxMana()));
+        getCurrentZone().broadcast(new SpellCastAnnounced(getId(), getName(), spell.id(), spell.name(), target.getId(),
+                target.getName(), outcome.selfHeal(), outcome.hit(), outcome.amount(), outcome.targetHealthAfter(),
+                outcome.targetMaxHealth(), outcome.targetDefeated()), this);
+        if (outcome.targetDefeated()) {
+            getCombat().setTarget(null);
+        }
     }
 
     public int getXp() {

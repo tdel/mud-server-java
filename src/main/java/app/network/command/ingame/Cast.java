@@ -3,42 +3,26 @@ package app.network.command.ingame;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import org.springframework.stereotype.Component;
 
 import app.domain.Spell;
-import app.domain.SpellEffectType;
-import app.domain.actor.AbstractCharacter;
-import app.domain.actor.AbstractNpc;
-import app.domain.actor.component.SpellCasting;
 import app.domain.actor.instance.CharacterInstance;
-import app.game.engine.MovementEngine;
+import app.game.catalog.SpellCatalog;
 import app.network.CommandArguments;
 import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
-import app.network.message.ingame.CastReceived;
-import app.network.message.ingame.CastResult;
-import app.network.message.ingame.CharacterMovementStopped;
-import app.network.message.ingame.MovementStopped;
-import app.network.message.ingame.NoTargetSelected;
-import app.network.message.ingame.NotEnoughMana;
-import app.network.message.ingame.SpellModifierAnnounced;
-import app.network.message.ingame.SpellCastObserved;
 import app.network.message.ingame.SpellNotKnown;
-import app.network.message.ingame.SpellOnCooldown;
-import app.network.message.ingame.SpellOutOfRange;
-import app.network.message.ingame.TargetNotFound;
 
 @Component
 public class Cast implements CommandHandler {
 
-    private final MovementEngine movementEngine;
+    private final SpellCatalog spellCatalog;
 
-    public Cast(MovementEngine movementEngine) {
-        this.movementEngine = movementEngine;
+    public Cast(SpellCatalog spellCatalog) {
+        this.spellCatalog = spellCatalog;
     }
 
     @Override
@@ -57,112 +41,26 @@ public class Cast implements CommandHandler {
         String trimmed = argument.trim();
 
         if (trimmed.isEmpty()) {
-            connection.send(new Usage("cast <spellUuid> [targetUuid]"));
+            connection.send(new Usage("cast <spellUuid>"));
             return;
         }
 
-        String[] tokens = trimmed.split("\\s+", 2);
-        String spellToken = tokens[0];
-        String targetToken = tokens.length > 1 ? tokens[1].trim() : "";
+        String spellToken = trimmed.split("\\s+", 2)[0];
 
-        Optional<Spell> resolved = CommandArguments.tryParseUuid(spellToken)
-                .flatMap(spellId -> findKnownSpellById(character, spellId));
-        if (resolved.isEmpty()) {
+        Optional<UUID> spellId = CommandArguments.tryParseUuid(spellToken);
+        if (spellId.isEmpty()) {
             connection.send(new SpellNotKnown(spellToken));
             return;
         }
-        Spell spell = resolved.get();
 
-        boolean selfTargetedByDefault = spell.effect() == SpellEffectType.HEALING
-                || spell.effect() == SpellEffectType.BUFF;
-
-        AbstractCharacter target;
-        if (selfTargetedByDefault && targetToken.isEmpty()) {
-            target = character;
-        } else if (!targetToken.isEmpty()) {
-            Optional<AbstractCharacter> found = CommandArguments.tryParseUuid(targetToken)
-                    .flatMap(id -> character.getCurrentZone().findAttackableById(id, character));
-            if (found.isEmpty()) {
-                connection.send(new TargetNotFound(targetToken));
-                return;
-            }
-            target = found.get();
-        } else {
-            target = character.getCombat().getTarget();
-            if (target == null) {
-                connection.send(new NoTargetSelected());
-                return;
-            }
-        }
-
-        // "select" (voir Select.java) permet aussi de cibler un PNJ (interaction, pas
-        // combat) : un sort à dégâts lancé sans nom explicite sur un PNJ sélectionné
-        // finirait ici avec une cible non attaquable (SpellCasting.applyDamage ne gère
-        // que MonsterInstance/CharacterInstance) ; BUFF/DEBUFF n'ont pas ce problème
-        // (ils ne font qu'ajouter un effet actif) mais autant rester cohérent.
-        if (target instanceof AbstractNpc && spell.effect() == SpellEffectType.DAMAGE) {
-            connection.send(new TargetNotFound(target.getId().toString()));
+        Spell spell;
+        try {
+            spell = spellCatalog.getById(spellId.get());
+        } catch (IllegalStateException e) {
+            connection.send(new SpellNotKnown(spellToken));
             return;
         }
 
-        if (spell.range() > 0 && character.getPosition().distanceTo(target.getPosition()) > spell.range()) {
-            connection.send(new SpellOutOfRange(spell.name(), target.getName()));
-            return;
-        }
-
-        SpellCasting spellCasting = character.getSpellCasting();
-        if (!spellCasting.isReady(spell.id())) {
-            connection.send(new SpellOnCooldown(spell.name(), spellCasting.remainingCooldown(spell.id()).toMillis()));
-            return;
-        }
-
-        if (character.getCurrentMana() < spell.manaCost()) {
-            connection.send(new NotEnoughMana(spell.name(), spell.manaCost(), character.getCurrentMana()));
-            return;
-        }
-
-        // Toutes les vérifications (sort connu, cible, portée, cooldown, mana) sont
-        // passées : le sort va effectivement être lancé, on arrête donc le déplacement
-        // en
-        // cours juste avant de le calculer — on ne combat pas en marchant.
-        if (character.activeMovement != null) {
-            movementEngine.stopMovement(character);
-            connection.send(new MovementStopped(character.getPosition().x(), character.getPosition().y()));
-            character.getCurrentZone().broadcast(new CharacterMovementStopped(character.getName(),
-                    character.getPosition().x(), character.getPosition().y()), character);
-        }
-
-        SpellCasting.CastOutcome outcome = character.castSpell(spell, target);
-
-        if (spell.effect() == SpellEffectType.BUFF || spell.effect() == SpellEffectType.DEBUFF) {
-            boolean beneficial = spell.effect() == SpellEffectType.BUFF;
-            character.getCurrentZone()
-                    .broadcast(new SpellModifierAnnounced(character.getId(), character.getName(), spell.id(),
-                            spell.name(), target.getId(), target.getName(), target == character, beneficial,
-                            outcome.hit(), spell.modifiedStat(), outcome.amount(), spell.durationSeconds()), null);
-            return;
-        }
-
-        connection.send(new CastResult(spell.id(), spell.name(), target.getId(), target.getName(), outcome.selfHeal(),
-                outcome.hit(), outcome.amount(), outcome.targetHealthAfter(), outcome.targetMaxHealth(),
-                outcome.targetDefeated()));
-        if (target != character) {
-            target.send(new CastReceived(character.getId(), character.getName(), spell.id(), spell.name(),
-                    outcome.hit(), outcome.amount(), outcome.targetHealthAfter(), outcome.targetMaxHealth(),
-                    outcome.targetDefeated()));
-        }
-        character.getCurrentZone()
-                .broadcast(new SpellCastObserved(character.getId(), character.getName(), spell.id(), spell.name(),
-                        target.getId(), target.getName(), outcome.selfHeal(), outcome.hit(), outcome.amount(),
-                        outcome.targetDefeated()), null);
-        if (outcome.targetDefeated()) {
-            character.getCombat().setTarget(null);
-        }
-    }
-
-    private Optional<Spell> findKnownSpellById(CharacterInstance character, UUID spellId) {
-        Stream<Spell> known = character.getSpellCasting().knownSpells().stream();
-        Stream<Spell> granted = character.getGrantedSpells().stream();
-        return Stream.concat(known, granted).filter(spell -> spell.id().equals(spellId)).findFirst();
+        character.castSpell(spell, character.getCombat().getTarget());
     }
 }

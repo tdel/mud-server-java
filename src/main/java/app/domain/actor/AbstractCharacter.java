@@ -2,8 +2,10 @@ package app.domain.actor;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
+import app.domain.Spell;
 import app.domain.actor.component.ActiveEffects;
 import app.domain.actor.component.SpellCasting;
 import app.domain.map.Position;
@@ -58,6 +60,16 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public SpellCasting getSpellCasting() {
         return spellCasting;
+    }
+
+    // Défaut neutre : seul CharacterInstance a des objets équipés susceptibles
+    // d'accorder des sorts.
+    public Set<Spell> getGrantedSpells() {
+        return Set.of();
+    }
+
+    public boolean hasSpell(Spell spell) {
+        return spellCasting.knows(spell.id()) || getGrantedSpells().contains(spell);
     }
 
     // Défaut neutre pour les sous-classes qui ne lancent pas encore de sorts

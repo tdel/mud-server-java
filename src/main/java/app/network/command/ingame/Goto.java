@@ -77,8 +77,9 @@ public class Goto implements CommandHandler {
             connection.send(new ViewAround(character));
         } else {
             connection.send(new MovementStarted(target.x(), target.y()));
-            character.getCurrentZone().broadcast(new CharacterMovementStarted(character.getId(),
-                    character.getName(), target.x(), target.y()), character);
+            character.getCurrentZone().broadcast(
+                    new CharacterMovementStarted(character.getId(), character.getName(), target.x(), target.y()),
+                    character);
         }
     }
 

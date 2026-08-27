@@ -38,9 +38,7 @@ public class Stop implements CommandHandler {
         movementEngine.stopMovement(character);
 
         connection.send(new MovementStopped(character.getPosition().x(), character.getPosition().y()));
-        character.getCurrentZone().broadcast(
-                new CharacterMovementStopped(character.getName(), character.getPosition().x(),
-                        character.getPosition().y()),
-                character);
+        character.getCurrentZone().broadcast(new CharacterMovementStopped(character.getName(),
+                character.getPosition().x(), character.getPosition().y()), character);
     }
 }

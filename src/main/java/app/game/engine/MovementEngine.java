@@ -12,15 +12,19 @@ import app.game.engine.ContinuousStep.StepResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import app.domain.actor.AbstractCharacter;
+import app.domain.actor.event.SpellCast;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.message.ingame.CharacterMovementBlocked;
 import app.network.message.ingame.CharacterMovementFinished;
+import app.network.message.ingame.CharacterMovementStopped;
 import app.network.message.ingame.MovementBlockedByBounds;
 import app.network.message.ingame.MovementFinished;
+import app.network.message.ingame.MovementStopped;
 
 @Component
 public class MovementEngine {
@@ -56,6 +60,19 @@ public class MovementEngine {
         log.debug("movement.stopped thread={} character={}", Thread.currentThread().getName(), character.getId());
     }
 
+    @EventListener
+    void onSpellCast(SpellCast event) {
+        CharacterInstance caster = event.caster();
+        if (caster.activeMovement == null) {
+            return;
+        }
+        stopMovement(caster);
+        caster.send(new MovementStopped(caster.getPosition().x(), caster.getPosition().y()));
+        caster.getCurrentZone().broadcast(
+                new CharacterMovementStopped(caster.getName(), caster.getPosition().x(), caster.getPosition().y()),
+                caster);
+    }
+
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
     void tick() {
         long now = System.nanoTime();
@@ -85,8 +102,8 @@ public class MovementEngine {
                         movingCharacters.remove(character.getId());
                         log.debug("movement.blocked thread={} character={}", Thread.currentThread().getName(),
                                 character.getId());
-                        character.send(new MovementBlockedByBounds(character.getPosition().x(),
-                                character.getPosition().y()));
+                        character.send(
+                                new MovementBlockedByBounds(character.getPosition().x(), character.getPosition().y()));
                         if (character instanceof CharacterInstance player) {
                             character.getCurrentZone().broadcast(new CharacterMovementBlocked(character.getName(),
                                     character.getPosition().x(), character.getPosition().y()), player);

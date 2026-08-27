@@ -12,7 +12,8 @@ import app.network.server.tcpjson.TcpJsonOutput;
 
 public record ViewAround(AbstractCharacter character) implements OutputJsonMessage {
 
-    public record EntityView(UUID id, String name, double x, double y, double speed) {
+    public record EntityView(UUID id, String name, double x, double y, double speed, int currentHealth, int maxHealth,
+            Double targetX, Double targetY) {
     }
 
     public record PortalView(double x, double y, String direction, String targetZoneName) {
@@ -46,8 +47,18 @@ public record ViewAround(AbstractCharacter character) implements OutputJsonMessa
     }
 
     private EntityView toEntityView(AbstractCharacter other) {
+        MovementEngine.ActiveMovement movement = other.activeMovement;
+        Double targetX = null;
+        Double targetY = null;
+        if (movement != null && !movement.remainingWaypoints().isEmpty()) {
+            List<Position> waypoints = movement.remainingWaypoints();
+            Position destination = waypoints.get(waypoints.size() - 1);
+            targetX = destination.x();
+            targetY = destination.y();
+        }
         return new EntityView(other.getId(), other.getName(), other.getPosition().x(), other.getPosition().y(),
-                MovementEngine.unitsPerSecond(other.getSpeed()));
+                MovementEngine.unitsPerSecond(other.getSpeed()), other.getCurrentHealth(), other.getMaxHealth(),
+                targetX, targetY);
     }
 
     private List<Position> remainingWaypoints() {
