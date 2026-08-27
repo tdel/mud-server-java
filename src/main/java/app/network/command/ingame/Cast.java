@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import app.domain.Spell;
 import app.domain.SpellEffectType;
 import app.domain.actor.AbstractCharacter;
+import app.domain.actor.AbstractNpc;
 import app.domain.actor.component.SpellCasting;
 import app.domain.actor.instance.CharacterInstance;
 import app.game.engine.MovementEngine;
@@ -86,6 +87,16 @@ public class Cast implements CommandHandler {
                 connection.send(new NoTargetSelected());
                 return;
             }
+        }
+
+        // "select" (voir Select.java) permet aussi de cibler un PNJ (interaction, pas
+        // combat) : un sort à dégâts lancé sans nom explicite sur un PNJ sélectionné
+        // finirait ici avec une cible non attaquable (SpellCasting.applyDamage ne gère
+        // que MonsterInstance/CharacterInstance) ; BUFF/DEBUFF n'ont pas ce problème
+        // (ils ne font qu'ajouter un effet actif) mais autant rester cohérent.
+        if (target instanceof AbstractNpc && spell.effect() == SpellEffectType.DAMAGE) {
+            connection.send(new TargetNotFound(target.getName()));
+            return;
         }
 
         if (spell.range() > 0 && character.getPosition().distanceTo(target.getPosition()) > spell.range()) {

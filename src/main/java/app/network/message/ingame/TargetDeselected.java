@@ -2,6 +2,6 @@ package app.network.message.ingame;
 
 import app.network.OutputJsonMessage;
 
-public record TargetSelected(String targetName) implements OutputJsonMessage {
+public record TargetDeselected() implements OutputJsonMessage {
 
 }

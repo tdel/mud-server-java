@@ -6,11 +6,11 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import app.network.CommandHandler;
-import app.domain.actor.instance.MonsterInstance;
+import app.domain.actor.AbstractCharacter;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.Connection;
 import app.network.ConnectionState;
-import app.network.message.Usage;
+import app.network.message.ingame.TargetDeselected;
 import app.network.message.ingame.TargetNotFound;
 import app.network.message.ingame.TargetSelected;
 
@@ -33,11 +33,14 @@ public class Select implements CommandHandler {
         String name = argument.trim();
 
         if (name.isEmpty()) {
-            connection.send(new Usage("select <monster name>"));
+            character.getCombat().setTarget(null);
+            connection.send(new TargetDeselected());
             return;
         }
 
-        Optional<MonsterInstance> target = character.getCurrentZone().findMonsterByName(name);
+        // Monstre, joueur ou PNJ : la sélection sert aussi bien à cibler un sort/une
+        // attaque (monstre, joueur) qu'à préparer une interaction (PNJ, commerce/quête).
+        Optional<AbstractCharacter> target = character.getCurrentZone().findOccupantByName(name);
         if (target.isEmpty()) {
             connection.send(new TargetNotFound(name));
             return;

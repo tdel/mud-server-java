@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import app.domain.actor.AbstractCharacter;
+import app.domain.actor.AbstractNpc;
 import app.domain.actor.component.CharacterCombat;
 import app.domain.actor.instance.CharacterInstance;
 import app.game.engine.MonsterAiEngine;
@@ -73,6 +74,17 @@ public class Attack implements CommandHandler {
             }
             target = found.get();
             combat.setTarget(target);
+        }
+
+        // "select" (voir Select.java) permet aussi de cibler un PNJ (interaction, pas
+        // combat) : un PNJ sélectionné puis attaqué via une commande "attack" sans nom
+        // finirait ici avec une cible non attaquable (CharacterCombat.attack ne gère que
+        // MonsterInstance/CharacterInstance).
+        if (target instanceof AbstractNpc) {
+            log.debug("attack.rejected character={} reason=target_not_attackable target={}", character.getId(),
+                    target.getId());
+            connection.send(new TargetNotFound(target.getName()));
+            return;
         }
 
         if (character.getPosition().distanceTo(target.getPosition()) > MonsterAiEngine.ATTACK_RANGE) {
