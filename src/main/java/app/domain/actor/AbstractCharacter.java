@@ -11,6 +11,7 @@ import app.domain.actor.component.SpellCasting;
 import app.domain.map.Position;
 import app.domain.world.ZoneInstance;
 import app.game.engine.MovementEngine;
+import app.game.engine.SpellCastEngine;
 import app.game.dice.DiceExpression;
 import app.game.dice.DiceRoller;
 import app.network.OutputMessage;
@@ -29,6 +30,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     private volatile Position position;
     protected int speed = DEFAULT_SPEED;
     public volatile MovementEngine.ActiveMovement activeMovement;
+    public volatile SpellCastEngine.ActiveCast activeCast;
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
             int maxHealth) {
@@ -123,6 +125,10 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public int getSpeed() {
         return speed;
+    }
+
+    public boolean isCasting() {
+        return activeCast != null;
     }
 
     public void setSpeed(int speed) {

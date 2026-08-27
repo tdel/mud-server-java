@@ -9,20 +9,24 @@ import org.springframework.stereotype.Component;
 import app.domain.Spell;
 import app.domain.actor.instance.CharacterInstance;
 import app.game.catalog.SpellCatalog;
+import app.game.engine.SpellCastEngine;
 import app.network.CommandArguments;
 import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
+import app.network.message.ingame.AlreadyCasting;
 import app.network.message.ingame.SpellNotKnown;
 
 @Component
 public class Cast implements CommandHandler {
 
     private final SpellCatalog spellCatalog;
+    private final SpellCastEngine spellCastEngine;
 
-    public Cast(SpellCatalog spellCatalog) {
+    public Cast(SpellCatalog spellCatalog, SpellCastEngine spellCastEngine) {
         this.spellCatalog = spellCatalog;
+        this.spellCastEngine = spellCastEngine;
     }
 
     @Override
@@ -38,6 +42,12 @@ public class Cast implements CommandHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
+
+        if (character.isCasting()) {
+            connection.send(new AlreadyCasting());
+            return;
+        }
+
         String trimmed = argument.trim();
 
         if (trimmed.isEmpty()) {
@@ -61,6 +71,6 @@ public class Cast implements CommandHandler {
             return;
         }
 
-        character.castSpell(spell, character.getCombat().getTarget());
+        character.castSpell(spell, character.getCombat().getTarget(), spellCastEngine);
     }
 }

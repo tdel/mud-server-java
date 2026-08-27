@@ -17,6 +17,7 @@ import app.network.CommandArguments;
 import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
+import app.network.message.ingame.AlreadyCasting;
 import app.network.message.ingame.AttackObserved;
 import app.network.message.ingame.AttackOnCooldown;
 import app.network.message.ingame.AttackOutOfRange;
@@ -51,6 +52,12 @@ public class Attack implements CommandHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
+
+        if (character.isCasting()) {
+            connection.send(new AlreadyCasting());
+            return;
+        }
+
         CharacterCombat combat = character.getCombat();
         String raw = argument.trim();
 

@@ -44,11 +44,17 @@ public class SpellCatalog {
             List<SpellDefinition> definitions = objectMapper.readValue(in, new TypeReference<List<SpellDefinition>>() {
             });
             for (SpellDefinition definition : definitions) {
+                if (definition.projectile() && definition.projectileSpeed() <= 0) {
+                    throw new IllegalStateException("Spell " + definition.id() + " (" + definition.name() + " tier "
+                            + definition.tier() + ") est un projectile mais n'a pas de projectileSpeed positif dans "
+                            + SPELL_RESOURCE);
+                }
                 Spell spell = new Spell(definition.id(), definition.name(),
                         definition.tier() == null ? 1 : definition.tier(), definition.description(),
                         definition.requiredLevel(), definition.manaCost(), definition.cooldownSeconds(),
-                        definition.range(), definition.effect(), definition.effectDice(),
-                        Set.copyOf(definition.classes()), definition.modifiedStat(),
+                        definition.castingTimeMs(), definition.range(), definition.effect(), definition.effectDice(),
+                        definition.projectile(), definition.projectileSpeed(), Set.copyOf(definition.classes()),
+                        definition.modifiedStat(),
                         definition.durationSeconds() == null ? 0 : definition.durationSeconds());
                 if (spells.containsKey(spell.id())) {
                     throw new IllegalStateException("Spell " + spell.id() + " (" + spell.name() + " tier "
@@ -104,7 +110,8 @@ public class SpellCatalog {
     }
 
     private record SpellDefinition(UUID id, String name, Integer tier, String description, int requiredLevel,
-            int manaCost, int cooldownSeconds, int range, SpellEffectType effect, String effectDice,
-            List<CharacterClass> classes, ModifiedStat modifiedStat, Integer durationSeconds) {
+            int manaCost, int cooldownSeconds, int castingTimeMs, int range, SpellEffectType effect, String effectDice,
+            boolean projectile, int projectileSpeed, List<CharacterClass> classes, ModifiedStat modifiedStat,
+            Integer durationSeconds) {
     }
 }

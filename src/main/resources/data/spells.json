@@ -7,9 +7,12 @@
         "requiredLevel": 1,
         "manaCost": 3,
         "cooldownSeconds": 3,
+        "castingTimeMs": 500,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "1d10",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -23,9 +26,12 @@
         "requiredLevel": 5,
         "manaCost": 4,
         "cooldownSeconds": 3,
+        "castingTimeMs": 700,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "2d10",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -39,9 +45,12 @@
         "requiredLevel": 9,
         "manaCost": 5,
         "cooldownSeconds": 2,
+        "castingTimeMs": 900,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "3d10",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -55,9 +64,12 @@
         "requiredLevel": 13,
         "manaCost": 6,
         "cooldownSeconds": 2,
+        "castingTimeMs": 1100,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "4d10",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -71,9 +83,12 @@
         "requiredLevel": 17,
         "manaCost": 7,
         "cooldownSeconds": 2,
+        "castingTimeMs": 1300,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "5d10",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -87,9 +102,12 @@
         "requiredLevel": 1,
         "manaCost": 3,
         "cooldownSeconds": 3,
+        "castingTimeMs": 500,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "1d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -103,9 +121,12 @@
         "requiredLevel": 5,
         "manaCost": 4,
         "cooldownSeconds": 3,
+        "castingTimeMs": 700,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "2d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -119,9 +140,12 @@
         "requiredLevel": 9,
         "manaCost": 5,
         "cooldownSeconds": 2,
+        "castingTimeMs": 900,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "3d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -135,9 +159,12 @@
         "requiredLevel": 13,
         "manaCost": 6,
         "cooldownSeconds": 2,
+        "castingTimeMs": 1100,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "4d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -151,9 +178,12 @@
         "requiredLevel": 17,
         "manaCost": 7,
         "cooldownSeconds": 2,
+        "castingTimeMs": 1300,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "5d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -167,9 +197,12 @@
         "requiredLevel": 1,
         "manaCost": 3,
         "cooldownSeconds": 3,
+        "castingTimeMs": 500,
         "range": 5,
         "effect": "DAMAGE",
         "effectDice": "1d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "CLERIC"
         ]
@@ -182,9 +215,12 @@
         "requiredLevel": 5,
         "manaCost": 4,
         "cooldownSeconds": 3,
+        "castingTimeMs": 700,
         "range": 5,
         "effect": "DAMAGE",
         "effectDice": "2d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "CLERIC"
         ]
@@ -197,9 +233,12 @@
         "requiredLevel": 9,
         "manaCost": 5,
         "cooldownSeconds": 2,
+        "castingTimeMs": 900,
         "range": 5,
         "effect": "DAMAGE",
         "effectDice": "3d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "CLERIC"
         ]
@@ -212,9 +251,12 @@
         "requiredLevel": 13,
         "manaCost": 6,
         "cooldownSeconds": 2,
+        "castingTimeMs": 1100,
         "range": 5,
         "effect": "DAMAGE",
         "effectDice": "4d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "CLERIC"
         ]
@@ -227,9 +269,12 @@
         "requiredLevel": 17,
         "manaCost": 7,
         "cooldownSeconds": 2,
+        "castingTimeMs": 1300,
         "range": 5,
         "effect": "DAMAGE",
         "effectDice": "5d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "CLERIC"
         ]
@@ -242,9 +287,12 @@
         "requiredLevel": 1,
         "manaCost": 2,
         "cooldownSeconds": 3,
+        "castingTimeMs": 500,
         "range": 5,
         "effect": "DAMAGE",
         "effectDice": "1d4",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "BARD"
         ]
@@ -257,9 +305,12 @@
         "requiredLevel": 5,
         "manaCost": 2,
         "cooldownSeconds": 3,
+        "castingTimeMs": 700,
         "range": 5,
         "effect": "DAMAGE",
         "effectDice": "2d4",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "BARD"
         ]
@@ -272,9 +323,12 @@
         "requiredLevel": 9,
         "manaCost": 3,
         "cooldownSeconds": 2,
+        "castingTimeMs": 900,
         "range": 5,
         "effect": "DAMAGE",
         "effectDice": "3d4",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "BARD"
         ]
@@ -287,9 +341,12 @@
         "requiredLevel": 13,
         "manaCost": 4,
         "cooldownSeconds": 2,
+        "castingTimeMs": 1100,
         "range": 5,
         "effect": "DAMAGE",
         "effectDice": "4d4",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "BARD"
         ]
@@ -302,9 +359,12 @@
         "requiredLevel": 17,
         "manaCost": 5,
         "cooldownSeconds": 2,
+        "castingTimeMs": 1300,
         "range": 5,
         "effect": "DAMAGE",
         "effectDice": "5d4",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "BARD"
         ]
@@ -317,9 +377,12 @@
         "requiredLevel": 1,
         "manaCost": 3,
         "cooldownSeconds": 3,
+        "castingTimeMs": 500,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "1d10",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "WARLOCK"
         ]
@@ -332,9 +395,12 @@
         "requiredLevel": 5,
         "manaCost": 4,
         "cooldownSeconds": 3,
+        "castingTimeMs": 700,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "2d10",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "WARLOCK"
         ]
@@ -347,9 +413,12 @@
         "requiredLevel": 9,
         "manaCost": 5,
         "cooldownSeconds": 2,
+        "castingTimeMs": 900,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "3d10",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "WARLOCK"
         ]
@@ -362,9 +431,12 @@
         "requiredLevel": 13,
         "manaCost": 6,
         "cooldownSeconds": 2,
+        "castingTimeMs": 1100,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "4d10",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "WARLOCK"
         ]
@@ -377,9 +449,12 @@
         "requiredLevel": 17,
         "manaCost": 7,
         "cooldownSeconds": 2,
+        "castingTimeMs": 1300,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "5d10",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "WARLOCK"
         ]
@@ -392,9 +467,12 @@
         "requiredLevel": 1,
         "manaCost": 3,
         "cooldownSeconds": 3,
+        "castingTimeMs": 500,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "1d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD",
@@ -409,9 +487,12 @@
         "requiredLevel": 5,
         "manaCost": 4,
         "cooldownSeconds": 3,
+        "castingTimeMs": 700,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "2d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD",
@@ -426,9 +507,12 @@
         "requiredLevel": 9,
         "manaCost": 5,
         "cooldownSeconds": 2,
+        "castingTimeMs": 900,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "3d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD",
@@ -443,9 +527,12 @@
         "requiredLevel": 13,
         "manaCost": 6,
         "cooldownSeconds": 2,
+        "castingTimeMs": 1100,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "4d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD",
@@ -460,9 +547,12 @@
         "requiredLevel": 17,
         "manaCost": 7,
         "cooldownSeconds": 2,
+        "castingTimeMs": 1300,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "5d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD",
@@ -477,9 +567,12 @@
         "requiredLevel": 1,
         "manaCost": 3,
         "cooldownSeconds": 3,
+        "castingTimeMs": 500,
         "range": 4,
         "effect": "DAMAGE",
         "effectDice": "1d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "DRUID"
         ]
@@ -492,9 +585,12 @@
         "requiredLevel": 5,
         "manaCost": 4,
         "cooldownSeconds": 3,
+        "castingTimeMs": 700,
         "range": 4,
         "effect": "DAMAGE",
         "effectDice": "2d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "DRUID"
         ]
@@ -507,9 +603,12 @@
         "requiredLevel": 9,
         "manaCost": 5,
         "cooldownSeconds": 2,
+        "castingTimeMs": 900,
         "range": 4,
         "effect": "DAMAGE",
         "effectDice": "3d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "DRUID"
         ]
@@ -522,9 +621,12 @@
         "requiredLevel": 13,
         "manaCost": 6,
         "cooldownSeconds": 2,
+        "castingTimeMs": 1100,
         "range": 4,
         "effect": "DAMAGE",
         "effectDice": "4d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "DRUID"
         ]
@@ -537,9 +639,12 @@
         "requiredLevel": 17,
         "manaCost": 7,
         "cooldownSeconds": 2,
+        "castingTimeMs": 1300,
         "range": 4,
         "effect": "DAMAGE",
         "effectDice": "5d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "DRUID"
         ]
@@ -552,9 +657,12 @@
         "requiredLevel": 1,
         "manaCost": 3,
         "cooldownSeconds": 3,
+        "castingTimeMs": 500,
         "range": 5,
         "effect": "DAMAGE",
         "effectDice": "1d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "CLERIC",
             "WARLOCK",
@@ -569,9 +677,12 @@
         "requiredLevel": 5,
         "manaCost": 4,
         "cooldownSeconds": 3,
+        "castingTimeMs": 700,
         "range": 5,
         "effect": "DAMAGE",
         "effectDice": "2d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "CLERIC",
             "WARLOCK",
@@ -586,9 +697,12 @@
         "requiredLevel": 9,
         "manaCost": 5,
         "cooldownSeconds": 2,
+        "castingTimeMs": 900,
         "range": 5,
         "effect": "DAMAGE",
         "effectDice": "3d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "CLERIC",
             "WARLOCK",
@@ -603,9 +717,12 @@
         "requiredLevel": 13,
         "manaCost": 6,
         "cooldownSeconds": 2,
+        "castingTimeMs": 1100,
         "range": 5,
         "effect": "DAMAGE",
         "effectDice": "4d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "CLERIC",
             "WARLOCK",
@@ -620,9 +737,12 @@
         "requiredLevel": 17,
         "manaCost": 7,
         "cooldownSeconds": 2,
+        "castingTimeMs": 1300,
         "range": 5,
         "effect": "DAMAGE",
         "effectDice": "5d8",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "CLERIC",
             "WARLOCK",
@@ -637,9 +757,12 @@
         "requiredLevel": 1,
         "manaCost": 6,
         "cooldownSeconds": 8,
+        "castingTimeMs": 500,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "3d4+3",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -653,9 +776,12 @@
         "requiredLevel": 5,
         "manaCost": 8,
         "cooldownSeconds": 7,
+        "castingTimeMs": 700,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "4d4+3",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -669,9 +795,12 @@
         "requiredLevel": 9,
         "manaCost": 9,
         "cooldownSeconds": 6,
+        "castingTimeMs": 900,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "5d4+3",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -685,9 +814,12 @@
         "requiredLevel": 13,
         "manaCost": 12,
         "cooldownSeconds": 5,
+        "castingTimeMs": 1100,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "6d4+3",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -701,9 +833,12 @@
         "requiredLevel": 17,
         "manaCost": 15,
         "cooldownSeconds": 5,
+        "castingTimeMs": 1300,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "7d4+3",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -717,9 +852,12 @@
         "requiredLevel": 1,
         "manaCost": 6,
         "cooldownSeconds": 8,
+        "castingTimeMs": 1200,
         "range": 2,
         "effect": "DAMAGE",
         "effectDice": "3d6",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -733,9 +871,12 @@
         "requiredLevel": 5,
         "manaCost": 8,
         "cooldownSeconds": 7,
+        "castingTimeMs": 1400,
         "range": 2,
         "effect": "DAMAGE",
         "effectDice": "4d6",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -749,9 +890,12 @@
         "requiredLevel": 9,
         "manaCost": 9,
         "cooldownSeconds": 6,
+        "castingTimeMs": 1600,
         "range": 2,
         "effect": "DAMAGE",
         "effectDice": "5d6",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -765,9 +909,12 @@
         "requiredLevel": 13,
         "manaCost": 12,
         "cooldownSeconds": 5,
+        "castingTimeMs": 1800,
         "range": 2,
         "effect": "DAMAGE",
         "effectDice": "6d6",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -781,9 +928,12 @@
         "requiredLevel": 17,
         "manaCost": 15,
         "cooldownSeconds": 5,
+        "castingTimeMs": 2000,
         "range": 2,
         "effect": "DAMAGE",
         "effectDice": "7d6",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -797,9 +947,12 @@
         "requiredLevel": 1,
         "manaCost": 6,
         "cooldownSeconds": 8,
+        "castingTimeMs": 500,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "4d6",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "CLERIC"
         ]
@@ -812,9 +965,12 @@
         "requiredLevel": 5,
         "manaCost": 8,
         "cooldownSeconds": 7,
+        "castingTimeMs": 700,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "5d6",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "CLERIC"
         ]
@@ -827,9 +983,12 @@
         "requiredLevel": 9,
         "manaCost": 9,
         "cooldownSeconds": 6,
+        "castingTimeMs": 900,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "6d6",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "CLERIC"
         ]
@@ -842,9 +1001,12 @@
         "requiredLevel": 13,
         "manaCost": 12,
         "cooldownSeconds": 5,
+        "castingTimeMs": 1100,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "7d6",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "CLERIC"
         ]
@@ -857,9 +1019,12 @@
         "requiredLevel": 17,
         "manaCost": 15,
         "cooldownSeconds": 5,
+        "castingTimeMs": 1300,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "8d6",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "CLERIC"
         ]
@@ -872,9 +1037,12 @@
         "requiredLevel": 1,
         "manaCost": 6,
         "cooldownSeconds": 8,
+        "castingTimeMs": 500,
         "range": 1,
         "effect": "DAMAGE",
         "effectDice": "3d10",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC"
         ]
@@ -887,9 +1055,12 @@
         "requiredLevel": 5,
         "manaCost": 8,
         "cooldownSeconds": 7,
+        "castingTimeMs": 700,
         "range": 1,
         "effect": "DAMAGE",
         "effectDice": "4d10",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC"
         ]
@@ -902,9 +1073,12 @@
         "requiredLevel": 9,
         "manaCost": 9,
         "cooldownSeconds": 6,
+        "castingTimeMs": 900,
         "range": 1,
         "effect": "DAMAGE",
         "effectDice": "5d10",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC"
         ]
@@ -917,9 +1091,12 @@
         "requiredLevel": 13,
         "manaCost": 12,
         "cooldownSeconds": 5,
+        "castingTimeMs": 1100,
         "range": 1,
         "effect": "DAMAGE",
         "effectDice": "6d10",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC"
         ]
@@ -932,9 +1109,12 @@
         "requiredLevel": 17,
         "manaCost": 15,
         "cooldownSeconds": 5,
+        "castingTimeMs": 1300,
         "range": 1,
         "effect": "DAMAGE",
         "effectDice": "7d10",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC"
         ]
@@ -947,9 +1127,12 @@
         "requiredLevel": 1,
         "manaCost": 6,
         "cooldownSeconds": 8,
+        "castingTimeMs": 1200,
         "range": 1,
         "effect": "DAMAGE",
         "effectDice": "2d8",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "SORCERER",
             "WIZARD",
@@ -965,9 +1148,12 @@
         "requiredLevel": 5,
         "manaCost": 8,
         "cooldownSeconds": 7,
+        "castingTimeMs": 1400,
         "range": 1,
         "effect": "DAMAGE",
         "effectDice": "3d8",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "SORCERER",
             "WIZARD",
@@ -983,9 +1169,12 @@
         "requiredLevel": 9,
         "manaCost": 9,
         "cooldownSeconds": 6,
+        "castingTimeMs": 1600,
         "range": 1,
         "effect": "DAMAGE",
         "effectDice": "4d8",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "SORCERER",
             "WIZARD",
@@ -1001,9 +1190,12 @@
         "requiredLevel": 13,
         "manaCost": 12,
         "cooldownSeconds": 5,
+        "castingTimeMs": 1800,
         "range": 1,
         "effect": "DAMAGE",
         "effectDice": "5d8",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "SORCERER",
             "WIZARD",
@@ -1019,9 +1211,12 @@
         "requiredLevel": 17,
         "manaCost": 15,
         "cooldownSeconds": 5,
+        "castingTimeMs": 2000,
         "range": 1,
         "effect": "DAMAGE",
         "effectDice": "6d8",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "SORCERER",
             "WIZARD",
@@ -1037,9 +1232,12 @@
         "requiredLevel": 1,
         "manaCost": 5,
         "cooldownSeconds": 6,
+        "castingTimeMs": 500,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "1d8+3",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "DRUID",
@@ -1056,9 +1254,12 @@
         "requiredLevel": 5,
         "manaCost": 6,
         "cooldownSeconds": 5,
+        "castingTimeMs": 700,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "2d8+3",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "DRUID",
@@ -1075,9 +1276,12 @@
         "requiredLevel": 9,
         "manaCost": 8,
         "cooldownSeconds": 5,
+        "castingTimeMs": 900,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "3d8+3",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "DRUID",
@@ -1094,9 +1298,12 @@
         "requiredLevel": 13,
         "manaCost": 10,
         "cooldownSeconds": 4,
+        "castingTimeMs": 1100,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "4d8+3",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "DRUID",
@@ -1113,9 +1320,12 @@
         "requiredLevel": 17,
         "manaCost": 12,
         "cooldownSeconds": 4,
+        "castingTimeMs": 1300,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "5d8+3",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "DRUID",
@@ -1132,9 +1342,12 @@
         "requiredLevel": 1,
         "manaCost": 4,
         "cooldownSeconds": 6,
+        "castingTimeMs": 500,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "1d4+3",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "BARD",
@@ -1149,9 +1362,12 @@
         "requiredLevel": 5,
         "manaCost": 5,
         "cooldownSeconds": 5,
+        "castingTimeMs": 700,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "2d4+3",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "BARD",
@@ -1166,9 +1382,12 @@
         "requiredLevel": 9,
         "manaCost": 6,
         "cooldownSeconds": 5,
+        "castingTimeMs": 900,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "3d4+3",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "BARD",
@@ -1183,9 +1402,12 @@
         "requiredLevel": 13,
         "manaCost": 8,
         "cooldownSeconds": 4,
+        "castingTimeMs": 1100,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "4d4+3",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "BARD",
@@ -1200,9 +1422,12 @@
         "requiredLevel": 17,
         "manaCost": 10,
         "cooldownSeconds": 4,
+        "castingTimeMs": 1300,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "5d4+3",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "BARD",
@@ -1217,9 +1442,12 @@
         "requiredLevel": 3,
         "manaCost": 12,
         "cooldownSeconds": 15,
+        "castingTimeMs": 1200,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "6d6",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -1233,9 +1461,12 @@
         "requiredLevel": 7,
         "manaCost": 15,
         "cooldownSeconds": 13,
+        "castingTimeMs": 1400,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "7d6",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -1249,9 +1480,12 @@
         "requiredLevel": 11,
         "manaCost": 19,
         "cooldownSeconds": 11,
+        "castingTimeMs": 1600,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "8d6",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -1265,9 +1499,12 @@
         "requiredLevel": 15,
         "manaCost": 23,
         "cooldownSeconds": 10,
+        "castingTimeMs": 1800,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "9d6",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -1281,9 +1518,12 @@
         "requiredLevel": 19,
         "manaCost": 29,
         "cooldownSeconds": 9,
+        "castingTimeMs": 2000,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "10d6",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -1297,9 +1537,12 @@
         "requiredLevel": 3,
         "manaCost": 12,
         "cooldownSeconds": 15,
+        "castingTimeMs": 1200,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "3d8",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC"
         ]
@@ -1312,9 +1555,12 @@
         "requiredLevel": 7,
         "manaCost": 15,
         "cooldownSeconds": 13,
+        "castingTimeMs": 1400,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "4d8",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC"
         ]
@@ -1327,9 +1573,12 @@
         "requiredLevel": 11,
         "manaCost": 19,
         "cooldownSeconds": 11,
+        "castingTimeMs": 1600,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "5d8",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC"
         ]
@@ -1342,9 +1591,12 @@
         "requiredLevel": 15,
         "manaCost": 23,
         "cooldownSeconds": 10,
+        "castingTimeMs": 1800,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "6d8",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC"
         ]
@@ -1357,9 +1609,12 @@
         "requiredLevel": 19,
         "manaCost": 29,
         "cooldownSeconds": 9,
+        "castingTimeMs": 2000,
         "range": 6,
         "effect": "DAMAGE",
         "effectDice": "7d8",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC"
         ]
@@ -1372,9 +1627,12 @@
         "requiredLevel": 3,
         "manaCost": 12,
         "cooldownSeconds": 20,
+        "castingTimeMs": 500,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "2d8+5",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC"
         ]
@@ -1387,9 +1645,12 @@
         "requiredLevel": 7,
         "manaCost": 15,
         "cooldownSeconds": 18,
+        "castingTimeMs": 700,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "3d8+5",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC"
         ]
@@ -1402,9 +1663,12 @@
         "requiredLevel": 11,
         "manaCost": 19,
         "cooldownSeconds": 15,
+        "castingTimeMs": 900,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "4d8+5",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC"
         ]
@@ -1417,9 +1681,12 @@
         "requiredLevel": 15,
         "manaCost": 23,
         "cooldownSeconds": 13,
+        "castingTimeMs": 1100,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "5d8+5",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC"
         ]
@@ -1432,9 +1699,12 @@
         "requiredLevel": 19,
         "manaCost": 29,
         "cooldownSeconds": 12,
+        "castingTimeMs": 1300,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "6d8+5",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC"
         ]
@@ -1447,9 +1717,12 @@
         "requiredLevel": 5,
         "manaCost": 20,
         "cooldownSeconds": 30,
+        "castingTimeMs": 1200,
         "range": 8,
         "effect": "DAMAGE",
         "effectDice": "8d6",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -1463,9 +1736,12 @@
         "requiredLevel": 9,
         "manaCost": 25,
         "cooldownSeconds": 26,
+        "castingTimeMs": 1400,
         "range": 8,
         "effect": "DAMAGE",
         "effectDice": "9d6",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -1479,9 +1755,12 @@
         "requiredLevel": 13,
         "manaCost": 31,
         "cooldownSeconds": 23,
+        "castingTimeMs": 1600,
         "range": 8,
         "effect": "DAMAGE",
         "effectDice": "10d6",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -1495,9 +1774,12 @@
         "requiredLevel": 17,
         "manaCost": 39,
         "cooldownSeconds": 20,
+        "castingTimeMs": 1800,
         "range": 8,
         "effect": "DAMAGE",
         "effectDice": "11d6",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -1511,9 +1793,12 @@
         "requiredLevel": 5,
         "manaCost": 20,
         "cooldownSeconds": 30,
+        "castingTimeMs": 1200,
         "range": 8,
         "effect": "DAMAGE",
         "effectDice": "8d6",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -1527,9 +1812,12 @@
         "requiredLevel": 9,
         "manaCost": 25,
         "cooldownSeconds": 26,
+        "castingTimeMs": 1400,
         "range": 8,
         "effect": "DAMAGE",
         "effectDice": "9d6",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -1543,9 +1831,12 @@
         "requiredLevel": 13,
         "manaCost": 31,
         "cooldownSeconds": 23,
+        "castingTimeMs": 1600,
         "range": 8,
         "effect": "DAMAGE",
         "effectDice": "10d6",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -1559,9 +1850,12 @@
         "requiredLevel": 17,
         "manaCost": 39,
         "cooldownSeconds": 20,
+        "castingTimeMs": 1800,
         "range": 8,
         "effect": "DAMAGE",
         "effectDice": "11d6",
+        "projectile": true,
+        "projectileSpeed": 20,
         "classes": [
             "SORCERER",
             "WIZARD"
@@ -1575,9 +1869,12 @@
         "requiredLevel": 5,
         "manaCost": 20,
         "cooldownSeconds": 30,
+        "castingTimeMs": 1200,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "3d8+8",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "DRUID"
@@ -1591,9 +1888,12 @@
         "requiredLevel": 9,
         "manaCost": 25,
         "cooldownSeconds": 26,
+        "castingTimeMs": 1400,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "4d8+8",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "DRUID"
@@ -1607,9 +1907,12 @@
         "requiredLevel": 13,
         "manaCost": 31,
         "cooldownSeconds": 23,
+        "castingTimeMs": 1600,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "5d8+8",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "DRUID"
@@ -1623,9 +1926,12 @@
         "requiredLevel": 17,
         "manaCost": 39,
         "cooldownSeconds": 20,
+        "castingTimeMs": 1800,
         "range": 0,
         "effect": "HEALING",
         "effectDice": "6d8+8",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "DRUID"
@@ -1639,9 +1945,12 @@
         "requiredLevel": 1,
         "manaCost": 5,
         "cooldownSeconds": 6,
+        "castingTimeMs": 500,
         "range": 5,
         "effect": "BUFF",
         "effectDice": "1d4",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "PALADIN",
@@ -1658,9 +1967,12 @@
         "requiredLevel": 5,
         "manaCost": 6,
         "cooldownSeconds": 5,
+        "castingTimeMs": 700,
         "range": 5,
         "effect": "BUFF",
         "effectDice": "2d4",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "PALADIN",
@@ -1677,9 +1989,12 @@
         "requiredLevel": 9,
         "manaCost": 8,
         "cooldownSeconds": 5,
+        "castingTimeMs": 900,
         "range": 5,
         "effect": "BUFF",
         "effectDice": "3d4",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "PALADIN",
@@ -1696,9 +2011,12 @@
         "requiredLevel": 13,
         "manaCost": 10,
         "cooldownSeconds": 4,
+        "castingTimeMs": 1100,
         "range": 5,
         "effect": "BUFF",
         "effectDice": "4d4",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "PALADIN",
@@ -1715,9 +2033,12 @@
         "requiredLevel": 17,
         "manaCost": 12,
         "cooldownSeconds": 4,
+        "castingTimeMs": 1300,
         "range": 5,
         "effect": "BUFF",
         "effectDice": "5d4",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "PALADIN",
@@ -1734,9 +2055,12 @@
         "requiredLevel": 1,
         "manaCost": 5,
         "cooldownSeconds": 6,
+        "castingTimeMs": 500,
         "range": 5,
         "effect": "DEBUFF",
         "effectDice": "1d4",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "BARD",
@@ -1753,9 +2077,12 @@
         "requiredLevel": 5,
         "manaCost": 6,
         "cooldownSeconds": 5,
+        "castingTimeMs": 700,
         "range": 5,
         "effect": "DEBUFF",
         "effectDice": "2d4",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "BARD",
@@ -1772,9 +2099,12 @@
         "requiredLevel": 9,
         "manaCost": 8,
         "cooldownSeconds": 5,
+        "castingTimeMs": 900,
         "range": 5,
         "effect": "DEBUFF",
         "effectDice": "3d4",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "BARD",
@@ -1791,9 +2121,12 @@
         "requiredLevel": 13,
         "manaCost": 10,
         "cooldownSeconds": 4,
+        "castingTimeMs": 1100,
         "range": 5,
         "effect": "DEBUFF",
         "effectDice": "4d4",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "BARD",
@@ -1810,9 +2143,12 @@
         "requiredLevel": 17,
         "manaCost": 12,
         "cooldownSeconds": 4,
+        "castingTimeMs": 1300,
         "range": 5,
         "effect": "DEBUFF",
         "effectDice": "5d4",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "BARD",
@@ -1829,9 +2165,12 @@
         "requiredLevel": 1,
         "manaCost": 5,
         "cooldownSeconds": 6,
+        "castingTimeMs": 500,
         "range": 5,
         "effect": "BUFF",
         "effectDice": "2",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "PALADIN"
@@ -1847,9 +2186,12 @@
         "requiredLevel": 5,
         "manaCost": 6,
         "cooldownSeconds": 5,
+        "castingTimeMs": 700,
         "range": 5,
         "effect": "BUFF",
         "effectDice": "3",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "PALADIN"
@@ -1865,9 +2207,12 @@
         "requiredLevel": 9,
         "manaCost": 8,
         "cooldownSeconds": 5,
+        "castingTimeMs": 900,
         "range": 5,
         "effect": "BUFF",
         "effectDice": "4",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "PALADIN"
@@ -1883,9 +2228,12 @@
         "requiredLevel": 13,
         "manaCost": 10,
         "cooldownSeconds": 4,
+        "castingTimeMs": 1100,
         "range": 5,
         "effect": "BUFF",
         "effectDice": "5",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "PALADIN"
@@ -1901,9 +2249,12 @@
         "requiredLevel": 17,
         "manaCost": 12,
         "cooldownSeconds": 4,
+        "castingTimeMs": 1300,
         "range": 5,
         "effect": "BUFF",
         "effectDice": "6",
+        "projectile": false,
+        "projectileSpeed": 0,
         "classes": [
             "CLERIC",
             "PALADIN"

@@ -3,6 +3,7 @@ package app.network.command.ingame;
 import java.util.Set;
 
 import app.game.engine.MovementEngine;
+import app.game.engine.SpellCastEngine;
 import org.springframework.stereotype.Component;
 
 import app.network.CommandHandler;
@@ -16,9 +17,11 @@ import app.network.message.ingame.MovementStopped;
 public class Stop implements CommandHandler {
 
     private final MovementEngine movementEngine;
+    private final SpellCastEngine spellCastEngine;
 
-    public Stop(MovementEngine movementEngine) {
+    public Stop(MovementEngine movementEngine, SpellCastEngine spellCastEngine) {
         this.movementEngine = movementEngine;
+        this.spellCastEngine = spellCastEngine;
     }
 
     @Override
@@ -36,6 +39,7 @@ public class Stop implements CommandHandler {
         CharacterInstance character = connection.character();
 
         movementEngine.stopMovement(character);
+        spellCastEngine.cancelCast(character);
 
         connection.send(new MovementStopped(character.getPosition().x(), character.getPosition().y()));
         character.getCurrentZone().broadcast(new CharacterMovementStopped(character.getName(),

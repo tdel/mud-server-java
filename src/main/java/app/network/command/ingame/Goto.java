@@ -16,6 +16,7 @@ import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
+import app.network.message.ingame.AlreadyCasting;
 import app.network.message.ingame.CharacterMovementStarted;
 import app.network.message.ingame.MovementStarted;
 import app.network.message.ingame.NoPathToDestination;
@@ -45,6 +46,12 @@ public class Goto implements CommandHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
+
+        if (character.isCasting()) {
+            connection.send(new AlreadyCasting());
+            return;
+        }
+
         String[] tokens = argument.trim().split("\\s+");
 
         if (argument.isBlank() || tokens.length != 2) {

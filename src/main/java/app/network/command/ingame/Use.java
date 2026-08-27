@@ -13,6 +13,7 @@ import app.domain.item.Item;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
+import app.network.message.ingame.AlreadyCasting;
 import app.network.message.ingame.ItemNotCarried;
 import app.network.message.ingame.ItemNotUsable;
 
@@ -32,6 +33,12 @@ public class Use implements CommandHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
+
+        if (character.isCasting()) {
+            connection.send(new AlreadyCasting());
+            return;
+        }
+
         String raw = argument.trim();
 
         if (raw.isEmpty()) {

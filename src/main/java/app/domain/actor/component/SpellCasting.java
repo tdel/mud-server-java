@@ -69,8 +69,32 @@ public final class SpellCasting {
             case DEBUFF -> castModifier(spell, target, true);
         };
 
-        nextCastAt.put(spell.id(), Instant.now().plusSeconds(spell.cooldownSeconds()));
+        markCooldown(spell);
         return outcome;
+    }
+
+    public void markCooldown(Spell spell) {
+        nextCastAt.put(spell.id(), Instant.now().plusSeconds(spell.cooldownSeconds()));
+    }
+
+    // Pour les sorts projectiles (cf. game.engine.ProjectileEngine) : le jet
+    // d'attaque et les dégâts sont calculés à la fin de l'incantation, mais leur
+    // application (PV décomptés, événement publié) est différée jusqu'à
+    // l'impact.
+    public AttackRollOutcome rollDamage(Spell spell, AbstractCharacter target) {
+        if (!rollSpellAttack(target)) {
+            return new AttackRollOutcome(false, 0);
+        }
+        return new AttackRollOutcome(true, DiceRoller.roll(spell.effectDice()).total());
+    }
+
+    public CastOutcome applyDamageOutcome(AttackRollOutcome roll, AbstractCharacter target) {
+        if (!roll.hit()) {
+            return new CastOutcome(false, 0, target.getCurrentHealth(), target.getMaxHealth(), false, false, null);
+        }
+        boolean defeated = applyDamage(target, roll.amount());
+        return new CastOutcome(true, roll.amount(), target.getCurrentHealth(), target.getMaxHealth(), defeated, false,
+                null);
     }
 
     private CastOutcome castHeal(Spell spell) {
@@ -79,12 +103,7 @@ public final class SpellCasting {
     }
 
     private CastOutcome castDamage(Spell spell, AbstractCharacter target) {
-        if (!rollSpellAttack(target)) {
-            return new CastOutcome(false, 0, target.getCurrentHealth(), target.getMaxHealth(), false, false, null);
-        }
-        int amount = DiceRoller.roll(spell.effectDice()).total();
-        boolean defeated = applyDamage(target, amount);
-        return new CastOutcome(true, amount, target.getCurrentHealth(), target.getMaxHealth(), defeated, false, null);
+        return applyDamageOutcome(rollDamage(spell, target), target);
     }
 
     private CastOutcome castModifier(Spell spell, AbstractCharacter target, boolean debuff) {
@@ -119,5 +138,8 @@ public final class SpellCasting {
 
     public record CastOutcome(boolean hit, int amount, int targetHealthAfter, int targetMaxHealth,
             boolean targetDefeated, boolean selfHeal, Instant effectExpiresAt) {
+    }
+
+    public record AttackRollOutcome(boolean hit, int amount) {
     }
 }
