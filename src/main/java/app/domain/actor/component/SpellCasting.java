@@ -11,6 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import app.domain.Spell;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.ModifiedStat;
+import app.domain.actor.event.DomainEventPublisher;
+import app.domain.actor.event.MonsterAttacked;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.instance.MonsterInstance;
 import app.game.dice.DiceRoll;
@@ -89,6 +91,9 @@ public final class SpellCasting {
     }
 
     public CastOutcome applyDamageOutcome(AttackRollOutcome roll, AbstractCharacter target) {
+        if (target instanceof MonsterInstance monster && character instanceof CharacterInstance casterPlayer) {
+            DomainEventPublisher.publish(new MonsterAttacked(monster, casterPlayer));
+        }
         if (!roll.hit()) {
             return new CastOutcome(false, 0, target.getCurrentHealth(), target.getMaxHealth(), false, false, null);
         }
