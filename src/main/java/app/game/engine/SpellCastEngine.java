@@ -19,6 +19,8 @@ import app.domain.actor.event.SpellCast;
 import app.domain.actor.event.SpellCastBegin;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.message.ingame.CastResult;
+import app.network.message.ingame.CharacterMovementStopped;
+import app.network.message.ingame.MovementStopped;
 import app.network.message.ingame.SpellCastAnnounced;
 import app.network.message.ingame.SpellCastCancelled;
 import app.network.message.ingame.SpellCastStarted;
@@ -47,7 +49,23 @@ public class SpellCastEngine {
     }
 
     private void beginCast(AbstractCharacter caster, Spell spell, AbstractCharacter target) {
-        movementEngine.stopMovement(caster);
+        // On incante sans marcher : le déplacement en cours est arrêté ici (avant même
+        // le
+        // délai d'incantation), mais il faut aussi le notifier tout de suite (comme le
+        // fait
+        // Attack.java) au lieu de compter sur l'événement SpellCast, qui n'est publié
+        // qu'à la
+        // résolution différée du sort (SpellCastEngine.resolveCast) — trop tard, le
+        // client
+        // continue sinon d'interpoler le déplacement pendant toute la durée de
+        // l'incantation.
+        if (caster.activeMovement != null) {
+            movementEngine.stopMovement(caster);
+            caster.send(new MovementStopped(caster.getPosition().x(), caster.getPosition().y()));
+            caster.getCurrentZone().broadcast(
+                    new CharacterMovementStopped(caster.getName(), caster.getPosition().x(), caster.getPosition().y()),
+                    caster instanceof CharacterInstance player ? player : null);
+        }
         caster.activeCast = new ActiveCast(spell, target, System.nanoTime(), spell.castingTimeMs() * 1_000_000L);
         casting.put(caster.getId(), caster);
         log.debug("spell.cast_started thread={} caster={} spell={} castingTimeMs={}", Thread.currentThread().getName(),

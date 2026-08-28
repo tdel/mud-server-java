@@ -12,12 +12,10 @@ import app.game.engine.ContinuousStep.StepResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import app.domain.actor.AbstractCharacter;
-import app.domain.actor.event.SpellCast;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.message.ingame.CharacterMovementBlocked;
 import app.network.message.ingame.CharacterMovementFinished;
@@ -62,19 +60,6 @@ public class MovementEngine {
             movingCharacters.remove(character.getId());
         }
         log.debug("movement.stopped thread={} character={}", Thread.currentThread().getName(), character.getId());
-    }
-
-    @EventListener
-    void onSpellCast(SpellCast event) {
-        AbstractCharacter caster = event.caster();
-        if (caster.activeMovement == null) {
-            return;
-        }
-        stopMovement(caster);
-        caster.send(new MovementStopped(caster.getPosition().x(), caster.getPosition().y()));
-        caster.getCurrentZone().broadcast(
-                new CharacterMovementStopped(caster.getName(), caster.getPosition().x(), caster.getPosition().y()),
-                caster instanceof CharacterInstance player ? player : null);
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
