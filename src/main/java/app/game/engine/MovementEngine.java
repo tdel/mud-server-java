@@ -45,18 +45,22 @@ public class MovementEngine {
         if (waypoints.isEmpty()) {
             return;
         }
-        character.activeMovement = new ActiveMovement(List.copyOf(waypoints), System.nanoTime());
-        movingCharacters.put(character.getId(), character);
+        synchronized (character) {
+            character.activeMovement = new ActiveMovement(List.copyOf(waypoints), System.nanoTime());
+            movingCharacters.put(character.getId(), character);
+        }
         log.debug("movement.started thread={} character={} waypoints={}", Thread.currentThread().getName(),
                 character.getId(), waypoints.size());
     }
 
     public void stopMovement(AbstractCharacter character) {
-        if (character.activeMovement == null) {
-            return;
+        synchronized (character) {
+            if (character.activeMovement == null) {
+                return;
+            }
+            character.activeMovement = null;
+            movingCharacters.remove(character.getId());
         }
-        character.activeMovement = null;
-        movingCharacters.remove(character.getId());
         log.debug("movement.stopped thread={} character={}", Thread.currentThread().getName(), character.getId());
     }
 
@@ -122,31 +126,33 @@ public class MovementEngine {
     }
 
     private MovementStepOutcome updatePosition(AbstractCharacter character, long now) {
-        ActiveMovement movement = character.activeMovement;
-        if (movement == null) {
-            return MovementStepOutcome.NO_MOVEMENT;
+        synchronized (character) {
+            ActiveMovement movement = character.activeMovement;
+            if (movement == null) {
+                return MovementStepOutcome.NO_MOVEMENT;
+            }
+
+            ZoneInstance zone = character.getCurrentZone();
+            CollisionGrid grid = zone.getCollisionGrid();
+            double dtSeconds = (now - movement.lastTickAtNanos()) / 1_000_000_000.0;
+
+            StepResult result = ContinuousStep.step(character.getPosition(), movement.remainingWaypoints(),
+                    unitsPerSecond(character.getSpeed()), dtSeconds, grid);
+            character.setPosition(result.position());
+
+            if (result.blocked()) {
+                character.activeMovement = null;
+                return MovementStepOutcome.BLOCKED_BY_BOUNDS;
+            }
+
+            if (result.remainingWaypoints().isEmpty()) {
+                character.activeMovement = null;
+                return MovementStepOutcome.FINISHED;
+            }
+
+            character.activeMovement = movement.withRemaining(result.remainingWaypoints(), now);
+            return MovementStepOutcome.STEPPED;
         }
-
-        ZoneInstance zone = character.getCurrentZone();
-        CollisionGrid grid = zone.getCollisionGrid();
-        double dtSeconds = (now - movement.lastTickAtNanos()) / 1_000_000_000.0;
-
-        StepResult result = ContinuousStep.step(character.getPosition(), movement.remainingWaypoints(),
-                unitsPerSecond(character.getSpeed()), dtSeconds, grid);
-        character.setPosition(result.position());
-
-        if (result.blocked()) {
-            character.activeMovement = null;
-            return MovementStepOutcome.BLOCKED_BY_BOUNDS;
-        }
-
-        if (result.remainingWaypoints().isEmpty()) {
-            character.activeMovement = null;
-            return MovementStepOutcome.FINISHED;
-        }
-
-        character.activeMovement = movement.withRemaining(result.remainingWaypoints(), now);
-        return MovementStepOutcome.STEPPED;
     }
 
     public record ActiveMovement(List<Position> remainingWaypoints, long lastTickAtNanos) {
