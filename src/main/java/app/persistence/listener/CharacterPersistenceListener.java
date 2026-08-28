@@ -14,11 +14,10 @@ import app.domain.actor.event.CharacterReceivedGold;
 import app.domain.actor.event.CharacterRegenerated;
 import app.domain.actor.event.CharacterSpentGold;
 import app.domain.actor.event.GamePlayerDamaged;
-import app.domain.actor.event.GamePlayerDied;
+import app.domain.actor.event.GamePlayerRespawned;
 import app.domain.actor.event.GamePlayerUsedManaPotion;
 import app.domain.actor.event.GamePlayerUsedPotion;
 import app.domain.actor.event.NewGamePlayerCreated;
-import app.domain.world.ZoneInstance;
 import app.game.catalog.LevelCatalog;
 import app.network.message.ingame.CharacterUsedItem;
 import app.network.message.ingame.GoldLooted;
@@ -110,18 +109,14 @@ public class CharacterPersistenceListener {
     }
 
     @EventListener
-    @Order(2)
-    void onGamePlayerDied(GamePlayerDied event) {
+    void onGamePlayerRespawned(GamePlayerRespawned event) {
         CharacterInstance character = event.character();
-        ZoneInstance startingZone = character.getWorldInstance().startingZoneInstance()
-                .orElseThrow(() -> new IllegalStateException("Aucune starting zone configurée"));
-
-        character.setCurrentHealth(character.getMaxHealth());
-        character.moveToZone(startingZone);
         characterDao.update(character);
 
-        character.send(new PlayerRespawned(startingZone.getName()));
-        log.info("character.respawned character={} zone={}", character.getName(), startingZone.getName());
+        character.send(new PlayerRespawned(character.getCurrentZone().getName(), character.getPosition().x(),
+                character.getPosition().y(), character.getCurrentHealth(), character.getMaxHealth(),
+                character.getCurrentMana(), character.getMaxMana()));
+        log.info("character.respawned character={} zone={}", character.getName(), character.getCurrentZone().getName());
     }
 
     @EventListener

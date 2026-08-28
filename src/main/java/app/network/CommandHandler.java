@@ -9,4 +9,8 @@ public interface CommandHandler {
     Set<ConnectionState> states();
 
     void onReceive(Connection connection, String argument);
+
+    default boolean requiresAlive() {
+        return false;
+    }
 }

@@ -162,7 +162,7 @@ public class ZoneInstance {
             return Optional.of(monster.get());
         }
         CharacterInstance client = clients.get(id);
-        if (client != null && !client.getId().equals(requester.getId())) {
+        if (client != null && !client.getId().equals(requester.getId()) && client.getCurrentHealth() > 0) {
             return Optional.of(client);
         }
         return Optional.empty();

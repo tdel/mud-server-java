@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import app.network.message.ActionNotFound;
+import app.network.message.ingame.CharacterIsDead;
 
 @Component
 public class CommandDispatcher {
@@ -19,6 +20,12 @@ public class CommandDispatcher {
 
     public void dispatch(Connection connection, String actionName, String argument) {
         registry.find(connection.state(), actionName).ifPresentOrElse(action -> {
+            if (connection.state() == ConnectionState.INGAME && action.requiresAlive()
+                    && connection.character().getCurrentHealth() <= 0) {
+                log.debug("command.rejected verb={} reason=character_dead", actionName);
+                connection.send(new CharacterIsDead());
+                return;
+            }
             log.info("command.received verb={} state={}", actionName, connection.state());
             action.onReceive(connection, argument);
         }, () -> {

@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.GamePlayerDied;
+import app.domain.actor.event.GamePlayerRespawned;
 import app.domain.world.ZoneInstance;
 import app.network.message.ingame.GamePlayerDefeated;
 import app.network.message.ingame.MonsterDefeated;
@@ -74,10 +75,16 @@ public class RegenHealthEngine {
 
     @EventListener
     void onGamePlayerDied(GamePlayerDied event) {
+        regenerating.remove(event.character().getId());
+
         ZoneInstance zone = event.character().getCurrentZone();
-        zone.broadcast(new GamePlayerDefeated(event.character().getName(), event.killer().getName()),
-                event.character());
+        zone.broadcast(new GamePlayerDefeated(event.character().getName(), event.killer().getName()), null);
         log.info("regenhp.player_defeated character={} killer={} zone={}", event.character().getName(),
                 event.killer().getName(), zone.getName());
+    }
+
+    @EventListener
+    void onGamePlayerRespawned(GamePlayerRespawned event) {
+        register(event.character());
     }
 }

@@ -28,6 +28,11 @@ public class Portal implements CommandHandler {
     }
 
     @Override
+    public boolean requiresAlive() {
+        return true;
+    }
+
+    @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
         Optional<ZonePortal> portal = character.getCurrentZone().findPortalAt(character.getPosition());

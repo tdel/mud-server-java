@@ -26,6 +26,7 @@ import app.domain.actor.event.GamePlayerDamaged;
 import app.domain.actor.event.GamePlayerDied;
 import app.domain.actor.event.GamePlayerEquippedItem;
 import app.domain.actor.event.GamePlayerMovedToZone;
+import app.domain.actor.event.GamePlayerRespawned;
 import app.domain.actor.event.GamePlayerUnequippedItem;
 import app.domain.actor.event.ItemDiscarded;
 import app.domain.actor.event.ItemPurchased;
@@ -373,9 +374,17 @@ public final class CharacterInstance extends AbstractCharacter {
         boolean defeated = getCurrentHealth() <= 0;
         DomainEventPublisher.publish(new GamePlayerDamaged(this, attacker, amount));
         if (defeated) {
+            getCombat().setTarget(null);
             DomainEventPublisher.publish(new GamePlayerDied(this, attacker));
         }
         return defeated;
+    }
+
+    public void respawn(ZoneInstance destination, Position position) {
+        setCurrentHealth(Math.max(1, getMaxHealth() / 4));
+        setCurrentMana(0);
+        moveToZone(destination, position);
+        DomainEventPublisher.publish(new GamePlayerRespawned(this));
     }
 
     public void moveToZone(ZoneInstance destination) {

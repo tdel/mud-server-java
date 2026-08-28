@@ -12,10 +12,12 @@ import app.game.engine.ContinuousStep.StepResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import app.domain.actor.AbstractCharacter;
+import app.domain.actor.event.GamePlayerDied;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.message.ingame.CharacterMovementBlocked;
 import app.network.message.ingame.CharacterMovementFinished;
@@ -60,6 +62,17 @@ public class MovementEngine {
             movingCharacters.remove(character.getId());
         }
         log.debug("movement.stopped thread={} character={}", Thread.currentThread().getName(), character.getId());
+    }
+
+    @EventListener
+    void onGamePlayerDied(GamePlayerDied event) {
+        CharacterInstance character = event.character();
+        if (character.activeMovement == null) {
+            return;
+        }
+        stopMovement(character);
+        character.getCurrentZone().broadcast(new CharacterMovementStopped(character.getId(), character.getName(),
+                character.getPosition().x(), character.getPosition().y()), null);
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)

@@ -32,6 +32,11 @@ public class Drop implements CommandHandler {
     }
 
     @Override
+    public boolean requiresAlive() {
+        return true;
+    }
+
+    @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
 

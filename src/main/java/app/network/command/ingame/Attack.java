@@ -50,6 +50,11 @@ public class Attack implements CommandHandler {
     }
 
     @Override
+    public boolean requiresAlive() {
+        return true;
+    }
+
+    @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
 
@@ -83,6 +88,13 @@ public class Attack implements CommandHandler {
             }
             target = found.get();
             combat.setTarget(target);
+        }
+
+        if (target.getCurrentHealth() <= 0) {
+            log.debug("attack.rejected character={} reason=target_dead target={}", character.getId(), target.getId());
+            combat.setTarget(null);
+            connection.send(new TargetNotFound(target.getId().toString()));
+            return;
         }
 
         // "select" (voir Select.java) permet aussi de cibler un PNJ (interaction, pas

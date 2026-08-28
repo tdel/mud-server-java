@@ -2,6 +2,7 @@ package app.network.message.ingame;
 
 import app.network.OutputJsonMessage;
 
-public record PlayerRespawned(String zoneName) implements OutputJsonMessage {
+public record PlayerRespawned(String zoneName, double x, double y, int currentHealth, int maxHealth, int currentMana,
+        int maxMana) implements OutputJsonMessage {
 
 }
