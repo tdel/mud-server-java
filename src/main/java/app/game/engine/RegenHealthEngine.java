@@ -25,10 +25,9 @@ public class RegenHealthEngine {
 
     private static final Logger log = LoggerFactory.getLogger(RegenHealthEngine.class);
 
-    private static final long REGEN_INTERVAL_MS = 10_000L;
     private static final long TICK_INTERVAL_MS = 1_000L;
 
-    private final Map<UUID, RegenState> regenerating = new ConcurrentHashMap<>();
+    private final Map<UUID, CharacterInstance> regenerating = new ConcurrentHashMap<>();
 
     @EventListener
     void onGamePlayerDamaged(GamePlayerDamaged event) {
@@ -44,23 +43,16 @@ public class RegenHealthEngine {
         if (isFull(character)) {
             return;
         }
-        regenerating.putIfAbsent(character.getId(), new RegenState(character, System.currentTimeMillis()));
+        regenerating.putIfAbsent(character.getId(), character);
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
     void tick() {
-        long now = System.currentTimeMillis();
-        for (RegenState state : regenerating.values()) {
-            if (now - state.lastRegenAt() < REGEN_INTERVAL_MS) {
-                continue;
-            }
-            CharacterInstance character = state.character();
+        for (CharacterInstance character : regenerating.values()) {
             character.regenerate(character.healthRegenAmountPerTick(), 0);
 
             if (isFull(character)) {
                 regenerating.remove(character.getId());
-            } else {
-                regenerating.put(character.getId(), new RegenState(character, now));
             }
         }
     }
@@ -87,8 +79,5 @@ public class RegenHealthEngine {
                 event.character());
         log.info("regenhp.player_defeated character={} killer={} zone={}", event.character().getName(),
                 event.killer().getName(), zone.getName());
-    }
-
-    private record RegenState(CharacterInstance character, long lastRegenAt) {
     }
 }

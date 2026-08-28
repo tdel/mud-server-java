@@ -19,10 +19,9 @@ public class RegenManaEngine {
 
     private static final Logger log = LoggerFactory.getLogger(RegenManaEngine.class);
 
-    private static final long REGEN_INTERVAL_MS = 10_000L;
     private static final long TICK_INTERVAL_MS = 1_000L;
 
-    private final Map<UUID, RegenState> regenerating = new ConcurrentHashMap<>();
+    private final Map<UUID, CharacterInstance> regenerating = new ConcurrentHashMap<>();
 
     @EventListener
     void onSpellCast(SpellCast event) {
@@ -40,33 +39,23 @@ public class RegenManaEngine {
         if (isFull(character)) {
             return;
         }
-        regenerating.putIfAbsent(character.getId(), new RegenState(character, System.currentTimeMillis()));
+        regenerating.putIfAbsent(character.getId(), character);
         log.debug("regen.mana.registered character={}", character.getId());
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
     void tick() {
-        long now = System.currentTimeMillis();
-        for (RegenState state : regenerating.values()) {
-            if (now - state.lastRegenAt() < REGEN_INTERVAL_MS) {
-                continue;
-            }
-            CharacterInstance character = state.character();
+        for (CharacterInstance character : regenerating.values()) {
             character.regenerate(0, character.manaRegenAmountPerTick());
 
             if (isFull(character)) {
                 regenerating.remove(character.getId());
                 log.debug("regen.mana.completed character={}", character.getId());
-            } else {
-                regenerating.put(character.getId(), new RegenState(character, now));
             }
         }
     }
 
     private boolean isFull(CharacterInstance character) {
         return character.getCurrentMana() >= character.getMaxMana();
-    }
-
-    private record RegenState(CharacterInstance character, long lastRegenAt) {
     }
 }
