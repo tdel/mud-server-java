@@ -57,6 +57,8 @@ public abstract class AbstractCharacter extends AbstractObject {
         return Math.floorDiv(getAttribute(attribute) - 10, 2);
     }
 
+    public abstract int getLevel();
+
     public int getArmorClass() {
         return 10 + getModifier(Attribute.DEXTERITY);
     }
