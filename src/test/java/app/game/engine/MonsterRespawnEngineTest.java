@@ -15,6 +15,7 @@ import app.domain.MonsterSpawnGroup;
 import app.domain.actor.Attribute;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.instance.MonsterInstance;
+import app.domain.actor.template.MonsterTemplate;
 import app.domain.map.Position;
 import app.domain.world.CollisionGrid;
 import app.domain.world.WorldInstance;
@@ -98,6 +99,8 @@ class MonsterRespawnEngineTest {
         public MonsterInstance spawnMonster(MonsterSpawn spawn, ZoneInstance zone) {
             MonsterInstance monster = new MonsterInstance(spawn.id(), "Test Monster", spawn.templateId(), zone.getId(),
                     Map.of(Attribute.STRENGTH, 10), 10, spawn.position());
+            monster.attachTemplate(new MonsterTemplate(spawn.templateId(), "Test Monster", "description", 10,
+                    Map.of(Attribute.STRENGTH, 10), 10, 0, "1d4", 0, List.of(), 5, 1, 1));
             monster.setCurrentZone(zone);
             zone.placeMonster(monster, spawn.position());
             return monster;

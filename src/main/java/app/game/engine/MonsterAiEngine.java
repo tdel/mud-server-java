@@ -21,6 +21,9 @@ import app.domain.world.CollisionGrid;
 import app.domain.world.ZoneInstance;
 import app.network.message.ingame.AttackObserved;
 import app.network.message.ingame.AttackReceived;
+import app.network.message.ingame.CharacterMovementFinished;
+import app.network.message.ingame.CharacterMovementStarted;
+import app.network.message.ingame.CharacterMovementStopped;
 import app.network.message.ingame.MonsterGaveUpChase;
 import app.network.message.ingame.MonsterStartedChasing;
 
@@ -50,7 +53,7 @@ public class MonsterAiEngine {
         PursuitState current = monster.pursuit;
         boolean startingChase = current == null || current.state() != State.CHASING;
 
-        monster.pursuit = new PursuitState(State.CHASING, attacker, System.nanoTime(), 0L);
+        monster.pursuit = new PursuitState(State.CHASING, attacker, System.nanoTime(), 0L, false);
         pursuing.put(monster.getId(), monster);
 
         if (startingChase) {
@@ -89,16 +92,25 @@ public class MonsterAiEngine {
         ZoneInstance zone = monster.getCurrentZone();
 
         if (target == null || target.getCurrentHealth() <= 0 || !zone.isPresent(target)) {
-            giveUpChase(monster, target);
+            giveUpChase(monster, state, target);
             return;
         }
 
         if (monster.getSpawnPosition().distanceTo(monster.getPosition()) > LEASH_RADIUS) {
-            giveUpChase(monster, target);
+            giveUpChase(monster, state, target);
             return;
         }
 
         if (monster.getPosition().distanceTo(target.getPosition()) <= ATTACK_RANGE) {
+            if (state.moving()) {
+                // À portée : le monstre s'arrête de courir pour attaquer, comme un joueur
+                // (voir Attack.java) — sans cette diffusion, le client continuerait
+                // d'interpoler le monstre vers la dernière position connue de la cible.
+                zone.broadcast(new CharacterMovementStopped(monster.getId(), monster.getName(),
+                        monster.getPosition().x(), monster.getPosition().y()), null);
+                state = state.withMoving(false);
+                monster.pursuit = state;
+            }
             if (nowMillis < state.nextAttackAt()) {
                 return;
             }
@@ -114,28 +126,51 @@ public class MonsterAiEngine {
 
         double dtSeconds = (nowNanos - state.lastStepAtNanos()) / 1_000_000_000.0;
         if (stepToward(monster, target.getPosition(), dtSeconds)) {
-            monster.pursuit = state.withLastStepAt(nowNanos);
+            // Rediffusé à chaque pas (toutes les ~250ms, voir TICK_INTERVAL_MS) plutôt
+            // qu'une seule fois au début de la poursuite : contrairement à un `goto`
+            // joueur, la destination (la cible) bouge en continu, donc le client doit
+            // recevoir une cible d'interpolation fraîche à chaque tick pour ne pas
+            // diverger.
+            zone.broadcast(new CharacterMovementStarted(monster.getId(), monster.getName(), target.getPosition().x(),
+                    target.getPosition().y()), null);
+            monster.pursuit = state.withLastStepAt(nowNanos).withMoving(true);
         }
     }
 
     private void tickReturning(MonsterInstance monster, PursuitState state, long nowNanos) {
+        ZoneInstance zone = monster.getCurrentZone();
+
         if (monster.getPosition().distanceTo(monster.getSpawnPosition()) < 1e-6) {
+            if (state.moving()) {
+                zone.broadcast(new CharacterMovementFinished(monster.getId(), monster.getName(),
+                        monster.getPosition().x(), monster.getPosition().y()), null);
+            }
             forget(monster);
             return;
         }
 
         double dtSeconds = (nowNanos - state.lastStepAtNanos()) / 1_000_000_000.0;
         if (stepToward(monster, monster.getSpawnPosition(), dtSeconds)) {
-            monster.pursuit = state.withLastStepAt(nowNanos);
+            zone.broadcast(new CharacterMovementStarted(monster.getId(), monster.getName(),
+                    monster.getSpawnPosition().x(), monster.getSpawnPosition().y()), null);
+            monster.pursuit = state.withLastStepAt(nowNanos).withMoving(true);
         } else {
             // Bloqué : on abandonne pour ne pas tourner en rond indéfiniment.
+            if (state.moving()) {
+                zone.broadcast(new CharacterMovementStopped(monster.getId(), monster.getName(),
+                        monster.getPosition().x(), monster.getPosition().y()), null);
+            }
             forget(monster);
         }
     }
 
-    private void giveUpChase(MonsterInstance monster, CharacterInstance target) {
+    private void giveUpChase(MonsterInstance monster, PursuitState state, CharacterInstance target) {
         log.info("monster.ai.give_up thread={} monsterId={}", Thread.currentThread().getName(), monster.getId());
-        monster.pursuit = new PursuitState(State.RETURNING, null, System.nanoTime(), 0L);
+        if (state.moving()) {
+            monster.getCurrentZone().broadcast(new CharacterMovementStopped(monster.getId(), monster.getName(),
+                    monster.getPosition().x(), monster.getPosition().y()), null);
+        }
+        monster.pursuit = new PursuitState(State.RETURNING, null, System.nanoTime(), 0L, false);
         if (target != null) {
             target.send(new MonsterGaveUpChase(monster.getName()));
         }
@@ -154,13 +189,18 @@ public class MonsterAiEngine {
         CHASING, RETURNING
     }
 
-    public record PursuitState(State state, CharacterInstance target, long lastStepAtNanos, long nextAttackAt) {
+    public record PursuitState(State state, CharacterInstance target, long lastStepAtNanos, long nextAttackAt,
+            boolean moving) {
         PursuitState withLastStepAt(long stepAtNanos) {
-            return new PursuitState(state, target, stepAtNanos, nextAttackAt);
+            return new PursuitState(state, target, stepAtNanos, nextAttackAt, moving);
         }
 
         PursuitState withNextAttackAt(long attackAt) {
-            return new PursuitState(state, target, lastStepAtNanos, attackAt);
+            return new PursuitState(state, target, lastStepAtNanos, attackAt, moving);
+        }
+
+        PursuitState withMoving(boolean moving) {
+            return new PursuitState(state, target, lastStepAtNanos, nextAttackAt, moving);
         }
     }
 }

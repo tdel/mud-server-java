@@ -1,7 +1,10 @@
 package app.network.message.ingame;
 
+import java.util.UUID;
+
 import app.network.OutputJsonMessage;
 
-public record CharacterMovementStopped(String characterName, double x, double y) implements OutputJsonMessage {
+public record CharacterMovementStopped(UUID characterId, String characterName, double x,
+        double y) implements OutputJsonMessage {
 
 }

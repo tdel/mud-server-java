@@ -83,8 +83,9 @@ public class MovementEngine {
                                 character.getId());
                         character.send(new MovementFinished(character.getPosition().x(), character.getPosition().y()));
                         if (character instanceof CharacterInstance player) {
-                            character.getCurrentZone().broadcast(new CharacterMovementFinished(character.getName(),
-                                    character.getPosition().x(), character.getPosition().y()), player);
+                            character.getCurrentZone().broadcast(new CharacterMovementFinished(character.getId(),
+                                    character.getName(), character.getPosition().x(), character.getPosition().y()),
+                                    player);
                         }
                     }
                     case BLOCKED_BY_BOUNDS -> {
@@ -94,8 +95,9 @@ public class MovementEngine {
                         character.send(
                                 new MovementBlockedByBounds(character.getPosition().x(), character.getPosition().y()));
                         if (character instanceof CharacterInstance player) {
-                            character.getCurrentZone().broadcast(new CharacterMovementBlocked(character.getName(),
-                                    character.getPosition().x(), character.getPosition().y()), player);
+                            character.getCurrentZone().broadcast(new CharacterMovementBlocked(character.getId(),
+                                    character.getName(), character.getPosition().x(), character.getPosition().y()),
+                                    player);
                         }
                     }
                 }

@@ -117,7 +117,7 @@ public class Attack implements CommandHandler {
         if (character.activeMovement != null) {
             movementEngine.stopMovement(character);
             connection.send(new MovementStopped(character.getPosition().x(), character.getPosition().y()));
-            character.getCurrentZone().broadcast(new CharacterMovementStopped(character.getName(),
+            character.getCurrentZone().broadcast(new CharacterMovementStopped(character.getId(), character.getName(),
                     character.getPosition().x(), character.getPosition().y()), character);
         }
 

@@ -62,9 +62,11 @@ public class SpellCastEngine {
         if (caster.activeMovement != null) {
             movementEngine.stopMovement(caster);
             caster.send(new MovementStopped(caster.getPosition().x(), caster.getPosition().y()));
-            caster.getCurrentZone().broadcast(
-                    new CharacterMovementStopped(caster.getName(), caster.getPosition().x(), caster.getPosition().y()),
-                    caster instanceof CharacterInstance player ? player : null);
+            caster.getCurrentZone()
+                    .broadcast(
+                            new CharacterMovementStopped(caster.getId(), caster.getName(), caster.getPosition().x(),
+                                    caster.getPosition().y()),
+                            caster instanceof CharacterInstance player ? player : null);
         }
         caster.activeCast = new ActiveCast(spell, target, System.nanoTime(), spell.castingTimeMs() * 1_000_000L);
         casting.put(caster.getId(), caster);

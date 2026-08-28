@@ -42,7 +42,7 @@ public class Stop implements CommandHandler {
         spellCastEngine.cancelCast(character);
 
         connection.send(new MovementStopped(character.getPosition().x(), character.getPosition().y()));
-        character.getCurrentZone().broadcast(new CharacterMovementStopped(character.getName(),
+        character.getCurrentZone().broadcast(new CharacterMovementStopped(character.getId(), character.getName(),
                 character.getPosition().x(), character.getPosition().y()), character);
     }
 }

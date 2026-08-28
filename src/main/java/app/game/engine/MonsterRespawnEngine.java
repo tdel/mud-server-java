@@ -19,6 +19,7 @@ import app.domain.actor.event.CharacterDied;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.world.ZoneInstance;
 import app.game.catalog.MonsterCatalog;
+import app.network.message.ingame.MonsterSpawned;
 
 @Component
 public class MonsterRespawnEngine {
@@ -75,6 +76,9 @@ public class MonsterRespawnEngine {
             }
             MonsterInstance monster = monsterCatalog.spawnMonster(freeSpawn.get(), zone);
             pending.remove(entry);
+            zone.broadcast(new MonsterSpawned(monster.getId(), monster.getName(), monster.getPosition().x(),
+                    monster.getPosition().y(), MovementEngine.unitsPerSecond(monster.getSpeed()),
+                    monster.getCurrentHealth(), monster.getMaxHealth(), monster.getLevel()), null);
             log.info("monster.respawned zone={} group={} monsterId={}", zone.getId(), group.id(), monster.getId());
         }
     }
