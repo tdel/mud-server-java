@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ import app.domain.actor.AbstractCharacter;
 import app.domain.actor.component.SpellCasting;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.SpellCast;
+import app.domain.actor.event.SpellCastBegin;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.message.ingame.CastResult;
 import app.network.message.ingame.SpellCastAnnounced;
@@ -30,7 +32,7 @@ public class SpellCastEngine {
 
     private static final long TICK_INTERVAL_MS = 100L;
 
-    private final Map<UUID, CharacterInstance> casting = new ConcurrentHashMap<>();
+    private final Map<UUID, AbstractCharacter> casting = new ConcurrentHashMap<>();
     private final MovementEngine movementEngine;
     private final ProjectileEngine projectileEngine;
 
@@ -39,7 +41,12 @@ public class SpellCastEngine {
         this.projectileEngine = projectileEngine;
     }
 
-    public void beginCast(CharacterInstance caster, Spell spell, AbstractCharacter target) {
+    @EventListener
+    void onSpellCastBegin(SpellCastBegin event) {
+        beginCast(event.caster(), event.spell(), event.target());
+    }
+
+    private void beginCast(AbstractCharacter caster, Spell spell, AbstractCharacter target) {
         movementEngine.stopMovement(caster);
         caster.activeCast = new ActiveCast(spell, target, System.nanoTime(), spell.castingTimeMs() * 1_000_000L);
         casting.put(caster.getId(), caster);
@@ -49,7 +56,7 @@ public class SpellCastEngine {
                 spell.name(), target.getId(), target.getName(), spell.castingTimeMs()), null);
     }
 
-    public void cancelCast(CharacterInstance caster) {
+    public void cancelCast(AbstractCharacter caster) {
         ActiveCast activeCast = caster.activeCast;
         if (activeCast == null) {
             return;
@@ -64,7 +71,7 @@ public class SpellCastEngine {
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
     void tick() {
         long now = System.nanoTime();
-        for (CharacterInstance caster : casting.values()) {
+        for (AbstractCharacter caster : casting.values()) {
             ActiveCast activeCast = caster.activeCast;
             if (activeCast == null) {
                 casting.remove(caster.getId());
@@ -83,7 +90,7 @@ public class SpellCastEngine {
         }
     }
 
-    private void resolveCast(CharacterInstance caster, ActiveCast activeCast) {
+    private void resolveCast(AbstractCharacter caster, ActiveCast activeCast) {
         Spell spell = activeCast.spell();
         AbstractCharacter target = activeCast.target();
 
@@ -124,15 +131,17 @@ public class SpellCastEngine {
         caster.send(new CastResult(spell.id(), spell.name(), target.getId(), target.getName(), outcome.selfHeal(),
                 outcome.hit(), outcome.amount(), outcome.targetHealthAfter(), outcome.targetMaxHealth(),
                 outcome.targetDefeated(), spell.manaCost(), caster.getCurrentMana(), caster.getMaxMana()));
-        caster.getCurrentZone().broadcast(new SpellCastAnnounced(caster.getId(), caster.getName(), spell.id(),
-                spell.name(), target.getId(), target.getName(), outcome.selfHeal(), outcome.hit(), outcome.amount(),
-                outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()), caster);
+        caster.getCurrentZone().broadcast(
+                new SpellCastAnnounced(caster.getId(), caster.getName(), spell.id(), spell.name(), target.getId(),
+                        target.getName(), outcome.selfHeal(), outcome.hit(), outcome.amount(),
+                        outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()),
+                caster instanceof CharacterInstance player ? player : null);
         if (outcome.targetDefeated()) {
-            caster.getCombat().setTarget(null);
+            caster.clearCombatTarget();
         }
     }
 
-    private boolean isTargetStillValid(CharacterInstance caster, Spell spell, AbstractCharacter target) {
+    private boolean isTargetStillValid(AbstractCharacter caster, Spell spell, AbstractCharacter target) {
         if (target == caster) {
             return true;
         }

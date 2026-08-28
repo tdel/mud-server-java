@@ -33,7 +33,7 @@ public class ProjectileEngine {
 
     private final Map<UUID, InFlightProjectile> projectiles = new ConcurrentHashMap<>();
 
-    public void launch(CharacterInstance caster, Spell spell, AbstractCharacter target,
+    public void launch(AbstractCharacter caster, Spell spell, AbstractCharacter target,
             SpellCasting.AttackRollOutcome roll) {
         UUID projectileId = UUID.randomUUID();
         double distance = caster.getPosition().distanceTo(target.getPosition());
@@ -66,7 +66,7 @@ public class ProjectileEngine {
     }
 
     private void resolveImpact(UUID projectileId, InFlightProjectile projectile) {
-        CharacterInstance caster = projectile.caster();
+        AbstractCharacter caster = projectile.caster();
         Spell spell = projectile.spell();
         AbstractCharacter target = projectile.target();
 
@@ -80,15 +80,17 @@ public class ProjectileEngine {
         caster.send(new CastResult(spell.id(), spell.name(), target.getId(), target.getName(), outcome.selfHeal(),
                 outcome.hit(), outcome.amount(), outcome.targetHealthAfter(), outcome.targetMaxHealth(),
                 outcome.targetDefeated(), spell.manaCost(), caster.getCurrentMana(), caster.getMaxMana()));
-        caster.getCurrentZone().broadcast(new SpellCastAnnounced(caster.getId(), caster.getName(), spell.id(),
-                spell.name(), target.getId(), target.getName(), outcome.selfHeal(), outcome.hit(), outcome.amount(),
-                outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()), caster);
+        caster.getCurrentZone().broadcast(
+                new SpellCastAnnounced(caster.getId(), caster.getName(), spell.id(), spell.name(), target.getId(),
+                        target.getName(), outcome.selfHeal(), outcome.hit(), outcome.amount(),
+                        outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()),
+                caster instanceof CharacterInstance player ? player : null);
         if (outcome.targetDefeated()) {
-            caster.getCombat().setTarget(null);
+            caster.clearCombatTarget();
         }
     }
 
-    public record InFlightProjectile(CharacterInstance caster, Spell spell, AbstractCharacter target,
+    public record InFlightProjectile(AbstractCharacter caster, Spell spell, AbstractCharacter target,
             SpellCasting.AttackRollOutcome roll, long impactAtNanos) {
     }
 }

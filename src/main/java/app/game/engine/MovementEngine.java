@@ -62,7 +62,7 @@ public class MovementEngine {
 
     @EventListener
     void onSpellCast(SpellCast event) {
-        CharacterInstance caster = event.caster();
+        AbstractCharacter caster = event.caster();
         if (caster.activeMovement == null) {
             return;
         }
@@ -70,7 +70,7 @@ public class MovementEngine {
         caster.send(new MovementStopped(caster.getPosition().x(), caster.getPosition().y()));
         caster.getCurrentZone().broadcast(
                 new CharacterMovementStopped(caster.getName(), caster.getPosition().x(), caster.getPosition().y()),
-                caster);
+                caster instanceof CharacterInstance player ? player : null);
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)

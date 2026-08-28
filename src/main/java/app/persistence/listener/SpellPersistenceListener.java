@@ -41,7 +41,9 @@ public class SpellPersistenceListener {
 
     @EventListener
     void onSpellCast(SpellCast event) {
-        characterDao.update(event.caster());
+        if (event.caster() instanceof CharacterInstance caster) {
+            characterDao.update(caster);
+        }
         log.info("spell.cast caster={} spell={} amount={} targetDefeated={}", event.caster().getName(),
                 event.spell().name(), event.amount(), event.targetDefeated());
     }

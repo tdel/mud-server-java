@@ -25,7 +25,9 @@ public class RegenManaEngine {
 
     @EventListener
     void onSpellCast(SpellCast event) {
-        register(event.caster());
+        if (event.caster() instanceof CharacterInstance character) {
+            register(character);
+        }
     }
 
     public void register(CharacterInstance character) {

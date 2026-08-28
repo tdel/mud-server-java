@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 import app.domain.Account;
 import app.domain.Spell;
-import app.domain.SpellEffectType;
 import app.domain.actor.*;
 import app.domain.actor.component.ActiveEffect;
 import app.domain.actor.component.CharacterCombat;
@@ -39,15 +38,8 @@ import app.domain.world.WorldInstance;
 import app.game.dice.CheckResult;
 import app.game.dice.DiceRoll;
 import app.game.dice.DiceRoller;
-import app.game.engine.SpellCastEngine;
 import app.network.Connection;
 import app.network.OutputMessage;
-import app.network.message.ingame.NoTargetSelected;
-import app.network.message.ingame.NotEnoughMana;
-import app.network.message.ingame.SpellNotKnown;
-import app.network.message.ingame.SpellOnCooldown;
-import app.network.message.ingame.SpellOutOfRange;
-import app.network.message.ingame.TargetNotFound;
 
 public final class CharacterInstance extends AbstractCharacter {
 
@@ -254,6 +246,7 @@ public final class CharacterInstance extends AbstractCharacter {
                 .collect(Collectors.toSet());
     }
 
+    @Override
     public int getMaxMana() {
         return maxMana;
     }
@@ -262,6 +255,7 @@ public final class CharacterInstance extends AbstractCharacter {
         this.maxMana = maxMana;
     }
 
+    @Override
     public int getCurrentMana() {
         return currentMana;
     }
@@ -270,12 +264,18 @@ public final class CharacterInstance extends AbstractCharacter {
         this.currentMana = currentMana;
     }
 
+    @Override
     public boolean trySpendMana(int amount) {
         if (currentMana < amount) {
             return false;
         }
         currentMana -= amount;
         return true;
+    }
+
+    @Override
+    public void clearCombatTarget() {
+        combat.setTarget(null);
     }
 
     public int gainMana(int amount) {
@@ -298,46 +298,6 @@ public final class CharacterInstance extends AbstractCharacter {
         if (healed > 0 || manaGained > 0) {
             DomainEventPublisher.publish(new CharacterRegenerated(this, healed, manaGained));
         }
-    }
-
-    // "select" (voir Select.java) permet aussi de cibler un PNJ (interaction, pas
-    // combat) : un
-    // sort à dégâts lancé sans nom explicite sur un PNJ sélectionné finirait avec
-    // une cible non
-    // attaquable (SpellCasting.applyDamage ne gère que
-    // MonsterInstance/CharacterInstance) ;
-    // BUFF/DEBUFF n'ont pas ce problème mais autant rester cohérent.
-    // Ne fait que valider et démarrer l'incantation : la résolution (dépense de
-    // mana, cooldown, application de l'effet) est différée à la fin du
-    // castingTime par SpellCastEngine.resolveCast, cf.
-    // AbstractCharacter#activeCast.
-    public void castSpell(Spell spell, AbstractCharacter target, SpellCastEngine spellCastEngine) {
-        if (!hasSpell(spell)) {
-            send(new SpellNotKnown(spell.name()));
-            return;
-        }
-        if (target == null) {
-            send(new NoTargetSelected());
-            return;
-        }
-        if (target instanceof AbstractNpc && spell.effect() == SpellEffectType.DAMAGE) {
-            send(new TargetNotFound(target.getId().toString()));
-            return;
-        }
-        if (spell.range() > 0 && getPosition().distanceTo(target.getPosition()) > spell.range()) {
-            send(new SpellOutOfRange(spell.name(), target.getName()));
-            return;
-        }
-        if (!getSpellCasting().isReady(spell.id())) {
-            send(new SpellOnCooldown(spell.name(), getSpellCasting().remainingCooldown(spell.id()).toMillis()));
-            return;
-        }
-        if (getCurrentMana() < spell.manaCost()) {
-            send(new NotEnoughMana(spell.name(), spell.manaCost(), getCurrentMana()));
-            return;
-        }
-
-        spellCastEngine.beginCast(this, spell, target);
     }
 
     public int getXp() {

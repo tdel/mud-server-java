@@ -6,8 +6,11 @@ import java.util.Set;
 import java.util.UUID;
 
 import app.domain.Spell;
+import app.domain.SpellEffectType;
 import app.domain.actor.component.ActiveEffects;
 import app.domain.actor.component.SpellCasting;
+import app.domain.actor.event.DomainEventPublisher;
+import app.domain.actor.event.SpellCastBegin;
 import app.domain.map.Position;
 import app.domain.world.ZoneInstance;
 import app.game.engine.MovementEngine;
@@ -15,6 +18,12 @@ import app.game.engine.SpellCastEngine;
 import app.game.dice.DiceExpression;
 import app.game.dice.DiceRoller;
 import app.network.OutputMessage;
+import app.network.message.ingame.NoTargetSelected;
+import app.network.message.ingame.NotEnoughMana;
+import app.network.message.ingame.SpellNotKnown;
+import app.network.message.ingame.SpellOnCooldown;
+import app.network.message.ingame.SpellOutOfRange;
+import app.network.message.ingame.TargetNotFound;
 
 public abstract class AbstractCharacter extends AbstractObject {
 
@@ -81,6 +90,27 @@ public abstract class AbstractCharacter extends AbstractObject {
         return 0;
     }
 
+    // Défaut neutre : seul CharacterInstance suit une réserve de mana ;
+    // MonsterInstance/AbstractNpc n'en ont pas encore, donc jamais bloqués par le
+    // coût en mana d'un sort.
+    public int getCurrentMana() {
+        return Integer.MAX_VALUE;
+    }
+
+    public int getMaxMana() {
+        return Integer.MAX_VALUE;
+    }
+
+    public boolean trySpendMana(int amount) {
+        return true;
+    }
+
+    // Défaut neutre : seul CharacterInstance a une CharacterCombat dont la cible
+    // doit être effacée après un kill ; le ciblage d'un MonsterInstance (pursuit,
+    // MonsterAiEngine) se recalcule de lui-même au prochain tick d'IA.
+    public void clearCombatTarget() {
+    }
+
     public Map<Attribute, Integer> getAttributes() {
         return Map.copyOf(attributes);
     }
@@ -141,6 +171,35 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     // No-op par défaut : seul GamePlayer a une Connection à notifier.
     public void send(OutputMessage message) {
+    }
+
+    public void castSpell(Spell spell, AbstractCharacter target) {
+        if (!hasSpell(spell)) {
+            send(new SpellNotKnown(spell.name()));
+            return;
+        }
+        if (target == null) {
+            send(new NoTargetSelected());
+            return;
+        }
+        if (target instanceof AbstractNpc && spell.effect() == SpellEffectType.DAMAGE) {
+            send(new TargetNotFound(target.getId().toString()));
+            return;
+        }
+        if (spell.range() > 0 && getPosition().distanceTo(target.getPosition()) > spell.range()) {
+            send(new SpellOutOfRange(spell.name(), target.getName()));
+            return;
+        }
+        if (!getSpellCasting().isReady(spell.id())) {
+            send(new SpellOnCooldown(spell.name(), getSpellCasting().remainingCooldown(spell.id()).toMillis()));
+            return;
+        }
+        if (getCurrentMana() < spell.manaCost()) {
+            send(new NotEnoughMana(spell.name(), spell.manaCost(), getCurrentMana()));
+            return;
+        }
+
+        DomainEventPublisher.publish(new SpellCastBegin(this, spell, target));
     }
 
 }
