@@ -114,6 +114,9 @@ public class TcpJsonConnection implements Connection, TcpJsonOutput {
 
     @Override
     public void write(String type, Object payload, boolean secure) {
+        log.info("message.sent type={} connectionId={} state={} character={} account={}", type, connectionId, state,
+                state == ConnectionState.INGAME ? player.getName() : "-",
+                state != ConnectionState.CONNECTED ? account.getLogin() : "-");
         try {
             String json = objectMapper.writeValueAsString(new TcpJsonEnvelope(type, payload, secure));
             channel.writeAndFlush(Unpooled.copiedBuffer(json + "\n", StandardCharsets.UTF_8));
