@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import app.domain.actor.template.MonsterTemplate;
 import app.domain.actor.template.MonsterTemplate.LootTableEntry;
 import app.domain.item.ItemTemplate;
 import app.domain.MonsterSpawn;
+import app.domain.MonsterSpawnGroup;
 import app.domain.world.ZoneInstance;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
@@ -55,23 +57,38 @@ public class MonsterCatalog {
     public void placeMonsters(Collection<ZoneInstance> zones) {
         int placedCount = 0;
         for (ZoneInstance zone : zones) {
-            for (MonsterSpawn spawn : zone.getMonsterSpawns()) {
-                MonsterTemplate template = templates.get(spawn.templateId());
-                if (template == null) {
-                    throw new IllegalStateException("Spawn " + spawn.id() + " de la zone " + zone.getId()
-                            + " référence le template " + spawn.templateId() + ", absent de " + MONSTERS_RESOURCE);
-                }
+            Map<String, MonsterSpawnGroup> groupsById = zone.getMonsterSpawnGroups().stream()
+                    .collect(Collectors.toMap(MonsterSpawnGroup::id, group -> group));
+            Map<String, List<MonsterSpawn>> spawnsByGroup = zone.getMonsterSpawns().stream()
+                    .collect(Collectors.groupingBy(MonsterSpawn::groupId));
 
-                MonsterInstance monster = new MonsterInstance(spawn.id(), template.getName(), template.getId(),
-                        zone.getId(), template.getAttributes(), template.getMaxHealth(), spawn.position());
-                monster.attachTemplate(template);
-                monster.setCurrentZone(zone);
-                zone.placeMonster(monster, spawn.position());
-                placedCount++;
+            for (Map.Entry<String, List<MonsterSpawn>> entry : spawnsByGroup.entrySet()) {
+                MonsterSpawnGroup group = groupsById.get(entry.getKey());
+                List<MonsterSpawn> spawns = entry.getValue();
+                int toPlace = Math.min(group.maxMonsters(), spawns.size());
+                for (MonsterSpawn spawn : spawns.subList(0, toPlace)) {
+                    spawnMonster(spawn, zone);
+                    placedCount++;
+                }
             }
         }
 
         log.info("monster.instances_placed count={}", placedCount);
+    }
+
+    public MonsterInstance spawnMonster(MonsterSpawn spawn, ZoneInstance zone) {
+        MonsterTemplate template = templates.get(spawn.templateId());
+        if (template == null) {
+            throw new IllegalStateException("Spawn " + spawn.id() + " de la zone " + zone.getId()
+                    + " référence le template " + spawn.templateId() + ", absent de " + MONSTERS_RESOURCE);
+        }
+
+        MonsterInstance monster = new MonsterInstance(spawn.id(), template.getName(), template.getId(), zone.getId(),
+                template.getAttributes(), template.getMaxHealth(), spawn.position());
+        monster.attachTemplate(template);
+        monster.setCurrentZone(zone);
+        zone.placeMonster(monster, spawn.position());
+        return monster;
     }
 
     private void registerTemplates(List<MonsterTemplateDefinition> definitions) {

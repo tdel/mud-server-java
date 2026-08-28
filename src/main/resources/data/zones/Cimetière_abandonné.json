@@ -11,7 +11,7 @@
     "tilewidth": 32,
     "tileheight": 32,
     "nextlayerid": 3,
-    "nextobjectid": 4,
+    "nextobjectid": 5,
     "properties": [
         {
             "name": "id",
@@ -279,6 +279,35 @@
                             "name": "templateId",
                             "type": "string",
                             "value": "7dfe22be-6147-45b3-bd07-89711810791d"
+                        },
+                        {
+                            "name": "spawnGroup",
+                            "type": "string",
+                            "value": "Cimetière_abandonné"
+                        }
+                    ]
+                },
+                {
+                    "id": 4,
+                    "name": "spawn-group-Cimetière_abandonné",
+                    "type": "monsterSpawnGroup",
+                    "x": 0.0,
+                    "y": 0.0,
+                    "properties": [
+                        {
+                            "name": "groupId",
+                            "type": "string",
+                            "value": "Cimetière_abandonné"
+                        },
+                        {
+                            "name": "maxMonsters",
+                            "type": "int",
+                            "value": 1
+                        },
+                        {
+                            "name": "respawnDelaySeconds",
+                            "type": "int",
+                            "value": 30
                         }
                     ]
                 }

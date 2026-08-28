@@ -11,7 +11,7 @@
     "tilewidth": 32,
     "tileheight": 32,
     "nextlayerid": 3,
-    "nextobjectid": 6,
+    "nextobjectid": 7,
     "properties": [
         {
             "name": "id",
@@ -326,6 +326,11 @@
                             "name": "templateId",
                             "type": "string",
                             "value": "e6caeb0d-f861-401b-b0c1-c88e315097c5"
+                        },
+                        {
+                            "name": "spawnGroup",
+                            "type": "string",
+                            "value": "Orée_de_la_forêt"
                         }
                     ]
                 },
@@ -340,6 +345,35 @@
                             "name": "templateId",
                             "type": "string",
                             "value": "026ce1a2-091d-4179-b715-65006480cfbe"
+                        },
+                        {
+                            "name": "spawnGroup",
+                            "type": "string",
+                            "value": "Orée_de_la_forêt"
+                        }
+                    ]
+                },
+                {
+                    "id": 6,
+                    "name": "spawn-group-Orée_de_la_forêt",
+                    "type": "monsterSpawnGroup",
+                    "x": 0.0,
+                    "y": 0.0,
+                    "properties": [
+                        {
+                            "name": "groupId",
+                            "type": "string",
+                            "value": "Orée_de_la_forêt"
+                        },
+                        {
+                            "name": "maxMonsters",
+                            "type": "int",
+                            "value": 2
+                        },
+                        {
+                            "name": "respawnDelaySeconds",
+                            "type": "int",
+                            "value": 30
                         }
                     ]
                 }

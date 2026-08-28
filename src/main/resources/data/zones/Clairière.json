@@ -11,7 +11,7 @@
     "tilewidth": 32,
     "tileheight": 32,
     "nextlayerid": 3,
-    "nextobjectid": 7,
+    "nextobjectid": 8,
     "properties": [
         {
             "name": "id",
@@ -329,6 +329,11 @@
                             "name": "templateId",
                             "type": "string",
                             "value": "c1a6b8f0-3b3e-4b0a-9f0a-1e2d3c4b5a6f"
+                        },
+                        {
+                            "name": "spawnGroup",
+                            "type": "string",
+                            "value": "Clairière"
                         }
                     ]
                 },
@@ -343,6 +348,11 @@
                             "name": "templateId",
                             "type": "string",
                             "value": "7dfe22be-6147-45b3-bd07-89711810791d"
+                        },
+                        {
+                            "name": "spawnGroup",
+                            "type": "string",
+                            "value": "Clairière"
                         }
                     ]
                 },
@@ -357,6 +367,35 @@
                             "name": "templateId",
                             "type": "string",
                             "value": "49e91691-3a13-4e2b-967f-bc1acf8cf03a"
+                        },
+                        {
+                            "name": "spawnGroup",
+                            "type": "string",
+                            "value": "Clairière"
+                        }
+                    ]
+                },
+                {
+                    "id": 7,
+                    "name": "spawn-group-Clairière",
+                    "type": "monsterSpawnGroup",
+                    "x": 0.0,
+                    "y": 0.0,
+                    "properties": [
+                        {
+                            "name": "groupId",
+                            "type": "string",
+                            "value": "Clairière"
+                        },
+                        {
+                            "name": "maxMonsters",
+                            "type": "int",
+                            "value": 3
+                        },
+                        {
+                            "name": "respawnDelaySeconds",
+                            "type": "int",
+                            "value": 30
                         }
                     ]
                 }

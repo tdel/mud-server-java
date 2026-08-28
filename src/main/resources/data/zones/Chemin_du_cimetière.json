@@ -11,7 +11,7 @@
     "tilewidth": 32,
     "tileheight": 32,
     "nextlayerid": 3,
-    "nextobjectid": 5,
+    "nextobjectid": 6,
     "properties": [
         {
             "name": "id",
@@ -326,6 +326,35 @@
                             "name": "templateId",
                             "type": "string",
                             "value": "f6630034-a160-4ffc-888e-eb2fee9d9428"
+                        },
+                        {
+                            "name": "spawnGroup",
+                            "type": "string",
+                            "value": "Chemin_du_cimetière"
+                        }
+                    ]
+                },
+                {
+                    "id": 5,
+                    "name": "spawn-group-Chemin_du_cimetière",
+                    "type": "monsterSpawnGroup",
+                    "x": 0.0,
+                    "y": 0.0,
+                    "properties": [
+                        {
+                            "name": "groupId",
+                            "type": "string",
+                            "value": "Chemin_du_cimetière"
+                        },
+                        {
+                            "name": "maxMonsters",
+                            "type": "int",
+                            "value": 1
+                        },
+                        {
+                            "name": "respawnDelaySeconds",
+                            "type": "int",
+                            "value": 30
                         }
                     ]
                 }

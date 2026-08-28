@@ -161,7 +161,8 @@ public class WorldTemplateCatalog {
         Map<UUID, ZoneTemplate> templates = new LinkedHashMap<>();
         for (ParsedZone zone : parsedZones) {
             ZoneTemplate template = new ZoneTemplate(zone.id(), zone.name(), zone.description(), zone.isStartingZone(),
-                    zone.terrain(), zone.spawnPosition(), zone.monsterSpawns(), zone.npcSpawns());
+                    zone.terrain(), zone.spawnPosition(), zone.monsterSpawns(), zone.monsterSpawnGroups(),
+                    zone.npcSpawns());
             if (!template.isWalkable(zone.spawnPosition())) {
                 throw new IllegalStateException("Zone " + zone.id() + " du monde " + shortName + " a une position de "
                         + "spawn " + zone.spawnPosition() + " non praticable de sa carte");

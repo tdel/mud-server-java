@@ -18,6 +18,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import app.domain.MonsterSpawn;
+import app.domain.MonsterSpawnGroup;
 import app.domain.NpcSpawn;
 import app.domain.map.Position;
 import app.domain.world.CollisionGrid;
@@ -47,6 +48,7 @@ public final class TiledZoneLoader {
     private static final String TYPE_PLAYER_SPAWN = "playerSpawn";
     private static final String TYPE_PORTAL = "portal";
     private static final String TYPE_MONSTER_SPAWN = "monsterSpawn";
+    private static final String TYPE_MONSTER_SPAWN_GROUP = "monsterSpawnGroup";
     private static final String TYPE_NPC_SPAWN = "npcSpawn";
     private static final double DEFAULT_PORTAL_TRIGGER_RADIUS = 0.6;
     private static final double COLLISION_CELL_SIZE = 1.0;
@@ -72,8 +74,8 @@ public final class TiledZoneLoader {
     }
 
     public record ParsedZone(UUID id, String name, String description, boolean isStartingZone, CollisionGrid terrain,
-            Position spawnPosition, List<MonsterSpawn> monsterSpawns, List<NpcSpawn> npcSpawns,
-            List<PortalDraft> portals) {
+            Position spawnPosition, List<MonsterSpawn> monsterSpawns, List<MonsterSpawnGroup> monsterSpawnGroups,
+            List<NpcSpawn> npcSpawns, List<PortalDraft> portals) {
     }
 
     public record PortalDraft(Position position, String direction, UUID targetZoneId, Position targetPosition,
@@ -91,9 +93,10 @@ public final class TiledZoneLoader {
 
         Position[] spawnPositionHolder = new Position[1];
         List<MonsterSpawn> monsterSpawns = new ArrayList<>();
+        List<MonsterSpawnGroup> monsterSpawnGroups = new ArrayList<>();
         List<NpcSpawn> npcSpawns = new ArrayList<>();
         List<PortalDraft> portals = new ArrayList<>();
-        parseObjects(map, id, spawnPositionHolder, monsterSpawns, npcSpawns, portals);
+        parseObjects(map, id, spawnPositionHolder, monsterSpawns, monsterSpawnGroups, npcSpawns, portals);
 
         if (spawnPositionHolder[0] == null) {
             throw new IllegalStateException("Zone " + id + " (" + name + ") n'a aucun objet playerSpawn");
@@ -108,8 +111,23 @@ public final class TiledZoneLoader {
             }
         }
 
+        Map<String, MonsterSpawnGroup> groupsById = new HashMap<>();
+        for (MonsterSpawnGroup group : monsterSpawnGroups) {
+            if (groupsById.putIfAbsent(group.id(), group) != null) {
+                throw new IllegalStateException(
+                        "Zone " + id + " (" + name + ") a plusieurs monsterSpawnGroup avec groupId=" + group.id());
+            }
+        }
+        for (MonsterSpawn spawn : monsterSpawns) {
+            if (!groupsById.containsKey(spawn.groupId())) {
+                throw new IllegalStateException("Zone " + id + " (" + name + ") : le monsterSpawn " + spawn.id()
+                        + " référence le spawnGroup " + spawn.groupId() + ", absent des monsterSpawnGroup de la zone");
+            }
+        }
+
         return new ParsedZone(id, name, description, isStartingZone, terrain, spawnPositionHolder[0],
-                List.copyOf(monsterSpawns), List.copyOf(npcSpawns), List.copyOf(portals));
+                List.copyOf(monsterSpawns), List.copyOf(monsterSpawnGroups), List.copyOf(npcSpawns),
+                List.copyOf(portals));
     }
 
     private static Map<Integer, TileType> buildTileTypeByGid(TiledMap map,
@@ -180,7 +198,8 @@ public final class TiledZoneLoader {
     }
 
     private static void parseObjects(TiledMap map, UUID id, Position[] spawnPositionHolder,
-            List<MonsterSpawn> monsterSpawns, List<NpcSpawn> npcSpawns, List<PortalDraft> portals) {
+            List<MonsterSpawn> monsterSpawns, List<MonsterSpawnGroup> monsterSpawnGroups, List<NpcSpawn> npcSpawns,
+            List<PortalDraft> portals) {
         TiledLayer layer = findLayer(map, id, OBJECTS_LAYER, "objectgroup");
         for (TiledObjectDef object : layer.objects()) {
             Position position = TiledCoordinateMapper.pixelToWorld(object.x(), object.y());
@@ -194,7 +213,12 @@ public final class TiledZoneLoader {
                             doubleProperty(object.properties(), "triggerRadius", DEFAULT_PORTAL_TRIGGER_RADIUS)));
                 case TYPE_MONSTER_SPAWN -> monsterSpawns.add(new MonsterSpawn(
                         UUID.nameUUIDFromBytes((id + ":" + object.id()).getBytes(StandardCharsets.UTF_8)),
-                        UUID.fromString(requireStringProperty(object.properties(), "templateId")), position));
+                        UUID.fromString(requireStringProperty(object.properties(), "templateId")), position,
+                        requireStringProperty(object.properties(), "spawnGroup")));
+                case TYPE_MONSTER_SPAWN_GROUP ->
+                    monsterSpawnGroups.add(new MonsterSpawnGroup(requireStringProperty(object.properties(), "groupId"),
+                            (int) doubleProperty(object.properties(), "maxMonsters"),
+                            (long) doubleProperty(object.properties(), "respawnDelaySeconds")));
                 case TYPE_NPC_SPAWN -> npcSpawns.add(
                         new NpcSpawn(UUID.nameUUIDFromBytes((id + ":" + object.id()).getBytes(StandardCharsets.UTF_8)),
                                 UUID.fromString(requireStringProperty(object.properties(), "npcId")), position));

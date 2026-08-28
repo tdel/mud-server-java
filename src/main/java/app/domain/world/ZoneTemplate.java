@@ -1,6 +1,7 @@
 package app.domain.world;
 
 import app.domain.MonsterSpawn;
+import app.domain.MonsterSpawnGroup;
 import app.domain.NpcSpawn;
 import app.domain.map.Position;
 
@@ -17,11 +18,13 @@ public class ZoneTemplate {
     private final CollisionGrid collisionGrid;
     private final Position spawnPosition;
     private final List<MonsterSpawn> monsterSpawns;
+    private final List<MonsterSpawnGroup> monsterSpawnGroups;
     private final List<NpcSpawn> npcSpawns;
     private List<ZoneTemplatePortal> portals = List.of();
 
     public ZoneTemplate(UUID id, String name, String description, Boolean isStartingZone, CollisionGrid collisionGrid,
-            Position spawnPosition, List<MonsterSpawn> monsterSpawns, List<NpcSpawn> npcSpawns) {
+            Position spawnPosition, List<MonsterSpawn> monsterSpawns, List<MonsterSpawnGroup> monsterSpawnGroups,
+            List<NpcSpawn> npcSpawns) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -29,6 +32,7 @@ public class ZoneTemplate {
         this.collisionGrid = collisionGrid;
         this.spawnPosition = spawnPosition;
         this.monsterSpawns = List.copyOf(monsterSpawns);
+        this.monsterSpawnGroups = List.copyOf(monsterSpawnGroups);
         this.npcSpawns = List.copyOf(npcSpawns);
     }
 
@@ -58,6 +62,10 @@ public class ZoneTemplate {
 
     public List<MonsterSpawn> getMonsterSpawns() {
         return monsterSpawns;
+    }
+
+    public List<MonsterSpawnGroup> getMonsterSpawnGroups() {
+        return monsterSpawnGroups;
     }
 
     public List<NpcSpawn> getNpcSpawns() {

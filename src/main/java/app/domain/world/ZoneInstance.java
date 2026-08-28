@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import app.domain.MonsterSpawn;
+import app.domain.MonsterSpawnGroup;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.actor.AbstractNpc;
@@ -174,6 +175,10 @@ public class ZoneInstance {
 
     public List<MonsterSpawn> getMonsterSpawns() {
         return template.getMonsterSpawns();
+    }
+
+    public List<MonsterSpawnGroup> getMonsterSpawnGroups() {
+        return template.getMonsterSpawnGroups();
     }
 
     public void placeMonster(MonsterInstance monster, Position position) {
