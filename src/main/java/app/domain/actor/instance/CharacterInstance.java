@@ -289,7 +289,7 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     public int manaRegenAmountPerTick() {
-        return Math.max(0, 1 + getModifier(characterClass.primaryAbility()));
+        return Math.max(1, 1 + getModifier(characterClass.primaryAbility()));
     }
 
     public void regenerate(int hpAmount, int manaAmount) {

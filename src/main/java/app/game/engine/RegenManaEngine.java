@@ -10,6 +10,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import app.domain.actor.event.PlayerLoadedInWorld;
 import app.domain.actor.event.SpellCast;
 import app.domain.actor.instance.CharacterInstance;
 
@@ -28,6 +29,11 @@ public class RegenManaEngine {
         if (event.caster() instanceof CharacterInstance character) {
             register(character);
         }
+    }
+
+    @EventListener
+    void onPlayerLoadedInWorld(PlayerLoadedInWorld event) {
+        register(event.character());
     }
 
     public void register(CharacterInstance character) {

@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import app.domain.actor.event.GamePlayerDamaged;
+import app.domain.actor.event.PlayerLoadedInWorld;
 import app.domain.actor.instance.CharacterInstance;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,11 @@ public class RegenHealthEngine {
 
     @EventListener
     void onGamePlayerDamaged(GamePlayerDamaged event) {
+        register(event.character());
+    }
+
+    @EventListener
+    void onPlayerLoadedInWorld(PlayerLoadedInWorld event) {
         register(event.character());
     }
 
