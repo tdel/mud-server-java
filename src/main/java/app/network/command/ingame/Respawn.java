@@ -10,6 +10,8 @@ import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.ingame.CharacterNotDead;
+import app.network.message.ingame.ViewAround;
+import app.network.message.ingame.ZoneMap;
 
 @Component
 public class Respawn implements CommandHandler {
@@ -36,5 +38,10 @@ public class Respawn implements CommandHandler {
         ZoneInstance startingZone = character.getWorldInstance().startingZoneInstance()
                 .orElseThrow(() -> new IllegalStateException("Aucune starting zone configurée"));
         character.respawn(startingZone, startingZone.getSpawnPosition());
+
+        // La starting zone peut différer de la zone où le personnage est mort : sans ça, le
+        // client resterait affiché sur l'ancienne carte (voir Portal.java, même besoin).
+        connection.send(new ZoneMap(character.getCurrentZone()));
+        connection.send(new ViewAround(character));
     }
 }
