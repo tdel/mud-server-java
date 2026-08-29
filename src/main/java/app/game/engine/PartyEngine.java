@@ -1,7 +1,8 @@
-package app.game;
+package app.game.engine;
 
 import java.util.Collection;
 
+import app.game.WorldInstanceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -14,16 +15,16 @@ import app.domain.actor.instance.CharacterInstance;
 import app.network.message.ingame.PartyInviteDeclined;
 
 @Service
-public class PartyService {
+public class PartyEngine {
 
-    private static final Logger log = LoggerFactory.getLogger(PartyService.class);
+    private static final Logger log = LoggerFactory.getLogger(PartyEngine.class);
 
     static final long INVITE_TIMEOUT_MS = 20_000L;
     private static final long TICK_INTERVAL_MS = 1_000L;
 
     private final WorldInstanceService worldInstanceService;
 
-    public PartyService(WorldInstanceService worldInstanceService) {
+    public PartyEngine(WorldInstanceService worldInstanceService) {
         this.worldInstanceService = worldInstanceService;
     }
 
