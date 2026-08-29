@@ -1,6 +1,7 @@
 package app.domain;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -10,6 +11,11 @@ import app.network.message.ingame.NewPartyLeader;
 import app.network.message.ingame.PartyMemberLeft;
 
 public class Party {
+
+    public static final int MAX_SIZE = 8;
+
+    private static final Map<Integer, Double> XP_SHARE_MULTIPLIERS = Map.of(1, 1.0, 2, 1.5, 3, 1.8, 4, 2.0, 5, 2.1, 6,
+            2.2, 7, 2.3, 8, 2.4);
 
     private final UUID id;
     private volatile CharacterInstance leader;
@@ -40,6 +46,14 @@ public class Party {
 
     public boolean isEmpty() {
         return members.isEmpty();
+    }
+
+    public boolean isFull() {
+        return members.size() >= MAX_SIZE;
+    }
+
+    public double xpShareMultiplier(int eligibleCount) {
+        return XP_SHARE_MULTIPLIERS.getOrDefault(eligibleCount, 1.0);
     }
 
     public boolean isLeader(CharacterInstance character) {

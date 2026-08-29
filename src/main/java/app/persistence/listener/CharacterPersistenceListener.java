@@ -1,11 +1,14 @@
 package app.persistence.listener;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import app.domain.Party;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.CharacterGainedXp;
@@ -24,6 +27,7 @@ import app.network.message.ingame.GoldLooted;
 import app.network.message.ingame.GoldSpent;
 import app.network.message.ingame.ItemUsed;
 import app.network.message.ingame.ManaPotionUsed;
+import app.network.message.ingame.PartyMemberVitalsUpdated;
 import app.network.message.ingame.PlayerLeveledUp;
 import app.network.message.ingame.PlayerRespawned;
 import app.network.message.ingame.RegenTick;
@@ -70,6 +74,7 @@ public class CharacterPersistenceListener {
     void onCharacterLeveledUp(CharacterLeveledUp event) {
         CharacterInstance character = event.character();
         character.getCurrentZone().broadcast(new PlayerLeveledUp(character.getName(), event.newLevel()), null);
+        broadcastVitalsToParty(character);
         log.info("character.leveled_up character={} newLevel={} hpGained={}", character.getName(), event.newLevel(),
                 event.hpGained());
     }
@@ -95,15 +100,27 @@ public class CharacterPersistenceListener {
     void onCharacterDied(CharacterDied event) {
         CharacterInstance killer = event.killer();
         int xpReward = event.character().getTemplate().getXpReward();
-        killer.gainXp(xpReward);
+        Party party = killer.getParty();
+
+        List<CharacterInstance> eligible = party != null
+                ? party.getMembers().stream().filter(member -> member.getCurrentZone() == killer.getCurrentZone())
+                        .toList()
+                : List.of(killer);
+
+        double multiplier = party != null ? party.xpShareMultiplier(eligible.size()) : 1.0;
+        int perMemberXp = (int) (xpReward * multiplier) / eligible.size();
+        for (CharacterInstance member : eligible) {
+            member.gainXp(perMemberXp);
+        }
         killer.getCombat().setTarget(null);
-        log.info("combat.kill_credited killer={} monster={} xpReward={}", killer.getName(), event.character().getName(),
-                xpReward);
+        log.info("combat.kill_credited killer={} monster={} xpReward={} partySize={} perMemberXp={}", killer.getName(),
+                event.character().getName(), xpReward, eligible.size(), perMemberXp);
     }
 
     @EventListener
     void onGamePlayerDamaged(GamePlayerDamaged event) {
         characterDao.update(event.character());
+        broadcastVitalsToParty(event.character());
         log.info("combat.damage_taken character={} attacker={} amount={} currentHealth={}", event.character().getName(),
                 event.attacker().getName(), event.amount(), event.character().getCurrentHealth());
     }
@@ -116,6 +133,7 @@ public class CharacterPersistenceListener {
         character.send(new PlayerRespawned(character.getCurrentZone().getName(), character.getPosition().x(),
                 character.getPosition().y(), character.getCurrentHealth(), character.getMaxHealth(),
                 character.getCurrentMana(), character.getMaxMana()));
+        broadcastVitalsToParty(character);
         log.info("character.respawned character={} zone={}", character.getName(), character.getCurrentZone().getName());
     }
 
@@ -127,6 +145,7 @@ public class CharacterPersistenceListener {
                 event.healedAmount(), character.getCurrentHealth(), character.getMaxHealth()));
         character.getCurrentZone().broadcast(new CharacterUsedItem(character.getId(), character.getName(),
                 event.item().getId(), event.item().getName()), character);
+        broadcastVitalsToParty(character);
         log.info("character.used_potion character={} item={} healedAmount={}", character.getName(),
                 event.item().getName(), event.healedAmount());
     }
@@ -139,6 +158,7 @@ public class CharacterPersistenceListener {
                 event.restoredAmount(), character.getCurrentMana(), character.getMaxMana()));
         character.getCurrentZone().broadcast(new CharacterUsedItem(character.getId(), character.getName(),
                 event.item().getId(), event.item().getName()), character);
+        broadcastVitalsToParty(character);
         log.info("character.used_mana_potion character={} item={} restoredAmount={}", character.getName(),
                 event.item().getName(), event.restoredAmount());
     }
@@ -149,8 +169,19 @@ public class CharacterPersistenceListener {
         characterDao.update(character);
         character.send(new RegenTick(event.hpRestored(), event.manaRestored(), character.getCurrentHealth(),
                 character.getMaxHealth(), character.getCurrentMana(), character.getMaxMana()));
+        broadcastVitalsToParty(character);
         log.info("character.regenerated character={} hpRestored={} manaRestored={}", character.getName(),
                 event.hpRestored(), event.manaRestored());
+    }
+
+    private void broadcastVitalsToParty(CharacterInstance character) {
+        Party party = character.getParty();
+        if (party != null) {
+            party.broadcast(
+                    new PartyMemberVitalsUpdated(character.getId(), character.getName(), character.getCurrentHealth(),
+                            character.getMaxHealth(), character.getCurrentMana(), character.getMaxMana()),
+                    character);
+        }
     }
 
 }

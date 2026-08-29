@@ -11,6 +11,7 @@ import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.ingame.NoPendingInvite;
+import app.network.message.ingame.PartyFull;
 import app.network.message.ingame.PartyJoined;
 import app.network.message.ingame.PartyMemberJoined;
 
@@ -40,6 +41,10 @@ public class PartyAccept implements CommandHandler {
 
         character.setPendingInvite(null);
         Party party = invite.party();
+        if (party.isFull()) {
+            connection.send(new PartyFull());
+            return;
+        }
         party.addMember(character);
 
         connection.send(new PartyJoined(party.getLeader().getId(), party.getLeader().getName(), party.size()));

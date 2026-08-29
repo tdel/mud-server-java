@@ -12,6 +12,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import app.domain.Party;
 import app.domain.SpellEffectType;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.component.ActiveEffect;
@@ -19,6 +20,8 @@ import app.domain.actor.event.CharacterEffectExpired;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.PlayerLoadedInWorld;
 import app.domain.actor.event.SpellCast;
+import app.domain.actor.instance.CharacterInstance;
+import app.network.message.ingame.PartyMemberEffectExpired;
 import app.network.message.ingame.SpellModifierExpired;
 
 @Component
@@ -43,6 +46,14 @@ public class ActiveEffectEngine {
     void onCharacterEffectExpired(CharacterEffectExpired event) {
         event.character().getCurrentZone()
                 .broadcast(new SpellModifierExpired(event.character().getName(), event.effect().spellName()), null);
+
+        if (event.character() instanceof CharacterInstance character) {
+            Party party = character.getParty();
+            if (party != null) {
+                party.broadcast(new PartyMemberEffectExpired(character.getId(), character.getName(),
+                        event.effect().spellName()), character);
+            }
+        }
     }
 
     @EventListener

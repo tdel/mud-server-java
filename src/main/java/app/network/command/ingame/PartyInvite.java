@@ -15,6 +15,7 @@ import app.network.message.ingame.AlreadyInParty;
 import app.network.message.ingame.CannotInviteSelf;
 import app.network.message.ingame.NoTargetSelected;
 import app.network.message.ingame.NotPartyLeader;
+import app.network.message.ingame.PartyFull;
 import app.network.message.ingame.PartyInviteReceived;
 import app.network.message.ingame.PartyInviteSent;
 import app.network.message.ingame.TargetNotFound;
@@ -54,6 +55,10 @@ public class PartyInvite implements CommandHandler {
         Party myParty = character.getParty();
         if (myParty != null && !myParty.isLeader(character)) {
             connection.send(new NotPartyLeader());
+            return;
+        }
+        if (myParty != null && myParty.isFull()) {
+            connection.send(new PartyFull());
             return;
         }
         if (target.getParty() != null) {
