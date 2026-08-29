@@ -29,6 +29,9 @@ public class PartyService {
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
     void tick() {
+        if (!worldInstanceService.isDefaultWorldMaterialized()) {
+            return;
+        }
         expireInvites(worldInstanceService.getDefaultInstance().onlineCharacters());
     }
 

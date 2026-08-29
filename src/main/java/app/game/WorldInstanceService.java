@@ -81,6 +81,10 @@ public class WorldInstanceService {
         return defaultInstance;
     }
 
+    public boolean isDefaultWorldMaterialized() {
+        return defaultInstance != null;
+    }
+
     public List<CharacterInstance> findCharactersFor(Account account) {
         return characterDao.findAllByAccount(account, getDefaultInstance());
     }
