@@ -9,7 +9,7 @@ import app.network.OutputJsonMessage;
  * (`goto`), pour que les clients puissent interpoler localement sa trajectoire
  * vers la cible plutôt que d'attendre une position poussée à chaque tick.
  */
-public record CharacterMovementStarted(UUID characterId, String characterName, double targetX,
-        double targetY) implements OutputJsonMessage {
+public record CharacterMovementStarted(UUID characterId, String characterName, double targetX, double targetY,
+        double heading) implements OutputJsonMessage {
 
 }

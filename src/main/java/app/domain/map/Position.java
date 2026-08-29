@@ -6,6 +6,10 @@ public record Position(double x, double y) {
         return Math.hypot(x - other.x, y - other.y);
     }
 
+    public double headingTo(Position other) {
+        return Math.atan2(other.y - y, other.x - x);
+    }
+
     public Position plus(Position delta) {
         return new Position(x + delta.x, y + delta.y);
     }

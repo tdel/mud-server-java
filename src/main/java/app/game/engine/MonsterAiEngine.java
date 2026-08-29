@@ -128,7 +128,7 @@ public class MonsterAiEngine {
             // recevoir une cible d'interpolation fraîche à chaque tick pour ne pas
             // diverger.
             zone.broadcast(new CharacterMovementStarted(monster.getId(), monster.getName(), target.getPosition().x(),
-                    target.getPosition().y()), null);
+                    target.getPosition().y(), monster.getHeading()), null);
             monster.pursuit = state.withLastStepAt(nowNanos).withMoving(true);
         }
     }
@@ -148,7 +148,7 @@ public class MonsterAiEngine {
         double dtSeconds = (nowNanos - state.lastStepAtNanos()) / 1_000_000_000.0;
         if (stepToward(monster, monster.getSpawnPosition(), dtSeconds)) {
             zone.broadcast(new CharacterMovementStarted(monster.getId(), monster.getName(),
-                    monster.getSpawnPosition().x(), monster.getSpawnPosition().y()), null);
+                    monster.getSpawnPosition().x(), monster.getSpawnPosition().y(), monster.getHeading()), null);
             monster.pursuit = state.withLastStepAt(nowNanos).withMoving(true);
         } else {
             // Bloqué : on abandonne pour ne pas tourner en rond indéfiniment.
@@ -175,9 +175,13 @@ public class MonsterAiEngine {
     private boolean stepToward(MonsterInstance monster, Position destination, double dtSeconds) {
         ZoneInstance zone = monster.getCurrentZone();
         CollisionGrid grid = zone.getCollisionGrid();
-        ContinuousStep.StepResult result = ContinuousStep.step(monster.getPosition(), List.of(destination),
+        Position previous = monster.getPosition();
+        ContinuousStep.StepResult result = ContinuousStep.step(previous, List.of(destination),
                 MovementEngine.unitsPerSecond(monster.getSpeed()), dtSeconds, grid);
         monster.setPosition(result.position());
+        if (!result.position().equals(previous)) {
+            monster.setHeading(previous.headingTo(result.position()));
+        }
         return !result.blocked();
     }
 

@@ -37,6 +37,7 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     private volatile ZoneInstance currentZone;
     private volatile Position position;
+    private volatile double heading;
     protected int speed = DEFAULT_SPEED;
     public volatile MovementEngine.ActiveMovement activeMovement;
     public volatile SpellCastEngine.ActiveCast activeCast;
@@ -153,6 +154,14 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public void setPosition(Position position) {
         this.position = position;
+    }
+
+    public double getHeading() {
+        return heading;
+    }
+
+    public void setHeading(double heading) {
+        this.heading = heading;
     }
 
     public int getSpeed() {

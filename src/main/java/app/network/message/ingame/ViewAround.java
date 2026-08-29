@@ -12,8 +12,8 @@ import app.network.server.tcpjson.TcpJsonOutput;
 
 public record ViewAround(AbstractCharacter character) implements OutputJsonMessage {
 
-    public record EntityView(UUID id, String name, double x, double y, double speed, int currentHealth, int maxHealth,
-            int level, Double targetX, Double targetY) {
+    public record EntityView(UUID id, String name, double x, double y, double heading, double speed, int currentHealth,
+            int maxHealth, int level, Double targetX, Double targetY) {
     }
 
     public record PortalView(double x, double y, String direction, String targetZoneName) {
@@ -22,7 +22,7 @@ public record ViewAround(AbstractCharacter character) implements OutputJsonMessa
     public record WaypointView(double x, double y) {
     }
 
-    public record Payload(String zoneName, String zoneDescription, double selfX, double selfY,
+    public record Payload(String zoneName, String zoneDescription, double selfX, double selfY, double selfHeading,
             List<EntityView> characters, List<EntityView> monsters, List<EntityView> npcs, List<PortalView> portals,
             List<WaypointView> remainingWaypoints) {
     }
@@ -43,7 +43,7 @@ public record ViewAround(AbstractCharacter character) implements OutputJsonMessa
         List<WaypointView> waypoints = remainingWaypoints().stream().map(p -> new WaypointView(p.x(), p.y())).toList();
 
         output.write("ViewAround", new Payload(zone.getName(), zone.getDescription(), self.x(), self.y(),
-                characterViews, monsterViews, npcViews, portals, waypoints), false);
+                character.getHeading(), characterViews, monsterViews, npcViews, portals, waypoints), false);
     }
 
     private EntityView toEntityView(AbstractCharacter other) {
@@ -57,8 +57,8 @@ public record ViewAround(AbstractCharacter character) implements OutputJsonMessa
             targetY = destination.y();
         }
         return new EntityView(other.getId(), other.getName(), other.getPosition().x(), other.getPosition().y(),
-                MovementEngine.unitsPerSecond(other.getSpeed()), other.getCurrentHealth(), other.getMaxHealth(),
-                other.getLevel(), targetX, targetY);
+                other.getHeading(), MovementEngine.unitsPerSecond(other.getSpeed()), other.getCurrentHealth(),
+                other.getMaxHealth(), other.getLevel(), targetX, targetY);
     }
 
     private List<Position> remainingWaypoints() {

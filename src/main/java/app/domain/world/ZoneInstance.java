@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,7 +94,12 @@ public class ZoneInstance {
         return template.isWalkable(position);
     }
 
+    private static double randomHeading() {
+        return ThreadLocalRandom.current().nextDouble(0, Math.PI * 2);
+    }
+
     public void join(CharacterInstance character) {
+        character.setHeading(randomHeading());
         join(character, getSpawnPosition());
     }
 
@@ -184,6 +190,7 @@ public class ZoneInstance {
     public void placeMonster(MonsterInstance monster, Position position) {
         addMonster(monster);
         monster.setPosition(position);
+        monster.setHeading(randomHeading());
     }
 
     public List<AbstractNpc> getNpcs() {
@@ -202,6 +209,7 @@ public class ZoneInstance {
     public void placeNpc(AbstractNpc npc, Position position) {
         addNpc(npc);
         npc.setPosition(position);
+        npc.setHeading(randomHeading());
     }
 
     public Optional<AbstractNpc> findNpcById(UUID id) {

@@ -88,10 +88,9 @@ public class Goto implements CommandHandler {
         if (waypoints.isEmpty()) {
             connection.send(new ViewAround(character));
         } else {
-            connection.send(new MovementStarted(target.x(), target.y()));
-            character.getCurrentZone().broadcast(
-                    new CharacterMovementStarted(character.getId(), character.getName(), target.x(), target.y()),
-                    character);
+            connection.send(new MovementStarted(target.x(), target.y(), character.getHeading()));
+            character.getCurrentZone().broadcast(new CharacterMovementStarted(character.getId(), character.getName(),
+                    target.x(), target.y(), character.getHeading()), character);
         }
     }
 

@@ -32,6 +32,7 @@ public class Position implements CommandHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
-        connection.send(new PositionUpdated(character.getPosition().x(), character.getPosition().y()));
+        connection.send(
+                new PositionUpdated(character.getPosition().x(), character.getPosition().y(), character.getHeading()));
     }
 }

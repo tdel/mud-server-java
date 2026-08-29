@@ -48,6 +48,7 @@ public class MovementEngine {
         }
         synchronized (character) {
             character.activeMovement = new ActiveMovement(List.copyOf(waypoints), System.nanoTime());
+            character.setHeading(character.getPosition().headingTo(waypoints.get(0)));
             movingCharacters.put(character.getId(), character);
         }
         log.debug("movement.started thread={} character={} waypoints={}", Thread.currentThread().getName(),
@@ -149,9 +150,13 @@ public class MovementEngine {
             CollisionGrid grid = zone.getCollisionGrid();
             double dtSeconds = (now - movement.lastTickAtNanos()) / 1_000_000_000.0;
 
-            StepResult result = ContinuousStep.step(character.getPosition(), movement.remainingWaypoints(),
+            Position previous = character.getPosition();
+            StepResult result = ContinuousStep.step(previous, movement.remainingWaypoints(),
                     unitsPerSecond(character.getSpeed()), dtSeconds, grid);
             character.setPosition(result.position());
+            if (!result.position().equals(previous)) {
+                character.setHeading(previous.headingTo(result.position()));
+            }
 
             if (result.blocked()) {
                 character.activeMovement = null;
