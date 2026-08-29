@@ -36,6 +36,7 @@ import app.domain.item.EquipmentSlot;
 import app.domain.map.Position;
 import app.domain.item.Item;
 import app.domain.world.MapInstance;
+import app.domain.world.PeaceZone;
 import app.domain.item.WeaponCategory;
 import app.domain.world.WorldInstance;
 import app.game.dice.CheckResult;
@@ -388,6 +389,9 @@ public final class CharacterInstance extends AbstractCharacter {
 
     public boolean takeDamage(int amount, AbstractCharacter attacker) {
         if (getCurrentHealth() <= 0) {
+            return false;
+        }
+        if (getZone() instanceof PeaceZone) {
             return false;
         }
         setCurrentHealth(Math.max(0, getCurrentHealth() - amount));

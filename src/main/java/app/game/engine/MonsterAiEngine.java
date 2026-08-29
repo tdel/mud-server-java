@@ -19,6 +19,7 @@ import app.domain.actor.instance.MonsterInstance;
 import app.domain.map.Position;
 import app.domain.world.CollisionGrid;
 import app.domain.world.MapInstance;
+import app.domain.world.PeaceZone;
 import app.network.message.ingame.AttackResult;
 import app.network.message.ingame.CharacterMovementFinished;
 import app.network.message.ingame.CharacterMovementStarted;
@@ -96,6 +97,11 @@ public class MonsterAiEngine {
         }
 
         if (monster.getSpawnPosition().distanceTo(monster.getPosition()) > LEASH_RADIUS) {
+            giveUpChase(monster, state, target);
+            return;
+        }
+
+        if (monster.getZone() instanceof PeaceZone || target.getZone() instanceof PeaceZone) {
             giveUpChase(monster, state, target);
             return;
         }

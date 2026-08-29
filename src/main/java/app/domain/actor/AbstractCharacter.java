@@ -13,7 +13,9 @@ import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.event.SpellCastBegin;
 import app.domain.map.Position;
+import app.domain.world.AbstractZone;
 import app.domain.world.MapInstance;
+import app.domain.world.NormalZone;
 import app.game.engine.MovementEngine;
 import app.game.engine.SpellCastEngine;
 import app.game.dice.DiceExpression;
@@ -156,6 +158,12 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public void setPosition(Position position) {
         this.position = position;
+        AbstractZone newZone = currentMap != null && position != null ? currentMap.zoneAt(position) : NormalZone.INSTANCE;
+        if (newZone != getZone()) {
+            getZone().onObjectExiting(this);
+            setZone(newZone);
+            newZone.onObjectEntering(this);
+        }
     }
 
     public double getHeading() {

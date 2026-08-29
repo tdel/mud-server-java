@@ -19,6 +19,7 @@ import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.item.EquipmentSlot;
 import app.domain.item.Item;
+import app.domain.world.PeaceZone;
 import app.game.dice.DiceRoll;
 import app.game.dice.DiceRoller;
 import app.game.engine.MonsterAiEngine;
@@ -26,6 +27,7 @@ import app.network.message.ingame.AlreadyCasting;
 import app.network.message.ingame.AttackOnCooldown;
 import app.network.message.ingame.AttackOutOfRange;
 import app.network.message.ingame.AttackResult;
+import app.network.message.ingame.CombatForbiddenHere;
 import app.network.message.ingame.NoTargetSelected;
 import app.network.message.ingame.TargetNotFound;
 
@@ -79,6 +81,15 @@ public final class CharacterCombat {
             log.debug("attack.rejected character={} reason=target_not_attackable target={}", character.getId(),
                     defender.getId());
             character.send(new TargetNotFound(defender.getId().toString()));
+            return;
+        }
+        PeaceZone peaceZone = character.getZone() instanceof PeaceZone attackerZone
+                ? attackerZone
+                : defender.getZone() instanceof PeaceZone defenderZone ? defenderZone : null;
+        if (peaceZone != null) {
+            log.debug("attack.rejected character={} reason=peace_zone zone={} target={}", character.getId(),
+                    peaceZone.getName(), defender.getId());
+            character.send(new CombatForbiddenHere(peaceZone.getName()));
             return;
         }
         if (character.getPosition().distanceTo(defender.getPosition()) > MonsterAiEngine.ATTACK_RANGE) {

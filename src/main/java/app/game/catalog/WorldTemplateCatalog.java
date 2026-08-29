@@ -20,6 +20,7 @@ import app.domain.NpcSpawn;
 import app.domain.item.ItemTemplate;
 import app.domain.world.MapTemplate;
 import app.domain.world.MapTemplatePortal;
+import app.domain.world.PeaceZone;
 import app.domain.world.WorldTemplate;
 import app.domain.world.WorldTemplateSummary;
 import app.domain.actor.AbstractNpc;
@@ -178,6 +179,7 @@ public class WorldTemplateCatalog {
                     .map(portal -> resolvePortal(shortName, map, source, portal, templates)).toList();
             checkNoOverlappingPortals(shortName, map, portals);
             source.setPortals(portals);
+            source.setPeaceZones(map.peaceZones().stream().map(zone -> new PeaceZone(zone.name(), zone.polygon())).toList());
         }
 
         return Map.copyOf(templates);

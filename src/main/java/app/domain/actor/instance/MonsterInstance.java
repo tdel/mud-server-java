@@ -15,6 +15,7 @@ import app.domain.actor.template.MonsterTemplate;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.map.Position;
+import app.domain.world.PeaceZone;
 import app.game.engine.MonsterAiEngine;
 import app.game.dice.DiceRoll;
 import app.game.dice.DiceRoller;
@@ -44,6 +45,9 @@ public final class MonsterInstance extends AbstractCharacter {
         int healthAfter;
         synchronized (this) {
             if (getCurrentHealth() <= 0) {
+                return false;
+            }
+            if (getZone() instanceof PeaceZone) {
                 return false;
             }
             setCurrentHealth(Math.max(0, getCurrentHealth() - amount));

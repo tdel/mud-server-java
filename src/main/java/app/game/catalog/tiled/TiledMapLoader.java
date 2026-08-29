@@ -26,6 +26,7 @@ import app.domain.world.CollisionGrid;
 import app.domain.world.TileType;
 import app.game.catalog.tiled.TiledMap.TiledLayer;
 import app.game.catalog.tiled.TiledMap.TiledObjectDef;
+import app.game.catalog.tiled.TiledMap.TiledPoint;
 import app.game.catalog.tiled.TiledMap.TiledProperty;
 import app.game.catalog.tiled.TiledMap.TiledTile;
 import app.game.catalog.tiled.TiledMap.TiledTileset;
@@ -49,6 +50,7 @@ public final class TiledMapLoader {
     private static final String TYPE_MONSTER_SPAWN = "monsterSpawn";
     private static final String TYPE_MONSTER_SPAWN_GROUP = "monsterSpawnGroup";
     private static final String TYPE_NPC_SPAWN = "npcSpawn";
+    private static final String TYPE_PEACE_ZONE = "peaceZone";
     // Élargi de 1.2 à 4.0 tuiles (2026-08-30, agrandissement des maps : un
     // portail doit pouvoir accueillir un groupe d'une dizaine de personnages sans
     // qu'elles se sentent entassées, ce qui suppose une map de déclenchement
@@ -95,11 +97,14 @@ public final class TiledMapLoader {
 
     public record ParsedMap(UUID id, String name, String description, boolean isStartingMap, CollisionGrid terrain,
             Position spawnPosition, List<MonsterSpawn> monsterSpawns, List<MonsterSpawnGroup> monsterSpawnGroups,
-            List<NpcSpawn> npcSpawns, List<PortalDraft> portals) {
+            List<NpcSpawn> npcSpawns, List<PortalDraft> portals, List<PeaceZoneDraft> peaceZones) {
     }
 
     public record PortalDraft(Position position, String direction, UUID targetMapId, Position targetPosition,
             double triggerRadius) {
+    }
+
+    public record PeaceZoneDraft(String name, List<Position> polygon) {
     }
 
     public static ParsedMap parse(TiledMap map, Function<String, InputStream> externalTilesetResolver) {
@@ -116,7 +121,8 @@ public final class TiledMapLoader {
         List<MonsterSpawnGroup> monsterSpawnGroups = new ArrayList<>();
         List<NpcSpawn> npcSpawns = new ArrayList<>();
         List<PortalDraft> portals = new ArrayList<>();
-        parseObjects(map, id, spawnPositionHolder, monsterSpawns, monsterSpawnGroups, npcSpawns, portals);
+        List<PeaceZoneDraft> peaceZones = new ArrayList<>();
+        parseObjects(map, id, spawnPositionHolder, monsterSpawns, monsterSpawnGroups, npcSpawns, portals, peaceZones);
 
         if (spawnPositionHolder[0] == null) {
             throw new IllegalStateException("Map " + id + " (" + name + ") n'a aucun objet playerSpawn");
@@ -147,7 +153,7 @@ public final class TiledMapLoader {
 
         return new ParsedMap(id, name, description, isStartingMap, terrain, spawnPositionHolder[0],
                 List.copyOf(monsterSpawns), List.copyOf(monsterSpawnGroups), List.copyOf(npcSpawns),
-                List.copyOf(portals));
+                List.copyOf(portals), List.copyOf(peaceZones));
     }
 
     private static Map<Integer, TileType> buildTileTypeByGid(TiledMap map,
@@ -203,7 +209,7 @@ public final class TiledMapLoader {
 
     private static void parseObjects(TiledMap map, UUID id, Position[] spawnPositionHolder,
             List<MonsterSpawn> monsterSpawns, List<MonsterSpawnGroup> monsterSpawnGroups, List<NpcSpawn> npcSpawns,
-            List<PortalDraft> portals) {
+            List<PortalDraft> portals, List<PeaceZoneDraft> peaceZones) {
         TiledLayer layer = findLayer(map, id, OBJECTS_LAYER, "objectgroup");
         for (TiledObjectDef object : layer.objects()) {
             Position position = TiledCoordinateMapper.pixelToWorld(object.x(), object.y());
@@ -226,6 +232,16 @@ public final class TiledMapLoader {
                 case TYPE_NPC_SPAWN -> npcSpawns.add(
                         new NpcSpawn(UUID.nameUUIDFromBytes((id + ":" + object.id()).getBytes(StandardCharsets.UTF_8)),
                                 UUID.fromString(requireStringProperty(object.properties(), "npcId")), position));
+                case TYPE_PEACE_ZONE -> {
+                    if (object.polygonPoints().isEmpty()) {
+                        throw new IllegalStateException(
+                                "Map " + id + " : la peaceZone " + object.id() + " n'a aucun <polygon>");
+                    }
+                    List<Position> polygon = object.polygonPoints().stream()
+                            .map(p -> TiledCoordinateMapper.pixelToWorld(object.x() + p.x(), object.y() + p.y()))
+                            .toList();
+                    peaceZones.add(new PeaceZoneDraft(object.name(), polygon));
+                }
                 default -> throw new IllegalStateException(
                         "Objet Tiled " + object.id() + " a un type inconnu : " + object.type());
             }
@@ -294,10 +310,23 @@ public final class TiledMapLoader {
             String type = objectElement.getAttribute("type");
             double x = Double.parseDouble(objectElement.getAttribute("x"));
             double y = Double.parseDouble(objectElement.getAttribute("y"));
+            List<TiledPoint> polygonPoints = readPolygonPoints(directChild(objectElement, "polygon"));
             List<TiledProperty> properties = readProperties(directChild(objectElement, "properties"));
-            objects.add(new TiledObjectDef(id, objectName, type, x, y, properties));
+            objects.add(new TiledObjectDef(id, objectName, type, x, y, polygonPoints, properties));
         }
         return new TiledLayer("objectgroup", name, null, null, null, objects, List.of());
+    }
+
+    private static List<TiledPoint> readPolygonPoints(Optional<Element> polygonElement) {
+        if (polygonElement.isEmpty()) {
+            return List.of();
+        }
+        List<TiledPoint> points = new ArrayList<>();
+        for (String pair : polygonElement.get().getAttribute("points").trim().split("\\s+")) {
+            String[] coordinates = pair.split(",");
+            points.add(new TiledPoint(Double.parseDouble(coordinates[0]), Double.parseDouble(coordinates[1])));
+        }
+        return points;
     }
 
     private static List<TiledProperty> readProperties(Optional<Element> propertiesElement) {

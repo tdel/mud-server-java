@@ -18,7 +18,12 @@ public record TiledMap(String orientation, int width, int height, int tilewidth,
             List<TiledObjectDef> objects, List<TiledProperty> properties) {
     }
 
-    public record TiledObjectDef(int id, String name, String type, double x, double y, List<TiledProperty> properties) {
+    public record TiledObjectDef(int id, String name, String type, double x, double y, List<TiledPoint> polygonPoints,
+            List<TiledProperty> properties) {
+    }
+
+    /** Point d'un {@code <polygon points="x1,y1 x2,y2 ...">}, relatif à x/y de l'objet qui le porte. */
+    public record TiledPoint(double x, double y) {
     }
 
     public record TiledTileset(int firstgid, String source, List<TiledTile> tiles) {

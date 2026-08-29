@@ -21,6 +21,7 @@ public class MapTemplate {
     private final List<MonsterSpawnGroup> monsterSpawnGroups;
     private final List<NpcSpawn> npcSpawns;
     private List<MapTemplatePortal> portals = List.of();
+    private List<PeaceZone> peaceZones = List.of();
 
     public MapTemplate(UUID id, String name, String description, Boolean isStartingMap, CollisionGrid collisionGrid,
             Position spawnPosition, List<MonsterSpawn> monsterSpawns, List<MonsterSpawnGroup> monsterSpawnGroups,
@@ -80,12 +81,29 @@ public class MapTemplate {
         this.portals = List.copyOf(portals);
     }
 
+    public List<PeaceZone> getPeaceZones() {
+        return peaceZones;
+    }
+
+    public void setPeaceZones(List<PeaceZone> peaceZones) {
+        this.peaceZones = List.copyOf(peaceZones);
+    }
+
     public boolean containsPosition(Position position) {
         return collisionGrid.containsPosition(position);
     }
 
     public boolean isWalkable(Position position) {
         return collisionGrid.isWalkable(position);
+    }
+
+    public AbstractZone zoneAt(Position position) {
+        for (PeaceZone zone : peaceZones) {
+            if (zone.contains(position)) {
+                return zone;
+            }
+        }
+        return NormalZone.INSTANCE;
     }
 
     @Override

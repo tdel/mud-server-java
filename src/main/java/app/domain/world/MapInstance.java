@@ -93,6 +93,10 @@ public class MapInstance {
         return template.isWalkable(position);
     }
 
+    public AbstractZone zoneAt(Position position) {
+        return template.zoneAt(position);
+    }
+
     private static double randomHeading() {
         return ThreadLocalRandom.current().nextDouble(0, Math.PI * 2);
     }
