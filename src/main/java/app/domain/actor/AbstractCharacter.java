@@ -10,6 +10,7 @@ import app.domain.SpellEffectType;
 import app.domain.actor.component.ActiveEffects;
 import app.domain.actor.component.SpellCasting;
 import app.domain.actor.event.DomainEventPublisher;
+import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.event.SpellCastBegin;
 import app.domain.map.Position;
 import app.domain.world.ZoneInstance;
@@ -41,6 +42,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     protected int speed = DEFAULT_SPEED;
     public volatile MovementEngine.ActiveMovement activeMovement;
     public volatile SpellCastEngine.ActiveCast activeCast;
+    private final KnownList knownList = new KnownList(this);
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
             int maxHealth) {
@@ -182,6 +184,27 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     // No-op par défaut : seul GamePlayer a une Connection à notifier.
     public void send(OutputMessage message) {
+    }
+
+    public KnownList getKnownList() {
+        return knownList;
+    }
+
+    /**
+     * Diffuse un message à tous les personnages qui connaissent actuellement ce
+     * personnage (sa KnownList), plus lui-même s'il s'agit d'un joueur (l'auteur
+     * d'une action reçoit toujours sa propre diffusion, même s'il n'apparaît pas
+     * dans sa propre KnownList).
+     */
+    public void broadcast(OutputMessage message, CharacterInstance exclude) {
+        for (AbstractCharacter known : knownList.asList()) {
+            if (known instanceof CharacterInstance target && target != exclude) {
+                target.send(message);
+            }
+        }
+        if (this instanceof CharacterInstance self && self != exclude) {
+            self.send(message);
+        }
     }
 
     public void castSpell(Spell spell, AbstractCharacter target) {

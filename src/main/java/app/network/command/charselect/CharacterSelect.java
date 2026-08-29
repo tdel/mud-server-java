@@ -16,7 +16,7 @@ import app.network.ConnectionState;
 import app.network.message.Usage;
 import app.network.message.charselect.NoCharacterNamed;
 import app.network.message.charselect.NowPlaying;
-import app.network.message.ingame.ViewAround;
+import app.network.message.ingame.ZoneEnter;
 import app.network.message.ingame.ZoneMap;
 import app.persistence.listener.ItemPersistenceListener;
 
@@ -73,6 +73,6 @@ public class CharacterSelect implements CommandHandler {
 
         connection.send(new NowPlaying(loadedChar.getName()));
         connection.send(new ZoneMap(loadedChar.getCurrentZone()));
-        connection.send(new ViewAround(loadedChar));
+        connection.send(new ZoneEnter(loadedChar));
     }
 }

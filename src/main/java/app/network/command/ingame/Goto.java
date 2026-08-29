@@ -20,7 +20,6 @@ import app.network.message.ingame.AlreadyCasting;
 import app.network.message.ingame.CharacterMovementStarted;
 import app.network.message.ingame.MovementStarted;
 import app.network.message.ingame.NoPathToDestination;
-import app.network.message.ingame.ViewAround;
 
 @Component
 public class Goto implements CommandHandler {
@@ -85,12 +84,10 @@ public class Goto implements CommandHandler {
         log.info("movement.requested character={} target=({},{}) waypoints={}", character.getId(), target.x(),
                 target.y(), waypoints.size());
         movementEngine.startMovement(waypoints, character);
-        if (waypoints.isEmpty()) {
-            connection.send(new ViewAround(character));
-        } else {
+        if (!waypoints.isEmpty()) {
             connection.send(new MovementStarted(target.x(), target.y(), character.getHeading()));
-            character.getCurrentZone().broadcast(new CharacterMovementStarted(character.getId(), character.getName(),
-                    target.x(), target.y(), character.getHeading()), character);
+            character.broadcast(new CharacterMovementStarted(character.getId(), character.getName(), target.x(),
+                    target.y(), character.getHeading()), character);
         }
     }
 

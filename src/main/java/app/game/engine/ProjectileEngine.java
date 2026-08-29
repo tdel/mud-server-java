@@ -44,9 +44,9 @@ public class ProjectileEngine {
         log.debug("projectile.launched thread={} projectileId={} caster={} spell={} travelDurationMs={}",
                 Thread.currentThread().getName(), projectileId, caster.getId(), spell.name(), travelDurationMs);
 
-        caster.getCurrentZone().broadcast(new SpellProjectileLaunched(projectileId, caster.getId(), caster.getName(),
-                spell.id(), spell.name(), caster.getPosition().x(), caster.getPosition().y(), target.getId(),
-                target.getName(), target.getPosition().x(), target.getPosition().y(), travelDurationMs), null);
+        caster.broadcast(new SpellProjectileLaunched(projectileId, caster.getId(), caster.getName(), spell.id(),
+                spell.name(), caster.getPosition().x(), caster.getPosition().y(), target.getId(), target.getName(),
+                target.getPosition().x(), target.getPosition().y(), travelDurationMs), null);
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
@@ -80,7 +80,7 @@ public class ProjectileEngine {
         caster.send(new CastResult(spell.id(), spell.name(), target.getId(), target.getName(), outcome.selfHeal(),
                 outcome.hit(), outcome.amount(), outcome.targetHealthAfter(), outcome.targetMaxHealth(),
                 outcome.targetDefeated(), spell.manaCost(), caster.getCurrentMana(), caster.getMaxMana()));
-        caster.getCurrentZone().broadcast(
+        caster.broadcast(
                 new SpellCastAnnounced(caster.getId(), caster.getName(), spell.id(), spell.name(), target.getId(),
                         target.getName(), outcome.selfHeal(), outcome.hit(), outcome.amount(),
                         outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()),

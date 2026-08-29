@@ -10,8 +10,9 @@ import app.network.server.tcpjson.TcpJsonOutput;
 /**
  * Carte statique complète d'une zone (grille de collision + portails), envoyée
  * une fois au client à l'entrée de la zone (voir Portal, CharacterCreate,
- * CharacterSelect) — contrairement à {@link ViewAround}, rejouée à chaque tick
- * avec uniquement le viewport dynamique (entités, chemin) autour du joueur.
+ * CharacterSelect) — contrairement à {@link ZoneEnter}, qui liste les entités
+ * dynamiques à portée du joueur au même instant (voir aussi
+ * EntityAppeared/EntityDisappeared pour leurs entrées/sorties ultérieures).
  */
 public record ZoneMap(ZoneInstance zone) implements OutputJsonMessage {
 

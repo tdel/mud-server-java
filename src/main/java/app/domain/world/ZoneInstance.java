@@ -23,7 +23,6 @@ import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.GamePlayerSpawnedToZone;
 import app.domain.map.Position;
-import app.network.OutputMessage;
 import app.network.message.ingame.GamePlayerDisconnected;
 import app.network.message.ingame.GamePlayerJoinedZone;
 import app.network.message.ingame.GamePlayerLeftZone;
@@ -111,23 +110,27 @@ public class ZoneInstance {
                 character.getId(), position);
         DomainEventPublisher.publish(new GamePlayerSpawnedToZone(character, this));
 
-        broadcast(new GamePlayerJoinedZone(character.getId(), character.getName(), position.x(), position.y()),
+        character.getKnownList().populateSilently();
+        character.broadcast(
+                new GamePlayerJoinedZone(character.getId(), character.getName(), position.x(), position.y()),
                 character);
     }
 
     public void leave(CharacterInstance character) {
         clients.remove(character.getId());
+        character.getKnownList().clear();
         character.setPosition(null);
         log.info("zone.left thread={} zoneId={} character={}", Thread.currentThread().getName(), id, character.getId());
-        broadcast(new GamePlayerLeftZone(character.getName()), character);
+        character.broadcast(new GamePlayerLeftZone(character.getName()), character);
     }
 
     public void disconnect(CharacterInstance character) {
         clients.remove(character.getId());
+        character.getKnownList().clear();
         character.setPosition(null);
         log.info("zone.disconnected thread={} zoneId={} character={}", Thread.currentThread().getName(), id,
                 character.getId());
-        broadcast(new GamePlayerDisconnected(character.getName()), character);
+        character.broadcast(new GamePlayerDisconnected(character.getName()), character);
     }
 
     public Optional<AbstractCharacter> findOccupantById(UUID id) {
@@ -261,15 +264,6 @@ public class ZoneInstance {
             }
         }
         return nearby;
-    }
-
-    public void broadcast(OutputMessage message, CharacterInstance exclude) {
-        for (CharacterInstance character : clients.values()) {
-            if (character == exclude || character.getConnection() == null) {
-                continue;
-            }
-            character.getConnection().send(message);
-        }
     }
 
     @Override

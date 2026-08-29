@@ -30,7 +30,7 @@ import app.network.message.charselect.CharacterNameTaken;
 import app.network.message.charselect.InvalidRace;
 import app.network.message.charselect.NowPlaying;
 import app.network.message.ingame.GamePlayerStats;
-import app.network.message.ingame.ViewAround;
+import app.network.message.ingame.ZoneEnter;
 import app.network.message.ingame.ZoneMap;
 import app.persistence.listener.ItemPersistenceListener;
 
@@ -176,6 +176,6 @@ public class CharacterCreate implements CommandHandler {
 
         connection.send(new NowPlaying(character.getName()));
         connection.send(new ZoneMap(character.getCurrentZone()));
-        connection.send(new ViewAround(character));
+        connection.send(new ZoneEnter(character));
     }
 }

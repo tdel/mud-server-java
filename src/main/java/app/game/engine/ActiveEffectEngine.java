@@ -44,8 +44,8 @@ public class ActiveEffectEngine {
 
     @EventListener
     void onCharacterEffectExpired(CharacterEffectExpired event) {
-        event.character().getCurrentZone()
-                .broadcast(new SpellModifierExpired(event.character().getName(), event.effect().spellName()), null);
+        event.character().broadcast(new SpellModifierExpired(event.character().getName(), event.effect().spellName()),
+                null);
 
         if (event.character() instanceof CharacterInstance character) {
             Party party = character.getParty();

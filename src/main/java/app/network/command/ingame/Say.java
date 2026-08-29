@@ -42,7 +42,7 @@ public class Say implements CommandHandler {
             return;
         }
 
-        character.getCurrentZone().broadcast(new Chat(character.getName(), message), character);
+        character.broadcast(new Chat(character.getName(), message), character);
         connection.send(new YouSaid(message));
     }
 }

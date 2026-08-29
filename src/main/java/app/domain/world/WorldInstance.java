@@ -25,7 +25,6 @@ import app.domain.actor.event.PlayerLoadedInWorld;
 import app.domain.actor.event.PlayerRemovedFromWorld;
 import app.game.dice.DiceRoll;
 import app.game.dice.DiceRoller;
-import app.network.OutputMessage;
 
 public class WorldInstance {
 
@@ -129,12 +128,6 @@ public class WorldInstance {
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));
 
         return character;
-    }
-
-    public void broadcast(OutputMessage message, CharacterInstance exclude) {
-        for (ZoneInstance zone : this.zoneInstances()) {
-            zone.broadcast(message, exclude);
-        }
     }
 
     private Map<Attribute, Integer> rollAttributeScores() {

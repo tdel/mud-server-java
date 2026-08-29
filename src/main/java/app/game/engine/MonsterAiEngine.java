@@ -105,7 +105,7 @@ public class MonsterAiEngine {
                 // À portée : le monstre s'arrête de courir pour attaquer, comme un joueur
                 // (voir Attack.java) — sans cette diffusion, le client continuerait
                 // d'interpoler le monstre vers la dernière position connue de la cible.
-                zone.broadcast(new CharacterMovementStopped(monster.getId(), monster.getName(),
+                monster.broadcast(new CharacterMovementStopped(monster.getId(), monster.getName(),
                         monster.getPosition().x(), monster.getPosition().y()), null);
                 state = state.withMoving(false);
                 monster.pursuit = state;
@@ -114,7 +114,7 @@ public class MonsterAiEngine {
                 return;
             }
             MonsterInstance.MonsterAttackOutcome outcome = monster.attack(target);
-            zone.broadcast(new AttackResult(monster.getId(), monster.getName(), target.getId(), target.getName(),
+            monster.broadcast(new AttackResult(monster.getId(), monster.getName(), target.getId(), target.getName(),
                     outcome.hit(), outcome.critical(), outcome.damage(), outcome.targetHealthAfter()), null);
             monster.pursuit = state.withNextAttackAt(nowMillis + CharacterCombat.ATTACK_COOLDOWN.toMillis());
             return;
@@ -127,18 +127,16 @@ public class MonsterAiEngine {
             // joueur, la destination (la cible) bouge en continu, donc le client doit
             // recevoir une cible d'interpolation fraîche à chaque tick pour ne pas
             // diverger.
-            zone.broadcast(new CharacterMovementStarted(monster.getId(), monster.getName(), target.getPosition().x(),
+            monster.broadcast(new CharacterMovementStarted(monster.getId(), monster.getName(), target.getPosition().x(),
                     target.getPosition().y(), monster.getHeading()), null);
             monster.pursuit = state.withLastStepAt(nowNanos).withMoving(true);
         }
     }
 
     private void tickReturning(MonsterInstance monster, PursuitState state, long nowNanos) {
-        ZoneInstance zone = monster.getCurrentZone();
-
         if (monster.getPosition().distanceTo(monster.getSpawnPosition()) < 1e-6) {
             if (state.moving()) {
-                zone.broadcast(new CharacterMovementFinished(monster.getId(), monster.getName(),
+                monster.broadcast(new CharacterMovementFinished(monster.getId(), monster.getName(),
                         monster.getPosition().x(), monster.getPosition().y()), null);
             }
             forget(monster);
@@ -147,13 +145,13 @@ public class MonsterAiEngine {
 
         double dtSeconds = (nowNanos - state.lastStepAtNanos()) / 1_000_000_000.0;
         if (stepToward(monster, monster.getSpawnPosition(), dtSeconds)) {
-            zone.broadcast(new CharacterMovementStarted(monster.getId(), monster.getName(),
+            monster.broadcast(new CharacterMovementStarted(monster.getId(), monster.getName(),
                     monster.getSpawnPosition().x(), monster.getSpawnPosition().y(), monster.getHeading()), null);
             monster.pursuit = state.withLastStepAt(nowNanos).withMoving(true);
         } else {
             // Bloqué : on abandonne pour ne pas tourner en rond indéfiniment.
             if (state.moving()) {
-                zone.broadcast(new CharacterMovementStopped(monster.getId(), monster.getName(),
+                monster.broadcast(new CharacterMovementStopped(monster.getId(), monster.getName(),
                         monster.getPosition().x(), monster.getPosition().y()), null);
             }
             forget(monster);
@@ -163,7 +161,7 @@ public class MonsterAiEngine {
     private void giveUpChase(MonsterInstance monster, PursuitState state, CharacterInstance target) {
         log.info("monster.ai.give_up thread={} monsterId={}", Thread.currentThread().getName(), monster.getId());
         if (state.moving()) {
-            monster.getCurrentZone().broadcast(new CharacterMovementStopped(monster.getId(), monster.getName(),
+            monster.broadcast(new CharacterMovementStopped(monster.getId(), monster.getName(),
                     monster.getPosition().x(), monster.getPosition().y()), null);
         }
         monster.pursuit = new PursuitState(State.RETURNING, null, System.nanoTime(), 0L, false);
@@ -182,6 +180,7 @@ public class MonsterAiEngine {
         if (!result.position().equals(previous)) {
             monster.setHeading(previous.headingTo(result.position()));
         }
+        monster.getKnownList().refresh();
         return !result.blocked();
     }
 

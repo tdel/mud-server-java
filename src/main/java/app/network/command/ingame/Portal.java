@@ -12,7 +12,7 @@ import app.domain.actor.instance.CharacterInstance;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.ingame.NoPortalHere;
-import app.network.message.ingame.ViewAround;
+import app.network.message.ingame.ZoneEnter;
 import app.network.message.ingame.ZoneMap;
 
 @Component
@@ -65,6 +65,6 @@ public class Portal implements CommandHandler {
 
         character.moveToZone(portal.get().targetZone(), portal.get().targetPosition());
         connection.send(new ZoneMap(character.getCurrentZone()));
-        connection.send(new ViewAround(character));
+        connection.send(new ZoneEnter(character));
     }
 }

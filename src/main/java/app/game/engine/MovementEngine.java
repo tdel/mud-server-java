@@ -73,7 +73,7 @@ public class MovementEngine {
             return;
         }
         stopMovement(character);
-        character.getCurrentZone().broadcast(new CharacterMovementStopped(character.getId(), character.getName(),
+        character.broadcast(new CharacterMovementStopped(character.getId(), character.getName(),
                 character.getPosition().x(), character.getPosition().y()), null);
     }
 
@@ -85,7 +85,7 @@ public class MovementEngine {
         }
         stopMovement(character);
         character.send(new MovementStopped(character.getPosition().x(), character.getPosition().y()));
-        character.getCurrentZone().broadcast(new CharacterMovementStopped(character.getId(), character.getName(),
+        character.broadcast(new CharacterMovementStopped(character.getId(), character.getName(),
                 character.getPosition().x(), character.getPosition().y()), character);
     }
 
@@ -94,7 +94,11 @@ public class MovementEngine {
         long now = System.nanoTime();
         for (AbstractCharacter character : movingCharacters.values()) {
             try {
-                switch (updatePosition(character, now)) {
+                MovementStepOutcome outcome = updatePosition(character, now);
+                if (outcome != MovementStepOutcome.NO_MOVEMENT) {
+                    character.getKnownList().refresh();
+                }
+                switch (outcome) {
                     case NO_MOVEMENT -> {
                     }
                     case STEPPED -> {
@@ -110,9 +114,8 @@ public class MovementEngine {
                                 character.getId());
                         character.send(new MovementFinished(character.getPosition().x(), character.getPosition().y()));
                         if (character instanceof CharacterInstance player) {
-                            character.getCurrentZone().broadcast(new CharacterMovementFinished(character.getId(),
-                                    character.getName(), character.getPosition().x(), character.getPosition().y()),
-                                    player);
+                            character.broadcast(new CharacterMovementFinished(character.getId(), character.getName(),
+                                    character.getPosition().x(), character.getPosition().y()), player);
                         }
                     }
                     case BLOCKED_BY_BOUNDS -> {
@@ -122,9 +125,8 @@ public class MovementEngine {
                         character.send(
                                 new MovementBlockedByBounds(character.getPosition().x(), character.getPosition().y()));
                         if (character instanceof CharacterInstance player) {
-                            character.getCurrentZone().broadcast(new CharacterMovementBlocked(character.getId(),
-                                    character.getName(), character.getPosition().x(), character.getPosition().y()),
-                                    player);
+                            character.broadcast(new CharacterMovementBlocked(character.getId(), character.getName(),
+                                    character.getPosition().x(), character.getPosition().y()), player);
                         }
                     }
                 }

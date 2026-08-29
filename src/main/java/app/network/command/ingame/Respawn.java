@@ -10,7 +10,7 @@ import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.ingame.CharacterNotDead;
-import app.network.message.ingame.ViewAround;
+import app.network.message.ingame.ZoneEnter;
 import app.network.message.ingame.ZoneMap;
 
 @Component
@@ -44,6 +44,6 @@ public class Respawn implements CommandHandler {
         // client resterait affiché sur l'ancienne carte (voir Portal.java, même
         // besoin).
         connection.send(new ZoneMap(character.getCurrentZone()));
-        connection.send(new ViewAround(character));
+        connection.send(new ZoneEnter(character));
     }
 }

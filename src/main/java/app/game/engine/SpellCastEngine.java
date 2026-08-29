@@ -62,18 +62,15 @@ public class SpellCastEngine {
         if (caster.activeMovement != null) {
             movementEngine.stopMovement(caster);
             caster.send(new MovementStopped(caster.getPosition().x(), caster.getPosition().y()));
-            caster.getCurrentZone()
-                    .broadcast(
-                            new CharacterMovementStopped(caster.getId(), caster.getName(), caster.getPosition().x(),
-                                    caster.getPosition().y()),
-                            caster instanceof CharacterInstance player ? player : null);
+            caster.broadcast(new CharacterMovementStopped(caster.getId(), caster.getName(), caster.getPosition().x(),
+                    caster.getPosition().y()), caster instanceof CharacterInstance player ? player : null);
         }
         caster.activeCast = new ActiveCast(spell, target, System.nanoTime(), spell.castingTimeMs() * 1_000_000L);
         casting.put(caster.getId(), caster);
         log.debug("spell.cast_started thread={} caster={} spell={} castingTimeMs={}", Thread.currentThread().getName(),
                 caster.getId(), spell.name(), spell.castingTimeMs());
-        caster.getCurrentZone().broadcast(new SpellCastStarted(caster.getId(), caster.getName(), spell.id(),
-                spell.name(), target.getId(), target.getName(), spell.castingTimeMs()), null);
+        caster.broadcast(new SpellCastStarted(caster.getId(), caster.getName(), spell.id(), spell.name(),
+                target.getId(), target.getName(), spell.castingTimeMs()), null);
     }
 
     public void cancelCast(AbstractCharacter caster) {
@@ -84,8 +81,8 @@ public class SpellCastEngine {
         caster.activeCast = null;
         casting.remove(caster.getId());
         log.debug("spell.cast_cancelled thread={} caster={}", Thread.currentThread().getName(), caster.getId());
-        caster.getCurrentZone().broadcast(new SpellCastCancelled(caster.getId(), caster.getName(),
-                activeCast.spell().id(), activeCast.spell().name()), null);
+        caster.broadcast(new SpellCastCancelled(caster.getId(), caster.getName(), activeCast.spell().id(),
+                activeCast.spell().name()), null);
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
@@ -140,18 +137,17 @@ public class SpellCastEngine {
 
         if (spell.effect() == SpellEffectType.BUFF || spell.effect() == SpellEffectType.DEBUFF) {
             boolean beneficial = spell.effect() == SpellEffectType.BUFF;
-            caster.getCurrentZone()
-                    .broadcast(new SpellModifierAnnounced(caster.getId(), caster.getName(), spell.id(), spell.name(),
-                            target.getId(), target.getName(), target == caster, beneficial, outcome.hit(),
-                            spell.modifiedStat(), outcome.amount(), spell.durationSeconds(), spell.manaCost(),
-                            caster.getCurrentMana(), caster.getMaxMana()), null);
+            caster.broadcast(new SpellModifierAnnounced(caster.getId(), caster.getName(), spell.id(), spell.name(),
+                    target.getId(), target.getName(), target == caster, beneficial, outcome.hit(), spell.modifiedStat(),
+                    outcome.amount(), spell.durationSeconds(), spell.manaCost(), caster.getCurrentMana(),
+                    caster.getMaxMana()), null);
             return;
         }
 
         caster.send(new CastResult(spell.id(), spell.name(), target.getId(), target.getName(), outcome.selfHeal(),
                 outcome.hit(), outcome.amount(), outcome.targetHealthAfter(), outcome.targetMaxHealth(),
                 outcome.targetDefeated(), spell.manaCost(), caster.getCurrentMana(), caster.getMaxMana()));
-        caster.getCurrentZone().broadcast(
+        caster.broadcast(
                 new SpellCastAnnounced(caster.getId(), caster.getName(), spell.id(), spell.name(), target.getId(),
                         target.getName(), outcome.selfHeal(), outcome.hit(), outcome.amount(),
                         outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()),

@@ -69,7 +69,8 @@ public class RegenHealthEngine {
     void onCharacterDied(CharacterDied event) {
         ZoneInstance zone = event.character().getCurrentZone();
         zone.removeMonster(event.character());
-        zone.broadcast(new MonsterDefeated(event.character().getName()), null);
+        event.character().broadcast(new MonsterDefeated(event.character().getName()), null);
+        event.character().getKnownList().clear();
         log.info("regenhp.monster_removed_from_zone monster={} zone={}", event.character().getName(), zone.getName());
 
         CharacterInstance killer = event.killer();
@@ -88,7 +89,8 @@ public class RegenHealthEngine {
         regenerating.remove(event.character().getId());
 
         ZoneInstance zone = event.character().getCurrentZone();
-        zone.broadcast(new GamePlayerDefeated(event.character().getName(), event.killer().getName()), null);
+        event.character().broadcast(new GamePlayerDefeated(event.character().getName(), event.killer().getName()),
+                null);
         log.info("regenhp.player_defeated character={} killer={} zone={}", event.character().getName(),
                 event.killer().getName(), zone.getName());
     }

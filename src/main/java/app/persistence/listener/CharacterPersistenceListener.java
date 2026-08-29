@@ -73,7 +73,7 @@ public class CharacterPersistenceListener {
     @EventListener
     void onCharacterLeveledUp(CharacterLeveledUp event) {
         CharacterInstance character = event.character();
-        character.getCurrentZone().broadcast(new PlayerLeveledUp(character.getName(), event.newLevel()), null);
+        character.broadcast(new PlayerLeveledUp(character.getName(), event.newLevel()), null);
         broadcastVitalsToParty(character);
         log.info("character.leveled_up character={} newLevel={} hpGained={}", character.getName(), event.newLevel(),
                 event.hpGained());
@@ -143,8 +143,8 @@ public class CharacterPersistenceListener {
         characterDao.update(character);
         character.send(new ItemUsed(event.item().getId(), event.item().getName(), event.item().getRarity(),
                 event.healedAmount(), character.getCurrentHealth(), character.getMaxHealth()));
-        character.getCurrentZone().broadcast(new CharacterUsedItem(character.getId(), character.getName(),
-                event.item().getId(), event.item().getName()), character);
+        character.broadcast(new CharacterUsedItem(character.getId(), character.getName(), event.item().getId(),
+                event.item().getName()), character);
         broadcastVitalsToParty(character);
         log.info("character.used_potion character={} item={} healedAmount={}", character.getName(),
                 event.item().getName(), event.healedAmount());
@@ -156,8 +156,8 @@ public class CharacterPersistenceListener {
         characterDao.update(character);
         character.send(new ManaPotionUsed(event.item().getId(), event.item().getName(), event.item().getRarity(),
                 event.restoredAmount(), character.getCurrentMana(), character.getMaxMana()));
-        character.getCurrentZone().broadcast(new CharacterUsedItem(character.getId(), character.getName(),
-                event.item().getId(), event.item().getName()), character);
+        character.broadcast(new CharacterUsedItem(character.getId(), character.getName(), event.item().getId(),
+                event.item().getName()), character);
         broadcastVitalsToParty(character);
         log.info("character.used_mana_potion character={} item={} restoredAmount={}", character.getName(),
                 event.item().getName(), event.restoredAmount());

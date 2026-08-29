@@ -131,7 +131,7 @@ public final class CharacterCombat {
                 "combat.attack_resolved attacker={} defender={} hit={} critical={} damage={} defenderHealthAfter={} defeated={}",
                 character.getId(), defender.getId(), hit, critical, damage, healthAfter, defeated);
 
-        character.getCurrentZone().broadcast(new AttackResult(character.getId(), character.getName(), defender.getId(),
+        character.broadcast(new AttackResult(character.getId(), character.getName(), defender.getId(),
                 defender.getName(), hit, critical, damage, healthAfter), null);
     }
 
