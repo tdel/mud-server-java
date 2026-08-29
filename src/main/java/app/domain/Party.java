@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import app.domain.actor.instance.CharacterInstance;
 import app.network.OutputMessage;
@@ -14,12 +16,18 @@ public class Party {
 
     public static final int MAX_SIZE = 8;
 
-    private static final Map<Integer, Double> XP_SHARE_MULTIPLIERS = Map.of(1, 1.0, 2, 1.5, 3, 1.8, 4, 2.0, 5, 2.1, 6,
-            2.2, 7, 2.3, 8, 2.4);
+    public enum LootMode {
+        RANDOM, ROUND_ROBIN
+    }
+
+    private static final Map<Integer, Double> SHARE_MULTIPLIERS = Map.of(1, 1.0, 2, 1.5, 3, 1.8, 4, 2.0, 5, 2.1, 6, 2.2,
+            7, 2.3, 8, 2.4);
 
     private final UUID id;
     private volatile CharacterInstance leader;
     private final List<CharacterInstance> members = new CopyOnWriteArrayList<>();
+    private volatile LootMode lootMode = LootMode.ROUND_ROBIN;
+    private final AtomicInteger lootTurnCursor = new AtomicInteger(-1);
 
     public Party(CharacterInstance leader) {
         this.id = UUID.randomUUID();
@@ -52,8 +60,37 @@ public class Party {
         return members.size() >= MAX_SIZE;
     }
 
-    public double xpShareMultiplier(int eligibleCount) {
-        return XP_SHARE_MULTIPLIERS.getOrDefault(eligibleCount, 1.0);
+    public double shareMultiplier(int eligibleCount) {
+        return SHARE_MULTIPLIERS.getOrDefault(eligibleCount, 1.0);
+    }
+
+    public LootMode getLootMode() {
+        return lootMode;
+    }
+
+    public void setLootMode(LootMode lootMode) {
+        this.lootMode = lootMode;
+    }
+
+    public CharacterInstance nextLootRecipient(List<CharacterInstance> eligibleMembers) {
+        if (eligibleMembers.isEmpty()) {
+            return null;
+        }
+        if (lootMode == LootMode.RANDOM) {
+            return eligibleMembers.get(ThreadLocalRandom.current().nextInt(eligibleMembers.size()));
+        }
+
+        int size = members.size();
+        int start = lootTurnCursor.get();
+        for (int i = 1; i <= size; i++) {
+            int index = Math.floorMod(start + i, size);
+            CharacterInstance candidate = members.get(index);
+            if (eligibleMembers.contains(candidate)) {
+                lootTurnCursor.set(index);
+                return candidate;
+            }
+        }
+        return eligibleMembers.get(0);
     }
 
     public boolean isLeader(CharacterInstance character) {

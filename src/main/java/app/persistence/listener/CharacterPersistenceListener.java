@@ -107,7 +107,7 @@ public class CharacterPersistenceListener {
                         .toList()
                 : List.of(killer);
 
-        double multiplier = party != null ? party.xpShareMultiplier(eligible.size()) : 1.0;
+        double multiplier = party != null ? party.shareMultiplier(eligible.size()) : 1.0;
         int perMemberXp = (int) (xpReward * multiplier) / eligible.size();
         for (CharacterInstance member : eligible) {
             member.gainXp(perMemberXp);

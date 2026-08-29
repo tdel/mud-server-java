@@ -1,9 +1,11 @@
 package app.game.engine;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import app.domain.Party;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.GamePlayerDied;
 import app.domain.actor.event.GamePlayerRespawned;
@@ -70,7 +72,15 @@ public class RegenHealthEngine {
         zone.broadcast(new MonsterDefeated(event.character().getName()), null);
         log.info("regenhp.monster_removed_from_zone monster={} zone={}", event.character().getName(), zone.getName());
 
-        event.character().getTemplate().grantLootTo(event.killer());
+        CharacterInstance killer = event.killer();
+        Party party = killer.getParty();
+        List<CharacterInstance> eligible = party != null
+                ? party.getMembers().stream().filter(member -> member.getCurrentZone() == killer.getCurrentZone())
+                        .toList()
+                : List.of(killer);
+        double multiplier = party != null ? party.shareMultiplier(eligible.size()) : 1.0;
+
+        event.character().getTemplate().grantLootTo(killer, party, eligible, multiplier);
     }
 
     @EventListener

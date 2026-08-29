@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import app.domain.Party;
 import app.domain.actor.Attribute;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.item.Item;
@@ -165,17 +166,24 @@ public class MonsterTemplate {
         return new LootResult(goldReward, items);
     }
 
-    public LootResult grantLootTo(CharacterInstance killer) {
+    public LootResult grantLootTo(CharacterInstance killer, Party party, List<CharacterInstance> eligibleMembers,
+            double goldShareMultiplier) {
         LootResult loot = rollLoot(killer);
 
         if (loot.gold() > 0) {
-            killer.receiveGold(loot.gold());
-            log.info("loot.gold_dropped killer={} amount={}", killer.getName(), loot.gold());
+            int perMemberGold = (int) (loot.gold() * goldShareMultiplier) / eligibleMembers.size();
+            for (CharacterInstance member : eligibleMembers) {
+                member.receiveGold(perMemberGold);
+            }
+            log.info("loot.gold_dropped killer={} totalGold={} partySize={} perMemberGold={}", killer.getName(),
+                    loot.gold(), eligibleMembers.size(), perMemberGold);
         }
 
         for (Item item : loot.items()) {
-            killer.receiveLootItem(item);
-            log.info("loot.item_dropped killer={} item={}", killer.getName(), item.getName());
+            CharacterInstance recipient = party != null ? party.nextLootRecipient(eligibleMembers) : killer;
+            recipient.receiveLootItem(item);
+            log.info("loot.item_dropped killer={} recipient={} item={}", killer.getName(), recipient.getName(),
+                    item.getName());
         }
 
         return loot;
