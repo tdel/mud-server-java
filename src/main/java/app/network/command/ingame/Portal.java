@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import app.game.engine.MovementEngine;
 import app.network.CommandHandler;
 import app.domain.world.ZonePortal;
 import app.domain.actor.instance.CharacterInstance;
@@ -16,6 +17,12 @@ import app.network.message.ingame.ZoneMap;
 
 @Component
 public class Portal implements CommandHandler {
+
+    private final MovementEngine movementEngine;
+
+    public Portal(MovementEngine movementEngine) {
+        this.movementEngine = movementEngine;
+    }
 
     @Override
     public String name() {
@@ -40,6 +47,15 @@ public class Portal implements CommandHandler {
             connection.send(new NoPortalHere());
             return;
         }
+
+        // Sans ça, un déplacement en cours (goto) au moment de franchir le portail continue
+        // à la prochaine tick de MovementEngine avec des waypoints calculés pour l'ancienne
+        // zone/grille de collision, alors que la position du personnage vient de changer de
+        // zone — le personnage se remet alors à marcher tout seul dans la zone d'arrivée
+        // vers une destination périmée (demandé explicitement le 2026-08-28 : "le passage
+        // dans le téléporteur annule tout déplacement"). Le client doit recliquer pour se
+        // redéplacer (voir aussi Game._rebuild_map côté client, même correctif local).
+        movementEngine.stopMovement(character);
 
         character.moveToZone(portal.get().targetZone(), portal.get().targetPosition());
         connection.send(new ZoneMap(character.getCurrentZone()));

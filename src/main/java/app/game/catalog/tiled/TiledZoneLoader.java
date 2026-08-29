@@ -50,7 +50,14 @@ public final class TiledZoneLoader {
     private static final String TYPE_MONSTER_SPAWN = "monsterSpawn";
     private static final String TYPE_MONSTER_SPAWN_GROUP = "monsterSpawnGroup";
     private static final String TYPE_NPC_SPAWN = "npcSpawn";
-    private static final double DEFAULT_PORTAL_TRIGGER_RADIUS = 0.6;
+    // Élargi de 0.6 à 1.2 tuiles (2026-08-28, demandé explicitement : "difficile de viser
+    // un point précis pour prendre un portail") — environ 2x le diamètre d'un personnage à
+    // l'écran (32px de sprite pour 48px/tuile, voir DISPLAY_TILE_SIZE côté client), plutôt
+    // qu'un cercle à peine plus large que le personnage lui-même. Les portails existants
+    // (data/zones/*.json) sont tous espacés d'au moins ~8 tuiles au sein d'une même zone :
+    // aucun risque de chevauchement avec checkNoOverlappingPortals (WorldTemplateCatalog),
+    // qui exige distance >= somme des deux rayons.
+    private static final double DEFAULT_PORTAL_TRIGGER_RADIUS = 1.2;
     private static final double COLLISION_CELL_SIZE = 1.0;
     private static final double MIN_SPAWN_PORTAL_DISTANCE = 2.0;
 

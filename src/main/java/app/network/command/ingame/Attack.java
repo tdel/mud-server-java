@@ -142,8 +142,5 @@ public class Attack implements CommandHandler {
         character.getCurrentZone().broadcast(new AttackObserved(character.getId(), character.getName(), target.getId(),
                 target.getName(), outcome.hit(), outcome.critical(), outcome.damage(), outcome.targetDefeated()), null);
 
-        if (outcome.targetDefeated()) {
-            combat.setTarget(null);
-        }
     }
 }
