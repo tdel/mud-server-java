@@ -122,7 +122,7 @@ public class WorldTemplateCatalog {
     }
 
     private List<ParsedZone> readZoneFiles() {
-        String pattern = "classpath*:" + DATA_DIR + "zones/*.json";
+        String pattern = "classpath*:" + DATA_DIR + "zones/*.tmx";
         Resource[] files;
         try {
             files = resourcePatternResolver.getResources(pattern);

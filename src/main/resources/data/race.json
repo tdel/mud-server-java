@@ -1,15 +1,15 @@
 [
-  { "name": "DWARF", "attributes": { "CONSTITUTION": 2 }, "speed": 5 },
-  { "name": "HUMAN", "attributes": { "STRENGTH": 1, "DEXTERITY": 1, "CONSTITUTION": 1, "INTELLIGENCE": 1, "WISDOM": 1, "CHARISMA": 1 }, "speed": 6 },
-  { "name": "HIGH_ELF", "attributes": { "DEXTERITY": 2, "INTELLIGENCE": 1 }, "speed": 6 },
-  { "name": "HALF_ORC", "attributes": { "STRENGTH": 2, "CONSTITUTION": 1 }, "speed": 6 },
-  { "name": "DRAGONBORN", "attributes": { "STRENGTH": 2, "CHARISMA": 1 }, "speed": 6 },
-  { "name": "ELF", "attributes": { "DEXTERITY": 2 }, "speed": 6 },
-  { "name": "GNOME", "attributes": { "INTELLIGENCE": 2 }, "speed": 5 },
-  { "name": "ROCK_GNOME", "attributes": { "INTELLIGENCE": 2, "CONSTITUTION": 1 }, "speed": 5 },
-  { "name": "HALF_ELF", "attributes": { "CHARISMA": 2, "INTELLIGENCE": 1, "WISDOM": 1 }, "speed": 6 },
-  { "name": "HALFLING", "attributes": { "DEXTERITY": 2 }, "speed": 5 },
-  { "name": "LIGHTFOOT_HALFLING", "attributes": { "DEXTERITY": 2, "CHARISMA": 1 }, "speed": 5 },
-  { "name": "TIEFLING", "attributes": { "INTELLIGENCE": 1, "CHARISMA": 2 }, "speed": 6 },
-  { "name": "HILL_DWARF", "attributes": { "CONSTITUTION": 2, "WISDOM": 1 }, "speed": 5 }
+  { "name": "DWARF", "attributes": { "CONSTITUTION": 2 }, "speed": 10 },
+  { "name": "HUMAN", "attributes": { "STRENGTH": 1, "DEXTERITY": 1, "CONSTITUTION": 1, "INTELLIGENCE": 1, "WISDOM": 1, "CHARISMA": 1 }, "speed": 12 },
+  { "name": "HIGH_ELF", "attributes": { "DEXTERITY": 2, "INTELLIGENCE": 1 }, "speed": 12 },
+  { "name": "HALF_ORC", "attributes": { "STRENGTH": 2, "CONSTITUTION": 1 }, "speed": 12 },
+  { "name": "DRAGONBORN", "attributes": { "STRENGTH": 2, "CHARISMA": 1 }, "speed": 12 },
+  { "name": "ELF", "attributes": { "DEXTERITY": 2 }, "speed": 12 },
+  { "name": "GNOME", "attributes": { "INTELLIGENCE": 2 }, "speed": 10 },
+  { "name": "ROCK_GNOME", "attributes": { "INTELLIGENCE": 2, "CONSTITUTION": 1 }, "speed": 10 },
+  { "name": "HALF_ELF", "attributes": { "CHARISMA": 2, "INTELLIGENCE": 1, "WISDOM": 1 }, "speed": 12 },
+  { "name": "HALFLING", "attributes": { "DEXTERITY": 2 }, "speed": 10 },
+  { "name": "LIGHTFOOT_HALFLING", "attributes": { "DEXTERITY": 2, "CHARISMA": 1 }, "speed": 10 },
+  { "name": "TIEFLING", "attributes": { "INTELLIGENCE": 1, "CHARISMA": 2 }, "speed": 12 },
+  { "name": "HILL_DWARF", "attributes": { "CONSTITUTION": 2, "WISDOM": 1 }, "speed": 10 }
 ]

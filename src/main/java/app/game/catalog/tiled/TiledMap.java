@@ -3,14 +3,13 @@ package app.game.catalog.tiled;
 import java.util.List;
 
 /**
- * Sous-ensemble du format JSON exporté par Tiled Map Editor (orientation
+ * Sous-ensemble du format {@code .tmx} (XML natif Tiled Map Editor, orientation
  * orthogonale) réellement exploité par {@link TiledZoneLoader}. Les autres
- * champs standards d'un export Tiled (version, tiledversion, infinite,
- * renderorder, nextlayerid, nextobjectid, image du tileset, etc.) restent
- * présents dans les fichiers authorés sous {@code data/zones/*.json} pour
- * rester ouvrables tels quels dans Tiled, mais ne sont pas modélisés ici :
- * {@link TiledZoneLoader} lit ces fichiers avec un mapper tolérant aux
- * propriétés inconnues.
+ * attributs/balises standards d'un fichier Tiled (version, tiledversion,
+ * infinite, renderorder, nextlayerid, nextobjectid, image du tileset, etc.)
+ * restent présents dans les fichiers authorés sous {@code data/zones/*.tmx}
+ * pour rester ouvrables tels quels dans Tiled, mais ne sont pas modélisés ici :
+ * {@link TiledZoneLoader} ignore simplement ce qu'il ne lit pas.
  */
 public record TiledMap(String orientation, int width, int height, int tilewidth, int tileheight,
         List<TiledLayer> layers, List<TiledTileset> tilesets, List<TiledProperty> properties) {

@@ -14,6 +14,7 @@ import java.util.function.Function;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -28,18 +29,16 @@ import app.game.catalog.tiled.TiledMap.TiledObjectDef;
 import app.game.catalog.tiled.TiledMap.TiledProperty;
 import app.game.catalog.tiled.TiledMap.TiledTile;
 import app.game.catalog.tiled.TiledMap.TiledTileset;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.DeserializationFeature;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
- * Convertit un {@link TiledMap} (arbre JSON Jackson reflétant un export Tiled
- * Map Editor, orientation orthogonale) en données de zone exploitables par
- * {@code WorldTemplateCatalog}. Un fichier par zone : un calque de tuiles nommé
- * "terrain" porte le terrain praticable/bloqué (propriété custom booléenne
- * "walkable" sur chaque tuile du tileset), un calque d'objets nommé "objects"
- * porte le point de spawn du joueur, les portails et les spawns de monstres.
+ * Convertit un fichier {@code .tmx} (XML natif Tiled Map Editor, orientation
+ * orthogonale) en données de zone exploitables par {@code WorldTemplateCatalog}.
+ * Un fichier par zone : un calque de tuiles nommé "terrain" porte le terrain
+ * praticable/bloqué (propriété custom booléenne "walkable" sur chaque tuile du
+ * tileset), un calque d'objets nommé "objects" porte le point de spawn du
+ * joueur, les portails et les spawns de monstres. Le {@code .tmx} est lu tel
+ * quel : c'est à la fois le fichier ouvert par Tiled Map Editor et la seule
+ * source lue par le serveur, il n'y a pas d'export JSON intermédiaire.
  */
 public final class TiledZoneLoader {
 
@@ -50,40 +49,48 @@ public final class TiledZoneLoader {
     private static final String TYPE_MONSTER_SPAWN = "monsterSpawn";
     private static final String TYPE_MONSTER_SPAWN_GROUP = "monsterSpawnGroup";
     private static final String TYPE_NPC_SPAWN = "npcSpawn";
-    // Élargi de 0.6 à 1.2 tuiles (2026-08-28, demandé explicitement : "difficile de
-    // viser
-    // un point précis pour prendre un portail") — environ 2x le diamètre d'un
-    // personnage à
-    // l'écran (32px de sprite pour 48px/tuile, voir DISPLAY_TILE_SIZE côté client),
-    // plutôt
-    // qu'un cercle à peine plus large que le personnage lui-même. Les portails
-    // existants
-    // (data/zones/*.json) sont tous espacés d'au moins ~8 tuiles au sein d'une même
-    // zone :
-    // aucun risque de chevauchement avec checkNoOverlappingPortals
-    // (WorldTemplateCatalog),
-    // qui exige distance >= somme des deux rayons.
-    private static final double DEFAULT_PORTAL_TRIGGER_RADIUS = 1.2;
+    // Élargi de 1.2 à 4.0 tuiles (2026-08-30, agrandissement des zones : un
+    // portail doit pouvoir accueillir un groupe d'une dizaine de personnages sans
+    // qu'elles se sentent entassées, ce qui suppose une zone de déclenchement
+    // nettement plus large qu'un simple point visé au pixel près). Les zones
+    // agrandies espacent leurs portails de bien plus que l'ancien minimum
+    // (~8 tuiles) : aucun risque de chevauchement avec checkNoOverlappingPortals
+    // (WorldTemplateCatalog), qui exige distance >= somme des deux rayons.
+    private static final double DEFAULT_PORTAL_TRIGGER_RADIUS = 4.0;
     private static final double COLLISION_CELL_SIZE = 1.0;
-    private static final double MIN_SPAWN_PORTAL_DISTANCE = 2.0;
-
-    // Un export Tiled porte des champs standards (version, tiledversion, infinite,
-    // renderorder, image du tileset, etc.) qu'on ne modélise pas dans TiledMap :
-    // ce mapper dédié les tolère plutôt que d'échouer, sans toucher au bean
-    // ObjectMapper partagé (utilisé ailleurs pour les autres data/*.json, où une
-    // propriété inconnue doit rester une erreur signalante).
-    private static final ObjectMapper TILED_MAPPER = JsonMapper.builder()
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).build();
+    // Doit rester strictement supérieur à DEFAULT_PORTAL_TRIGGER_RADIUS : sinon un
+    // joueur pourrait apparaître (spawn) déjà à l'intérieur du rayon de
+    // déclenchement d'un portail et être aussitôt téléporté.
+    private static final double MIN_SPAWN_PORTAL_DISTANCE = 5.0;
 
     private TiledZoneLoader() {
     }
 
     public static TiledMap readMap(InputStream in) {
-        try {
-            return TILED_MAPPER.readValue(in, TiledMap.class);
-        } catch (JacksonException e) {
-            throw new IllegalStateException("Impossible de lire un fichier de zone Tiled", e);
+        Document document = parseXml(in);
+        Element mapElement = document.getDocumentElement();
+
+        int width = Integer.parseInt(mapElement.getAttribute("width"));
+        int height = Integer.parseInt(mapElement.getAttribute("height"));
+        int tilewidth = Integer.parseInt(mapElement.getAttribute("tilewidth"));
+        int tileheight = Integer.parseInt(mapElement.getAttribute("tileheight"));
+        List<TiledProperty> properties = readProperties(directChild(mapElement, "properties"));
+
+        List<TiledTileset> tilesets = new ArrayList<>();
+        for (Element tilesetElement : directChildren(mapElement, "tileset")) {
+            tilesets.add(readTileset(tilesetElement));
         }
+
+        List<TiledLayer> layers = new ArrayList<>();
+        for (Element layerElement : directChildren(mapElement, "layer")) {
+            layers.add(readTileLayer(layerElement));
+        }
+        for (Element objectGroupElement : directChildren(mapElement, "objectgroup")) {
+            layers.add(readObjectLayer(objectGroupElement));
+        }
+
+        return new TiledMap(mapElement.getAttribute("orientation"), width, height, tilewidth, tileheight, layers,
+                tilesets, properties);
     }
 
     public record ParsedZone(UUID id, String name, String description, boolean isStartingZone, CollisionGrid terrain,
@@ -159,40 +166,24 @@ public final class TiledZoneLoader {
     }
 
     // Tileset externe partagé entre zones (data/zones/shared/*.tsx), au format
-    // Tiled XML natif
-    // (ouvrable tel quel dans Tiled Map Editor) — on n'en extrait que les
-    // <tile>/<properties>
-    // utiles, le reste (image, colonnes, etc.) n'étant pas exploité côté serveur.
+    // Tiled XML natif (ouvrable tel quel dans Tiled Map Editor) — on n'en
+    // extrait que les <tile>/<properties> utiles, le reste (image, colonnes,
+    // etc.) n'étant pas exploité côté serveur.
     private static List<TiledTile> readExternalTileset(String source,
             Function<String, InputStream> externalTilesetResolver) {
         try (InputStream in = externalTilesetResolver.apply(source)) {
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            NodeList tileNodes = builder.parse(in).getElementsByTagName("tile");
+            Document document = parseXml(in);
+            NodeList tileNodes = document.getElementsByTagName("tile");
             List<TiledTile> tiles = new ArrayList<>();
             for (int i = 0; i < tileNodes.getLength(); i++) {
                 Element tileElement = (Element) tileNodes.item(i);
                 int id = Integer.parseInt(tileElement.getAttribute("id"));
-                tiles.add(new TiledTile(id, readXmlProperties(tileElement)));
+                tiles.add(new TiledTile(id, readProperties(directChild(tileElement, "properties"))));
             }
             return tiles;
         } catch (Exception e) {
             throw new IllegalStateException("Impossible de charger le tileset externe " + source, e);
         }
-    }
-
-    private static List<TiledProperty> readXmlProperties(Element tileElement) {
-        List<TiledProperty> properties = new ArrayList<>();
-        NodeList propertyNodes = tileElement.getElementsByTagName("property");
-        for (int i = 0; i < propertyNodes.getLength(); i++) {
-            Element propertyElement = (Element) propertyNodes.item(i);
-            String name = propertyElement.getAttribute("name");
-            String type = propertyElement.hasAttribute("type") ? propertyElement.getAttribute("type") : "string";
-            Object value = "bool".equals(type)
-                    ? Boolean.valueOf(propertyElement.getAttribute("value"))
-                    : propertyElement.getAttribute("value");
-            properties.add(new TiledProperty(name, type, value));
-        }
-        return properties;
     }
 
     private static CollisionGrid parseTerrain(TiledMap map, Map<Integer, TileType> tileTypeByGid, UUID id) {
@@ -245,6 +236,109 @@ public final class TiledZoneLoader {
         return map.layers().stream().filter(l -> name.equals(l.name()) && type.equals(l.type())).findFirst()
                 .orElseThrow(() -> new IllegalStateException(
                         "Calque \"" + name + "\" (" + type + ") absent de la zone " + id));
+    }
+
+    // --- Parsing XML (.tmx) bas niveau ---
+
+    private static Document parseXml(InputStream in) {
+        try {
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            return builder.parse(in);
+        } catch (Exception e) {
+            throw new IllegalStateException("Impossible de lire un fichier XML Tiled", e);
+        }
+    }
+
+    private static TiledTileset readTileset(Element tilesetElement) {
+        int firstgid = Integer.parseInt(tilesetElement.getAttribute("firstgid"));
+        boolean external = tilesetElement.hasAttribute("source");
+        String source = external ? tilesetElement.getAttribute("source") : null;
+        List<TiledTile> tiles = null;
+        if (!external) {
+            tiles = new ArrayList<>();
+            for (Element tileElement : directChildren(tilesetElement, "tile")) {
+                int id = Integer.parseInt(tileElement.getAttribute("id"));
+                tiles.add(new TiledTile(id, readProperties(directChild(tileElement, "properties"))));
+            }
+        }
+        return new TiledTileset(firstgid, source, tiles);
+    }
+
+    private static TiledLayer readTileLayer(Element layerElement) {
+        String name = layerElement.getAttribute("name");
+        int width = Integer.parseInt(layerElement.getAttribute("width"));
+        int height = Integer.parseInt(layerElement.getAttribute("height"));
+        Element dataElement = directChild(layerElement, "data")
+                .orElseThrow(() -> new IllegalStateException("Calque \"" + name + "\" sans balise <data>"));
+        String encoding = dataElement.getAttribute("encoding");
+        if (!"csv".equals(encoding)) {
+            throw new IllegalStateException(
+                    "Calque \"" + name + "\" : encodage \"" + encoding + "\" non supporté (seul \"csv\" l'est)");
+        }
+        List<Integer> data = new ArrayList<>();
+        for (String token : dataElement.getTextContent().split(",")) {
+            String trimmed = token.trim();
+            if (!trimmed.isEmpty()) {
+                data.add(Integer.valueOf(trimmed));
+            }
+        }
+        return new TiledLayer("tilelayer", name, width, height, data, null, List.of());
+    }
+
+    private static TiledLayer readObjectLayer(Element objectGroupElement) {
+        String name = objectGroupElement.getAttribute("name");
+        List<TiledObjectDef> objects = new ArrayList<>();
+        for (Element objectElement : directChildren(objectGroupElement, "object")) {
+            int id = Integer.parseInt(objectElement.getAttribute("id"));
+            String objectName = objectElement.getAttribute("name");
+            String type = objectElement.getAttribute("type");
+            double x = Double.parseDouble(objectElement.getAttribute("x"));
+            double y = Double.parseDouble(objectElement.getAttribute("y"));
+            List<TiledProperty> properties = readProperties(directChild(objectElement, "properties"));
+            objects.add(new TiledObjectDef(id, objectName, type, x, y, properties));
+        }
+        return new TiledLayer("objectgroup", name, null, null, null, objects, List.of());
+    }
+
+    private static List<TiledProperty> readProperties(Optional<Element> propertiesElement) {
+        if (propertiesElement.isEmpty()) {
+            return List.of();
+        }
+        List<TiledProperty> properties = new ArrayList<>();
+        for (Element propertyElement : directChildren(propertiesElement.get(), "property")) {
+            String name = propertyElement.getAttribute("name");
+            String type = propertyElement.hasAttribute("type") ? propertyElement.getAttribute("type") : "string";
+            String rawValue = propertyElement.hasAttribute("value")
+                    ? propertyElement.getAttribute("value")
+                    : propertyElement.getTextContent();
+            properties.add(new TiledProperty(name, type, convertPropertyValue(type, rawValue)));
+        }
+        return properties;
+    }
+
+    private static Object convertPropertyValue(String type, String rawValue) {
+        return switch (type) {
+            case "bool" -> Boolean.valueOf(rawValue);
+            case "int" -> Integer.valueOf(rawValue);
+            case "float" -> Double.valueOf(rawValue);
+            default -> rawValue;
+        };
+    }
+
+    private static List<Element> directChildren(Element parent, String tagName) {
+        List<Element> result = new ArrayList<>();
+        NodeList children = parent.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            if (children.item(i) instanceof Element element && tagName.equals(element.getTagName())) {
+                result.add(element);
+            }
+        }
+        return result;
+    }
+
+    private static Optional<Element> directChild(Element parent, String tagName) {
+        List<Element> children = directChildren(parent, tagName);
+        return children.isEmpty() ? Optional.empty() : Optional.of(children.get(0));
     }
 
     private static String requireStringProperty(List<TiledProperty> properties, String name) {
