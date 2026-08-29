@@ -21,29 +21,29 @@ import app.domain.actor.instance.MonsterInstance;
 import app.domain.actor.AbstractNpc;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.event.DomainEventPublisher;
-import app.domain.actor.event.GamePlayerSpawnedToZone;
+import app.domain.actor.event.GamePlayerSpawnedToMap;
 import app.domain.map.Position;
 import app.network.message.ingame.GamePlayerDisconnected;
-import app.network.message.ingame.GamePlayerJoinedZone;
-import app.network.message.ingame.GamePlayerLeftZone;
+import app.network.message.ingame.GamePlayerJoinedMap;
+import app.network.message.ingame.GamePlayerLeftMap;
 
-public class ZoneInstance {
+public class MapInstance {
 
-    private static final Logger log = LoggerFactory.getLogger(ZoneInstance.class);
+    private static final Logger log = LoggerFactory.getLogger(MapInstance.class);
 
-    public static UUID deterministicId(UUID worldInstanceId, UUID zoneTemplateId) {
-        return UUID.nameUUIDFromBytes((worldInstanceId + ":" + zoneTemplateId).getBytes(StandardCharsets.UTF_8));
+    public static UUID deterministicId(UUID worldInstanceId, UUID mapTemplateId) {
+        return UUID.nameUUIDFromBytes((worldInstanceId + ":" + mapTemplateId).getBytes(StandardCharsets.UTF_8));
     }
 
     private final UUID id;
-    private final ZoneTemplate template;
+    private final MapTemplate template;
     private final WorldInstance worldInstance;
 
     private final Map<UUID, CharacterInstance> clients = new ConcurrentHashMap<>();
     private final List<MonsterInstance> monsters = new CopyOnWriteArrayList<>();
     private final List<AbstractNpc> npcs = new CopyOnWriteArrayList<>();
 
-    public ZoneInstance(UUID id, ZoneTemplate template, WorldInstance worldInstance) {
+    public MapInstance(UUID id, MapTemplate template, WorldInstance worldInstance) {
         this.id = id;
         this.template = template;
         this.worldInstance = worldInstance;
@@ -73,8 +73,8 @@ public class ZoneInstance {
         return template.getDescription();
     }
 
-    public Boolean isStartingZone() {
-        return template.isStartingZone();
+    public Boolean isStartingMap() {
+        return template.isStartingMap();
     }
 
     public CollisionGrid getCollisionGrid() {
@@ -103,16 +103,16 @@ public class ZoneInstance {
     }
 
     public void join(CharacterInstance character, Position position) {
-        character.setCurrentZone(this);
+        character.setCurrentMap(this);
         character.setPosition(position);
         clients.put(character.getId(), character);
-        log.info("zone.joined thread={} zoneId={} character={} position={}", Thread.currentThread().getName(), id,
+        log.info("map.joined thread={} mapId={} character={} position={}", Thread.currentThread().getName(), id,
                 character.getId(), position);
-        DomainEventPublisher.publish(new GamePlayerSpawnedToZone(character, this));
+        DomainEventPublisher.publish(new GamePlayerSpawnedToMap(character, this));
 
         character.getKnownList().populateSilently();
         character.broadcast(
-                new GamePlayerJoinedZone(character.getId(), character.getName(), position.x(), position.y()),
+                new GamePlayerJoinedMap(character.getId(), character.getName(), position.x(), position.y()),
                 character);
     }
 
@@ -120,15 +120,15 @@ public class ZoneInstance {
         clients.remove(character.getId());
         character.getKnownList().clear();
         character.setPosition(null);
-        log.info("zone.left thread={} zoneId={} character={}", Thread.currentThread().getName(), id, character.getId());
-        character.broadcast(new GamePlayerLeftZone(character.getName()), character);
+        log.info("map.left thread={} mapId={} character={}", Thread.currentThread().getName(), id, character.getId());
+        character.broadcast(new GamePlayerLeftMap(character.getName()), character);
     }
 
     public void disconnect(CharacterInstance character) {
         clients.remove(character.getId());
         character.getKnownList().clear();
         character.setPosition(null);
-        log.info("zone.disconnected thread={} zoneId={} character={}", Thread.currentThread().getName(), id,
+        log.info("map.disconnected thread={} mapId={} character={}", Thread.currentThread().getName(), id,
                 character.getId());
         character.broadcast(new GamePlayerDisconnected(character.getName()), character);
     }
@@ -219,21 +219,21 @@ public class ZoneInstance {
         return npcs.stream().filter(npc -> npc.getId().equals(id)).findFirst();
     }
 
-    public List<ZonePortal> getPortals() {
-        return template.getPortals().stream().map(this::toZonePortal).toList();
+    public List<MapPortal> getPortals() {
+        return template.getPortals().stream().map(this::toMapPortal).toList();
     }
 
-    public Optional<ZonePortal> findPortalAt(Position position) {
+    public Optional<MapPortal> findPortalAt(Position position) {
         return template.getPortals().stream()
                 .filter(portal -> portal.position().distanceTo(position) <= portal.triggerRadius()).findFirst()
-                .map(this::toZonePortal);
+                .map(this::toMapPortal);
     }
 
-    private ZonePortal toZonePortal(ZoneTemplatePortal portal) {
-        ZoneInstance target = worldInstance.zoneInstanceForTemplate(portal.targetZoneTemplateId())
+    private MapPortal toMapPortal(MapTemplatePortal portal) {
+        MapInstance target = worldInstance.mapInstanceForTemplate(portal.targetMapTemplateId())
                 .orElseThrow(() -> new IllegalStateException("Portail de " + id + " vers "
-                        + portal.targetZoneTemplateId() + ", absente de " + worldInstance.getId()));
-        return new ZonePortal(portal.position(), portal.direction(), this, target, portal.targetPosition(),
+                        + portal.targetMapTemplateId() + ", absente de " + worldInstance.getId()));
+        return new MapPortal(portal.position(), portal.direction(), this, target, portal.targetPosition(),
                 portal.triggerRadius());
     }
 
@@ -271,7 +271,7 @@ public class ZoneInstance {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ZoneInstance other)) {
+        if (!(o instanceof MapInstance other)) {
             return false;
         }
         return Objects.equals(id, other.id);
@@ -284,7 +284,7 @@ public class ZoneInstance {
 
     @Override
     public String toString() {
-        return "ZoneInstance[id=" + id + ", templateId=" + template.getId() + ", worldInstanceId="
+        return "MapInstance[id=" + id + ", templateId=" + template.getId() + ", worldInstanceId="
                 + worldInstance.getId() + "]";
     }
 }

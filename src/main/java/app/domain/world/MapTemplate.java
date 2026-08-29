@@ -9,26 +9,26 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class ZoneTemplate {
+public class MapTemplate {
 
     private final UUID id;
     private final String name;
     private final String description;
-    private final Boolean isStartingZone;
+    private final Boolean isStartingMap;
     private final CollisionGrid collisionGrid;
     private final Position spawnPosition;
     private final List<MonsterSpawn> monsterSpawns;
     private final List<MonsterSpawnGroup> monsterSpawnGroups;
     private final List<NpcSpawn> npcSpawns;
-    private List<ZoneTemplatePortal> portals = List.of();
+    private List<MapTemplatePortal> portals = List.of();
 
-    public ZoneTemplate(UUID id, String name, String description, Boolean isStartingZone, CollisionGrid collisionGrid,
+    public MapTemplate(UUID id, String name, String description, Boolean isStartingMap, CollisionGrid collisionGrid,
             Position spawnPosition, List<MonsterSpawn> monsterSpawns, List<MonsterSpawnGroup> monsterSpawnGroups,
             List<NpcSpawn> npcSpawns) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.isStartingZone = isStartingZone;
+        this.isStartingMap = isStartingMap;
         this.collisionGrid = collisionGrid;
         this.spawnPosition = spawnPosition;
         this.monsterSpawns = List.copyOf(monsterSpawns);
@@ -48,8 +48,8 @@ public class ZoneTemplate {
         return description;
     }
 
-    public Boolean isStartingZone() {
-        return isStartingZone;
+    public Boolean isStartingMap() {
+        return isStartingMap;
     }
 
     public CollisionGrid getCollisionGrid() {
@@ -72,11 +72,11 @@ public class ZoneTemplate {
         return npcSpawns;
     }
 
-    public List<ZoneTemplatePortal> getPortals() {
+    public List<MapTemplatePortal> getPortals() {
         return portals;
     }
 
-    public void setPortals(List<ZoneTemplatePortal> portals) {
+    public void setPortals(List<MapTemplatePortal> portals) {
         this.portals = List.copyOf(portals);
     }
 
@@ -93,7 +93,7 @@ public class ZoneTemplate {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ZoneTemplate other)) {
+        if (!(o instanceof MapTemplate other)) {
             return false;
         }
         return Objects.equals(id, other.id);
@@ -106,7 +106,7 @@ public class ZoneTemplate {
 
     @Override
     public String toString() {
-        return "ZoneTemplate[id=" + id + ", name=" + name + ", isStartingZone=" + isStartingZone + ", spawnPosition="
+        return "MapTemplate[id=" + id + ", name=" + name + ", isStartingMap=" + isStartingMap + ", spawnPosition="
                 + spawnPosition + "]";
     }
 }

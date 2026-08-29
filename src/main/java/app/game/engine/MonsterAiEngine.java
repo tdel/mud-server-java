@@ -18,7 +18,7 @@ import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.map.Position;
 import app.domain.world.CollisionGrid;
-import app.domain.world.ZoneInstance;
+import app.domain.world.MapInstance;
 import app.network.message.ingame.AttackResult;
 import app.network.message.ingame.CharacterMovementFinished;
 import app.network.message.ingame.CharacterMovementStarted;
@@ -88,9 +88,9 @@ public class MonsterAiEngine {
 
     private void tickChasing(MonsterInstance monster, PursuitState state, long nowMillis, long nowNanos) {
         CharacterInstance target = state.target();
-        ZoneInstance zone = monster.getCurrentZone();
+        MapInstance map = monster.getCurrentMap();
 
-        if (target == null || target.getCurrentHealth() <= 0 || !zone.isPresent(target)) {
+        if (target == null || target.getCurrentHealth() <= 0 || !map.isPresent(target)) {
             giveUpChase(monster, state, target);
             return;
         }
@@ -171,8 +171,8 @@ public class MonsterAiEngine {
     }
 
     private boolean stepToward(MonsterInstance monster, Position destination, double dtSeconds) {
-        ZoneInstance zone = monster.getCurrentZone();
-        CollisionGrid grid = zone.getCollisionGrid();
+        MapInstance map = monster.getCurrentMap();
+        CollisionGrid grid = map.getCollisionGrid();
         Position previous = monster.getPosition();
         ContinuousStep.StepResult result = ContinuousStep.step(previous, List.of(destination),
                 MovementEngine.unitsPerSecond(monster.getSpeed()), dtSeconds, grid);

@@ -161,7 +161,7 @@ public class SpellCastEngine {
         if (target == caster) {
             return true;
         }
-        if (target.getCurrentHealth() <= 0 || !caster.getCurrentZone().isPresent(target)) {
+        if (target.getCurrentHealth() <= 0 || !caster.getCurrentMap().isPresent(target)) {
             return false;
         }
         return spell.range() <= 0 || caster.getPosition().distanceTo(target.getPosition()) <= spell.range();

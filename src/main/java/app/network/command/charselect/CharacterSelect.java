@@ -16,8 +16,8 @@ import app.network.ConnectionState;
 import app.network.message.Usage;
 import app.network.message.charselect.NoCharacterNamed;
 import app.network.message.charselect.NowPlaying;
-import app.network.message.ingame.ZoneEnter;
-import app.network.message.ingame.ZoneMap;
+import app.network.message.ingame.MapEnter;
+import app.network.message.ingame.MapView;
 import app.persistence.listener.ItemPersistenceListener;
 
 @Component
@@ -72,7 +72,7 @@ public class CharacterSelect implements CommandHandler {
         MDC.put("character", loadedChar.getName());
 
         connection.send(new NowPlaying(loadedChar.getName()));
-        connection.send(new ZoneMap(loadedChar.getCurrentZone()));
-        connection.send(new ZoneEnter(loadedChar));
+        connection.send(new MapView(loadedChar.getCurrentMap()));
+        connection.send(new MapEnter(loadedChar));
     }
 }

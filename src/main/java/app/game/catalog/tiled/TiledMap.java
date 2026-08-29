@@ -4,12 +4,12 @@ import java.util.List;
 
 /**
  * Sous-ensemble du format {@code .tmx} (XML natif Tiled Map Editor, orientation
- * orthogonale) réellement exploité par {@link TiledZoneLoader}. Les autres
+ * orthogonale) réellement exploité par {@link TiledMapLoader}. Les autres
  * attributs/balises standards d'un fichier Tiled (version, tiledversion,
  * infinite, renderorder, nextlayerid, nextobjectid, image du tileset, etc.)
- * restent présents dans les fichiers authorés sous {@code data/zones/*.tmx}
+ * restent présents dans les fichiers authorés sous {@code data/maps/*.tmx}
  * pour rester ouvrables tels quels dans Tiled, mais ne sont pas modélisés ici :
- * {@link TiledZoneLoader} ignore simplement ce qu'il ne lit pas.
+ * {@link TiledMapLoader} ignore simplement ce qu'il ne lit pas.
  */
 public record TiledMap(String orientation, int width, int height, int tilewidth, int tileheight,
         List<TiledLayer> layers, List<TiledTileset> tilesets, List<TiledProperty> properties) {

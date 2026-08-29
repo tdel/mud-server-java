@@ -15,18 +15,18 @@ public class WorldTemplate {
     private final String description;
     private final int minPlayers;
     private final int maxPlayers;
-    private final Map<UUID, ZoneTemplate> zoneTemplates;
+    private final Map<UUID, MapTemplate> mapTemplates;
     private final Map<UUID, NpcTemplate> npcTemplates;
 
     public WorldTemplate(UUID id, String shortName, String name, String description, int minPlayers, int maxPlayers,
-            Map<UUID, ZoneTemplate> zoneTemplates, Map<UUID, NpcTemplate> npcTemplates) {
+            Map<UUID, MapTemplate> mapTemplates, Map<UUID, NpcTemplate> npcTemplates) {
         this.id = id;
         this.shortName = shortName;
         this.name = name;
         this.description = description;
         this.minPlayers = minPlayers;
         this.maxPlayers = maxPlayers;
-        this.zoneTemplates = Map.copyOf(zoneTemplates);
+        this.mapTemplates = Map.copyOf(mapTemplates);
         this.npcTemplates = Map.copyOf(npcTemplates);
     }
 
@@ -54,26 +54,26 @@ public class WorldTemplate {
         return maxPlayers;
     }
 
-    public Map<UUID, ZoneTemplate> getZoneTemplates() {
-        return zoneTemplates;
+    public Map<UUID, MapTemplate> getMapTemplates() {
+        return mapTemplates;
     }
 
     public Map<UUID, NpcTemplate> getNpcTemplates() {
         return npcTemplates;
     }
 
-    public Optional<ZoneTemplate> startingZoneTemplate() {
-        return zoneTemplates.values().stream().filter(zone -> Boolean.TRUE.equals(zone.isStartingZone())).findFirst();
+    public Optional<MapTemplate> startingMapTemplate() {
+        return mapTemplates.values().stream().filter(map -> Boolean.TRUE.equals(map.isStartingMap())).findFirst();
     }
 
-    public Collection<NpcTemplate> npcTemplatesForZone(UUID zoneTemplateId) {
-        return npcTemplates.values().stream().filter(npc -> npc.zoneTemplateId().equals(zoneTemplateId)).toList();
+    public Collection<NpcTemplate> npcTemplatesForMap(UUID mapTemplateId) {
+        return npcTemplates.values().stream().filter(npc -> npc.mapTemplateId().equals(mapTemplateId)).toList();
     }
 
     @Override
     public String toString() {
         return "WorldTemplate[id=" + id + ", shortName=" + shortName + ", name=" + name + ", minPlayers=" + minPlayers
-                + ", maxPlayers=" + maxPlayers + ", zones=" + zoneTemplates.size() + ", npcs=" + npcTemplates.size()
+                + ", maxPlayers=" + maxPlayers + ", maps=" + mapTemplates.size() + ", npcs=" + npcTemplates.size()
                 + "]";
     }
 }

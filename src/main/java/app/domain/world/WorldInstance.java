@@ -36,7 +36,7 @@ public class WorldInstance {
     private final UUID worldTemplateId;
     private final Instant createdAt;
 
-    private Map<UUID, ZoneInstance> zoneInstances = Map.of();
+    private Map<UUID, MapInstance> mapInstances = Map.of();
 
     private final Map<UUID, CharacterInstance> players = new ConcurrentHashMap<>();
 
@@ -58,28 +58,28 @@ public class WorldInstance {
         return createdAt;
     }
 
-    public void setZoneInstances(Map<UUID, ZoneInstance> zoneInstances) {
-        this.zoneInstances = Map.copyOf(zoneInstances);
+    public void setMapInstances(Map<UUID, MapInstance> mapInstances) {
+        this.mapInstances = Map.copyOf(mapInstances);
     }
 
     public boolean isMaterialized() {
-        return !zoneInstances.isEmpty();
+        return !mapInstances.isEmpty();
     }
 
-    public Collection<ZoneInstance> zoneInstances() {
-        return zoneInstances.values();
+    public Collection<MapInstance> mapInstances() {
+        return mapInstances.values();
     }
 
-    public Optional<ZoneInstance> zoneInstanceForTemplate(UUID zoneTemplateId) {
-        return Optional.ofNullable(zoneInstances.get(zoneTemplateId));
+    public Optional<MapInstance> mapInstanceForTemplate(UUID mapTemplateId) {
+        return Optional.ofNullable(mapInstances.get(mapTemplateId));
     }
 
-    public Optional<ZoneInstance> startingZoneInstance() {
-        return zoneInstances.values().stream().filter(zone -> Boolean.TRUE.equals(zone.isStartingZone())).findFirst();
+    public Optional<MapInstance> startingMapInstance() {
+        return mapInstances.values().stream().filter(map -> Boolean.TRUE.equals(map.isStartingMap())).findFirst();
     }
 
     public void loadPlayer(CharacterInstance character) {
-        character.getCurrentZone().join(character);
+        character.getCurrentMap().join(character);
         players.put(character.getId(), character);
         log.info("world.player_loaded thread={} worldId={} character={}", Thread.currentThread().getName(), id,
                 character.getId());
@@ -103,8 +103,8 @@ public class WorldInstance {
 
     public CharacterInstance createCharacter(Account account, String name, Gender gender, Race race,
             CharacterClass characterClass) {
-        ZoneInstance startingZone = startingZoneInstance()
-                .orElseThrow(() -> new IllegalStateException("WorldInstance " + id + " n'a aucune zone de départ"));
+        MapInstance startingMap = startingMapInstance()
+                .orElseThrow(() -> new IllegalStateException("WorldInstance " + id + " n'a aucune map de départ"));
 
         Map<Attribute, Integer> scores = rollAttributeScores();
         for (Map.Entry<Attribute, Integer> bonus : race.attributeScoreBonuses().entrySet()) {
@@ -121,7 +121,7 @@ public class WorldInstance {
 
         int startingMana = characterClass.manaGainPerLevel();
 
-        CharacterInstance character = new CharacterInstance(UUID.randomUUID(), account, name, startingZone, gender,
+        CharacterInstance character = new CharacterInstance(UUID.randomUUID(), account, name, startingMap, gender,
                 race, characterClass, 1, maxHealth, maxHealth, scores, 0, gold, 0, startingMana, startingMana);
         character.setWorldInstance(this);
 

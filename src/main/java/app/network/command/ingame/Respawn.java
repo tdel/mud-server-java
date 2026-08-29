@@ -5,13 +5,13 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import app.domain.actor.instance.CharacterInstance;
-import app.domain.world.ZoneInstance;
+import app.domain.world.MapInstance;
 import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.ingame.CharacterNotDead;
-import app.network.message.ingame.ZoneEnter;
-import app.network.message.ingame.ZoneMap;
+import app.network.message.ingame.MapEnter;
+import app.network.message.ingame.MapView;
 
 @Component
 public class Respawn implements CommandHandler {
@@ -35,15 +35,15 @@ public class Respawn implements CommandHandler {
             return;
         }
 
-        ZoneInstance startingZone = character.getWorldInstance().startingZoneInstance()
-                .orElseThrow(() -> new IllegalStateException("Aucune starting zone configurée"));
-        character.respawn(startingZone, startingZone.getSpawnPosition());
+        MapInstance startingMap = character.getWorldInstance().startingMapInstance()
+                .orElseThrow(() -> new IllegalStateException("Aucune starting map configurée"));
+        character.respawn(startingMap, startingMap.getSpawnPosition());
 
-        // La starting zone peut différer de la zone où le personnage est mort : sans
+        // La starting map peut différer de la map où le personnage est mort : sans
         // ça, le
         // client resterait affiché sur l'ancienne carte (voir Portal.java, même
         // besoin).
-        connection.send(new ZoneMap(character.getCurrentZone()));
-        connection.send(new ZoneEnter(character));
+        connection.send(new MapView(character.getCurrentMap()));
+        connection.send(new MapEnter(character));
     }
 }

@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import app.domain.world.ZoneInstance;
+import app.domain.world.MapInstance;
 import app.domain.actor.template.NpcTemplate;
 
 public class AbstractNpc extends AbstractCharacter {
@@ -16,10 +16,10 @@ public class AbstractNpc extends AbstractCharacter {
 
     private final NpcTemplate template;
 
-    public AbstractNpc(UUID id, NpcTemplate template, ZoneInstance zone) {
+    public AbstractNpc(UUID id, NpcTemplate template, MapInstance map) {
         super(id, template.name(), neutralAttributes(), NOMINAL_HEALTH, NOMINAL_HEALTH);
         this.template = Objects.requireNonNull(template);
-        setCurrentZone(Objects.requireNonNull(zone));
+        setCurrentMap(Objects.requireNonNull(map));
         this.speed = 0;
     }
 
@@ -56,17 +56,17 @@ public class AbstractNpc extends AbstractCharacter {
             return false;
         }
         return Objects.equals(getId(), other.getId()) && Objects.equals(getName(), other.getName())
-                && Objects.equals(getCurrentZone(), other.getCurrentZone());
+                && Objects.equals(getCurrentMap(), other.getCurrentMap());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getCurrentZone());
+        return Objects.hash(getId(), getName(), getCurrentMap());
     }
 
     @Override
     public String toString() {
-        return "GameNpc[id=" + getId() + ", name=" + getName() + ", zoneId=" + getCurrentZone().getId() + "]";
+        return "GameNpc[id=" + getId() + ", name=" + getName() + ", mapId=" + getCurrentMap().getId() + "]";
     }
 
     public enum NpcDialogueOptionType {

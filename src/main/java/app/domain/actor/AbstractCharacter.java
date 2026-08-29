@@ -13,7 +13,7 @@ import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.event.SpellCastBegin;
 import app.domain.map.Position;
-import app.domain.world.ZoneInstance;
+import app.domain.world.MapInstance;
 import app.game.engine.MovementEngine;
 import app.game.engine.SpellCastEngine;
 import app.game.dice.DiceExpression;
@@ -36,7 +36,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     private int currentHealth;
     private int maxHealth;
 
-    private volatile ZoneInstance currentZone;
+    private volatile MapInstance currentMap;
     private volatile Position position;
     private volatile double heading;
     protected int speed = DEFAULT_SPEED;
@@ -142,12 +142,12 @@ public abstract class AbstractCharacter extends AbstractObject {
         return healed;
     }
 
-    public ZoneInstance getCurrentZone() {
-        return currentZone;
+    public MapInstance getCurrentMap() {
+        return currentMap;
     }
 
-    public void setCurrentZone(ZoneInstance currentZone) {
-        this.currentZone = currentZone;
+    public void setCurrentMap(MapInstance currentMap) {
+        this.currentMap = currentMap;
     }
 
     public Position getPosition() {

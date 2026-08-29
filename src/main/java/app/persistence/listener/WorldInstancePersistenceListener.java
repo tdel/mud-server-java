@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import app.domain.actor.event.GamePlayerMovedToZone;
-import app.domain.actor.event.GamePlayerSpawnedToZone;
+import app.domain.actor.event.GamePlayerMovedToMap;
+import app.domain.actor.event.GamePlayerSpawnedToMap;
 import app.persistence.CharacterDao;
 
 @Service
@@ -21,14 +21,14 @@ public class WorldInstancePersistenceListener {
     }
 
     @EventListener
-    void onGamePlayerMovedToZone(GamePlayerMovedToZone event) {
-        characterDao.updateCurrentZone(event.character().getId(), event.to().getTemplateId());
-        log.debug("zone.player_moved character={} to={}", event.character().getName(), event.to().getName());
+    void onGamePlayerMovedToMap(GamePlayerMovedToMap event) {
+        characterDao.updateCurrentMap(event.character().getId(), event.to().getTemplateId());
+        log.debug("map.player_moved character={} to={}", event.character().getName(), event.to().getName());
     }
 
     @EventListener
-    void onGamePlayerSpawnedToZone(GamePlayerSpawnedToZone event) {
-        characterDao.updateCurrentZone(event.character().getId(), event.zone().getTemplateId());
-        log.info("zone.player_spawned character={} zone={}", event.character().getName(), event.zone().getName());
+    void onGamePlayerSpawnedToMap(GamePlayerSpawnedToMap event) {
+        characterDao.updateCurrentMap(event.character().getId(), event.map().getTemplateId());
+        log.info("map.player_spawned character={} map={}", event.character().getName(), event.map().getName());
     }
 }

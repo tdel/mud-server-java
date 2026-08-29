@@ -72,7 +72,7 @@ public class Goto implements CommandHandler {
 
         Position target = new Position(x.get(), y.get());
         Optional<List<Position>> path = GridPathfinder.findPath(character.getPosition(), target,
-                character.getCurrentZone().getCollisionGrid());
+                character.getCurrentMap().getCollisionGrid());
 
         if (path.isEmpty()) {
             log.debug("movement.no_path character={} target=({},{})", character.getId(), target.x(), target.y());

@@ -21,7 +21,7 @@ import app.domain.actor.template.MonsterTemplate.LootTableEntry;
 import app.domain.item.ItemTemplate;
 import app.domain.MonsterSpawn;
 import app.domain.MonsterSpawnGroup;
-import app.domain.world.ZoneInstance;
+import app.domain.world.MapInstance;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -54,12 +54,12 @@ public class MonsterCatalog {
         }
     }
 
-    public void placeMonsters(Collection<ZoneInstance> zones) {
+    public void placeMonsters(Collection<MapInstance> maps) {
         int placedCount = 0;
-        for (ZoneInstance zone : zones) {
-            Map<String, MonsterSpawnGroup> groupsById = zone.getMonsterSpawnGroups().stream()
+        for (MapInstance map : maps) {
+            Map<String, MonsterSpawnGroup> groupsById = map.getMonsterSpawnGroups().stream()
                     .collect(Collectors.toMap(MonsterSpawnGroup::id, group -> group));
-            Map<String, List<MonsterSpawn>> spawnsByGroup = zone.getMonsterSpawns().stream()
+            Map<String, List<MonsterSpawn>> spawnsByGroup = map.getMonsterSpawns().stream()
                     .collect(Collectors.groupingBy(MonsterSpawn::groupId));
 
             for (Map.Entry<String, List<MonsterSpawn>> entry : spawnsByGroup.entrySet()) {
@@ -67,7 +67,7 @@ public class MonsterCatalog {
                 List<MonsterSpawn> spawns = entry.getValue();
                 int toPlace = Math.min(group.maxMonsters(), spawns.size());
                 for (MonsterSpawn spawn : spawns.subList(0, toPlace)) {
-                    spawnMonster(spawn, zone);
+                    spawnMonster(spawn, map);
                     placedCount++;
                 }
             }
@@ -76,18 +76,18 @@ public class MonsterCatalog {
         log.info("monster.instances_placed count={}", placedCount);
     }
 
-    public MonsterInstance spawnMonster(MonsterSpawn spawn, ZoneInstance zone) {
+    public MonsterInstance spawnMonster(MonsterSpawn spawn, MapInstance map) {
         MonsterTemplate template = templates.get(spawn.templateId());
         if (template == null) {
-            throw new IllegalStateException("Spawn " + spawn.id() + " de la zone " + zone.getId()
+            throw new IllegalStateException("Spawn " + spawn.id() + " de la map " + map.getId()
                     + " référence le template " + spawn.templateId() + ", absent de " + MONSTERS_RESOURCE);
         }
 
-        MonsterInstance monster = new MonsterInstance(spawn.id(), template.getName(), template.getId(), zone.getId(),
+        MonsterInstance monster = new MonsterInstance(spawn.id(), template.getName(), template.getId(), map.getId(),
                 template.getAttributes(), template.getMaxHealth(), spawn.position());
         monster.attachTemplate(template);
-        monster.setCurrentZone(zone);
-        zone.placeMonster(monster, spawn.position());
+        monster.setCurrentMap(map);
+        map.placeMonster(monster, spawn.position());
         return monster;
     }
 

@@ -6,6 +6,6 @@ import app.domain.map.Position;
 import app.domain.actor.AbstractNpc;
 import app.domain.actor.instance.NpcSellerInstance;
 
-public record NpcTemplate(UUID id, String name, UUID zoneTemplateId, Position position, String description,
+public record NpcTemplate(UUID id, String name, UUID mapTemplateId, Position position, String description,
         AbstractNpc.NpcDialogue dialogue, NpcSellerInstance.NpcShop shop, int level) {
 }

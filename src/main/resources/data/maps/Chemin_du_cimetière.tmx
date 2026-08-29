@@ -4,7 +4,7 @@
   <property name="id" value="4dae9974-45f7-46c9-8e66-12cdac759860"/>
   <property name="name" value="Chemin du cimetière"/>
   <property name="description" value="Un sentier de terre battue serpente entre les herbes hautes, quittant le village pour rejoindre les grilles rouillées du cimetière."/>
-  <property name="isStartingZone" type="bool" value="false"/>
+  <property name="isStartingMap" type="bool" value="false"/>
  </properties>
  <tileset firstgid="1" name="Chemin du cimetière" tilewidth="32" tileheight="32" tilecount="4" columns="4">
   <tile id="0">
@@ -78,7 +78,7 @@
   <object id="2" name="" type="portal" x="192.0" y="576.0">
    <properties>
          <property name="direction" value="O"/>
-         <property name="targetZoneId" value="5e4ada37-37e1-438c-9233-581f10c055c7"/>
+         <property name="targetMapId" value="5e4ada37-37e1-438c-9233-581f10c055c7"/>
          <property name="targetX" type="float" value="2640.0"/>
          <property name="targetY" type="float" value="2160.0"/>
    </properties>
@@ -86,7 +86,7 @@
   <object id="3" name="" type="portal" x="1728.0" y="576.0">
    <properties>
          <property name="direction" value="E"/>
-         <property name="targetZoneId" value="a73e8fb0-c05b-4aa8-9c57-4b097644cd0d"/>
+         <property name="targetMapId" value="a73e8fb0-c05b-4aa8-9c57-4b097644cd0d"/>
          <property name="targetX" type="float" value="192.0"/>
          <property name="targetY" type="float" value="576.0"/>
    </properties>

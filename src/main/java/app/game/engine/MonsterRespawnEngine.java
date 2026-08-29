@@ -17,7 +17,7 @@ import app.domain.MonsterSpawn;
 import app.domain.MonsterSpawnGroup;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.instance.MonsterInstance;
-import app.domain.world.ZoneInstance;
+import app.domain.world.MapInstance;
 import app.game.catalog.MonsterCatalog;
 import app.network.message.ingame.MonsterSpawned;
 
@@ -38,18 +38,18 @@ public class MonsterRespawnEngine {
     @EventListener
     void onCharacterDied(CharacterDied event) {
         MonsterInstance monster = event.character();
-        ZoneInstance zone = monster.getCurrentZone();
-        Optional<MonsterSpawn> spawn = zone.getMonsterSpawns().stream()
+        MapInstance map = monster.getCurrentMap();
+        Optional<MonsterSpawn> spawn = map.getMonsterSpawns().stream()
                 .filter(candidate -> candidate.id().equals(monster.getId())).findFirst();
         if (spawn.isEmpty()) {
             return;
         }
-        MonsterSpawnGroup group = zone.getMonsterSpawnGroups().stream()
+        MonsterSpawnGroup group = map.getMonsterSpawnGroups().stream()
                 .filter(candidate -> candidate.id().equals(spawn.get().groupId())).findFirst()
                 .orElseThrow(() -> new IllegalStateException("Spawn " + spawn.get().id() + " référence le groupe "
-                        + spawn.get().groupId() + ", absent de la zone " + zone.getId()));
-        pending.add(new PendingRespawn(zone, group, System.currentTimeMillis()));
-        log.info("monster.respawn_scheduled zone={} group={} delaySeconds={}", zone.getId(), group.id(),
+                        + spawn.get().groupId() + ", absent de la map " + map.getId()));
+        pending.add(new PendingRespawn(map, group, System.currentTimeMillis()));
+        log.info("monster.respawn_scheduled map={} group={} delaySeconds={}", map.getId(), group.id(),
                 group.respawnDelaySeconds());
     }
 
@@ -60,11 +60,11 @@ public class MonsterRespawnEngine {
                 .filter(entry -> now - entry.diedAt() >= entry.group().respawnDelaySeconds() * 1000).toList();
 
         for (PendingRespawn entry : due) {
-            ZoneInstance zone = entry.zone();
+            MapInstance map = entry.map();
             MonsterSpawnGroup group = entry.group();
-            List<MonsterSpawn> groupSpawns = zone.getMonsterSpawns().stream()
+            List<MonsterSpawn> groupSpawns = map.getMonsterSpawns().stream()
                     .filter(spawn -> spawn.groupId().equals(group.id())).toList();
-            Set<UUID> occupiedIds = zone.getMonsters().stream().map(MonsterInstance::getId).collect(Collectors.toSet());
+            Set<UUID> occupiedIds = map.getMonsters().stream().map(MonsterInstance::getId).collect(Collectors.toSet());
             long occupiedCount = groupSpawns.stream().filter(spawn -> occupiedIds.contains(spawn.id())).count();
             if (occupiedCount >= group.maxMonsters()) {
                 continue;
@@ -74,16 +74,16 @@ public class MonsterRespawnEngine {
             if (freeSpawn.isEmpty()) {
                 continue;
             }
-            MonsterInstance monster = monsterCatalog.spawnMonster(freeSpawn.get(), zone);
+            MonsterInstance monster = monsterCatalog.spawnMonster(freeSpawn.get(), map);
             pending.remove(entry);
             monster.getKnownList().populateSilently();
             monster.broadcast(new MonsterSpawned(monster.getId(), monster.getName(), monster.getPosition().x(),
                     monster.getPosition().y(), MovementEngine.unitsPerSecond(monster.getSpeed()),
                     monster.getCurrentHealth(), monster.getMaxHealth(), monster.getLevel()), null);
-            log.info("monster.respawned zone={} group={} monsterId={}", zone.getId(), group.id(), monster.getId());
+            log.info("monster.respawned map={} group={} monsterId={}", map.getId(), group.id(), monster.getId());
         }
     }
 
-    private record PendingRespawn(ZoneInstance zone, MonsterSpawnGroup group, long diedAt) {
+    private record PendingRespawn(MapInstance map, MonsterSpawnGroup group, long diedAt) {
     }
 }

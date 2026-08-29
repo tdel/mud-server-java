@@ -24,18 +24,18 @@ public final class MonsterInstance extends AbstractCharacter {
     private static final Logger log = LoggerFactory.getLogger(MonsterInstance.class);
 
     private final UUID templateId;
-    private final UUID zoneId;
+    private final UUID mapId;
     private final Position spawnPosition;
 
     private MonsterTemplate template;
 
     public volatile MonsterAiEngine.PursuitState pursuit;
 
-    public MonsterInstance(UUID id, String name, UUID templateId, UUID zoneId, Map<Attribute, Integer> attributes,
+    public MonsterInstance(UUID id, String name, UUID templateId, UUID mapId, Map<Attribute, Integer> attributes,
             int maxHealth, Position spawnPosition) {
         super(id, name, attributes, maxHealth, maxHealth);
         this.templateId = templateId;
-        this.zoneId = zoneId;
+        this.mapId = mapId;
         this.spawnPosition = spawnPosition;
     }
 
@@ -141,8 +141,8 @@ public final class MonsterInstance extends AbstractCharacter {
         return templateId;
     }
 
-    public UUID getZoneId() {
-        return zoneId;
+    public UUID getMapId() {
+        return mapId;
     }
 
     public Position getSpawnPosition() {
@@ -159,20 +159,20 @@ public final class MonsterInstance extends AbstractCharacter {
         }
         return getCurrentHealth() == other.getCurrentHealth() && getMaxHealth() == other.getMaxHealth()
                 && Objects.equals(getId(), other.getId()) && Objects.equals(getName(), other.getName())
-                && Objects.equals(templateId, other.templateId) && Objects.equals(zoneId, other.zoneId)
+                && Objects.equals(templateId, other.templateId) && Objects.equals(mapId, other.mapId)
                 && Objects.equals(spawnPosition, other.spawnPosition)
                 && Objects.equals(getAttributes(), other.getAttributes());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), templateId, zoneId, spawnPosition, getAttributes(), getCurrentHealth(),
+        return Objects.hash(getId(), getName(), templateId, mapId, spawnPosition, getAttributes(), getCurrentHealth(),
                 getMaxHealth());
     }
 
     @Override
     public String toString() {
-        return "GameMonster[id=" + getId() + ", name=" + getName() + ", templateId=" + templateId + ", zoneId=" + zoneId
+        return "GameMonster[id=" + getId() + ", name=" + getName() + ", templateId=" + templateId + ", mapId=" + mapId
                 + ", spawnPosition=" + spawnPosition + ", currentHealth=" + getCurrentHealth() + ", maxHealth="
                 + getMaxHealth() + "]";
     }

@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 
 import app.domain.NpcSpawn;
 import app.domain.item.ItemTemplate;
-import app.domain.world.ZoneTemplate;
-import app.domain.world.ZoneTemplatePortal;
+import app.domain.world.MapTemplate;
+import app.domain.world.MapTemplatePortal;
 import app.domain.world.WorldTemplate;
 import app.domain.world.WorldTemplateSummary;
 import app.domain.actor.AbstractNpc;
@@ -27,9 +27,9 @@ import app.domain.actor.AbstractNpc.NpcDialogueOptionType;
 import app.domain.actor.instance.NpcSellerInstance;
 import app.domain.actor.template.NpcTemplate;
 import app.game.catalog.tiled.TiledMap;
-import app.game.catalog.tiled.TiledZoneLoader;
-import app.game.catalog.tiled.TiledZoneLoader.ParsedZone;
-import app.game.catalog.tiled.TiledZoneLoader.PortalDraft;
+import app.game.catalog.tiled.TiledMapLoader;
+import app.game.catalog.tiled.TiledMapLoader.ParsedMap;
+import app.game.catalog.tiled.TiledMapLoader.PortalDraft;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -99,8 +99,8 @@ public class WorldTemplateCatalog {
 
     private WorldTemplate loadWorldTemplate(WorldTemplateSummary summary, Map<UUID, ItemTemplate> itemTemplatesById) {
         String shortName = summary.shortName();
-        List<ParsedZone> parsedZones = readZoneFiles();
-        Map<UUID, ZoneTemplate> zoneTemplates = buildZoneTemplates(shortName, parsedZones);
+        List<ParsedMap> parsedMaps = readMapFiles();
+        Map<UUID, MapTemplate> mapTemplates = buildMapTemplates(shortName, parsedMaps);
 
         List<NpcDefinition> npcDefinitionList = readJsonList("npcs.json", new TypeReference<List<NpcDefinition>>() {
         });
@@ -110,19 +110,19 @@ public class WorldTemplateCatalog {
                 throw new IllegalStateException("NPC " + definition.id() + " dupliqué dans data/npcs.json");
             }
         }
-        Map<UUID, NpcTemplate> npcTemplates = buildNpcTemplates(shortName, npcDefinitionsById, zoneTemplates,
+        Map<UUID, NpcTemplate> npcTemplates = buildNpcTemplates(shortName, npcDefinitionsById, mapTemplates,
                 itemTemplatesById);
 
         WorldTemplate template = new WorldTemplate(summary.id(), shortName, summary.name(), summary.description(),
-                summary.minPlayers(), summary.maxPlayers(), zoneTemplates, npcTemplates);
+                summary.minPlayers(), summary.maxPlayers(), mapTemplates, npcTemplates);
 
-        log.info("world.template_loaded shortName={} id={} zones={} npcs={}", shortName, template.getId(),
-                zoneTemplates.size(), npcTemplates.size());
+        log.info("world.template_loaded shortName={} id={} maps={} npcs={}", shortName, template.getId(),
+                mapTemplates.size(), npcTemplates.size());
         return template;
     }
 
-    private List<ParsedZone> readZoneFiles() {
-        String pattern = "classpath*:" + DATA_DIR + "zones/*.tmx";
+    private List<ParsedMap> readMapFiles() {
+        String pattern = "classpath*:" + DATA_DIR + "maps/*.tmx";
         Resource[] files;
         try {
             files = resourcePatternResolver.getResources(pattern);
@@ -130,89 +130,89 @@ public class WorldTemplateCatalog {
             throw new IllegalStateException("Impossible d'énumérer " + pattern, e);
         }
         if (files.length == 0) {
-            throw new IllegalStateException("Aucune zone Tiled sous " + pattern);
+            throw new IllegalStateException("Aucune map Tiled sous " + pattern);
         }
-        List<ParsedZone> zones = new ArrayList<>();
+        List<ParsedMap> maps = new ArrayList<>();
         for (Resource file : files) {
             try (InputStream in = file.getInputStream()) {
-                zones.add(TiledZoneLoader.parse(TiledZoneLoader.readMap(in), this::openZoneTilesetResource));
+                maps.add(TiledMapLoader.parse(TiledMapLoader.readMap(in), this::openMapTilesetResource));
             } catch (IOException e) {
-                throw new IllegalStateException("Impossible de charger la zone Tiled " + file, e);
+                throw new IllegalStateException("Impossible de charger la map Tiled " + file, e);
             }
         }
-        return zones;
+        return maps;
     }
 
-    private InputStream openZoneTilesetResource(String relativeSource) {
+    private InputStream openMapTilesetResource(String relativeSource) {
         try {
-            return worldFile("zones/" + relativeSource).getInputStream();
+            return worldFile("maps/" + relativeSource).getInputStream();
         } catch (IOException e) {
             throw new IllegalStateException("Impossible de charger le tileset " + relativeSource, e);
         }
     }
 
-    Map<UUID, ZoneTemplate> buildZoneTemplates(String shortName, List<ParsedZone> parsedZones) {
-        long startingZoneCount = parsedZones.stream().filter(ParsedZone::isStartingZone).count();
-        if (startingZoneCount != 1) {
-            throw new IllegalStateException("Le monde " + shortName + " doit avoir exactement une zone isStartingZone"
-                    + " (trouvé " + startingZoneCount + ")");
+    Map<UUID, MapTemplate> buildMapTemplates(String shortName, List<ParsedMap> parsedMaps) {
+        long startingMapCount = parsedMaps.stream().filter(ParsedMap::isStartingMap).count();
+        if (startingMapCount != 1) {
+            throw new IllegalStateException("Le monde " + shortName + " doit avoir exactement une map isStartingMap"
+                    + " (trouvé " + startingMapCount + ")");
         }
 
-        Map<UUID, ZoneTemplate> templates = new LinkedHashMap<>();
-        for (ParsedZone zone : parsedZones) {
-            ZoneTemplate template = new ZoneTemplate(zone.id(), zone.name(), zone.description(), zone.isStartingZone(),
-                    zone.terrain(), zone.spawnPosition(), zone.monsterSpawns(), zone.monsterSpawnGroups(),
-                    zone.npcSpawns());
-            if (!template.isWalkable(zone.spawnPosition())) {
-                throw new IllegalStateException("Zone " + zone.id() + " du monde " + shortName + " a une position de "
-                        + "spawn " + zone.spawnPosition() + " non praticable de sa carte");
+        Map<UUID, MapTemplate> templates = new LinkedHashMap<>();
+        for (ParsedMap map : parsedMaps) {
+            MapTemplate template = new MapTemplate(map.id(), map.name(), map.description(), map.isStartingMap(),
+                    map.terrain(), map.spawnPosition(), map.monsterSpawns(), map.monsterSpawnGroups(),
+                    map.npcSpawns());
+            if (!template.isWalkable(map.spawnPosition())) {
+                throw new IllegalStateException("Map " + map.id() + " du monde " + shortName + " a une position de "
+                        + "spawn " + map.spawnPosition() + " non praticable de sa carte");
             }
             if (templates.putIfAbsent(template.getId(), template) != null) {
-                throw new IllegalStateException("Zone " + zone.id() + " dupliquée dans le monde " + shortName);
+                throw new IllegalStateException("Map " + map.id() + " dupliquée dans le monde " + shortName);
             }
         }
 
-        for (ParsedZone zone : parsedZones) {
-            ZoneTemplate source = templates.get(zone.id());
-            List<ZoneTemplatePortal> portals = zone.portals().stream()
-                    .map(portal -> resolvePortal(shortName, zone, source, portal, templates)).toList();
-            checkNoOverlappingPortals(shortName, zone, portals);
+        for (ParsedMap map : parsedMaps) {
+            MapTemplate source = templates.get(map.id());
+            List<MapTemplatePortal> portals = map.portals().stream()
+                    .map(portal -> resolvePortal(shortName, map, source, portal, templates)).toList();
+            checkNoOverlappingPortals(shortName, map, portals);
             source.setPortals(portals);
         }
 
         return Map.copyOf(templates);
     }
 
-    private ZoneTemplatePortal resolvePortal(String shortName, ParsedZone zone, ZoneTemplate source, PortalDraft portal,
-            Map<UUID, ZoneTemplate> templates) {
-        ZoneTemplate target = templates.get(portal.targetZoneId());
+    private MapTemplatePortal resolvePortal(String shortName, ParsedMap map, MapTemplate source, PortalDraft portal,
+            Map<UUID, MapTemplate> templates) {
+        MapTemplate target = templates.get(portal.targetMapId());
         if (target == null) {
-            throw new IllegalStateException("Zone " + zone.id() + " du monde " + shortName + " a un portail '"
-                    + portal.direction() + "' vers " + portal.targetZoneId() + ", absente de ce monde");
+            throw new IllegalStateException("Map " + map.id() + " du monde " + shortName + " a un portail '"
+                    + portal.direction() + "' vers " + portal.targetMapId() + ", absente de ce monde");
         }
 
         if (!source.isWalkable(portal.position())) {
-            throw new IllegalStateException("Zone " + zone.id() + " du monde " + shortName + " a un portail en "
+            throw new IllegalStateException("Map " + map.id() + " du monde " + shortName + " a un portail en "
                     + portal.position() + " non praticable de sa carte");
         }
 
         if (!target.isWalkable(portal.targetPosition())) {
             throw new IllegalStateException(
-                    "Zone " + zone.id() + " du monde " + shortName + " a un portail vers " + portal.targetPosition()
-                            + " non praticable de la carte de la zone cible " + portal.targetZoneId());
+                    "Map " + map.id() + " du monde " + shortName + " a un portail vers " + portal.targetPosition()
+                            + " non praticable de la carte de la map cible " + portal.targetMapId());
         }
 
-        return new ZoneTemplatePortal(portal.position(), portal.direction(), target.getId(), portal.targetPosition(),
+        return new MapTemplatePortal(portal.position(), portal.direction(), target.getId(), portal.targetPosition(),
                 portal.triggerRadius());
     }
 
-    private void checkNoOverlappingPortals(String shortName, ParsedZone zone, List<ZoneTemplatePortal> portals) {
+    private void checkNoOverlappingPortals(String shortName, ParsedMap map, List<MapTemplatePortal> portals) {
         for (int i = 0; i < portals.size(); i++) {
             for (int j = i + 1; j < portals.size(); j++) {
-                ZoneTemplatePortal a = portals.get(i);
-                ZoneTemplatePortal b = portals.get(j);
+                MapTemplatePortal a = portals.get(i);
+                MapTemplatePortal b = portals.get(j);
                 if (a.position().distanceTo(b.position()) < a.triggerRadius() + b.triggerRadius()) {
-                    throw new IllegalStateException("Zone " + zone.id() + " du monde " + shortName
+                    throw new IllegalStateException("Map " + map.id() + " du monde " + shortName
                             + " a des portails qui se chevauchent en " + a.position() + " et " + b.position());
                 }
             }
@@ -220,20 +220,20 @@ public class WorldTemplateCatalog {
     }
 
     Map<UUID, NpcTemplate> buildNpcTemplates(String shortName, Map<UUID, NpcDefinition> definitionsById,
-            Map<UUID, ZoneTemplate> zoneTemplates, Map<UUID, ItemTemplate> itemTemplatesById) {
+            Map<UUID, MapTemplate> mapTemplates, Map<UUID, ItemTemplate> itemTemplatesById) {
         Map<UUID, NpcTemplate> templates = new LinkedHashMap<>();
-        for (ZoneTemplate zone : zoneTemplates.values()) {
-            for (NpcSpawn spawn : zone.getNpcSpawns()) {
+        for (MapTemplate map : mapTemplates.values()) {
+            for (NpcSpawn spawn : map.getNpcSpawns()) {
                 NpcDefinition definition = definitionsById.get(spawn.npcId());
                 if (definition == null) {
-                    throw new IllegalStateException("Spawn " + spawn.id() + " de la zone " + zone.getId() + " du monde "
+                    throw new IllegalStateException("Spawn " + spawn.id() + " de la map " + map.getId() + " du monde "
                             + shortName + " référence le NPC " + spawn.npcId() + ", absent de data/npcs.json");
                 }
 
                 AbstractNpc.NpcDialogue dialogue = toDialogue(definition);
                 NpcSellerInstance.NpcShop shop = toShop(shortName, definition, itemTemplatesById);
 
-                NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), zone.getId(),
+                NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), map.getId(),
                         spawn.position(), definition.description(), dialogue, shop, definition.level());
                 if (templates.putIfAbsent(template.id(), template) != null) {
                     throw new IllegalStateException("NPC " + definition.id() + " dupliqué dans le monde " + shortName);

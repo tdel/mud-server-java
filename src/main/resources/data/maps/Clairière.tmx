@@ -4,7 +4,7 @@
   <property name="id" value="7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5"/>
   <property name="name" value="Clairière"/>
   <property name="description" value="Une trouée de lumière au coeur de la forêt, où l'herbe pousse haute et où des bruits inquiétants se font parfois entendre."/>
-  <property name="isStartingZone" type="bool" value="false"/>
+  <property name="isStartingMap" type="bool" value="false"/>
  </properties>
  <tileset firstgid="1" name="Clairière" tilewidth="32" tileheight="32" tilecount="3" columns="3">
   <tile id="0">
@@ -72,7 +72,7 @@
   <object id="2" name="" type="portal" x="192.0" y="576.0">
    <properties>
          <property name="direction" value="O"/>
-         <property name="targetZoneId" value="8203e5a0-9fa2-4799-a6d8-398b11292c17"/>
+         <property name="targetMapId" value="8203e5a0-9fa2-4799-a6d8-398b11292c17"/>
          <property name="targetX" type="float" value="1728.0"/>
          <property name="targetY" type="float" value="448.0"/>
    </properties>
@@ -80,7 +80,7 @@
   <object id="3" name="" type="portal" x="1984.0" y="576.0">
    <properties>
          <property name="direction" value="E"/>
-         <property name="targetZoneId" value="9a884ac7-b954-4cd6-ab67-c677d472cb0f"/>
+         <property name="targetMapId" value="9a884ac7-b954-4cd6-ab67-c677d472cb0f"/>
          <property name="targetX" type="float" value="192.0"/>
          <property name="targetY" type="float" value="576.0"/>
    </properties>

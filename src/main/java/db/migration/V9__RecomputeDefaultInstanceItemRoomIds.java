@@ -11,7 +11,7 @@ import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
 import app.domain.world.WorldInstance;
-import app.domain.world.ZoneInstance;
+import app.domain.world.MapInstance;
 
 public class V9__RecomputeDefaultInstanceItemRoomIds extends BaseJavaMigration {
 
@@ -26,7 +26,7 @@ public class V9__RecomputeDefaultInstanceItemRoomIds extends BaseJavaMigration {
             while (rs.next()) {
                 UUID itemId = UUID.fromString(rs.getString("id"));
                 UUID oldRoomId = UUID.fromString(rs.getString("room_id"));
-                UUID newRoomId = ZoneInstance.deterministicId(WorldInstance.DEFAULT_ID, oldRoomId);
+                UUID newRoomId = MapInstance.deterministicId(WorldInstance.DEFAULT_ID, oldRoomId);
                 updates.add(new Object[]{itemId, newRoomId});
             }
         }

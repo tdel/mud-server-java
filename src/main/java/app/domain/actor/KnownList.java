@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import app.domain.actor.instance.CharacterInstance;
-import app.domain.world.ZoneInstance;
+import app.domain.world.MapInstance;
 import app.network.message.ingame.EntityAppeared;
 import app.network.message.ingame.EntityDisappeared;
 import app.network.message.ingame.EntityKind;
@@ -38,9 +38,9 @@ public final class KnownList {
      * join/spawn).
      */
     public void populateSilently() {
-        ZoneInstance zone = owner.getCurrentZone();
-        synchronized (zone) {
-            for (AbstractCharacter other : nearbyOthers(zone)) {
+        MapInstance map = owner.getCurrentMap();
+        synchronized (map) {
+            for (AbstractCharacter other : nearbyOthers(map)) {
                 known.add(other);
                 other.getKnownList().known.add(owner);
             }
@@ -49,8 +49,8 @@ public final class KnownList {
 
     /** Retrait bidirectionnel complet (voir leave/disconnect/mort de monstre). */
     public void clear() {
-        ZoneInstance zone = owner.getCurrentZone();
-        synchronized (zone) {
+        MapInstance map = owner.getCurrentMap();
+        synchronized (map) {
             for (AbstractCharacter other : known) {
                 other.getKnownList().known.remove(owner);
             }
@@ -64,9 +64,9 @@ public final class KnownList {
      * EntityAppeared/EntityDisappeared).
      */
     public void refresh() {
-        ZoneInstance zone = owner.getCurrentZone();
-        synchronized (zone) {
-            Set<AbstractCharacter> current = nearbyOthers(zone);
+        MapInstance map = owner.getCurrentMap();
+        synchronized (map) {
+            Set<AbstractCharacter> current = nearbyOthers(map);
             for (AbstractCharacter other : current) {
                 if (known.add(other)) {
                     other.getKnownList().known.add(owner);
@@ -83,8 +83,8 @@ public final class KnownList {
         }
     }
 
-    private Set<AbstractCharacter> nearbyOthers(ZoneInstance zone) {
-        Set<AbstractCharacter> nearby = new HashSet<>(zone.occupantsWithin(owner.getPosition(), AWARENESS_RANGE));
+    private Set<AbstractCharacter> nearbyOthers(MapInstance map) {
+        Set<AbstractCharacter> nearby = new HashSet<>(map.occupantsWithin(owner.getPosition(), AWARENESS_RANGE));
         nearby.remove(owner);
         return nearby;
     }

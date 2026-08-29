@@ -105,13 +105,13 @@ Quatre messages construisent un `payload` dédié plutôt que de sérialiser l'o
 domaine brut :
 
 - `ViewAround` — le viewport dynamique autour du joueur, rejoué à chaque déplacement :
-  `zoneName`, `zoneDescription`, `cells` (liste de `{q, r, kind}`, `kind` ∈
+  `mapName`, `mapDescription`, `cells` (liste de `{q, r, kind}`, `kind` ∈
   `self/floor/path/destination/portal/portalDestination/player/monster/npc/outOfBounds`),
-  `portals` (`{direction, targetZoneName}`), `charactersNearby`, `monstersNearby`,
+  `portals` (`{direction, targetMapName}`), `charactersNearby`, `monstersNearby`,
   `npcsNearby`.
-- `ZoneMap` — la carte statique complète de la zone (terrain + portails), envoyée une fois à
-  l'entrée dans la zone : `zoneId`, `zoneName`, `cells` (liste de `{q, r, walkable}`),
-  `portals` (`{q, r, direction, targetZoneName}`).
+- `MapView` — la carte statique complète de la map (terrain + portails), envoyée une fois à
+  l'entrée dans la map : `mapId`, `mapName`, `cells` (liste de `{q, r, walkable}`),
+  `portals` (`{q, r, direction, targetMapName}`).
 - `GamePlayerStats` — fiche de personnage : `name`, `gender`, `level`,
   `characterClass`, `currentHealth`, `maxHealth`, `armorClass`, `proficiencyBonus`,
   les six caractéristiques (`strength`, `dexterity`, ... en `{score, modifier}`),

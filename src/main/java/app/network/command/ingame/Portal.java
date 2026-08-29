@@ -7,13 +7,13 @@ import org.springframework.stereotype.Component;
 
 import app.game.engine.MovementEngine;
 import app.network.CommandHandler;
-import app.domain.world.ZonePortal;
+import app.domain.world.MapPortal;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.ingame.NoPortalHere;
-import app.network.message.ingame.ZoneEnter;
-import app.network.message.ingame.ZoneMap;
+import app.network.message.ingame.MapEnter;
+import app.network.message.ingame.MapView;
 
 @Component
 public class Portal implements CommandHandler {
@@ -42,7 +42,7 @@ public class Portal implements CommandHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
-        Optional<ZonePortal> portal = character.getCurrentZone().findPortalAt(character.getPosition());
+        Optional<MapPortal> portal = character.getCurrentMap().findPortalAt(character.getPosition());
         if (portal.isEmpty()) {
             connection.send(new NoPortalHere());
             return;
@@ -52,9 +52,9 @@ public class Portal implements CommandHandler {
         // continue
         // à la prochaine tick de MovementEngine avec des waypoints calculés pour
         // l'ancienne
-        // zone/grille de collision, alors que la position du personnage vient de
+        // map/grille de collision, alors que la position du personnage vient de
         // changer de
-        // zone — le personnage se remet alors à marcher tout seul dans la zone
+        // map — le personnage se remet alors à marcher tout seul dans la map
         // d'arrivée
         // vers une destination périmée (demandé explicitement le 2026-08-28 : "le
         // passage
@@ -63,8 +63,8 @@ public class Portal implements CommandHandler {
         // redéplacer (voir aussi Game._rebuild_map côté client, même correctif local).
         movementEngine.stopMovement(character);
 
-        character.moveToZone(portal.get().targetZone(), portal.get().targetPosition());
-        connection.send(new ZoneMap(character.getCurrentZone()));
-        connection.send(new ZoneEnter(character));
+        character.moveToMap(portal.get().targetMap(), portal.get().targetPosition());
+        connection.send(new MapView(character.getCurrentMap()));
+        connection.send(new MapEnter(character));
     }
 }

@@ -22,7 +22,7 @@ import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.CharacterClass;
 import app.domain.actor.Gender;
 import app.domain.actor.Race;
-import app.domain.world.ZoneInstance;
+import app.domain.world.MapInstance;
 import app.domain.world.WorldInstance;
 import app.game.catalog.SpellCatalog;
 import app.persistence.jooq.tables.records.CharacterRecord;
@@ -44,12 +44,12 @@ public class CharacterDao {
     }
 
     public void insert(CharacterInstance character) {
-        dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_ZONE_ID,
+        dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_MAP_ID,
                 CHARACTER.GENDER, CHARACTER.RACE, CHARACTER.CHARACTER_CLASS, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH,
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
                 CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA, CHARACTER.XP, CHARACTER.GOLD,
                 CHARACTER.SHORT_REST_COUNT, CHARACTER.MAX_MANA, CHARACTER.CURRENT_MANA)
-                .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentZoneId(),
+                .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentMapId(),
                         character.getGender().name(), character.getRace().name(), character.getCharacterClass().name(),
                         character.getLevel(), character.getCurrentHealth(), character.getMaxHealth(),
                         character.getAttribute(Attribute.STRENGTH), character.getAttribute(Attribute.DEXTERITY),
@@ -74,12 +74,12 @@ public class CharacterDao {
                 .fetchOptional().map(record -> toDomain(record, account, instance));
     }
 
-    public void updateCurrentZone(UUID characterId, UUID zoneId) {
-        dsl.update(CHARACTER).set(CHARACTER.CURRENT_ZONE_ID, zoneId).where(CHARACTER.ID.eq(characterId)).execute();
+    public void updateCurrentMap(UUID characterId, UUID mapId) {
+        dsl.update(CHARACTER).set(CHARACTER.CURRENT_MAP_ID, mapId).where(CHARACTER.ID.eq(characterId)).execute();
     }
 
     public void update(CharacterInstance character) {
-        dsl.update(CHARACTER).set(CHARACTER.CURRENT_ZONE_ID, character.getCurrentZoneId())
+        dsl.update(CHARACTER).set(CHARACTER.CURRENT_MAP_ID, character.getCurrentMapId())
                 .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).set(CHARACTER.XP, character.getXp())
                 .set(CHARACTER.LEVEL, character.getLevel()).set(CHARACTER.MAX_HEALTH, character.getMaxHealth())
                 .set(CHARACTER.GOLD, character.getInventory().getGold())
@@ -104,9 +104,9 @@ public class CharacterDao {
         CharacterClass characterClass = CharacterClass.valueOf(record.getCharacterClass());
         Race race = Race.valueOf(record.getRace());
 
-        ZoneInstance zone = instance.zoneInstanceForTemplate(record.getCurrentZoneId())
-                .or(instance::startingZoneInstance).orElseThrow(() -> new IllegalStateException(
-                        "WorldInstance " + instance.getId() + " n'a aucune zone de départ"));
+        MapInstance map = instance.mapInstanceForTemplate(record.getCurrentMapId())
+                .or(instance::startingMapInstance).orElseThrow(() -> new IllegalStateException(
+                        "WorldInstance " + instance.getId() + " n'a aucune map de départ"));
 
         Set<Spell> knownSpells = characterSpellDao.findSpellIdsByCharacter(record.getId()).stream()
                 .map(spellCatalog::getById).collect(Collectors.toSet());
@@ -114,7 +114,7 @@ public class CharacterDao {
         List<ActiveEffect> activeEffects = characterActiveEffectDao.findByCharacterId(record.getId()).stream()
                 .filter(effect -> effect.expiresAt().isAfter(now)).toList();
 
-        CharacterInstance character = new CharacterInstance(record.getId(), account, record.getName(), zone,
+        CharacterInstance character = new CharacterInstance(record.getId(), account, record.getName(), map,
                 Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
                 record.getMaxHealth(), attributes, record.getXp(), record.getGold(), record.getShortRestCount(),
                 record.getMaxMana(), record.getCurrentMana(), knownSpells, activeEffects);

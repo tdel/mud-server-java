@@ -5,7 +5,7 @@ import java.util.UUID;
 import app.network.OutputJsonMessage;
 
 /**
- * Diffusé à toute la zone (lanceur inclus) quand un sort projectile part :
+ * Diffusé à toute la map (lanceur inclus) quand un sort projectile part :
  * chaque client anime localement la trajectoire jusqu'à la cible pendant
  * {@code travelDurationMs}, le serveur ne pousse aucune position intermédiaire.
  */

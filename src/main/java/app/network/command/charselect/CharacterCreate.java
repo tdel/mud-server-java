@@ -30,8 +30,8 @@ import app.network.message.charselect.CharacterNameTaken;
 import app.network.message.charselect.InvalidRace;
 import app.network.message.charselect.NowPlaying;
 import app.network.message.ingame.GamePlayerStats;
-import app.network.message.ingame.ZoneEnter;
-import app.network.message.ingame.ZoneMap;
+import app.network.message.ingame.MapEnter;
+import app.network.message.ingame.MapView;
 import app.persistence.listener.ItemPersistenceListener;
 
 @Component
@@ -175,7 +175,7 @@ public class CharacterCreate implements CommandHandler {
         MDC.put("character", character.getName());
 
         connection.send(new NowPlaying(character.getName()));
-        connection.send(new ZoneMap(character.getCurrentZone()));
-        connection.send(new ZoneEnter(character));
+        connection.send(new MapView(character.getCurrentMap()));
+        connection.send(new MapEnter(character));
     }
 }

@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import app.domain.world.ZoneInstance;
+import app.domain.world.MapInstance;
 import app.domain.world.WorldTemplate;
 import app.domain.actor.AbstractNpc;
 import app.domain.actor.instance.NpcSellerInstance;
@@ -20,21 +20,21 @@ public class NpcCatalog {
 
     private static final Logger log = LoggerFactory.getLogger(NpcCatalog.class);
 
-    public void warmNpcs(Collection<WorldTemplate> worldTemplates, Collection<ZoneInstance> zones) {
-        Map<UUID, ZoneInstance> zonesByTemplateId = new ConcurrentHashMap<>();
-        for (ZoneInstance zone : zones) {
-            zonesByTemplateId.put(zone.getTemplateId(), zone);
+    public void warmNpcs(Collection<WorldTemplate> worldTemplates, Collection<MapInstance> maps) {
+        Map<UUID, MapInstance> mapsByTemplateId = new ConcurrentHashMap<>();
+        for (MapInstance map : maps) {
+            mapsByTemplateId.put(map.getTemplateId(), map);
         }
 
         int count = 0;
         for (WorldTemplate worldTemplate : worldTemplates) {
             for (NpcTemplate template : worldTemplate.getNpcTemplates().values()) {
-                ZoneInstance zone = zonesByTemplateId.get(template.zoneTemplateId());
-                if (zone == null) {
-                    throw new IllegalStateException("NPC " + template.id() + " référence la zone "
-                            + template.zoneTemplateId() + ", absente du monde " + worldTemplate.getShortName());
+                MapInstance map = mapsByTemplateId.get(template.mapTemplateId());
+                if (map == null) {
+                    throw new IllegalStateException("NPC " + template.id() + " référence la map "
+                            + template.mapTemplateId() + ", absente du monde " + worldTemplate.getShortName());
                 }
-                place(template, zone);
+                place(template, map);
                 count++;
             }
         }
@@ -42,10 +42,10 @@ public class NpcCatalog {
         log.info("npc.instances_placed count={}", count);
     }
 
-    private void place(NpcTemplate template, ZoneInstance zone) {
+    private void place(NpcTemplate template, MapInstance map) {
         AbstractNpc npc = template.shop() != null
-                ? new NpcSellerInstance(template.id(), template, zone)
-                : new AbstractNpc(template.id(), template, zone);
-        zone.placeNpc(npc, template.position());
+                ? new NpcSellerInstance(template.id(), template, map)
+                : new AbstractNpc(template.id(), template, map);
+        map.placeNpc(npc, template.position());
     }
 }

@@ -32,15 +32,15 @@ import app.game.catalog.tiled.TiledMap.TiledTileset;
 
 /**
  * Convertit un fichier {@code .tmx} (XML natif Tiled Map Editor, orientation
- * orthogonale) en données de zone exploitables par {@code WorldTemplateCatalog}.
- * Un fichier par zone : un calque de tuiles nommé "terrain" porte le terrain
+ * orthogonale) en données de map exploitables par {@code WorldTemplateCatalog}.
+ * Un fichier par map : un calque de tuiles nommé "terrain" porte le terrain
  * praticable/bloqué (propriété custom booléenne "walkable" sur chaque tuile du
  * tileset), un calque d'objets nommé "objects" porte le point de spawn du
  * joueur, les portails et les spawns de monstres. Le {@code .tmx} est lu tel
  * quel : c'est à la fois le fichier ouvert par Tiled Map Editor et la seule
  * source lue par le serveur, il n'y a pas d'export JSON intermédiaire.
  */
-public final class TiledZoneLoader {
+public final class TiledMapLoader {
 
     private static final String TERRAIN_LAYER = "terrain";
     private static final String OBJECTS_LAYER = "objects";
@@ -49,10 +49,10 @@ public final class TiledZoneLoader {
     private static final String TYPE_MONSTER_SPAWN = "monsterSpawn";
     private static final String TYPE_MONSTER_SPAWN_GROUP = "monsterSpawnGroup";
     private static final String TYPE_NPC_SPAWN = "npcSpawn";
-    // Élargi de 1.2 à 4.0 tuiles (2026-08-30, agrandissement des zones : un
+    // Élargi de 1.2 à 4.0 tuiles (2026-08-30, agrandissement des maps : un
     // portail doit pouvoir accueillir un groupe d'une dizaine de personnages sans
-    // qu'elles se sentent entassées, ce qui suppose une zone de déclenchement
-    // nettement plus large qu'un simple point visé au pixel près). Les zones
+    // qu'elles se sentent entassées, ce qui suppose une map de déclenchement
+    // nettement plus large qu'un simple point visé au pixel près). Les maps
     // agrandies espacent leurs portails de bien plus que l'ancien minimum
     // (~8 tuiles) : aucun risque de chevauchement avec checkNoOverlappingPortals
     // (WorldTemplateCatalog), qui exige distance >= somme des deux rayons.
@@ -63,7 +63,7 @@ public final class TiledZoneLoader {
     // déclenchement d'un portail et être aussitôt téléporté.
     private static final double MIN_SPAWN_PORTAL_DISTANCE = 5.0;
 
-    private TiledZoneLoader() {
+    private TiledMapLoader() {
     }
 
     public static TiledMap readMap(InputStream in) {
@@ -93,20 +93,20 @@ public final class TiledZoneLoader {
                 tilesets, properties);
     }
 
-    public record ParsedZone(UUID id, String name, String description, boolean isStartingZone, CollisionGrid terrain,
+    public record ParsedMap(UUID id, String name, String description, boolean isStartingMap, CollisionGrid terrain,
             Position spawnPosition, List<MonsterSpawn> monsterSpawns, List<MonsterSpawnGroup> monsterSpawnGroups,
             List<NpcSpawn> npcSpawns, List<PortalDraft> portals) {
     }
 
-    public record PortalDraft(Position position, String direction, UUID targetZoneId, Position targetPosition,
+    public record PortalDraft(Position position, String direction, UUID targetMapId, Position targetPosition,
             double triggerRadius) {
     }
 
-    public static ParsedZone parse(TiledMap map, Function<String, InputStream> externalTilesetResolver) {
+    public static ParsedMap parse(TiledMap map, Function<String, InputStream> externalTilesetResolver) {
         UUID id = UUID.fromString(requireStringProperty(map.properties(), "id"));
         String name = requireStringProperty(map.properties(), "name");
         String description = requireStringProperty(map.properties(), "description");
-        boolean isStartingZone = booleanProperty(map.properties(), "isStartingZone", false);
+        boolean isStartingMap = booleanProperty(map.properties(), "isStartingMap", false);
 
         Map<Integer, TileType> tileTypeByGid = buildTileTypeByGid(map, externalTilesetResolver);
         CollisionGrid terrain = parseTerrain(map, tileTypeByGid, id);
@@ -119,14 +119,14 @@ public final class TiledZoneLoader {
         parseObjects(map, id, spawnPositionHolder, monsterSpawns, monsterSpawnGroups, npcSpawns, portals);
 
         if (spawnPositionHolder[0] == null) {
-            throw new IllegalStateException("Zone " + id + " (" + name + ") n'a aucun objet playerSpawn");
+            throw new IllegalStateException("Map " + id + " (" + name + ") n'a aucun objet playerSpawn");
         }
 
         for (PortalDraft portal : portals) {
             double distance = portal.position().distanceTo(spawnPositionHolder[0]);
             if (distance < MIN_SPAWN_PORTAL_DISTANCE) {
                 throw new IllegalStateException(
-                        "Zone " + id + " (" + name + ") : le playerSpawn est trop proche (" + distance + " < "
+                        "Map " + id + " (" + name + ") : le playerSpawn est trop proche (" + distance + " < "
                                 + MIN_SPAWN_PORTAL_DISTANCE + ") du portail direction " + portal.direction());
             }
         }
@@ -135,17 +135,17 @@ public final class TiledZoneLoader {
         for (MonsterSpawnGroup group : monsterSpawnGroups) {
             if (groupsById.putIfAbsent(group.id(), group) != null) {
                 throw new IllegalStateException(
-                        "Zone " + id + " (" + name + ") a plusieurs monsterSpawnGroup avec groupId=" + group.id());
+                        "Map " + id + " (" + name + ") a plusieurs monsterSpawnGroup avec groupId=" + group.id());
             }
         }
         for (MonsterSpawn spawn : monsterSpawns) {
             if (!groupsById.containsKey(spawn.groupId())) {
-                throw new IllegalStateException("Zone " + id + " (" + name + ") : le monsterSpawn " + spawn.id()
-                        + " référence le spawnGroup " + spawn.groupId() + ", absent des monsterSpawnGroup de la zone");
+                throw new IllegalStateException("Map " + id + " (" + name + ") : le monsterSpawn " + spawn.id()
+                        + " référence le spawnGroup " + spawn.groupId() + ", absent des monsterSpawnGroup de la map");
             }
         }
 
-        return new ParsedZone(id, name, description, isStartingZone, terrain, spawnPositionHolder[0],
+        return new ParsedMap(id, name, description, isStartingMap, terrain, spawnPositionHolder[0],
                 List.copyOf(monsterSpawns), List.copyOf(monsterSpawnGroups), List.copyOf(npcSpawns),
                 List.copyOf(portals));
     }
@@ -165,7 +165,7 @@ public final class TiledZoneLoader {
         return byGid;
     }
 
-    // Tileset externe partagé entre zones (data/zones/shared/*.tsx), au format
+    // Tileset externe partagé entre maps (data/maps/shared/*.tsx), au format
     // Tiled XML natif (ouvrable tel quel dans Tiled Map Editor) — on n'en
     // extrait que les <tile>/<properties> utiles, le reste (image, colonnes,
     // etc.) n'étant pas exploité côté serveur.
@@ -211,7 +211,7 @@ public final class TiledZoneLoader {
                 case TYPE_PLAYER_SPAWN -> spawnPositionHolder[0] = position;
                 case TYPE_PORTAL ->
                     portals.add(new PortalDraft(position, requireStringProperty(object.properties(), "direction"),
-                            UUID.fromString(requireStringProperty(object.properties(), "targetZoneId")),
+                            UUID.fromString(requireStringProperty(object.properties(), "targetMapId")),
                             TiledCoordinateMapper.pixelToWorld(doubleProperty(object.properties(), "targetX"),
                                     doubleProperty(object.properties(), "targetY")),
                             doubleProperty(object.properties(), "triggerRadius", DEFAULT_PORTAL_TRIGGER_RADIUS)));
@@ -235,7 +235,7 @@ public final class TiledZoneLoader {
     private static TiledLayer findLayer(TiledMap map, UUID id, String name, String type) {
         return map.layers().stream().filter(l -> name.equals(l.name()) && type.equals(l.type())).findFirst()
                 .orElseThrow(() -> new IllegalStateException(
-                        "Calque \"" + name + "\" (" + type + ") absent de la zone " + id));
+                        "Calque \"" + name + "\" (" + type + ") absent de la map " + id));
     }
 
     // --- Parsing XML (.tmx) bas niveau ---

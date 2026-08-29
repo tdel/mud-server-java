@@ -14,8 +14,8 @@ import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 
 import app.domain.Account;
-import app.domain.world.ZoneInstance;
-import app.domain.world.ZoneTemplate;
+import app.domain.world.MapInstance;
+import app.domain.world.MapTemplate;
 import app.domain.world.WorldInstance;
 import app.domain.world.WorldTemplate;
 import app.domain.world.WorldTemplateSummary;
@@ -56,21 +56,21 @@ public class WorldInstanceService {
 
         WorldInstance instance = new WorldInstance(WorldInstance.DEFAULT_ID, template.getId(), Instant.now());
 
-        Map<UUID, ZoneInstance> zoneInstances = new LinkedHashMap<>();
-        for (ZoneTemplate zoneTemplate : template.getZoneTemplates().values()) {
-            UUID zoneInstanceId = ZoneInstance.deterministicId(instance.getId(), zoneTemplate.getId());
-            zoneInstances.put(zoneTemplate.getId(), new ZoneInstance(zoneInstanceId, zoneTemplate, instance));
+        Map<UUID, MapInstance> mapInstances = new LinkedHashMap<>();
+        for (MapTemplate mapTemplate : template.getMapTemplates().values()) {
+            UUID mapInstanceId = MapInstance.deterministicId(instance.getId(), mapTemplate.getId());
+            mapInstances.put(mapTemplate.getId(), new MapInstance(mapInstanceId, mapTemplate, instance));
         }
 
         long placementStart = System.currentTimeMillis();
-        monsterService.placeMonsters(zoneInstances.values());
-        npcService.warmNpcs(List.of(template), zoneInstances.values());
+        monsterService.placeMonsters(mapInstances.values());
+        npcService.warmNpcs(List.of(template), mapInstances.values());
         long placementDurationMs = System.currentTimeMillis() - placementStart;
 
-        instance.setZoneInstances(zoneInstances);
+        instance.setMapInstances(mapInstances);
         this.defaultInstance = instance;
-        log.info("world.materialized id={} worldTemplateId={} zones={} placementDurationMs={}", instance.getId(),
-                instance.getWorldTemplateId(), zoneInstances.size(), placementDurationMs);
+        log.info("world.materialized id={} worldTemplateId={} maps={} placementDurationMs={}", instance.getId(),
+                instance.getWorldTemplateId(), mapInstances.size(), placementDurationMs);
         return instance;
     }
 
@@ -99,14 +99,14 @@ public class WorldInstanceService {
         }
 
         CharacterInstance character = connection.character();
-        ZoneInstance zone = character.getCurrentZone();
+        MapInstance map = character.getCurrentMap();
         WorldInstance instance = character.getWorldInstance();
 
         characterDao.update(character);
         movementEngine.stopMovement(character);
-        zone.disconnect(character);
+        map.disconnect(character);
         instance.removePlayer(character);
-        log.info("world.session_ended character={} zone={}", character.getName(), zone.getName());
+        log.info("world.session_ended character={} map={}", character.getName(), map.getName());
         MDC.remove("character");
     }
 

@@ -103,7 +103,7 @@ public class CharacterPersistenceListener {
         Party party = killer.getParty();
 
         List<CharacterInstance> eligible = party != null
-                ? party.getMembers().stream().filter(member -> member.getCurrentZone() == killer.getCurrentZone())
+                ? party.getMembers().stream().filter(member -> member.getCurrentMap() == killer.getCurrentMap())
                         .toList()
                 : List.of(killer);
 
@@ -130,11 +130,11 @@ public class CharacterPersistenceListener {
         CharacterInstance character = event.character();
         characterDao.update(character);
 
-        character.send(new PlayerRespawned(character.getCurrentZone().getName(), character.getPosition().x(),
+        character.send(new PlayerRespawned(character.getCurrentMap().getName(), character.getPosition().x(),
                 character.getPosition().y(), character.getCurrentHealth(), character.getMaxHealth(),
                 character.getCurrentMana(), character.getMaxMana()));
         broadcastVitalsToParty(character);
-        log.info("character.respawned character={} zone={}", character.getName(), character.getCurrentZone().getName());
+        log.info("character.respawned character={} map={}", character.getName(), character.getCurrentMap().getName());
     }
 
     @EventListener

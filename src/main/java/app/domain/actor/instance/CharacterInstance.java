@@ -27,7 +27,7 @@ import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.GamePlayerDamaged;
 import app.domain.actor.event.GamePlayerDied;
 import app.domain.actor.event.GamePlayerEquippedItem;
-import app.domain.actor.event.GamePlayerMovedToZone;
+import app.domain.actor.event.GamePlayerMovedToMap;
 import app.domain.actor.event.GamePlayerRespawned;
 import app.domain.actor.event.GamePlayerUnequippedItem;
 import app.domain.actor.event.ItemDiscarded;
@@ -35,7 +35,7 @@ import app.domain.actor.event.ItemPurchased;
 import app.domain.item.EquipmentSlot;
 import app.domain.map.Position;
 import app.domain.item.Item;
-import app.domain.world.ZoneInstance;
+import app.domain.world.MapInstance;
 import app.domain.item.WeaponCategory;
 import app.domain.world.WorldInstance;
 import app.game.dice.CheckResult;
@@ -65,27 +65,27 @@ public final class CharacterInstance extends AbstractCharacter {
 
     public static final int MAX_SHORT_RESTS_BEFORE_LONG_REST = 2;
 
-    public CharacterInstance(UUID id, Account account, String name, ZoneInstance zone, Gender gender, Race race,
+    public CharacterInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold) {
-        this(id, account, name, zone, gender, race, characterClass, level, currentHealth, maxHealth, attributes, xp,
+        this(id, account, name, map, gender, race, characterClass, level, currentHealth, maxHealth, attributes, xp,
                 gold, 0, 0, 0);
     }
 
-    public CharacterInstance(UUID id, Account account, String name, ZoneInstance zone, Gender gender, Race race,
+    public CharacterInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold, int shortRestCount, int maxMana, int currentMana) {
-        this(id, account, name, zone, gender, race, characterClass, level, currentHealth, maxHealth, attributes, xp,
+        this(id, account, name, map, gender, race, characterClass, level, currentHealth, maxHealth, attributes, xp,
                 gold, shortRestCount, maxMana, currentMana, Set.of(), List.of());
     }
 
-    public CharacterInstance(UUID id, Account account, String name, ZoneInstance zone, Gender gender, Race race,
+    public CharacterInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold, int shortRestCount, int maxMana, int currentMana,
             Set<Spell> knownSpells, List<ActiveEffect> activeEffects) {
         super(id, name, attributes, currentHealth, maxHealth);
         this.account = account;
-        setCurrentZone(zone);
+        setCurrentMap(map);
         this.gender = gender;
         this.race = race;
         this.speed = race.speed();
@@ -109,8 +109,8 @@ public final class CharacterInstance extends AbstractCharacter {
         return account.getId();
     }
 
-    public UUID getCurrentZoneId() {
-        return getCurrentZone().getTemplateId();
+    public UUID getCurrentMapId() {
+        return getCurrentMap().getTemplateId();
     }
 
     public WorldInstance getWorldInstance() {
@@ -400,22 +400,22 @@ public final class CharacterInstance extends AbstractCharacter {
         return defeated;
     }
 
-    public void respawn(ZoneInstance destination, Position position) {
+    public void respawn(MapInstance destination, Position position) {
         setCurrentHealth(Math.max(1, getMaxHealth() / 4));
         setCurrentMana(0);
-        moveToZone(destination, position);
+        moveToMap(destination, position);
         DomainEventPublisher.publish(new GamePlayerRespawned(this));
     }
 
-    public void moveToZone(ZoneInstance destination) {
-        moveToZone(destination, destination.getSpawnPosition());
+    public void moveToMap(MapInstance destination) {
+        moveToMap(destination, destination.getSpawnPosition());
     }
 
-    public void moveToZone(ZoneInstance destination, Position targetPosition) {
-        ZoneInstance previous = getCurrentZone();
+    public void moveToMap(MapInstance destination, Position targetPosition) {
+        MapInstance previous = getCurrentMap();
         previous.leave(this);
         destination.join(this, targetPosition);
-        DomainEventPublisher.publish(new GamePlayerMovedToZone(this, previous, destination));
+        DomainEventPublisher.publish(new GamePlayerMovedToMap(this, previous, destination));
     }
 
     public Optional<EquipmentSlot> equipItem(Item item) {
@@ -471,21 +471,21 @@ public final class CharacterInstance extends AbstractCharacter {
                 && getCurrentHealth() == other.getCurrentHealth() && getMaxHealth() == other.getMaxHealth()
                 && shortRestCount == other.shortRestCount && Objects.equals(getId(), other.getId())
                 && Objects.equals(getAccountId(), other.getAccountId()) && Objects.equals(getName(), other.getName())
-                && Objects.equals(getCurrentZoneId(), other.getCurrentZoneId()) && gender == other.gender
+                && Objects.equals(getCurrentMapId(), other.getCurrentMapId()) && gender == other.gender
                 && race == other.race && characterClass == other.characterClass
                 && Objects.equals(getAttributes(), other.getAttributes());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getAccountId(), getName(), getCurrentZoneId(), gender, race, characterClass, level,
+        return Objects.hash(getId(), getAccountId(), getName(), getCurrentMapId(), gender, race, characterClass, level,
                 xp, inventory.getGold(), getCurrentHealth(), getMaxHealth(), shortRestCount, getAttributes());
     }
 
     @Override
     public String toString() {
-        return "GamePlayer[id=" + getId() + ", accountId=" + getAccountId() + ", name=" + getName() + ", currentZoneId="
-                + getCurrentZoneId() + ", gender=" + gender + ", race=" + race + ", characterClass=" + characterClass
+        return "GamePlayer[id=" + getId() + ", accountId=" + getAccountId() + ", name=" + getName() + ", currentMapId="
+                + getCurrentMapId() + ", gender=" + gender + ", race=" + race + ", characterClass=" + characterClass
                 + ", level=" + level + ", xp=" + xp + ", gold=" + inventory.getGold() + ", currentHealth="
                 + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + ", shortRestCount=" + shortRestCount
                 + ", attributes=" + getAttributes() + "]";

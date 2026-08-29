@@ -9,12 +9,12 @@ import app.domain.actor.AbstractNpc;
 import app.domain.actor.template.NpcTemplate;
 import app.domain.item.Item;
 import app.domain.item.ItemTemplate;
-import app.domain.world.ZoneInstance;
+import app.domain.world.MapInstance;
 
 public final class NpcSellerInstance extends AbstractNpc {
 
-    public NpcSellerInstance(UUID id, NpcTemplate template, ZoneInstance zone) {
-        super(id, template, zone);
+    public NpcSellerInstance(UUID id, NpcTemplate template, MapInstance map) {
+        super(id, template, map);
         Objects.requireNonNull(template.shop());
     }
 

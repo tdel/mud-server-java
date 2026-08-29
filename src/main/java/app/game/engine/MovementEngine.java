@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import app.domain.map.Position;
 import app.domain.world.CollisionGrid;
-import app.domain.world.ZoneInstance;
+import app.domain.world.MapInstance;
 import app.game.engine.ContinuousStep.StepResult;
 
 import org.slf4j.Logger;
@@ -104,7 +104,7 @@ public class MovementEngine {
                     case STEPPED -> {
                         // Plus d'envoi de position à chaque tick (~100ms) : le client interpole
                         // localement son propre déplacement et celui des autres personnages de la
-                        // zone à partir de la cible (CharacterMovementStarted/MovementStarted) et de
+                        // map à partir de la cible (CharacterMovementStarted/MovementStarted) et de
                         // sa vitesse, et corrige la dérive via la commande "position" à la demande
                         // (voir Position.java) plutôt que via un flux poussé par le serveur.
                     }
@@ -148,8 +148,8 @@ public class MovementEngine {
                 return MovementStepOutcome.NO_MOVEMENT;
             }
 
-            ZoneInstance zone = character.getCurrentZone();
-            CollisionGrid grid = zone.getCollisionGrid();
+            MapInstance map = character.getCurrentMap();
+            CollisionGrid grid = map.getCollisionGrid();
             double dtSeconds = (now - movement.lastTickAtNanos()) / 1_000_000_000.0;
 
             Position previous = character.getPosition();

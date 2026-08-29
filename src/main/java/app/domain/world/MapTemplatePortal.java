@@ -2,6 +2,8 @@ package app.domain.world;
 
 import app.domain.map.Position;
 
-public record ZonePortal(Position position, String direction, ZoneInstance sourceZone, ZoneInstance targetZone,
+import java.util.UUID;
+
+public record MapTemplatePortal(Position position, String direction, UUID targetMapTemplateId,
         Position targetPosition, double triggerRadius) {
 }
