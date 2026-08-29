@@ -10,6 +10,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import app.domain.Account;
+import app.domain.Party;
+import app.domain.PendingPartyInvite;
 import app.domain.Spell;
 import app.domain.actor.*;
 import app.domain.actor.component.ActiveEffect;
@@ -54,6 +56,8 @@ public final class CharacterInstance extends AbstractCharacter {
     private Connection connection;
     private final PlayerInventory inventory;
     private final CharacterCombat combat;
+    private Party party;
+    private PendingPartyInvite pendingInvite;
     private int xp;
     private int shortRestCount;
     private int maxMana;
@@ -239,6 +243,22 @@ public final class CharacterInstance extends AbstractCharacter {
 
     public CharacterCombat getCombat() {
         return combat;
+    }
+
+    public Party getParty() {
+        return party;
+    }
+
+    public void setParty(Party party) {
+        this.party = party;
+    }
+
+    public PendingPartyInvite getPendingInvite() {
+        return pendingInvite;
+    }
+
+    public void setPendingInvite(PendingPartyInvite pendingInvite) {
+        this.pendingInvite = pendingInvite;
     }
 
     @Override

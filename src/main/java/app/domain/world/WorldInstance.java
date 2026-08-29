@@ -22,6 +22,7 @@ import app.domain.actor.Race;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.NewGamePlayerCreated;
 import app.domain.actor.event.PlayerLoadedInWorld;
+import app.domain.actor.event.PlayerRemovedFromWorld;
 import app.game.dice.DiceRoll;
 import app.game.dice.DiceRoller;
 import app.network.OutputMessage;
@@ -90,6 +91,7 @@ public class WorldInstance {
         players.remove(character.getId());
         log.info("world.player_removed thread={} worldId={} character={}", Thread.currentThread().getName(), id,
                 character.getId());
+        DomainEventPublisher.publish(new PlayerRemovedFromWorld(character));
     }
 
     public Collection<CharacterInstance> onlineCharacters() {
