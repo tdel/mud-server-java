@@ -1,5 +1,6 @@
 package app.network.command.ingame;
 
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
@@ -47,7 +48,14 @@ public class PartyAccept implements CommandHandler {
         }
         party.addMember(character);
 
-        connection.send(new PartyJoined(party.getLeader().getId(), party.getLeader().getName(), party.size()));
-        party.broadcast(new PartyMemberJoined(character.getId(), character.getName()), character);
+        List<PartyJoined.MemberView> existingMembers = party.getMembers().stream()
+                .filter(member -> member != character)
+                .map(member -> new PartyJoined.MemberView(member.getId(), member.getName(), member.getCurrentHealth(),
+                        member.getMaxHealth(), member.getCurrentMana(), member.getMaxMana()))
+                .toList();
+        connection.send(new PartyJoined(party.getLeader().getId(), party.getLeader().getName(), party.size(),
+                existingMembers));
+        party.broadcast(new PartyMemberJoined(character.getId(), character.getName(), character.getCurrentHealth(),
+                character.getMaxHealth(), character.getCurrentMana(), character.getMaxMana()), character);
     }
 }
