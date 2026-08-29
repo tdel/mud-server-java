@@ -17,6 +17,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import app.domain.actor.AbstractCharacter;
+import app.domain.actor.event.AttackBegin;
 import app.domain.actor.event.GamePlayerDied;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.message.ingame.CharacterMovementBlocked;
@@ -73,6 +74,18 @@ public class MovementEngine {
         stopMovement(character);
         character.getCurrentZone().broadcast(new CharacterMovementStopped(character.getId(), character.getName(),
                 character.getPosition().x(), character.getPosition().y()), null);
+    }
+
+    @EventListener
+    void onAttackBegin(AttackBegin event) {
+        CharacterInstance character = event.attacker();
+        if (character.activeMovement == null) {
+            return;
+        }
+        stopMovement(character);
+        character.send(new MovementStopped(character.getPosition().x(), character.getPosition().y()));
+        character.getCurrentZone().broadcast(new CharacterMovementStopped(character.getId(), character.getName(),
+                character.getPosition().x(), character.getPosition().y()), character);
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)

@@ -9,8 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import app.domain.actor.AbstractCharacter;
+import app.domain.actor.AbstractNpc;
 import app.domain.actor.Attribute;
 import app.domain.actor.ModifiedStat;
+import app.domain.actor.event.AttackBegin;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.MonsterAttacked;
 import app.domain.actor.instance.CharacterInstance;
@@ -19,6 +21,13 @@ import app.domain.item.EquipmentSlot;
 import app.domain.item.Item;
 import app.game.dice.DiceRoll;
 import app.game.dice.DiceRoller;
+import app.game.engine.MonsterAiEngine;
+import app.network.message.ingame.AlreadyCasting;
+import app.network.message.ingame.AttackOnCooldown;
+import app.network.message.ingame.AttackOutOfRange;
+import app.network.message.ingame.AttackResult;
+import app.network.message.ingame.NoTargetSelected;
+import app.network.message.ingame.TargetNotFound;
 
 public final class CharacterCombat {
 
@@ -51,7 +60,41 @@ public final class CharacterCombat {
         return remaining.isNegative() ? Duration.ZERO : remaining;
     }
 
-    public AttackOutcome attack(AbstractCharacter defender) {
+    public void attack(AbstractCharacter defender) {
+        if (character.isCasting()) {
+            character.send(new AlreadyCasting());
+            return;
+        }
+        if (defender == null) {
+            character.send(new NoTargetSelected());
+            return;
+        }
+        if (defender.getCurrentHealth() <= 0) {
+            log.debug("attack.rejected character={} reason=target_dead target={}", character.getId(), defender.getId());
+            setTarget(null);
+            character.send(new TargetNotFound(defender.getId().toString()));
+            return;
+        }
+        if (defender instanceof AbstractNpc) {
+            log.debug("attack.rejected character={} reason=target_not_attackable target={}", character.getId(),
+                    defender.getId());
+            character.send(new TargetNotFound(defender.getId().toString()));
+            return;
+        }
+        if (character.getPosition().distanceTo(defender.getPosition()) > MonsterAiEngine.ATTACK_RANGE) {
+            log.debug("attack.rejected character={} reason=out_of_range target={}", character.getId(),
+                    defender.getId());
+            character.send(new AttackOutOfRange(defender.getName()));
+            return;
+        }
+        if (!isReady()) {
+            log.debug("attack.rejected character={} reason=on_cooldown target={}", character.getId(), defender.getId());
+            character.send(new AttackOnCooldown(remainingCooldown().toMillis()));
+            return;
+        }
+
+        DomainEventPublisher.publish(new AttackBegin(character));
+
         if (defender instanceof MonsterInstance monster) {
             DomainEventPublisher.publish(new MonsterAttacked(monster, character));
         }
@@ -88,7 +131,8 @@ public final class CharacterCombat {
                 "combat.attack_resolved attacker={} defender={} hit={} critical={} damage={} defenderHealthAfter={} defeated={}",
                 character.getId(), defender.getId(), hit, critical, damage, healthAfter, defeated);
 
-        return new AttackOutcome(hit, critical, damage, healthAfter, defender.getMaxHealth(), defeated);
+        character.getCurrentZone().broadcast(new AttackResult(character.getId(), character.getName(), defender.getId(),
+                defender.getName(), hit, critical, damage, healthAfter), null);
     }
 
     private int rollWeaponDamage(Optional<Item> weapon) {
@@ -108,9 +152,5 @@ public final class CharacterCombat {
     private Optional<Item> getEquippedWeapon() {
         return character.getInventory().getEquippedItems().stream()
                 .filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
-    }
-
-    public record AttackOutcome(boolean hit, boolean critical, int damage, int targetHealthAfter, int targetMaxHealth,
-            boolean targetDefeated) {
     }
 }

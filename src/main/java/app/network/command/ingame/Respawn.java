@@ -39,8 +39,10 @@ public class Respawn implements CommandHandler {
                 .orElseThrow(() -> new IllegalStateException("Aucune starting zone configurée"));
         character.respawn(startingZone, startingZone.getSpawnPosition());
 
-        // La starting zone peut différer de la zone où le personnage est mort : sans ça, le
-        // client resterait affiché sur l'ancienne carte (voir Portal.java, même besoin).
+        // La starting zone peut différer de la zone où le personnage est mort : sans
+        // ça, le
+        // client resterait affiché sur l'ancienne carte (voir Portal.java, même
+        // besoin).
         connection.send(new ZoneMap(character.getCurrentZone()));
         connection.send(new ViewAround(character));
     }

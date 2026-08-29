@@ -48,12 +48,18 @@ public class Portal implements CommandHandler {
             return;
         }
 
-        // Sans ça, un déplacement en cours (goto) au moment de franchir le portail continue
-        // à la prochaine tick de MovementEngine avec des waypoints calculés pour l'ancienne
-        // zone/grille de collision, alors que la position du personnage vient de changer de
-        // zone — le personnage se remet alors à marcher tout seul dans la zone d'arrivée
-        // vers une destination périmée (demandé explicitement le 2026-08-28 : "le passage
-        // dans le téléporteur annule tout déplacement"). Le client doit recliquer pour se
+        // Sans ça, un déplacement en cours (goto) au moment de franchir le portail
+        // continue
+        // à la prochaine tick de MovementEngine avec des waypoints calculés pour
+        // l'ancienne
+        // zone/grille de collision, alors que la position du personnage vient de
+        // changer de
+        // zone — le personnage se remet alors à marcher tout seul dans la zone
+        // d'arrivée
+        // vers une destination périmée (demandé explicitement le 2026-08-28 : "le
+        // passage
+        // dans le téléporteur annule tout déplacement"). Le client doit recliquer pour
+        // se
         // redéplacer (voir aussi Game._rebuild_map côté client, même correctif local).
         movementEngine.stopMovement(character);
 
