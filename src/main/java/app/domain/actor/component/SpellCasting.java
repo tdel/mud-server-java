@@ -88,10 +88,10 @@ public final class SpellCasting {
         }
         boolean critical = DiceRoller.rollChance(character.getEffectiveCriticalRate() / 100.0);
         double variance = DiceRoller.randomVariance(0.9, 1.1);
-        // Le die du sort (effectDice) module la puissance magique du lancer, ce
-        // qui préserve la progression entre tiers d'un même sort (Fireball tier 1
-        // vs tier 5) au lieu de tout aplatir sur le seul m.atk du personnage.
-        int spellPower = character.getEffectiveMAtk() + DiceRoller.roll(spell.effectDice()).total();
+        // Le power du sort module la puissance magique du lancer, ce qui préserve
+        // la progression entre tiers d'un même sort (Flame Strike tier 1 vs tier 5)
+        // au lieu de tout aplatir sur le seul m.atk du personnage.
+        int spellPower = character.getEffectiveMAtk() + spell.power();
         int amount = CombatFormulas.resolveDamage(spellPower, target.getEffectiveMDef(), variance, critical);
         return new AttackRollOutcome(true, amount);
     }
@@ -109,7 +109,7 @@ public final class SpellCasting {
     }
 
     private CastOutcome castHeal(Spell spell) {
-        int amount = character.heal(DiceRoller.roll(spell.effectDice()).total());
+        int amount = character.heal(spell.power());
         return new CastOutcome(true, amount, character.getCurrentHealth(), character.getMaxHealth(), false, true, null);
     }
 
@@ -122,8 +122,7 @@ public final class SpellCasting {
             return new CastOutcome(false, 0, target.getCurrentHealth(), target.getMaxHealth(), false, false, null);
         }
 
-        int rolled = DiceRoller.roll(spell.effectDice()).total();
-        int amount = debuff ? -rolled : rolled;
+        int amount = debuff ? -spell.power() : spell.power();
         Instant expiresAt = Instant.now().plusSeconds(spell.durationSeconds());
         target.getActiveEffects()
                 .apply(new ActiveEffect(spell.id(), spell.name(), spell.modifiedStat(), amount, expiresAt));

@@ -32,7 +32,7 @@ Used identically for a melee attack and a damage spell (physical uses P.Atk/P.De
 4. Roll damage variance: `DiceRoller.randomVariance(0.9, 1.1)`.
 5. `damage = max(1, round(atk * (atk / (atk + def)) * variance * (critical ? 2.0 : 1.0)))`.
 
-A spell's `effectDice` (from `data/spells.json`) is added to the caster's effective M.Atk before this resolution, so spell tiers of the same name (e.g. a damage spell's tier 1 vs tier 5) still scale meaningfully instead of all hitting identically — a deliberate refinement over a pure "read M.Atk only" approach, since the L2-inspired ratio formula alone would otherwise flatten tier progression.
+A spell's `power` (a flat, per-tier integer from `data/spells.json`) is added to the caster's effective M.Atk before this resolution, so spell tiers of the same name (e.g. a damage spell's tier 1 vs tier 5) still scale meaningfully instead of all hitting identically — a deliberate refinement over a pure "read M.Atk only" approach, since the L2-inspired ratio formula alone would otherwise flatten tier progression.
 
 ## What didn't change
 

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import app.domain.Spell;
 import app.domain.SpellEffectType;
+import app.domain.SpellElement;
 import app.domain.actor.CharacterClass;
 import app.domain.actor.ModifiedStat;
 import tools.jackson.core.JacksonException;
@@ -52,7 +53,8 @@ public class SpellCatalog {
                 Spell spell = new Spell(definition.id(), definition.name(),
                         definition.tier() == null ? 1 : definition.tier(), definition.description(),
                         definition.requiredLevel(), definition.manaCost(), definition.cooldownSeconds(),
-                        definition.castingTimeMs(), definition.range(), definition.effect(), definition.effectDice(),
+                        definition.castingTimeMs(), definition.range(), definition.effect(), definition.power(),
+                        definition.element() == null ? SpellElement.NONE : definition.element(),
                         definition.projectile(), definition.projectileSpeed(), Set.copyOf(definition.classes()),
                         definition.modifiedStat(),
                         definition.durationSeconds() == null ? 0 : definition.durationSeconds());
@@ -110,8 +112,8 @@ public class SpellCatalog {
     }
 
     private record SpellDefinition(UUID id, String name, Integer tier, String description, int requiredLevel,
-            int manaCost, int cooldownSeconds, int castingTimeMs, int range, SpellEffectType effect, String effectDice,
-            boolean projectile, int projectileSpeed, List<CharacterClass> classes, ModifiedStat modifiedStat,
-            Integer durationSeconds) {
+            int manaCost, int cooldownSeconds, int castingTimeMs, int range, SpellEffectType effect, int power,
+            SpellElement element, boolean projectile, int projectileSpeed, List<CharacterClass> classes,
+            ModifiedStat modifiedStat, Integer durationSeconds) {
     }
 }
