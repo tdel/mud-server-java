@@ -65,9 +65,11 @@ public class MovementEngine {
         }
         log.debug("movement.stopped thread={} character={}", Thread.currentThread().getName(), character.getId());
         character.send(new MovementStopped(character.getPosition().x(), character.getPosition().y()));
-        character.broadcast(new CharacterMovementStopped(character.getId(), character.getName(),
-                character.getPosition().x(), character.getPosition().y()),
-                character instanceof CharacterInstance player ? player : null);
+        character
+                .broadcast(
+                        new CharacterMovementStopped(character.getId(), character.getName(),
+                                character.getPosition().x(), character.getPosition().y()),
+                        character instanceof CharacterInstance player ? player : null);
     }
 
     @EventListener

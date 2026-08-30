@@ -9,7 +9,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import app.domain.Spell;
+import app.domain.SpellElement;
 import app.domain.actor.AbstractCharacter;
+import app.domain.actor.Attribute;
+import app.domain.actor.event.CharacterEffectExpired;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.MonsterAttacked;
 import app.domain.actor.instance.CharacterInstance;
@@ -86,13 +89,16 @@ public final class SpellCasting {
         if (!rollSpellHit(target)) {
             return new AttackRollOutcome(false, 0);
         }
-        boolean critical = DiceRoller.rollChance(character.getEffectiveCriticalRate() / 100.0);
+        boolean critical = DiceRoller.rollChance(character.getEffectiveMagicalCriticalRate() / 100.0);
         double variance = DiceRoller.randomVariance(0.9, 1.1);
         // Le power du sort module la puissance magique du lancer, ce qui préserve
         // la progression entre tiers d'un même sort (Flame Strike tier 1 vs tier 5)
         // au lieu de tout aplatir sur le seul m.atk du personnage.
         int spellPower = character.getEffectiveMAtk() + spell.power();
         int amount = CombatFormulas.resolveDamage(spellPower, target.getEffectiveMDef(), variance, critical);
+        if (spell.element() != SpellElement.NONE) {
+            amount = CombatFormulas.applyElementalResistance(amount, target.getElementalResistance(spell.element()));
+        }
         return new AttackRollOutcome(true, amount);
     }
 
@@ -118,14 +124,16 @@ public final class SpellCasting {
     }
 
     private CastOutcome castModifier(Spell spell, AbstractCharacter target, boolean debuff) {
-        if (debuff && !rollSpellHit(target)) {
+        if (debuff && (!rollSpellHit(target)
+                || DiceRoller.rollChance(CombatFormulas.debuffResistChance(target.getAttribute(Attribute.MEN))))) {
             return new CastOutcome(false, 0, target.getCurrentHealth(), target.getMaxHealth(), false, false, null);
         }
 
         int amount = debuff ? -spell.power() : spell.power();
         Instant expiresAt = Instant.now().plusSeconds(spell.durationSeconds());
-        target.getActiveEffects()
+        Optional<ActiveEffect> evicted = target.getActiveEffects()
                 .apply(new ActiveEffect(spell.id(), spell.name(), spell.modifiedStat(), amount, expiresAt));
+        evicted.ifPresent(effect -> DomainEventPublisher.publish(new CharacterEffectExpired(target, effect)));
         return new CastOutcome(true, amount, target.getCurrentHealth(), target.getMaxHealth(), false, false, expiresAt);
     }
 

@@ -61,7 +61,8 @@
         "weight": 1,
         "pAtk": 9, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 10,
-        "rarity": "COMMON"
+        "rarity": "COMMON",
+        "grade": "D"
     },
     {
         "id": "ac9fe757-ab75-47ef-b413-8844d5c5ed73",
@@ -70,7 +71,8 @@
         "weight": 1,
         "pAtk": 5, "mAtk": 10, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 10,
-        "rarity": "COMMON"
+        "rarity": "COMMON",
+        "grade": "D"
     },
     {
         "id": "ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd",
@@ -79,7 +81,8 @@
         "weight": 1,
         "pAtk": 6, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 2,
-        "rarity": "COMMON"
+        "rarity": "COMMON",
+        "grade": "D"
     },
     {
         "id": "019faec6-116d-723d-b04c-76d51a2a2cb7",
@@ -88,7 +91,9 @@
         "weight": 2,
         "pAtk": 0, "mAtk": 0, "pDef": 2, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 10,
-        "rarity": "COMMON"
+        "rarity": "COMMON",
+        "grade": "D",
+        "setId": "plate-set"
     },
     {
         "id": "019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518",
@@ -98,7 +103,8 @@
         "armorCategory": "LIGHT",
         "pAtk": 0, "mAtk": 0, "pDef": 5, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 10,
-        "rarity": "COMMON"
+        "rarity": "COMMON",
+        "grade": "D"
     },
     {
         "id": "019fcf0d-1f8c-7d43-9e98-a9944b4ccefe",
@@ -108,7 +114,8 @@
         "armorCategory": "MEDIUM",
         "pAtk": 0, "mAtk": 0, "pDef": 10, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 50,
-        "rarity": "COMMON"
+        "rarity": "COMMON",
+        "grade": "D"
     },
     {
         "id": "019fcf0d-1f8d-7c4c-9275-33c4af4410a8",
@@ -118,7 +125,9 @@
         "armorCategory": "HEAVY",
         "pAtk": 0, "mAtk": 0, "pDef": 16, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 1500,
-        "rarity": "UNCOMMON"
+        "rarity": "UNCOMMON",
+        "grade": "C",
+        "setId": "plate-set"
     },
     {
         "id": "019fcf0d-1f8f-7d01-8e4f-fd592812a1a7",
@@ -127,7 +136,9 @@
         "weight": 3,
         "pAtk": 0, "mAtk": 0, "pDef": 4, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 10,
-        "rarity": "COMMON"
+        "rarity": "COMMON",
+        "grade": "D",
+        "setId": "plate-set"
     },
     {
         "id": "019fe3f6-b1ee-78f8-a681-d288c7f87511",
@@ -136,7 +147,8 @@
         "weight": 3,
         "pAtk": 12, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 2,
         "price": 500,
-        "rarity": "UNCOMMON"
+        "rarity": "UNCOMMON",
+        "grade": "C"
     },
     {
         "id": "019fe3f6-b1ef-786d-bc17-46dd46660eb0",
@@ -145,7 +157,8 @@
         "weight": 3,
         "pAtk": 0, "mAtk": 0, "pDef": 6, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 400,
-        "rarity": "UNCOMMON"
+        "rarity": "UNCOMMON",
+        "grade": "C"
     },
     {
         "id": "019fe3f6-b1f0-7e00-a18d-ee3ac38f9332",
@@ -154,7 +167,8 @@
         "weight": 3,
         "pAtk": 16, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 4,
         "price": 4000,
-        "rarity": "RARE"
+        "rarity": "RARE",
+        "grade": "B"
     },
     {
         "id": "019fe3f6-b1f2-7ac5-9ca3-2a4aa1f21cde",
@@ -164,7 +178,8 @@
         "armorCategory": "MEDIUM",
         "pAtk": 0, "mAtk": 0, "pDef": 13, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 4500,
-        "rarity": "RARE"
+        "rarity": "RARE",
+        "grade": "B"
     },
     {
         "id": "019fe3f6-b1f3-7285-8107-94d2bf661434",
@@ -174,7 +189,8 @@
         "armorCategory": "HEAVY",
         "pAtk": 0, "mAtk": 0, "pDef": 22, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 40000,
-        "rarity": "VERY_RARE"
+        "rarity": "VERY_RARE",
+        "grade": "A"
     },
     {
         "id": "019fe3f6-b1f4-78c7-8791-3103eb639821",
@@ -183,7 +199,8 @@
         "weight": 3,
         "pAtk": 0, "mAtk": 0, "pDef": 10, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 60000,
-        "rarity": "LEGENDARY"
+        "rarity": "LEGENDARY",
+        "grade": "S"
     },
     {
         "id": "b4b5f22f-0fd1-43a6-b1f0-7ac0103478d6",
@@ -234,6 +251,7 @@
         "pAtk": 5, "mAtk": 16, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 100,
         "rarity": "UNCOMMON",
+        "grade": "C",
         "grantedSpellIds": ["2127fbac-35aa-4897-a07d-bd619c4ec5b0"]
     },
     {
@@ -245,6 +263,7 @@
         "pAtk": 5, "mAtk": 16, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 150,
         "rarity": "UNCOMMON",
+        "grade": "C",
         "grantedSpellIds": ["e287e606-621f-48c5-b8dc-613fa98709d3"]
     },
     {
@@ -257,7 +276,9 @@
         "pAtk": 0, "mAtk": 0, "pDef": 5, "mDef": 4, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 200,
         "rarity": "UNCOMMON",
-        "grantedSpellIds": ["2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f"]
+        "grade": "C",
+        "grantedSpellIds": ["2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f"],
+        "elementalResistances": {"HOLY": 15}
     },
     {
         "id": "9c4f5d6b-1e7a-4b0d-8f5c-4d6a8b0c2e4f",
@@ -268,6 +289,8 @@
         "pAtk": 0, "mAtk": 0, "pDef": 2, "mDef": 3, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 200,
         "rarity": "UNCOMMON",
-        "grantedSpellIds": ["8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e"]
+        "grade": "C",
+        "grantedSpellIds": ["8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e"],
+        "elementalResistances": {"DARK": 15}
     }
 ]

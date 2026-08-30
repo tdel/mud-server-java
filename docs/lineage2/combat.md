@@ -14,11 +14,12 @@ Every `AbstractCharacter` exposes 7 derived stats, computed on the fly from its 
 | M.Def | `sum(equipped mDef) + statBonus(MEN) * BASE_DEF_FACTOR` | equipped armor, MEN |
 | Accuracy | `BASE_ACCURACY + level + statBonus(DEX) * ACCURACY_FACTOR + itemBonus` | DEX, level, items |
 | Evasion | `BASE_EVASION + level + statBonus(DEX) * EVASION_FACTOR - armorWeightPenalty + itemBonus` | DEX, level, armor weight, items |
-| Critical Rate | `BASE_CRIT_RATE + statBonus(DEX) * ACCURACY_FACTOR + itemBonus`, clamped to [1, 90]% | DEX, items |
+| P.Crit (`getCriticalRate()`) | `BASE_CRIT_RATE + statBonus(DEX) * ACCURACY_FACTOR + itemBonus`, clamped to [1, 90]% | DEX, items |
+| M.Crit (`getMagicalCriticalRate()`) | `BASE_CRIT_RATE + statBonus(WIT) * ACCURACY_FACTOR + itemBonus`, clamped to [1, 90]% | WIT, items |
 
 `statBonus(score) = 1.03^(score - 10)` — a smooth exponential centered on score 10 (neutral, bonus = 1.0), used consistently across all 6 attributes instead of DnD5e's `(score-10)/2` linear modifier. `levelFactor(level) = 1 + (level-1) * 0.02`.
 
-Each stat has an `effective` variant (`getEffectivePAtk()`, etc.) that adds any active buff/debuff from `ActiveEffects` (`ModifiedStat.PATK/PDEF/MATK/MDEF/ACCURACY/EVASION`) — this is what combat resolution actually reads, exactly like `getEffectiveArmorClass()` did before.
+Each stat has an `effective` variant (`getEffectivePAtk()`, etc.) that adds any active buff/debuff from `ActiveEffects` (`ModifiedStat.PATK/PDEF/MATK/MDEF/ACCURACY/EVASION/PCRIT/MCRIT`) — this is what combat resolution actually reads, exactly like `getEffectiveArmorClass()` did before. M.Crit (`CombatFormulas.magicCriticalRate`, driven by WIT) is a straight mirror of P.Crit's DEX formula: WIT had no formula reading it at all before this — the only attribute of the six that was otherwise inert.
 
 `AbstractCharacter` exposes these via 8 `protected` hooks (`basePAtk()`, `baseMAtk()`, `basePDefSum()`, `baseMDefSum()`, `accuracyItemBonus()`, `evasionItemBonus()`, `armorWeightPenalty()`, `critItemBonus()`) with neutral defaults; `CharacterInstance` sums its equipped items, `MonsterInstance` reads its `MonsterTemplate`'s natural values (monsters keep a full STR/DEX/CON/INT/WIT/MEN block, same as players — their "weapon+armor" is just baked into the template's natural pAtk/pDef/etc.).
 
@@ -28,11 +29,21 @@ Used identically for a melee attack and a damage spell (physical uses P.Atk/P.De
 
 1. `hitChance = accuracy / (accuracy + evasion)`, clamped to `[0.20, 0.98]` — accuracy/evasion are opposed, never a guaranteed hit or miss.
 2. Roll `DiceRoller.rollChance(hitChance)`. Miss → 0 damage.
-3. On a hit, roll critical independently: `DiceRoller.rollChance(criticalRate / 100.0)`.
+3. On a hit, roll critical independently: `DiceRoller.rollChance(criticalRate / 100.0)` — melee/`CharacterCombat` and monster attacks use effective P.Crit, damage spells (`SpellCasting.rollDamage`) use effective M.Crit.
 4. Roll damage variance: `DiceRoller.randomVariance(0.9, 1.1)`.
 5. `damage = max(1, round(atk * (atk / (atk + def)) * variance * (critical ? 2.0 : 1.0)))`.
 
 A spell's `power` (a flat, per-tier integer from `data/spells.json`) is added to the caster's effective M.Atk before this resolution, so spell tiers of the same name (e.g. a damage spell's tier 1 vs tier 5) still scale meaningfully instead of all hitting identically — a deliberate refinement over a pure "read M.Atk only" approach, since the L2-inspired ratio formula alone would otherwise flatten tier progression.
+
+## Elemental resistance
+
+A damage spell whose `Spell.element()` (`SpellElement`: FIRE/WATER/WIND/EARTH/HOLY/DARK, or NONE for a physical/neutral spell) is not `NONE` has `CombatFormulas.applyElementalResistance(rawDamage, resistScore)` applied on top of step 5 above, in `SpellCasting.rollDamage`: `multiplier = clamp(1 - resistScore * 0.01, [0.1, 2.0])`, `damage = max(1, round(rawDamage * multiplier))`. `resistScore` reads `target.getElementalResistance(element)` — a positive score (resistance) reduces damage down to ×0.1, a negative one (vulnerability) amplifies it up to ×2. It sums `ItemTemplate.elementalResistances`/`MonsterTemplate.elementalResistances` (see `docs/lineage2/equipment.md`) across a character's equipped items, or reads a monster's natural resistances directly — never persisted, computed on the fly like every other derived stat. Melee/`CharacterCombat` damage is untouched: elemental resistance only applies to spell damage, since melee has no element.
+
+## Buffs/debuffs
+
+`ActiveEffect.category()` derives `BUFF`/`DEBUFF` (`EffectCategory`) from `amount`'s sign — no separate persisted field. `ActiveEffects` caps active effects per category: `MAX_BUFF_SLOTS` (6), `MAX_DEBUFF_SLOTS` (4). Applying a new effect (not a refresh of an already-active `spellId`) while a category is full evicts the soonest-to-expire effect of that same category; `SpellCasting.castModifier` publishes `CharacterEffectExpired` for the evicted effect, reusing the exact same expiry pipeline (`ActiveEffectEngine`/`ActiveEffectPersistenceListener`) a natural timeout goes through — no new event type needed.
+
+A debuff can additionally be resisted independently of the spell's normal hit/evasion check: `CombatFormulas.debuffResistChance(menScore)` — `clamp(0, 70, round(5 + statBonus(MEN) * 3.0)) / 100.0` — rolled right after a successful hit in `SpellCasting.castModifier`. A resist is reported the same way as a miss (`CastOutcome.hit() == false`) — there's no separate "resisted" status on the wire yet.
 
 ## What didn't change
 

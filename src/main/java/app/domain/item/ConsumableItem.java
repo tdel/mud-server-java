@@ -1,6 +1,7 @@
 package app.domain.item;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import app.domain.*;
@@ -17,10 +18,11 @@ public class ConsumableItem extends ItemTemplate {
 
     public ConsumableItem(UUID id, String name, String description, ItemType type, int weight,
             ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus,
-            int critBonus, int price, Rarity rarity, List<Spell> grantedSpells, ConsumableEffect effect,
+            int critBonus, int price, Rarity rarity, List<Spell> grantedSpells,
+            Map<SpellElement, Integer> elementalResistances, ItemGrade grade, String setId, ConsumableEffect effect,
             String effectDice) {
         super(id, name, description, type, weight, armorCategory, pAtk, mAtk, pDef, mDef, accuracyBonus, evasionBonus,
-                critBonus, price, rarity, grantedSpells);
+                critBonus, price, rarity, grantedSpells, elementalResistances, grade, setId);
         this.effect = effect;
         this.effectDice = effectDice;
     }

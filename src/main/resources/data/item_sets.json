@@ -1,0 +1,10 @@
+[
+    {
+        "id": "plate-set",
+        "name": "Set du plaqueur",
+        "bonusByPieceCount": {
+            "2": {"PDEF": 5},
+            "3": {"PDEF": 12, "EVASION": -3}
+        }
+    }
+]

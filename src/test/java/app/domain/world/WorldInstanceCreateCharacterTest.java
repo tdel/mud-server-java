@@ -51,8 +51,8 @@ class WorldInstanceCreateCharacterTest {
     private void assertAttributesMatchClassProfilePlusHumanBonus(CharacterInstance character,
             CharacterClass characterClass) {
         for (Attribute attribute : Attribute.values()) {
-            int expected = characterClass.baseAttributes().get(attribute) + Race.HUMAN.attributeScoreBonuses()
-                    .getOrDefault(attribute, 0);
+            int expected = characterClass.baseAttributes().get(attribute)
+                    + Race.HUMAN.attributeScoreBonuses().getOrDefault(attribute, 0);
             assertThat(character.getAttribute(attribute)).as("attribute %s", attribute).isEqualTo(expected);
         }
     }

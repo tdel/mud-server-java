@@ -57,9 +57,9 @@ public class CharacterDao {
                         character.getLevel(), character.getCurrentHealth(), character.getMaxHealth(),
                         character.getAttribute(Attribute.STRENGTH), character.getAttribute(Attribute.DEXTERITY),
                         character.getAttribute(Attribute.CONSTITUTION), character.getAttribute(Attribute.INTELLIGENCE),
-                        character.getAttribute(Attribute.WIT), character.getAttribute(Attribute.MEN),
-                        character.getXp(), character.getInventory().getGold(), character.getShortRestCount(),
-                        character.getMaxMana(), character.getCurrentMana(), name(character.getSubclassTier1()),
+                        character.getAttribute(Attribute.WIT), character.getAttribute(Attribute.MEN), character.getXp(),
+                        character.getInventory().getGold(), character.getShortRestCount(), character.getMaxMana(),
+                        character.getCurrentMana(), name(character.getSubclassTier1()),
                         name(character.getSubclassTier2()))
                 .execute();
     }

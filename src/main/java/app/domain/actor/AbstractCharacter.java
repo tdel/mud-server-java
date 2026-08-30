@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import app.domain.Spell;
 import app.domain.SpellEffectType;
+import app.domain.SpellElement;
 import app.domain.actor.component.ActiveEffects;
 import app.domain.actor.component.SpellCasting;
 import app.domain.actor.event.CharacterPositionChanged;
@@ -100,12 +101,30 @@ public abstract class AbstractCharacter extends AbstractObject {
         return 0;
     }
 
+    protected Map<SpellElement, Integer> elementalResistanceMap() {
+        return Map.of();
+    }
+
+    public final int getElementalResistance(SpellElement element) {
+        return elementalResistanceMap().getOrDefault(element, 0);
+    }
+
+    // Défaut neutre : seul CharacterInstance regroupe des items équipés
+    // susceptibles de former un set.
+    protected Map<ModifiedStat, Integer> setBonusModifiers() {
+        return Map.of();
+    }
+
+    private int setBonus(ModifiedStat stat) {
+        return setBonusModifiers().getOrDefault(stat, 0);
+    }
+
     public int getPAtk() {
         return CombatFormulas.physicalAttack(basePAtk(), getAttribute(Attribute.STRENGTH), getLevel());
     }
 
     public final int getEffectivePAtk() {
-        return getPAtk() + activeEffects.totalModifier(ModifiedStat.PATK);
+        return getPAtk() + activeEffects.totalModifier(ModifiedStat.PATK) + setBonus(ModifiedStat.PATK);
     }
 
     public int getMAtk() {
@@ -113,7 +132,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public final int getEffectiveMAtk() {
-        return getMAtk() + activeEffects.totalModifier(ModifiedStat.MATK);
+        return getMAtk() + activeEffects.totalModifier(ModifiedStat.MATK) + setBonus(ModifiedStat.MATK);
     }
 
     public int getPDef() {
@@ -121,7 +140,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public final int getEffectivePDef() {
-        return getPDef() + activeEffects.totalModifier(ModifiedStat.PDEF);
+        return getPDef() + activeEffects.totalModifier(ModifiedStat.PDEF) + setBonus(ModifiedStat.PDEF);
     }
 
     public int getMDef() {
@@ -129,7 +148,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public final int getEffectiveMDef() {
-        return getMDef() + activeEffects.totalModifier(ModifiedStat.MDEF);
+        return getMDef() + activeEffects.totalModifier(ModifiedStat.MDEF) + setBonus(ModifiedStat.MDEF);
     }
 
     public int getAccuracy() {
@@ -137,7 +156,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public final int getEffectiveAccuracy() {
-        return getAccuracy() + activeEffects.totalModifier(ModifiedStat.ACCURACY);
+        return getAccuracy() + activeEffects.totalModifier(ModifiedStat.ACCURACY) + setBonus(ModifiedStat.ACCURACY);
     }
 
     public int getEvasion() {
@@ -146,7 +165,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public final int getEffectiveEvasion() {
-        return getEvasion() + activeEffects.totalModifier(ModifiedStat.EVASION);
+        return getEvasion() + activeEffects.totalModifier(ModifiedStat.EVASION) + setBonus(ModifiedStat.EVASION);
     }
 
     public int getCriticalRate() {
@@ -154,7 +173,15 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public final int getEffectiveCriticalRate() {
-        return getCriticalRate();
+        return getCriticalRate() + activeEffects.totalModifier(ModifiedStat.PCRIT);
+    }
+
+    public int getMagicalCriticalRate() {
+        return CombatFormulas.magicCriticalRate(getAttribute(Attribute.WIT), critItemBonus());
+    }
+
+    public final int getEffectiveMagicalCriticalRate() {
+        return getMagicalCriticalRate() + activeEffects.totalModifier(ModifiedStat.MCRIT);
     }
 
     public ActiveEffects getActiveEffects() {

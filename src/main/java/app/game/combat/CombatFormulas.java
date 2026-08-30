@@ -7,21 +7,23 @@ import app.domain.item.ArmorCategory;
  * /accuracy/evasion/criticalRate) et résolution d'un coup (touche, critique,
  * dégâts). Reconstruites à partir des mécaniques largement documentées par la
  * communauté (notamment le moteur open-source L2J) — les constantes ci-dessous
- * sont un point de départ à équilibrer en jeu, pas une reproduction garantie
- * du client retail.
+ * sont un point de départ à équilibrer en jeu, pas une reproduction garantie du
+ * client retail.
  *
- * <p>Fonctions pures, sans dépendance Spring ni RNG : le tirage aléatoire réel
+ * <p>
+ * Fonctions pures, sans dépendance Spring ni RNG : le tirage aléatoire réel
  * (hit/critique/variance) reste à la charge de l'appelant, via
  * {@code app.game.dice.DiceRoller}.
  *
- * <p>Constantes calibrées par simulation déterministe (espérance de dégâts,
- * pas de tirages réels) sur un Fighter/Mystic niveau 1 fraîchement créé
- * (arme de départ, sans armure) contre chaque monstre de {@code data/monsters
+ * <p>
+ * Constantes calibrées par simulation déterministe (espérance de dégâts, pas de
+ * tirages réels) sur un Fighter/Mystic niveau 1 fraîchement créé (arme de
+ * départ, sans armure) contre chaque monstre de {@code data/monsters
  * .json} : viser un hitChance en miroir ~65-70%, une marge de temps-de-mise-
  * à-mort favorable au joueur sur les monstres "starter" (même niveau, faible
- * récompense XP), et une difficulté réelle sur les monstres au-dessus du
- * niveau du joueur. Point de départ à retester après tout changement de
- * contenu (nouvelles armes/armures, nouveaux monstres).
+ * récompense XP), et une difficulté réelle sur les monstres au-dessus du niveau
+ * du joueur. Point de départ à retester après tout changement de contenu
+ * (nouvelles armes/armures, nouveaux monstres).
  */
 public final class CombatFormulas {
 
@@ -40,6 +42,14 @@ public final class CombatFormulas {
     public static final double MIN_HIT_CHANCE = 0.20;
     public static final double MAX_HIT_CHANCE = 0.98;
     public static final double CRITICAL_MULTIPLIER = 2.0;
+    public static final double ELEMENT_RESIST_FACTOR = 0.01;
+    public static final double MIN_ELEMENT_MULTIPLIER = 0.1;
+    public static final double MAX_ELEMENT_MULTIPLIER = 2.0;
+    public static final int ENCHANT_ATK_BONUS_PER_LEVEL = 2;
+    public static final int ENCHANT_DEF_BONUS_PER_LEVEL = 1;
+    public static final int BASE_DEBUFF_RESIST = 5;
+    public static final double DEBUFF_RESIST_FACTOR = 3.0;
+    public static final int MAX_DEBUFF_RESIST = 70;
 
     private CombatFormulas() {
     }
@@ -75,14 +85,20 @@ public final class CombatFormulas {
     }
 
     public static int evasion(int level, int dexterityScore, int armorWeightPenalty, int evasionItemBonus) {
-        int raw = (int) Math.round(
-                BASE_EVASION + level + statBonus(dexterityScore) * EVASION_FACTOR + armorWeightPenalty
-                        + evasionItemBonus);
+        int raw = (int) Math.round(BASE_EVASION + level + statBonus(dexterityScore) * EVASION_FACTOR
+                + armorWeightPenalty + evasionItemBonus);
         return Math.max(0, raw);
     }
 
     public static int criticalRate(int dexterityScore, int critItemBonus) {
         int raw = (int) Math.round(BASE_CRIT_RATE + statBonus(dexterityScore) * ACCURACY_FACTOR + critItemBonus);
+        return Math.min(MAX_CRIT_RATE, Math.max(MIN_CRIT_RATE, raw));
+    }
+
+    // Miroir magique de criticalRate() : DEX pilote le critique physique, WIT le
+    // critique magique.
+    public static int magicCriticalRate(int witScore, int critItemBonus) {
+        int raw = (int) Math.round(BASE_CRIT_RATE + statBonus(witScore) * ACCURACY_FACTOR + critItemBonus);
         return Math.min(MAX_CRIT_RATE, Math.max(MIN_CRIT_RATE, raw));
     }
 
@@ -97,6 +113,28 @@ public final class CombatFormulas {
             base *= CRITICAL_MULTIPLIER;
         }
         return Math.max(1, (int) Math.round(base));
+    }
+
+    // Chance (0.0-1.0) qu'un debuff soit résisté, indépendamment du jet de
+    // touche du sort — MEN protège des altérations d'état comme CON protège des
+    // dégâts physiques.
+    public static double debuffResistChance(int menScore) {
+        int raw = (int) Math.round(BASE_DEBUFF_RESIST + statBonus(menScore) * DEBUFF_RESIST_FACTOR);
+        return Math.min(MAX_DEBUFF_RESIST, Math.max(0, raw)) / 100.0;
+    }
+
+    // N'applique le bonus d'enchant que si l'item porte déjà ce stat (baseStat >
+    // 0) : évite qu'une armure enchantée gagne un p.atk fantôme, et vice versa.
+    public static int enchantBonus(int baseStat, int enchantLevel, int bonusPerLevel) {
+        return baseStat > 0 ? baseStat + enchantLevel * bonusPerLevel : baseStat;
+    }
+
+    // Un score positif (résistance) réduit les dégâts jusqu'à x0.1, un score
+    // négatif (vulnérabilité) les amplifie jusqu'à x2 — jamais en dessous de 1.
+    public static int applyElementalResistance(int rawDamage, int resistScore) {
+        double multiplier = 1.0 - resistScore * ELEMENT_RESIST_FACTOR;
+        multiplier = Math.min(MAX_ELEMENT_MULTIPLIER, Math.max(MIN_ELEMENT_MULTIPLIER, multiplier));
+        return Math.max(1, (int) Math.round(rawDamage * multiplier));
     }
 
     public static int armorWeightPenalty(ArmorCategory category) {

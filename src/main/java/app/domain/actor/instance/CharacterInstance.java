@@ -1,6 +1,7 @@
 package app.domain.actor.instance;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -13,6 +14,7 @@ import app.domain.Account;
 import app.domain.Party;
 import app.domain.PendingPartyInvite;
 import app.domain.Spell;
+import app.domain.SpellElement;
 import app.domain.actor.*;
 import app.domain.actor.component.ActiveEffect;
 import app.domain.actor.component.CharacterCombat;
@@ -35,11 +37,13 @@ import app.domain.actor.event.GamePlayerUnequippedItem;
 import app.domain.actor.event.ItemDiscarded;
 import app.domain.actor.event.ItemPurchased;
 import app.domain.item.EquipmentSlot;
+import app.domain.item.ItemSet;
 import app.domain.map.Position;
 import app.domain.item.Item;
 import app.domain.world.MapInstance;
 import app.domain.world.PeaceZone;
 import app.domain.world.WorldInstance;
+import app.game.catalog.ItemSetCatalogHolder;
 import app.game.combat.CombatFormulas;
 import app.game.dice.CheckResult;
 import app.game.dice.DiceRoll;
@@ -280,13 +284,37 @@ public final class CharacterInstance extends AbstractCharacter {
 
     @Override
     protected int armorWeightPenalty() {
-        return inventory.getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.CHEST)
-                .findFirst().map(item -> CombatFormulas.armorWeightPenalty(item.getArmorCategory())).orElse(0);
+        return inventory.getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.CHEST).findFirst()
+                .map(item -> CombatFormulas.armorWeightPenalty(item.getArmorCategory())).orElse(0);
+    }
+
+    @Override
+    protected Map<SpellElement, Integer> elementalResistanceMap() {
+        return inventory.getEquippedItems().stream().flatMap(item -> item.getElementalResistances().entrySet().stream())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum));
+    }
+
+    @Override
+    protected Map<ModifiedStat, Integer> setBonusModifiers() {
+        Map<String, Long> equippedCountBySetId = inventory.getEquippedItems().stream()
+                .map(item -> item.getTemplate().getSetId()).filter(Objects::nonNull)
+                .collect(Collectors.groupingBy(setId -> setId, Collectors.counting()));
+
+        Map<ModifiedStat, Integer> modifiers = new EnumMap<>(ModifiedStat.class);
+        for (Map.Entry<String, Long> entry : equippedCountBySetId.entrySet()) {
+            ItemSet set = ItemSetCatalogHolder.getById(entry.getKey());
+            int piecesEquipped = entry.getValue().intValue();
+            for (Map.Entry<Integer, Map<ModifiedStat, Integer>> tier : set.bonusByPieceCount().entrySet()) {
+                if (piecesEquipped >= tier.getKey()) {
+                    tier.getValue().forEach((stat, amount) -> modifiers.merge(stat, amount, Integer::sum));
+                }
+            }
+        }
+        return modifiers;
     }
 
     private Optional<Item> getEquippedWeapon() {
-        return inventory.getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.WEAPON)
-                .findFirst();
+        return inventory.getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
     }
 
     public boolean isWearingNonProficientArmor() {

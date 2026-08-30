@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import app.domain.Party;
+import app.domain.SpellElement;
 import app.domain.actor.Attribute;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.item.Item;
@@ -38,11 +39,12 @@ public class MonsterTemplate {
     private int presenceRadius;
     private int speed;
     private int level;
+    private Map<SpellElement, Integer> elementalResistances;
 
     public MonsterTemplate(UUID id, String name, String description, int maxHealth, Map<Attribute, Integer> attributes,
             int naturalPAtk, int naturalMAtk, int naturalPDef, int naturalMDef, int accuracyBonus, int evasionBonus,
             int critBonus, int xpReward, int goldReward, List<LootTableEntry> lootTable, int presenceRadius, int speed,
-            int level) {
+            int level, Map<SpellElement, Integer> elementalResistances) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -61,6 +63,7 @@ public class MonsterTemplate {
         this.presenceRadius = presenceRadius;
         this.speed = speed;
         this.level = level;
+        this.elementalResistances = elementalResistances == null ? Map.of() : elementalResistances;
     }
 
     public UUID getId() {
@@ -207,6 +210,14 @@ public class MonsterTemplate {
         this.level = level;
     }
 
+    public Map<SpellElement, Integer> getElementalResistances() {
+        return elementalResistances;
+    }
+
+    public void setElementalResistances(Map<SpellElement, Integer> elementalResistances) {
+        this.elementalResistances = elementalResistances == null ? Map.of() : elementalResistances;
+    }
+
     public LootResult rollLoot(CharacterInstance killer) {
         List<Item> items = new ArrayList<>();
         for (LootTableEntry entry : lootTable) {
@@ -255,14 +266,15 @@ public class MonsterTemplate {
                 && presenceRadius == other.presenceRadius && speed == other.speed && level == other.level
                 && Objects.equals(id, other.id) && Objects.equals(name, other.name)
                 && Objects.equals(description, other.description) && Objects.equals(attributes, other.attributes)
-                && Objects.equals(lootTable, other.lootTable);
+                && Objects.equals(lootTable, other.lootTable)
+                && Objects.equals(elementalResistances, other.elementalResistances);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, name, description, maxHealth, attributes, naturalPAtk, naturalMAtk, naturalPDef,
                 naturalMDef, accuracyBonus, evasionBonus, critBonus, xpReward, goldReward, lootTable, presenceRadius,
-                speed, level);
+                speed, level, elementalResistances);
     }
 
     @Override
@@ -272,7 +284,8 @@ public class MonsterTemplate {
                 + naturalMAtk + ", naturalPDef=" + naturalPDef + ", naturalMDef=" + naturalMDef + ", accuracyBonus="
                 + accuracyBonus + ", evasionBonus=" + evasionBonus + ", critBonus=" + critBonus + ", xpReward="
                 + xpReward + ", goldReward=" + goldReward + ", lootTable=" + lootTable + ", presenceRadius="
-                + presenceRadius + ", speed=" + speed + ", level=" + level + "]";
+                + presenceRadius + ", speed=" + speed + ", level=" + level + ", elementalResistances="
+                + elementalResistances + "]";
     }
 
     public record LootTableEntry(ItemTemplate itemTemplate, double dropChance) {

@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import app.game.WorldInstanceService;
+import app.game.catalog.ItemSetCatalog;
 import app.game.catalog.ItemTemplateCatalog;
 import app.game.catalog.LevelCatalog;
 import app.game.catalog.MonsterCatalog;
@@ -32,14 +33,15 @@ public class ServerApplication {
     // (WorldInstance.createCharacter) apprend les sorts de niveau 1 via
     // SpellCatalogHolder dès la création du monde par défaut.
     @Bean
-    public ApplicationRunner warmupRunner(ItemTemplateCatalog itemTemplateCatalog, SpellCatalog spellCatalog,
-            LevelCatalog levelCatalog, MonsterCatalog monsterCatalog, WorldTemplateCatalog worldTemplateCatalog,
-            WorldInstanceService worldInstanceService) {
+    public ApplicationRunner warmupRunner(ItemTemplateCatalog itemTemplateCatalog, ItemSetCatalog itemSetCatalog,
+            SpellCatalog spellCatalog, LevelCatalog levelCatalog, MonsterCatalog monsterCatalog,
+            WorldTemplateCatalog worldTemplateCatalog, WorldInstanceService worldInstanceService) {
         return args -> {
             long start = System.currentTimeMillis();
             log.info("startup.warmup_started");
             spellCatalog.warmSpells();
             itemTemplateCatalog.warmItemTemplates();
+            itemSetCatalog.warmItemSets();
             worldTemplateCatalog.warmWorldTemplates();
             monsterCatalog.warmMonsterTemplates();
             levelCatalog.warmXpThresholds();

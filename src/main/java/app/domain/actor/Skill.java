@@ -3,13 +3,11 @@ package app.domain.actor;
 public enum Skill {
     ACROBATICS(Attribute.DEXTERITY), ANIMAL_HANDLING(Attribute.WIT), ARCANA(Attribute.INTELLIGENCE), ATHLETICS(
             Attribute.STRENGTH), DECEPTION(Attribute.MEN), HISTORY(Attribute.INTELLIGENCE), INSIGHT(
-                    Attribute.WIT), INTIMIDATION(Attribute.MEN), INVESTIGATION(
-                            Attribute.INTELLIGENCE), MEDICINE(Attribute.WIT), NATURE(
-                                    Attribute.INTELLIGENCE), PERCEPTION(Attribute.WIT), PERFORMANCE(
-                                            Attribute.MEN), PERSUASION(Attribute.MEN), RELIGION(
-                                                    Attribute.INTELLIGENCE), SLEIGHT_OF_HAND(
-                                                            Attribute.DEXTERITY), STEALTH(
-                                                                    Attribute.DEXTERITY), SURVIVAL(Attribute.WIT);
+                    Attribute.WIT), INTIMIDATION(Attribute.MEN), INVESTIGATION(Attribute.INTELLIGENCE), MEDICINE(
+                            Attribute.WIT), NATURE(Attribute.INTELLIGENCE), PERCEPTION(Attribute.WIT), PERFORMANCE(
+                                    Attribute.MEN), PERSUASION(Attribute.MEN), RELIGION(
+                                            Attribute.INTELLIGENCE), SLEIGHT_OF_HAND(Attribute.DEXTERITY), STEALTH(
+                                                    Attribute.DEXTERITY), SURVIVAL(Attribute.WIT);
 
     private final Attribute governingAttribute;
 

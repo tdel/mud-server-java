@@ -1,23 +1,34 @@
 package app.domain.item;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import app.domain.SpellElement;
 import app.domain.actor.AbstractCharacter;
+import app.game.combat.CombatFormulas;
 
 public class Item {
+
+    public static final int MAX_ENCHANT = 20;
 
     private final UUID id;
     private final ItemTemplate template;
 
     private AbstractCharacter character;
     private EquipmentSlot slot;
+    private int enchant;
 
     public Item(UUID id, ItemTemplate template, AbstractCharacter character, EquipmentSlot slot) {
+        this(id, template, character, slot, 0);
+    }
+
+    public Item(UUID id, ItemTemplate template, AbstractCharacter character, EquipmentSlot slot, int enchant) {
         this.id = id;
         this.template = Objects.requireNonNull(template);
         this.character = character;
         this.slot = slot;
+        setEnchant(enchant);
     }
 
     public ItemTemplate getTemplate() {
@@ -49,19 +60,27 @@ public class Item {
     }
 
     public int getPAtk() {
-        return template.getPAtk();
+        return CombatFormulas.enchantBonus(template.getPAtk(), enchant, CombatFormulas.ENCHANT_ATK_BONUS_PER_LEVEL);
     }
 
     public int getMAtk() {
-        return template.getMAtk();
+        return CombatFormulas.enchantBonus(template.getMAtk(), enchant, CombatFormulas.ENCHANT_ATK_BONUS_PER_LEVEL);
     }
 
     public int getPDef() {
-        return template.getPDef();
+        return CombatFormulas.enchantBonus(template.getPDef(), enchant, CombatFormulas.ENCHANT_DEF_BONUS_PER_LEVEL);
     }
 
     public int getMDef() {
-        return template.getMDef();
+        return CombatFormulas.enchantBonus(template.getMDef(), enchant, CombatFormulas.ENCHANT_DEF_BONUS_PER_LEVEL);
+    }
+
+    public int getEnchant() {
+        return enchant;
+    }
+
+    public void setEnchant(int enchant) {
+        this.enchant = Math.max(0, Math.min(MAX_ENCHANT, enchant));
     }
 
     public int getAccuracyBonus() {
@@ -74,6 +93,14 @@ public class Item {
 
     public int getCritBonus() {
         return template.getCritBonus();
+    }
+
+    public Map<SpellElement, Integer> getElementalResistances() {
+        return template.getElementalResistances();
+    }
+
+    public ItemGrade getGrade() {
+        return template.getGrade();
     }
 
     public Rarity getRarity() {

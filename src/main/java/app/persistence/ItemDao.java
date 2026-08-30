@@ -27,9 +27,14 @@ public class ItemDao {
     }
 
     public void insert(Item item) {
-        dsl.insertInto(ITEM, ITEM.ID, ITEM.TEMPLATE_ID, ITEM.CHARACTER_ID, ITEM.SLOT).values(item.getId(),
-                item.getTemplateId(), item.getCharacterId(), item.getSlot() == null ? null : item.getSlot().name())
+        dsl.insertInto(ITEM, ITEM.ID, ITEM.TEMPLATE_ID, ITEM.CHARACTER_ID, ITEM.SLOT, ITEM.ENCHANT)
+                .values(item.getId(), item.getTemplateId(), item.getCharacterId(),
+                        item.getSlot() == null ? null : item.getSlot().name(), item.getEnchant())
                 .execute();
+    }
+
+    public void updateEnchant(UUID itemId, int enchant) {
+        dsl.update(ITEM).set(ITEM.ENCHANT, enchant).where(ITEM.ID.eq(itemId)).execute();
     }
 
     public List<Item> findByCharacter(AbstractCharacter character) {
@@ -52,6 +57,7 @@ public class ItemDao {
     private Item toItem(ItemRecord record, AbstractCharacter character) {
         ItemTemplate template = itemTemplateCatalog.getById(record.getTemplateId());
         String slot = record.getSlot();
-        return new Item(record.getId(), template, character, slot == null ? null : EquipmentSlot.valueOf(slot));
+        return new Item(record.getId(), template, character, slot == null ? null : EquipmentSlot.valueOf(slot),
+                record.getEnchant());
     }
 }

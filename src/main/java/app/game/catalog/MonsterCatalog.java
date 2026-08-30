@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import app.domain.SpellElement;
 import app.domain.actor.Attribute;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.actor.template.MonsterTemplate;
@@ -106,13 +107,16 @@ public class MonsterCatalog {
                 }
                 lootTable.add(new LootTableEntry(itemTemplate, entryDef.dropChance()));
             }
+            Map<SpellElement, Integer> elementalResistances = definition.elementalResistances() == null
+                    ? Map.of()
+                    : definition.elementalResistances();
             templates.put(definition.id(),
                     new MonsterTemplate(definition.id(), definition.name(), definition.description(),
                             definition.maxHealth(), definition.attributes(), definition.naturalPAtk(),
                             definition.naturalMAtk(), definition.naturalPDef(), definition.naturalMDef(),
                             definition.accuracyBonus(), definition.evasionBonus(), definition.critBonus(),
                             definition.xpReward(), definition.goldReward(), lootTable, definition.presenceRadius(),
-                            definition.speed(), definition.level()));
+                            definition.speed(), definition.level(), elementalResistances));
         }
         log.info("monster.templates_loaded count={}", templates.size());
     }
@@ -123,6 +127,7 @@ public class MonsterCatalog {
     record MonsterTemplateDefinition(UUID id, String name, String description, int maxHealth,
             Map<Attribute, Integer> attributes, int naturalPAtk, int naturalMAtk, int naturalPDef, int naturalMDef,
             int accuracyBonus, int evasionBonus, int critBonus, int xpReward, int goldReward,
-            List<LootTableEntryDefinition> lootTable, int presenceRadius, int speed, int level) {
+            List<LootTableEntryDefinition> lootTable, int presenceRadius, int speed, int level,
+            Map<SpellElement, Integer> elementalResistances) {
     }
 }

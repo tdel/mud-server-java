@@ -1,10 +1,12 @@
 package app.domain.item;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 import app.domain.Spell;
+import app.domain.SpellElement;
 
 public class ItemTemplate {
 
@@ -24,10 +26,14 @@ public class ItemTemplate {
     private int price;
     private Rarity rarity;
     private List<Spell> grantedSpells;
+    private Map<SpellElement, Integer> elementalResistances;
+    private ItemGrade grade;
+    private String setId;
 
     public ItemTemplate(UUID id, String name, String description, ItemType type, int weight,
             ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus,
-            int critBonus, int price, Rarity rarity, List<Spell> grantedSpells) {
+            int critBonus, int price, Rarity rarity, List<Spell> grantedSpells,
+            Map<SpellElement, Integer> elementalResistances, ItemGrade grade, String setId) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -44,6 +50,9 @@ public class ItemTemplate {
         this.price = price;
         this.rarity = rarity;
         this.grantedSpells = grantedSpells == null ? List.of() : grantedSpells;
+        this.elementalResistances = elementalResistances == null ? Map.of() : elementalResistances;
+        this.grade = grade == null ? ItemGrade.D : grade;
+        this.setId = setId;
     }
 
     public UUID getId() {
@@ -174,6 +183,30 @@ public class ItemTemplate {
         this.grantedSpells = grantedSpells == null ? List.of() : grantedSpells;
     }
 
+    public Map<SpellElement, Integer> getElementalResistances() {
+        return elementalResistances;
+    }
+
+    public void setElementalResistances(Map<SpellElement, Integer> elementalResistances) {
+        this.elementalResistances = elementalResistances == null ? Map.of() : elementalResistances;
+    }
+
+    public ItemGrade getGrade() {
+        return grade;
+    }
+
+    public void setGrade(ItemGrade grade) {
+        this.grade = grade == null ? ItemGrade.D : grade;
+    }
+
+    public String getSetId() {
+        return setId;
+    }
+
+    public void setSetId(String setId) {
+        this.setId = setId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -187,13 +220,15 @@ public class ItemTemplate {
                 && critBonus == other.critBonus && price == other.price && Objects.equals(id, other.id)
                 && Objects.equals(name, other.name) && Objects.equals(description, other.description)
                 && type == other.type && armorCategory == other.armorCategory && rarity == other.rarity
-                && Objects.equals(grantedSpells, other.grantedSpells);
+                && Objects.equals(grantedSpells, other.grantedSpells)
+                && Objects.equals(elementalResistances, other.elementalResistances) && grade == other.grade
+                && Objects.equals(setId, other.setId);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, name, description, type, weight, armorCategory, pAtk, mAtk, pDef, mDef, accuracyBonus,
-                evasionBonus, critBonus, price, rarity, grantedSpells);
+                evasionBonus, critBonus, price, rarity, grantedSpells, elementalResistances, grade, setId);
     }
 
     @Override
@@ -202,6 +237,7 @@ public class ItemTemplate {
                 + ", weight=" + weight + ", armorCategory=" + armorCategory + ", pAtk=" + pAtk + ", mAtk=" + mAtk
                 + ", pDef=" + pDef + ", mDef=" + mDef + ", accuracyBonus=" + accuracyBonus + ", evasionBonus="
                 + evasionBonus + ", critBonus=" + critBonus + ", price=" + price + ", rarity=" + rarity
-                + ", grantedSpells=" + grantedSpells + "]";
+                + ", grantedSpells=" + grantedSpells + ", elementalResistances=" + elementalResistances + ", grade="
+                + grade + ", setId=" + setId + "]";
     }
 }

@@ -37,6 +37,19 @@ class CombatFormulasTest {
     }
 
     @Test
+    void magicCriticalRateIsClampedToBounds() {
+        assertThat(CombatFormulas.magicCriticalRate(30, 1000)).isEqualTo(CombatFormulas.MAX_CRIT_RATE);
+        assertThat(CombatFormulas.magicCriticalRate(1, -1000)).isEqualTo(CombatFormulas.MIN_CRIT_RATE);
+    }
+
+    @Test
+    void magicCriticalRateGrowsWithWit() {
+        int lowWit = CombatFormulas.magicCriticalRate(8, 0);
+        int highWit = CombatFormulas.magicCriticalRate(18, 0);
+        assertThat(highWit).isGreaterThan(lowWit);
+    }
+
+    @Test
     void resolveDamageIsNeverBelowOne() {
         assertThat(CombatFormulas.resolveDamage(1, 100000, 1.0, false)).isEqualTo(1);
     }
@@ -82,5 +95,53 @@ class CombatFormulasTest {
     void physicalDefenseAndMagicalDefenseAreNeverBelowOne() {
         assertThat(CombatFormulas.physicalDefense(0, 1)).isGreaterThanOrEqualTo(1);
         assertThat(CombatFormulas.magicalDefense(0, 1)).isGreaterThanOrEqualTo(1);
+    }
+
+    @Test
+    void applyElementalResistanceReducesDamageWithPositiveResist() {
+        int reduced = CombatFormulas.applyElementalResistance(100, 20);
+        assertThat(reduced).isLessThan(100);
+    }
+
+    @Test
+    void applyElementalResistanceAmplifiesDamageWithNegativeResist() {
+        int amplified = CombatFormulas.applyElementalResistance(100, -20);
+        assertThat(amplified).isGreaterThan(100);
+    }
+
+    @Test
+    void applyElementalResistanceIsClampedToMultiplierBounds() {
+        assertThat(CombatFormulas.applyElementalResistance(100, 1000)).isEqualTo(10);
+        assertThat(CombatFormulas.applyElementalResistance(100, -1000)).isEqualTo(200);
+    }
+
+    @Test
+    void applyElementalResistanceNeverBelowOne() {
+        assertThat(CombatFormulas.applyElementalResistance(1, 90)).isEqualTo(1);
+    }
+
+    @Test
+    void enchantBonusScalesLinearly() {
+        int unenchanted = CombatFormulas.enchantBonus(10, 0, CombatFormulas.ENCHANT_ATK_BONUS_PER_LEVEL);
+        int enchantedPlusFive = CombatFormulas.enchantBonus(10, 5, CombatFormulas.ENCHANT_ATK_BONUS_PER_LEVEL);
+        assertThat(unenchanted).isEqualTo(10);
+        assertThat(enchantedPlusFive).isEqualTo(10 + 5 * CombatFormulas.ENCHANT_ATK_BONUS_PER_LEVEL);
+    }
+
+    @Test
+    void enchantBonusLeavesZeroBaseStatUnaffected() {
+        assertThat(CombatFormulas.enchantBonus(0, 10, CombatFormulas.ENCHANT_ATK_BONUS_PER_LEVEL)).isZero();
+    }
+
+    @Test
+    void debuffResistChanceGrowsWithMen() {
+        double lowMen = CombatFormulas.debuffResistChance(8);
+        double highMen = CombatFormulas.debuffResistChance(18);
+        assertThat(highMen).isGreaterThan(lowMen);
+    }
+
+    @Test
+    void debuffResistChanceClampedToMax() {
+        assertThat(CombatFormulas.debuffResistChance(200)).isEqualTo(CombatFormulas.MAX_DEBUFF_RESIST / 100.0);
     }
 }
