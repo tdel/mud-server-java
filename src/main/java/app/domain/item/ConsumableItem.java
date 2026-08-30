@@ -16,10 +16,11 @@ public class ConsumableItem extends ItemTemplate {
     private final String effectDice;
 
     public ConsumableItem(UUID id, String name, String description, ItemType type, int weight,
-            ArmorCategory armorCategory, int baseAc, String damageDice, WeaponCategory weaponCategory, int price,
-            Rarity rarity, int bonus, List<Spell> grantedSpells, ConsumableEffect effect, String effectDice) {
-        super(id, name, description, type, weight, armorCategory, baseAc, damageDice, weaponCategory, price, rarity,
-                bonus, grantedSpells);
+            ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus,
+            int critBonus, int price, Rarity rarity, List<Spell> grantedSpells, ConsumableEffect effect,
+            String effectDice) {
+        super(id, name, description, type, weight, armorCategory, pAtk, mAtk, pDef, mDef, accuracyBonus, evasionBonus,
+                critBonus, price, rarity, grantedSpells);
         this.effect = effect;
         this.effectDice = effectDice;
     }

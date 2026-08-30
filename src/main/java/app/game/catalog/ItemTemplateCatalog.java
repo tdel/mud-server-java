@@ -19,7 +19,6 @@ import app.domain.item.FoodItem;
 import app.domain.item.ItemTemplate;
 import app.domain.item.ItemType;
 import app.domain.item.Rarity;
-import app.domain.item.WeaponCategory;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -63,20 +62,22 @@ public class ItemTemplateCatalog {
 
         if (definition.consumableEffect() != null) {
             return new ConsumableItem(definition.id(), definition.name(), definition.description(), definition.type(),
-                    definition.weight(), definition.armorCategory(), definition.baseAc(), definition.damageDice(),
-                    definition.weaponCategory(), definition.price(), definition.rarity(), definition.bonus(),
-                    grantedSpells, definition.consumableEffect(), definition.effectDice());
+                    definition.weight(), definition.armorCategory(), definition.pAtk(), definition.mAtk(),
+                    definition.pDef(), definition.mDef(), definition.accuracyBonus(), definition.evasionBonus(),
+                    definition.critBonus(), definition.price(), definition.rarity(), grantedSpells,
+                    definition.consumableEffect(), definition.effectDice());
         }
         if (definition.nutritionValue() != null) {
             return new FoodItem(definition.id(), definition.name(), definition.description(), definition.type(),
-                    definition.weight(), definition.armorCategory(), definition.baseAc(), definition.damageDice(),
-                    definition.weaponCategory(), definition.price(), definition.rarity(), definition.bonus(),
-                    grantedSpells, definition.nutritionValue());
+                    definition.weight(), definition.armorCategory(), definition.pAtk(), definition.mAtk(),
+                    definition.pDef(), definition.mDef(), definition.accuracyBonus(), definition.evasionBonus(),
+                    definition.critBonus(), definition.price(), definition.rarity(), grantedSpells,
+                    definition.nutritionValue());
         }
         return new ItemTemplate(definition.id(), definition.name(), definition.description(), definition.type(),
-                definition.weight(), definition.armorCategory(), definition.baseAc(), definition.damageDice(),
-                definition.weaponCategory(), definition.price(), definition.rarity(), definition.bonus(),
-                grantedSpells);
+                definition.weight(), definition.armorCategory(), definition.pAtk(), definition.mAtk(),
+                definition.pDef(), definition.mDef(), definition.accuracyBonus(), definition.evasionBonus(),
+                definition.critBonus(), definition.price(), definition.rarity(), grantedSpells);
     }
 
     public Map<UUID, ItemTemplate> templatesById() {
@@ -93,8 +94,8 @@ public class ItemTemplateCatalog {
     }
 
     private record ItemTemplateDefinition(UUID id, String name, String description, ItemType type, int weight,
-            ArmorCategory armorCategory, int baseAc, String damageDice, WeaponCategory weaponCategory, int price,
-            Rarity rarity, int bonus, List<UUID> grantedSpellIds, ConsumableEffect consumableEffect, String effectDice,
-            Integer nutritionValue) {
+            ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus,
+            int critBonus, int price, Rarity rarity, List<UUID> grantedSpellIds, ConsumableEffect consumableEffect,
+            String effectDice, Integer nutritionValue) {
     }
 }

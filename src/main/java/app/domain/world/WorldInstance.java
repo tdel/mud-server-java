@@ -1,9 +1,8 @@
 package app.domain.world;
 
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,7 +23,6 @@ import app.domain.actor.event.NewGamePlayerCreated;
 import app.domain.actor.event.PlayerLoadedInWorld;
 import app.domain.actor.event.PlayerRemovedFromWorld;
 import app.domain.map.Position;
-import app.game.dice.DiceRoll;
 import app.game.dice.DiceRoller;
 
 public class WorldInstance {
@@ -112,7 +110,7 @@ public class WorldInstance {
         MapInstance startingMap = startingMapInstance()
                 .orElseThrow(() -> new IllegalStateException("WorldInstance " + id + " n'a aucune map de départ"));
 
-        Map<Attribute, Integer> scores = rollAttributeScores();
+        Map<Attribute, Integer> scores = new EnumMap<>(characterClass.baseAttributes());
         for (Map.Entry<Attribute, Integer> bonus : race.attributeScoreBonuses().entrySet()) {
             scores.merge(bonus.getKey(), bonus.getValue(), Integer::sum);
         }
@@ -134,26 +132,6 @@ public class WorldInstance {
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));
 
         return character;
-    }
-
-    private Map<Attribute, Integer> rollAttributeScores() {
-        Map<Attribute, Integer> scores = new LinkedHashMap<>();
-        for (Attribute attribute : Attribute.values()) {
-            scores.put(attribute, rollAttributeScore());
-        }
-        return scores;
-    }
-
-    private int rollAttributeScore() {
-        // Official 5e method: roll 4d6, drop the lowest single die, sum the rest.
-        DiceRoll roll = DiceRoller.roll("4d6");
-        int[] dice = roll.rolls().clone();
-        Arrays.sort(dice);
-        int sum = 0;
-        for (int i = 1; i < dice.length; i++) {
-            sum += dice[i];
-        }
-        return sum;
     }
 
     @Override

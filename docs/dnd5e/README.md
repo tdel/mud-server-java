@@ -1,6 +1,6 @@
 # DnD5e Rules Reference
 
-Reference documentation for D&D 5th Edition rules, summarized from the [D&D 5e SRD 5.1](https://5thsrd.org/) (CC-BY-4.0, Wizards of the Coast). This project targets DnD5e compliance (see `CLAUDE.md`), so these files exist as a scoped, load-on-demand reference: pull in only the file(s) relevant to the system being touched, instead of re-deriving or guessing SRD rules from general knowledge each time.
+Reference documentation for D&D 5th Edition rules, summarized from the [D&D 5e SRD 5.1](https://5thsrd.org/) (CC-BY-4.0, Wizards of the Coast). This project targets DnD5e compliance for the systems below (see `CLAUDE.md`), so these files exist as a scoped, load-on-demand reference: pull in only the file(s) relevant to the system being touched, instead of re-deriving or guessing SRD rules from general knowledge each time. **Combat itself is no longer DnD5e** — see [../lineage2/README.md](../lineage2/README.md) for the current attack/damage/defense model.
 
 Each file ends with a **"Notes for this project"** section connecting the rule to the current Java implementation (or noting that it isn't implemented yet).
 
@@ -21,6 +21,8 @@ Each file ends with a **"Notes for this project"** section connecting the rule t
 | [spellcasting.md](spellcasting.md) | Spell levels/slots, casting time/components/duration, save DC |
 | [feats.md](feats.md) | Feats as an ASI alternative |
 | [monsters-npcs.md](monsters-npcs.md) | CR/XP, size categories, stat blocks, legendary creatures, NPC customization |
+
+See also [../lineage2/README.md](../lineage2/README.md) for the current Lineage2-style combat model (p.atk/p.def/m.atk/m.def, accuracy/evasion, criticalRate), which replaced the `combat.md` attack-roll-vs-AC resolution described below.
 
 ## Scope note
 

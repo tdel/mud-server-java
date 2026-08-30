@@ -14,29 +14,35 @@ public class ItemTemplate {
     private ItemType type;
     private int weight;
     private ArmorCategory armorCategory;
-    private int baseAc;
-    private String damageDice;
-    private WeaponCategory weaponCategory;
+    private int pAtk;
+    private int mAtk;
+    private int pDef;
+    private int mDef;
+    private int accuracyBonus;
+    private int evasionBonus;
+    private int critBonus;
     private int price;
     private Rarity rarity;
-    private int bonus;
     private List<Spell> grantedSpells;
 
     public ItemTemplate(UUID id, String name, String description, ItemType type, int weight,
-            ArmorCategory armorCategory, int baseAc, String damageDice, WeaponCategory weaponCategory, int price,
-            Rarity rarity, int bonus, List<Spell> grantedSpells) {
+            ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus,
+            int critBonus, int price, Rarity rarity, List<Spell> grantedSpells) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.type = type;
         this.weight = weight;
         this.armorCategory = armorCategory;
-        this.baseAc = baseAc;
-        this.damageDice = damageDice;
-        this.weaponCategory = weaponCategory;
+        this.pAtk = pAtk;
+        this.mAtk = mAtk;
+        this.pDef = pDef;
+        this.mDef = mDef;
+        this.accuracyBonus = accuracyBonus;
+        this.evasionBonus = evasionBonus;
+        this.critBonus = critBonus;
         this.price = price;
         this.rarity = rarity;
-        this.bonus = bonus;
         this.grantedSpells = grantedSpells == null ? List.of() : grantedSpells;
     }
 
@@ -88,28 +94,60 @@ public class ItemTemplate {
         this.armorCategory = armorCategory;
     }
 
-    public int getBaseAc() {
-        return baseAc;
+    public int getPAtk() {
+        return pAtk;
     }
 
-    public void setBaseAc(int baseAc) {
-        this.baseAc = baseAc;
+    public void setPAtk(int pAtk) {
+        this.pAtk = pAtk;
     }
 
-    public String getDamageDice() {
-        return damageDice;
+    public int getMAtk() {
+        return mAtk;
     }
 
-    public void setDamageDice(String damageDice) {
-        this.damageDice = damageDice;
+    public void setMAtk(int mAtk) {
+        this.mAtk = mAtk;
     }
 
-    public WeaponCategory getWeaponCategory() {
-        return weaponCategory;
+    public int getPDef() {
+        return pDef;
     }
 
-    public void setWeaponCategory(WeaponCategory weaponCategory) {
-        this.weaponCategory = weaponCategory;
+    public void setPDef(int pDef) {
+        this.pDef = pDef;
+    }
+
+    public int getMDef() {
+        return mDef;
+    }
+
+    public void setMDef(int mDef) {
+        this.mDef = mDef;
+    }
+
+    public int getAccuracyBonus() {
+        return accuracyBonus;
+    }
+
+    public void setAccuracyBonus(int accuracyBonus) {
+        this.accuracyBonus = accuracyBonus;
+    }
+
+    public int getEvasionBonus() {
+        return evasionBonus;
+    }
+
+    public void setEvasionBonus(int evasionBonus) {
+        this.evasionBonus = evasionBonus;
+    }
+
+    public int getCritBonus() {
+        return critBonus;
+    }
+
+    public void setCritBonus(int critBonus) {
+        this.critBonus = critBonus;
     }
 
     public int getPrice() {
@@ -128,14 +166,6 @@ public class ItemTemplate {
         this.rarity = rarity;
     }
 
-    public int getBonus() {
-        return bonus;
-    }
-
-    public void setBonus(int bonus) {
-        this.bonus = bonus;
-    }
-
     public List<Spell> getGrantedSpells() {
         return grantedSpells;
     }
@@ -152,25 +182,26 @@ public class ItemTemplate {
         if (!(o instanceof ItemTemplate other)) {
             return false;
         }
-        return weight == other.weight && baseAc == other.baseAc && price == other.price && bonus == other.bonus
-                && Objects.equals(id, other.id) && Objects.equals(name, other.name)
-                && Objects.equals(description, other.description) && type == other.type
-                && armorCategory == other.armorCategory && Objects.equals(damageDice, other.damageDice)
-                && weaponCategory == other.weaponCategory && rarity == other.rarity
+        return weight == other.weight && pAtk == other.pAtk && mAtk == other.mAtk && pDef == other.pDef
+                && mDef == other.mDef && accuracyBonus == other.accuracyBonus && evasionBonus == other.evasionBonus
+                && critBonus == other.critBonus && price == other.price && Objects.equals(id, other.id)
+                && Objects.equals(name, other.name) && Objects.equals(description, other.description)
+                && type == other.type && armorCategory == other.armorCategory && rarity == other.rarity
                 && Objects.equals(grantedSpells, other.grantedSpells);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, type, weight, armorCategory, baseAc, damageDice, weaponCategory,
-                price, rarity, bonus, grantedSpells);
+        return Objects.hash(id, name, description, type, weight, armorCategory, pAtk, mAtk, pDef, mDef, accuracyBonus,
+                evasionBonus, critBonus, price, rarity, grantedSpells);
     }
 
     @Override
     public String toString() {
         return "ItemTemplate[id=" + id + ", name=" + name + ", description=" + description + ", type=" + type
-                + ", weight=" + weight + ", armorCategory=" + armorCategory + ", baseAc=" + baseAc + ", damageDice="
-                + damageDice + ", weaponCategory=" + weaponCategory + ", price=" + price + ", rarity=" + rarity
-                + ", bonus=" + bonus + ", grantedSpells=" + grantedSpells + "]";
+                + ", weight=" + weight + ", armorCategory=" + armorCategory + ", pAtk=" + pAtk + ", mAtk=" + mAtk
+                + ", pDef=" + pDef + ", mDef=" + mDef + ", accuracyBonus=" + accuracyBonus + ", evasionBonus="
+                + evasionBonus + ", critBonus=" + critBonus + ", price=" + price + ", rarity=" + rarity
+                + ", grantedSpells=" + grantedSpells + "]";
     }
 }

@@ -49,7 +49,7 @@ public class CharacterDao {
         dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_MAP_ID,
                 CHARACTER.GENDER, CHARACTER.RACE, CHARACTER.CHARACTER_CLASS, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH,
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
-                CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA, CHARACTER.XP, CHARACTER.GOLD,
+                CHARACTER.INTELLIGENCE, CHARACTER.WIT, CHARACTER.MEN, CHARACTER.XP, CHARACTER.GOLD,
                 CHARACTER.SHORT_REST_COUNT, CHARACTER.MAX_MANA, CHARACTER.CURRENT_MANA, CHARACTER.SUBCLASS_TIER1,
                 CHARACTER.SUBCLASS_TIER2)
                 .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentMapId(),
@@ -57,7 +57,7 @@ public class CharacterDao {
                         character.getLevel(), character.getCurrentHealth(), character.getMaxHealth(),
                         character.getAttribute(Attribute.STRENGTH), character.getAttribute(Attribute.DEXTERITY),
                         character.getAttribute(Attribute.CONSTITUTION), character.getAttribute(Attribute.INTELLIGENCE),
-                        character.getAttribute(Attribute.WISDOM), character.getAttribute(Attribute.CHARISMA),
+                        character.getAttribute(Attribute.WIT), character.getAttribute(Attribute.MEN),
                         character.getXp(), character.getInventory().getGold(), character.getShortRestCount(),
                         character.getMaxMana(), character.getCurrentMana(), name(character.getSubclassTier1()),
                         name(character.getSubclassTier2()))
@@ -113,8 +113,8 @@ public class CharacterDao {
         attributes.put(Attribute.DEXTERITY, record.getDexterity());
         attributes.put(Attribute.CONSTITUTION, record.getConstitution());
         attributes.put(Attribute.INTELLIGENCE, record.getIntelligence());
-        attributes.put(Attribute.WISDOM, record.getWisdom());
-        attributes.put(Attribute.CHARISMA, record.getCharisma());
+        attributes.put(Attribute.WIT, record.getWit());
+        attributes.put(Attribute.MEN, record.getMen());
 
         CharacterClass characterClass = CharacterClass.valueOf(record.getCharacterClass());
         Race race = Race.valueOf(record.getRace());

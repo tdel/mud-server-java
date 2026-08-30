@@ -48,24 +48,36 @@ public class Item {
         return template.getArmorCategory();
     }
 
-    public int getBaseAc() {
-        return template.getBaseAc();
+    public int getPAtk() {
+        return template.getPAtk();
     }
 
-    public String getDamageDice() {
-        return template.getDamageDice();
+    public int getMAtk() {
+        return template.getMAtk();
     }
 
-    public WeaponCategory getWeaponCategory() {
-        return template.getWeaponCategory();
+    public int getPDef() {
+        return template.getPDef();
+    }
+
+    public int getMDef() {
+        return template.getMDef();
+    }
+
+    public int getAccuracyBonus() {
+        return template.getAccuracyBonus();
+    }
+
+    public int getEvasionBonus() {
+        return template.getEvasionBonus();
+    }
+
+    public int getCritBonus() {
+        return template.getCritBonus();
     }
 
     public Rarity getRarity() {
         return template.getRarity();
-    }
-
-    public int getBonus() {
-        return template.getBonus();
     }
 
     public void setCharacter(AbstractCharacter character) {

@@ -10,12 +10,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import app.domain.Spell;
 import app.domain.actor.AbstractCharacter;
-import app.domain.actor.ModifiedStat;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.MonsterAttacked;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.instance.MonsterInstance;
-import app.game.dice.DiceRoll;
+import app.game.combat.CombatFormulas;
 import app.game.dice.DiceRoller;
 
 public final class SpellCasting {
@@ -84,10 +83,17 @@ public final class SpellCasting {
     // application (PV décomptés, événement publié) est différée jusqu'à
     // l'impact.
     public AttackRollOutcome rollDamage(Spell spell, AbstractCharacter target) {
-        if (!rollSpellAttack(target)) {
+        if (!rollSpellHit(target)) {
             return new AttackRollOutcome(false, 0);
         }
-        return new AttackRollOutcome(true, DiceRoller.roll(spell.effectDice()).total());
+        boolean critical = DiceRoller.rollChance(character.getEffectiveCriticalRate() / 100.0);
+        double variance = DiceRoller.randomVariance(0.9, 1.1);
+        // Le die du sort (effectDice) module la puissance magique du lancer, ce
+        // qui préserve la progression entre tiers d'un même sort (Fireball tier 1
+        // vs tier 5) au lieu de tout aplatir sur le seul m.atk du personnage.
+        int spellPower = character.getEffectiveMAtk() + DiceRoller.roll(spell.effectDice()).total();
+        int amount = CombatFormulas.resolveDamage(spellPower, target.getEffectiveMDef(), variance, critical);
+        return new AttackRollOutcome(true, amount);
     }
 
     public CastOutcome applyDamageOutcome(AttackRollOutcome roll, AbstractCharacter target) {
@@ -112,7 +118,7 @@ public final class SpellCasting {
     }
 
     private CastOutcome castModifier(Spell spell, AbstractCharacter target, boolean debuff) {
-        if (debuff && !rollSpellAttack(target)) {
+        if (debuff && !rollSpellHit(target)) {
             return new CastOutcome(false, 0, target.getCurrentHealth(), target.getMaxHealth(), false, false, null);
         }
 
@@ -124,11 +130,9 @@ public final class SpellCasting {
         return new CastOutcome(true, amount, target.getCurrentHealth(), target.getMaxHealth(), false, false, expiresAt);
     }
 
-    private boolean rollSpellAttack(AbstractCharacter target) {
-        int spellAttackBonus = character.getSpellAttackBonus()
-                + character.getActiveEffects().totalModifier(ModifiedStat.ATTACK_ROLL);
-        DiceRoll attackRoll = DiceRoller.rollD20(spellAttackBonus, false);
-        return DiceRoller.resolveHit(attackRoll.rolls()[0], attackRoll.total(), target.getEffectiveArmorClass());
+    private boolean rollSpellHit(AbstractCharacter target) {
+        double hitChance = CombatFormulas.hitChance(character.getEffectiveAccuracy(), target.getEffectiveEvasion());
+        return DiceRoller.rollChance(hitChance);
     }
 
     private boolean applyDamage(AbstractCharacter defender, int damage) {

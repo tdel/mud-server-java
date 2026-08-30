@@ -12,9 +12,10 @@ public record MonsterStatBlock(MonsterInstance monster) implements OutputJsonMes
     public record AttributeScore(int score, int modifier) {
     }
 
-    public record Payload(UUID id, String name, String description, int currentHealth, int maxHealth, int armorClass,
-            AttributeScore strength, AttributeScore dexterity, AttributeScore constitution, AttributeScore intelligence,
-            AttributeScore wisdom, AttributeScore charisma) {
+    public record Payload(UUID id, String name, String description, int currentHealth, int maxHealth, int pAtk,
+            int pDef, int mAtk, int mDef, int accuracy, int evasion, int criticalRate, AttributeScore strength,
+            AttributeScore dexterity, AttributeScore constitution, AttributeScore intelligence, AttributeScore wit,
+            AttributeScore men) {
     }
 
     @Override
@@ -22,10 +23,11 @@ public record MonsterStatBlock(MonsterInstance monster) implements OutputJsonMes
         MonsterInstance m = monster;
         output.write("MonsterStatBlock",
                 new Payload(m.getId(), m.getName(), m.getDescription(), m.getCurrentHealth(), m.getMaxHealth(),
-                        m.getArmorClass(), attributeScore(m, Attribute.STRENGTH),
-                        attributeScore(m, Attribute.DEXTERITY), attributeScore(m, Attribute.CONSTITUTION),
-                        attributeScore(m, Attribute.INTELLIGENCE), attributeScore(m, Attribute.WISDOM),
-                        attributeScore(m, Attribute.CHARISMA)),
+                        m.getEffectivePAtk(), m.getEffectivePDef(), m.getEffectiveMAtk(), m.getEffectiveMDef(),
+                        m.getEffectiveAccuracy(), m.getEffectiveEvasion(), m.getEffectiveCriticalRate(),
+                        attributeScore(m, Attribute.STRENGTH), attributeScore(m, Attribute.DEXTERITY),
+                        attributeScore(m, Attribute.CONSTITUTION), attributeScore(m, Attribute.INTELLIGENCE),
+                        attributeScore(m, Attribute.WIT), attributeScore(m, Attribute.MEN)),
                 false);
     }
 

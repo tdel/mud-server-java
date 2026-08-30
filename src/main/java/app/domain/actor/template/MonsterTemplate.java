@@ -25,9 +25,14 @@ public class MonsterTemplate {
     private String description;
     private int maxHealth;
     private Map<Attribute, Integer> attributes;
-    private Integer naturalArmorClass;
+    private int naturalPAtk;
+    private int naturalMAtk;
+    private int naturalPDef;
+    private int naturalMDef;
+    private int accuracyBonus;
+    private int evasionBonus;
+    private int critBonus;
     private int xpReward;
-    private String naturalDamageDice;
     private int goldReward;
     private List<LootTableEntry> lootTable;
     private int presenceRadius;
@@ -35,16 +40,22 @@ public class MonsterTemplate {
     private int level;
 
     public MonsterTemplate(UUID id, String name, String description, int maxHealth, Map<Attribute, Integer> attributes,
-            Integer naturalArmorClass, int xpReward, String naturalDamageDice, int goldReward,
-            List<LootTableEntry> lootTable, int presenceRadius, int speed, int level) {
+            int naturalPAtk, int naturalMAtk, int naturalPDef, int naturalMDef, int accuracyBonus, int evasionBonus,
+            int critBonus, int xpReward, int goldReward, List<LootTableEntry> lootTable, int presenceRadius, int speed,
+            int level) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.maxHealth = maxHealth;
         this.attributes = attributes;
-        this.naturalArmorClass = naturalArmorClass;
+        this.naturalPAtk = naturalPAtk;
+        this.naturalMAtk = naturalMAtk;
+        this.naturalPDef = naturalPDef;
+        this.naturalMDef = naturalMDef;
+        this.accuracyBonus = accuracyBonus;
+        this.evasionBonus = evasionBonus;
+        this.critBonus = critBonus;
         this.xpReward = xpReward;
-        this.naturalDamageDice = naturalDamageDice;
         this.goldReward = goldReward;
         this.lootTable = lootTable;
         this.presenceRadius = presenceRadius;
@@ -92,12 +103,60 @@ public class MonsterTemplate {
         this.attributes = attributes;
     }
 
-    public Integer getNaturalArmorClass() {
-        return naturalArmorClass;
+    public int getNaturalPAtk() {
+        return naturalPAtk;
     }
 
-    public void setNaturalArmorClass(Integer naturalArmorClass) {
-        this.naturalArmorClass = naturalArmorClass;
+    public void setNaturalPAtk(int naturalPAtk) {
+        this.naturalPAtk = naturalPAtk;
+    }
+
+    public int getNaturalMAtk() {
+        return naturalMAtk;
+    }
+
+    public void setNaturalMAtk(int naturalMAtk) {
+        this.naturalMAtk = naturalMAtk;
+    }
+
+    public int getNaturalPDef() {
+        return naturalPDef;
+    }
+
+    public void setNaturalPDef(int naturalPDef) {
+        this.naturalPDef = naturalPDef;
+    }
+
+    public int getNaturalMDef() {
+        return naturalMDef;
+    }
+
+    public void setNaturalMDef(int naturalMDef) {
+        this.naturalMDef = naturalMDef;
+    }
+
+    public int getAccuracyBonus() {
+        return accuracyBonus;
+    }
+
+    public void setAccuracyBonus(int accuracyBonus) {
+        this.accuracyBonus = accuracyBonus;
+    }
+
+    public int getEvasionBonus() {
+        return evasionBonus;
+    }
+
+    public void setEvasionBonus(int evasionBonus) {
+        this.evasionBonus = evasionBonus;
+    }
+
+    public int getCritBonus() {
+        return critBonus;
+    }
+
+    public void setCritBonus(int critBonus) {
+        this.critBonus = critBonus;
     }
 
     public int getXpReward() {
@@ -106,14 +165,6 @@ public class MonsterTemplate {
 
     public void setXpReward(int xpReward) {
         this.xpReward = xpReward;
-    }
-
-    public String getNaturalDamageDice() {
-        return naturalDamageDice;
-    }
-
-    public void setNaturalDamageDice(String naturalDamageDice) {
-        this.naturalDamageDice = naturalDamageDice;
     }
 
     public int getGoldReward() {
@@ -197,27 +248,31 @@ public class MonsterTemplate {
         if (!(o instanceof MonsterTemplate other)) {
             return false;
         }
-        return maxHealth == other.maxHealth && xpReward == other.xpReward && goldReward == other.goldReward
+        return maxHealth == other.maxHealth && naturalPAtk == other.naturalPAtk && naturalMAtk == other.naturalMAtk
+                && naturalPDef == other.naturalPDef && naturalMDef == other.naturalMDef
+                && accuracyBonus == other.accuracyBonus && evasionBonus == other.evasionBonus
+                && critBonus == other.critBonus && xpReward == other.xpReward && goldReward == other.goldReward
                 && presenceRadius == other.presenceRadius && speed == other.speed && level == other.level
                 && Objects.equals(id, other.id) && Objects.equals(name, other.name)
                 && Objects.equals(description, other.description) && Objects.equals(attributes, other.attributes)
-                && Objects.equals(naturalArmorClass, other.naturalArmorClass)
-                && Objects.equals(naturalDamageDice, other.naturalDamageDice)
                 && Objects.equals(lootTable, other.lootTable);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, maxHealth, attributes, naturalArmorClass, xpReward,
-                naturalDamageDice, goldReward, lootTable, presenceRadius, speed, level);
+        return Objects.hash(id, name, description, maxHealth, attributes, naturalPAtk, naturalMAtk, naturalPDef,
+                naturalMDef, accuracyBonus, evasionBonus, critBonus, xpReward, goldReward, lootTable, presenceRadius,
+                speed, level);
     }
 
     @Override
     public String toString() {
         return "MonsterTemplate[id=" + id + ", name=" + name + ", description=" + description + ", maxHealth="
-                + maxHealth + ", attributes=" + attributes + ", naturalArmorClass=" + naturalArmorClass + ", xpReward="
-                + xpReward + ", naturalDamageDice=" + naturalDamageDice + ", goldReward=" + goldReward + ", lootTable="
-                + lootTable + ", presenceRadius=" + presenceRadius + ", speed=" + speed + ", level=" + level + "]";
+                + maxHealth + ", attributes=" + attributes + ", naturalPAtk=" + naturalPAtk + ", naturalMAtk="
+                + naturalMAtk + ", naturalPDef=" + naturalPDef + ", naturalMDef=" + naturalMDef + ", accuracyBonus="
+                + accuracyBonus + ", evasionBonus=" + evasionBonus + ", critBonus=" + critBonus + ", xpReward="
+                + xpReward + ", goldReward=" + goldReward + ", lootTable=" + lootTable + ", presenceRadius="
+                + presenceRadius + ", speed=" + speed + ", level=" + level + "]";
     }
 
     public record LootTableEntry(ItemTemplate itemTemplate, double dropChance) {

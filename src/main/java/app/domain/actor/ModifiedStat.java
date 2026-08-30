@@ -1,12 +1,16 @@
 package app.domain.actor;
 
 public enum ModifiedStat {
-    ATTACK_ROLL, ARMOR_CLASS;
+    ACCURACY, EVASION, PATK, PDEF, MATK, MDEF;
 
     public String label() {
         return switch (this) {
-            case ATTACK_ROLL -> "attack rolls";
-            case ARMOR_CLASS -> "AC";
+            case ACCURACY -> "accuracy";
+            case EVASION -> "evasion";
+            case PATK -> "P.Atk.";
+            case PDEF -> "P.Def.";
+            case MATK -> "M.Atk.";
+            case MDEF -> "M.Def.";
         };
     }
 }

@@ -20,6 +20,10 @@ public final class DiceRoller {
         return RANDOM.nextDouble() < probability;
     }
 
+    public static double randomVariance(double minInclusive, double maxInclusive) {
+        return minInclusive + RANDOM.nextDouble() * (maxInclusive - minInclusive);
+    }
+
     public static DiceRoll roll(DiceExpression expression) {
         int[] rolls = new int[expression.count()];
         for (int i = 0; i < expression.count(); i++) {
@@ -31,16 +35,6 @@ public final class DiceRoller {
     public static DiceRoll rollD20(int modifier, boolean disadvantage) {
         int kept = disadvantage ? Math.min(rollDie(20), rollDie(20)) : rollDie(20);
         return new DiceRoll(new int[]{kept}, modifier);
-    }
-
-    public static boolean resolveHit(int naturalRoll, int totalRoll, int armorClass) {
-        if (naturalRoll == 1) {
-            return false;
-        }
-        if (naturalRoll == 20) {
-            return true;
-        }
-        return totalRoll >= armorClass;
     }
 
     private static int rollDie(int sides) {

@@ -1839,7 +1839,7 @@
         "id": "2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f",
         "name": "Bless",
         "tier": 1,
-        "description": "You bless up to three creatures of your choice within range, granting a bonus to attack rolls.",
+        "description": "You bless up to three creatures of your choice within range, granting a bonus to accuracy.",
         "requiredLevel": 1,
         "manaCost": 5,
         "cooldownSeconds": 6,
@@ -1852,14 +1852,14 @@
         "classes": [
             "MYSTIC"
         ],
-        "modifiedStat": "ATTACK_ROLL",
+        "modifiedStat": "ACCURACY",
         "durationSeconds": 60
     },
     {
         "id": "cb7fd1e3-d229-4f9b-b17b-f139cf16ff1c",
         "name": "Bless",
         "tier": 2,
-        "description": "You bless up to three creatures of your choice within range, granting a bonus to attack rolls.",
+        "description": "You bless up to three creatures of your choice within range, granting a bonus to accuracy.",
         "requiredLevel": 5,
         "manaCost": 6,
         "cooldownSeconds": 5,
@@ -1872,14 +1872,14 @@
         "classes": [
             "MYSTIC"
         ],
-        "modifiedStat": "ATTACK_ROLL",
+        "modifiedStat": "ACCURACY",
         "durationSeconds": 60
     },
     {
         "id": "cc9b6857-47a0-4501-8558-5efa47f63fa9",
         "name": "Bless",
         "tier": 3,
-        "description": "You bless up to three creatures of your choice within range, granting a bonus to attack rolls.",
+        "description": "You bless up to three creatures of your choice within range, granting a bonus to accuracy.",
         "requiredLevel": 9,
         "manaCost": 8,
         "cooldownSeconds": 5,
@@ -1892,14 +1892,14 @@
         "classes": [
             "MYSTIC"
         ],
-        "modifiedStat": "ATTACK_ROLL",
+        "modifiedStat": "ACCURACY",
         "durationSeconds": 60
     },
     {
         "id": "ac4d3098-bbe1-4406-9e92-485c08b04e66",
         "name": "Bless",
         "tier": 4,
-        "description": "You bless up to three creatures of your choice within range, granting a bonus to attack rolls.",
+        "description": "You bless up to three creatures of your choice within range, granting a bonus to accuracy.",
         "requiredLevel": 13,
         "manaCost": 10,
         "cooldownSeconds": 4,
@@ -1912,14 +1912,14 @@
         "classes": [
             "MYSTIC"
         ],
-        "modifiedStat": "ATTACK_ROLL",
+        "modifiedStat": "ACCURACY",
         "durationSeconds": 60
     },
     {
         "id": "639a2793-b84d-4117-b348-d7bb0085eb6c",
         "name": "Bless",
         "tier": 5,
-        "description": "You bless up to three creatures of your choice within range, granting a bonus to attack rolls.",
+        "description": "You bless up to three creatures of your choice within range, granting a bonus to accuracy.",
         "requiredLevel": 17,
         "manaCost": 12,
         "cooldownSeconds": 4,
@@ -1932,14 +1932,14 @@
         "classes": [
             "MYSTIC"
         ],
-        "modifiedStat": "ATTACK_ROLL",
+        "modifiedStat": "ACCURACY",
         "durationSeconds": 60
     },
     {
         "id": "8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e",
         "name": "Bane",
         "tier": 1,
-        "description": "Up to three creatures of your choice within range must make a saving throw or take a penalty to attack rolls.",
+        "description": "Up to three creatures of your choice within range must make a saving throw or take a penalty to accuracy.",
         "requiredLevel": 1,
         "manaCost": 5,
         "cooldownSeconds": 6,
@@ -1952,14 +1952,14 @@
         "classes": [
             "MYSTIC"
         ],
-        "modifiedStat": "ATTACK_ROLL",
+        "modifiedStat": "ACCURACY",
         "durationSeconds": 60
     },
     {
         "id": "32f35af9-020f-4375-a6ee-e178d3cc3ba3",
         "name": "Bane",
         "tier": 2,
-        "description": "Up to three creatures of your choice within range must make a saving throw or take a penalty to attack rolls.",
+        "description": "Up to three creatures of your choice within range must make a saving throw or take a penalty to accuracy.",
         "requiredLevel": 5,
         "manaCost": 6,
         "cooldownSeconds": 5,
@@ -1972,14 +1972,14 @@
         "classes": [
             "MYSTIC"
         ],
-        "modifiedStat": "ATTACK_ROLL",
+        "modifiedStat": "ACCURACY",
         "durationSeconds": 60
     },
     {
         "id": "20a5fd97-759e-422d-b01a-a27c3f2b18e2",
         "name": "Bane",
         "tier": 3,
-        "description": "Up to three creatures of your choice within range must make a saving throw or take a penalty to attack rolls.",
+        "description": "Up to three creatures of your choice within range must make a saving throw or take a penalty to accuracy.",
         "requiredLevel": 9,
         "manaCost": 8,
         "cooldownSeconds": 5,
@@ -1992,14 +1992,14 @@
         "classes": [
             "MYSTIC"
         ],
-        "modifiedStat": "ATTACK_ROLL",
+        "modifiedStat": "ACCURACY",
         "durationSeconds": 60
     },
     {
         "id": "44fd98d5-816d-4620-99d0-4c71759dfec3",
         "name": "Bane",
         "tier": 4,
-        "description": "Up to three creatures of your choice within range must make a saving throw or take a penalty to attack rolls.",
+        "description": "Up to three creatures of your choice within range must make a saving throw or take a penalty to accuracy.",
         "requiredLevel": 13,
         "manaCost": 10,
         "cooldownSeconds": 4,
@@ -2012,14 +2012,14 @@
         "classes": [
             "MYSTIC"
         ],
-        "modifiedStat": "ATTACK_ROLL",
+        "modifiedStat": "ACCURACY",
         "durationSeconds": 60
     },
     {
         "id": "ff8f1333-3a2d-4ee2-a2dd-b38054944db8",
         "name": "Bane",
         "tier": 5,
-        "description": "Up to three creatures of your choice within range must make a saving throw or take a penalty to attack rolls.",
+        "description": "Up to three creatures of your choice within range must make a saving throw or take a penalty to accuracy.",
         "requiredLevel": 17,
         "manaCost": 12,
         "cooldownSeconds": 4,
@@ -2032,14 +2032,14 @@
         "classes": [
             "MYSTIC"
         ],
-        "modifiedStat": "ATTACK_ROLL",
+        "modifiedStat": "ACCURACY",
         "durationSeconds": 60
     },
     {
         "id": "5c3b9e1d-7a4f-4b8c-9d2e-6f1a3c8b5d0e",
         "name": "Shield of Faith",
         "tier": 1,
-        "description": "A shimmering field appears and surrounds a creature of your choice within range, granting a bonus to AC.",
+        "description": "A shimmering field appears and surrounds a creature of your choice within range, granting a bonus to evasion.",
         "requiredLevel": 1,
         "manaCost": 5,
         "cooldownSeconds": 6,
@@ -2052,14 +2052,14 @@
         "classes": [
             "MYSTIC"
         ],
-        "modifiedStat": "ARMOR_CLASS",
+        "modifiedStat": "EVASION",
         "durationSeconds": 60
     },
     {
         "id": "e4123c21-208b-4060-9b58-7d80107ab7c8",
         "name": "Shield of Faith",
         "tier": 2,
-        "description": "A shimmering field appears and surrounds a creature of your choice within range, granting a bonus to AC.",
+        "description": "A shimmering field appears and surrounds a creature of your choice within range, granting a bonus to evasion.",
         "requiredLevel": 5,
         "manaCost": 6,
         "cooldownSeconds": 5,
@@ -2072,14 +2072,14 @@
         "classes": [
             "MYSTIC"
         ],
-        "modifiedStat": "ARMOR_CLASS",
+        "modifiedStat": "EVASION",
         "durationSeconds": 60
     },
     {
         "id": "cf52f92c-aa1b-4905-b8fa-de83e29fe2eb",
         "name": "Shield of Faith",
         "tier": 3,
-        "description": "A shimmering field appears and surrounds a creature of your choice within range, granting a bonus to AC.",
+        "description": "A shimmering field appears and surrounds a creature of your choice within range, granting a bonus to evasion.",
         "requiredLevel": 9,
         "manaCost": 8,
         "cooldownSeconds": 5,
@@ -2092,14 +2092,14 @@
         "classes": [
             "MYSTIC"
         ],
-        "modifiedStat": "ARMOR_CLASS",
+        "modifiedStat": "EVASION",
         "durationSeconds": 60
     },
     {
         "id": "8e49d6ad-c0ea-4922-98e3-6df6110ca885",
         "name": "Shield of Faith",
         "tier": 4,
-        "description": "A shimmering field appears and surrounds a creature of your choice within range, granting a bonus to AC.",
+        "description": "A shimmering field appears and surrounds a creature of your choice within range, granting a bonus to evasion.",
         "requiredLevel": 13,
         "manaCost": 10,
         "cooldownSeconds": 4,
@@ -2112,14 +2112,14 @@
         "classes": [
             "MYSTIC"
         ],
-        "modifiedStat": "ARMOR_CLASS",
+        "modifiedStat": "EVASION",
         "durationSeconds": 60
     },
     {
         "id": "3c235ad7-e35f-4afb-b785-23f15511bc01",
         "name": "Shield of Faith",
         "tier": 5,
-        "description": "A shimmering field appears and surrounds a creature of your choice within range, granting a bonus to AC.",
+        "description": "A shimmering field appears and surrounds a creature of your choice within range, granting a bonus to evasion.",
         "requiredLevel": 17,
         "manaCost": 12,
         "cooldownSeconds": 4,
@@ -2132,7 +2132,7 @@
         "classes": [
             "MYSTIC"
         ],
-        "modifiedStat": "ARMOR_CLASS",
+        "modifiedStat": "EVASION",
         "durationSeconds": 60
     }
 ]

@@ -59,3 +59,7 @@ See [leveling-xp.md](leveling-xp.md) for the full level progression.
 
 - Awarded by the GM for playing out personality traits, flaws, or bonds in a compelling way. Binary — a character either has it or doesn't (no stacking).
 - Spend it to gain advantage on one attack roll, saving throw, or ability check, or give it to another player for good roleplaying/clever play.
+
+## Notes for this project
+
+The six abilities are `STRENGTH, DEXTERITY, CONSTITUTION, INTELLIGENCE, WIT, MEN` (`domain.actor.Attribute`) — Wisdom and Charisma were renamed to WIT and MEN to match Lineage2's vocabulary, no rules change. `getModifier()` (`(score-10)/2`, this file's formula) is still used for HP-on-level-up (`CharacterInstance.hitDieRecovery`) and skill/saving-throw checks (`CharacterInstance.checkOrSave`) — those stayed DnD5e. Combat, however, no longer reads this modifier at all: it derives p.atk/p.def/m.atk/m.def/accuracy/evasion/criticalRate via a separate `CombatFormulas.statBonus()` curve (`1.03^(score-10)`), see [../lineage2/combat.md](../lineage2/combat.md). Don't assume the two ability-score consumers use the same curve — they deliberately don't.

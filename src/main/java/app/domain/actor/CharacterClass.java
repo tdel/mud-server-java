@@ -3,9 +3,9 @@ package app.domain.actor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import app.domain.item.WeaponCategory;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -50,16 +50,16 @@ public enum CharacterClass {
         return definition.primaryAbility();
     }
 
-    public Set<WeaponCategory> weaponProficiencies() {
-        return definition.weaponProficiencies();
-    }
-
     public Set<ArmorProficiency> armorProficiencies() {
         return definition.armorProficiencies();
     }
 
     public int manaGainPerLevel() {
         return definition.manaGainPerLevel();
+    }
+
+    public Map<Attribute, Integer> baseAttributes() {
+        return definition.baseAttributes();
     }
 
     public String label() {
@@ -73,17 +73,17 @@ public enum CharacterClass {
     }
 
     private record Definition(int hitDie, StartingGold startingGold, Set<Attribute> savingThrows, Set<Skill> skills,
-            Attribute primaryAbility, Set<WeaponCategory> weaponProficiencies, Set<ArmorProficiency> armorProficiencies,
-            int manaGainPerLevel) {
+            Attribute primaryAbility, Set<ArmorProficiency> armorProficiencies, int manaGainPerLevel,
+            Map<Attribute, Integer> baseAttributes) {
     }
 
     private record Json(CharacterClass name, int hitDie, String startingGoldDice, int startingGoldMultiplier,
             List<Attribute> savingThrows, List<Skill> skills, Attribute primaryAbility,
-            List<WeaponCategory> weaponProficiencies, List<ArmorProficiency> armorProficiencies, int manaGainPerLevel) {
+            List<ArmorProficiency> armorProficiencies, int manaGainPerLevel, Map<Attribute, Integer> baseAttributes) {
         Definition toDefinition() {
             return new Definition(hitDie, new StartingGold(startingGoldDice, startingGoldMultiplier),
-                    Set.copyOf(savingThrows), Set.copyOf(skills), primaryAbility, Set.copyOf(weaponProficiencies),
-                    Set.copyOf(armorProficiencies), manaGainPerLevel);
+                    Set.copyOf(savingThrows), Set.copyOf(skills), primaryAbility, Set.copyOf(armorProficiencies),
+                    manaGainPerLevel, Map.copyOf(baseAttributes));
         }
     }
 }

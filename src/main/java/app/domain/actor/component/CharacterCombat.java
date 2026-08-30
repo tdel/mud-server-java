@@ -2,25 +2,19 @@ package app.domain.actor.component;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Optional;
-import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.AbstractNpc;
-import app.domain.actor.Attribute;
-import app.domain.actor.ModifiedStat;
 import app.domain.actor.event.AttackBegin;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.MonsterAttacked;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.instance.MonsterInstance;
-import app.domain.item.EquipmentSlot;
-import app.domain.item.Item;
 import app.domain.world.PeaceZone;
-import app.game.dice.DiceRoll;
+import app.game.combat.CombatFormulas;
 import app.game.dice.DiceRoller;
 import app.game.engine.MonsterAiEngine;
 import app.network.message.ingame.AlreadyCasting;
@@ -110,28 +104,19 @@ public final class CharacterCombat {
             DomainEventPublisher.publish(new MonsterAttacked(monster, character));
         }
 
-        int strengthModifier = character.getModifier(Attribute.STRENGTH);
-        Optional<Item> weapon = getEquippedWeapon();
-        boolean proficient = weapon.map(item -> character.getWeaponProficiencies().contains(item.getWeaponCategory()))
-                .orElse(true);
-        int attackModifier = strengthModifier + (proficient ? character.getProficiencyBonus() : 0)
-                + character.getActiveEffects().totalModifier(ModifiedStat.ATTACK_ROLL);
-
-        DiceRoll attackRoll = DiceRoller.rollD20(attackModifier, false);
-        int naturalRoll = attackRoll.rolls()[0];
-        boolean critical = naturalRoll == 20;
-        boolean hit = DiceRoller.resolveHit(naturalRoll, attackRoll.total(), defender.getEffectiveArmorClass());
+        double hitChance = CombatFormulas.hitChance(character.getEffectiveAccuracy(), defender.getEffectiveEvasion());
+        boolean hit = DiceRoller.rollChance(hitChance);
 
         int damage = 0;
+        boolean critical = false;
         boolean defeated = false;
         int healthAfter = defender.getCurrentHealth();
 
         if (hit) {
-            int weaponDamage = rollWeaponDamage(weapon);
-            if (critical) {
-                weaponDamage += rollWeaponDamage(weapon);
-            }
-            damage = Math.max(0, weaponDamage + strengthModifier);
+            critical = DiceRoller.rollChance(character.getEffectiveCriticalRate() / 100.0);
+            double variance = DiceRoller.randomVariance(0.9, 1.1);
+            damage = CombatFormulas.resolveDamage(character.getEffectivePAtk(), defender.getEffectivePDef(), variance,
+                    critical);
             healthAfter = Math.max(0, defender.getCurrentHealth() - damage);
             defeated = applyDamage(defender, damage);
         }
@@ -146,10 +131,6 @@ public final class CharacterCombat {
                 defender.getName(), hit, critical, damage, healthAfter), null);
     }
 
-    private int rollWeaponDamage(Optional<Item> weapon) {
-        return weapon.map(item -> IntStream.of(DiceRoller.roll(item.getDamageDice()).rolls()).sum()).orElse(1);
-    }
-
     private boolean applyDamage(AbstractCharacter defender, int damage) {
         if (defender instanceof CharacterInstance targetPlayer) {
             return targetPlayer.takeDamage(damage, character);
@@ -158,10 +139,5 @@ public final class CharacterCombat {
             return targetMonster.takeDamage(damage, character);
         }
         throw new IllegalStateException("Cible de combat non supportée : " + defender.getClass());
-    }
-
-    private Optional<Item> getEquippedWeapon() {
-        return character.getInventory().getEquippedItems().stream()
-                .filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
     }
 }

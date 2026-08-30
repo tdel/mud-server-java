@@ -39,8 +39,8 @@ import app.domain.map.Position;
 import app.domain.item.Item;
 import app.domain.world.MapInstance;
 import app.domain.world.PeaceZone;
-import app.domain.item.WeaponCategory;
 import app.domain.world.WorldInstance;
+import app.game.combat.CombatFormulas;
 import app.game.dice.CheckResult;
 import app.game.dice.DiceRoll;
 import app.game.dice.DiceRoller;
@@ -208,10 +208,6 @@ public final class CharacterInstance extends AbstractCharacter {
         return characterClass.skillProficiencies();
     }
 
-    public Set<WeaponCategory> getWeaponProficiencies() {
-        return characterClass.weaponProficiencies();
-    }
-
     public Set<ArmorProficiency> getArmorProficiencies() {
         return characterClass.armorProficiencies();
     }
@@ -226,11 +222,6 @@ public final class CharacterInstance extends AbstractCharacter {
 
     public int getProficiencyBonus() {
         return 2 + Math.floorDiv(level - 1, 4);
-    }
-
-    @Override
-    public int getSpellAttackBonus() {
-        return getProficiencyBonus() + getModifier(characterClass.primaryAbility());
     }
 
     public CheckResult check(Skill skill, int dc) {
@@ -253,22 +244,49 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     @Override
-    public int getArmorClass() {
-        int ac = inventory.getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.CHEST).findFirst()
-                .map(this::armorAc).orElseGet(super::getArmorClass);
-
-        return ac + inventory.getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.OFF_HAND)
-                .mapToInt(item -> item.getBaseAc() + item.getBonus()).sum();
+    protected int basePAtk() {
+        return getEquippedWeapon().map(Item::getPAtk).orElse(CombatFormulas.UNARMED_PATK);
     }
 
-    private int armorAc(Item armor) {
-        int dexMod = getModifier(Attribute.DEXTERITY);
-        int baseAndBonus = armor.getBaseAc() + armor.getBonus();
-        return switch (armor.getArmorCategory()) {
-            case LIGHT -> baseAndBonus + dexMod;
-            case MEDIUM -> baseAndBonus + Math.min(dexMod, 2);
-            case HEAVY -> baseAndBonus;
-        };
+    @Override
+    protected int baseMAtk() {
+        return getEquippedWeapon().map(Item::getMAtk).orElse(0);
+    }
+
+    @Override
+    protected int basePDefSum() {
+        return inventory.getEquippedItems().stream().mapToInt(Item::getPDef).sum();
+    }
+
+    @Override
+    protected int baseMDefSum() {
+        return inventory.getEquippedItems().stream().mapToInt(Item::getMDef).sum();
+    }
+
+    @Override
+    protected int accuracyItemBonus() {
+        return inventory.getEquippedItems().stream().mapToInt(Item::getAccuracyBonus).sum();
+    }
+
+    @Override
+    protected int evasionItemBonus() {
+        return inventory.getEquippedItems().stream().mapToInt(Item::getEvasionBonus).sum();
+    }
+
+    @Override
+    protected int critItemBonus() {
+        return inventory.getEquippedItems().stream().mapToInt(Item::getCritBonus).sum();
+    }
+
+    @Override
+    protected int armorWeightPenalty() {
+        return inventory.getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.CHEST)
+                .findFirst().map(item -> CombatFormulas.armorWeightPenalty(item.getArmorCategory())).orElse(0);
+    }
+
+    private Optional<Item> getEquippedWeapon() {
+        return inventory.getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.WEAPON)
+                .findFirst();
     }
 
     public boolean isWearingNonProficientArmor() {

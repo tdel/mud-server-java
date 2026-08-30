@@ -17,6 +17,7 @@ import app.domain.map.Position;
 import app.domain.world.AbstractZone;
 import app.domain.world.MapInstance;
 import app.domain.world.NormalZone;
+import app.game.combat.CombatFormulas;
 import app.game.engine.MovementEngine;
 import app.game.engine.SpellCastEngine;
 import app.game.dice.DiceExpression;
@@ -65,12 +66,95 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public abstract int getLevel();
 
-    public int getArmorClass() {
-        return 10 + getModifier(Attribute.DEXTERITY);
+    // Défauts neutres : seul CharacterInstance a des objets équipés (arme,
+    // armure) ; MonsterInstance surcharge depuis son MonsterTemplate.
+    protected int basePAtk() {
+        return CombatFormulas.UNARMED_PATK;
     }
 
-    public final int getEffectiveArmorClass() {
-        return getArmorClass() + activeEffects.totalModifier(ModifiedStat.ARMOR_CLASS);
+    protected int baseMAtk() {
+        return 0;
+    }
+
+    protected int basePDefSum() {
+        return 0;
+    }
+
+    protected int baseMDefSum() {
+        return 0;
+    }
+
+    protected int accuracyItemBonus() {
+        return 0;
+    }
+
+    protected int evasionItemBonus() {
+        return 0;
+    }
+
+    protected int armorWeightPenalty() {
+        return 0;
+    }
+
+    protected int critItemBonus() {
+        return 0;
+    }
+
+    public int getPAtk() {
+        return CombatFormulas.physicalAttack(basePAtk(), getAttribute(Attribute.STRENGTH), getLevel());
+    }
+
+    public final int getEffectivePAtk() {
+        return getPAtk() + activeEffects.totalModifier(ModifiedStat.PATK);
+    }
+
+    public int getMAtk() {
+        return CombatFormulas.magicalAttack(baseMAtk(), getAttribute(Attribute.INTELLIGENCE), getLevel());
+    }
+
+    public final int getEffectiveMAtk() {
+        return getMAtk() + activeEffects.totalModifier(ModifiedStat.MATK);
+    }
+
+    public int getPDef() {
+        return CombatFormulas.physicalDefense(basePDefSum(), getAttribute(Attribute.CONSTITUTION));
+    }
+
+    public final int getEffectivePDef() {
+        return getPDef() + activeEffects.totalModifier(ModifiedStat.PDEF);
+    }
+
+    public int getMDef() {
+        return CombatFormulas.magicalDefense(baseMDefSum(), getAttribute(Attribute.MEN));
+    }
+
+    public final int getEffectiveMDef() {
+        return getMDef() + activeEffects.totalModifier(ModifiedStat.MDEF);
+    }
+
+    public int getAccuracy() {
+        return CombatFormulas.accuracy(getLevel(), getAttribute(Attribute.DEXTERITY), accuracyItemBonus());
+    }
+
+    public final int getEffectiveAccuracy() {
+        return getAccuracy() + activeEffects.totalModifier(ModifiedStat.ACCURACY);
+    }
+
+    public int getEvasion() {
+        return CombatFormulas.evasion(getLevel(), getAttribute(Attribute.DEXTERITY), armorWeightPenalty(),
+                evasionItemBonus());
+    }
+
+    public final int getEffectiveEvasion() {
+        return getEvasion() + activeEffects.totalModifier(ModifiedStat.EVASION);
+    }
+
+    public int getCriticalRate() {
+        return CombatFormulas.criticalRate(getAttribute(Attribute.DEXTERITY), critItemBonus());
+    }
+
+    public final int getEffectiveCriticalRate() {
+        return getCriticalRate();
     }
 
     public ActiveEffects getActiveEffects() {
@@ -89,13 +173,6 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public boolean hasSpell(Spell spell) {
         return spellCasting.knows(spell.id()) || getGrantedSpells().contains(spell);
-    }
-
-    // Défaut neutre pour les sous-classes qui ne lancent pas encore de sorts
-    // (MonsterInstance, AbstractNpc) ; CharacterInstance surcharge avec le calcul
-    // DnD5e réel.
-    public int getSpellAttackBonus() {
-        return 0;
     }
 
     // Défaut neutre : seul CharacterInstance suit une réserve de mana ;

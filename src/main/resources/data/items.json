@@ -4,10 +4,9 @@
         "name": "Potion de soin",
         "type": "POTION",
         "weight": 1,
-        "baseAc": 0,
+        "pAtk": 0, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 50,
         "rarity": "COMMON",
-        "bonus": 0,
         "consumableEffect": "HEALING",
         "effectDice": "2d4+2"
     },
@@ -16,10 +15,9 @@
         "name": "Potion de soin supérieure",
         "type": "POTION",
         "weight": 1,
-        "baseAc": 0,
+        "pAtk": 0, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 150,
         "rarity": "UNCOMMON",
-        "bonus": 0,
         "consumableEffect": "HEALING",
         "effectDice": "4d4+4"
     },
@@ -28,10 +26,9 @@
         "name": "Potion de soin majeure",
         "type": "POTION",
         "weight": 1,
-        "baseAc": 0,
+        "pAtk": 0, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 700,
         "rarity": "RARE",
-        "bonus": 0,
         "consumableEffect": "HEALING",
         "effectDice": "8d4+8"
     },
@@ -40,10 +37,9 @@
         "name": "Potion de soin suprême",
         "type": "POTION",
         "weight": 1,
-        "baseAc": 0,
+        "pAtk": 0, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 2700,
         "rarity": "VERY_RARE",
-        "bonus": 0,
         "consumableEffect": "HEALING",
         "effectDice": "10d4+20"
     },
@@ -52,10 +48,9 @@
         "name": "Potion de mana",
         "type": "POTION",
         "weight": 1,
-        "baseAc": 0,
+        "pAtk": 0, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 60,
         "rarity": "COMMON",
-        "bonus": 0,
         "consumableEffect": "MANA_RESTORE",
         "effectDice": "2d4+2"
     },
@@ -64,46 +59,36 @@
         "name": "Epée courte",
         "type": "WEAPON",
         "weight": 1,
-        "baseAc": 0,
-        "damageDice": "1d6",
-        "weaponCategory": "MARTIAL",
+        "pAtk": 9, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 10,
-        "rarity": "COMMON",
-        "bonus": 0
+        "rarity": "COMMON"
     },
     {
         "id": "ac9fe757-ab75-47ef-b413-8844d5c5ed73",
         "name": "Bâton de magicien basique",
         "type": "WEAPON",
         "weight": 1,
-        "baseAc": 0,
-        "damageDice": "1d6",
-        "weaponCategory": "SIMPLE",
+        "pAtk": 5, "mAtk": 10, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 10,
-        "rarity": "COMMON",
-        "bonus": 0
+        "rarity": "COMMON"
     },
     {
         "id": "ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd",
         "name": "Dague",
         "type": "WEAPON",
         "weight": 1,
-        "baseAc": 0,
-        "damageDice": "1d4",
-        "weaponCategory": "SIMPLE",
+        "pAtk": 6, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 2,
-        "rarity": "COMMON",
-        "bonus": 0
+        "rarity": "COMMON"
     },
     {
         "id": "019faec6-116d-723d-b04c-76d51a2a2cb7",
         "name": "Casque de fer",
         "type": "HELMET",
         "weight": 2,
-        "baseAc": 0,
+        "pAtk": 0, "mAtk": 0, "pDef": 2, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 10,
-        "rarity": "COMMON",
-        "bonus": 0
+        "rarity": "COMMON"
     },
     {
         "id": "019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518",
@@ -111,10 +96,9 @@
         "type": "ARMOR",
         "weight": 5,
         "armorCategory": "LIGHT",
-        "baseAc": 11,
+        "pAtk": 0, "mAtk": 0, "pDef": 5, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 10,
-        "rarity": "COMMON",
-        "bonus": 0
+        "rarity": "COMMON"
     },
     {
         "id": "019fcf0d-1f8c-7d43-9e98-a9944b4ccefe",
@@ -122,10 +106,9 @@
         "type": "ARMOR",
         "weight": 10,
         "armorCategory": "MEDIUM",
-        "baseAc": 13,
+        "pAtk": 0, "mAtk": 0, "pDef": 10, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 50,
-        "rarity": "COMMON",
-        "bonus": 0
+        "rarity": "COMMON"
     },
     {
         "id": "019fcf0d-1f8d-7c4c-9275-33c4af4410a8",
@@ -133,54 +116,45 @@
         "type": "ARMOR",
         "weight": 30,
         "armorCategory": "HEAVY",
-        "baseAc": 18,
+        "pAtk": 0, "mAtk": 0, "pDef": 16, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 1500,
-        "rarity": "UNCOMMON",
-        "bonus": 0
+        "rarity": "UNCOMMON"
     },
     {
         "id": "019fcf0d-1f8f-7d01-8e4f-fd592812a1a7",
         "name": "Bouclier",
         "type": "SHIELD",
         "weight": 3,
-        "baseAc": 2,
+        "pAtk": 0, "mAtk": 0, "pDef": 4, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 10,
-        "rarity": "COMMON",
-        "bonus": 0
+        "rarity": "COMMON"
     },
     {
         "id": "019fe3f6-b1ee-78f8-a681-d288c7f87511",
         "name": "Epée longue +1",
         "type": "WEAPON",
         "weight": 3,
-        "baseAc": 0,
-        "damageDice": "1d8",
-        "weaponCategory": "MARTIAL",
+        "pAtk": 12, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 2,
         "price": 500,
-        "rarity": "UNCOMMON",
-        "bonus": 1
+        "rarity": "UNCOMMON"
     },
     {
         "id": "019fe3f6-b1ef-786d-bc17-46dd46660eb0",
         "name": "Bouclier +1",
         "type": "SHIELD",
         "weight": 3,
-        "baseAc": 2,
+        "pAtk": 0, "mAtk": 0, "pDef": 6, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 400,
-        "rarity": "UNCOMMON",
-        "bonus": 1
+        "rarity": "UNCOMMON"
     },
     {
         "id": "019fe3f6-b1f0-7e00-a18d-ee3ac38f9332",
         "name": "Epée longue +2",
         "type": "WEAPON",
         "weight": 3,
-        "baseAc": 0,
-        "damageDice": "1d8",
-        "weaponCategory": "MARTIAL",
+        "pAtk": 16, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 4,
         "price": 4000,
-        "rarity": "RARE",
-        "bonus": 2
+        "rarity": "RARE"
     },
     {
         "id": "019fe3f6-b1f2-7ac5-9ca3-2a4aa1f21cde",
@@ -188,10 +162,9 @@
         "type": "ARMOR",
         "weight": 10,
         "armorCategory": "MEDIUM",
-        "baseAc": 13,
+        "pAtk": 0, "mAtk": 0, "pDef": 13, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 4500,
-        "rarity": "RARE",
-        "bonus": 1
+        "rarity": "RARE"
     },
     {
         "id": "019fe3f6-b1f3-7285-8107-94d2bf661434",
@@ -199,30 +172,27 @@
         "type": "ARMOR",
         "weight": 30,
         "armorCategory": "HEAVY",
-        "baseAc": 18,
+        "pAtk": 0, "mAtk": 0, "pDef": 22, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 40000,
-        "rarity": "VERY_RARE",
-        "bonus": 2
+        "rarity": "VERY_RARE"
     },
     {
         "id": "019fe3f6-b1f4-78c7-8791-3103eb639821",
         "name": "Bouclier +3",
         "type": "SHIELD",
         "weight": 3,
-        "baseAc": 2,
+        "pAtk": 0, "mAtk": 0, "pDef": 10, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 60000,
-        "rarity": "LEGENDARY",
-        "bonus": 3
+        "rarity": "LEGENDARY"
     },
     {
         "id": "b4b5f22f-0fd1-43a6-b1f0-7ac0103478d6",
         "name": "Pomme",
         "type": "FOOD",
         "weight": 1,
-        "baseAc": 0,
+        "pAtk": 0, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 1,
         "rarity": "COMMON",
-        "bonus": 0,
         "nutritionValue": 5
     },
     {
@@ -230,10 +200,9 @@
         "name": "Petit morceau de pain",
         "type": "FOOD",
         "weight": 1,
-        "baseAc": 0,
+        "pAtk": 0, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 1,
         "rarity": "COMMON",
-        "bonus": 0,
         "nutritionValue": 5
     },
     {
@@ -241,10 +210,9 @@
         "name": "Gros morceau de pain",
         "type": "FOOD",
         "weight": 2,
-        "baseAc": 0,
+        "pAtk": 0, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 2,
         "rarity": "COMMON",
-        "bonus": 0,
         "nutritionValue": 10
     },
     {
@@ -252,10 +220,9 @@
         "name": "Oeufs",
         "type": "FOOD",
         "weight": 1,
-        "baseAc": 0,
+        "pAtk": 0, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 3,
         "rarity": "COMMON",
-        "bonus": 0,
         "nutritionValue": 15
     },
     {
@@ -264,12 +231,9 @@
         "description": "Une baguette gravée de runes ardentes ; l'empoigner permet d'invoquer un trait de feu.",
         "type": "WEAPON",
         "weight": 1,
-        "baseAc": 0,
-        "damageDice": "1d4",
-        "weaponCategory": "SIMPLE",
+        "pAtk": 5, "mAtk": 16, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 100,
         "rarity": "UNCOMMON",
-        "bonus": 0,
         "grantedSpellIds": ["2127fbac-35aa-4897-a07d-bd619c4ec5b0"]
     },
     {
@@ -278,12 +242,9 @@
         "description": "Un bâton de bois blanc qui canalise une énergie curative au contact.",
         "type": "WEAPON",
         "weight": 2,
-        "baseAc": 0,
-        "damageDice": "1d6",
-        "weaponCategory": "SIMPLE",
+        "pAtk": 5, "mAtk": 16, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 150,
         "rarity": "UNCOMMON",
-        "bonus": 0,
         "grantedSpellIds": ["e287e606-621f-48c5-b8dc-613fa98709d3"]
     },
     {
@@ -293,10 +254,9 @@
         "type": "ARMOR",
         "weight": 5,
         "armorCategory": "LIGHT",
-        "baseAc": 11,
+        "pAtk": 0, "mAtk": 0, "pDef": 5, "mDef": 4, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 200,
         "rarity": "UNCOMMON",
-        "bonus": 0,
         "grantedSpellIds": ["2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f"]
     },
     {
@@ -305,10 +265,9 @@
         "description": "Un heaume orné de crocs qui répand la malédiction sur les ennemis à sa portée.",
         "type": "HELMET",
         "weight": 2,
-        "baseAc": 0,
+        "pAtk": 0, "mAtk": 0, "pDef": 2, "mDef": 3, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 200,
         "rarity": "UNCOMMON",
-        "bonus": 0,
         "grantedSpellIds": ["8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e"]
     }
 ]

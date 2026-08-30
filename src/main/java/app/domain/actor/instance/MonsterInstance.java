@@ -3,21 +3,19 @@ package app.domain.actor.instance;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import app.domain.actor.Attribute;
 import app.domain.actor.AbstractCharacter;
-import app.domain.actor.ModifiedStat;
 import app.domain.actor.template.MonsterTemplate;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.map.Position;
 import app.domain.world.PeaceZone;
+import app.game.combat.CombatFormulas;
 import app.game.engine.MonsterAiEngine;
-import app.game.dice.DiceRoll;
 import app.game.dice.DiceRoller;
 
 public final class MonsterInstance extends AbstractCharacter {
@@ -63,23 +61,18 @@ public final class MonsterInstance extends AbstractCharacter {
     }
 
     public MonsterAttackOutcome attack(CharacterInstance defender) {
-        int strengthModifier = getModifier(Attribute.STRENGTH);
-        int attackModifier = strengthModifier + getActiveEffects().totalModifier(ModifiedStat.ATTACK_ROLL);
-        DiceRoll attackRoll = DiceRoller.rollD20(attackModifier, false);
-        int naturalRoll = attackRoll.rolls()[0];
-        boolean critical = naturalRoll == 20;
-        boolean hit = DiceRoller.resolveHit(naturalRoll, attackRoll.total(), defender.getEffectiveArmorClass());
+        double hitChance = CombatFormulas.hitChance(getEffectiveAccuracy(), defender.getEffectiveEvasion());
+        boolean hit = DiceRoller.rollChance(hitChance);
 
         int damage = 0;
+        boolean critical = false;
         boolean defeated = false;
         int healthAfter = defender.getCurrentHealth();
 
         if (hit) {
-            int naturalDamage = rollNaturalDamage();
-            if (critical) {
-                naturalDamage += rollNaturalDamage();
-            }
-            damage = Math.max(0, naturalDamage + strengthModifier);
+            critical = DiceRoller.rollChance(getEffectiveCriticalRate() / 100.0);
+            double variance = DiceRoller.randomVariance(0.9, 1.1);
+            damage = CombatFormulas.resolveDamage(getEffectivePAtk(), defender.getEffectivePDef(), variance, critical);
             healthAfter = Math.max(0, defender.getCurrentHealth() - damage);
             defeated = defender.takeDamage(damage, this);
         }
@@ -89,10 +82,6 @@ public final class MonsterInstance extends AbstractCharacter {
                 getId(), defender.getId(), hit, critical, damage, healthAfter, defeated);
 
         return new MonsterAttackOutcome(hit, critical, damage, healthAfter, defender.getMaxHealth(), defeated);
-    }
-
-    private int rollNaturalDamage() {
-        return IntStream.of(DiceRoller.roll(getNaturalDamageDice()).rolls()).sum();
     }
 
     public record MonsterAttackOutcome(boolean hit, boolean critical, int damage, int targetHealthAfter,
@@ -111,10 +100,6 @@ public final class MonsterInstance extends AbstractCharacter {
         return requireTemplate().getDescription();
     }
 
-    public String getNaturalDamageDice() {
-        return requireTemplate().getNaturalDamageDice();
-    }
-
     public int getPresenceRadius() {
         return requireTemplate().getPresenceRadius();
     }
@@ -129,9 +114,38 @@ public final class MonsterInstance extends AbstractCharacter {
     }
 
     @Override
-    public int getArmorClass() {
-        Integer natural = requireTemplate().getNaturalArmorClass();
-        return natural != null ? natural : super.getArmorClass();
+    protected int basePAtk() {
+        return requireTemplate().getNaturalPAtk();
+    }
+
+    @Override
+    protected int baseMAtk() {
+        return requireTemplate().getNaturalMAtk();
+    }
+
+    @Override
+    protected int basePDefSum() {
+        return requireTemplate().getNaturalPDef();
+    }
+
+    @Override
+    protected int baseMDefSum() {
+        return requireTemplate().getNaturalMDef();
+    }
+
+    @Override
+    protected int accuracyItemBonus() {
+        return requireTemplate().getAccuracyBonus();
+    }
+
+    @Override
+    protected int evasionItemBonus() {
+        return requireTemplate().getEvasionBonus();
+    }
+
+    @Override
+    protected int critItemBonus() {
+        return requireTemplate().getCritBonus();
     }
 
     private MonsterTemplate requireTemplate() {
