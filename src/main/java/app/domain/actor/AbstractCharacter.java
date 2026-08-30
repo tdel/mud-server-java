@@ -9,6 +9,7 @@ import app.domain.Spell;
 import app.domain.SpellEffectType;
 import app.domain.actor.component.ActiveEffects;
 import app.domain.actor.component.SpellCasting;
+import app.domain.actor.event.CharacterPositionChanged;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.event.SpellCastBegin;
@@ -158,11 +159,16 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public void setPosition(Position position) {
         this.position = position;
-        AbstractZone newZone = currentMap != null && position != null ? currentMap.zoneAt(position) : NormalZone.INSTANCE;
+        AbstractZone newZone = currentMap != null && position != null
+                ? currentMap.zoneAt(position)
+                : NormalZone.INSTANCE;
         if (newZone != getZone()) {
             getZone().onObjectExiting(this);
             setZone(newZone);
             newZone.onObjectEntering(this);
+        }
+        if (position != null && this instanceof CharacterInstance character) {
+            DomainEventPublisher.publish(new CharacterPositionChanged(character));
         }
     }
 

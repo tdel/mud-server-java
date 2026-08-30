@@ -23,6 +23,7 @@ import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.NewGamePlayerCreated;
 import app.domain.actor.event.PlayerLoadedInWorld;
 import app.domain.actor.event.PlayerRemovedFromWorld;
+import app.domain.map.Position;
 import app.game.dice.DiceRoll;
 import app.game.dice.DiceRoller;
 
@@ -79,7 +80,12 @@ public class WorldInstance {
     }
 
     public void loadPlayer(CharacterInstance character) {
-        character.getCurrentMap().join(character);
+        Position savedPosition = character.getPosition();
+        if (savedPosition != null) {
+            character.getCurrentMap().join(character, savedPosition);
+        } else {
+            character.getCurrentMap().join(character);
+        }
         players.put(character.getId(), character);
         log.info("world.player_loaded thread={} worldId={} character={}", Thread.currentThread().getName(), id,
                 character.getId());
@@ -121,8 +127,8 @@ public class WorldInstance {
 
         int startingMana = characterClass.manaGainPerLevel();
 
-        CharacterInstance character = new CharacterInstance(UUID.randomUUID(), account, name, startingMap, gender,
-                race, characterClass, 1, maxHealth, maxHealth, scores, 0, gold, 0, startingMana, startingMana);
+        CharacterInstance character = new CharacterInstance(UUID.randomUUID(), account, name, startingMap, gender, race,
+                characterClass, 1, maxHealth, maxHealth, scores, 0, gold, 0, startingMana, startingMana);
         character.setWorldInstance(this);
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));

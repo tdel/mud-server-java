@@ -20,6 +20,7 @@ import app.domain.world.WorldInstance;
 import app.domain.world.WorldTemplate;
 import app.domain.world.WorldTemplateSummary;
 import app.domain.actor.instance.CharacterInstance;
+import app.domain.map.Position;
 import app.game.catalog.MonsterCatalog;
 import app.game.catalog.NpcCatalog;
 import app.game.catalog.WorldTemplateCatalog;
@@ -103,6 +104,10 @@ public class WorldInstanceService {
         WorldInstance instance = character.getWorldInstance();
 
         characterDao.update(character);
+        Position position = character.getPosition();
+        if (position != null) {
+            characterDao.updatePosition(character.getId(), position.x(), position.y());
+        }
         movementEngine.stopMovement(character);
         map.disconnect(character);
         instance.removePlayer(character);

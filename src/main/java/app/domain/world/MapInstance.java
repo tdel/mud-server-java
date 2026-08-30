@@ -115,8 +115,7 @@ public class MapInstance {
         DomainEventPublisher.publish(new GamePlayerSpawnedToMap(character, this));
 
         character.getKnownList().populateSilently();
-        character.broadcast(
-                new GamePlayerJoinedMap(character.getId(), character.getName(), position.x(), position.y()),
+        character.broadcast(new GamePlayerJoinedMap(character.getId(), character.getName(), position.x(), position.y()),
                 character);
     }
 

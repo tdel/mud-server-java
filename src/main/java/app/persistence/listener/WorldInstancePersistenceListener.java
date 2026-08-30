@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import app.domain.actor.event.GamePlayerMovedToMap;
 import app.domain.actor.event.GamePlayerSpawnedToMap;
+import app.domain.map.Position;
 import app.persistence.CharacterDao;
 
 @Service
@@ -29,6 +30,10 @@ public class WorldInstancePersistenceListener {
     @EventListener
     void onGamePlayerSpawnedToMap(GamePlayerSpawnedToMap event) {
         characterDao.updateCurrentMap(event.character().getId(), event.map().getTemplateId());
+        Position position = event.character().getPosition();
+        if (position != null) {
+            characterDao.updatePosition(event.character().getId(), position.x(), position.y());
+        }
         log.info("map.player_spawned character={} map={}", event.character().getName(), event.map().getName());
     }
 }

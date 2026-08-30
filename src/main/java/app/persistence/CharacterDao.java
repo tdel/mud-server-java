@@ -22,6 +22,7 @@ import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.CharacterClass;
 import app.domain.actor.Gender;
 import app.domain.actor.Race;
+import app.domain.map.Position;
 import app.domain.world.MapInstance;
 import app.domain.world.WorldInstance;
 import app.game.catalog.SpellCatalog;
@@ -78,6 +79,11 @@ public class CharacterDao {
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_MAP_ID, mapId).where(CHARACTER.ID.eq(characterId)).execute();
     }
 
+    public void updatePosition(UUID characterId, double x, double y) {
+        dsl.update(CHARACTER).set(CHARACTER.POS_X, x).set(CHARACTER.POS_Y, y).where(CHARACTER.ID.eq(characterId))
+                .execute();
+    }
+
     public void update(CharacterInstance character) {
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_MAP_ID, character.getCurrentMapId())
                 .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).set(CHARACTER.XP, character.getXp())
@@ -104,8 +110,8 @@ public class CharacterDao {
         CharacterClass characterClass = CharacterClass.valueOf(record.getCharacterClass());
         Race race = Race.valueOf(record.getRace());
 
-        MapInstance map = instance.mapInstanceForTemplate(record.getCurrentMapId())
-                .or(instance::startingMapInstance).orElseThrow(() -> new IllegalStateException(
+        MapInstance map = instance.mapInstanceForTemplate(record.getCurrentMapId()).or(instance::startingMapInstance)
+                .orElseThrow(() -> new IllegalStateException(
                         "WorldInstance " + instance.getId() + " n'a aucune map de départ"));
 
         Set<Spell> knownSpells = characterSpellDao.findSpellIdsByCharacter(record.getId()).stream()
@@ -119,6 +125,13 @@ public class CharacterDao {
                 record.getMaxHealth(), attributes, record.getXp(), record.getGold(), record.getShortRestCount(),
                 record.getMaxMana(), record.getCurrentMana(), knownSpells, activeEffects);
         character.setWorldInstance(instance);
+
+        Double posX = record.getPosX();
+        Double posY = record.getPosY();
+        if (posX != null && posY != null) {
+            character.setPosition(new Position(posX, posY));
+        }
+
         return character;
     }
 }
