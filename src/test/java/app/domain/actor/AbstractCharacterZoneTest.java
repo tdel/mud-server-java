@@ -24,16 +24,16 @@ class AbstractCharacterZoneTest {
     @Test
     void setPositionUpdatesZoneOnlyWhenCrossingAZoneBoundary() {
         CollisionGrid grid = new CollisionGrid(20, 20, 1.0, allWalkable(20, 20));
-        MapTemplate template = new MapTemplate(UUID.randomUUID(), "map", "description", true, grid,
-                new Position(1, 1), List.of(), List.of(), List.of());
+        MapTemplate template = new MapTemplate(UUID.randomUUID(), "map", "description", true, grid, new Position(1, 1),
+                List.of(), List.of(), List.of());
         PeaceZone peaceZone = new PeaceZone("Peace Zone",
                 List.of(new Position(0, 0), new Position(10, 0), new Position(10, 10), new Position(0, 10)));
         template.setPeaceZones(List.of(peaceZone));
         MapInstance map = new MapInstance(UUID.randomUUID(), template,
                 new WorldInstance(UUID.randomUUID(), UUID.randomUUID(), Instant.now()));
 
-        MonsterInstance monster = new MonsterInstance(UUID.randomUUID(), "monster", UUID.randomUUID(),
-                map.getId(), Map.of(Attribute.STRENGTH, 10), 10, new Position(15, 15));
+        MonsterInstance monster = new MonsterInstance(UUID.randomUUID(), "monster", UUID.randomUUID(), map.getId(),
+                Map.of(Attribute.STRENGTH, 10), 10, new Position(15, 15));
         monster.setCurrentMap(map);
 
         assertThat(monster.getZone()).isSameAs(NormalZone.INSTANCE);

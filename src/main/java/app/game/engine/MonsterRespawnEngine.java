@@ -77,7 +77,7 @@ public class MonsterRespawnEngine {
             MonsterInstance monster = monsterCatalog.spawnMonster(freeSpawn.get(), map);
             pending.remove(entry);
             monster.getKnownList().populateSilently();
-            monster.broadcast(new MonsterSpawned(monster.getId(), monster.getName(), monster.getPosition().x(),
+            monster.broadcastToMap(new MonsterSpawned(monster.getId(), monster.getName(), monster.getPosition().x(),
                     monster.getPosition().y(), MovementEngine.unitsPerSecond(monster.getSpeed()),
                     monster.getCurrentHealth(), monster.getMaxHealth(), monster.getLevel()), null);
             log.info("monster.respawned map={} group={} monsterId={}", map.getId(), group.id(), monster.getId());

@@ -3,9 +3,6 @@ package app.network.message.ingame;
 import java.util.List;
 
 import app.domain.actor.AbstractCharacter;
-import app.domain.actor.AbstractNpc;
-import app.domain.actor.instance.CharacterInstance;
-import app.domain.actor.instance.MonsterInstance;
 import app.domain.map.Position;
 import app.domain.world.MapInstance;
 import app.game.engine.MovementEngine;
@@ -14,10 +11,11 @@ import app.network.server.tcpjson.TcpJsonOutput;
 
 /**
  * Photo de la map envoyée au chargement (création/sélection de personnage,
- * portail, réapparition) — pas à chaque déplacement. Ne liste que ce qui est
- * déjà dans la KnownList du personnage (peuplée par MapInstance.join juste
- * avant l'envoi de ce message) ; les entités qui entrent/sortent de portée
- * ensuite sont signalées par EntityAppeared/EntityDisappeared.
+ * portail, réapparition) — pas à chaque déplacement. Liste TOUS les occupants
+ * de la map (pas seulement la KnownList du personnage) : la sélection d'une
+ * cible ne doit pas dépendre de la portée de perception, seules les diffusions
+ * de mouvement/combat/chat en cours de partie restent scopées à la KnownList
+ * pour la bande passante (voir AbstractCharacter.broadcastToMap).
  */
 public record MapEnter(AbstractCharacter character) implements OutputJsonMessage {
 
@@ -36,13 +34,11 @@ public record MapEnter(AbstractCharacter character) implements OutputJsonMessage
     public void toJson(TcpJsonOutput output) {
         MapInstance map = character.getCurrentMap();
         Position self = character.getPosition();
-        List<AbstractCharacter> known = character.getKnownList().asList();
 
-        List<EntityView> characterViews = known.stream().filter(CharacterInstance.class::isInstance).map(EntityView::of)
-                .toList();
-        List<EntityView> monsterViews = known.stream().filter(MonsterInstance.class::isInstance).map(EntityView::of)
-                .toList();
-        List<EntityView> npcViews = known.stream().filter(AbstractNpc.class::isInstance).map(EntityView::of).toList();
+        List<EntityView> characterViews = map.characters().stream()
+                .filter(other -> !other.getId().equals(character.getId())).map(EntityView::of).toList();
+        List<EntityView> monsterViews = map.getMonsters().stream().map(EntityView::of).toList();
+        List<EntityView> npcViews = map.getNpcs().stream().map(EntityView::of).toList();
 
         List<PortalView> portals = map.getPortals().stream().map(portal -> new PortalView(portal.position().x(),
                 portal.position().y(), portal.direction(), portal.targetMap().getName())).toList();

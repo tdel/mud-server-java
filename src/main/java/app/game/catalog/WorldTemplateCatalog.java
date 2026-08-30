@@ -162,8 +162,7 @@ public class WorldTemplateCatalog {
         Map<UUID, MapTemplate> templates = new LinkedHashMap<>();
         for (ParsedMap map : parsedMaps) {
             MapTemplate template = new MapTemplate(map.id(), map.name(), map.description(), map.isStartingMap(),
-                    map.terrain(), map.spawnPosition(), map.monsterSpawns(), map.monsterSpawnGroups(),
-                    map.npcSpawns());
+                    map.terrain(), map.spawnPosition(), map.monsterSpawns(), map.monsterSpawnGroups(), map.npcSpawns());
             if (!template.isWalkable(map.spawnPosition())) {
                 throw new IllegalStateException("Map " + map.id() + " du monde " + shortName + " a une position de "
                         + "spawn " + map.spawnPosition() + " non praticable de sa carte");
@@ -179,7 +178,8 @@ public class WorldTemplateCatalog {
                     .map(portal -> resolvePortal(shortName, map, source, portal, templates)).toList();
             checkNoOverlappingPortals(shortName, map, portals);
             source.setPortals(portals);
-            source.setPeaceZones(map.peaceZones().stream().map(zone -> new PeaceZone(zone.name(), zone.polygon())).toList());
+            source.setPeaceZones(
+                    map.peaceZones().stream().map(zone -> new PeaceZone(zone.name(), zone.polygon())).toList());
         }
 
         return Map.copyOf(templates);
@@ -199,9 +199,8 @@ public class WorldTemplateCatalog {
         }
 
         if (!target.isWalkable(portal.targetPosition())) {
-            throw new IllegalStateException(
-                    "Map " + map.id() + " du monde " + shortName + " a un portail vers " + portal.targetPosition()
-                            + " non praticable de la carte de la map cible " + portal.targetMapId());
+            throw new IllegalStateException("Map " + map.id() + " du monde " + shortName + " a un portail vers "
+                    + portal.targetPosition() + " non praticable de la carte de la map cible " + portal.targetMapId());
         }
 
         return new MapTemplatePortal(portal.position(), portal.direction(), target.getId(), portal.targetPosition(),

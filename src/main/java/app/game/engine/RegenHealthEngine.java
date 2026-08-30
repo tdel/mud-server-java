@@ -69,7 +69,7 @@ public class RegenHealthEngine {
     void onCharacterDied(CharacterDied event) {
         MapInstance map = event.character().getCurrentMap();
         map.removeMonster(event.character());
-        event.character().broadcast(new MonsterDefeated(event.character().getName()), null);
+        event.character().broadcastToMap(new MonsterDefeated(event.character().getName()), null);
         event.character().getKnownList().clear();
         log.info("regenhp.monster_removed_from_map monster={} map={}", event.character().getName(), map.getName());
 

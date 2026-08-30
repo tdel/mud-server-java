@@ -115,25 +115,25 @@ public class MapInstance {
         DomainEventPublisher.publish(new GamePlayerSpawnedToMap(character, this));
 
         character.getKnownList().populateSilently();
-        character.broadcast(new GamePlayerJoinedMap(character.getId(), character.getName(), position.x(), position.y()),
-                character);
+        character.broadcastToMap(
+                new GamePlayerJoinedMap(character.getId(), character.getName(), position.x(), position.y()), character);
     }
 
     public void leave(CharacterInstance character) {
+        character.broadcastToMap(new GamePlayerLeftMap(character.getName()), character);
         clients.remove(character.getId());
         character.getKnownList().clear();
         character.setPosition(null);
         log.info("map.left thread={} mapId={} character={}", Thread.currentThread().getName(), id, character.getId());
-        character.broadcast(new GamePlayerLeftMap(character.getName()), character);
     }
 
     public void disconnect(CharacterInstance character) {
+        character.broadcastToMap(new GamePlayerDisconnected(character.getName()), character);
         clients.remove(character.getId());
         character.getKnownList().clear();
         character.setPosition(null);
         log.info("map.disconnected thread={} mapId={} character={}", Thread.currentThread().getName(), id,
                 character.getId());
-        character.broadcast(new GamePlayerDisconnected(character.getName()), character);
     }
 
     public Optional<AbstractCharacter> findOccupantById(UUID id) {

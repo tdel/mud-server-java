@@ -38,8 +38,8 @@ public final class PeaceZone extends AbstractZone {
         for (int i = 0, j = n - 1; i < n; j = i++) {
             Position vi = polygon.get(i);
             Position vj = polygon.get(j);
-            boolean crossesRay = (vi.y() > position.y()) != (vj.y() > position.y()) && position.x() < (vj.x() - vi.x())
-                    * (position.y() - vi.y()) / (vj.y() - vi.y()) + vi.x();
+            boolean crossesRay = (vi.y() > position.y()) != (vj.y() > position.y())
+                    && position.x() < (vj.x() - vi.x()) * (position.y() - vi.y()) / (vj.y() - vi.y()) + vi.x();
             if (crossesRay) {
                 inside = !inside;
             }

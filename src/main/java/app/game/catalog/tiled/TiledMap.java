@@ -7,8 +7,8 @@ import java.util.List;
  * orthogonale) réellement exploité par {@link TiledMapLoader}. Les autres
  * attributs/balises standards d'un fichier Tiled (version, tiledversion,
  * infinite, renderorder, nextlayerid, nextobjectid, image du tileset, etc.)
- * restent présents dans les fichiers authorés sous {@code data/maps/*.tmx}
- * pour rester ouvrables tels quels dans Tiled, mais ne sont pas modélisés ici :
+ * restent présents dans les fichiers authorés sous {@code data/maps/*.tmx} pour
+ * rester ouvrables tels quels dans Tiled, mais ne sont pas modélisés ici :
  * {@link TiledMapLoader} ignore simplement ce qu'il ne lit pas.
  */
 public record TiledMap(String orientation, int width, int height, int tilewidth, int tileheight,
@@ -22,7 +22,10 @@ public record TiledMap(String orientation, int width, int height, int tilewidth,
             List<TiledProperty> properties) {
     }
 
-    /** Point d'un {@code <polygon points="x1,y1 x2,y2 ...">}, relatif à x/y de l'objet qui le porte. */
+    /**
+     * Point d'un {@code <polygon points="x1,y1 x2,y2 ...">}, relatif à x/y de
+     * l'objet qui le porte.
+     */
     public record TiledPoint(double x, double y) {
     }
 

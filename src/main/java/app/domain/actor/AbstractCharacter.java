@@ -221,6 +221,25 @@ public abstract class AbstractCharacter extends AbstractObject {
         }
     }
 
+    /**
+     * Diffuse un message à TOUS les joueurs de la carte courante, sans passer par
+     * la KnownList (portée de perception) — réservé aux événements de
+     * présence/absence d'une entité (arrivée/départ d'un joueur, apparition/mort
+     * d'un monstre) : la sélection d'une cible ne doit pas dépendre de la distance,
+     * contrairement aux diffusions de mouvement/combat/chat qui, elles, restent
+     * scopées à {@link #broadcast} pour la bande passante.
+     */
+    public void broadcastToMap(OutputMessage message, CharacterInstance exclude) {
+        if (currentMap == null) {
+            return;
+        }
+        for (CharacterInstance target : currentMap.characters()) {
+            if (target != exclude) {
+                target.send(message);
+            }
+        }
+    }
+
     public void castSpell(Spell spell, AbstractCharacter target) {
         if (!hasSpell(spell)) {
             send(new SpellNotKnown(spell.name()));
