@@ -6,7 +6,7 @@ SHELL := /bin/bash
 export JAVA_HOME := $(HOME)/.sdkman/candidates/java/current
 export PATH := $(JAVA_HOME)/bin:$(HOME)/.sdkman/candidates/maven/current/bin:$(PATH)
 
-.PHONY: help build package test run format format-check clean install-linux
+.PHONY: help build package test run stop format format-check clean install-linux
 
 help: ## Affiche cette aide
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "%-14s %s\n", $$1, $$2}'
@@ -44,6 +44,16 @@ test: ## Lance la suite de tests
 
 run: ## Démarre le serveur telnet (mvn spring-boot:run)
 	mvn spring-boot:run
+
+stop: ## Arrête le serveur lancé par `make run` (process mvn + JVM forkée + ports résiduels)
+	@for p in $$(pgrep -f 'spring-boot:run|app\.ServerApplication'); do \
+		if [ "$$(ps -o comm= -p $$p 2>/dev/null)" = "java" ]; then \
+			echo "Arrêt du process Java $$p..."; \
+			kill -9 $$p 2>/dev/null; \
+		fi; \
+	done
+	@fuser -k 4002/tcp 8080/tcp 8081/tcp 2>/dev/null; true
+	@echo "Serveur arrêté."
 
 format: ## Formate le code (spotless:apply)
 	mvn spotless:apply
