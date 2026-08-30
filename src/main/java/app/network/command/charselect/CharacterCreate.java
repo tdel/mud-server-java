@@ -23,11 +23,9 @@ import app.network.message.Usage;
 import app.network.message.charselect.CharacterCreated;
 import app.network.message.charselect.ChooseClass;
 import app.network.message.charselect.ChooseGender;
-import app.network.message.charselect.ChooseRace;
 import app.network.message.charselect.InvalidClass;
 import app.network.message.charselect.InvalidGender;
 import app.network.message.charselect.CharacterNameTaken;
-import app.network.message.charselect.InvalidRace;
 import app.network.message.charselect.NowPlaying;
 import app.network.message.ingame.GamePlayerStats;
 import app.network.message.ingame.MapEnter;
@@ -89,7 +87,7 @@ public class CharacterCreate implements CommandHandler {
                 return;
             }
 
-            promptRace(connection, account, instance, name, gender);
+            promptClass(connection, account, instance, name, gender);
         });
     }
 
@@ -102,37 +100,8 @@ public class CharacterCreate implements CommandHandler {
         }
     }
 
-    private void promptRace(Connection connection, Account account, WorldInstance instance, String name,
+    private void promptClass(Connection connection, Account account, WorldInstance instance, String name,
             Gender gender) {
-        Map<Race, Map<Attribute, Integer>> bonusesByRace = new LinkedHashMap<>();
-        for (Race race : Race.values()) {
-            bonusesByRace.put(race, race.attributeScoreBonuses());
-        }
-
-        connection.requestBlocking(new ChooseRace(bonusesByRace), line -> {
-            Race race = parseRace(line);
-
-            if (race == null) {
-                connection.send(new InvalidRace(line.trim()));
-                promptRace(connection, account, instance, name, gender);
-                return;
-            }
-
-            promptClass(connection, account, instance, name, gender, race);
-        });
-    }
-
-    private Race parseRace(String input) {
-        String normalized = input.strip().toLowerCase(Locale.ROOT).replace(' ', '_').replace('-', '_');
-        try {
-            return Race.valueOf(normalized.toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
-
-    private void promptClass(Connection connection, Account account, WorldInstance instance, String name, Gender gender,
-            Race race) {
         Map<CharacterClass, Integer> hitDiceByClass = new LinkedHashMap<>();
         Map<CharacterClass, Attribute> primaryAbilityByClass = new LinkedHashMap<>();
         for (CharacterClass characterClass : CharacterClass.values()) {
@@ -145,11 +114,11 @@ public class CharacterCreate implements CommandHandler {
 
             if (characterClass == null) {
                 connection.send(new InvalidClass(line.trim()));
-                promptClass(connection, account, instance, name, gender, race);
+                promptClass(connection, account, instance, name, gender);
                 return;
             }
 
-            createCharacter(connection, account, instance, name, gender, race, characterClass);
+            createCharacter(connection, account, instance, name, gender, characterClass);
         });
     }
 
@@ -163,8 +132,8 @@ public class CharacterCreate implements CommandHandler {
     }
 
     private void createCharacter(Connection connection, Account account, WorldInstance instance, String name,
-            Gender gender, Race race, CharacterClass characterClass) {
-        CharacterInstance character = instance.createCharacter(account, name, gender, race, characterClass);
+            Gender gender, CharacterClass characterClass) {
+        CharacterInstance character = instance.createCharacter(account, name, gender, Race.HUMAN, characterClass);
 
         connection.send(new CharacterCreated(name));
         connection.send(new GamePlayerStats(character));

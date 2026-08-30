@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import app.domain.Party;
 import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.event.CharacterChoseSubclass;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.CharacterGainedXp;
 import app.domain.actor.event.CharacterLeveledUp;
@@ -21,6 +22,7 @@ import app.domain.actor.event.GamePlayerRespawned;
 import app.domain.actor.event.GamePlayerUsedManaPotion;
 import app.domain.actor.event.GamePlayerUsedPotion;
 import app.domain.actor.event.NewGamePlayerCreated;
+import app.domain.actor.event.SubclassChoiceAvailable;
 import app.game.catalog.LevelCatalog;
 import app.network.message.ingame.CharacterUsedItem;
 import app.network.message.ingame.GoldLooted;
@@ -31,6 +33,8 @@ import app.network.message.ingame.PartyMemberVitalsUpdated;
 import app.network.message.ingame.PlayerLeveledUp;
 import app.network.message.ingame.PlayerRespawned;
 import app.network.message.ingame.RegenTick;
+import app.network.message.ingame.SubclassChoiceOffered;
+import app.network.message.ingame.SubclassChosen;
 import app.network.message.ingame.XpGained;
 import app.persistence.CharacterDao;
 
@@ -77,6 +81,23 @@ public class CharacterPersistenceListener {
         broadcastVitalsToParty(character);
         log.info("character.leveled_up character={} newLevel={} hpGained={}", character.getName(), event.newLevel(),
                 event.hpGained());
+    }
+
+    @EventListener
+    void onSubclassChoiceAvailable(SubclassChoiceAvailable event) {
+        CharacterInstance character = event.character();
+        character.send(new SubclassChoiceOffered(event.tier(), event.options()));
+        log.info("character.subclass_choice_available character={} tier={} options={}", character.getName(),
+                event.tier(), event.options());
+    }
+
+    @EventListener
+    void onCharacterChoseSubclass(CharacterChoseSubclass event) {
+        CharacterInstance character = event.character();
+        characterDao.update(character);
+        character.send(new SubclassChosen(event.tier(), event.subclass()));
+        log.info("character.subclass_chosen character={} tier={} subclass={}", character.getName(), event.tier(),
+                event.subclass());
     }
 
     @EventListener

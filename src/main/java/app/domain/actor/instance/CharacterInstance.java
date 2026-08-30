@@ -17,6 +17,7 @@ import app.domain.actor.*;
 import app.domain.actor.component.ActiveEffect;
 import app.domain.actor.component.CharacterCombat;
 import app.domain.actor.component.PlayerInventory;
+import app.domain.actor.event.CharacterChoseSubclass;
 import app.domain.actor.event.CharacterGainedXp;
 import app.domain.actor.event.CharacterLeveledUp;
 import app.domain.actor.event.CharacterLootedItem;
@@ -24,6 +25,7 @@ import app.domain.actor.event.CharacterReceivedGold;
 import app.domain.actor.event.CharacterRegenerated;
 import app.domain.actor.event.CharacterSpentGold;
 import app.domain.actor.event.DomainEventPublisher;
+import app.domain.actor.event.SubclassChoiceAvailable;
 import app.domain.actor.event.GamePlayerDamaged;
 import app.domain.actor.event.GamePlayerDied;
 import app.domain.actor.event.GamePlayerEquippedItem;
@@ -53,6 +55,8 @@ public final class CharacterInstance extends AbstractCharacter {
     private Race race;
     private CharacterClass characterClass;
     private int level;
+    private Subclass subclassTier1;
+    private Subclass subclassTier2;
 
     private Connection connection;
     private final PlayerInventory inventory;
@@ -84,6 +88,14 @@ public final class CharacterInstance extends AbstractCharacter {
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold, int shortRestCount, int maxMana, int currentMana,
             Set<Spell> knownSpells, List<ActiveEffect> activeEffects) {
+        this(id, account, name, map, gender, race, characterClass, level, currentHealth, maxHealth, attributes, xp,
+                gold, shortRestCount, maxMana, currentMana, knownSpells, activeEffects, null, null);
+    }
+
+    public CharacterInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
+            CharacterClass characterClass, int level, int currentHealth, int maxHealth,
+            Map<Attribute, Integer> attributes, int xp, int gold, int shortRestCount, int maxMana, int currentMana,
+            Set<Spell> knownSpells, List<ActiveEffect> activeEffects, Subclass subclassTier1, Subclass subclassTier2) {
         super(id, name, attributes, currentHealth, maxHealth);
         this.account = account;
         setCurrentMap(map);
@@ -92,6 +104,8 @@ public final class CharacterInstance extends AbstractCharacter {
         this.speed = race.speed();
         this.characterClass = characterClass;
         this.level = level;
+        this.subclassTier1 = subclassTier1;
+        this.subclassTier2 = subclassTier2;
         this.xp = xp;
         this.inventory = new PlayerInventory(gold);
         this.combat = new CharacterCombat(this);
@@ -144,6 +158,42 @@ public final class CharacterInstance extends AbstractCharacter {
 
     public void setCharacterClass(CharacterClass characterClass) {
         this.characterClass = characterClass;
+    }
+
+    public Subclass getSubclassTier1() {
+        return subclassTier1;
+    }
+
+    public Subclass getSubclassTier2() {
+        return subclassTier2;
+    }
+
+    // tier 1 (niveau 20) puis tier 2 (niveau 40) restent en attente tant qu'aucune
+    // option n'a été
+    // choisie ; dérivé de l'état plutôt que stocké, pour survivre à une reconnexion
+    // sans champ dédié.
+    public Integer getPendingSubclassTier() {
+        if (subclassTier1 == null && level >= 20) {
+            return 1;
+        }
+        if (subclassTier2 == null && level >= 40) {
+            return 2;
+        }
+        return null;
+    }
+
+    public void chooseSubclass(Subclass subclass) {
+        Integer tier = getPendingSubclassTier();
+        if (tier == null || !Subclass.availableAt(characterClass, tier).contains(subclass)) {
+            throw new IllegalStateException("Choix de sous-classe invalide: " + subclass + " (tier=" + tier
+                    + ", classe=" + characterClass + ")");
+        }
+        if (tier == 1) {
+            subclassTier1 = subclass;
+        } else {
+            subclassTier2 = subclass;
+        }
+        DomainEventPublisher.publish(new CharacterChoseSubclass(this, tier, subclass));
     }
 
     public Attribute getPrimaryAbility() {
@@ -347,6 +397,14 @@ public final class CharacterInstance extends AbstractCharacter {
         currentMana += manaGain;
 
         DomainEventPublisher.publish(new CharacterLeveledUp(this, level, hpGain));
+
+        Integer pendingTier = getPendingSubclassTier();
+        if (pendingTier != null) {
+            List<Subclass> options = Subclass.availableAt(characterClass, pendingTier);
+            if (!options.isEmpty()) {
+                DomainEventPublisher.publish(new SubclassChoiceAvailable(this, pendingTier, options));
+            }
+        }
     }
 
     public int getShortRestCount() {

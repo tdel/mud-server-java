@@ -72,6 +72,18 @@
         "bonus": 0
     },
     {
+        "id": "ac9fe757-ab75-47ef-b413-8844d5c5ed73",
+        "name": "Bâton de magicien basique",
+        "type": "WEAPON",
+        "weight": 1,
+        "baseAc": 0,
+        "damageDice": "1d6",
+        "weaponCategory": "SIMPLE",
+        "price": 10,
+        "rarity": "COMMON",
+        "bonus": 0
+    },
+    {
         "id": "ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd",
         "name": "Dague",
         "type": "WEAPON",

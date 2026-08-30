@@ -22,6 +22,7 @@ import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.CharacterClass;
 import app.domain.actor.Gender;
 import app.domain.actor.Race;
+import app.domain.actor.Subclass;
 import app.domain.map.Position;
 import app.domain.world.MapInstance;
 import app.domain.world.WorldInstance;
@@ -49,7 +50,8 @@ public class CharacterDao {
                 CHARACTER.GENDER, CHARACTER.RACE, CHARACTER.CHARACTER_CLASS, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH,
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
                 CHARACTER.INTELLIGENCE, CHARACTER.WISDOM, CHARACTER.CHARISMA, CHARACTER.XP, CHARACTER.GOLD,
-                CHARACTER.SHORT_REST_COUNT, CHARACTER.MAX_MANA, CHARACTER.CURRENT_MANA)
+                CHARACTER.SHORT_REST_COUNT, CHARACTER.MAX_MANA, CHARACTER.CURRENT_MANA, CHARACTER.SUBCLASS_TIER1,
+                CHARACTER.SUBCLASS_TIER2)
                 .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentMapId(),
                         character.getGender().name(), character.getRace().name(), character.getCharacterClass().name(),
                         character.getLevel(), character.getCurrentHealth(), character.getMaxHealth(),
@@ -57,8 +59,13 @@ public class CharacterDao {
                         character.getAttribute(Attribute.CONSTITUTION), character.getAttribute(Attribute.INTELLIGENCE),
                         character.getAttribute(Attribute.WISDOM), character.getAttribute(Attribute.CHARISMA),
                         character.getXp(), character.getInventory().getGold(), character.getShortRestCount(),
-                        character.getMaxMana(), character.getCurrentMana())
+                        character.getMaxMana(), character.getCurrentMana(), name(character.getSubclassTier1()),
+                        name(character.getSubclassTier2()))
                 .execute();
+    }
+
+    private static String name(Subclass subclass) {
+        return subclass == null ? null : subclass.name();
     }
 
     public List<CharacterInstance> findAllByAccount(Account account, WorldInstance instance) {
@@ -91,6 +98,8 @@ public class CharacterDao {
                 .set(CHARACTER.GOLD, character.getInventory().getGold())
                 .set(CHARACTER.SHORT_REST_COUNT, character.getShortRestCount())
                 .set(CHARACTER.MAX_MANA, character.getMaxMana()).set(CHARACTER.CURRENT_MANA, character.getCurrentMana())
+                .set(CHARACTER.SUBCLASS_TIER1, name(character.getSubclassTier1()))
+                .set(CHARACTER.SUBCLASS_TIER2, name(character.getSubclassTier2()))
                 .where(CHARACTER.ID.eq(character.getId())).execute();
     }
 
@@ -120,10 +129,13 @@ public class CharacterDao {
         List<ActiveEffect> activeEffects = characterActiveEffectDao.findByCharacterId(record.getId()).stream()
                 .filter(effect -> effect.expiresAt().isAfter(now)).toList();
 
+        Subclass subclassTier1 = record.getSubclassTier1() == null ? null : Subclass.valueOf(record.getSubclassTier1());
+        Subclass subclassTier2 = record.getSubclassTier2() == null ? null : Subclass.valueOf(record.getSubclassTier2());
+
         CharacterInstance character = new CharacterInstance(record.getId(), account, record.getName(), map,
                 Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
                 record.getMaxHealth(), attributes, record.getXp(), record.getGold(), record.getShortRestCount(),
-                record.getMaxMana(), record.getCurrentMana(), knownSpells, activeEffects);
+                record.getMaxMana(), record.getCurrentMana(), knownSpells, activeEffects, subclassTier1, subclassTier2);
         character.setWorldInstance(instance);
 
         Double posX = record.getPosX();

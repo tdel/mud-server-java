@@ -6,6 +6,8 @@ Please talk in French, without too much verbosity. Be concise.
 ## Project
 This project is a game. It is built around DnD5e (Dungeon and Dragon 5th edition). Every system in this game must be compliant with DnD5e.
 
+**Exception (races/classes/leveling)**: races, classes and the level cap deliberately deviate from strict SRD compliance since the "human-only, Fighter/Mystic + subclasses" refactor — see the "Notes for this project" sections of `docs/dnd5e/races.md`, `classes.md`, `leveling-xp.md`. Attack roll, damage, and AC math stay DnD5e-compliant; character build/progression is now closer to a Lineage2/Ragnarok Online style.
+
 ## DnD5e rules reference
 
 `docs/dnd5e/` holds a scoped, per-system summary of the DnD5e SRD rules (sourced from the official CC-BY-licensed SRD 5.1), each file ending with a "Notes for this project" section tying the rule to the current implementation. Load only the file(s) relevant to the system being touched — don't read the whole directory speculatively. Start from `docs/dnd5e/README.md` for the full index (`combat.md` and `spellcasting.md` are the two most likely to be relevant now that both systems are implemented, see below).

@@ -8,7 +8,7 @@ Each file ends with a **"Notes for this project"** section connecting the rule t
 |---|---|
 | [ability-scores.md](ability-scores.md) | The six abilities, modifiers, ability checks, saving throws, advantage/disadvantage, proficiency bonus, inspiration |
 | [races.md](races.md) | Playable races/subraces: ability increases, size, speed, traits |
-| [classes.md](classes.md) | The 12 classes: hit dice, saves, spellcasting, core mechanic |
+| [classes.md](classes.md) | SRD's 12 classes (reference only) + this project's actual Fighter/Mystic + subclasses system |
 | [backgrounds-alignment.md](backgrounds-alignment.md) | Alignment grid, backgrounds, languages |
 | [leveling-xp.md](leveling-xp.md) | XP table, proficiency bonus by level, HP on level-up, multiclassing |
 | [combat.md](combat.md) | Turn/round structure, initiative, actions, attack rolls, cover |

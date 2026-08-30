@@ -11,7 +11,7 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 public enum CharacterClass {
-    BARBARIAN, BARD, CLERIC, DRUID, FIGHTER, MONK, PALADIN, RANGER, ROGUE, SORCERER, WARLOCK, WIZARD;
+    FIGHTER, MYSTIC;
 
     private static final String RESOURCE = "/data/class.json";
 
@@ -64,18 +64,8 @@ public enum CharacterClass {
 
     public String label() {
         return switch (this) {
-            case BARBARIAN -> "Barbarian";
-            case BARD -> "Bard";
-            case CLERIC -> "Cleric";
-            case DRUID -> "Druid";
             case FIGHTER -> "Fighter";
-            case MONK -> "Monk";
-            case PALADIN -> "Paladin";
-            case RANGER -> "Ranger";
-            case ROGUE -> "Rogue";
-            case SORCERER -> "Sorcerer";
-            case WARLOCK -> "Warlock";
-            case WIZARD -> "Wizard";
+            case MYSTIC -> "Mystic";
         };
     }
 

@@ -26,7 +26,7 @@ du compte, s'il y en a, est affichée automatiquement en entrant)
 | Commande | Effet |
 | --- | --- |
 | `character-list` | Lister les personnages du compte |
-| `character-create` | Créer un personnage (nom, genre, race, classe) |
+| `character-create` | Créer un personnage (nom, genre, classe : Fighter/Mystic) |
 | `character-select` | Incarner un personnage existant (`character-select <name>`) |
 | `character-delete` | Supprimer un personnage (`character-delete <name>`) |
 
