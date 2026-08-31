@@ -21,7 +21,6 @@ import app.domain.item.Item;
 import app.domain.item.ItemGrade;
 import app.domain.item.ItemTemplate;
 import app.domain.item.ItemType;
-import app.domain.item.Rarity;
 import app.domain.map.Position;
 import app.domain.world.CollisionGrid;
 import app.domain.world.MapInstance;
@@ -60,7 +59,7 @@ class CharacterInstanceElementalResistanceTest {
 
     private ItemTemplate armorTemplate(Map<SpellElement, Integer> elementalResistances) {
         return new ItemTemplate(UUID.randomUUID(), "armor", "description", ItemType.ARMOR, 5, ArmorCategory.LIGHT, 0, 0,
-                5, 0, 0, 0, 0, 100, Rarity.COMMON, List.of(), elementalResistances, ItemGrade.D, null);
+                5, 0, 0, 0, 0, 100, List.of(), elementalResistances, ItemGrade.D, null);
     }
 
     private CharacterInstance createCharacter() {

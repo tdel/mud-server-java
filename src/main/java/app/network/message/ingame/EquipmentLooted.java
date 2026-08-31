@@ -1,8 +1,8 @@
 package app.network.message.ingame;
 
 import app.network.OutputJsonMessage;
-import app.domain.item.Rarity;
+import app.domain.item.ItemGrade;
 
-public record EquipmentLooted(String itemName, Rarity rarity) implements OutputJsonMessage {
+public record EquipmentLooted(String itemName, ItemGrade grade) implements OutputJsonMessage {
 
 }

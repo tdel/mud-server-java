@@ -11,7 +11,7 @@ import app.network.CommandHandler;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.item.EquipmentSlot;
 import app.domain.item.Item;
-import app.domain.item.Rarity;
+import app.domain.item.ItemGrade;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
@@ -63,7 +63,7 @@ public class Equip implements CommandHandler {
 
         UUID templateId = item.get().getId();
         String templateName = item.get().getName();
-        Rarity templateRarity = item.get().getRarity();
+        ItemGrade templateGrade = item.get().getGrade();
         Optional<EquipmentSlot> slot = character.equipItem(item.get());
 
         if (slot.isEmpty()) {
@@ -71,6 +71,6 @@ public class Equip implements CommandHandler {
             return;
         }
 
-        connection.send(new ItemEquipped(templateId, templateName, templateRarity, slot.get()));
+        connection.send(new ItemEquipped(templateId, templateName, templateGrade, slot.get()));
     }
 }

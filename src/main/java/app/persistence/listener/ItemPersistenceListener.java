@@ -63,14 +63,14 @@ public class ItemPersistenceListener {
     @EventListener
     void onCharacterLootedItem(CharacterLootedItem event) {
         itemDao.insert(event.item());
-        event.character().send(new EquipmentLooted(event.item().getName(), event.item().getRarity()));
+        event.character().send(new EquipmentLooted(event.item().getName(), event.item().getGrade()));
         log.info("item.looted item={} character={}", event.item().getName(), event.character().getName());
     }
 
     @EventListener
     void onItemPurchased(ItemPurchased event) {
         itemDao.insert(event.item());
-        event.character().send(new ItemBought(event.item().getName(), event.item().getRarity(), event.price()));
+        event.character().send(new ItemBought(event.item().getName(), event.item().getGrade(), event.price()));
         log.info("item.purchased item={} character={} price={}", event.item().getName(), event.character().getName(),
                 event.price());
     }

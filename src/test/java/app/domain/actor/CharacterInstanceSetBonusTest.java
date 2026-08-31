@@ -21,7 +21,6 @@ import app.domain.item.ItemGrade;
 import app.domain.item.ItemSet;
 import app.domain.item.ItemTemplate;
 import app.domain.item.ItemType;
-import app.domain.item.Rarity;
 import app.domain.map.Position;
 import app.domain.world.CollisionGrid;
 import app.domain.world.MapInstance;
@@ -84,7 +83,7 @@ class CharacterInstanceSetBonusTest {
 
     private ItemTemplate setTemplate() {
         return new ItemTemplate(UUID.randomUUID(), "set piece", "description", ItemType.ARMOR, 1, ArmorCategory.LIGHT,
-                0, 0, 0, 0, 0, 0, 0, 10, Rarity.COMMON, List.of(), Map.of(), ItemGrade.D, SET_ID);
+                0, 0, 0, 0, 0, 0, 0, 10, List.of(), Map.of(), ItemGrade.D, SET_ID);
     }
 
     private CharacterInstance createCharacter() {

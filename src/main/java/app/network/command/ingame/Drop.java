@@ -10,7 +10,7 @@ import app.network.CommandArguments;
 import app.network.CommandHandler;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.item.Item;
-import app.domain.item.Rarity;
+import app.domain.item.ItemGrade;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
@@ -61,9 +61,9 @@ public class Drop implements CommandHandler {
 
         UUID templateId = item.get().getId();
         String templateName = item.get().getName();
-        Rarity templateRarity = item.get().getRarity();
+        ItemGrade templateGrade = item.get().getGrade();
         character.discardItem(item.get());
 
-        connection.send(new ItemDiscarded(templateId, templateName, templateRarity));
+        connection.send(new ItemDiscarded(templateId, templateName, templateGrade));
     }
 }

@@ -99,7 +99,7 @@ public class Talk implements CommandHandler {
             AbstractNpc.NpcDialogue dialogue) {
         List<ShopCatalog.Entry> entries = npc.shop().items().stream()
                 .map(entry -> new ShopCatalog.Entry(entry.itemTemplate().getId(), entry.itemTemplate().getName(),
-                        entry.itemTemplate().getRarity(), entry.price()))
+                        entry.itemTemplate().getGrade(), entry.price()))
                 .toList();
 
         connection.requestBlocking(

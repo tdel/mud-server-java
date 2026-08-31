@@ -13,10 +13,10 @@ public class FoodItem extends ItemTemplate {
 
     public FoodItem(UUID id, String name, String description, ItemType type, int weight, ArmorCategory armorCategory,
             int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus, int critBonus, int price,
-            Rarity rarity, List<Spell> grantedSpells, Map<SpellElement, Integer> elementalResistances, ItemGrade grade,
-            String setId, int nutritionValue) {
+            List<Spell> grantedSpells, Map<SpellElement, Integer> elementalResistances, ItemGrade grade, String setId,
+            int nutritionValue) {
         super(id, name, description, type, weight, armorCategory, pAtk, mAtk, pDef, mDef, accuracyBonus, evasionBonus,
-                critBonus, price, rarity, grantedSpells, elementalResistances, grade, setId);
+                critBonus, price, grantedSpells, elementalResistances, grade, setId);
         this.nutritionValue = nutritionValue;
     }
 

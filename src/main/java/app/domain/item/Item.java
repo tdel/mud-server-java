@@ -103,10 +103,6 @@ public class Item {
         return template.getGrade();
     }
 
-    public Rarity getRarity() {
-        return template.getRarity();
-    }
-
     public void setCharacter(AbstractCharacter character) {
         this.character = character;
         this.slot = null;

@@ -32,6 +32,6 @@ Varies per item: some work passively once worn/wielded, others need a **command 
 
 ## Notes for this project
 
-The game currently implements **rarity** (`domain/Rarity`: `COMMON, UNCOMMON, RARE, VERY_RARE, LEGENDARY, ARTIFACT` — matches the SRD tiers above) and a **flat integer magic bonus** (`ItemTemplate.bonus`, surfaced via `Item.getBonus()`), applied to attack/damage rolls in `domain/actor/GamePlayer.tryAttack`/`GameMonster.tryAttack` and to AC in `domain/actor/GamePlayer.getArmorClass()`. Nothing in code currently enforces a rarity↔bonus correlation (a Common item could carry a +1 bonus) — if stricter SRD alignment is wanted later, tie bonus ranges to rarity at item-template authoring time rather than in code.
+**Rarity has been removed from the game entirely** — there is no `Rarity` enum/field anymore. The only tier concept left is `domain/item/ItemGrade` (`NOGRADE, D, C, B, A, S`), a display/progression tier unrelated to the SRD rarity table above — see "Notes for this project" in [../lineage2/equipment.md](../lineage2/equipment.md). Magic bonuses aren't a flat integer either; combat itself is the Lineage2-style model (p.atk/p.def/m.atk/m.def) described in [../lineage2/combat.md](../lineage2/combat.md), not the SRD attack/damage/AC bonuses described above.
 
 **Attunement is not implemented** — there's no limit on how many bonus-carrying items a character can equip simultaneously beyond normal equip slots. This is a known gap versus full SRD compliance, not an oversight to silently work around.

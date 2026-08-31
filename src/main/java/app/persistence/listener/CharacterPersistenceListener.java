@@ -162,7 +162,7 @@ public class CharacterPersistenceListener {
     void onGamePlayerUsedPotion(GamePlayerUsedPotion event) {
         CharacterInstance character = event.character();
         characterDao.update(character);
-        character.send(new ItemUsed(event.item().getId(), event.item().getName(), event.item().getRarity(),
+        character.send(new ItemUsed(event.item().getId(), event.item().getName(), event.item().getGrade(),
                 event.healedAmount(), character.getCurrentHealth(), character.getMaxHealth()));
         character.broadcast(new CharacterUsedItem(character.getId(), character.getName(), event.item().getId(),
                 event.item().getName()), character);
@@ -175,7 +175,7 @@ public class CharacterPersistenceListener {
     void onGamePlayerUsedManaPotion(GamePlayerUsedManaPotion event) {
         CharacterInstance character = event.character();
         characterDao.update(character);
-        character.send(new ManaPotionUsed(event.item().getId(), event.item().getName(), event.item().getRarity(),
+        character.send(new ManaPotionUsed(event.item().getId(), event.item().getName(), event.item().getGrade(),
                 event.restoredAmount(), character.getCurrentMana(), character.getMaxMana()));
         character.broadcast(new CharacterUsedItem(character.getId(), character.getName(), event.item().getId(),
                 event.item().getName()), character);

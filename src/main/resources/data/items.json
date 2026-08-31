@@ -6,7 +6,7 @@
         "weight": 1,
         "pAtk": 0, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 50,
-        "rarity": "COMMON",
+        "grade": "NOGRADE",
         "consumableEffect": "HEALING",
         "effectDice": "2d4+2"
     },
@@ -17,7 +17,7 @@
         "weight": 1,
         "pAtk": 0, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 150,
-        "rarity": "UNCOMMON",
+        "grade": "NOGRADE",
         "consumableEffect": "HEALING",
         "effectDice": "4d4+4"
     },
@@ -28,7 +28,7 @@
         "weight": 1,
         "pAtk": 0, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 700,
-        "rarity": "RARE",
+        "grade": "NOGRADE",
         "consumableEffect": "HEALING",
         "effectDice": "8d4+8"
     },
@@ -39,7 +39,7 @@
         "weight": 1,
         "pAtk": 0, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 2700,
-        "rarity": "VERY_RARE",
+        "grade": "NOGRADE",
         "consumableEffect": "HEALING",
         "effectDice": "10d4+20"
     },
@@ -50,7 +50,7 @@
         "weight": 1,
         "pAtk": 0, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 60,
-        "rarity": "COMMON",
+        "grade": "NOGRADE",
         "consumableEffect": "MANA_RESTORE",
         "effectDice": "2d4+2"
     },
@@ -61,7 +61,6 @@
         "weight": 1,
         "pAtk": 9, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 10,
-        "rarity": "COMMON",
         "grade": "D"
     },
     {
@@ -71,7 +70,6 @@
         "weight": 1,
         "pAtk": 5, "mAtk": 10, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 10,
-        "rarity": "COMMON",
         "grade": "D"
     },
     {
@@ -81,7 +79,6 @@
         "weight": 1,
         "pAtk": 6, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 2,
-        "rarity": "COMMON",
         "grade": "D"
     },
     {
@@ -91,7 +88,6 @@
         "weight": 2,
         "pAtk": 0, "mAtk": 0, "pDef": 2, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 10,
-        "rarity": "COMMON",
         "grade": "D",
         "setId": "plate-set"
     },
@@ -103,7 +99,6 @@
         "armorCategory": "LIGHT",
         "pAtk": 0, "mAtk": 0, "pDef": 5, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 10,
-        "rarity": "COMMON",
         "grade": "D"
     },
     {
@@ -114,7 +109,6 @@
         "armorCategory": "MEDIUM",
         "pAtk": 0, "mAtk": 0, "pDef": 10, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 50,
-        "rarity": "COMMON",
         "grade": "D"
     },
     {
@@ -125,7 +119,6 @@
         "armorCategory": "HEAVY",
         "pAtk": 0, "mAtk": 0, "pDef": 16, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 1500,
-        "rarity": "UNCOMMON",
         "grade": "C",
         "setId": "plate-set"
     },
@@ -136,7 +129,6 @@
         "weight": 3,
         "pAtk": 0, "mAtk": 0, "pDef": 4, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 10,
-        "rarity": "COMMON",
         "grade": "D",
         "setId": "plate-set"
     },
@@ -147,7 +139,6 @@
         "weight": 3,
         "pAtk": 12, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 2,
         "price": 500,
-        "rarity": "UNCOMMON",
         "grade": "C"
     },
     {
@@ -157,7 +148,6 @@
         "weight": 3,
         "pAtk": 0, "mAtk": 0, "pDef": 6, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 400,
-        "rarity": "UNCOMMON",
         "grade": "C"
     },
     {
@@ -167,7 +157,6 @@
         "weight": 3,
         "pAtk": 16, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 4,
         "price": 4000,
-        "rarity": "RARE",
         "grade": "B"
     },
     {
@@ -178,7 +167,6 @@
         "armorCategory": "MEDIUM",
         "pAtk": 0, "mAtk": 0, "pDef": 13, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 4500,
-        "rarity": "RARE",
         "grade": "B"
     },
     {
@@ -189,7 +177,6 @@
         "armorCategory": "HEAVY",
         "pAtk": 0, "mAtk": 0, "pDef": 22, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 40000,
-        "rarity": "VERY_RARE",
         "grade": "A"
     },
     {
@@ -199,7 +186,6 @@
         "weight": 3,
         "pAtk": 0, "mAtk": 0, "pDef": 10, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 60000,
-        "rarity": "LEGENDARY",
         "grade": "S"
     },
     {
@@ -209,7 +195,7 @@
         "weight": 1,
         "pAtk": 0, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 1,
-        "rarity": "COMMON",
+        "grade": "NOGRADE",
         "nutritionValue": 5
     },
     {
@@ -219,7 +205,7 @@
         "weight": 1,
         "pAtk": 0, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 1,
-        "rarity": "COMMON",
+        "grade": "NOGRADE",
         "nutritionValue": 5
     },
     {
@@ -229,7 +215,7 @@
         "weight": 2,
         "pAtk": 0, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 2,
-        "rarity": "COMMON",
+        "grade": "NOGRADE",
         "nutritionValue": 10
     },
     {
@@ -239,7 +225,7 @@
         "weight": 1,
         "pAtk": 0, "mAtk": 0, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 3,
-        "rarity": "COMMON",
+        "grade": "NOGRADE",
         "nutritionValue": 15
     },
     {
@@ -250,7 +236,6 @@
         "weight": 1,
         "pAtk": 5, "mAtk": 16, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 100,
-        "rarity": "UNCOMMON",
         "grade": "C",
         "grantedSpellIds": ["2127fbac-35aa-4897-a07d-bd619c4ec5b0"]
     },
@@ -262,7 +247,6 @@
         "weight": 2,
         "pAtk": 5, "mAtk": 16, "pDef": 0, "mDef": 0, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 150,
-        "rarity": "UNCOMMON",
         "grade": "C",
         "grantedSpellIds": ["e287e606-621f-48c5-b8dc-613fa98709d3"]
     },
@@ -275,7 +259,6 @@
         "armorCategory": "LIGHT",
         "pAtk": 0, "mAtk": 0, "pDef": 5, "mDef": 4, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 200,
-        "rarity": "UNCOMMON",
         "grade": "C",
         "grantedSpellIds": ["2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f"],
         "elementalResistances": {"HOLY": 15}
@@ -288,7 +271,6 @@
         "weight": 2,
         "pAtk": 0, "mAtk": 0, "pDef": 2, "mDef": 3, "accuracyBonus": 0, "evasionBonus": 0, "critBonus": 0,
         "price": 200,
-        "rarity": "UNCOMMON",
         "grade": "C",
         "grantedSpellIds": ["8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e"],
         "elementalResistances": {"DARK": 15}
