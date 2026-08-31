@@ -33,7 +33,7 @@ public class Effects implements CommandHandler {
         CharacterInstance character = connection.character();
         Instant now = Instant.now();
 
-        List<EffectView> views = character.getActiveEffects().active().stream().map(effect -> toView(effect, now))
+        List<EffectView> views = character.getEffectsSystem().active().stream().map(effect -> toView(effect, now))
                 .toList();
 
         connection.send(new ActiveEffectsListed(views));

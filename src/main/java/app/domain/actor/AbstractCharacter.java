@@ -28,7 +28,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     public static final int DEFAULT_SPEED = 110;
 
     private final Map<Attribute, Integer> attributes;
-    private final EffectsSystem activeEffects = new EffectsSystem();
+    private final EffectsSystem effectsSystem = new EffectsSystem();
     private final SkillSystem skillSystem = new SkillSystem(this);
     private int currentHealth;
     private int maxHealth;
@@ -120,7 +120,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public final int getEffectivePAtk() {
-        return getPAtk() + activeEffects.totalModifier(ModifiedStat.PATK) + setBonus(ModifiedStat.PATK);
+        return getPAtk() + effectsSystem.totalModifier(ModifiedStat.PATK) + setBonus(ModifiedStat.PATK);
     }
 
     public int getMAtk() {
@@ -128,7 +128,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public final int getEffectiveMAtk() {
-        return getMAtk() + activeEffects.totalModifier(ModifiedStat.MATK) + setBonus(ModifiedStat.MATK);
+        return getMAtk() + effectsSystem.totalModifier(ModifiedStat.MATK) + setBonus(ModifiedStat.MATK);
     }
 
     public int getPDef() {
@@ -136,7 +136,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public final int getEffectivePDef() {
-        return getPDef() + activeEffects.totalModifier(ModifiedStat.PDEF) + setBonus(ModifiedStat.PDEF);
+        return getPDef() + effectsSystem.totalModifier(ModifiedStat.PDEF) + setBonus(ModifiedStat.PDEF);
     }
 
     public int getMDef() {
@@ -144,7 +144,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public final int getEffectiveMDef() {
-        return getMDef() + activeEffects.totalModifier(ModifiedStat.MDEF) + setBonus(ModifiedStat.MDEF);
+        return getMDef() + effectsSystem.totalModifier(ModifiedStat.MDEF) + setBonus(ModifiedStat.MDEF);
     }
 
     public int getAccuracy() {
@@ -152,7 +152,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public final int getEffectiveAccuracy() {
-        return getAccuracy() + activeEffects.totalModifier(ModifiedStat.ACCURACY) + setBonus(ModifiedStat.ACCURACY);
+        return getAccuracy() + effectsSystem.totalModifier(ModifiedStat.ACCURACY) + setBonus(ModifiedStat.ACCURACY);
     }
 
     public int getEvasion() {
@@ -161,7 +161,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public final int getEffectiveEvasion() {
-        return getEvasion() + activeEffects.totalModifier(ModifiedStat.EVASION) + setBonus(ModifiedStat.EVASION);
+        return getEvasion() + effectsSystem.totalModifier(ModifiedStat.EVASION) + setBonus(ModifiedStat.EVASION);
     }
 
     public int getCriticalRate() {
@@ -169,7 +169,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public final int getEffectiveCriticalRate() {
-        return getCriticalRate() + activeEffects.totalModifier(ModifiedStat.PCRIT);
+        return getCriticalRate() + effectsSystem.totalModifier(ModifiedStat.PCRIT);
     }
 
     public int getMagicalCriticalRate() {
@@ -177,7 +177,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public final int getEffectiveMagicalCriticalRate() {
-        return getMagicalCriticalRate() + activeEffects.totalModifier(ModifiedStat.MCRIT);
+        return getMagicalCriticalRate() + effectsSystem.totalModifier(ModifiedStat.MCRIT);
     }
 
     public int getAtkSpd() {
@@ -185,11 +185,11 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public final int getEffectiveAtkSpd() {
-        return getAtkSpd() + activeEffects.totalModifier(ModifiedStat.ATKSPD) + setBonus(ModifiedStat.ATKSPD);
+        return getAtkSpd() + effectsSystem.totalModifier(ModifiedStat.ATKSPD) + setBonus(ModifiedStat.ATKSPD);
     }
 
-    public EffectsSystem getActiveEffects() {
-        return activeEffects;
+    public EffectsSystem getEffectsSystem() {
+        return effectsSystem;
     }
 
     public SkillSystem getSkillSystem() {

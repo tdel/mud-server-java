@@ -118,7 +118,7 @@ public final class CharacterInstance extends AbstractCharacter {
         this.maxMana = maxMana;
         this.currentMana = currentMana;
         knownSkills.forEach(getSkillSystem()::learn);
-        activeEffects.forEach(getActiveEffects()::apply);
+        activeEffects.forEach(getEffectsSystem()::apply);
         knownPassiveSkills.forEach(getSkillSystem()::learn);
         recomputeGradePenalty();
     }
@@ -536,10 +536,10 @@ public final class CharacterInstance extends AbstractCharacter {
         boolean overGraded = inventory.getEquippedItems().stream()
                 .anyMatch(item -> item.getGrade().ordinal() > getSkillSystem().unlockedGrade().ordinal());
         if (overGraded) {
-            getActiveEffects().apply(new ActiveEffect(GRADE_PENALTY_EFFECT_ID, "Grade Penalty", ModifiedStat.PATK, -1,
+            getEffectsSystem().apply(new ActiveEffect(GRADE_PENALTY_EFFECT_ID, "Grade Penalty", ModifiedStat.PATK, -1,
                     Instant.now().plus(Duration.ofDays(3650))));
         } else {
-            getActiveEffects().remove(GRADE_PENALTY_EFFECT_ID);
+            getEffectsSystem().remove(GRADE_PENALTY_EFFECT_ID);
         }
     }
 

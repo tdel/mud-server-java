@@ -150,7 +150,7 @@ public final class SkillSystem {
 
         int amount = debuff ? -activeSkill.power() : activeSkill.power();
         Instant expiresAt = Instant.now().plusSeconds(activeSkill.durationSeconds());
-        Optional<ActiveEffect> evicted = target.getActiveEffects().apply(
+        Optional<ActiveEffect> evicted = target.getEffectsSystem().apply(
                 new ActiveEffect(activeSkill.id(), activeSkill.name(), activeSkill.modifiedStat(), amount, expiresAt));
         evicted.ifPresent(effect -> DomainEventPublisher.publish(new CharacterEffectExpired(target, effect)));
         return new CastOutcome(true, amount, target.getCurrentHealth(), target.getMaxHealth(), false, false, expiresAt);
