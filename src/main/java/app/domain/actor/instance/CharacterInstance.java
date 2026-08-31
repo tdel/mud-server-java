@@ -484,23 +484,28 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     public Optional<EquipmentSlot> equipItem(Item item) {
-        Optional<EquipmentSlot> slot = item.getType().equipmentSlot();
+        List<EquipmentSlot> candidates = item.getType().equipmentSlots();
 
-        if (slot.isEmpty()) {
+        if (candidates.isEmpty()) {
             return Optional.empty();
         }
 
+        List<Item> equipped = inventory.getEquippedItems();
+        EquipmentSlot slot = candidates.stream()
+                .filter(candidate -> equipped.stream().noneMatch(existing -> existing.getSlot() == candidate))
+                .findFirst().orElse(candidates.get(0));
+
         List<Item> previousOccupants = new ArrayList<>();
-        for (Item existing : inventory.getEquippedItems()) {
-            if (!existing.getId().equals(item.getId()) && existing.getSlot() == slot.get()) {
+        for (Item existing : equipped) {
+            if (!existing.getId().equals(item.getId()) && existing.getSlot() == slot) {
                 previousOccupants.add(existing);
                 existing.setSlot(null);
             }
         }
 
-        item.setSlot(slot.get());
-        DomainEventPublisher.publish(new GamePlayerEquippedItem(this, item, slot.get(), previousOccupants));
-        return slot;
+        item.setSlot(slot);
+        DomainEventPublisher.publish(new GamePlayerEquippedItem(this, item, slot, previousOccupants));
+        return Optional.of(slot);
     }
 
     public void unequipItem(Item item) {

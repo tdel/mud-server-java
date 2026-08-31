@@ -32,6 +32,7 @@ public class ItemTemplateCatalog {
     private static final String CONSUMABLES_RESOURCE = "/data/items/consumables.json";
     private static final String ARMORS_RESOURCE = "/data/items/armors.json";
     private static final String WEAPONS_RESOURCE = "/data/items/weapons.json";
+    private static final String JEWELLERY_RESOURCE = "/data/items/jewellery.json";
     private static final String OTHERS_RESOURCE = "/data/items/others.json";
 
     private final Map<UUID, ItemTemplate> templates = new ConcurrentHashMap<>();
@@ -48,6 +49,7 @@ public class ItemTemplateCatalog {
         loadConsumables();
         loadEquipment(ARMORS_RESOURCE);
         loadEquipment(WEAPONS_RESOURCE);
+        loadEquipment(JEWELLERY_RESOURCE);
         loadOthers();
         log.info("item.templates_loaded count={}", templates.size());
     }
