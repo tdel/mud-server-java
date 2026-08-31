@@ -15,7 +15,7 @@ import app.domain.actor.Attribute;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.item.Item;
 import app.domain.item.ItemTemplate;
-import app.game.dice.DiceRoller;
+import app.game.Randomizer;
 
 public class MonsterTemplate {
 
@@ -151,7 +151,7 @@ public class MonsterTemplate {
     public LootResult rollLoot(CharacterInstance killer) {
         List<Item> items = new ArrayList<>();
         for (LootTableEntry entry : lootTable) {
-            if (DiceRoller.rollChance(entry.dropChance())) {
+            if (Randomizer.rollChance(entry.dropChance())) {
                 items.add(new Item(UUID.randomUUID(), entry.itemTemplate(), killer, null));
             }
         }

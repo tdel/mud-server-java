@@ -3,7 +3,7 @@ package app.game.combat;
 import java.time.Duration;
 
 import app.domain.item.ArmorCategory;
-import app.game.dice.DiceRoller;
+import app.game.Randomizer;
 
 /**
  * Formules de combat façon Lineage2 : stats dérivées (p.atk/p.def/m.atk/m.def
@@ -16,7 +16,7 @@ import app.game.dice.DiceRoller;
  * <p>
  * Fonctions pures, sans dépendance Spring ni RNG : le tirage aléatoire réel
  * (hit/critique/variance) reste à la charge de l'appelant, via
- * {@code app.game.dice.DiceRoller}.
+ * {@code app.game.Randomizer}.
  *
  * <p>
  * Constantes calibrées par simulation déterministe (espérance de dégâts, pas de
@@ -137,7 +137,7 @@ public final class CombatFormulas {
 
     public static int resolveDamage(int attackerAtk, int defenderDef, boolean critical) {
         double base = attackerAtk * ((double) attackerAtk / (attackerAtk + defenderDef))
-                * DiceRoller.randomVariance(0.9, 1.1);
+                * Randomizer.randomVariance(0.9, 1.1);
         if (critical) {
             base *= CRITICAL_MULTIPLIER;
         }

@@ -16,7 +16,7 @@ import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.world.PeaceZone;
 import app.game.combat.CombatFormulas;
-import app.game.dice.DiceRoller;
+import app.game.Randomizer;
 import app.game.engine.MonsterAiEngine;
 import app.network.message.ingame.AttackResult;
 
@@ -88,7 +88,7 @@ public final class CharacterCombat {
         }
 
         double hitChance = CombatFormulas.hitChance(character.getEffectiveAccuracy(), defender.getEffectiveEvasion());
-        boolean hit = DiceRoller.rollChance(hitChance);
+        boolean hit = Randomizer.rollChance(hitChance);
 
         int damage = 0;
         boolean critical = false;
@@ -96,7 +96,7 @@ public final class CharacterCombat {
         int healthAfter = defender.getCurrentHealth();
 
         if (hit) {
-            critical = DiceRoller.rollChance(character.getEffectiveCriticalRate() / 100.0);
+            critical = Randomizer.rollChance(character.getEffectiveCriticalRate() / 100.0);
             damage = CombatFormulas.resolveDamage(character.getEffectivePAtk(), defender.getEffectivePDef(), critical);
             healthAfter = Math.max(0, defender.getCurrentHealth() - damage);
             defeated = applyDamage(defender, damage);

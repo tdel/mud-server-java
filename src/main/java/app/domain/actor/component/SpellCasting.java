@@ -18,7 +18,7 @@ import app.domain.actor.event.MonsterAttacked;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.instance.MonsterInstance;
 import app.game.combat.CombatFormulas;
-import app.game.dice.DiceRoller;
+import app.game.Randomizer;
 
 public final class SpellCasting {
 
@@ -89,7 +89,7 @@ public final class SpellCasting {
         if (!rollSpellHit(target)) {
             return new AttackRollOutcome(false, 0);
         }
-        boolean critical = DiceRoller.rollChance(character.getEffectiveMagicalCriticalRate() / 100.0);
+        boolean critical = Randomizer.rollChance(character.getEffectiveMagicalCriticalRate() / 100.0);
         // Le power du sort module la puissance magique du lancer, ce qui préserve
         // la progression entre tiers d'un même sort (Flame Strike tier 1 vs tier 5)
         // au lieu de tout aplatir sur le seul m.atk du personnage.
@@ -124,7 +124,7 @@ public final class SpellCasting {
 
     private CastOutcome castModifier(Spell spell, AbstractCharacter target, boolean debuff) {
         if (debuff && (!rollSpellHit(target)
-                || DiceRoller.rollChance(CombatFormulas.debuffResistChance(target.getAttribute(Attribute.MEN))))) {
+                || Randomizer.rollChance(CombatFormulas.debuffResistChance(target.getAttribute(Attribute.MEN))))) {
             return new CastOutcome(false, 0, target.getCurrentHealth(), target.getMaxHealth(), false, false, null);
         }
 
@@ -138,7 +138,7 @@ public final class SpellCasting {
 
     private boolean rollSpellHit(AbstractCharacter target) {
         double hitChance = CombatFormulas.hitChance(character.getEffectiveAccuracy(), target.getEffectiveEvasion());
-        return DiceRoller.rollChance(hitChance);
+        return Randomizer.rollChance(hitChance);
     }
 
     private boolean applyDamage(AbstractCharacter defender, int damage) {

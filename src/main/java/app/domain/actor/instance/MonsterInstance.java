@@ -17,7 +17,7 @@ import app.domain.map.Position;
 import app.domain.world.PeaceZone;
 import app.game.combat.CombatFormulas;
 import app.game.engine.MonsterAiEngine;
-import app.game.dice.DiceRoller;
+import app.game.Randomizer;
 
 public final class MonsterInstance extends AbstractCharacter {
 
@@ -63,7 +63,7 @@ public final class MonsterInstance extends AbstractCharacter {
 
     public MonsterAttackOutcome attack(CharacterInstance defender) {
         double hitChance = CombatFormulas.hitChance(getEffectiveAccuracy(), defender.getEffectiveEvasion());
-        boolean hit = DiceRoller.rollChance(hitChance);
+        boolean hit = Randomizer.rollChance(hitChance);
 
         int damage = 0;
         boolean critical = false;
@@ -71,7 +71,7 @@ public final class MonsterInstance extends AbstractCharacter {
         int healthAfter = defender.getCurrentHealth();
 
         if (hit) {
-            critical = DiceRoller.rollChance(getEffectiveCriticalRate() / 100.0);
+            critical = Randomizer.rollChance(getEffectiveCriticalRate() / 100.0);
             damage = CombatFormulas.resolveDamage(getEffectivePAtk(), defender.getEffectivePDef(), critical);
             healthAfter = Math.max(0, defender.getCurrentHealth() - damage);
             defeated = defender.takeDamage(damage, this);
