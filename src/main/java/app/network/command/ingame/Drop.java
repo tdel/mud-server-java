@@ -61,7 +61,7 @@ public class Drop implements CommandHandler {
         UUID templateId = item.get().getId();
         String templateName = item.get().getName();
         ItemGrade templateGrade = item.get().getGrade();
-        character.discardItem(item.get());
+        character.getInventorySystem().discardItem(item.get());
 
         connection.send(new ItemDiscarded(templateId, templateName, templateGrade));
     }

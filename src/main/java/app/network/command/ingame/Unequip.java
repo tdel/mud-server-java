@@ -68,7 +68,7 @@ public class Unequip implements CommandHandler {
         }
 
         ItemGrade templateGrade = item.get().getGrade();
-        character.unequipItem(item.get());
+        character.getInventorySystem().unequipItem(item.get());
 
         connection.send(new ItemUnequipped(templateId, templateName, templateGrade));
     }

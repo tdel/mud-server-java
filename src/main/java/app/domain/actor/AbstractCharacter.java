@@ -2,7 +2,6 @@ package app.domain.actor;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import app.domain.ActiveSkill;
@@ -196,16 +195,6 @@ public abstract class AbstractCharacter extends AbstractObject {
         return skillSystem;
     }
 
-    // Défaut neutre : seul CharacterInstance a des objets équipés susceptibles
-    // d'accorder des sorts.
-    public Set<ActiveSkill> getGrantedSkills() {
-        return Set.of();
-    }
-
-    public boolean hasSkill(ActiveSkill activeSkill) {
-        return skillSystem.knows(activeSkill.id()) || getGrantedSkills().contains(activeSkill);
-    }
-
     // Défaut neutre : seul CharacterInstance suit une réserve de mana ;
     // MonsterInstance/AbstractNpc n'en ont pas encore, donc jamais bloqués par le
     // coût en mana d'un sort.
@@ -369,7 +358,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     }
 
     public CastRequestOutcome castSkill(ActiveSkill activeSkill, AbstractCharacter target) {
-        if (!hasSkill(activeSkill)) {
+        if (!getSkillSystem().hasSkill(activeSkill)) {
             return new CastRequestOutcome.SkillUnknown(activeSkill.name());
         }
         if (target == null) {

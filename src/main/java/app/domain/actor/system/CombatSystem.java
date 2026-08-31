@@ -40,6 +40,10 @@ public final class CombatSystem {
         this.target = target;
     }
 
+    public void clearTarget() {
+        this.target = null;
+    }
+
     public boolean isReady() {
         return !Instant.now().isBefore(nextAttackAt);
     }

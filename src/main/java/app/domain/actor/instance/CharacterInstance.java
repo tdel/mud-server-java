@@ -1,8 +1,5 @@
 package app.domain.actor.instance;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -25,20 +22,12 @@ import app.domain.actor.system.InventorySystem;
 import app.domain.actor.event.CharacterChoseSubclass;
 import app.domain.actor.event.CharacterGainedXp;
 import app.domain.actor.event.CharacterLeveledUp;
-import app.domain.actor.event.CharacterLootedItem;
-import app.domain.actor.event.CharacterReceivedGold;
 import app.domain.actor.event.CharacterRegenerated;
-import app.domain.actor.event.CharacterSpentGold;
 import app.domain.actor.event.DomainEventPublisher;
-import app.domain.actor.event.SubclassChoiceAvailable;
 import app.domain.actor.event.GamePlayerDamaged;
 import app.domain.actor.event.GamePlayerDied;
-import app.domain.actor.event.GamePlayerEquippedItem;
 import app.domain.actor.event.GamePlayerMovedToMap;
 import app.domain.actor.event.GamePlayerRespawned;
-import app.domain.actor.event.GamePlayerUnequippedItem;
-import app.domain.actor.event.ItemDiscarded;
-import app.domain.actor.event.ItemPurchased;
 import app.game.catalog.LevelCatalogHolder;
 import app.domain.item.EquipmentSlot;
 import app.domain.item.ItemSet;
@@ -54,8 +43,6 @@ import app.network.OutputMessage;
 import app.network.message.ingame.XpGained;
 
 public final class CharacterInstance extends AbstractCharacter {
-
-    private static final UUID GRADE_PENALTY_EFFECT_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
 
     private final Account account;
     private WorldInstance worldInstance;
@@ -113,14 +100,14 @@ public final class CharacterInstance extends AbstractCharacter {
         this.subclassTier1 = subclassTier1;
         this.subclassTier2 = subclassTier2;
         this.xp = xp;
-        this.inventorySystem = new InventorySystem(gold);
+        this.inventorySystem = new InventorySystem(this, gold);
         this.combatSystem = new CombatSystem(this);
         this.maxMana = maxMana;
         this.currentMana = currentMana;
         knownSkills.forEach(getSkillSystem()::learn);
         activeEffects.forEach(getEffectsSystem()::apply);
         knownPassiveSkills.forEach(getSkillSystem()::learn);
-        recomputeGradePenalty();
+        inventorySystem.recomputeGradePenalty();
     }
 
     public Account getAccount() {
@@ -304,12 +291,6 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     @Override
-    public Set<ActiveSkill> getGrantedSkills() {
-        return inventorySystem.getEquippedItems().stream().flatMap(item -> item.getGrantedSkills().stream())
-                .collect(Collectors.toSet());
-    }
-
-    @Override
     public int getMaxMana() {
         return maxMana;
     }
@@ -338,7 +319,7 @@ public final class CharacterInstance extends AbstractCharacter {
 
     @Override
     public void clearCombatTarget() {
-        combatSystem.setTarget(null);
+        combatSystem.clearTarget();
     }
 
     public int gainMana(int amount) {
@@ -393,36 +374,6 @@ public final class CharacterInstance extends AbstractCharacter {
         currentMana += manaGain;
 
         DomainEventPublisher.publish(new CharacterLeveledUp(this, level, hpGain));
-
-        Integer pendingTier = getPendingSubclassTier();
-        if (pendingTier != null) {
-            List<Subclass> options = Subclass.availableAt(characterClass, pendingTier);
-            if (!options.isEmpty()) {
-                DomainEventPublisher.publish(new SubclassChoiceAvailable(this, pendingTier, options));
-            }
-        }
-    }
-
-    public void receiveGold(int amount) {
-        inventorySystem.addGold(amount);
-        DomainEventPublisher.publish(new CharacterReceivedGold(this, amount));
-    }
-
-    public void receiveLootItem(Item item) {
-        item.setCharacter(this);
-        inventorySystem.addItem(item);
-        DomainEventPublisher.publish(new CharacterLootedItem(this, item));
-    }
-
-    public boolean buyItem(Item item, int price) {
-        if (!inventorySystem.trySpendGold(price)) {
-            return false;
-        }
-        DomainEventPublisher.publish(new CharacterSpentGold(this, price));
-        item.setCharacter(this);
-        inventorySystem.addItem(item);
-        DomainEventPublisher.publish(new ItemPurchased(this, item, price));
-        return true;
     }
 
     public boolean takeDamage(int amount, AbstractCharacter attacker) {
@@ -458,63 +409,6 @@ public final class CharacterInstance extends AbstractCharacter {
         previous.leave(this);
         destination.join(this, targetPosition);
         DomainEventPublisher.publish(new GamePlayerMovedToMap(this, previous, destination));
-    }
-
-    public Optional<EquipmentSlot> equipItem(Item item) {
-        List<EquipmentSlot> candidates = item.getType().equipmentSlots();
-
-        if (candidates.isEmpty()) {
-            return Optional.empty();
-        }
-
-        List<Item> equipped = inventorySystem.getEquippedItems();
-        EquipmentSlot slot = candidates.stream()
-                .filter(candidate -> equipped.stream().noneMatch(existing -> existing.getSlot() == candidate))
-                .findFirst().orElse(candidates.get(0));
-
-        List<Item> previousOccupants = new ArrayList<>();
-        for (Item existing : equipped) {
-            if (!existing.getId().equals(item.getId()) && existing.getSlot() == slot) {
-                previousOccupants.add(existing);
-                existing.setSlot(null);
-            }
-        }
-
-        item.setSlot(slot);
-        DomainEventPublisher.publish(new GamePlayerEquippedItem(this, item, slot, previousOccupants));
-        recomputeGradePenalty();
-        return Optional.of(slot);
-    }
-
-    public void unequipItem(Item item) {
-        item.setSlot(null);
-        DomainEventPublisher.publish(new GamePlayerUnequippedItem(this, item));
-        recomputeGradePenalty();
-    }
-
-    // Marqueur unique dans ActiveEffects tant qu'au moins un objet équipé dépasse
-    // le grade débloqué par les compétences passives connues (SkillSystem). Pas
-    // de vraie expiration (le malus dure tant que l'objet reste équipé) : on
-    // recalcule/rafraîchit à chaque equip/unequip plutôt que de s'appuyer sur un
-    // minuteur. ModifiedStat.PATK/amount=-1 est un placeholder inerte, requis
-    // uniquement pour que ActiveEffect.category() retombe côté DEBUFF — le vrai
-    // calcul des malus par stat (p.atk, atk.spd, évasion, vitesse, régénération...)
-    // sera implémenté séparément, en lisant l'équipement + l'expertise directement
-    // plutôt que la valeur de cet effet.
-    private void recomputeGradePenalty() {
-        boolean overGraded = inventorySystem.getEquippedItems().stream()
-                .anyMatch(item -> item.getGrade().ordinal() > getSkillSystem().unlockedGrade().ordinal());
-        if (overGraded) {
-            getEffectsSystem().apply(new ActiveEffect(GRADE_PENALTY_EFFECT_ID, "Grade Penalty", ModifiedStat.PATK, -1,
-                    Instant.now().plus(Duration.ofDays(3650))));
-        } else {
-            getEffectsSystem().remove(GRADE_PENALTY_EFFECT_ID);
-        }
-    }
-
-    public void discardItem(Item item) {
-        inventorySystem.removeItem(item);
-        DomainEventPublisher.publish(new ItemDiscarded(this, item));
     }
 
     public InventorySystem getInventorySystem() {

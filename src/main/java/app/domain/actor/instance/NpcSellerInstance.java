@@ -50,7 +50,7 @@ public final class NpcSellerInstance extends AbstractNpc {
         }
 
         Item item = new Item(UUID.randomUUID(), entry.get().itemTemplate(), buyer, null);
-        boolean bought = buyer.buyItem(item, entry.get().price());
+        boolean bought = buyer.getInventorySystem().buyItem(item, entry.get().price());
         return bought
                 ? new PurchaseOutcome.Purchased(item, entry.get().price())
                 : new PurchaseOutcome.InsufficientGold(entry.get().price());

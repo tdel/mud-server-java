@@ -37,8 +37,8 @@ public class StartingEquipmentEngine {
 
         ItemTemplate template = itemTemplateCatalog.getById(templateId);
         Item weapon = new Item(UUID.randomUUID(), template, character, null);
-        character.receiveLootItem(weapon);
-        character.equipItem(weapon);
+        character.getInventorySystem().receiveLootItem(weapon);
+        character.getInventorySystem().equipItem(weapon);
 
         log.info("character.starting_equipment_granted character={} item={}", character.getName(), weapon.getName());
     }

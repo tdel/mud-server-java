@@ -165,7 +165,7 @@ public class MonsterTemplate {
         if (loot.gold() > 0) {
             int perMemberGold = (int) (loot.gold() * goldShareMultiplier) / eligibleMembers.size();
             for (CharacterInstance member : eligibleMembers) {
-                member.receiveGold(perMemberGold);
+                member.getInventorySystem().receiveGold(perMemberGold);
             }
             log.info("loot.gold_dropped killer={} totalGold={} partySize={} perMemberGold={}", killer.getName(),
                     loot.gold(), eligibleMembers.size(), perMemberGold);
@@ -173,7 +173,7 @@ public class MonsterTemplate {
 
         for (Item item : loot.items()) {
             CharacterInstance recipient = party != null ? party.nextLootRecipient(eligibleMembers) : killer;
-            recipient.receiveLootItem(item);
+            recipient.getInventorySystem().receiveLootItem(item);
             log.info("loot.item_dropped killer={} recipient={} item={}", killer.getName(), recipient.getName(),
                     item.getName());
         }

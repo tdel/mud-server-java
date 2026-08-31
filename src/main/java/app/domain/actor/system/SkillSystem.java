@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import app.domain.ActiveEffect;
 import app.domain.PassiveSkill;
@@ -60,6 +61,20 @@ public final class SkillSystem {
 
     public Set<ActiveSkill> knownSkills() {
         return Set.copyOf(knownSkills);
+    }
+
+    // Seul CharacterInstance a des objets équipés susceptibles d'accorder des
+    // sorts ; MonsterInstance/AbstractNpc n'en accordent jamais.
+    public Set<ActiveSkill> getGrantedSkills() {
+        if (!(character instanceof CharacterInstance player)) {
+            return Set.of();
+        }
+        return player.getInventorySystem().getEquippedItems().stream().flatMap(item -> item.getGrantedSkills().stream())
+                .collect(Collectors.toSet());
+    }
+
+    public boolean hasSkill(ActiveSkill activeSkill) {
+        return knows(activeSkill.id()) || getGrantedSkills().contains(activeSkill);
     }
 
     public boolean learn(PassiveSkill passiveSkill) {

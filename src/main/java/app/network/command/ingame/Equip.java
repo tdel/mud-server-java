@@ -63,7 +63,7 @@ public class Equip implements CommandHandler {
         UUID templateId = item.get().getId();
         String templateName = item.get().getName();
         ItemGrade templateGrade = item.get().getGrade();
-        Optional<EquipmentSlot> slot = character.equipItem(item.get());
+        Optional<EquipmentSlot> slot = character.getInventorySystem().equipItem(item.get());
 
         if (slot.isEmpty()) {
             connection.send(new ItemNotEquippable(templateName));

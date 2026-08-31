@@ -35,7 +35,7 @@ public class Skills implements CommandHandler {
         // ce cas on ne garde que l'entrée "appris" (granted=false), qui reste valable
         // même après un déséquipement, plutôt que d'afficher le sort deux fois.
         Map<String, KnownSkills.Entry> entriesByName = new LinkedHashMap<>();
-        character.getGrantedSkills().stream().map(skill -> toEntry(skill, true))
+        character.getSkillSystem().getGrantedSkills().stream().map(skill -> toEntry(skill, true))
                 .forEach(entry -> entriesByName.put(entry.name(), entry));
         character.getSkillSystem().knownSkills().stream().map(skill -> toEntry(skill, false))
                 .forEach(entry -> entriesByName.put(entry.name(), entry));
