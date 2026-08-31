@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import app.domain.ActiveEffect;
 import app.domain.EffectCategory;
+import app.domain.actor.AbstractCharacter;
 import app.domain.actor.ModifiedStat;
 
 public final class EffectsSystem {
@@ -18,7 +19,12 @@ public final class EffectsSystem {
     public static final int MAX_BUFF_SLOTS = 6;
     public static final int MAX_DEBUFF_SLOTS = 4;
 
+    private final AbstractCharacter character;
     private final Map<UUID, ActiveEffect> activeEffects = new ConcurrentHashMap<>();
+
+    public EffectsSystem(AbstractCharacter character) {
+        this.character = character;
+    }
 
     // Retourne l'effet évicté (le plus proche d'expirer, dans la même catégorie)
     // si l'application de ce nouvel effet a saturé les slots — vide sinon.
@@ -47,7 +53,8 @@ public final class EffectsSystem {
 
     public int totalModifier(ModifiedStat stat) {
         Instant now = Instant.now();
-        return activeEffects.values().stream().filter(effect -> effect.stat() == stat && now.isBefore(effect.expiresAt()))
+        return activeEffects.values().stream()
+                .filter(effect -> effect.stat() == stat && now.isBefore(effect.expiresAt()))
                 .mapToInt(ActiveEffect::amount).sum();
     }
 

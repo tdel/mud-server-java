@@ -41,7 +41,7 @@ public class Attack implements CommandHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
-        switch (character.getCombat().attack(character.getCombat().getTarget())) {
+        switch (character.getCombatSystem().attack(character.getCombatSystem().getTarget())) {
             case CombatSystem.AttackOutcome.Success ignored -> {
             }
             case CombatSystem.AttackOutcome.NoTarget ignored -> connection.send(new NoTargetSelected());

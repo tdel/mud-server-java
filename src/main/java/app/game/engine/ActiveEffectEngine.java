@@ -58,7 +58,7 @@ public class ActiveEffectEngine {
 
     @EventListener
     void onPlayerLoadedInWorld(PlayerLoadedInWorld event) {
-        if (!event.character().getActiveEffects().isEmpty()) {
+        if (!event.character().getEffectsSystem().isEmpty()) {
             register(event.character());
         }
     }
@@ -72,11 +72,11 @@ public class ActiveEffectEngine {
     void tick() {
         Instant now = Instant.now();
         for (AbstractCharacter character : tracked.values()) {
-            List<ActiveEffect> expired = character.getActiveEffects().expireDue(now);
+            List<ActiveEffect> expired = character.getEffectsSystem().expireDue(now);
             for (ActiveEffect effect : expired) {
                 DomainEventPublisher.publish(new CharacterEffectExpired(character, effect));
             }
-            if (character.getActiveEffects().isEmpty()) {
+            if (character.getEffectsSystem().isEmpty()) {
                 tracked.remove(character.getId());
                 log.debug("effect.tracking_stopped character={}", character.getId());
             }

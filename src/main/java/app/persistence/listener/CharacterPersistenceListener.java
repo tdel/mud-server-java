@@ -94,7 +94,7 @@ public class CharacterPersistenceListener {
         characterDao.update(event.character());
         event.character().send(new GoldLooted(event.amount()));
         log.info("character.gold_received character={} amount={} newGold={}", event.character().getName(),
-                event.amount(), event.character().getInventory().getGold());
+                event.amount(), event.character().getInventorySystem().getGold());
     }
 
     @EventListener
@@ -102,7 +102,7 @@ public class CharacterPersistenceListener {
         characterDao.update(event.character());
         event.character().send(new GoldSpent(event.amount()));
         log.info("character.gold_spent character={} amount={} newGold={}", event.character().getName(), event.amount(),
-                event.character().getInventory().getGold());
+                event.character().getInventorySystem().getGold());
     }
 
     @EventListener
@@ -121,7 +121,7 @@ public class CharacterPersistenceListener {
         for (CharacterInstance member : eligible) {
             member.gainXp(perMemberXp);
         }
-        killer.getCombat().setTarget(null);
+        killer.getCombatSystem().setTarget(null);
         log.info("combat.kill_credited killer={} monster={} xpReward={} partySize={} perMemberXp={}", killer.getName(),
                 event.character().getName(), xpReward, eligible.size(), perMemberXp);
     }

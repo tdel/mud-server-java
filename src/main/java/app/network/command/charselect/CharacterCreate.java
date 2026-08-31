@@ -139,7 +139,7 @@ public class CharacterCreate implements CommandHandler {
         connection.send(new GamePlayerStats(character));
 
         connection.attachCharacter(character);
-        character.getInventory().replaceItems(itemService.loadInventory(character));
+        character.getInventorySystem().replaceItems(itemService.loadInventory(character));
         character.getWorldInstance().loadPlayer(character);
         MDC.put("character", character.getName());
 

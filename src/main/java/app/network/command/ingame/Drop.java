@@ -51,7 +51,7 @@ public class Drop implements CommandHandler {
             return;
         }
 
-        Optional<Item> item = CommandArguments.tryParseUuid(raw).flatMap(character.getInventory()::findOneById);
+        Optional<Item> item = CommandArguments.tryParseUuid(raw).flatMap(character.getInventorySystem()::findOneById);
 
         if (item.isEmpty()) {
             connection.send(new ItemNotCarried(raw));

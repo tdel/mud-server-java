@@ -67,8 +67,8 @@ public final class CharacterInstance extends AbstractCharacter {
     private Subclass subclassTier2;
 
     private Connection connection;
-    private final InventorySystem inventory;
-    private final CombatSystem combat;
+    private final InventorySystem inventorySystem;
+    private final CombatSystem combatSystem;
     private Party party;
     private PendingPartyInvite pendingInvite;
     private int xp;
@@ -113,8 +113,8 @@ public final class CharacterInstance extends AbstractCharacter {
         this.subclassTier1 = subclassTier1;
         this.subclassTier2 = subclassTier2;
         this.xp = xp;
-        this.inventory = new InventorySystem(gold);
-        this.combat = new CombatSystem(this);
+        this.inventorySystem = new InventorySystem(gold);
+        this.combatSystem = new CombatSystem(this);
         this.maxMana = maxMana;
         this.currentMana = currentMana;
         knownSkills.forEach(getSkillSystem()::learn);
@@ -191,32 +191,12 @@ public final class CharacterInstance extends AbstractCharacter {
         DomainEventPublisher.publish(new CharacterChoseSubclass(this, tier, subclass));
     }
 
-    public Attribute getPrimaryAbility() {
-        return characterClass.primaryAbility();
-    }
-
-    public Set<Attribute> getSavingThrowProficiencies() {
-        return characterClass.savingThrowProficiencies();
-    }
-
-    public Set<Skill> getSkillProficiencies() {
-        return characterClass.skillProficiencies();
-    }
-
-    public Set<ArmorProficiency> getArmorProficiencies() {
-        return characterClass.armorProficiencies();
-    }
-
     public int getLevel() {
         return level;
     }
 
     public void setLevel(int level) {
         this.level = level;
-    }
-
-    public int getProficiencyBonus() {
-        return 2 + Math.floorDiv(level - 1, 4);
     }
 
     @Override
@@ -231,27 +211,27 @@ public final class CharacterInstance extends AbstractCharacter {
 
     @Override
     protected int basePDefSum() {
-        return inventory.getEquippedItems().stream().mapToInt(Item::getPDef).sum();
+        return inventorySystem.getEquippedItems().stream().mapToInt(Item::getPDef).sum();
     }
 
     @Override
     protected int baseMDefSum() {
-        return inventory.getEquippedItems().stream().mapToInt(Item::getMDef).sum();
+        return inventorySystem.getEquippedItems().stream().mapToInt(Item::getMDef).sum();
     }
 
     @Override
     protected int accuracyItemBonus() {
-        return inventory.getEquippedItems().stream().mapToInt(Item::getAccuracyBonus).sum();
+        return inventorySystem.getEquippedItems().stream().mapToInt(Item::getAccuracyBonus).sum();
     }
 
     @Override
     protected int evasionItemBonus() {
-        return inventory.getEquippedItems().stream().mapToInt(Item::getEvasionBonus).sum();
+        return inventorySystem.getEquippedItems().stream().mapToInt(Item::getEvasionBonus).sum();
     }
 
     @Override
     protected int critItemBonus() {
-        return inventory.getEquippedItems().stream().mapToInt(Item::getCritBonus).sum();
+        return inventorySystem.getEquippedItems().stream().mapToInt(Item::getCritBonus).sum();
     }
 
     @Override
@@ -261,19 +241,20 @@ public final class CharacterInstance extends AbstractCharacter {
 
     @Override
     protected int armorWeightPenalty() {
-        return inventory.getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.CHEST).findFirst()
-                .map(item -> CombatFormulas.armorWeightPenalty(item.getArmorCategory())).orElse(0);
+        return inventorySystem.getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.CHEST)
+                .findFirst().map(item -> CombatFormulas.armorWeightPenalty(item.getArmorCategory())).orElse(0);
     }
 
     @Override
     protected Map<SkillElement, Integer> elementalResistanceMap() {
-        return inventory.getEquippedItems().stream().flatMap(item -> item.getElementalResistances().entrySet().stream())
+        return inventorySystem.getEquippedItems().stream()
+                .flatMap(item -> item.getElementalResistances().entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum));
     }
 
     @Override
     protected Map<ModifiedStat, Integer> setBonusModifiers() {
-        Map<String, Long> equippedCountBySetId = inventory.getEquippedItems().stream().map(Item::getSetId)
+        Map<String, Long> equippedCountBySetId = inventorySystem.getEquippedItems().stream().map(Item::getSetId)
                 .filter(Objects::nonNull).collect(Collectors.groupingBy(setId -> setId, Collectors.counting()));
 
         Map<ModifiedStat, Integer> modifiers = new EnumMap<>(ModifiedStat.class);
@@ -290,20 +271,8 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     private Optional<Item> getEquippedWeapon() {
-        return inventory.getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
-    }
-
-    public boolean isWearingNonProficientArmor() {
-        return inventory.getEquippedItems().stream().map(this::requiredArmorProficiency)
-                .anyMatch(required -> required.isPresent() && !getArmorProficiencies().contains(required.get()));
-    }
-
-    private Optional<ArmorProficiency> requiredArmorProficiency(Item item) {
-        return switch (item.getType()) {
-            case ARMOR, HELMET, PANTS, BOOTS, GLOVES -> Optional.of(ArmorProficiency.of(item.getArmorCategory()));
-            case SHIELD -> Optional.of(ArmorProficiency.SHIELDS);
-            default -> Optional.empty();
-        };
+        return inventorySystem.getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.WEAPON)
+                .findFirst();
     }
 
     public Connection getConnection() {
@@ -314,8 +283,8 @@ public final class CharacterInstance extends AbstractCharacter {
         this.connection = connection;
     }
 
-    public CombatSystem getCombat() {
-        return combat;
+    public CombatSystem getCombatSystem() {
+        return combatSystem;
     }
 
     public Party getParty() {
@@ -336,7 +305,7 @@ public final class CharacterInstance extends AbstractCharacter {
 
     @Override
     public Set<ActiveSkill> getGrantedSkills() {
-        return inventory.getEquippedItems().stream().flatMap(item -> item.getGrantedSkills().stream())
+        return inventorySystem.getEquippedItems().stream().flatMap(item -> item.getGrantedSkills().stream())
                 .collect(Collectors.toSet());
     }
 
@@ -369,7 +338,7 @@ public final class CharacterInstance extends AbstractCharacter {
 
     @Override
     public void clearCombatTarget() {
-        combat.setTarget(null);
+        combatSystem.setTarget(null);
     }
 
     public int gainMana(int amount) {
@@ -435,23 +404,23 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     public void receiveGold(int amount) {
-        inventory.addGold(amount);
+        inventorySystem.addGold(amount);
         DomainEventPublisher.publish(new CharacterReceivedGold(this, amount));
     }
 
     public void receiveLootItem(Item item) {
         item.setCharacter(this);
-        inventory.addItem(item);
+        inventorySystem.addItem(item);
         DomainEventPublisher.publish(new CharacterLootedItem(this, item));
     }
 
     public boolean buyItem(Item item, int price) {
-        if (!inventory.trySpendGold(price)) {
+        if (!inventorySystem.trySpendGold(price)) {
             return false;
         }
         DomainEventPublisher.publish(new CharacterSpentGold(this, price));
         item.setCharacter(this);
-        inventory.addItem(item);
+        inventorySystem.addItem(item);
         DomainEventPublisher.publish(new ItemPurchased(this, item, price));
         return true;
     }
@@ -467,7 +436,7 @@ public final class CharacterInstance extends AbstractCharacter {
         boolean defeated = getCurrentHealth() <= 0;
         DomainEventPublisher.publish(new GamePlayerDamaged(this, attacker, amount));
         if (defeated) {
-            getCombat().setTarget(null);
+            getCombatSystem().setTarget(null);
             DomainEventPublisher.publish(new GamePlayerDied(this, attacker));
         }
         return defeated;
@@ -498,7 +467,7 @@ public final class CharacterInstance extends AbstractCharacter {
             return Optional.empty();
         }
 
-        List<Item> equipped = inventory.getEquippedItems();
+        List<Item> equipped = inventorySystem.getEquippedItems();
         EquipmentSlot slot = candidates.stream()
                 .filter(candidate -> equipped.stream().noneMatch(existing -> existing.getSlot() == candidate))
                 .findFirst().orElse(candidates.get(0));
@@ -533,7 +502,7 @@ public final class CharacterInstance extends AbstractCharacter {
     // sera implémenté séparément, en lisant l'équipement + l'expertise directement
     // plutôt que la valeur de cet effet.
     private void recomputeGradePenalty() {
-        boolean overGraded = inventory.getEquippedItems().stream()
+        boolean overGraded = inventorySystem.getEquippedItems().stream()
                 .anyMatch(item -> item.getGrade().ordinal() > getSkillSystem().unlockedGrade().ordinal());
         if (overGraded) {
             getEffectsSystem().apply(new ActiveEffect(GRADE_PENALTY_EFFECT_ID, "Grade Penalty", ModifiedStat.PATK, -1,
@@ -544,12 +513,12 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     public void discardItem(Item item) {
-        inventory.removeItem(item);
+        inventorySystem.removeItem(item);
         DomainEventPublisher.publish(new ItemDiscarded(this, item));
     }
 
-    public InventorySystem getInventory() {
-        return inventory;
+    public InventorySystem getInventorySystem() {
+        return inventorySystem;
     }
 
     @Override
@@ -560,33 +529,10 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof CharacterInstance other)) {
-            return false;
-        }
-        return level == other.level && xp == other.xp && inventory.getGold() == other.inventory.getGold()
-                && getCurrentHealth() == other.getCurrentHealth() && getMaxHealth() == other.getMaxHealth()
-                && Objects.equals(getId(), other.getId()) && Objects.equals(getAccountId(), other.getAccountId())
-                && Objects.equals(getName(), other.getName())
-                && Objects.equals(getCurrentMapId(), other.getCurrentMapId()) && gender == other.gender
-                && race == other.race && characterClass == other.characterClass
-                && Objects.equals(getAttributes(), other.getAttributes());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getAccountId(), getName(), getCurrentMapId(), gender, race, characterClass, level,
-                xp, inventory.getGold(), getCurrentHealth(), getMaxHealth(), getAttributes());
-    }
-
-    @Override
     public String toString() {
         return "GamePlayer[id=" + getId() + ", accountId=" + getAccountId() + ", name=" + getName() + ", currentMapId="
                 + getCurrentMapId() + ", gender=" + gender + ", race=" + race + ", characterClass=" + characterClass
-                + ", level=" + level + ", xp=" + xp + ", gold=" + inventory.getGold() + ", currentHealth="
+                + ", level=" + level + ", xp=" + xp + ", gold=" + inventorySystem.getGold() + ", currentHealth="
                 + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + ", attributes=" + getAttributes() + "]";
     }
 }

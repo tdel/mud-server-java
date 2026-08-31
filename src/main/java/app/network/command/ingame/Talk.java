@@ -103,7 +103,8 @@ public class Talk implements CommandHandler {
                 .toList();
 
         connection.requestBlocking(
-                new ShopCatalog(npc.getId(), npc.getName(), entries, character.getInventory().getGold()), line -> {
+                new ShopCatalog(npc.getId(), npc.getName(), entries, character.getInventorySystem().getGold()),
+                line -> {
                     String trimmed = line.trim();
                     if (trimmed.equals("0") || trimmed.equalsIgnoreCase("back") || trimmed.equalsIgnoreCase("retour")) {
                         promptDialogue(connection, character, npc, dialogue);

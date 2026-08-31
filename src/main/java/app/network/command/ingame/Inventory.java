@@ -28,12 +28,12 @@ public class Inventory implements CommandHandler {
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
 
-        List<Item> items = character.getInventory().getItems();
+        List<Item> items = character.getInventorySystem().getItems();
         List<app.network.message.ingame.Inventory.Entry> entries = items.stream()
                 .map(item -> new app.network.message.ingame.Inventory.Entry(item.getId(), item.getName(),
                         item.getGrade(), item.getSlot()))
                 .toList();
 
-        connection.send(new app.network.message.ingame.Inventory(entries, character.getInventory().getGold()));
+        connection.send(new app.network.message.ingame.Inventory(entries, character.getInventorySystem().getGold()));
     }
 }

@@ -67,7 +67,7 @@ public class CharacterSelect implements CommandHandler {
         CharacterInstance loadedChar = character.get();
         connection.attachCharacter(loadedChar);
         skillLearningEngine.reconcile(loadedChar);
-        loadedChar.getInventory().replaceItems(itemService.loadInventory(loadedChar));
+        loadedChar.getInventorySystem().replaceItems(itemService.loadInventory(loadedChar));
         loadedChar.getWorldInstance().loadPlayer(loadedChar);
         MDC.put("character", loadedChar.getName());
 

@@ -36,7 +36,7 @@ public class PartyInvite implements CommandHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
-        AbstractCharacter selected = character.getCombat().getTarget();
+        AbstractCharacter selected = character.getCombatSystem().getTarget();
 
         if (selected == null) {
             connection.send(new NoTargetSelected());

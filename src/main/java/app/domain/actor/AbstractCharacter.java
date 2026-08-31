@@ -28,7 +28,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     public static final int DEFAULT_SPEED = 110;
 
     private final Map<Attribute, Integer> attributes;
-    private final EffectsSystem effectsSystem = new EffectsSystem();
+    private final EffectsSystem effectsSystem = new EffectsSystem(this);
     private final SkillSystem skillSystem = new SkillSystem(this);
     private int currentHealth;
     private int maxHealth;

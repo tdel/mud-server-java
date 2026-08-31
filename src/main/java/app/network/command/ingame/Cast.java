@@ -78,7 +78,7 @@ public class Cast implements CommandHandler {
             return;
         }
 
-        switch (character.castSkill(activeSkill, character.getCombat().getTarget())) {
+        switch (character.castSkill(activeSkill, character.getCombatSystem().getTarget())) {
             case AbstractCharacter.CastRequestOutcome.Started ignored -> {
             }
             case AbstractCharacter.CastRequestOutcome.SkillUnknown(var skillName) ->

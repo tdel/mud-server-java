@@ -19,8 +19,7 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
             int maxHealth, int healthRegenPerSecond, int currentMana, int maxMana, int manaRegenPerSecond, int pAtk,
             int pDef, int mAtk, int mDef, int accuracy, int evasion, int criticalRate, int atkSpd,
             AttributeScore strength, AttributeScore dexterity, AttributeScore constitution, AttributeScore intelligence,
-            AttributeScore wit, AttributeScore men, String primaryAbility, List<String> savingThrowProficiencies,
-            List<String> skillProficiencies, double speed) {
+            AttributeScore wit, AttributeScore men, double speed) {
     }
 
     @Override
@@ -34,10 +33,7 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
                         c.getEffectiveCriticalRate(), c.getEffectiveAtkSpd(), attributeScore(c, Attribute.STRENGTH),
                         attributeScore(c, Attribute.DEXTERITY), attributeScore(c, Attribute.CONSTITUTION),
                         attributeScore(c, Attribute.INTELLIGENCE), attributeScore(c, Attribute.WIT),
-                        attributeScore(c, Attribute.MEN), c.getPrimaryAbility().label(),
-                        c.getSavingThrowProficiencies().stream().sorted().map(Attribute::label).toList(),
-                        c.getSkillProficiencies().stream().sorted().map(Skill::label).toList(),
-                        MovementEngine.unitsPerSecond(c.getSpeed())),
+                        attributeScore(c, Attribute.MEN), MovementEngine.unitsPerSecond(c.getSpeed())),
                 false);
     }
 

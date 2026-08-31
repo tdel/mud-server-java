@@ -34,7 +34,7 @@ public class Select implements CommandHandler {
         String raw = argument.trim();
 
         if (raw.isEmpty()) {
-            character.getCombat().setTarget(null);
+            character.getCombatSystem().setTarget(null);
             connection.send(new TargetDeselected());
             return;
         }
@@ -49,7 +49,7 @@ public class Select implements CommandHandler {
             return;
         }
 
-        character.getCombat().setTarget(target.get());
+        character.getCombatSystem().setTarget(target.get());
         connection.send(new TargetSelected(target.get().getId(), target.get().getName()));
     }
 }

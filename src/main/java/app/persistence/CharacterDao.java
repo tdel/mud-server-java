@@ -65,7 +65,7 @@ public class CharacterDao {
                         character.getAttribute(Attribute.STRENGTH), character.getAttribute(Attribute.DEXTERITY),
                         character.getAttribute(Attribute.CONSTITUTION), character.getAttribute(Attribute.INTELLIGENCE),
                         character.getAttribute(Attribute.WIT), character.getAttribute(Attribute.MEN), character.getXp(),
-                        character.getInventory().getGold(), character.getMaxMana(), character.getCurrentMana(),
+                        character.getInventorySystem().getGold(), character.getMaxMana(), character.getCurrentMana(),
                         name(character.getSubclassTier1()), name(character.getSubclassTier2()))
                 .execute();
     }
@@ -101,8 +101,8 @@ public class CharacterDao {
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_MAP_ID, character.getCurrentMapId())
                 .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).set(CHARACTER.XP, character.getXp())
                 .set(CHARACTER.LEVEL, character.getLevel()).set(CHARACTER.MAX_HEALTH, character.getMaxHealth())
-                .set(CHARACTER.GOLD, character.getInventory().getGold()).set(CHARACTER.MAX_MANA, character.getMaxMana())
-                .set(CHARACTER.CURRENT_MANA, character.getCurrentMana())
+                .set(CHARACTER.GOLD, character.getInventorySystem().getGold())
+                .set(CHARACTER.MAX_MANA, character.getMaxMana()).set(CHARACTER.CURRENT_MANA, character.getCurrentMana())
                 .set(CHARACTER.SUBCLASS_TIER1, name(character.getSubclassTier1()))
                 .set(CHARACTER.SUBCLASS_TIER2, name(character.getSubclassTier2()))
                 .where(CHARACTER.ID.eq(character.getId())).execute();
