@@ -95,7 +95,7 @@
         "atkSpd": 280,
         "price": 100,
         "grade": "C",
-        "grantedSpellIds": [
+        "grantedSkillIds": [
             "2127fbac-35aa-4897-a07d-bd619c4ec5b0"
         ]
     },
@@ -115,7 +115,7 @@
         "atkSpd": 280,
         "price": 150,
         "grade": "C",
-        "grantedSpellIds": [
+        "grantedSkillIds": [
             "e287e606-621f-48c5-b8dc-613fa98709d3"
         ]
     },

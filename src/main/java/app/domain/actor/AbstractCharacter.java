@@ -5,22 +5,22 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import app.domain.Spell;
-import app.domain.SpellEffectType;
-import app.domain.SpellElement;
-import app.domain.actor.component.ActiveEffects;
-import app.domain.actor.component.SpellCasting;
+import app.domain.ActiveSkill;
+import app.domain.SkillEffectType;
+import app.domain.SkillElement;
+import app.domain.actor.system.EffectsSystem;
+import app.domain.actor.system.SkillSystem;
 import app.domain.actor.event.CharacterPositionChanged;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.instance.CharacterInstance;
-import app.domain.actor.event.SpellCastBegin;
+import app.domain.actor.event.SkillCastBegin;
 import app.domain.map.Position;
 import app.domain.world.AbstractZone;
 import app.domain.world.MapInstance;
 import app.domain.world.NormalZone;
 import app.game.combat.CombatFormulas;
 import app.game.engine.MovementEngine;
-import app.game.engine.SpellCastEngine;
+import app.game.engine.SkillCastEngine;
 import app.network.OutputMessage;
 
 public abstract class AbstractCharacter extends AbstractObject {
@@ -28,8 +28,8 @@ public abstract class AbstractCharacter extends AbstractObject {
     public static final int DEFAULT_SPEED = 110;
 
     private final Map<Attribute, Integer> attributes;
-    private final ActiveEffects activeEffects = new ActiveEffects();
-    private final SpellCasting spellCasting = new SpellCasting(this);
+    private final EffectsSystem activeEffects = new EffectsSystem();
+    private final SkillSystem skillSystem = new SkillSystem(this);
     private int currentHealth;
     private int maxHealth;
 
@@ -38,7 +38,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     private volatile double heading;
     protected int speed = DEFAULT_SPEED;
     private volatile MovementEngine.ActiveMovement activeMovement;
-    private volatile SpellCastEngine.ActiveCast activeCast;
+    private volatile SkillCastEngine.ActiveCast activeCast;
     private final KnownList knownList = new KnownList(this);
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
@@ -97,11 +97,11 @@ public abstract class AbstractCharacter extends AbstractObject {
         return CombatFormulas.BASE_ATK_SPD;
     }
 
-    protected Map<SpellElement, Integer> elementalResistanceMap() {
+    protected Map<SkillElement, Integer> elementalResistanceMap() {
         return Map.of();
     }
 
-    public final int getElementalResistance(SpellElement element) {
+    public final int getElementalResistance(SkillElement element) {
         return elementalResistanceMap().getOrDefault(element, 0);
     }
 
@@ -188,22 +188,22 @@ public abstract class AbstractCharacter extends AbstractObject {
         return getAtkSpd() + activeEffects.totalModifier(ModifiedStat.ATKSPD) + setBonus(ModifiedStat.ATKSPD);
     }
 
-    public ActiveEffects getActiveEffects() {
+    public EffectsSystem getActiveEffects() {
         return activeEffects;
     }
 
-    public SpellCasting getSpellCasting() {
-        return spellCasting;
+    public SkillSystem getSkillSystem() {
+        return skillSystem;
     }
 
     // Défaut neutre : seul CharacterInstance a des objets équipés susceptibles
     // d'accorder des sorts.
-    public Set<Spell> getGrantedSpells() {
+    public Set<ActiveSkill> getGrantedSkills() {
         return Set.of();
     }
 
-    public boolean hasSpell(Spell spell) {
-        return spellCasting.knows(spell.id()) || getGrantedSpells().contains(spell);
+    public boolean hasSkill(ActiveSkill activeSkill) {
+        return skillSystem.knows(activeSkill.id()) || getGrantedSkills().contains(activeSkill);
     }
 
     // Défaut neutre : seul CharacterInstance suit une réserve de mana ;
@@ -308,11 +308,11 @@ public abstract class AbstractCharacter extends AbstractObject {
         this.activeMovement = null;
     }
 
-    public SpellCastEngine.ActiveCast getActiveCast() {
+    public SkillCastEngine.ActiveCast getActiveCast() {
         return activeCast;
     }
 
-    public void updateCast(SpellCastEngine.ActiveCast cast) {
+    public void updateCast(SkillCastEngine.ActiveCast cast) {
         this.activeCast = cast;
     }
 
@@ -368,28 +368,29 @@ public abstract class AbstractCharacter extends AbstractObject {
         }
     }
 
-    public CastRequestOutcome castSpell(Spell spell, AbstractCharacter target) {
-        if (!hasSpell(spell)) {
-            return new CastRequestOutcome.SpellUnknown(spell.name());
+    public CastRequestOutcome castSkill(ActiveSkill activeSkill, AbstractCharacter target) {
+        if (!hasSkill(activeSkill)) {
+            return new CastRequestOutcome.SkillUnknown(activeSkill.name());
         }
         if (target == null) {
             return new CastRequestOutcome.NoTarget();
         }
-        if (target instanceof AbstractNpc && spell.effect() == SpellEffectType.DAMAGE) {
+        if (target instanceof AbstractNpc && activeSkill.effect() == SkillEffectType.DAMAGE) {
             return new CastRequestOutcome.TargetInvalid(target.getId());
         }
-        if (spell.range() > 0 && getPosition().distanceTo(target.getPosition()) > spell.range()) {
-            return new CastRequestOutcome.OutOfRange(spell.name(), target.getName());
+        if (activeSkill.range() > 0 && getPosition().distanceTo(target.getPosition()) > activeSkill.range()) {
+            return new CastRequestOutcome.OutOfRange(activeSkill.name(), target.getName());
         }
-        if (!getSpellCasting().isReady(spell.id())) {
-            return new CastRequestOutcome.OnCooldown(spell.name(),
-                    getSpellCasting().remainingCooldown(spell.id()).toMillis());
+        if (!getSkillSystem().isReady(activeSkill.id())) {
+            return new CastRequestOutcome.OnCooldown(activeSkill.name(),
+                    getSkillSystem().remainingCooldown(activeSkill.id()).toMillis());
         }
-        if (getCurrentMana() < spell.manaCost()) {
-            return new CastRequestOutcome.InsufficientMana(spell.name(), spell.manaCost(), getCurrentMana());
+        if (getCurrentMana() < activeSkill.manaCost()) {
+            return new CastRequestOutcome.InsufficientMana(activeSkill.name(), activeSkill.manaCost(),
+                    getCurrentMana());
         }
 
-        DomainEventPublisher.publish(new SpellCastBegin(this, spell, target));
+        DomainEventPublisher.publish(new SkillCastBegin(this, activeSkill, target));
         return new CastRequestOutcome.Started();
     }
 
@@ -398,7 +399,7 @@ public abstract class AbstractCharacter extends AbstractObject {
         record Started() implements CastRequestOutcome {
         }
 
-        record SpellUnknown(String spellName) implements CastRequestOutcome {
+        record SkillUnknown(String skillName) implements CastRequestOutcome {
         }
 
         record NoTarget() implements CastRequestOutcome {
@@ -407,13 +408,13 @@ public abstract class AbstractCharacter extends AbstractObject {
         record TargetInvalid(UUID targetId) implements CastRequestOutcome {
         }
 
-        record OutOfRange(String spellName, String targetName) implements CastRequestOutcome {
+        record OutOfRange(String skillName, String targetName) implements CastRequestOutcome {
         }
 
-        record OnCooldown(String spellName, long remainingMs) implements CastRequestOutcome {
+        record OnCooldown(String skillName, long remainingMs) implements CastRequestOutcome {
         }
 
-        record InsufficientMana(String spellName, int required, int current) implements CastRequestOutcome {
+        record InsufficientMana(String skillName, int required, int current) implements CastRequestOutcome {
         }
     }
 

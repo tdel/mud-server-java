@@ -12,7 +12,8 @@ import app.game.catalog.ItemSetCatalog;
 import app.game.catalog.ItemTemplateCatalog;
 import app.game.catalog.LevelCatalog;
 import app.game.catalog.MonsterCatalog;
-import app.game.catalog.SpellCatalog;
+import app.game.catalog.PassiveSkillCatalog;
+import app.game.catalog.SkillCatalog;
 import app.game.catalog.WorldTemplateCatalog;
 
 @SpringBootApplication
@@ -25,21 +26,24 @@ public class ServerApplication {
     }
 
     // Ordre significatif : les sorts doivent être chargés avant les item templates,
-    // car ItemTemplateCatalog dénormalise les grantedSpellIds d'items.json en
+    // car ItemTemplateCatalog dénormalise les grantedSkillIds d'items.json en
     // objets
-    // Spell via SpellCatalog.getById dès le chargement (armes/armures magiques
+    // ActiveSkill via SkillCatalog.getById dès le chargement (armes/armures
+    // magiques
     // octroyant un sort à l'équipement). Les item templates doivent ensuite être
     // chargées avant materializeDefaultWorld(), puisque la création de personnage
     // (WorldInstance.createCharacter) apprend les sorts de niveau 1 via
-    // SpellCatalogHolder dès la création du monde par défaut.
+    // SkillCatalogHolder dès la création du monde par défaut.
     @Bean
     public ApplicationRunner warmupRunner(ItemTemplateCatalog itemTemplateCatalog, ItemSetCatalog itemSetCatalog,
-            SpellCatalog spellCatalog, LevelCatalog levelCatalog, MonsterCatalog monsterCatalog,
-            WorldTemplateCatalog worldTemplateCatalog, WorldInstanceService worldInstanceService) {
+            SkillCatalog skillCatalog, PassiveSkillCatalog passiveSkillCatalog, LevelCatalog levelCatalog,
+            MonsterCatalog monsterCatalog, WorldTemplateCatalog worldTemplateCatalog,
+            WorldInstanceService worldInstanceService) {
         return args -> {
             long start = System.currentTimeMillis();
             log.info("startup.warmup_started");
-            spellCatalog.warmSpells();
+            skillCatalog.warmSkills();
+            passiveSkillCatalog.warmPassiveSkills();
             itemTemplateCatalog.warmItemTemplates();
             itemSetCatalog.warmItemSets();
             worldTemplateCatalog.warmWorldTemplates();

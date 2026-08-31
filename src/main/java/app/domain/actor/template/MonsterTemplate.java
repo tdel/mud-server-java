@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import app.domain.Party;
-import app.domain.SpellElement;
+import app.domain.SkillElement;
 import app.domain.actor.Attribute;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.item.Item;
@@ -40,12 +40,12 @@ public class MonsterTemplate {
     private int speed;
     private int atkSpd;
     private int level;
-    private Map<SpellElement, Integer> elementalResistances;
+    private Map<SkillElement, Integer> elementalResistances;
 
     public MonsterTemplate(UUID id, String name, String description, int maxHealth, Map<Attribute, Integer> attributes,
             int naturalPAtk, int naturalMAtk, int naturalPDef, int naturalMDef, int accuracyBonus, int evasionBonus,
             int critBonus, int xpReward, int goldReward, List<LootTableEntry> lootTable, int presenceRadius, int speed,
-            int atkSpd, int level, Map<SpellElement, Integer> elementalResistances) {
+            int atkSpd, int level, Map<SkillElement, Integer> elementalResistances) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -144,7 +144,7 @@ public class MonsterTemplate {
         return level;
     }
 
-    public Map<SpellElement, Integer> getElementalResistances() {
+    public Map<SkillElement, Integer> getElementalResistances() {
         return elementalResistances;
     }
 

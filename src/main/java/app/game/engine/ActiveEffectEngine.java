@@ -13,16 +13,16 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import app.domain.Party;
-import app.domain.SpellEffectType;
+import app.domain.SkillEffectType;
 import app.domain.actor.AbstractCharacter;
-import app.domain.actor.component.ActiveEffect;
+import app.domain.ActiveEffect;
 import app.domain.actor.event.CharacterEffectExpired;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.PlayerLoadedInWorld;
-import app.domain.actor.event.SpellCast;
+import app.domain.actor.event.SkillCast;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.message.ingame.PartyMemberEffectExpired;
-import app.network.message.ingame.SpellModifierExpired;
+import app.network.message.ingame.SkillModifierExpired;
 
 @Component
 public class ActiveEffectEngine {
@@ -34,9 +34,9 @@ public class ActiveEffectEngine {
     private final Map<UUID, AbstractCharacter> tracked = new ConcurrentHashMap<>();
 
     @EventListener
-    void onSpellCast(SpellCast event) {
-        boolean modifier = event.spell().effect() == SpellEffectType.BUFF
-                || event.spell().effect() == SpellEffectType.DEBUFF;
+    void onSkillCast(SkillCast event) {
+        boolean modifier = event.activeSkill().effect() == SkillEffectType.BUFF
+                || event.activeSkill().effect() == SkillEffectType.DEBUFF;
         if (event.hit() && modifier) {
             register(event.target());
         }
@@ -44,14 +44,14 @@ public class ActiveEffectEngine {
 
     @EventListener
     void onCharacterEffectExpired(CharacterEffectExpired event) {
-        event.character().broadcast(new SpellModifierExpired(event.character().getName(), event.effect().spellName()),
+        event.character().broadcast(new SkillModifierExpired(event.character().getName(), event.effect().skillName()),
                 null);
 
         if (event.character() instanceof CharacterInstance character) {
             Party party = character.getParty();
             if (party != null) {
                 party.broadcast(new PartyMemberEffectExpired(character.getId(), character.getName(),
-                        event.effect().spellName()), character);
+                        event.effect().skillName()), character);
             }
         }
     }

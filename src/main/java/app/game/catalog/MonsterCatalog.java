@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import app.domain.SpellElement;
+import app.domain.SkillElement;
 import app.domain.actor.Attribute;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.actor.template.MonsterTemplate;
@@ -107,7 +107,7 @@ public class MonsterCatalog {
                 }
                 lootTable.add(new LootTableEntry(itemTemplate, entryDef.dropChance()));
             }
-            Map<SpellElement, Integer> elementalResistances = definition.elementalResistances() == null
+            Map<SkillElement, Integer> elementalResistances = definition.elementalResistances() == null
                     ? Map.of()
                     : definition.elementalResistances();
             templates.put(definition.id(),
@@ -128,6 +128,6 @@ public class MonsterCatalog {
             Map<Attribute, Integer> attributes, int naturalPAtk, int naturalMAtk, int naturalPDef, int naturalMDef,
             int accuracyBonus, int evasionBonus, int critBonus, int xpReward, int goldReward,
             List<LootTableEntryDefinition> lootTable, int presenceRadius, int speed, int atkSpd, int level,
-            Map<SpellElement, Integer> elementalResistances) {
+            Map<SkillElement, Integer> elementalResistances) {
     }
 }

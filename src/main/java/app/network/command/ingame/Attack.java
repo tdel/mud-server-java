@@ -4,7 +4,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import app.domain.actor.component.CharacterCombat;
+import app.domain.actor.system.CombatSystem;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.CommandHandler;
 import app.network.Connection;
@@ -42,16 +42,16 @@ public class Attack implements CommandHandler {
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
         switch (character.getCombat().attack(character.getCombat().getTarget())) {
-            case CharacterCombat.AttackOutcome.Success ignored -> {
+            case CombatSystem.AttackOutcome.Success ignored -> {
             }
-            case CharacterCombat.AttackOutcome.NoTarget ignored -> connection.send(new NoTargetSelected());
-            case CharacterCombat.AttackOutcome.TargetInvalid(var targetId) ->
+            case CombatSystem.AttackOutcome.NoTarget ignored -> connection.send(new NoTargetSelected());
+            case CombatSystem.AttackOutcome.TargetInvalid(var targetId) ->
                 connection.send(new TargetNotFound(targetId.toString()));
-            case CharacterCombat.AttackOutcome.ForbiddenZone(var zoneName) ->
+            case CombatSystem.AttackOutcome.ForbiddenZone(var zoneName) ->
                 connection.send(new CombatForbiddenHere(zoneName));
-            case CharacterCombat.AttackOutcome.OutOfRange(var targetName) ->
+            case CombatSystem.AttackOutcome.OutOfRange(var targetName) ->
                 connection.send(new AttackOutOfRange(targetName));
-            case CharacterCombat.AttackOutcome.OnCooldown(var remainingMs) ->
+            case CombatSystem.AttackOutcome.OnCooldown(var remainingMs) ->
                 connection.send(new AttackOnCooldown(remainingMs));
         }
     }

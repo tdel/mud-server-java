@@ -7,7 +7,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import app.domain.actor.component.ActiveEffect;
+import app.domain.ActiveEffect;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.CommandHandler;
 import app.network.Connection;
@@ -41,7 +41,7 @@ public class Effects implements CommandHandler {
 
     private EffectView toView(ActiveEffect effect, Instant now) {
         long secondsRemaining = Duration.between(now, effect.expiresAt()).toSeconds();
-        return new EffectView(effect.spellName(), effect.stat().label(), effect.amount(),
+        return new EffectView(effect.skillName(), effect.stat().label(), effect.amount(),
                 Math.max(0, secondsRemaining));
     }
 }

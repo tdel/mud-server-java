@@ -9,14 +9,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import app.domain.Spell;
+import app.domain.ActiveSkill;
 import app.domain.actor.AbstractCharacter;
-import app.domain.actor.component.SpellCasting;
+import app.domain.actor.system.SkillSystem;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.message.ingame.CastResult;
-import app.network.message.ingame.SpellCastAnnounced;
-import app.network.message.ingame.SpellProjectileFizzled;
-import app.network.message.ingame.SpellProjectileLaunched;
+import app.network.message.ingame.SkillCastAnnounced;
+import app.network.message.ingame.SkillProjectileFizzled;
+import app.network.message.ingame.SkillProjectileLaunched;
 
 /**
  * Le vol d'un projectile n'est pas simulé tick par tick (pas de collision, pas
@@ -33,20 +33,20 @@ public class ProjectileEngine {
 
     private final Map<UUID, InFlightProjectile> projectiles = new ConcurrentHashMap<>();
 
-    public void launch(AbstractCharacter caster, Spell spell, AbstractCharacter target,
-            SpellCasting.AttackRollOutcome roll) {
+    public void launch(AbstractCharacter caster, ActiveSkill activeSkill, AbstractCharacter target,
+            SkillSystem.AttackRollOutcome roll) {
         UUID projectileId = UUID.randomUUID();
         double distance = caster.getPosition().distanceTo(target.getPosition());
-        long travelDurationMs = Math.max(1, Math.round(distance / spell.projectileSpeed() * 1000));
+        long travelDurationMs = Math.max(1, Math.round(distance / activeSkill.projectileSpeed() * 1000));
         long impactAtNanos = System.nanoTime() + travelDurationMs * 1_000_000L;
 
-        projectiles.put(projectileId, new InFlightProjectile(caster, spell, target, roll, impactAtNanos));
-        log.debug("projectile.launched thread={} projectileId={} caster={} spell={} travelDurationMs={}",
-                Thread.currentThread().getName(), projectileId, caster.getId(), spell.name(), travelDurationMs);
+        projectiles.put(projectileId, new InFlightProjectile(caster, activeSkill, target, roll, impactAtNanos));
+        log.debug("projectile.launched thread={} projectileId={} caster={} activeSkill={} travelDurationMs={}",
+                Thread.currentThread().getName(), projectileId, caster.getId(), activeSkill.name(), travelDurationMs);
 
-        caster.broadcast(new SpellProjectileLaunched(projectileId, caster.getId(), caster.getName(), spell.id(),
-                spell.name(), caster.getPosition().x(), caster.getPosition().y(), target.getId(), target.getName(),
-                target.getPosition().x(), target.getPosition().y(), travelDurationMs), null);
+        caster.broadcast(new SkillProjectileLaunched(projectileId, caster.getId(), caster.getName(), activeSkill.id(),
+                activeSkill.name(), caster.getPosition().x(), caster.getPosition().y(), target.getId(),
+                target.getName(), target.getPosition().x(), target.getPosition().y(), travelDurationMs), null);
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
@@ -67,22 +67,23 @@ public class ProjectileEngine {
 
     private void resolveImpact(UUID projectileId, InFlightProjectile projectile) {
         AbstractCharacter caster = projectile.caster();
-        Spell spell = projectile.spell();
+        ActiveSkill activeSkill = projectile.activeSkill();
         AbstractCharacter target = projectile.target();
 
         if (target.getCurrentHealth() <= 0) {
-            caster.send(new SpellProjectileFizzled(projectileId, spell.id(), spell.name()));
+            caster.send(new SkillProjectileFizzled(projectileId, activeSkill.id(), activeSkill.name()));
             return;
         }
 
-        SpellCasting.CastOutcome outcome = caster.getSpellCasting().applyDamageOutcome(projectile.roll(), target);
+        SkillSystem.CastOutcome outcome = caster.getSkillSystem().applyDamageOutcome(projectile.roll(), target);
 
-        caster.send(new CastResult(spell.id(), spell.name(), target.getId(), target.getName(), outcome.selfHeal(),
-                outcome.hit(), outcome.amount(), outcome.targetHealthAfter(), outcome.targetMaxHealth(),
-                outcome.targetDefeated(), spell.manaCost(), caster.getCurrentMana(), caster.getMaxMana()));
+        caster.send(new CastResult(activeSkill.id(), activeSkill.name(), target.getId(), target.getName(),
+                outcome.selfHeal(), outcome.hit(), outcome.amount(), outcome.targetHealthAfter(),
+                outcome.targetMaxHealth(), outcome.targetDefeated(), activeSkill.manaCost(), caster.getCurrentMana(),
+                caster.getMaxMana()));
         caster.broadcast(
-                new SpellCastAnnounced(caster.getId(), caster.getName(), spell.id(), spell.name(), target.getId(),
-                        target.getName(), outcome.selfHeal(), outcome.hit(), outcome.amount(),
+                new SkillCastAnnounced(caster.getId(), caster.getName(), activeSkill.id(), activeSkill.name(),
+                        target.getId(), target.getName(), outcome.selfHeal(), outcome.hit(), outcome.amount(),
                         outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()),
                 caster instanceof CharacterInstance player ? player : null);
         if (outcome.targetDefeated()) {
@@ -90,7 +91,7 @@ public class ProjectileEngine {
         }
     }
 
-    public record InFlightProjectile(AbstractCharacter caster, Spell spell, AbstractCharacter target,
-            SpellCasting.AttackRollOutcome roll, long impactAtNanos) {
+    public record InFlightProjectile(AbstractCharacter caster, ActiveSkill activeSkill, AbstractCharacter target,
+            SkillSystem.AttackRollOutcome roll, long impactAtNanos) {
     }
 }

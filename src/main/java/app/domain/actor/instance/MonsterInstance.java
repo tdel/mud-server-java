@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import app.domain.SpellElement;
+import app.domain.SkillElement;
 import app.domain.actor.Attribute;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.template.MonsterTemplate;
@@ -154,7 +154,7 @@ public final class MonsterInstance extends AbstractCharacter {
     }
 
     @Override
-    protected Map<SpellElement, Integer> elementalResistanceMap() {
+    protected Map<SkillElement, Integer> elementalResistanceMap() {
         return requireTemplate().getElementalResistances();
     }
 

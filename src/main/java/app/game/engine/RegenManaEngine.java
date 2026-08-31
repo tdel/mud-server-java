@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import app.domain.actor.event.GamePlayerDied;
 import app.domain.actor.event.GamePlayerRespawned;
 import app.domain.actor.event.PlayerLoadedInWorld;
-import app.domain.actor.event.SpellCast;
+import app.domain.actor.event.SkillCast;
 import app.domain.actor.instance.CharacterInstance;
 
 @Component
@@ -26,7 +26,7 @@ public class RegenManaEngine {
     private final Map<UUID, CharacterInstance> regenerating = new ConcurrentHashMap<>();
 
     @EventListener
-    void onSpellCast(SpellCast event) {
+    void onSkillCast(SkillCast event) {
         if (event.caster() instanceof CharacterInstance character) {
             register(character);
         }

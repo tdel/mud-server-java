@@ -1,0 +1,13 @@
+package app.domain;
+
+import java.util.Set;
+import java.util.UUID;
+
+import app.domain.actor.CharacterClass;
+import app.domain.actor.ModifiedStat;
+
+public record ActiveSkill(UUID id, String name, int tier, String description, int requiredLevel, int manaCost,
+        int cooldownSeconds, int castingTimeMs, int range, SkillEffectType effect, int power, SkillElement element,
+        boolean projectile, int projectileSpeed, Set<CharacterClass> classes, ModifiedStat modifiedStat,
+        int durationSeconds) {
+}

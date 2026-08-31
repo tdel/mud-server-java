@@ -15,9 +15,10 @@ import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
 import app.domain.Account;
-import app.domain.Spell;
+import app.domain.PassiveSkill;
+import app.domain.ActiveSkill;
 import app.domain.actor.Attribute;
-import app.domain.actor.component.ActiveEffect;
+import app.domain.ActiveEffect;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.CharacterClass;
 import app.domain.actor.Gender;
@@ -26,7 +27,8 @@ import app.domain.actor.Subclass;
 import app.domain.map.Position;
 import app.domain.world.MapInstance;
 import app.domain.world.WorldInstance;
-import app.game.catalog.SpellCatalog;
+import app.game.catalog.PassiveSkillCatalog;
+import app.game.catalog.SkillCatalog;
 import app.game.combat.CombatFormulas;
 import app.persistence.jooq.tables.records.CharacterRecord;
 
@@ -34,16 +36,21 @@ import app.persistence.jooq.tables.records.CharacterRecord;
 public class CharacterDao {
 
     private final DSLContext dsl;
-    private final CharacterSpellDao characterSpellDao;
+    private final CharacterSkillDao characterSkillDao;
     private final CharacterActiveEffectDao characterActiveEffectDao;
-    private final SpellCatalog spellCatalog;
+    private final CharacterPassiveSkillDao characterPassiveSkillDao;
+    private final SkillCatalog skillCatalog;
+    private final PassiveSkillCatalog passiveSkillCatalog;
 
-    public CharacterDao(DSLContext dsl, CharacterSpellDao characterSpellDao,
-            CharacterActiveEffectDao characterActiveEffectDao, SpellCatalog spellCatalog) {
+    public CharacterDao(DSLContext dsl, CharacterSkillDao characterSkillDao,
+            CharacterActiveEffectDao characterActiveEffectDao, CharacterPassiveSkillDao characterPassiveSkillDao,
+            SkillCatalog skillCatalog, PassiveSkillCatalog passiveSkillCatalog) {
         this.dsl = dsl;
-        this.characterSpellDao = characterSpellDao;
+        this.characterSkillDao = characterSkillDao;
         this.characterActiveEffectDao = characterActiveEffectDao;
-        this.spellCatalog = spellCatalog;
+        this.characterPassiveSkillDao = characterPassiveSkillDao;
+        this.skillCatalog = skillCatalog;
+        this.passiveSkillCatalog = passiveSkillCatalog;
     }
 
     public void insert(CharacterInstance character) {
@@ -121,8 +128,10 @@ public class CharacterDao {
                 .orElseThrow(() -> new IllegalStateException(
                         "WorldInstance " + instance.getId() + " n'a aucune map de départ"));
 
-        Set<Spell> knownSpells = characterSpellDao.findSpellIdsByCharacter(record.getId()).stream()
-                .map(spellCatalog::getById).collect(Collectors.toSet());
+        Set<ActiveSkill> knownSkills = characterSkillDao.findSkillIdsByCharacter(record.getId()).stream()
+                .map(skillCatalog::getById).collect(Collectors.toSet());
+        Set<PassiveSkill> knownPassiveSkills = characterPassiveSkillDao.findPassiveSkillIdsByCharacter(record.getId())
+                .stream().map(passiveSkillCatalog::getById).collect(Collectors.toSet());
         Instant now = Instant.now();
         List<ActiveEffect> activeEffects = characterActiveEffectDao.findByCharacterId(record.getId()).stream()
                 .filter(effect -> effect.expiresAt().isAfter(now)).toList();
@@ -135,8 +144,8 @@ public class CharacterDao {
 
         CharacterInstance character = new CharacterInstance(record.getId(), account, record.getName(), map,
                 Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
-                maxHealth, attributes, record.getXp(), record.getGold(), maxMana, record.getCurrentMana(), knownSpells,
-                activeEffects, subclassTier1, subclassTier2);
+                maxHealth, attributes, record.getXp(), record.getGold(), maxMana, record.getCurrentMana(), knownSkills,
+                activeEffects, subclassTier1, subclassTier2, knownPassiveSkills);
         character.setWorldInstance(instance);
 
         Double posX = record.getPosX();

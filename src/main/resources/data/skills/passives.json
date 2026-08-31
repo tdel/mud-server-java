@@ -1,0 +1,37 @@
+[
+  {
+    "id": "865a7263-fb06-48ef-89c1-9ccbad268215",
+    "name": "Expertise D-Grade",
+    "description": "Permet de porter armes, armures et bijoux de grade D sans pénalité.",
+    "requiredLevel": 20,
+    "grantsGrade": "D"
+  },
+  {
+    "id": "79a543e2-24c5-49d4-b90d-8f7c45c929b5",
+    "name": "Expertise C-Grade",
+    "description": "Permet de porter armes, armures et bijoux de grade C sans pénalité.",
+    "requiredLevel": 40,
+    "grantsGrade": "C"
+  },
+  {
+    "id": "b056411d-5e82-49b0-833a-1c449615a5c9",
+    "name": "Expertise B-Grade",
+    "description": "Permet de porter armes, armures et bijoux de grade B sans pénalité.",
+    "requiredLevel": 52,
+    "grantsGrade": "B"
+  },
+  {
+    "id": "77086cb5-2ff2-45a0-8643-62a3c4ed0400",
+    "name": "Expertise A-Grade",
+    "description": "Permet de porter armes, armures et bijoux de grade A sans pénalité.",
+    "requiredLevel": 61,
+    "grantsGrade": "A"
+  },
+  {
+    "id": "b13d398e-07b4-430c-bfb8-ad7ddf816974",
+    "name": "Expertise S-Grade",
+    "description": "Permet de porter armes, armures et bijoux de grade S sans pénalité.",
+    "requiredLevel": 76,
+    "grantsGrade": "S"
+  }
+]

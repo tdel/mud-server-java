@@ -9,10 +9,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import app.domain.Party;
-import app.domain.SpellEffectType;
-import app.domain.actor.component.ActiveEffect;
+import app.domain.SkillEffectType;
+import app.domain.ActiveEffect;
 import app.domain.actor.event.CharacterEffectExpired;
-import app.domain.actor.event.SpellCast;
+import app.domain.actor.event.SkillCast;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.message.ingame.PartyMemberEffectApplied;
 import app.persistence.CharacterActiveEffectDao;
@@ -29,26 +29,25 @@ public class ActiveEffectPersistenceListener {
     }
 
     @EventListener
-    void onSpellCast(SpellCast event) {
-        boolean modifier = event.spell().effect() == SpellEffectType.BUFF
-                || event.spell().effect() == SpellEffectType.DEBUFF;
+    void onSkillCast(SkillCast event) {
+        boolean modifier = event.activeSkill().effect() == SkillEffectType.BUFF
+                || event.activeSkill().effect() == SkillEffectType.DEBUFF;
         if (!event.hit() || !modifier || !(event.target() instanceof CharacterInstance targetPlayer)) {
             return;
         }
-        characterActiveEffectDao.upsert(targetPlayer.getId(), new ActiveEffect(event.spell().id(), event.spell().name(),
-                event.spell().modifiedStat(), event.amount(), event.expiresAt()));
+        characterActiveEffectDao.upsert(targetPlayer.getId(), new ActiveEffect(event.activeSkill().id(),
+                event.activeSkill().name(), event.activeSkill().modifiedStat(), event.amount(), event.expiresAt()));
 
         Party party = targetPlayer.getParty();
         if (party != null) {
             long secondsRemaining = Duration.between(Instant.now(), event.expiresAt()).toSeconds();
-            party.broadcast(
-                    new PartyMemberEffectApplied(targetPlayer.getId(), targetPlayer.getName(), event.spell().name(),
-                            event.spell().modifiedStat().label(), event.amount(), Math.max(0, secondsRemaining)),
-                    targetPlayer);
+            party.broadcast(new PartyMemberEffectApplied(targetPlayer.getId(), targetPlayer.getName(),
+                    event.activeSkill().name(), event.activeSkill().modifiedStat().label(), event.amount(),
+                    Math.max(0, secondsRemaining)), targetPlayer);
         }
 
-        log.info("character.effect_applied character={} spell={} expiresAt={}", targetPlayer.getName(),
-                event.spell().name(), event.expiresAt());
+        log.info("character.effect_applied character={} activeSkill={} expiresAt={}", targetPlayer.getName(),
+                event.activeSkill().name(), event.expiresAt());
     }
 
     @EventListener
@@ -56,7 +55,8 @@ public class ActiveEffectPersistenceListener {
         if (!(event.character() instanceof CharacterInstance targetPlayer)) {
             return;
         }
-        characterActiveEffectDao.delete(targetPlayer.getId(), event.effect().spellId());
-        log.info("character.effect_expired character={} spell={}", targetPlayer.getName(), event.effect().spellName());
+        characterActiveEffectDao.delete(targetPlayer.getId(), event.effect().skillId());
+        log.info("character.effect_expired character={} activeSkill={}", targetPlayer.getName(),
+                event.effect().skillName());
     }
 }

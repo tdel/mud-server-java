@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import app.domain.Spell;
-import app.domain.SpellElement;
+import app.domain.ActiveSkill;
+import app.domain.SkillElement;
 import app.domain.actor.AbstractCharacter;
 import app.game.combat.CombatFormulas;
 
@@ -101,12 +101,12 @@ public class Item {
         return equipment().getAtkSpd();
     }
 
-    public Map<SpellElement, Integer> getElementalResistances() {
+    public Map<SkillElement, Integer> getElementalResistances() {
         return equipment().getElementalResistances();
     }
 
-    public List<Spell> getGrantedSpells() {
-        return equipment().getGrantedSpells();
+    public List<ActiveSkill> getGrantedSkills() {
+        return equipment().getGrantedSkills();
     }
 
     public String getSetId() {

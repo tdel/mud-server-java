@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import app.domain.Spell;
-import app.domain.SpellElement;
+import app.domain.ActiveSkill;
+import app.domain.SkillElement;
 
 public class EquipmentItem extends ItemTemplate {
 
@@ -19,14 +19,14 @@ public class EquipmentItem extends ItemTemplate {
     private int evasionBonus;
     private int critBonus;
     private int atkSpd;
-    private List<Spell> grantedSpells;
-    private Map<SpellElement, Integer> elementalResistances;
+    private List<ActiveSkill> grantedSkills;
+    private Map<SkillElement, Integer> elementalResistances;
     private String setId;
 
     public EquipmentItem(UUID id, String name, String description, ItemType type, int weight,
             ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus,
-            int critBonus, int atkSpd, int price, List<Spell> grantedSpells,
-            Map<SpellElement, Integer> elementalResistances, ItemGrade grade, String setId) {
+            int critBonus, int atkSpd, int price, List<ActiveSkill> grantedSkills,
+            Map<SkillElement, Integer> elementalResistances, ItemGrade grade, String setId) {
         super(id, name, description, type, weight, price, grade);
         this.armorCategory = armorCategory;
         this.pAtk = pAtk;
@@ -37,7 +37,7 @@ public class EquipmentItem extends ItemTemplate {
         this.evasionBonus = evasionBonus;
         this.critBonus = critBonus;
         this.atkSpd = atkSpd;
-        this.grantedSpells = grantedSpells == null ? List.of() : grantedSpells;
+        this.grantedSkills = grantedSkills == null ? List.of() : grantedSkills;
         this.elementalResistances = elementalResistances == null ? Map.of() : elementalResistances;
         this.setId = setId;
     }
@@ -114,19 +114,19 @@ public class EquipmentItem extends ItemTemplate {
         this.atkSpd = atkSpd;
     }
 
-    public List<Spell> getGrantedSpells() {
-        return grantedSpells;
+    public List<ActiveSkill> getGrantedSkills() {
+        return grantedSkills;
     }
 
-    public void setGrantedSpells(List<Spell> grantedSpells) {
-        this.grantedSpells = grantedSpells == null ? List.of() : grantedSpells;
+    public void setGrantedSkills(List<ActiveSkill> grantedSkills) {
+        this.grantedSkills = grantedSkills == null ? List.of() : grantedSkills;
     }
 
-    public Map<SpellElement, Integer> getElementalResistances() {
+    public Map<SkillElement, Integer> getElementalResistances() {
         return elementalResistances;
     }
 
-    public void setElementalResistances(Map<SpellElement, Integer> elementalResistances) {
+    public void setElementalResistances(Map<SkillElement, Integer> elementalResistances) {
         this.elementalResistances = elementalResistances == null ? Map.of() : elementalResistances;
     }
 
@@ -149,7 +149,7 @@ public class EquipmentItem extends ItemTemplate {
         return super.equals(other) && pAtk == other.pAtk && mAtk == other.mAtk && pDef == other.pDef
                 && mDef == other.mDef && accuracyBonus == other.accuracyBonus && evasionBonus == other.evasionBonus
                 && critBonus == other.critBonus && atkSpd == other.atkSpd && armorCategory == other.armorCategory
-                && Objects.equals(grantedSpells, other.grantedSpells)
+                && Objects.equals(grantedSkills, other.grantedSkills)
                 && Objects.equals(elementalResistances, other.elementalResistances)
                 && Objects.equals(setId, other.setId);
     }
@@ -157,14 +157,14 @@ public class EquipmentItem extends ItemTemplate {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), armorCategory, pAtk, mAtk, pDef, mDef, accuracyBonus, evasionBonus,
-                critBonus, atkSpd, grantedSpells, elementalResistances, setId);
+                critBonus, atkSpd, grantedSkills, elementalResistances, setId);
     }
 
     @Override
     public String toString() {
         return "EquipmentItem[" + super.toString() + ", armorCategory=" + armorCategory + ", pAtk=" + pAtk + ", mAtk="
                 + mAtk + ", pDef=" + pDef + ", mDef=" + mDef + ", accuracyBonus=" + accuracyBonus + ", evasionBonus="
-                + evasionBonus + ", critBonus=" + critBonus + ", atkSpd=" + atkSpd + ", grantedSpells=" + grantedSpells
+                + evasionBonus + ", critBonus=" + critBonus + ", atkSpd=" + atkSpd + ", grantedSkills=" + grantedSkills
                 + ", elementalResistances=" + elementalResistances + ", setId=" + setId + "]";
     }
 }

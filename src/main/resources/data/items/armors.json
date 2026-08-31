@@ -168,7 +168,7 @@
         "atkSpd": 0,
         "price": 200,
         "grade": "C",
-        "grantedSpellIds": [
+        "grantedSkillIds": [
             "2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f"
         ],
         "elementalResistances": {
@@ -191,7 +191,7 @@
         "atkSpd": 0,
         "price": 200,
         "grade": "C",
-        "grantedSpellIds": [
+        "grantedSkillIds": [
             "8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e"
         ],
         "elementalResistances": {

@@ -1,5 +1,7 @@
 package app.domain.actor.instance;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -12,13 +14,14 @@ import java.util.stream.Collectors;
 
 import app.domain.Account;
 import app.domain.Party;
+import app.domain.PassiveSkill;
 import app.domain.PendingPartyInvite;
-import app.domain.Spell;
-import app.domain.SpellElement;
+import app.domain.ActiveSkill;
+import app.domain.SkillElement;
 import app.domain.actor.*;
-import app.domain.actor.component.ActiveEffect;
-import app.domain.actor.component.CharacterCombat;
-import app.domain.actor.component.PlayerInventory;
+import app.domain.ActiveEffect;
+import app.domain.actor.system.CombatSystem;
+import app.domain.actor.system.InventorySystem;
 import app.domain.actor.event.CharacterChoseSubclass;
 import app.domain.actor.event.CharacterGainedXp;
 import app.domain.actor.event.CharacterLeveledUp;
@@ -52,6 +55,8 @@ import app.network.message.ingame.XpGained;
 
 public final class CharacterInstance extends AbstractCharacter {
 
+    private static final UUID GRADE_PENALTY_EFFECT_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
+
     private final Account account;
     private WorldInstance worldInstance;
     private Gender gender;
@@ -62,8 +67,8 @@ public final class CharacterInstance extends AbstractCharacter {
     private Subclass subclassTier2;
 
     private Connection connection;
-    private final PlayerInventory inventory;
-    private final CharacterCombat combat;
+    private final InventorySystem inventory;
+    private final CombatSystem combat;
     private Party party;
     private PendingPartyInvite pendingInvite;
     private int xp;
@@ -86,16 +91,17 @@ public final class CharacterInstance extends AbstractCharacter {
 
     public CharacterInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
-            Map<Attribute, Integer> attributes, int xp, int gold, int maxMana, int currentMana, Set<Spell> knownSpells,
-            List<ActiveEffect> activeEffects) {
+            Map<Attribute, Integer> attributes, int xp, int gold, int maxMana, int currentMana,
+            Set<ActiveSkill> knownSkills, List<ActiveEffect> activeEffects) {
         this(id, account, name, map, gender, race, characterClass, level, currentHealth, maxHealth, attributes, xp,
-                gold, maxMana, currentMana, knownSpells, activeEffects, null, null);
+                gold, maxMana, currentMana, knownSkills, activeEffects, null, null, Set.of());
     }
 
     public CharacterInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
-            Map<Attribute, Integer> attributes, int xp, int gold, int maxMana, int currentMana, Set<Spell> knownSpells,
-            List<ActiveEffect> activeEffects, Subclass subclassTier1, Subclass subclassTier2) {
+            Map<Attribute, Integer> attributes, int xp, int gold, int maxMana, int currentMana,
+            Set<ActiveSkill> knownSkills, List<ActiveEffect> activeEffects, Subclass subclassTier1,
+            Subclass subclassTier2, Set<PassiveSkill> knownPassiveSkills) {
         super(id, name, attributes, currentHealth, maxHealth);
         this.account = account;
         setCurrentMap(map);
@@ -107,12 +113,14 @@ public final class CharacterInstance extends AbstractCharacter {
         this.subclassTier1 = subclassTier1;
         this.subclassTier2 = subclassTier2;
         this.xp = xp;
-        this.inventory = new PlayerInventory(gold);
-        this.combat = new CharacterCombat(this);
+        this.inventory = new InventorySystem(gold);
+        this.combat = new CombatSystem(this);
         this.maxMana = maxMana;
         this.currentMana = currentMana;
-        knownSpells.forEach(getSpellCasting()::learn);
+        knownSkills.forEach(getSkillSystem()::learn);
         activeEffects.forEach(getActiveEffects()::apply);
+        knownPassiveSkills.forEach(getSkillSystem()::learn);
+        recomputeGradePenalty();
     }
 
     public Account getAccount() {
@@ -258,7 +266,7 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     @Override
-    protected Map<SpellElement, Integer> elementalResistanceMap() {
+    protected Map<SkillElement, Integer> elementalResistanceMap() {
         return inventory.getEquippedItems().stream().flatMap(item -> item.getElementalResistances().entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum));
     }
@@ -306,7 +314,7 @@ public final class CharacterInstance extends AbstractCharacter {
         this.connection = connection;
     }
 
-    public CharacterCombat getCombat() {
+    public CombatSystem getCombat() {
         return combat;
     }
 
@@ -327,8 +335,8 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     @Override
-    public Set<Spell> getGrantedSpells() {
-        return inventory.getEquippedItems().stream().flatMap(item -> item.getGrantedSpells().stream())
+    public Set<ActiveSkill> getGrantedSkills() {
+        return inventory.getEquippedItems().stream().flatMap(item -> item.getGrantedSkills().stream())
                 .collect(Collectors.toSet());
     }
 
@@ -505,12 +513,34 @@ public final class CharacterInstance extends AbstractCharacter {
 
         item.setSlot(slot);
         DomainEventPublisher.publish(new GamePlayerEquippedItem(this, item, slot, previousOccupants));
+        recomputeGradePenalty();
         return Optional.of(slot);
     }
 
     public void unequipItem(Item item) {
         item.setSlot(null);
         DomainEventPublisher.publish(new GamePlayerUnequippedItem(this, item));
+        recomputeGradePenalty();
+    }
+
+    // Marqueur unique dans ActiveEffects tant qu'au moins un objet équipé dépasse
+    // le grade débloqué par les compétences passives connues (SkillSystem). Pas
+    // de vraie expiration (le malus dure tant que l'objet reste équipé) : on
+    // recalcule/rafraîchit à chaque equip/unequip plutôt que de s'appuyer sur un
+    // minuteur. ModifiedStat.PATK/amount=-1 est un placeholder inerte, requis
+    // uniquement pour que ActiveEffect.category() retombe côté DEBUFF — le vrai
+    // calcul des malus par stat (p.atk, atk.spd, évasion, vitesse, régénération...)
+    // sera implémenté séparément, en lisant l'équipement + l'expertise directement
+    // plutôt que la valeur de cet effet.
+    private void recomputeGradePenalty() {
+        boolean overGraded = inventory.getEquippedItems().stream()
+                .anyMatch(item -> item.getGrade().ordinal() > getSkillSystem().unlockedGrade().ordinal());
+        if (overGraded) {
+            getActiveEffects().apply(new ActiveEffect(GRADE_PENALTY_EFFECT_ID, "Grade Penalty", ModifiedStat.PATK, -1,
+                    Instant.now().plus(Duration.ofDays(3650))));
+        } else {
+            getActiveEffects().remove(GRADE_PENALTY_EFFECT_ID);
+        }
     }
 
     public void discardItem(Item item) {
@@ -518,7 +548,7 @@ public final class CharacterInstance extends AbstractCharacter {
         DomainEventPublisher.publish(new ItemDiscarded(this, item));
     }
 
-    public PlayerInventory getInventory() {
+    public InventorySystem getInventory() {
         return inventory;
     }
 

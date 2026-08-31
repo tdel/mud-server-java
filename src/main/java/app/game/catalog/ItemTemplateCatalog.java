@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import app.domain.ConsumableEffect;
-import app.domain.Spell;
-import app.domain.SpellElement;
+import app.domain.ActiveSkill;
+import app.domain.SkillElement;
 import app.domain.item.ArmorCategory;
 import app.domain.item.ConsumableItem;
 import app.domain.item.EquipmentItem;
@@ -38,11 +38,11 @@ public class ItemTemplateCatalog {
     private final Map<UUID, ItemTemplate> templates = new ConcurrentHashMap<>();
 
     private final ObjectMapper objectMapper;
-    private final SpellCatalog spellCatalog;
+    private final SkillCatalog skillCatalog;
 
-    public ItemTemplateCatalog(ObjectMapper objectMapper, SpellCatalog spellCatalog) {
+    public ItemTemplateCatalog(ObjectMapper objectMapper, SkillCatalog skillCatalog) {
         this.objectMapper = objectMapper;
-        this.spellCatalog = spellCatalog;
+        this.skillCatalog = skillCatalog;
     }
 
     public void warmItemTemplates() {
@@ -66,10 +66,10 @@ public class ItemTemplateCatalog {
 
     private void loadEquipment(String resource) {
         for (EquipmentDefinition definition : readResource(resource, EquipmentDefinition.class)) {
-            List<Spell> grantedSpells = definition.grantedSpellIds() == null
+            List<ActiveSkill> grantedSkills = definition.grantedSkillIds() == null
                     ? List.of()
-                    : definition.grantedSpellIds().stream().map(spellCatalog::getById).toList();
-            Map<SpellElement, Integer> elementalResistances = definition.elementalResistances() == null
+                    : definition.grantedSkillIds().stream().map(skillCatalog::getById).toList();
+            Map<SkillElement, Integer> elementalResistances = definition.elementalResistances() == null
                     ? Map.of()
                     : definition.elementalResistances();
             ItemGrade grade = definition.grade() == null ? ItemGrade.NOGRADE : definition.grade();
@@ -78,7 +78,7 @@ public class ItemTemplateCatalog {
                     definition.type(), definition.weight(), definition.armorCategory(), definition.pAtk(),
                     definition.mAtk(), definition.pDef(), definition.mDef(), definition.accuracyBonus(),
                     definition.evasionBonus(), definition.critBonus(), definition.atkSpd(), definition.price(),
-                    grantedSpells, elementalResistances, grade, definition.setId());
+                    grantedSkills, elementalResistances, grade, definition.setId());
             templates.put(template.getId(), template);
         }
     }
@@ -120,8 +120,8 @@ public class ItemTemplateCatalog {
 
     private record EquipmentDefinition(UUID id, String name, String description, ItemType type, int weight,
             ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus,
-            int critBonus, int atkSpd, int price, List<UUID> grantedSpellIds,
-            Map<SpellElement, Integer> elementalResistances, ItemGrade grade, String setId) {
+            int critBonus, int atkSpd, int price, List<UUID> grantedSkillIds,
+            Map<SkillElement, Integer> elementalResistances, ItemGrade grade, String setId) {
     }
 
     private record OtherDefinition(UUID id, String name, String description, ItemType type, int weight, int price,

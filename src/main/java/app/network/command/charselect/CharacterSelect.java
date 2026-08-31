@@ -10,7 +10,7 @@ import app.network.CommandHandler;
 import app.domain.Account;
 import app.domain.actor.instance.CharacterInstance;
 import app.game.WorldInstanceService;
-import app.game.engine.SpellLearningEngine;
+import app.game.engine.SkillLearningEngine;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
@@ -26,14 +26,14 @@ public class CharacterSelect implements CommandHandler {
     private final WorldInstanceService worldInstanceService;
     private final ItemPersistenceListener itemService;
     private final CharSelectStatus charSelectStatus;
-    private final SpellLearningEngine spellLearningEngine;
+    private final SkillLearningEngine skillLearningEngine;
 
     public CharacterSelect(WorldInstanceService worldInstanceService, ItemPersistenceListener itemService,
-            CharSelectStatus charSelectStatus, SpellLearningEngine spellLearningEngine) {
+            CharSelectStatus charSelectStatus, SkillLearningEngine skillLearningEngine) {
         this.worldInstanceService = worldInstanceService;
         this.itemService = itemService;
         this.charSelectStatus = charSelectStatus;
-        this.spellLearningEngine = spellLearningEngine;
+        this.skillLearningEngine = skillLearningEngine;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class CharacterSelect implements CommandHandler {
 
         CharacterInstance loadedChar = character.get();
         connection.attachCharacter(loadedChar);
-        spellLearningEngine.reconcile(loadedChar);
+        skillLearningEngine.reconcile(loadedChar);
         loadedChar.getInventory().replaceItems(itemService.loadInventory(loadedChar));
         loadedChar.getWorldInstance().loadPlayer(loadedChar);
         MDC.put("character", loadedChar.getName());
