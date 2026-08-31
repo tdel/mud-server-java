@@ -26,7 +26,8 @@
             { "itemTemplateId": "019fa0a5-80c0-7035-9c2d-113b09a275df", "dropChance": 0.01 }
         ],
         "presenceRadius": 2,
-        "speed": 6,
+        "speed": 55,
+        "atkSpd": 300,
         "level": 1
     },
     {
@@ -53,7 +54,8 @@
         "goldReward": 1,
         "lootTable": [],
         "presenceRadius": 1,
-        "speed": 6,
+        "speed": 55,
+        "atkSpd": 300,
         "level": 1
     },
     {
@@ -80,7 +82,8 @@
         "goldReward": 2,
         "lootTable": [],
         "presenceRadius": 3,
-        "speed": 8,
+        "speed": 75,
+        "atkSpd": 300,
         "level": 1
     },
     {
@@ -110,7 +113,8 @@
             { "itemTemplateId": "019faec6-116d-723d-b04c-76d51a2a2cb7", "dropChance": 0.001 }
         ],
         "presenceRadius": 2,
-        "speed": 6,
+        "speed": 55,
+        "atkSpd": 300,
         "level": 1
     },
     {
@@ -141,7 +145,8 @@
             { "itemTemplateId": "019faec6-116d-723d-b04c-76d51a2a2cb7", "dropChance": 0.02 }
         ],
         "presenceRadius": 2,
-        "speed": 6,
+        "speed": 55,
+        "atkSpd": 300,
         "level": 1
     },
     {
@@ -171,7 +176,8 @@
             { "itemTemplateId": "019fcf0d-1f8f-7d01-8e4f-fd592812a1a7", "dropChance": 0.001 }
         ],
         "presenceRadius": 3,
-        "speed": 6,
+        "speed": 55,
+        "atkSpd": 300,
         "level": 3
     },
     {
@@ -201,7 +207,8 @@
             { "itemTemplateId": "019fcf0d-1f8d-7c4c-9275-33c4af4410a8", "dropChance": 0.0001 }
         ],
         "presenceRadius": 3,
-        "speed": 8,
+        "speed": 75,
+        "atkSpd": 300,
         "level": 2
     }
 ]

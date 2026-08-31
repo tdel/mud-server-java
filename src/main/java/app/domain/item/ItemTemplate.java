@@ -23,6 +23,7 @@ public class ItemTemplate {
     private int accuracyBonus;
     private int evasionBonus;
     private int critBonus;
+    private int atkSpd;
     private int price;
     private List<Spell> grantedSpells;
     private Map<SpellElement, Integer> elementalResistances;
@@ -31,8 +32,8 @@ public class ItemTemplate {
 
     public ItemTemplate(UUID id, String name, String description, ItemType type, int weight,
             ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus,
-            int critBonus, int price, List<Spell> grantedSpells, Map<SpellElement, Integer> elementalResistances,
-            ItemGrade grade, String setId) {
+            int critBonus, int atkSpd, int price, List<Spell> grantedSpells,
+            Map<SpellElement, Integer> elementalResistances, ItemGrade grade, String setId) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -46,6 +47,7 @@ public class ItemTemplate {
         this.accuracyBonus = accuracyBonus;
         this.evasionBonus = evasionBonus;
         this.critBonus = critBonus;
+        this.atkSpd = atkSpd;
         this.price = price;
         this.grantedSpells = grantedSpells == null ? List.of() : grantedSpells;
         this.elementalResistances = elementalResistances == null ? Map.of() : elementalResistances;
@@ -157,6 +159,14 @@ public class ItemTemplate {
         this.critBonus = critBonus;
     }
 
+    public int getAtkSpd() {
+        return atkSpd;
+    }
+
+    public void setAtkSpd(int atkSpd) {
+        this.atkSpd = atkSpd;
+    }
+
     public int getPrice() {
         return price;
     }
@@ -207,10 +217,10 @@ public class ItemTemplate {
         }
         return weight == other.weight && pAtk == other.pAtk && mAtk == other.mAtk && pDef == other.pDef
                 && mDef == other.mDef && accuracyBonus == other.accuracyBonus && evasionBonus == other.evasionBonus
-                && critBonus == other.critBonus && price == other.price && Objects.equals(id, other.id)
-                && Objects.equals(name, other.name) && Objects.equals(description, other.description)
-                && type == other.type && armorCategory == other.armorCategory
-                && Objects.equals(grantedSpells, other.grantedSpells)
+                && critBonus == other.critBonus && atkSpd == other.atkSpd && price == other.price
+                && Objects.equals(id, other.id) && Objects.equals(name, other.name)
+                && Objects.equals(description, other.description) && type == other.type
+                && armorCategory == other.armorCategory && Objects.equals(grantedSpells, other.grantedSpells)
                 && Objects.equals(elementalResistances, other.elementalResistances) && grade == other.grade
                 && Objects.equals(setId, other.setId);
     }
@@ -218,7 +228,7 @@ public class ItemTemplate {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, description, type, weight, armorCategory, pAtk, mAtk, pDef, mDef, accuracyBonus,
-                evasionBonus, critBonus, price, grantedSpells, elementalResistances, grade, setId);
+                evasionBonus, critBonus, atkSpd, price, grantedSpells, elementalResistances, grade, setId);
     }
 
     @Override
@@ -226,7 +236,8 @@ public class ItemTemplate {
         return "ItemTemplate[id=" + id + ", name=" + name + ", description=" + description + ", type=" + type
                 + ", weight=" + weight + ", armorCategory=" + armorCategory + ", pAtk=" + pAtk + ", mAtk=" + mAtk
                 + ", pDef=" + pDef + ", mDef=" + mDef + ", accuracyBonus=" + accuracyBonus + ", evasionBonus="
-                + evasionBonus + ", critBonus=" + critBonus + ", price=" + price + ", grantedSpells=" + grantedSpells
-                + ", elementalResistances=" + elementalResistances + ", grade=" + grade + ", setId=" + setId + "]";
+                + evasionBonus + ", critBonus=" + critBonus + ", atkSpd=" + atkSpd + ", price=" + price
+                + ", grantedSpells=" + grantedSpells + ", elementalResistances=" + elementalResistances + ", grade="
+                + grade + ", setId=" + setId + "]";
     }
 }

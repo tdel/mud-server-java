@@ -29,8 +29,6 @@ public final class CharacterCombat {
 
     private static final Logger log = LoggerFactory.getLogger(CharacterCombat.class);
 
-    public static final Duration ATTACK_COOLDOWN = Duration.ofSeconds(2);
-
     private final CharacterInstance character;
     private volatile AbstractCharacter target;
     private volatile Instant nextAttackAt = Instant.MIN;
@@ -121,7 +119,7 @@ public final class CharacterCombat {
             defeated = applyDamage(defender, damage);
         }
 
-        nextAttackAt = Instant.now().plus(ATTACK_COOLDOWN);
+        nextAttackAt = Instant.now().plus(CombatFormulas.attackCooldown(character.getEffectiveAtkSpd()));
 
         log.info(
                 "combat.attack_resolved attacker={} defender={} hit={} critical={} damage={} defenderHealthAfter={} defeated={}",

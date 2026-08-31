@@ -116,7 +116,7 @@ public class MonsterCatalog {
                             definition.naturalMAtk(), definition.naturalPDef(), definition.naturalMDef(),
                             definition.accuracyBonus(), definition.evasionBonus(), definition.critBonus(),
                             definition.xpReward(), definition.goldReward(), lootTable, definition.presenceRadius(),
-                            definition.speed(), definition.level(), elementalResistances));
+                            definition.speed(), definition.atkSpd(), definition.level(), elementalResistances));
         }
         log.info("monster.templates_loaded count={}", templates.size());
     }
@@ -127,7 +127,7 @@ public class MonsterCatalog {
     record MonsterTemplateDefinition(UUID id, String name, String description, int maxHealth,
             Map<Attribute, Integer> attributes, int naturalPAtk, int naturalMAtk, int naturalPDef, int naturalMDef,
             int accuracyBonus, int evasionBonus, int critBonus, int xpReward, int goldReward,
-            List<LootTableEntryDefinition> lootTable, int presenceRadius, int speed, int level,
+            List<LootTableEntryDefinition> lootTable, int presenceRadius, int speed, int atkSpd, int level,
             Map<SpellElement, Integer> elementalResistances) {
     }
 }

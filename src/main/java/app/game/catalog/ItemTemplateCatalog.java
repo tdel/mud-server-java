@@ -70,21 +70,22 @@ public class ItemTemplateCatalog {
             return new ConsumableItem(definition.id(), definition.name(), definition.description(), definition.type(),
                     definition.weight(), definition.armorCategory(), definition.pAtk(), definition.mAtk(),
                     definition.pDef(), definition.mDef(), definition.accuracyBonus(), definition.evasionBonus(),
-                    definition.critBonus(), definition.price(), grantedSpells, elementalResistances, grade,
-                    definition.setId(), definition.consumableEffect(), definition.effectDice());
+                    definition.critBonus(), definition.atkSpd(), definition.price(), grantedSpells,
+                    elementalResistances, grade, definition.setId(), definition.consumableEffect(),
+                    definition.effectDice());
         }
         if (definition.nutritionValue() != null) {
             return new FoodItem(definition.id(), definition.name(), definition.description(), definition.type(),
                     definition.weight(), definition.armorCategory(), definition.pAtk(), definition.mAtk(),
                     definition.pDef(), definition.mDef(), definition.accuracyBonus(), definition.evasionBonus(),
-                    definition.critBonus(), definition.price(), grantedSpells, elementalResistances, grade,
-                    definition.setId(), definition.nutritionValue());
+                    definition.critBonus(), definition.atkSpd(), definition.price(), grantedSpells,
+                    elementalResistances, grade, definition.setId(), definition.nutritionValue());
         }
         return new ItemTemplate(definition.id(), definition.name(), definition.description(), definition.type(),
                 definition.weight(), definition.armorCategory(), definition.pAtk(), definition.mAtk(),
                 definition.pDef(), definition.mDef(), definition.accuracyBonus(), definition.evasionBonus(),
-                definition.critBonus(), definition.price(), grantedSpells, elementalResistances, grade,
-                definition.setId());
+                definition.critBonus(), definition.atkSpd(), definition.price(), grantedSpells, elementalResistances,
+                grade, definition.setId());
     }
 
     public Map<UUID, ItemTemplate> templatesById() {
@@ -102,8 +103,8 @@ public class ItemTemplateCatalog {
 
     private record ItemTemplateDefinition(UUID id, String name, String description, ItemType type, int weight,
             ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus,
-            int critBonus, int price, List<UUID> grantedSpellIds, Map<SpellElement, Integer> elementalResistances,
-            ItemGrade grade, String setId, ConsumableEffect consumableEffect, String effectDice,
-            Integer nutritionValue) {
+            int critBonus, int atkSpd, int price, List<UUID> grantedSpellIds,
+            Map<SpellElement, Integer> elementalResistances, ItemGrade grade, String setId,
+            ConsumableEffect consumableEffect, String effectDice, Integer nutritionValue) {
     }
 }

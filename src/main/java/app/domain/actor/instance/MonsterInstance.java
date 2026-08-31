@@ -150,6 +150,11 @@ public final class MonsterInstance extends AbstractCharacter {
     }
 
     @Override
+    protected int baseAtkSpd() {
+        return requireTemplate().getAtkSpd();
+    }
+
+    @Override
     protected Map<SpellElement, Integer> elementalResistanceMap() {
         return requireTemplate().getElementalResistances();
     }

@@ -38,13 +38,14 @@ public class MonsterTemplate {
     private List<LootTableEntry> lootTable;
     private int presenceRadius;
     private int speed;
+    private int atkSpd;
     private int level;
     private Map<SpellElement, Integer> elementalResistances;
 
     public MonsterTemplate(UUID id, String name, String description, int maxHealth, Map<Attribute, Integer> attributes,
             int naturalPAtk, int naturalMAtk, int naturalPDef, int naturalMDef, int accuracyBonus, int evasionBonus,
             int critBonus, int xpReward, int goldReward, List<LootTableEntry> lootTable, int presenceRadius, int speed,
-            int level, Map<SpellElement, Integer> elementalResistances) {
+            int atkSpd, int level, Map<SpellElement, Integer> elementalResistances) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -62,6 +63,7 @@ public class MonsterTemplate {
         this.lootTable = lootTable;
         this.presenceRadius = presenceRadius;
         this.speed = speed;
+        this.atkSpd = atkSpd;
         this.level = level;
         this.elementalResistances = elementalResistances == null ? Map.of() : elementalResistances;
     }
@@ -202,6 +204,14 @@ public class MonsterTemplate {
         this.speed = speed;
     }
 
+    public int getAtkSpd() {
+        return atkSpd;
+    }
+
+    public void setAtkSpd(int atkSpd) {
+        this.atkSpd = atkSpd;
+    }
+
     public int getLevel() {
         return level;
     }
@@ -263,8 +273,8 @@ public class MonsterTemplate {
                 && naturalPDef == other.naturalPDef && naturalMDef == other.naturalMDef
                 && accuracyBonus == other.accuracyBonus && evasionBonus == other.evasionBonus
                 && critBonus == other.critBonus && xpReward == other.xpReward && goldReward == other.goldReward
-                && presenceRadius == other.presenceRadius && speed == other.speed && level == other.level
-                && Objects.equals(id, other.id) && Objects.equals(name, other.name)
+                && presenceRadius == other.presenceRadius && speed == other.speed && atkSpd == other.atkSpd
+                && level == other.level && Objects.equals(id, other.id) && Objects.equals(name, other.name)
                 && Objects.equals(description, other.description) && Objects.equals(attributes, other.attributes)
                 && Objects.equals(lootTable, other.lootTable)
                 && Objects.equals(elementalResistances, other.elementalResistances);
@@ -274,7 +284,7 @@ public class MonsterTemplate {
     public int hashCode() {
         return Objects.hash(id, name, description, maxHealth, attributes, naturalPAtk, naturalMAtk, naturalPDef,
                 naturalMDef, accuracyBonus, evasionBonus, critBonus, xpReward, goldReward, lootTable, presenceRadius,
-                speed, level, elementalResistances);
+                speed, atkSpd, level, elementalResistances);
     }
 
     @Override
@@ -284,8 +294,8 @@ public class MonsterTemplate {
                 + naturalMAtk + ", naturalPDef=" + naturalPDef + ", naturalMDef=" + naturalMDef + ", accuracyBonus="
                 + accuracyBonus + ", evasionBonus=" + evasionBonus + ", critBonus=" + critBonus + ", xpReward="
                 + xpReward + ", goldReward=" + goldReward + ", lootTable=" + lootTable + ", presenceRadius="
-                + presenceRadius + ", speed=" + speed + ", level=" + level + ", elementalResistances="
-                + elementalResistances + "]";
+                + presenceRadius + ", speed=" + speed + ", atkSpd=" + atkSpd + ", level=" + level
+                + ", elementalResistances=" + elementalResistances + "]";
     }
 
     public record LootTableEntry(ItemTemplate itemTemplate, double dropChance) {

@@ -17,9 +17,9 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
 
     public record Payload(UUID id, String name, String gender, int level, String characterClass, int currentHealth,
             int maxHealth, int healthRegenPerSecond, int currentMana, int maxMana, int manaRegenPerSecond, int pAtk,
-            int pDef, int mAtk, int mDef, int accuracy, int evasion, int criticalRate, AttributeScore strength,
-            AttributeScore dexterity, AttributeScore constitution, AttributeScore intelligence, AttributeScore wit,
-            AttributeScore men, String primaryAbility, List<String> savingThrowProficiencies,
+            int pDef, int mAtk, int mDef, int accuracy, int evasion, int criticalRate, int atkSpd,
+            AttributeScore strength, AttributeScore dexterity, AttributeScore constitution, AttributeScore intelligence,
+            AttributeScore wit, AttributeScore men, String primaryAbility, List<String> savingThrowProficiencies,
             List<String> skillProficiencies, double speed) {
     }
 
@@ -31,7 +31,7 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
                         c.getCurrentHealth(), c.getMaxHealth(), c.healthRegenAmountPerTick(), c.getCurrentMana(),
                         c.getMaxMana(), c.manaRegenAmountPerTick(), c.getEffectivePAtk(), c.getEffectivePDef(),
                         c.getEffectiveMAtk(), c.getEffectiveMDef(), c.getEffectiveAccuracy(), c.getEffectiveEvasion(),
-                        c.getEffectiveCriticalRate(), attributeScore(c, Attribute.STRENGTH),
+                        c.getEffectiveCriticalRate(), c.getEffectiveAtkSpd(), attributeScore(c, Attribute.STRENGTH),
                         attributeScore(c, Attribute.DEXTERITY), attributeScore(c, Attribute.CONSTITUTION),
                         attributeScore(c, Attribute.INTELLIGENCE), attributeScore(c, Attribute.WIT),
                         attributeScore(c, Attribute.MEN), c.getPrimaryAbility().label(),

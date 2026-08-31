@@ -13,22 +13,20 @@ public record MonsterStatBlock(MonsterInstance monster) implements OutputJsonMes
     }
 
     public record Payload(UUID id, String name, String description, int currentHealth, int maxHealth, int pAtk,
-            int pDef, int mAtk, int mDef, int accuracy, int evasion, int criticalRate, AttributeScore strength,
-            AttributeScore dexterity, AttributeScore constitution, AttributeScore intelligence, AttributeScore wit,
-            AttributeScore men) {
+            int pDef, int mAtk, int mDef, int accuracy, int evasion, int criticalRate, int atkSpd,
+            AttributeScore strength, AttributeScore dexterity, AttributeScore constitution, AttributeScore intelligence,
+            AttributeScore wit, AttributeScore men) {
     }
 
     @Override
     public void toJson(TcpJsonOutput output) {
         MonsterInstance m = monster;
-        output.write("MonsterStatBlock",
-                new Payload(m.getId(), m.getName(), m.getDescription(), m.getCurrentHealth(), m.getMaxHealth(),
-                        m.getEffectivePAtk(), m.getEffectivePDef(), m.getEffectiveMAtk(), m.getEffectiveMDef(),
-                        m.getEffectiveAccuracy(), m.getEffectiveEvasion(), m.getEffectiveCriticalRate(),
-                        attributeScore(m, Attribute.STRENGTH), attributeScore(m, Attribute.DEXTERITY),
-                        attributeScore(m, Attribute.CONSTITUTION), attributeScore(m, Attribute.INTELLIGENCE),
-                        attributeScore(m, Attribute.WIT), attributeScore(m, Attribute.MEN)),
-                false);
+        output.write("MonsterStatBlock", new Payload(m.getId(), m.getName(), m.getDescription(), m.getCurrentHealth(),
+                m.getMaxHealth(), m.getEffectivePAtk(), m.getEffectivePDef(), m.getEffectiveMAtk(),
+                m.getEffectiveMDef(), m.getEffectiveAccuracy(), m.getEffectiveEvasion(), m.getEffectiveCriticalRate(),
+                m.getEffectiveAtkSpd(), attributeScore(m, Attribute.STRENGTH), attributeScore(m, Attribute.DEXTERITY),
+                attributeScore(m, Attribute.CONSTITUTION), attributeScore(m, Attribute.INTELLIGENCE),
+                attributeScore(m, Attribute.WIT), attributeScore(m, Attribute.MEN)), false);
     }
 
     private static AttributeScore attributeScore(MonsterInstance m, Attribute attribute) {

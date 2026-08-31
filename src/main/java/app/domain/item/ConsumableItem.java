@@ -18,10 +18,11 @@ public class ConsumableItem extends ItemTemplate {
 
     public ConsumableItem(UUID id, String name, String description, ItemType type, int weight,
             ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus,
-            int critBonus, int price, List<Spell> grantedSpells, Map<SpellElement, Integer> elementalResistances,
-            ItemGrade grade, String setId, ConsumableEffect effect, String effectDice) {
+            int critBonus, int atkSpd, int price, List<Spell> grantedSpells,
+            Map<SpellElement, Integer> elementalResistances, ItemGrade grade, String setId, ConsumableEffect effect,
+            String effectDice) {
         super(id, name, description, type, weight, armorCategory, pAtk, mAtk, pDef, mDef, accuracyBonus, evasionBonus,
-                critBonus, price, grantedSpells, elementalResistances, grade, setId);
+                critBonus, atkSpd, price, grantedSpells, elementalResistances, grade, setId);
         this.effect = effect;
         this.effectDice = effectDice;
     }

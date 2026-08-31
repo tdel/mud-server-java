@@ -95,6 +95,10 @@ public class Item {
         return template.getCritBonus();
     }
 
+    public int getAtkSpd() {
+        return template.getAtkSpd();
+    }
+
     public Map<SpellElement, Integer> getElementalResistances() {
         return template.getElementalResistances();
     }

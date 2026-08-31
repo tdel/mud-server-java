@@ -33,7 +33,7 @@ import app.network.message.ingame.TargetNotFound;
 
 public abstract class AbstractCharacter extends AbstractObject {
 
-    public static final int DEFAULT_SPEED = 6;
+    public static final int DEFAULT_SPEED = 110;
 
     private final Map<Attribute, Integer> attributes;
     private final ActiveEffects activeEffects = new ActiveEffects();
@@ -99,6 +99,10 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     protected int critItemBonus() {
         return 0;
+    }
+
+    protected int baseAtkSpd() {
+        return CombatFormulas.BASE_ATK_SPD;
     }
 
     protected Map<SpellElement, Integer> elementalResistanceMap() {
@@ -182,6 +186,14 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public final int getEffectiveMagicalCriticalRate() {
         return getMagicalCriticalRate() + activeEffects.totalModifier(ModifiedStat.MCRIT);
+    }
+
+    public int getAtkSpd() {
+        return CombatFormulas.attackSpeed(baseAtkSpd(), getAttribute(Attribute.DEXTERITY));
+    }
+
+    public final int getEffectiveAtkSpd() {
+        return getAtkSpd() + activeEffects.totalModifier(ModifiedStat.ATKSPD) + setBonus(ModifiedStat.ATKSPD);
     }
 
     public ActiveEffects getActiveEffects() {

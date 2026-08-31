@@ -283,6 +283,11 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     @Override
+    protected int baseAtkSpd() {
+        return getEquippedWeapon().map(Item::getAtkSpd).orElse(CombatFormulas.BASE_ATK_SPD);
+    }
+
+    @Override
     protected int armorWeightPenalty() {
         return inventory.getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.CHEST).findFirst()
                 .map(item -> CombatFormulas.armorWeightPenalty(item.getArmorCategory())).orElse(0);

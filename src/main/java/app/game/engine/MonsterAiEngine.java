@@ -11,7 +11,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import app.domain.actor.component.CharacterCombat;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.MonsterAttacked;
 import app.domain.actor.instance.CharacterInstance;
@@ -20,6 +19,7 @@ import app.domain.map.Position;
 import app.domain.world.CollisionGrid;
 import app.domain.world.MapInstance;
 import app.domain.world.PeaceZone;
+import app.game.combat.CombatFormulas;
 import app.network.message.ingame.AttackResult;
 import app.network.message.ingame.CharacterMovementFinished;
 import app.network.message.ingame.CharacterMovementStarted;
@@ -122,7 +122,8 @@ public class MonsterAiEngine {
             MonsterInstance.MonsterAttackOutcome outcome = monster.attack(target);
             monster.broadcast(new AttackResult(monster.getId(), monster.getName(), target.getId(), target.getName(),
                     outcome.hit(), outcome.critical(), outcome.damage(), outcome.targetHealthAfter()), null);
-            monster.pursuit = state.withNextAttackAt(nowMillis + CharacterCombat.ATTACK_COOLDOWN.toMillis());
+            monster.pursuit = state.withNextAttackAt(
+                    nowMillis + CombatFormulas.attackCooldown(monster.getEffectiveAtkSpd()).toMillis());
             return;
         }
 

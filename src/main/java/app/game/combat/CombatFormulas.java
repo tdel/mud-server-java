@@ -1,5 +1,7 @@
 package app.game.combat;
 
+import java.time.Duration;
+
 import app.domain.item.ArmorCategory;
 
 /**
@@ -52,6 +54,8 @@ public final class CombatFormulas {
     public static final int MAX_DEBUFF_RESIST = 70;
     public static final double HP_REGEN_RATE = 0.02;
     public static final double MP_REGEN_RATE = 0.02;
+    public static final int BASE_ATK_SPD = 300;
+    public static final double ATK_SPD_DELAY_CONSTANT = 500_000.0;
 
     private CombatFormulas() {
     }
@@ -158,6 +162,20 @@ public final class CombatFormulas {
         double multiplier = 1.0 - resistScore * ELEMENT_RESIST_FACTOR;
         multiplier = Math.min(MAX_ELEMENT_MULTIPLIER, Math.max(MIN_ELEMENT_MULTIPLIER, multiplier));
         return Math.max(1, (int) Math.round(rawDamage * multiplier));
+    }
+
+    // atk.spd suit DEX comme p.crit/accuracy (même statBonus), pondéré par la
+    // vitesse d'attaque naturelle de l'arme (0 → dégénère en pur DEX, une arme
+    // "lourde" ayant un atkSpd de base plus faible qu'une dague).
+    public static int attackSpeed(int weaponAtkSpd, int dexterityScore) {
+        return Math.max(1, (int) Math.round(weaponAtkSpd * statBonus(dexterityScore)));
+    }
+
+    // Formule L2 canonique : délai entre deux coups (ms) = 500 000 / atk.spd —
+    // atk.spd=300 (base, à neutre) donne ~1666ms, plus l'atk.spd est haut, plus
+    // l'attaque est rapide.
+    public static Duration attackCooldown(int atkSpd) {
+        return Duration.ofMillis(Math.round(ATK_SPD_DELAY_CONSTANT / Math.max(1, atkSpd)));
     }
 
     public static int armorWeightPenalty(ArmorCategory category) {
