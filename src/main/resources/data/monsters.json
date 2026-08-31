@@ -1,8 +1,8 @@
 [
     {
         "id": "c1a6b8f0-3b3e-4b0a-9f0a-1e2d3c4b5a6f",
-        "name": "Gobelin",
-        "description": "Une petite créature verte armée d'une dague rouillée.",
+        "name": "Goblin",
+        "description": "A small green creature armed with a rusty dagger.",
         "maxHealth": 7,
         "naturalPAtk": 7,
         "naturalPDef": 7,
@@ -22,8 +22,14 @@
         },
         "goldReward": 5,
         "lootTable": [
-            { "itemTemplateId": "019fa0a5-80bf-7e84-87bf-5cf699c00315", "dropChance": 0.10 },
-            { "itemTemplateId": "019fa0a5-80c0-7035-9c2d-113b09a275df", "dropChance": 0.01 }
+            {
+                "itemTemplateId": "019fa0a5-80bf-7e84-87bf-5cf699c00315",
+                "dropChance": 0.1
+            },
+            {
+                "itemTemplateId": "019fa0a5-80c0-7035-9c2d-113b09a275df",
+                "dropChance": 0.01
+            }
         ],
         "presenceRadius": 2,
         "speed": 55,
@@ -32,8 +38,8 @@
     },
     {
         "id": "dcff9d89-1f33-41e2-8011-e5b3b7092f0d",
-        "name": "Rat géant",
-        "description": "Un rongeur de la taille d'un chien, aux dents jaunies et acérées.",
+        "name": "Giant Rat",
+        "description": "A dog-sized rodent with sharp, yellowed teeth.",
         "maxHealth": 7,
         "naturalPAtk": 4,
         "naturalPDef": 4,
@@ -60,8 +66,8 @@
     },
     {
         "id": "e6caeb0d-f861-401b-b0c1-c88e315097c5",
-        "name": "Loup",
-        "description": "Un loup gris au pelage hirsute, les babines retroussées.",
+        "name": "Wolf",
+        "description": "A gray wolf with a shaggy coat, lips curled back.",
         "maxHealth": 11,
         "naturalPAtk": 7,
         "naturalPDef": 5,
@@ -88,8 +94,8 @@
     },
     {
         "id": "7dfe22be-6147-45b3-bd07-89711810791d",
-        "name": "Squelette",
-        "description": "Un amas d'os articulés qui s'anime d'une lueur froide dans les orbites.",
+        "name": "Skeleton",
+        "description": "A jumble of articulated bones animated by a cold glow in its eye sockets.",
         "maxHealth": 13,
         "naturalPAtk": 7,
         "naturalPDef": 5,
@@ -109,8 +115,14 @@
         },
         "goldReward": 8,
         "lootTable": [
-            { "itemTemplateId": "019fa0a5-80c0-7035-9c2d-113b09a275df", "dropChance": 0.05 },
-            { "itemTemplateId": "019faec6-116d-723d-b04c-76d51a2a2cb7", "dropChance": 0.001 }
+            {
+                "itemTemplateId": "019fa0a5-80c0-7035-9c2d-113b09a275df",
+                "dropChance": 0.05
+            },
+            {
+                "itemTemplateId": "019faec6-116d-723d-b04c-76d51a2a2cb7",
+                "dropChance": 0.001
+            }
         ],
         "presenceRadius": 2,
         "speed": 55,
@@ -120,7 +132,7 @@
     {
         "id": "f6630034-a160-4ffc-888e-eb2fee9d9428",
         "name": "Bandit",
-        "description": "Un vagabond patibulaire, la main posée sur le pommeau d'une épée courte.",
+        "description": "A shifty-looking vagrant, hand resting on the pommel of a short sword.",
         "maxHealth": 11,
         "naturalPAtk": 7,
         "naturalPDef": 4,
@@ -140,9 +152,18 @@
         },
         "goldReward": 15,
         "lootTable": [
-            { "itemTemplateId": "019fa0a5-80c0-7035-9c2d-113b09a275df", "dropChance": 0.10 },
-            { "itemTemplateId": "019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518", "dropChance": 0.05 },
-            { "itemTemplateId": "019faec6-116d-723d-b04c-76d51a2a2cb7", "dropChance": 0.02 }
+            {
+                "itemTemplateId": "019fa0a5-80c0-7035-9c2d-113b09a275df",
+                "dropChance": 0.1
+            },
+            {
+                "itemTemplateId": "019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518",
+                "dropChance": 0.05
+            },
+            {
+                "itemTemplateId": "019faec6-116d-723d-b04c-76d51a2a2cb7",
+                "dropChance": 0.02
+            }
         ],
         "presenceRadius": 2,
         "speed": 55,
@@ -151,8 +172,8 @@
     },
     {
         "id": "026ce1a2-091d-4179-b715-65006480cfbe",
-        "name": "Araignée géante",
-        "description": "Une araignée de la taille d'un cheval, tissant une toile poisseuse entre les arbres.",
+        "name": "Giant Spider",
+        "description": "A horse-sized spider weaving a sticky web between the trees.",
         "maxHealth": 26,
         "naturalPAtk": 9,
         "naturalPDef": 6,
@@ -172,8 +193,14 @@
         },
         "goldReward": 20,
         "lootTable": [
-            { "itemTemplateId": "019fa0a5-80bf-7e84-87bf-5cf699c00315", "dropChance": 0.10 },
-            { "itemTemplateId": "019fcf0d-1f8f-7d01-8e4f-fd592812a1a7", "dropChance": 0.001 }
+            {
+                "itemTemplateId": "019fa0a5-80bf-7e84-87bf-5cf699c00315",
+                "dropChance": 0.1
+            },
+            {
+                "itemTemplateId": "019fcf0d-1f8f-7d01-8e4f-fd592812a1a7",
+                "dropChance": 0.001
+            }
         ],
         "presenceRadius": 3,
         "speed": 55,
@@ -182,8 +209,8 @@
     },
     {
         "id": "49e91691-3a13-4e2b-967f-bc1acf8cf03a",
-        "name": "Ours noir",
-        "description": "Un ours massif au pelage sombre, dressé sur ses pattes arrière.",
+        "name": "Black Bear",
+        "description": "A massive bear with a dark coat, reared up on its hind legs.",
         "maxHealth": 19,
         "naturalPAtk": 7,
         "naturalPDef": 3,
@@ -203,8 +230,14 @@
         },
         "goldReward": 10,
         "lootTable": [
-            { "itemTemplateId": "019fa0a5-80bf-7e84-87bf-5cf699c00315", "dropChance": 0.05 },
-            { "itemTemplateId": "019fcf0d-1f8d-7c4c-9275-33c4af4410a8", "dropChance": 0.0001 }
+            {
+                "itemTemplateId": "019fa0a5-80bf-7e84-87bf-5cf699c00315",
+                "dropChance": 0.05
+            },
+            {
+                "itemTemplateId": "019fcf0d-1f8d-7c4c-9275-33c4af4410a8",
+                "dropChance": 0.0001
+            }
         ],
         "presenceRadius": 3,
         "speed": 75,

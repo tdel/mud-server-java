@@ -1,7 +1,7 @@
 {
     "id": "f128833b-9a8a-4fb9-9796-33fd9413490d",
-    "name": "Le village et ses environs",
-    "description": "Le monde de départ : un village, sa taverne, et l'orée de la forêt.",
+    "name": "The Village and its Surroundings",
+    "description": "The starting world: a village, its tavern, and the edge of the forest.",
     "minPlayers": 1,
     "maxPlayers": 6
 }

@@ -1,25 +1,43 @@
 [
     {
         "id": "a3c8d0f2-5d5f-4d2c-9f2c-3f4e5d6c7b8a",
-        "name": "Aubergiste",
-        "description": "Un aubergiste jovial essuie un verre derrière son comptoir, contre le rempart est.",
+        "name": "Innkeeper",
+        "description": "A jovial innkeeper wipes a glass behind his counter, against the east wall.",
         "dialogue": {
-            "greeting": "Bonjour, je vends plusieurs choses intéressantes, veux-tu voir ?",
+            "greeting": "Hello, I sell several interesting things, would you like to see?",
             "options": [
-                { "label": "Voir ce que tu vends", "type": "SHOP" },
                 {
-                    "label": "D'où viens-tu ?",
-                    "type": "RESPONSE",
-                    "response": "Je viens des terres du nord, j'ai ouvert cette auberge il y a dix ans."
+                    "label": "See what you sell",
+                    "type": "SHOP"
                 },
-                { "label": "Au revoir", "type": "LEAVE" }
+                {
+                    "label": "Where are you from?",
+                    "type": "RESPONSE",
+                    "response": "I come from the northern lands, I opened this inn ten years ago."
+                },
+                {
+                    "label": "Goodbye",
+                    "type": "LEAVE"
+                }
             ],
             "shop": {
                 "items": [
-                    { "itemTemplateId": "019fa0a5-80bf-7e84-87bf-5cf699c00315", "price": 50 },
-                    { "itemTemplateId": "019fa0a5-80c0-7035-9c2d-113b09a275df", "price": 10 },
-                    { "itemTemplateId": "019fcf0d-1f8f-7d01-8e4f-fd592812a1a7", "price": 10 },
-                    { "itemTemplateId": "3a4a5836-051e-4641-aef8-7b6e6792322e", "price": 60 }
+                    {
+                        "itemTemplateId": "019fa0a5-80bf-7e84-87bf-5cf699c00315",
+                        "price": 50
+                    },
+                    {
+                        "itemTemplateId": "019fa0a5-80c0-7035-9c2d-113b09a275df",
+                        "price": 10
+                    },
+                    {
+                        "itemTemplateId": "019fcf0d-1f8f-7d01-8e4f-fd592812a1a7",
+                        "price": 10
+                    },
+                    {
+                        "itemTemplateId": "3a4a5836-051e-4641-aef8-7b6e6792322e",
+                        "price": 60
+                    }
                 ]
             }
         },
@@ -27,29 +45,59 @@
     },
     {
         "id": "dcb67f1e-b178-4062-8393-26abca9b0d66",
-        "name": "Forgeron",
-        "description": "Un forgeron trapu martèle une pièce de métal rougeoyante, contre le rempart ouest.",
+        "name": "Blacksmith",
+        "description": "A stocky blacksmith hammers a glowing piece of metal, against the west wall.",
         "dialogue": {
-            "greeting": "Une arme, une armure ? J'ai ce qu'il te faut.",
+            "greeting": "A weapon, some armor? I've got what you need.",
             "options": [
-                { "label": "Voir ce que tu vends", "type": "SHOP" },
                 {
-                    "label": "Depuis quand forges-tu ?",
-                    "type": "RESPONSE",
-                    "response": "Depuis que je sais tenir un marteau. Mon père avait la forge avant moi."
+                    "label": "See what you sell",
+                    "type": "SHOP"
                 },
-                { "label": "Au revoir", "type": "LEAVE" }
+                {
+                    "label": "How long have you been smithing?",
+                    "type": "RESPONSE",
+                    "response": "Since I could hold a hammer. My father had the forge before me."
+                },
+                {
+                    "label": "Goodbye",
+                    "type": "LEAVE"
+                }
             ],
             "shop": {
                 "items": [
-                    { "itemTemplateId": "019fa0a5-80c0-7035-9c2d-113b09a275df", "price": 10 },
-                    { "itemTemplateId": "ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd", "price": 2 },
-                    { "itemTemplateId": "019faec6-116d-723d-b04c-76d51a2a2cb7", "price": 10 },
-                    { "itemTemplateId": "019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518", "price": 10 },
-                    { "itemTemplateId": "019fcf0d-1f8c-7d43-9e98-a9944b4ccefe", "price": 50 },
-                    { "itemTemplateId": "019fcf0d-1f8d-7c4c-9275-33c4af4410a8", "price": 1500 },
-                    { "itemTemplateId": "019fcf0d-1f8f-7d01-8e4f-fd592812a1a7", "price": 10 },
-                    { "itemTemplateId": "019fe3f6-b1ee-78f8-a681-d288c7f87511", "price": 500 }
+                    {
+                        "itemTemplateId": "019fa0a5-80c0-7035-9c2d-113b09a275df",
+                        "price": 10
+                    },
+                    {
+                        "itemTemplateId": "ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd",
+                        "price": 2
+                    },
+                    {
+                        "itemTemplateId": "019faec6-116d-723d-b04c-76d51a2a2cb7",
+                        "price": 10
+                    },
+                    {
+                        "itemTemplateId": "019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518",
+                        "price": 10
+                    },
+                    {
+                        "itemTemplateId": "019fcf0d-1f8c-7d43-9e98-a9944b4ccefe",
+                        "price": 50
+                    },
+                    {
+                        "itemTemplateId": "019fcf0d-1f8d-7c4c-9275-33c4af4410a8",
+                        "price": 1500
+                    },
+                    {
+                        "itemTemplateId": "019fcf0d-1f8f-7d01-8e4f-fd592812a1a7",
+                        "price": 10
+                    },
+                    {
+                        "itemTemplateId": "019fe3f6-b1ee-78f8-a681-d288c7f87511",
+                        "price": 500
+                    }
                 ]
             }
         },
@@ -57,24 +105,30 @@
     },
     {
         "id": "b0362279-5a46-4461-9672-6f4e0b2cf7e0",
-        "name": "Garde du village",
-        "description": "Un garde en armure de cuir surveille la porte d'un œil sévère, lance à la main.",
+        "name": "Village Guard",
+        "description": "A guard in leather armor watches the gate with a stern eye, spear in hand.",
         "dialogue": {
-            "greeting": "Halte ! ... C'est bon, circule.",
+            "greeting": "Halt! ... Alright, move along.",
             "options": [
-                { "label": "Au revoir", "type": "LEAVE" }
+                {
+                    "label": "Goodbye",
+                    "type": "LEAVE"
+                }
             ]
         },
         "level": 2
     },
     {
         "id": "318a4b28-4aae-46fa-ab99-2bc62738f1c3",
-        "name": "Garde de la porte",
-        "description": "Un second garde, posté de l'autre côté de la porte, scrute la route au loin.",
+        "name": "Gate Guard",
+        "description": "A second guard, posted on the other side of the gate, scans the road in the distance.",
         "dialogue": {
-            "greeting": "Rien à signaler par ici. Passe ton chemin.",
+            "greeting": "Nothing to report here. Move along.",
             "options": [
-                { "label": "Au revoir", "type": "LEAVE" }
+                {
+                    "label": "Goodbye",
+                    "type": "LEAVE"
+                }
             ]
         },
         "level": 2
