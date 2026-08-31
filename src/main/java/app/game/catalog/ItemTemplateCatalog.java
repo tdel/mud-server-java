@@ -57,7 +57,7 @@ public class ItemTemplateCatalog {
             ItemGrade grade = definition.grade() == null ? ItemGrade.NOGRADE : definition.grade();
             ItemTemplate template = new ConsumableItem(definition.id(), definition.name(), definition.description(),
                     definition.type(), definition.weight(), definition.price(), grade, definition.consumableEffect(),
-                    definition.effectDice());
+                    definition.effectAmount());
             templates.put(template.getId(), template);
         }
     }
@@ -113,7 +113,7 @@ public class ItemTemplateCatalog {
     }
 
     private record ConsumableDefinition(UUID id, String name, String description, ItemType type, int weight, int price,
-            ItemGrade grade, ConsumableEffect consumableEffect, String effectDice) {
+            ItemGrade grade, ConsumableEffect consumableEffect, int effectAmount) {
     }
 
     private record EquipmentDefinition(UUID id, String name, String description, ItemType type, int weight,

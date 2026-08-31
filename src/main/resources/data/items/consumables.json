@@ -7,7 +7,7 @@
         "price": 50,
         "grade": "NOGRADE",
         "consumableEffect": "HEALING",
-        "effectDice": "2d4+2"
+        "effectAmount": 10
     },
     {
         "id": "6aeb7483-2694-4388-8c6b-f841fd5e48b4",
@@ -17,7 +17,7 @@
         "price": 150,
         "grade": "NOGRADE",
         "consumableEffect": "HEALING",
-        "effectDice": "4d4+4"
+        "effectAmount": 25
     },
     {
         "id": "f9083584-d5af-458c-bb9b-3ee7714452e3",
@@ -27,7 +27,7 @@
         "price": 700,
         "grade": "NOGRADE",
         "consumableEffect": "HEALING",
-        "effectDice": "8d4+8"
+        "effectAmount": 50
     },
     {
         "id": "58373f5a-2f2a-4039-8a52-05ac333dd57f",
@@ -37,7 +37,7 @@
         "price": 2700,
         "grade": "NOGRADE",
         "consumableEffect": "HEALING",
-        "effectDice": "10d4+20"
+        "effectAmount": 100
     },
     {
         "id": "3a4a5836-051e-4641-aef8-7b6e6792322e",
@@ -47,6 +47,6 @@
         "price": 60,
         "grade": "NOGRADE",
         "consumableEffect": "MANA_RESTORE",
-        "effectDice": "2d4+2"
+        "effectAmount": 10
     }
 ]

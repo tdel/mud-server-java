@@ -34,10 +34,6 @@ public enum CharacterClass {
         return definition.hitDie();
     }
 
-    public StartingGold startingGold() {
-        return definition.startingGold();
-    }
-
     public Set<Attribute> savingThrowProficiencies() {
         return definition.savingThrows();
     }
@@ -69,21 +65,16 @@ public enum CharacterClass {
         };
     }
 
-    public record StartingGold(String dice, int multiplier) {
+    private record Definition(int hitDie, Set<Attribute> savingThrows, Set<Skill> skills, Attribute primaryAbility,
+            Set<ArmorProficiency> armorProficiencies, int manaGainPerLevel, Map<Attribute, Integer> baseAttributes) {
     }
 
-    private record Definition(int hitDie, StartingGold startingGold, Set<Attribute> savingThrows, Set<Skill> skills,
-            Attribute primaryAbility, Set<ArmorProficiency> armorProficiencies, int manaGainPerLevel,
+    private record Json(CharacterClass name, int hitDie, List<Attribute> savingThrows, List<Skill> skills,
+            Attribute primaryAbility, List<ArmorProficiency> armorProficiencies, int manaGainPerLevel,
             Map<Attribute, Integer> baseAttributes) {
-    }
-
-    private record Json(CharacterClass name, int hitDie, String startingGoldDice, int startingGoldMultiplier,
-            List<Attribute> savingThrows, List<Skill> skills, Attribute primaryAbility,
-            List<ArmorProficiency> armorProficiencies, int manaGainPerLevel, Map<Attribute, Integer> baseAttributes) {
         Definition toDefinition() {
-            return new Definition(hitDie, new StartingGold(startingGoldDice, startingGoldMultiplier),
-                    Set.copyOf(savingThrows), Set.copyOf(skills), primaryAbility, Set.copyOf(armorProficiencies),
-                    manaGainPerLevel, Map.copyOf(baseAttributes));
+            return new Definition(hitDie, Set.copyOf(savingThrows), Set.copyOf(skills), primaryAbility,
+                    Set.copyOf(armorProficiencies), manaGainPerLevel, Map.copyOf(baseAttributes));
         }
     }
 }

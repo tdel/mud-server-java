@@ -24,7 +24,6 @@ import app.domain.actor.event.PlayerLoadedInWorld;
 import app.domain.actor.event.PlayerRemovedFromWorld;
 import app.domain.map.Position;
 import app.game.combat.CombatFormulas;
-import app.game.dice.DiceRoller;
 
 public class WorldInstance {
 
@@ -114,13 +113,10 @@ public class WorldInstance {
 
         int maxHealth = CombatFormulas.maxHealth(characterClass.hitDie(), scores.get(Attribute.CONSTITUTION), 1);
 
-        CharacterClass.StartingGold startingGold = characterClass.startingGold();
-        int gold = DiceRoller.roll(startingGold.dice()).total() * startingGold.multiplier();
-
         int startingMana = CombatFormulas.maxMana(characterClass.manaGainPerLevel(), scores.get(Attribute.MEN), 1);
 
         CharacterInstance character = new CharacterInstance(UUID.randomUUID(), account, name, startingMap, gender, race,
-                characterClass, 1, maxHealth, maxHealth, scores, 0, gold, startingMana, startingMana);
+                characterClass, 1, maxHealth, maxHealth, scores, 0, 0, startingMana, startingMana);
         character.setWorldInstance(this);
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));

@@ -7,18 +7,17 @@ import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.GamePlayerUsedManaPotion;
 import app.domain.actor.event.GamePlayerUsedPotion;
-import app.game.dice.DiceRoller;
 
 public class ConsumableItem extends ItemTemplate {
 
     private final ConsumableEffect effect;
-    private final String effectDice;
+    private final int effectAmount;
 
     public ConsumableItem(UUID id, String name, String description, ItemType type, int weight, int price,
-            ItemGrade grade, ConsumableEffect effect, String effectDice) {
+            ItemGrade grade, ConsumableEffect effect, int effectAmount) {
         super(id, name, description, type, weight, price, grade);
         this.effect = effect;
-        this.effectDice = effectDice;
+        this.effectAmount = effectAmount;
     }
 
     public void consume(CharacterInstance character, Item item) {
@@ -29,15 +28,13 @@ public class ConsumableItem extends ItemTemplate {
     }
 
     private void heal(CharacterInstance character, Item item) {
-        int amount = DiceRoller.roll(effectDice).total();
-        int healed = character.heal(amount);
+        int healed = character.heal(effectAmount);
         character.getInventory().removeItem(item);
         DomainEventPublisher.publish(new GamePlayerUsedPotion(character, item, healed));
     }
 
     private void restoreMana(CharacterInstance character, Item item) {
-        int amount = DiceRoller.roll(effectDice).total();
-        int restored = character.gainMana(amount);
+        int restored = character.gainMana(effectAmount);
         character.getInventory().removeItem(item);
         DomainEventPublisher.publish(new GamePlayerUsedManaPotion(character, item, restored));
     }
