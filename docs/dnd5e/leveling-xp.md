@@ -35,6 +35,8 @@ Each level grants one additional Hit Die. Either:
 
 If Constitution modifier increases retroactively, HP max increases by 1 per already-attained level for each point gained.
 
+**No longer the model used by this project** — max HP (and max mana) moved to a Lineage2-style CON/MEN-driven formula; see `docs/lineage2/combat.md`'s "Health & Mana pools".
+
 ## Ability Score Improvements
 
 At class-specific levels (commonly 4, 8, 12, 16, 19), a character may increase one ability score by 2, or two different scores by 1 each, capped at 20 per score (some class features can exceed this cap).

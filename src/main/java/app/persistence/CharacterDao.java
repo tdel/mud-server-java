@@ -27,6 +27,7 @@ import app.domain.map.Position;
 import app.domain.world.MapInstance;
 import app.domain.world.WorldInstance;
 import app.game.catalog.SpellCatalog;
+import app.game.combat.CombatFormulas;
 import app.persistence.jooq.tables.records.CharacterRecord;
 
 @Repository
@@ -132,10 +133,13 @@ public class CharacterDao {
         Subclass subclassTier1 = record.getSubclassTier1() == null ? null : Subclass.valueOf(record.getSubclassTier1());
         Subclass subclassTier2 = record.getSubclassTier2() == null ? null : Subclass.valueOf(record.getSubclassTier2());
 
+        int maxHealth = CombatFormulas.maxHealth(characterClass.hitDie(), record.getConstitution(), record.getLevel());
+        int maxMana = CombatFormulas.maxMana(characterClass.manaGainPerLevel(), record.getMen(), record.getLevel());
+
         CharacterInstance character = new CharacterInstance(record.getId(), account, record.getName(), map,
                 Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
-                record.getMaxHealth(), attributes, record.getXp(), record.getGold(), record.getShortRestCount(),
-                record.getMaxMana(), record.getCurrentMana(), knownSpells, activeEffects, subclassTier1, subclassTier2);
+                maxHealth, attributes, record.getXp(), record.getGold(), record.getShortRestCount(), maxMana,
+                record.getCurrentMana(), knownSpells, activeEffects, subclassTier1, subclassTier2);
         character.setWorldInstance(instance);
 
         Double posX = record.getPosX();

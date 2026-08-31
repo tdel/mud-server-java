@@ -8,7 +8,7 @@ This project is a game. It was originally built around DnD5e (Dungeon and Dragon
 
 **Exception (races/classes/leveling)**: races, classes and the level cap deliberately deviate from strict SRD compliance since the "human-only, Fighter/Mystic + subclasses" refactor — see the "Notes for this project" sections of `docs/dnd5e/races.md`, `classes.md`, `leveling-xp.md`. Character build/progression is closer to a Lineage2/Ragnarok Online style.
 
-**Exception (combat)**: combat itself (attack roll, damage, defense) is no longer DnD5e at all — it was replaced by a Lineage2-style model (p.atk/p.def/m.atk/m.def, accuracy/evasion, criticalRate; STR/DEX/CON/INT/WIT/MEN attributes, WIT/MEN being the renamed Wisdom/Charisma). See `docs/lineage2/README.md` for the current combat rules and `docs/dnd5e/combat.md`'s "Notes for this project" for what it replaced. Skill/saving-throw checks, HP-on-level-up, resting, and XP/leveling stay DnD5e-compliant (see `docs/dnd5e/`).
+**Exception (combat)**: combat itself (attack roll, damage, defense) is no longer DnD5e at all — it was replaced by a Lineage2-style model (p.atk/p.def/m.atk/m.def, accuracy/evasion, criticalRate; STR/DEX/CON/INT/WIT/MEN attributes, WIT/MEN being the renamed Wisdom/Charisma). Max HP/mana and their regen followed the same move (CON/MEN-driven, see `docs/lineage2/combat.md`'s "Health & Mana pools"). See `docs/lineage2/README.md` for the current combat rules and `docs/dnd5e/combat.md`'s "Notes for this project" for what it replaced. Skill/saving-throw checks, resting, and XP/leveling stay DnD5e-compliant (see `docs/dnd5e/`).
 
 ## DnD5e rules reference
 

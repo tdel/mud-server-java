@@ -98,6 +98,42 @@ class CombatFormulasTest {
     }
 
     @Test
+    void maxHealthGrowsWithConstitutionAndLevel() {
+        int lowConLowLevel = CombatFormulas.maxHealth(10, 8, 1);
+        int highConLowLevel = CombatFormulas.maxHealth(10, 18, 1);
+        int lowConHighLevel = CombatFormulas.maxHealth(10, 8, 20);
+
+        assertThat(highConLowLevel).isGreaterThan(lowConLowLevel);
+        assertThat(lowConHighLevel).isGreaterThan(lowConLowLevel);
+        assertThat(CombatFormulas.maxHealth(10, 1, 1)).isGreaterThanOrEqualTo(1);
+    }
+
+    @Test
+    void maxManaGrowsWithMenAndLevel() {
+        int lowMenLowLevel = CombatFormulas.maxMana(15, 8, 1);
+        int highMenLowLevel = CombatFormulas.maxMana(15, 18, 1);
+        int lowMenHighLevel = CombatFormulas.maxMana(15, 8, 20);
+
+        assertThat(highMenLowLevel).isGreaterThan(lowMenLowLevel);
+        assertThat(lowMenHighLevel).isGreaterThan(lowMenLowLevel);
+        assertThat(CombatFormulas.maxMana(0, 10, 1)).isGreaterThanOrEqualTo(0);
+    }
+
+    @Test
+    void healthAndManaRegenPerTickAreNeverBelowOneAndGrowWithScore() {
+        assertThat(CombatFormulas.healthRegenPerTick(1, 1)).isGreaterThanOrEqualTo(1);
+        assertThat(CombatFormulas.manaRegenPerTick(1, 1)).isGreaterThanOrEqualTo(1);
+
+        int lowCon = CombatFormulas.healthRegenPerTick(1000, 8);
+        int highCon = CombatFormulas.healthRegenPerTick(1000, 18);
+        assertThat(highCon).isGreaterThan(lowCon);
+
+        int lowMen = CombatFormulas.manaRegenPerTick(1000, 8);
+        int highMen = CombatFormulas.manaRegenPerTick(1000, 18);
+        assertThat(highMen).isGreaterThan(lowMen);
+    }
+
+    @Test
     void applyElementalResistanceReducesDamageWithPositiveResist() {
         int reduced = CombatFormulas.applyElementalResistance(100, 20);
         assertThat(reduced).isLessThan(100);

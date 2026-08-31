@@ -23,6 +23,7 @@ import app.domain.actor.event.NewGamePlayerCreated;
 import app.domain.actor.event.PlayerLoadedInWorld;
 import app.domain.actor.event.PlayerRemovedFromWorld;
 import app.domain.map.Position;
+import app.game.combat.CombatFormulas;
 import app.game.dice.DiceRoller;
 
 public class WorldInstance {
@@ -115,15 +116,12 @@ public class WorldInstance {
             scores.merge(bonus.getKey(), bonus.getValue(), Integer::sum);
         }
 
-        // 5e niveau 1 : PV max = valeur MAXIMALE du dé de vie de la classe (pas un jet)
-        // + modificateur de CON.
-        int constitutionModifier = Math.floorDiv(scores.get(Attribute.CONSTITUTION) - 10, 2);
-        int maxHealth = Math.max(1, characterClass.hitDie() + constitutionModifier);
+        int maxHealth = CombatFormulas.maxHealth(characterClass.hitDie(), scores.get(Attribute.CONSTITUTION), 1);
 
         CharacterClass.StartingGold startingGold = characterClass.startingGold();
         int gold = DiceRoller.roll(startingGold.dice()).total() * startingGold.multiplier();
 
-        int startingMana = characterClass.manaGainPerLevel();
+        int startingMana = CombatFormulas.maxMana(characterClass.manaGainPerLevel(), scores.get(Attribute.MEN), 1);
 
         CharacterInstance character = new CharacterInstance(UUID.randomUUID(), account, name, startingMap, gender, race,
                 characterClass, 1, maxHealth, maxHealth, scores, 0, gold, 0, startingMana, startingMana);

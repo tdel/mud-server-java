@@ -11,4 +11,4 @@ These formulas are **not** an exact reproduction of Lineage2's retail client —
 
 ## What's still DnD5e
 
-Skill/saving-throw checks (`CharacterInstance.check`/`save`/`checkOrSave`), the `(score-10)/2` ability modifier used for HP-on-level-up and those checks, short/long rest rules, and XP/leveling progression are unchanged — only the combat resolution itself (attack, spell damage, defense) moved to this model. See `docs/dnd5e/README.md` for those.
+Skill/saving-throw checks (`CharacterInstance.check`/`save`/`checkOrSave`), the `(score-10)/2` ability modifier those checks use, short/long rest rules, and XP/leveling progression are unchanged — only combat resolution (attack, spell damage, defense) and, since [combat.md](combat.md)'s "Health & Mana pools" section, max HP/mana and their regen moved to this model. See `docs/dnd5e/README.md` for those.

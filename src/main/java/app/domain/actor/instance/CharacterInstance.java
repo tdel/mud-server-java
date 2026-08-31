@@ -403,11 +403,11 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     public int healthRegenAmountPerTick() {
-        return 1 + level / 5;
+        return CombatFormulas.healthRegenPerTick(getMaxHealth(), getAttribute(Attribute.CONSTITUTION));
     }
 
     public int manaRegenAmountPerTick() {
-        return Math.max(1, 1 + getModifier(characterClass.primaryAbility()));
+        return CombatFormulas.manaRegenPerTick(getMaxMana(), getAttribute(Attribute.MEN));
     }
 
     public void regenerate(int hpAmount, int manaAmount) {
@@ -427,19 +427,18 @@ public final class CharacterInstance extends AbstractCharacter {
         DomainEventPublisher.publish(new CharacterGainedXp(this, amount));
     }
 
-    public int hitDieRecovery() {
-        int hitDie = characterClass.hitDie();
-        return Math.max(1, hitDie / 2 + 1 + getModifier(Attribute.CONSTITUTION));
-    }
-
     public void applyLevelUp() {
-        int hpGain = hitDieRecovery();
         level++;
-        setMaxHealth(getMaxHealth() + hpGain);
+
+        int newMaxHealth = CombatFormulas.maxHealth(characterClass.hitDie(), getAttribute(Attribute.CONSTITUTION),
+                level);
+        int hpGain = newMaxHealth - getMaxHealth();
+        setMaxHealth(newMaxHealth);
         setCurrentHealth(getCurrentHealth() + hpGain);
 
-        int manaGain = characterClass.manaGainPerLevel();
-        maxMana += manaGain;
+        int newMaxMana = CombatFormulas.maxMana(characterClass.manaGainPerLevel(), getAttribute(Attribute.MEN), level);
+        int manaGain = newMaxMana - maxMana;
+        maxMana = newMaxMana;
         currentMana += manaGain;
 
         DomainEventPublisher.publish(new CharacterLeveledUp(this, level, hpGain));

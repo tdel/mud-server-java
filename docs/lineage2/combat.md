@@ -23,6 +23,32 @@ Each stat has an `effective` variant (`getEffectivePAtk()`, etc.) that adds any 
 
 `AbstractCharacter` exposes these via 8 `protected` hooks (`basePAtk()`, `baseMAtk()`, `basePDefSum()`, `baseMDefSum()`, `accuracyItemBonus()`, `evasionItemBonus()`, `armorWeightPenalty()`, `critItemBonus()`) with neutral defaults; `CharacterInstance` sums its equipped items, `MonsterInstance` reads its `MonsterTemplate`'s natural values (monsters keep a full STR/DEX/CON/INT/WIT/MEN block, same as players — their "weapon+armor" is just baked into the template's natural pAtk/pDef/etc.).
 
+## Health & Mana pools
+
+Like the derived combat stats above, max HP and max mana follow CON/MEN via `statBonus`, but
+scale **linearly with level** instead of using `levelFactor()`: HP/mana have no equipment
+lever to carry progression the way p.atk/p.def do (no item grants a flat HP/mana bonus in this
+project), so level itself has to drive growth directly, with CON/MEN modulating it as a build
+choice — same relationship as CON→P.Def and MEN→M.Def, just applied to the vitals pool instead
+of a defense stat.
+
+| Stat | Formula | Driven by |
+|---|---|---|
+| Max HP | `classHitDie * level * statBonus(CON)` | class (`hitDie`), level, CON |
+| Max Mana | `classManaGainPerLevel * level * statBonus(MEN)` | class (`manaGainPerLevel`), level, MEN |
+| HP regen/tick | `maxHealth * HP_REGEN_RATE * statBonus(CON)` | max HP, CON |
+| Mana regen/tick | `maxMana * MP_REGEN_RATE * statBonus(MEN)` | max mana, MEN |
+
+`classHitDie`/`classManaGainPerLevel` are the same `CharacterClass` fields the old DnD5e
+model used (hit die, mana-per-level) — reused here purely as a per-class base multiplier, no
+JSON change needed. Unlike p.atk/p.def, `maxHealth`/`maxMana` stay **persisted fields**
+(`CharacterInstance`, recomputed at character creation, level-up, and on every DB load in
+`CharacterDao.toDomain`) rather than recomputed on every read: CON/MEN never change after
+character creation in this project (no stat allocation, no attribute-granting gear), so
+recomputing only at those three points is equivalent to a fully derived stat, without the
+larger refactor a truly always-derived HP/mana would require (see `CombatFormulas.maxHealth`/
+`maxMana`/`healthRegenPerTick`/`manaRegenPerTick`).
+
 ## Resolving a hit
 
 Used identically for a melee attack and a damage spell (physical uses P.Atk/P.Def, magic uses M.Atk/M.Def):

@@ -50,6 +50,8 @@ public final class CombatFormulas {
     public static final int BASE_DEBUFF_RESIST = 5;
     public static final double DEBUFF_RESIST_FACTOR = 3.0;
     public static final int MAX_DEBUFF_RESIST = 70;
+    public static final double HP_REGEN_RATE = 0.02;
+    public static final double MP_REGEN_RATE = 0.02;
 
     private CombatFormulas() {
     }
@@ -76,6 +78,27 @@ public final class CombatFormulas {
 
     public static int magicalDefense(int armorMDefSum, int menScore) {
         return Math.max(1, (int) Math.round(armorMDefSum + statBonus(menScore) * BASE_DEF_FACTOR));
+    }
+
+    // Pas d'équivalent "objet" pour HP/mana dans ce projet (contrairement à
+    // p.atk/p.def) : le niveau doit rester le moteur direct de la croissance, d'où
+    // un facteur linéaire en level plutôt que le levelFactor() ci-dessus
+    // (+2%/niveau
+    // seulement, calibré pour un système où l'équipement porte la progression).
+    public static int maxHealth(int hitDie, int constitutionScore, int level) {
+        return Math.max(1, (int) Math.round(hitDie * level * statBonus(constitutionScore)));
+    }
+
+    public static int maxMana(int manaGainPerLevel, int menScore, int level) {
+        return Math.max(0, (int) Math.round(manaGainPerLevel * level * statBonus(menScore)));
+    }
+
+    public static int healthRegenPerTick(int maxHealth, int constitutionScore) {
+        return Math.max(1, (int) Math.round(maxHealth * HP_REGEN_RATE * statBonus(constitutionScore)));
+    }
+
+    public static int manaRegenPerTick(int maxMana, int menScore) {
+        return Math.max(1, (int) Math.round(maxMana * MP_REGEN_RATE * statBonus(menScore)));
     }
 
     public static int accuracy(int level, int dexterityScore, int accuracyItemBonus) {
