@@ -3,6 +3,7 @@ package app.game.combat;
 import java.time.Duration;
 
 import app.domain.item.ArmorCategory;
+import app.game.dice.DiceRoller;
 
 /**
  * Formules de combat façon Lineage2 : stats dérivées (p.atk/p.def/m.atk/m.def
@@ -119,23 +120,24 @@ public final class CombatFormulas {
 
     public static int criticalRate(int dexterityScore, int critItemBonus) {
         int raw = (int) Math.round(BASE_CRIT_RATE + statBonus(dexterityScore) * ACCURACY_FACTOR + critItemBonus);
-        return Math.min(MAX_CRIT_RATE, Math.max(MIN_CRIT_RATE, raw));
+        return Math.clamp(raw, MIN_CRIT_RATE, MAX_CRIT_RATE);
     }
 
     // Miroir magique de criticalRate() : DEX pilote le critique physique, WIT le
     // critique magique.
     public static int magicCriticalRate(int witScore, int critItemBonus) {
         int raw = (int) Math.round(BASE_CRIT_RATE + statBonus(witScore) * ACCURACY_FACTOR + critItemBonus);
-        return Math.min(MAX_CRIT_RATE, Math.max(MIN_CRIT_RATE, raw));
+        return Math.clamp(raw, MIN_CRIT_RATE, MAX_CRIT_RATE);
     }
 
     public static double hitChance(int accuracy, int evasion) {
         double chance = (double) accuracy / (accuracy + evasion);
-        return Math.min(MAX_HIT_CHANCE, Math.max(MIN_HIT_CHANCE, chance));
+        return Math.clamp(chance, MIN_HIT_CHANCE, MAX_HIT_CHANCE);
     }
 
-    public static int resolveDamage(int attackerAtk, int defenderDef, double variance, boolean critical) {
-        double base = attackerAtk * ((double) attackerAtk / (attackerAtk + defenderDef)) * variance;
+    public static int resolveDamage(int attackerAtk, int defenderDef, boolean critical) {
+        double base = attackerAtk * ((double) attackerAtk / (attackerAtk + defenderDef))
+                * DiceRoller.randomVariance(0.9, 1.1);
         if (critical) {
             base *= CRITICAL_MULTIPLIER;
         }
@@ -147,7 +149,7 @@ public final class CombatFormulas {
     // dégâts physiques.
     public static double debuffResistChance(int menScore) {
         int raw = (int) Math.round(BASE_DEBUFF_RESIST + statBonus(menScore) * DEBUFF_RESIST_FACTOR);
-        return Math.min(MAX_DEBUFF_RESIST, Math.max(0, raw)) / 100.0;
+        return Math.clamp(raw, 0, MAX_DEBUFF_RESIST) / 100.0;
     }
 
     // N'applique le bonus d'enchant que si l'item porte déjà ce stat (baseStat >
@@ -160,7 +162,7 @@ public final class CombatFormulas {
     // négatif (vulnérabilité) les amplifie jusqu'à x2 — jamais en dessous de 1.
     public static int applyElementalResistance(int rawDamage, int resistScore) {
         double multiplier = 1.0 - resistScore * ELEMENT_RESIST_FACTOR;
-        multiplier = Math.min(MAX_ELEMENT_MULTIPLIER, Math.max(MIN_ELEMENT_MULTIPLIER, multiplier));
+        multiplier = Math.clamp(multiplier, MIN_ELEMENT_MULTIPLIER, MAX_ELEMENT_MULTIPLIER);
         return Math.max(1, (int) Math.round(rawDamage * multiplier));
     }
 

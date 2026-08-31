@@ -72,8 +72,7 @@ public final class MonsterInstance extends AbstractCharacter {
 
         if (hit) {
             critical = DiceRoller.rollChance(getEffectiveCriticalRate() / 100.0);
-            double variance = DiceRoller.randomVariance(0.9, 1.1);
-            damage = CombatFormulas.resolveDamage(getEffectivePAtk(), defender.getEffectivePDef(), variance, critical);
+            damage = CombatFormulas.resolveDamage(getEffectivePAtk(), defender.getEffectivePDef(), critical);
             healthAfter = Math.max(0, defender.getCurrentHealth() - damage);
             defeated = defender.takeDamage(damage, this);
         }

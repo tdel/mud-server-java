@@ -97,9 +97,7 @@ public final class CharacterCombat {
 
         if (hit) {
             critical = DiceRoller.rollChance(character.getEffectiveCriticalRate() / 100.0);
-            double variance = DiceRoller.randomVariance(0.9, 1.1);
-            damage = CombatFormulas.resolveDamage(character.getEffectivePAtk(), defender.getEffectivePDef(), variance,
-                    critical);
+            damage = CombatFormulas.resolveDamage(character.getEffectivePAtk(), defender.getEffectivePDef(), critical);
             healthAfter = Math.max(0, defender.getCurrentHealth() - damage);
             defeated = applyDamage(defender, damage);
         }

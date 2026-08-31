@@ -90,12 +90,11 @@ public final class SpellCasting {
             return new AttackRollOutcome(false, 0);
         }
         boolean critical = DiceRoller.rollChance(character.getEffectiveMagicalCriticalRate() / 100.0);
-        double variance = DiceRoller.randomVariance(0.9, 1.1);
         // Le power du sort module la puissance magique du lancer, ce qui préserve
         // la progression entre tiers d'un même sort (Flame Strike tier 1 vs tier 5)
         // au lieu de tout aplatir sur le seul m.atk du personnage.
         int spellPower = character.getEffectiveMAtk() + spell.power();
-        int amount = CombatFormulas.resolveDamage(spellPower, target.getEffectiveMDef(), variance, critical);
+        int amount = CombatFormulas.resolveDamage(spellPower, target.getEffectiveMDef(), critical);
         if (spell.element() != SpellElement.NONE) {
             amount = CombatFormulas.applyElementalResistance(amount, target.getElementalResistance(spell.element()));
         }
