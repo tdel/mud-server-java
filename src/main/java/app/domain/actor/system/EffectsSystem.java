@@ -18,7 +18,7 @@ public final class EffectsSystem {
     public static final int MAX_BUFF_SLOTS = 6;
     public static final int MAX_DEBUFF_SLOTS = 4;
 
-    private final Map<UUID, ActiveEffect> effects = new ConcurrentHashMap<>();
+    private final Map<UUID, ActiveEffect> activeEffects = new ConcurrentHashMap<>();
 
     // Retourne l'effet évicté (le plus proche d'expirer, dans la même catégorie)
     // si l'application de ce nouvel effet a saturé les slots — vide sinon.
@@ -26,10 +26,10 @@ public final class EffectsSystem {
     // n'est pas un nouveau slot.
     public Optional<ActiveEffect> apply(ActiveEffect effect) {
         Optional<ActiveEffect> evicted = Optional.empty();
-        if (!effects.containsKey(effect.skillId())) {
+        if (!activeEffects.containsKey(effect.skillId())) {
             evicted = evictIfFull(effect.category());
         }
-        effects.put(effect.skillId(), effect);
+        activeEffects.put(effect.skillId(), effect);
         return evicted;
     }
 
@@ -41,26 +41,26 @@ public final class EffectsSystem {
         }
         ActiveEffect soonestToExpire = sameCategory.stream().min(Comparator.comparing(ActiveEffect::expiresAt))
                 .orElseThrow();
-        effects.remove(soonestToExpire.skillId(), soonestToExpire);
+        activeEffects.remove(soonestToExpire.skillId(), soonestToExpire);
         return Optional.of(soonestToExpire);
     }
 
     public int totalModifier(ModifiedStat stat) {
         Instant now = Instant.now();
-        return effects.values().stream().filter(effect -> effect.stat() == stat && now.isBefore(effect.expiresAt()))
+        return activeEffects.values().stream().filter(effect -> effect.stat() == stat && now.isBefore(effect.expiresAt()))
                 .mapToInt(ActiveEffect::amount).sum();
     }
 
     public List<ActiveEffect> active() {
         Instant now = Instant.now();
-        return effects.values().stream().filter(effect -> now.isBefore(effect.expiresAt())).toList();
+        return activeEffects.values().stream().filter(effect -> now.isBefore(effect.expiresAt())).toList();
     }
 
     public List<ActiveEffect> expireDue(Instant now) {
         List<ActiveEffect> expired = new ArrayList<>();
-        for (ActiveEffect effect : effects.values()) {
+        for (ActiveEffect effect : activeEffects.values()) {
             if (!now.isBefore(effect.expiresAt())) {
-                effects.remove(effect.skillId(), effect);
+                activeEffects.remove(effect.skillId(), effect);
                 expired.add(effect);
             }
         }
@@ -68,10 +68,10 @@ public final class EffectsSystem {
     }
 
     public boolean isEmpty() {
-        return effects.isEmpty();
+        return activeEffects.isEmpty();
     }
 
     public void remove(UUID effectId) {
-        effects.remove(effectId);
+        activeEffects.remove(effectId);
     }
 }
