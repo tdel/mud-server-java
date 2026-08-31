@@ -22,12 +22,6 @@ import app.game.combat.CombatFormulas;
 import app.game.engine.MovementEngine;
 import app.game.engine.SpellCastEngine;
 import app.network.OutputMessage;
-import app.network.message.ingame.NoTargetSelected;
-import app.network.message.ingame.NotEnoughMana;
-import app.network.message.ingame.SpellNotKnown;
-import app.network.message.ingame.SpellOnCooldown;
-import app.network.message.ingame.SpellOutOfRange;
-import app.network.message.ingame.TargetNotFound;
 
 public abstract class AbstractCharacter extends AbstractObject {
 
@@ -43,8 +37,8 @@ public abstract class AbstractCharacter extends AbstractObject {
     private volatile Position position;
     private volatile double heading;
     protected int speed = DEFAULT_SPEED;
-    public volatile MovementEngine.ActiveMovement activeMovement;
-    public volatile SpellCastEngine.ActiveCast activeCast;
+    private volatile MovementEngine.ActiveMovement activeMovement;
+    private volatile SpellCastEngine.ActiveCast activeCast;
     private final KnownList knownList = new KnownList(this);
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
@@ -302,6 +296,30 @@ public abstract class AbstractCharacter extends AbstractObject {
         return activeCast != null;
     }
 
+    public MovementEngine.ActiveMovement getActiveMovement() {
+        return activeMovement;
+    }
+
+    public void updateMovement(MovementEngine.ActiveMovement movement) {
+        this.activeMovement = movement;
+    }
+
+    public void clearMovement() {
+        this.activeMovement = null;
+    }
+
+    public SpellCastEngine.ActiveCast getActiveCast() {
+        return activeCast;
+    }
+
+    public void updateCast(SpellCastEngine.ActiveCast cast) {
+        this.activeCast = cast;
+    }
+
+    public void clearCast() {
+        this.activeCast = null;
+    }
+
     public void setSpeed(int speed) {
         this.speed = speed;
     }
@@ -350,33 +368,53 @@ public abstract class AbstractCharacter extends AbstractObject {
         }
     }
 
-    public void castSpell(Spell spell, AbstractCharacter target) {
+    public CastRequestOutcome castSpell(Spell spell, AbstractCharacter target) {
         if (!hasSpell(spell)) {
-            send(new SpellNotKnown(spell.name()));
-            return;
+            return new CastRequestOutcome.SpellUnknown(spell.name());
         }
         if (target == null) {
-            send(new NoTargetSelected());
-            return;
+            return new CastRequestOutcome.NoTarget();
         }
         if (target instanceof AbstractNpc && spell.effect() == SpellEffectType.DAMAGE) {
-            send(new TargetNotFound(target.getId().toString()));
-            return;
+            return new CastRequestOutcome.TargetInvalid(target.getId());
         }
         if (spell.range() > 0 && getPosition().distanceTo(target.getPosition()) > spell.range()) {
-            send(new SpellOutOfRange(spell.name(), target.getName()));
-            return;
+            return new CastRequestOutcome.OutOfRange(spell.name(), target.getName());
         }
         if (!getSpellCasting().isReady(spell.id())) {
-            send(new SpellOnCooldown(spell.name(), getSpellCasting().remainingCooldown(spell.id()).toMillis()));
-            return;
+            return new CastRequestOutcome.OnCooldown(spell.name(),
+                    getSpellCasting().remainingCooldown(spell.id()).toMillis());
         }
         if (getCurrentMana() < spell.manaCost()) {
-            send(new NotEnoughMana(spell.name(), spell.manaCost(), getCurrentMana()));
-            return;
+            return new CastRequestOutcome.InsufficientMana(spell.name(), spell.manaCost(), getCurrentMana());
         }
 
         DomainEventPublisher.publish(new SpellCastBegin(this, spell, target));
+        return new CastRequestOutcome.Started();
+    }
+
+    public sealed interface CastRequestOutcome {
+
+        record Started() implements CastRequestOutcome {
+        }
+
+        record SpellUnknown(String spellName) implements CastRequestOutcome {
+        }
+
+        record NoTarget() implements CastRequestOutcome {
+        }
+
+        record TargetInvalid(UUID targetId) implements CastRequestOutcome {
+        }
+
+        record OutOfRange(String spellName, String targetName) implements CastRequestOutcome {
+        }
+
+        record OnCooldown(String spellName, long remainingMs) implements CastRequestOutcome {
+        }
+
+        record InsufficientMana(String spellName, int required, int current) implements CastRequestOutcome {
+        }
     }
 
 }

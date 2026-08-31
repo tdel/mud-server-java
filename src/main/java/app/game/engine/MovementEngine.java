@@ -52,7 +52,7 @@ public class MovementEngine {
             return;
         }
         synchronized (character) {
-            character.activeMovement = new ActiveMovement(List.copyOf(waypoints), System.nanoTime());
+            character.updateMovement(new ActiveMovement(List.copyOf(waypoints), System.nanoTime()));
             character.setHeading(character.getPosition().headingTo(waypoints.get(0)));
             movingCharacters.put(character.getId(), character);
         }
@@ -62,10 +62,10 @@ public class MovementEngine {
 
     public void stopMovement(AbstractCharacter character) {
         synchronized (character) {
-            if (character.activeMovement == null) {
+            if (character.getActiveMovement() == null) {
                 return;
             }
-            character.activeMovement = null;
+            character.clearMovement();
             movingCharacters.remove(character.getId());
         }
         log.debug("movement.stopped thread={} character={}", Thread.currentThread().getName(), character.getId());
@@ -141,7 +141,7 @@ public class MovementEngine {
 
     private MovementStepOutcome updatePosition(AbstractCharacter character, long now) {
         synchronized (character) {
-            ActiveMovement movement = character.activeMovement;
+            ActiveMovement movement = character.getActiveMovement();
             if (movement == null) {
                 return MovementStepOutcome.NO_MOVEMENT;
             }
@@ -159,16 +159,16 @@ public class MovementEngine {
             }
 
             if (result.blocked()) {
-                character.activeMovement = null;
+                character.clearMovement();
                 return MovementStepOutcome.BLOCKED_BY_BOUNDS;
             }
 
             if (result.remainingWaypoints().isEmpty()) {
-                character.activeMovement = null;
+                character.clearMovement();
                 return MovementStepOutcome.FINISHED;
             }
 
-            character.activeMovement = movement.withRemaining(result.remainingWaypoints(), now);
+            character.updateMovement(movement.withRemaining(result.remainingWaypoints(), now));
             return MovementStepOutcome.STEPPED;
         }
     }

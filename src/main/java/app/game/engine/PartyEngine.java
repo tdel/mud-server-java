@@ -7,14 +7,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import app.domain.PendingPartyInvite;
 import app.domain.actor.event.PlayerRemovedFromWorld;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.message.ingame.PartyInviteDeclined;
 
-@Service
+@Component
 public class PartyEngine {
 
     private static final Logger log = LoggerFactory.getLogger(PartyEngine.class);

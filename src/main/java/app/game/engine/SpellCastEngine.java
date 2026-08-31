@@ -52,7 +52,7 @@ public class SpellCastEngine {
         // (resolveCast) — trop tard, le client continue sinon d'interpoler le
         // déplacement pendant toute la durée de l'incantation.
         movementEngine.stopMovement(caster);
-        caster.activeCast = new ActiveCast(spell, target, System.nanoTime(), spell.castingTimeMs() * 1_000_000L);
+        caster.updateCast(new ActiveCast(spell, target, System.nanoTime(), spell.castingTimeMs() * 1_000_000L));
         casting.put(caster.getId(), caster);
         log.debug("spell.cast_started thread={} caster={} spell={} castingTimeMs={}", Thread.currentThread().getName(),
                 caster.getId(), spell.name(), spell.castingTimeMs());
@@ -61,11 +61,11 @@ public class SpellCastEngine {
     }
 
     public void cancelCast(AbstractCharacter caster) {
-        ActiveCast activeCast = caster.activeCast;
+        ActiveCast activeCast = caster.getActiveCast();
         if (activeCast == null) {
             return;
         }
-        caster.activeCast = null;
+        caster.clearCast();
         casting.remove(caster.getId());
         log.debug("spell.cast_cancelled thread={} caster={}", Thread.currentThread().getName(), caster.getId());
         caster.broadcast(new SpellCastCancelled(caster.getId(), caster.getName(), activeCast.spell().id(),
@@ -76,7 +76,7 @@ public class SpellCastEngine {
     void tick() {
         long now = System.nanoTime();
         for (AbstractCharacter caster : casting.values()) {
-            ActiveCast activeCast = caster.activeCast;
+            ActiveCast activeCast = caster.getActiveCast();
             if (activeCast == null) {
                 casting.remove(caster.getId());
                 continue;
@@ -85,7 +85,7 @@ public class SpellCastEngine {
                 continue;
             }
             casting.remove(caster.getId());
-            caster.activeCast = null;
+            caster.clearCast();
             try {
                 resolveCast(caster, activeCast);
             } catch (Exception e) {

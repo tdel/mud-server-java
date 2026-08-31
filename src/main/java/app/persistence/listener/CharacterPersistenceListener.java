@@ -23,7 +23,6 @@ import app.domain.actor.event.GamePlayerUsedManaPotion;
 import app.domain.actor.event.GamePlayerUsedPotion;
 import app.domain.actor.event.NewGamePlayerCreated;
 import app.domain.actor.event.SubclassChoiceAvailable;
-import app.game.catalog.LevelCatalog;
 import app.network.message.ingame.CharacterUsedItem;
 import app.network.message.ingame.GoldLooted;
 import app.network.message.ingame.GoldSpent;
@@ -35,7 +34,6 @@ import app.network.message.ingame.PlayerRespawned;
 import app.network.message.ingame.RegenTick;
 import app.network.message.ingame.SubclassChoiceOffered;
 import app.network.message.ingame.SubclassChosen;
-import app.network.message.ingame.XpGained;
 import app.persistence.CharacterDao;
 
 @Service
@@ -44,11 +42,9 @@ public class CharacterPersistenceListener {
     private static final Logger log = LoggerFactory.getLogger(CharacterPersistenceListener.class);
 
     private final CharacterDao characterDao;
-    private final LevelCatalog levelCatalog;
 
-    public CharacterPersistenceListener(CharacterDao characterDao, LevelCatalog levelCatalog) {
+    public CharacterPersistenceListener(CharacterDao characterDao) {
         this.characterDao = characterDao;
-        this.levelCatalog = levelCatalog;
     }
 
     @EventListener
@@ -62,13 +58,6 @@ public class CharacterPersistenceListener {
     @EventListener
     void onCharacterGainedXp(CharacterGainedXp event) {
         CharacterInstance character = event.character();
-        character.send(new XpGained(event.amount()));
-
-        while (character.getLevel() < levelCatalog.maxLevel()
-                && character.getXp() >= levelCatalog.xpRequiredForLevel(character.getLevel() + 1)) {
-            character.applyLevelUp();
-        }
-
         characterDao.update(character);
         log.info("character.xp_gained character={} amount={} newXp={} newLevel={}", character.getName(), event.amount(),
                 character.getXp(), character.getLevel());
@@ -117,7 +106,6 @@ public class CharacterPersistenceListener {
     }
 
     @EventListener
-    @Order(2)
     void onCharacterDied(CharacterDied event) {
         CharacterInstance killer = event.killer();
         int xpReward = event.character().getTemplate().getXpReward();

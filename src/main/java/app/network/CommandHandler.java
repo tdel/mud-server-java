@@ -13,4 +13,8 @@ public interface CommandHandler {
     default boolean requiresAlive() {
         return false;
     }
+
+    default boolean requiresNotCasting() {
+        return false;
+    }
 }

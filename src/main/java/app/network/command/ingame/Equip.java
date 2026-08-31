@@ -15,7 +15,6 @@ import app.domain.item.ItemGrade;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
-import app.network.message.ingame.AlreadyCasting;
 import app.network.message.ingame.ItemEquipped;
 import app.network.message.ingame.ItemNotCarried;
 import app.network.message.ingame.ItemNotEquippable;
@@ -39,13 +38,13 @@ public class Equip implements CommandHandler {
     }
 
     @Override
+    public boolean requiresNotCasting() {
+        return true;
+    }
+
+    @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
-
-        if (character.isCasting()) {
-            connection.send(new AlreadyCasting());
-            return;
-        }
 
         String raw = argument.trim();
 

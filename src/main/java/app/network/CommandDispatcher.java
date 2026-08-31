@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import app.network.message.ActionNotFound;
+import app.network.message.ingame.AlreadyCasting;
 import app.network.message.ingame.CharacterIsDead;
 
 @Component
@@ -24,6 +25,12 @@ public class CommandDispatcher {
                     && connection.character().getCurrentHealth() <= 0) {
                 log.debug("command.rejected verb={} reason=character_dead", actionName);
                 connection.send(new CharacterIsDead());
+                return;
+            }
+            if (connection.state() == ConnectionState.INGAME && action.requiresNotCasting()
+                    && connection.character().isCasting()) {
+                log.debug("command.rejected verb={} reason=character_casting", actionName);
+                connection.send(new AlreadyCasting());
                 return;
             }
             log.info("command.received verb={} state={}", actionName, connection.state());

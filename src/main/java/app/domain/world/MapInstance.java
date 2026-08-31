@@ -107,31 +107,37 @@ public class MapInstance {
     }
 
     public void join(CharacterInstance character, Position position) {
-        character.setCurrentMap(this);
-        character.setPosition(position);
-        clients.put(character.getId(), character);
-        log.info("map.joined thread={} mapId={} character={} position={}", Thread.currentThread().getName(), id,
-                character.getId(), position);
-        DomainEventPublisher.publish(new GamePlayerSpawnedToMap(character, this));
+        synchronized (this) {
+            character.setCurrentMap(this);
+            character.setPosition(position);
+            clients.put(character.getId(), character);
+            log.info("map.joined thread={} mapId={} character={} position={}", Thread.currentThread().getName(), id,
+                    character.getId(), position);
+            DomainEventPublisher.publish(new GamePlayerSpawnedToMap(character, this));
 
-        character.getKnownList().populateSilently();
+            character.getKnownList().populateSilently();
+        }
         character.broadcastToMap(
                 new GamePlayerJoinedMap(character.getId(), character.getName(), position.x(), position.y()), character);
     }
 
     public void leave(CharacterInstance character) {
         character.broadcastToMap(new GamePlayerLeftMap(character.getName()), character);
-        clients.remove(character.getId());
-        character.getKnownList().clear();
-        character.setPosition(null);
+        synchronized (this) {
+            clients.remove(character.getId());
+            character.getKnownList().clear();
+            character.setPosition(null);
+        }
         log.info("map.left thread={} mapId={} character={}", Thread.currentThread().getName(), id, character.getId());
     }
 
     public void disconnect(CharacterInstance character) {
         character.broadcastToMap(new GamePlayerDisconnected(character.getName()), character);
-        clients.remove(character.getId());
-        character.getKnownList().clear();
-        character.setPosition(null);
+        synchronized (this) {
+            clients.remove(character.getId());
+            character.getKnownList().clear();
+            character.setPosition(null);
+        }
         log.info("map.disconnected thread={} mapId={} character={}", Thread.currentThread().getName(), id,
                 character.getId());
     }

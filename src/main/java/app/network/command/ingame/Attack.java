@@ -4,10 +4,16 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import app.domain.actor.component.CharacterCombat;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
+import app.network.message.ingame.AttackOnCooldown;
+import app.network.message.ingame.AttackOutOfRange;
+import app.network.message.ingame.CombatForbiddenHere;
+import app.network.message.ingame.NoTargetSelected;
+import app.network.message.ingame.TargetNotFound;
 
 @Component
 public class Attack implements CommandHandler {
@@ -28,8 +34,25 @@ public class Attack implements CommandHandler {
     }
 
     @Override
+    public boolean requiresNotCasting() {
+        return true;
+    }
+
+    @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
-        character.getCombat().attack(character.getCombat().getTarget());
+        switch (character.getCombat().attack(character.getCombat().getTarget())) {
+            case CharacterCombat.AttackOutcome.Success ignored -> {
+            }
+            case CharacterCombat.AttackOutcome.NoTarget ignored -> connection.send(new NoTargetSelected());
+            case CharacterCombat.AttackOutcome.TargetInvalid(var targetId) ->
+                connection.send(new TargetNotFound(targetId.toString()));
+            case CharacterCombat.AttackOutcome.ForbiddenZone(var zoneName) ->
+                connection.send(new CombatForbiddenHere(zoneName));
+            case CharacterCombat.AttackOutcome.OutOfRange(var targetName) ->
+                connection.send(new AttackOutOfRange(targetName));
+            case CharacterCombat.AttackOutcome.OnCooldown(var remainingMs) ->
+                connection.send(new AttackOnCooldown(remainingMs));
+        }
     }
 }

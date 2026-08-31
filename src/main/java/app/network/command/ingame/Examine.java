@@ -55,7 +55,7 @@ public class Examine implements CommandHandler {
             case CharacterInstance p -> connection.send(new GamePlayerStats(p));
             case MonsterInstance m -> connection.send(new MonsterStatBlock(m));
             case AbstractNpc n -> connection.send(new NpcDescription(n));
-            default -> throw new IllegalStateException("Type de cible inattendu : " + target.get().getClass());
+            default -> connection.send(new TargetNotFound(raw));
         }
     }
 }

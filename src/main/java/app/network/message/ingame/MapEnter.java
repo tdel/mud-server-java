@@ -50,7 +50,7 @@ public record MapEnter(AbstractCharacter character) implements OutputJsonMessage
     }
 
     private List<Position> remainingWaypoints() {
-        MovementEngine.ActiveMovement movement = character.activeMovement;
+        MovementEngine.ActiveMovement movement = character.getActiveMovement();
         return movement == null ? List.of() : movement.remainingWaypoints();
     }
 }

@@ -36,6 +36,7 @@ import app.domain.actor.event.GamePlayerRespawned;
 import app.domain.actor.event.GamePlayerUnequippedItem;
 import app.domain.actor.event.ItemDiscarded;
 import app.domain.actor.event.ItemPurchased;
+import app.game.catalog.LevelCatalogHolder;
 import app.domain.item.EquipmentSlot;
 import app.domain.item.ItemSet;
 import app.domain.map.Position;
@@ -47,6 +48,7 @@ import app.game.catalog.ItemSetCatalogHolder;
 import app.game.combat.CombatFormulas;
 import app.network.Connection;
 import app.network.OutputMessage;
+import app.network.message.ingame.XpGained;
 
 public final class CharacterInstance extends AbstractCharacter {
 
@@ -390,6 +392,12 @@ public final class CharacterInstance extends AbstractCharacter {
 
     public void gainXp(int amount) {
         this.xp += amount;
+        send(new XpGained(amount));
+
+        while (level < LevelCatalogHolder.maxLevel() && xp >= LevelCatalogHolder.xpRequiredForLevel(level + 1)) {
+            applyLevelUp();
+        }
+
         DomainEventPublisher.publish(new CharacterGainedXp(this, amount));
     }
 

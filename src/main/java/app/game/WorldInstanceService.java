@@ -1,11 +1,13 @@
 package app.game;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import app.game.engine.MovementEngine;
 import org.slf4j.Logger;
@@ -19,10 +21,12 @@ import app.domain.world.MapTemplate;
 import app.domain.world.WorldInstance;
 import app.domain.world.WorldTemplate;
 import app.domain.world.WorldTemplateSummary;
+import app.domain.actor.AbstractNpc;
 import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.NpcSellerInstance;
+import app.domain.actor.template.NpcTemplate;
 import app.domain.map.Position;
 import app.game.catalog.MonsterCatalog;
-import app.game.catalog.NpcCatalog;
 import app.game.catalog.WorldTemplateCatalog;
 import app.network.Connection;
 import app.network.ConnectionState;
@@ -35,17 +39,15 @@ public class WorldInstanceService {
 
     private final WorldTemplateCatalog worldTemplateService;
     private final MonsterCatalog monsterService;
-    private final NpcCatalog npcService;
     private final MovementEngine movementEngine;
     private final CharacterDao characterDao;
 
     private WorldInstance defaultInstance;
 
     public WorldInstanceService(WorldTemplateCatalog worldTemplateService, MonsterCatalog monsterService,
-            NpcCatalog npcService, MovementEngine movementEngine, CharacterDao characterDao) {
+            MovementEngine movementEngine, CharacterDao characterDao) {
         this.worldTemplateService = worldTemplateService;
         this.monsterService = monsterService;
-        this.npcService = npcService;
         this.movementEngine = movementEngine;
         this.characterDao = characterDao;
     }
@@ -65,7 +67,7 @@ public class WorldInstanceService {
 
         long placementStart = System.currentTimeMillis();
         monsterService.placeMonsters(mapInstances.values());
-        npcService.warmNpcs(List.of(template), mapInstances.values());
+        warmNpcs(List.of(template), mapInstances.values());
         long placementDurationMs = System.currentTimeMillis() - placementStart;
 
         instance.setMapInstances(mapInstances);
@@ -115,4 +117,32 @@ public class WorldInstanceService {
         MDC.remove("character");
     }
 
+    private void warmNpcs(Collection<WorldTemplate> worldTemplates, Collection<MapInstance> maps) {
+        Map<UUID, MapInstance> mapsByTemplateId = new ConcurrentHashMap<>();
+        for (MapInstance map : maps) {
+            mapsByTemplateId.put(map.getTemplateId(), map);
+        }
+
+        int count = 0;
+        for (WorldTemplate worldTemplate : worldTemplates) {
+            for (NpcTemplate npcTemplate : worldTemplate.getNpcTemplates().values()) {
+                MapInstance map = mapsByTemplateId.get(npcTemplate.mapTemplateId());
+                if (map == null) {
+                    throw new IllegalStateException("NPC " + npcTemplate.id() + " référence la map "
+                            + npcTemplate.mapTemplateId() + ", absente du monde " + worldTemplate.getShortName());
+                }
+                placeNpc(npcTemplate, map);
+                count++;
+            }
+        }
+
+        log.info("npc.instances_placed count={}", count);
+    }
+
+    private void placeNpc(NpcTemplate template, MapInstance map) {
+        AbstractNpc npc = template.shop() != null
+                ? new NpcSellerInstance(template.id(), template, map)
+                : new AbstractNpc(template.id(), template, map);
+        map.placeNpc(npc, template.position());
+    }
 }

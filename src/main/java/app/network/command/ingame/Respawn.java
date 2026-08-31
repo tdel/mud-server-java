@@ -1,5 +1,6 @@
 package app.network.command.ingame;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
@@ -12,6 +13,7 @@ import app.network.ConnectionState;
 import app.network.message.ingame.CharacterNotDead;
 import app.network.message.ingame.MapEnter;
 import app.network.message.ingame.MapView;
+import app.network.message.ingame.StartingMapNotConfigured;
 
 @Component
 public class Respawn implements CommandHandler {
@@ -35,9 +37,12 @@ public class Respawn implements CommandHandler {
             return;
         }
 
-        MapInstance startingMap = character.getWorldInstance().startingMapInstance()
-                .orElseThrow(() -> new IllegalStateException("Aucune starting map configurée"));
-        character.respawn(startingMap, startingMap.getSpawnPosition());
+        Optional<MapInstance> startingMap = character.getWorldInstance().startingMapInstance();
+        if (startingMap.isEmpty()) {
+            connection.send(new StartingMapNotConfigured());
+            return;
+        }
+        character.respawn(startingMap.get(), startingMap.get().getSpawnPosition());
 
         // La starting map peut différer de la map où le personnage est mort : sans
         // ça, le

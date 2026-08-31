@@ -11,7 +11,7 @@ public record EntityView(UUID id, String name, double x, double y, double headin
         int maxHealth, int level, Double targetX, Double targetY) {
 
     public static EntityView of(AbstractCharacter character) {
-        MovementEngine.ActiveMovement movement = character.activeMovement;
+        MovementEngine.ActiveMovement movement = character.getActiveMovement();
         Double targetX = null;
         Double targetY = null;
         if (movement != null && !movement.remainingWaypoints().isEmpty()) {
