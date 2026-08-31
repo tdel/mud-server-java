@@ -80,10 +80,6 @@ public class SpellCatalog {
         return spell;
     }
 
-    public Collection<Spell> allSpells() {
-        return List.copyOf(spells.values());
-    }
-
     public List<Spell> spellsLearnableAt(CharacterClass characterClass, int level) {
         return spells.values().stream()
                 .filter(spell -> spell.requiredLevel() == level && spell.classes().contains(characterClass)).toList();

@@ -21,8 +21,6 @@ import app.domain.world.NormalZone;
 import app.game.combat.CombatFormulas;
 import app.game.engine.MovementEngine;
 import app.game.engine.SpellCastEngine;
-import app.game.dice.DiceExpression;
-import app.game.dice.DiceRoller;
 import app.network.OutputMessage;
 import app.network.message.ingame.NoTargetSelected;
 import app.network.message.ingame.NotEnoughMana;
@@ -306,10 +304,6 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public void setSpeed(int speed) {
         this.speed = speed;
-    }
-
-    public int rollInitiative() {
-        return DiceRoller.roll(new DiceExpression(1, 20, getModifier(Attribute.DEXTERITY))).total();
     }
 
     // No-op par défaut : seul GamePlayer a une Connection à notifier.

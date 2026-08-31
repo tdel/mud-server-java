@@ -45,9 +45,6 @@ import app.domain.world.PeaceZone;
 import app.domain.world.WorldInstance;
 import app.game.catalog.ItemSetCatalogHolder;
 import app.game.combat.CombatFormulas;
-import app.game.dice.CheckResult;
-import app.game.dice.DiceRoll;
-import app.game.dice.DiceRoller;
 import app.network.Connection;
 import app.network.OutputMessage;
 
@@ -68,38 +65,35 @@ public final class CharacterInstance extends AbstractCharacter {
     private Party party;
     private PendingPartyInvite pendingInvite;
     private int xp;
-    private int shortRestCount;
     private int maxMana;
     private int currentMana;
-
-    public static final int MAX_SHORT_RESTS_BEFORE_LONG_REST = 2;
 
     public CharacterInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold) {
         this(id, account, name, map, gender, race, characterClass, level, currentHealth, maxHealth, attributes, xp,
-                gold, 0, 0, 0);
+                gold, 0, 0);
     }
 
     public CharacterInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
-            Map<Attribute, Integer> attributes, int xp, int gold, int shortRestCount, int maxMana, int currentMana) {
+            Map<Attribute, Integer> attributes, int xp, int gold, int maxMana, int currentMana) {
         this(id, account, name, map, gender, race, characterClass, level, currentHealth, maxHealth, attributes, xp,
-                gold, shortRestCount, maxMana, currentMana, Set.of(), List.of());
+                gold, maxMana, currentMana, Set.of(), List.of());
     }
 
     public CharacterInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
-            Map<Attribute, Integer> attributes, int xp, int gold, int shortRestCount, int maxMana, int currentMana,
-            Set<Spell> knownSpells, List<ActiveEffect> activeEffects) {
+            Map<Attribute, Integer> attributes, int xp, int gold, int maxMana, int currentMana, Set<Spell> knownSpells,
+            List<ActiveEffect> activeEffects) {
         this(id, account, name, map, gender, race, characterClass, level, currentHealth, maxHealth, attributes, xp,
-                gold, shortRestCount, maxMana, currentMana, knownSpells, activeEffects, null, null);
+                gold, maxMana, currentMana, knownSpells, activeEffects, null, null);
     }
 
     public CharacterInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
-            Map<Attribute, Integer> attributes, int xp, int gold, int shortRestCount, int maxMana, int currentMana,
-            Set<Spell> knownSpells, List<ActiveEffect> activeEffects, Subclass subclassTier1, Subclass subclassTier2) {
+            Map<Attribute, Integer> attributes, int xp, int gold, int maxMana, int currentMana, Set<Spell> knownSpells,
+            List<ActiveEffect> activeEffects, Subclass subclassTier1, Subclass subclassTier2) {
         super(id, name, attributes, currentHealth, maxHealth);
         this.account = account;
         setCurrentMap(map);
@@ -113,7 +107,6 @@ public final class CharacterInstance extends AbstractCharacter {
         this.xp = xp;
         this.inventory = new PlayerInventory(gold);
         this.combat = new CharacterCombat(this);
-        this.shortRestCount = shortRestCount;
         this.maxMana = maxMana;
         this.currentMana = currentMana;
         knownSpells.forEach(getSpellCasting()::learn);
@@ -144,24 +137,12 @@ public final class CharacterInstance extends AbstractCharacter {
         return gender;
     }
 
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
     public Race getRace() {
         return race;
     }
 
-    public void setRace(Race race) {
-        this.race = race;
-    }
-
     public CharacterClass getCharacterClass() {
         return characterClass;
-    }
-
-    public void setCharacterClass(CharacterClass characterClass) {
-        this.characterClass = characterClass;
     }
 
     public Subclass getSubclassTier1() {
@@ -226,25 +207,6 @@ public final class CharacterInstance extends AbstractCharacter {
 
     public int getProficiencyBonus() {
         return 2 + Math.floorDiv(level - 1, 4);
-    }
-
-    public CheckResult check(Skill skill, int dc) {
-        boolean proficient = getSkillProficiencies().contains(skill);
-        return checkOrSave(skill.getGoverningAttribute(), proficient, dc, skill.label());
-    }
-
-    public CheckResult save(Attribute attribute, int dc) {
-        boolean proficient = getSavingThrowProficiencies().contains(attribute);
-        return checkOrSave(attribute, proficient, dc, attribute.label());
-    }
-
-    private CheckResult checkOrSave(Attribute attribute, boolean proficient, int dc, String label) {
-        int modifier = getModifier(attribute) + (proficient ? getProficiencyBonus() : 0);
-        boolean disadvantage = (attribute == Attribute.STRENGTH || attribute == Attribute.DEXTERITY)
-                && isWearingNonProficientArmor();
-        DiceRoll diceRoll = DiceRoller.rollD20(modifier, disadvantage);
-        boolean success = diceRoll.total() >= dc;
-        return new CheckResult(label, diceRoll.total(), dc, proficient, disadvantage, success);
     }
 
     @Override
@@ -456,22 +418,6 @@ public final class CharacterInstance extends AbstractCharacter {
         }
     }
 
-    public int getShortRestCount() {
-        return shortRestCount;
-    }
-
-    public boolean canTakeShortRest() {
-        return shortRestCount < MAX_SHORT_RESTS_BEFORE_LONG_REST;
-    }
-
-    public void incrementShortRestCount() {
-        shortRestCount++;
-    }
-
-    public void resetShortRestCount() {
-        shortRestCount = 0;
-    }
-
     public void receiveGold(int amount) {
         inventory.addGold(amount);
         DomainEventPublisher.publish(new CharacterReceivedGold(this, amount));
@@ -580,8 +526,8 @@ public final class CharacterInstance extends AbstractCharacter {
         }
         return level == other.level && xp == other.xp && inventory.getGold() == other.inventory.getGold()
                 && getCurrentHealth() == other.getCurrentHealth() && getMaxHealth() == other.getMaxHealth()
-                && shortRestCount == other.shortRestCount && Objects.equals(getId(), other.getId())
-                && Objects.equals(getAccountId(), other.getAccountId()) && Objects.equals(getName(), other.getName())
+                && Objects.equals(getId(), other.getId()) && Objects.equals(getAccountId(), other.getAccountId())
+                && Objects.equals(getName(), other.getName())
                 && Objects.equals(getCurrentMapId(), other.getCurrentMapId()) && gender == other.gender
                 && race == other.race && characterClass == other.characterClass
                 && Objects.equals(getAttributes(), other.getAttributes());
@@ -590,7 +536,7 @@ public final class CharacterInstance extends AbstractCharacter {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getAccountId(), getName(), getCurrentMapId(), gender, race, characterClass, level,
-                xp, inventory.getGold(), getCurrentHealth(), getMaxHealth(), shortRestCount, getAttributes());
+                xp, inventory.getGold(), getCurrentHealth(), getMaxHealth(), getAttributes());
     }
 
     @Override
@@ -598,7 +544,6 @@ public final class CharacterInstance extends AbstractCharacter {
         return "GamePlayer[id=" + getId() + ", accountId=" + getAccountId() + ", name=" + getName() + ", currentMapId="
                 + getCurrentMapId() + ", gender=" + gender + ", race=" + race + ", characterClass=" + characterClass
                 + ", level=" + level + ", xp=" + xp + ", gold=" + inventory.getGold() + ", currentHealth="
-                + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + ", shortRestCount=" + shortRestCount
-                + ", attributes=" + getAttributes() + "]";
+                + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + ", attributes=" + getAttributes() + "]";
     }
 }

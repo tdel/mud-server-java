@@ -1,8 +1,6 @@
 package app.domain.world;
 
-import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 import app.domain.actor.template.NpcTemplate;
@@ -60,14 +58,6 @@ public class WorldTemplate {
 
     public Map<UUID, NpcTemplate> getNpcTemplates() {
         return npcTemplates;
-    }
-
-    public Optional<MapTemplate> startingMapTemplate() {
-        return mapTemplates.values().stream().filter(map -> Boolean.TRUE.equals(map.isStartingMap())).findFirst();
-    }
-
-    public Collection<NpcTemplate> npcTemplatesForMap(UUID mapTemplateId) {
-        return npcTemplates.values().stream().filter(npc -> npc.mapTemplateId().equals(mapTemplateId)).toList();
     }
 
     @Override

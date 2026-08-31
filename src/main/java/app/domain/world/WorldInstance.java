@@ -62,10 +62,6 @@ public class WorldInstance {
         this.mapInstances = Map.copyOf(mapInstances);
     }
 
-    public boolean isMaterialized() {
-        return !mapInstances.isEmpty();
-    }
-
     public Collection<MapInstance> mapInstances() {
         return mapInstances.values();
     }
@@ -124,7 +120,7 @@ public class WorldInstance {
         int startingMana = CombatFormulas.maxMana(characterClass.manaGainPerLevel(), scores.get(Attribute.MEN), 1);
 
         CharacterInstance character = new CharacterInstance(UUID.randomUUID(), account, name, startingMap, gender, race,
-                characterClass, 1, maxHealth, maxHealth, scores, 0, gold, 0, startingMana, startingMana);
+                characterClass, 1, maxHealth, maxHealth, scores, 0, gold, startingMana, startingMana);
         character.setWorldInstance(this);
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));

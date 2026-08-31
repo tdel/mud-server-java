@@ -32,11 +32,6 @@ public final class DiceRoller {
         return new DiceRoll(rolls, expression.modifier());
     }
 
-    public static DiceRoll rollD20(int modifier, boolean disadvantage) {
-        int kept = disadvantage ? Math.min(rollDie(20), rollDie(20)) : rollDie(20);
-        return new DiceRoll(new int[]{kept}, modifier);
-    }
-
     private static int rollDie(int sides) {
         if (sides == 100) {
             return rollPercentile();

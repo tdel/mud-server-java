@@ -3,7 +3,6 @@ package app.persistence;
 import static app.persistence.jooq.Tables.ACCOUNT;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
@@ -23,10 +22,6 @@ public class AccountDao {
     public void insert(Account account) {
         dsl.insertInto(ACCOUNT, ACCOUNT.ID, ACCOUNT.LOGIN, ACCOUNT.PASSWORD)
                 .values(account.getId(), account.getLogin(), account.getPassword()).execute();
-    }
-
-    public Optional<Account> findById(UUID id) {
-        return dsl.selectFrom(ACCOUNT).where(ACCOUNT.ID.eq(id)).fetchOptional(AccountDao::toDomain);
     }
 
     public Optional<Account> findByLogin(String login) {

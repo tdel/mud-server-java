@@ -81,10 +81,6 @@ public class MapTemplate {
         this.portals = List.copyOf(portals);
     }
 
-    public List<PeaceZone> getPeaceZones() {
-        return peaceZones;
-    }
-
     public void setPeaceZones(List<PeaceZone> peaceZones) {
         this.peaceZones = List.copyOf(peaceZones);
     }

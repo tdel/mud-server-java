@@ -72,160 +72,80 @@ public class MonsterTemplate {
         return id;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public int getMaxHealth() {
         return maxHealth;
-    }
-
-    public void setMaxHealth(int maxHealth) {
-        this.maxHealth = maxHealth;
     }
 
     public Map<Attribute, Integer> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(Map<Attribute, Integer> attributes) {
-        this.attributes = attributes;
-    }
-
     public int getNaturalPAtk() {
         return naturalPAtk;
-    }
-
-    public void setNaturalPAtk(int naturalPAtk) {
-        this.naturalPAtk = naturalPAtk;
     }
 
     public int getNaturalMAtk() {
         return naturalMAtk;
     }
 
-    public void setNaturalMAtk(int naturalMAtk) {
-        this.naturalMAtk = naturalMAtk;
-    }
-
     public int getNaturalPDef() {
         return naturalPDef;
-    }
-
-    public void setNaturalPDef(int naturalPDef) {
-        this.naturalPDef = naturalPDef;
     }
 
     public int getNaturalMDef() {
         return naturalMDef;
     }
 
-    public void setNaturalMDef(int naturalMDef) {
-        this.naturalMDef = naturalMDef;
-    }
-
     public int getAccuracyBonus() {
         return accuracyBonus;
-    }
-
-    public void setAccuracyBonus(int accuracyBonus) {
-        this.accuracyBonus = accuracyBonus;
     }
 
     public int getEvasionBonus() {
         return evasionBonus;
     }
 
-    public void setEvasionBonus(int evasionBonus) {
-        this.evasionBonus = evasionBonus;
-    }
-
     public int getCritBonus() {
         return critBonus;
-    }
-
-    public void setCritBonus(int critBonus) {
-        this.critBonus = critBonus;
     }
 
     public int getXpReward() {
         return xpReward;
     }
 
-    public void setXpReward(int xpReward) {
-        this.xpReward = xpReward;
-    }
-
     public int getGoldReward() {
         return goldReward;
-    }
-
-    public void setGoldReward(int goldReward) {
-        this.goldReward = goldReward;
     }
 
     public List<LootTableEntry> getLootTable() {
         return lootTable;
     }
 
-    public void setLootTable(List<LootTableEntry> lootTable) {
-        this.lootTable = lootTable;
-    }
-
     public int getPresenceRadius() {
         return presenceRadius;
-    }
-
-    public void setPresenceRadius(int presenceRadius) {
-        this.presenceRadius = presenceRadius;
     }
 
     public int getSpeed() {
         return speed;
     }
 
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
-
     public int getAtkSpd() {
         return atkSpd;
-    }
-
-    public void setAtkSpd(int atkSpd) {
-        this.atkSpd = atkSpd;
     }
 
     public int getLevel() {
         return level;
     }
 
-    public void setLevel(int level) {
-        this.level = level;
-    }
-
     public Map<SpellElement, Integer> getElementalResistances() {
         return elementalResistances;
-    }
-
-    public void setElementalResistances(Map<SpellElement, Integer> elementalResistances) {
-        this.elementalResistances = elementalResistances == null ? Map.of() : elementalResistances;
     }
 
     public LootResult rollLoot(CharacterInstance killer) {

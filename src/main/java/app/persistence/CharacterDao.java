@@ -50,18 +50,16 @@ public class CharacterDao {
         dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_MAP_ID,
                 CHARACTER.GENDER, CHARACTER.RACE, CHARACTER.CHARACTER_CLASS, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH,
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
-                CHARACTER.INTELLIGENCE, CHARACTER.WIT, CHARACTER.MEN, CHARACTER.XP, CHARACTER.GOLD,
-                CHARACTER.SHORT_REST_COUNT, CHARACTER.MAX_MANA, CHARACTER.CURRENT_MANA, CHARACTER.SUBCLASS_TIER1,
-                CHARACTER.SUBCLASS_TIER2)
+                CHARACTER.INTELLIGENCE, CHARACTER.WIT, CHARACTER.MEN, CHARACTER.XP, CHARACTER.GOLD, CHARACTER.MAX_MANA,
+                CHARACTER.CURRENT_MANA, CHARACTER.SUBCLASS_TIER1, CHARACTER.SUBCLASS_TIER2)
                 .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentMapId(),
                         character.getGender().name(), character.getRace().name(), character.getCharacterClass().name(),
                         character.getLevel(), character.getCurrentHealth(), character.getMaxHealth(),
                         character.getAttribute(Attribute.STRENGTH), character.getAttribute(Attribute.DEXTERITY),
                         character.getAttribute(Attribute.CONSTITUTION), character.getAttribute(Attribute.INTELLIGENCE),
                         character.getAttribute(Attribute.WIT), character.getAttribute(Attribute.MEN), character.getXp(),
-                        character.getInventory().getGold(), character.getShortRestCount(), character.getMaxMana(),
-                        character.getCurrentMana(), name(character.getSubclassTier1()),
-                        name(character.getSubclassTier2()))
+                        character.getInventory().getGold(), character.getMaxMana(), character.getCurrentMana(),
+                        name(character.getSubclassTier1()), name(character.getSubclassTier2()))
                 .execute();
     }
 
@@ -96,9 +94,8 @@ public class CharacterDao {
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_MAP_ID, character.getCurrentMapId())
                 .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).set(CHARACTER.XP, character.getXp())
                 .set(CHARACTER.LEVEL, character.getLevel()).set(CHARACTER.MAX_HEALTH, character.getMaxHealth())
-                .set(CHARACTER.GOLD, character.getInventory().getGold())
-                .set(CHARACTER.SHORT_REST_COUNT, character.getShortRestCount())
-                .set(CHARACTER.MAX_MANA, character.getMaxMana()).set(CHARACTER.CURRENT_MANA, character.getCurrentMana())
+                .set(CHARACTER.GOLD, character.getInventory().getGold()).set(CHARACTER.MAX_MANA, character.getMaxMana())
+                .set(CHARACTER.CURRENT_MANA, character.getCurrentMana())
                 .set(CHARACTER.SUBCLASS_TIER1, name(character.getSubclassTier1()))
                 .set(CHARACTER.SUBCLASS_TIER2, name(character.getSubclassTier2()))
                 .where(CHARACTER.ID.eq(character.getId())).execute();
@@ -138,8 +135,8 @@ public class CharacterDao {
 
         CharacterInstance character = new CharacterInstance(record.getId(), account, record.getName(), map,
                 Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
-                maxHealth, attributes, record.getXp(), record.getGold(), record.getShortRestCount(), maxMana,
-                record.getCurrentMana(), knownSpells, activeEffects, subclassTier1, subclassTier2);
+                maxHealth, attributes, record.getXp(), record.getGold(), maxMana, record.getCurrentMana(), knownSpells,
+                activeEffects, subclassTier1, subclassTier2);
         character.setWorldInstance(instance);
 
         Double posX = record.getPosX();

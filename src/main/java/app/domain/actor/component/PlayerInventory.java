@@ -40,10 +40,6 @@ public final class PlayerInventory {
         return items.stream().filter(item -> item.getId().equals(id)).findFirst();
     }
 
-    public List<Item> getCarriedItems() {
-        return items.stream().filter(item -> item.getSlot() == null).toList();
-    }
-
     public List<Item> getEquippedItems() {
         return items.stream().filter(item -> item.getSlot() != null).toList();
     }

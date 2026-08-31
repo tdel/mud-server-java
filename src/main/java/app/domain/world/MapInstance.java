@@ -168,23 +168,6 @@ public class MapInstance {
         return monsters.stream().filter(monster -> monster.getId().equals(id)).findFirst();
     }
 
-    public Optional<AbstractCharacter> findAttackableById(UUID id, CharacterInstance requester) {
-        Optional<MonsterInstance> monster = findMonsterById(id);
-        if (monster.isPresent()) {
-            return Optional.of(monster.get());
-        }
-        CharacterInstance client = clients.get(id);
-        if (client != null && !client.getId().equals(requester.getId()) && client.getCurrentHealth() > 0) {
-            return Optional.of(client);
-        }
-        return Optional.empty();
-    }
-
-    public void setMonsters(List<MonsterInstance> monsters) {
-        this.monsters.clear();
-        this.monsters.addAll(monsters);
-    }
-
     public List<MonsterSpawn> getMonsterSpawns() {
         return template.getMonsterSpawns();
     }
@@ -205,11 +188,6 @@ public class MapInstance {
 
     public void addNpc(AbstractNpc npc) {
         npcs.add(npc);
-    }
-
-    public void setNpcs(List<AbstractNpc> npcs) {
-        this.npcs.clear();
-        this.npcs.addAll(npcs);
     }
 
     public void placeNpc(AbstractNpc npc, Position position) {

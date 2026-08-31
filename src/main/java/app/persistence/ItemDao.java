@@ -33,17 +33,9 @@ public class ItemDao {
                 .execute();
     }
 
-    public void updateEnchant(UUID itemId, int enchant) {
-        dsl.update(ITEM).set(ITEM.ENCHANT, enchant).where(ITEM.ID.eq(itemId)).execute();
-    }
-
     public List<Item> findByCharacter(AbstractCharacter character) {
         return dsl.selectFrom(ITEM).where(ITEM.CHARACTER_ID.eq(character.getId()))
                 .fetch(record -> toItem(record, character));
-    }
-
-    public void assignToCharacter(UUID itemId, UUID characterId) {
-        dsl.update(ITEM).set(ITEM.CHARACTER_ID, characterId).setNull(ITEM.SLOT).where(ITEM.ID.eq(itemId)).execute();
     }
 
     public void updateSlot(UUID itemId, EquipmentSlot slot) {

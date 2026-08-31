@@ -170,10 +170,6 @@ public final class MonsterInstance extends AbstractCharacter {
         return templateId;
     }
 
-    public UUID getMapId() {
-        return mapId;
-    }
-
     public Position getSpawnPosition() {
         return spawnPosition;
     }
