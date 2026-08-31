@@ -301,9 +301,8 @@ public final class CharacterInstance extends AbstractCharacter {
 
     @Override
     protected Map<ModifiedStat, Integer> setBonusModifiers() {
-        Map<String, Long> equippedCountBySetId = inventory.getEquippedItems().stream()
-                .map(item -> item.getTemplate().getSetId()).filter(Objects::nonNull)
-                .collect(Collectors.groupingBy(setId -> setId, Collectors.counting()));
+        Map<String, Long> equippedCountBySetId = inventory.getEquippedItems().stream().map(Item::getSetId)
+                .filter(Objects::nonNull).collect(Collectors.groupingBy(setId -> setId, Collectors.counting()));
 
         Map<ModifiedStat, Integer> modifiers = new EnumMap<>(ModifiedStat.class);
         for (Map.Entry<String, Long> entry : equippedCountBySetId.entrySet()) {
@@ -365,7 +364,7 @@ public final class CharacterInstance extends AbstractCharacter {
 
     @Override
     public Set<Spell> getGrantedSpells() {
-        return inventory.getEquippedItems().stream().flatMap(item -> item.getTemplate().getGrantedSpells().stream())
+        return inventory.getEquippedItems().stream().flatMap(item -> item.getGrantedSpells().stream())
                 .collect(Collectors.toSet());
     }
 

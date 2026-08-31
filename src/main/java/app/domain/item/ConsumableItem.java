@@ -1,10 +1,8 @@
 package app.domain.item;
 
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-import app.domain.*;
+import app.domain.ConsumableEffect;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.GamePlayerUsedManaPotion;
@@ -16,13 +14,9 @@ public class ConsumableItem extends ItemTemplate {
     private final ConsumableEffect effect;
     private final String effectDice;
 
-    public ConsumableItem(UUID id, String name, String description, ItemType type, int weight,
-            ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus,
-            int critBonus, int atkSpd, int price, List<Spell> grantedSpells,
-            Map<SpellElement, Integer> elementalResistances, ItemGrade grade, String setId, ConsumableEffect effect,
-            String effectDice) {
-        super(id, name, description, type, weight, armorCategory, pAtk, mAtk, pDef, mDef, accuracyBonus, evasionBonus,
-                critBonus, atkSpd, price, grantedSpells, elementalResistances, grade, setId);
+    public ConsumableItem(UUID id, String name, String description, ItemType type, int weight, int price,
+            ItemGrade grade, ConsumableEffect effect, String effectDice) {
+        super(id, name, description, type, weight, price, grade);
         this.effect = effect;
         this.effectDice = effectDice;
     }

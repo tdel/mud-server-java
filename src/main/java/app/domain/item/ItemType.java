@@ -3,7 +3,7 @@ package app.domain.item;
 import java.util.Optional;
 
 public enum ItemType {
-    WEAPON, HELMET, ARMOR, PANTS, BOOTS, GLOVES, SHIELD, POTION, KEY, TOOL, MISC, FOOD;
+    WEAPON, HELMET, ARMOR, PANTS, BOOTS, GLOVES, SHIELD, POTION, KEY, TOOL, MISC;
 
     public Optional<EquipmentSlot> equipmentSlot() {
         return switch (this) {

@@ -19,10 +19,6 @@
                     { "itemTemplateId": "019fa0a5-80bf-7e84-87bf-5cf699c00315", "price": 50 },
                     { "itemTemplateId": "019fa0a5-80c0-7035-9c2d-113b09a275df", "price": 10 },
                     { "itemTemplateId": "019fcf0d-1f8f-7d01-8e4f-fd592812a1a7", "price": 10 },
-                    { "itemTemplateId": "b4b5f22f-0fd1-43a6-b1f0-7ac0103478d6", "price": 1 },
-                    { "itemTemplateId": "db14f158-a073-4ef4-9dcd-94fea003e416", "price": 1 },
-                    { "itemTemplateId": "507c6d42-1a10-4195-bc99-753be8bc4902", "price": 2 },
-                    { "itemTemplateId": "95c33240-6454-408f-9584-cfb45427db84", "price": 3 },
                     { "itemTemplateId": "3a4a5836-051e-4641-aef8-7b6e6792322e", "price": 60 }
                 ]
             }

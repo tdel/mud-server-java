@@ -1,9 +1,11 @@
 package app.domain.item;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import app.domain.Spell;
 import app.domain.SpellElement;
 import app.domain.actor.AbstractCharacter;
 import app.game.combat.CombatFormulas;
@@ -56,23 +58,23 @@ public class Item {
     }
 
     public ArmorCategory getArmorCategory() {
-        return template.getArmorCategory();
+        return equipment().getArmorCategory();
     }
 
     public int getPAtk() {
-        return CombatFormulas.enchantBonus(template.getPAtk(), enchant, CombatFormulas.ENCHANT_ATK_BONUS_PER_LEVEL);
+        return CombatFormulas.enchantBonus(equipment().getPAtk(), enchant, CombatFormulas.ENCHANT_ATK_BONUS_PER_LEVEL);
     }
 
     public int getMAtk() {
-        return CombatFormulas.enchantBonus(template.getMAtk(), enchant, CombatFormulas.ENCHANT_ATK_BONUS_PER_LEVEL);
+        return CombatFormulas.enchantBonus(equipment().getMAtk(), enchant, CombatFormulas.ENCHANT_ATK_BONUS_PER_LEVEL);
     }
 
     public int getPDef() {
-        return CombatFormulas.enchantBonus(template.getPDef(), enchant, CombatFormulas.ENCHANT_DEF_BONUS_PER_LEVEL);
+        return CombatFormulas.enchantBonus(equipment().getPDef(), enchant, CombatFormulas.ENCHANT_DEF_BONUS_PER_LEVEL);
     }
 
     public int getMDef() {
-        return CombatFormulas.enchantBonus(template.getMDef(), enchant, CombatFormulas.ENCHANT_DEF_BONUS_PER_LEVEL);
+        return CombatFormulas.enchantBonus(equipment().getMDef(), enchant, CombatFormulas.ENCHANT_DEF_BONUS_PER_LEVEL);
     }
 
     public int getEnchant() {
@@ -84,27 +86,39 @@ public class Item {
     }
 
     public int getAccuracyBonus() {
-        return template.getAccuracyBonus();
+        return equipment().getAccuracyBonus();
     }
 
     public int getEvasionBonus() {
-        return template.getEvasionBonus();
+        return equipment().getEvasionBonus();
     }
 
     public int getCritBonus() {
-        return template.getCritBonus();
+        return equipment().getCritBonus();
     }
 
     public int getAtkSpd() {
-        return template.getAtkSpd();
+        return equipment().getAtkSpd();
     }
 
     public Map<SpellElement, Integer> getElementalResistances() {
-        return template.getElementalResistances();
+        return equipment().getElementalResistances();
+    }
+
+    public List<Spell> getGrantedSpells() {
+        return equipment().getGrantedSpells();
+    }
+
+    public String getSetId() {
+        return equipment().getSetId();
     }
 
     public ItemGrade getGrade() {
         return template.getGrade();
+    }
+
+    private EquipmentItem equipment() {
+        return (EquipmentItem) template;
     }
 
     public void setCharacter(AbstractCharacter character) {
