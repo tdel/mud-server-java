@@ -73,7 +73,6 @@ public final class CharacterInstance extends AbstractCharacter {
         this.classSystem = new ClassSystem(this, characterClass, subclasses);
         this.level = level;
         this.xp = xp;
-        items.forEach(item -> item.attachOwner(this));
         this.inventorySystem = new InventorySystem(this, gold, items);
         this.combatSystem = new CombatSystem(this);
         this.maxMana = maxMana;

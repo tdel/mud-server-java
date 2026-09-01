@@ -34,6 +34,7 @@ public final class InventorySystem {
         this.character = character;
         this.gold = gold;
         this.items.addAll(items);
+        items.forEach(item -> item.attachOwner(this.character));
     }
 
     public int getGold() {
