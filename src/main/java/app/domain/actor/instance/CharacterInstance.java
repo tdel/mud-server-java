@@ -61,7 +61,7 @@ public final class CharacterInstance extends AbstractCharacter {
             Set<ActiveSkill> knownSkills, List<ActiveEffect> activeEffects, List<Subclass> subclasses,
             Set<PassiveSkill> knownPassiveSkills, List<Item> items) {
         super(id, name, attributes, currentHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects,
-                computeBaseStats(attributes, level, items, race.speed()), false);
+                computeBaseStats(attributes, level, items, race.speed()), false, 0, 0, List.of());
         this.account = account;
         getMotionSystem().setCurrentMap(map);
         this.appearanceSystem = new AppearanceSystem(this, gender, race);

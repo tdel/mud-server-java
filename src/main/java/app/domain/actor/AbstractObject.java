@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public abstract class AbstractObject {
 
-    private UUID id;
+    private final UUID id;
     private String name;
     private AbstractZone zone = NormalZone.INSTANCE;
 

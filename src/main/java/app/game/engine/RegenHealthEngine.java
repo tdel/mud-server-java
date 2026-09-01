@@ -87,7 +87,7 @@ public class RegenHealthEngine {
                 : List.of(killer);
         double multiplier = party != null ? party.shareMultiplier(eligible.size()) : 1.0;
 
-        monster.grantLootTo(killer, party, eligible, multiplier);
+        monster.getLootSystem().grantLootTo(killer, party, eligible, multiplier);
     }
 
     @EventListener

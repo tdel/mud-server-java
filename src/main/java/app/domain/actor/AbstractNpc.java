@@ -18,7 +18,8 @@ public class AbstractNpc extends AbstractCharacter {
 
     public AbstractNpc(UUID id, NpcTemplate template, MapInstance map) {
         super(id, template.name(), neutralAttributes(), NOMINAL_HEALTH, NOMINAL_HEALTH, template.knownSkills(),
-                template.knownPassiveSkills(), template.activeEffects(), Map.of(ModifiedStat.SPEED, 0), true);
+                template.knownPassiveSkills(), template.activeEffects(), Map.of(ModifiedStat.SPEED, 0), true, 0, 0,
+                List.of());
         this.template = Objects.requireNonNull(template);
         getMotionSystem().setCurrentMap(Objects.requireNonNull(map));
     }
@@ -41,23 +42,6 @@ public class AbstractNpc extends AbstractCharacter {
             attributes.put(attribute, 10);
         }
         return attributes;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof AbstractNpc other)) {
-            return false;
-        }
-        return Objects.equals(getId(), other.getId()) && Objects.equals(getName(), other.getName())
-                && Objects.equals(getMotionSystem().getCurrentMap(), other.getMotionSystem().getCurrentMap());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getName(), getMotionSystem().getCurrentMap());
     }
 
     @Override

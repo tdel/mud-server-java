@@ -12,10 +12,12 @@ import app.domain.PassiveSkill;
 import app.domain.SkillElement;
 import app.domain.actor.system.CombatSystem;
 import app.domain.actor.system.EffectsSystem;
+import app.domain.actor.system.LootSystem;
 import app.domain.actor.system.MotionSystem;
 import app.domain.actor.system.SkillSystem;
 import app.domain.actor.system.StatSystem;
 import app.domain.actor.instance.CharacterInstance;
+import app.domain.item.LootTableEntry;
 import app.domain.world.MapInstance;
 import app.network.OutputMessage;
 
@@ -27,6 +29,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     private final MotionSystem motionSystem = new MotionSystem(this);
     private final CombatSystem combatSystem;
     private final StatSystem statSystem;
+    private final LootSystem lootSystem;
     private int currentHealth;
     private int maxHealth;
 
@@ -34,13 +37,15 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
             int maxHealth, Set<ActiveSkill> knownSkills, Set<PassiveSkill> knownPassiveSkills,
-            List<ActiveEffect> activeEffects, Map<ModifiedStat, Integer> initialBaseStats, boolean invulnerable) {
+            List<ActiveEffect> activeEffects, Map<ModifiedStat, Integer> initialBaseStats, boolean invulnerable,
+            int xpReward, int goldReward, List<LootTableEntry> lootTable) {
         super(id, name);
         this.attributes = new EnumMap<>(attributes);
         this.currentHealth = currentHealth;
         this.maxHealth = maxHealth;
         this.statSystem = new StatSystem(effectsSystem, initialBaseStats);
         this.combatSystem = new CombatSystem(this, invulnerable);
+        this.lootSystem = new LootSystem(this, xpReward, goldReward, lootTable);
         knownSkills.forEach(getSkillSystem()::learn);
         knownPassiveSkills.forEach(getSkillSystem()::learn);
         activeEffects.forEach(getEffectsSystem()::apply);
@@ -88,6 +93,10 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public CombatSystem getCombatSystem() {
         return combatSystem;
+    }
+
+    public LootSystem getLootSystem() {
+        return lootSystem;
     }
 
     // Défaut neutre : seul CharacterInstance suit une réserve de mana ;

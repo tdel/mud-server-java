@@ -113,7 +113,7 @@ public class CharacterPersistenceListener {
                 || !(event.killer() instanceof CharacterInstance killer)) {
             return;
         }
-        int xpReward = monster.getXpReward();
+        int xpReward = monster.getLootSystem().getXpReward();
         Party party = killer.getParty();
 
         List<CharacterInstance> eligible = party != null
