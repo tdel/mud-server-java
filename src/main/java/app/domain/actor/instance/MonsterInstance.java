@@ -17,14 +17,10 @@ import app.domain.SkillElement;
 import app.domain.actor.Attribute;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.ModifiedStat;
-import app.domain.actor.event.CharacterDamaged;
-import app.domain.actor.event.CharacterDied;
-import app.domain.actor.event.DomainEventPublisher;
 import app.domain.item.Item;
 import app.domain.item.LootResult;
 import app.domain.item.LootTableEntry;
 import app.domain.map.Position;
-import app.domain.world.PeaceZone;
 import app.game.engine.MonsterAiEngine;
 import app.game.Randomizer;
 
@@ -48,7 +44,8 @@ public final class MonsterInstance extends AbstractCharacter {
             Set<PassiveSkill> knownPassiveSkills, List<ActiveEffect> activeEffects, int level, int aggroRadius,
             Map<SkillElement, Integer> elementalResistances, int xpReward, int goldReward,
             List<LootTableEntry> lootTable) {
-        super(id, name, attributes, maxHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects, baseStats);
+        super(id, name, attributes, maxHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects, baseStats,
+                false);
         this.spawnPosition = spawnPosition;
         this.level = level;
         this.aggroRadius = aggroRadius;
@@ -56,30 +53,6 @@ public final class MonsterInstance extends AbstractCharacter {
         this.xpReward = xpReward;
         this.goldReward = goldReward;
         this.lootTable = lootTable;
-    }
-
-    @Override
-    public boolean takeDamage(int amount, AbstractCharacter attacker) {
-        boolean defeated;
-        int healthAfter;
-        synchronized (this) {
-            if (getCurrentHealth() <= 0) {
-                return false;
-            }
-            if (getZone() instanceof PeaceZone) {
-                return false;
-            }
-            setCurrentHealth(Math.max(0, getCurrentHealth() - amount));
-            defeated = getCurrentHealth() <= 0;
-            healthAfter = getCurrentHealth();
-        }
-        log.debug("monster.take_damage thread={} monsterId={} attacker={} amount={} healthAfter={}",
-                Thread.currentThread().getName(), getId(), attacker.getId(), amount, healthAfter);
-        DomainEventPublisher.publish(new CharacterDamaged(this, attacker, amount));
-        if (defeated) {
-            DomainEventPublisher.publish(new CharacterDied(this, attacker));
-        }
-        return defeated;
     }
 
     private LootResult rollLoot(CharacterInstance killer) {

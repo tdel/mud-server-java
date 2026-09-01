@@ -25,7 +25,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     private final EffectsSystem effectsSystem = new EffectsSystem(this);
     private final SkillSystem skillSystem = new SkillSystem(this);
     private final MotionSystem motionSystem = new MotionSystem(this);
-    private final CombatSystem combatSystem = new CombatSystem(this);
+    private final CombatSystem combatSystem;
     private final StatSystem statSystem;
     private int currentHealth;
     private int maxHealth;
@@ -34,12 +34,13 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
             int maxHealth, Set<ActiveSkill> knownSkills, Set<PassiveSkill> knownPassiveSkills,
-            List<ActiveEffect> activeEffects, Map<ModifiedStat, Integer> initialBaseStats) {
+            List<ActiveEffect> activeEffects, Map<ModifiedStat, Integer> initialBaseStats, boolean invulnerable) {
         super(id, name);
         this.attributes = new EnumMap<>(attributes);
         this.currentHealth = currentHealth;
         this.maxHealth = maxHealth;
         this.statSystem = new StatSystem(effectsSystem, initialBaseStats);
+        this.combatSystem = new CombatSystem(this, invulnerable);
         knownSkills.forEach(getSkillSystem()::learn);
         knownPassiveSkills.forEach(getSkillSystem()::learn);
         activeEffects.forEach(getEffectsSystem()::apply);
@@ -55,7 +56,9 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public abstract int getLevel();
 
-    public abstract boolean takeDamage(int amount, AbstractCharacter attacker);
+    public boolean takeDamage(int amount, AbstractCharacter attacker) {
+        return combatSystem.takeDamage(amount, attacker);
+    }
 
     // Défaut neutre : seul CharacterInstance a des objets équipés susceptibles
     // de porter des résistances élémentaires ; MonsterInstance la surcharge.

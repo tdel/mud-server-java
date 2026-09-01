@@ -18,20 +18,13 @@ public class AbstractNpc extends AbstractCharacter {
 
     public AbstractNpc(UUID id, NpcTemplate template, MapInstance map) {
         super(id, template.name(), neutralAttributes(), NOMINAL_HEALTH, NOMINAL_HEALTH, template.knownSkills(),
-                template.knownPassiveSkills(), template.activeEffects(), Map.of(ModifiedStat.SPEED, 0));
+                template.knownPassiveSkills(), template.activeEffects(), Map.of(ModifiedStat.SPEED, 0), true);
         this.template = Objects.requireNonNull(template);
         getMotionSystem().setCurrentMap(Objects.requireNonNull(map));
     }
 
     public int getLevel() {
         return template.level();
-    }
-
-    // Jamais réellement appelée : CombatSystem.attack() rejette toute cible
-    // instanceof AbstractNpc avant résolution du coup (marchands non attaquables).
-    @Override
-    public boolean takeDamage(int amount, AbstractCharacter attacker) {
-        return false;
     }
 
     public Optional<NpcDialogue> getDialogue() {

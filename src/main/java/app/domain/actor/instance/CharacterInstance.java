@@ -20,8 +20,6 @@ import app.domain.ActiveEffect;
 import app.domain.actor.system.AppearanceSystem;
 import app.domain.actor.system.ClassSystem;
 import app.domain.actor.system.InventorySystem;
-import app.domain.actor.event.CharacterDamaged;
-import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.CharacterGainedXp;
 import app.domain.actor.event.CharacterLeveledUp;
 import app.domain.actor.event.CharacterRegenerated;
@@ -34,7 +32,6 @@ import app.domain.item.ItemSet;
 import app.domain.map.Position;
 import app.domain.item.Item;
 import app.domain.world.MapInstance;
-import app.domain.world.PeaceZone;
 import app.domain.world.WorldInstance;
 import app.game.catalog.ItemSetCatalogHolder;
 import app.game.combat.CombatFormulas;
@@ -64,7 +61,7 @@ public final class CharacterInstance extends AbstractCharacter {
             Set<ActiveSkill> knownSkills, List<ActiveEffect> activeEffects, List<Subclass> subclasses,
             Set<PassiveSkill> knownPassiveSkills, List<Item> items) {
         super(id, name, attributes, currentHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects,
-                computeBaseStats(attributes, level, items, race.speed()));
+                computeBaseStats(attributes, level, items, race.speed()), false);
         this.account = account;
         getMotionSystem().setCurrentMap(map);
         this.appearanceSystem = new AppearanceSystem(this, gender, race);
@@ -280,24 +277,6 @@ public final class CharacterInstance extends AbstractCharacter {
         recomputeStats();
 
         DomainEventPublisher.publish(new CharacterLeveledUp(this, level, hpGain));
-    }
-
-    @Override
-    public boolean takeDamage(int amount, AbstractCharacter attacker) {
-        if (getCurrentHealth() <= 0) {
-            return false;
-        }
-        if (getZone() instanceof PeaceZone) {
-            return false;
-        }
-        setCurrentHealth(Math.max(0, getCurrentHealth() - amount));
-        boolean defeated = getCurrentHealth() <= 0;
-        DomainEventPublisher.publish(new CharacterDamaged(this, attacker, amount));
-        if (defeated) {
-            getCombatSystem().setTarget(null);
-            DomainEventPublisher.publish(new CharacterDied(this, attacker));
-        }
-        return defeated;
     }
 
     public void respawn(MapInstance destination, Position position) {

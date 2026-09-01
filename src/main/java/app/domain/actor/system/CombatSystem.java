@@ -11,6 +11,8 @@ import app.domain.actor.AbstractCharacter;
 import app.domain.actor.AbstractNpc;
 import app.domain.actor.ModifiedStat;
 import app.domain.actor.event.CharacterBeginAttack;
+import app.domain.actor.event.CharacterDamaged;
+import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.world.PeaceZone;
 import app.game.combat.CombatFormulas;
@@ -22,11 +24,13 @@ public final class CombatSystem {
     private static final Logger log = LoggerFactory.getLogger(CombatSystem.class);
 
     private final AbstractCharacter character;
+    private final boolean invulnerable;
     private volatile AbstractCharacter target;
     private volatile Instant nextAttackAt = Instant.MIN;
 
-    public CombatSystem(AbstractCharacter character) {
+    public CombatSystem(AbstractCharacter character, boolean invulnerable) {
         this.character = character;
+        this.invulnerable = invulnerable;
     }
 
     public AbstractCharacter getTarget() {
@@ -116,6 +120,34 @@ public final class CombatSystem {
 
     private boolean applyDamage(AbstractCharacter defender, int damage) {
         return defender.takeDamage(damage, character);
+    }
+
+    // Logique commune à CharacterInstance et MonsterInstance :
+    // synchronized(character)
+    // couvre le cas monstre (attaqué par un joueur en même temps que
+    // MonsterAiEngine
+    // le fait agir), et ne coûte rien de plus pour un joueur (déjà mono-thread).
+    public boolean takeDamage(int amount, AbstractCharacter attacker) {
+        if (invulnerable) {
+            return false;
+        }
+        boolean defeated;
+        synchronized (character) {
+            if (character.getCurrentHealth() <= 0 || character.getZone() instanceof PeaceZone) {
+                return false;
+            }
+            character.setCurrentHealth(Math.max(0, character.getCurrentHealth() - amount));
+            defeated = character.getCurrentHealth() <= 0;
+        }
+        log.debug("character.take_damage thread={} character={} attacker={} amount={} healthAfter={}",
+                Thread.currentThread().getName(), character.getId(), attacker.getId(), amount,
+                character.getCurrentHealth());
+        DomainEventPublisher.publish(new CharacterDamaged(character, attacker, amount));
+        if (defeated) {
+            clearTarget();
+            DomainEventPublisher.publish(new CharacterDied(character, attacker));
+        }
+        return defeated;
     }
 
     public sealed interface AttackOutcome {
