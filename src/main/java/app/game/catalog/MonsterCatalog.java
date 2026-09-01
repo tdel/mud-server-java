@@ -92,7 +92,7 @@ public class MonsterCatalog {
                 template.getCritBonus(), 0, template.getAtkSpd(), template.getAttributes(), template.getLevel());
         baseStats.put(ModifiedStat.SPEED, template.getSpeed());
 
-        MonsterInstance monster = new MonsterInstance(spawn.id(), template.getName(), template.getId(), map.getId(),
+        MonsterInstance monster = new MonsterInstance(spawn.id(), template.getName(), map.getId(),
                 template.getAttributes(), template.getMaxHealth(), baseStats, spawn.position(),
                 template.getKnownSkills(), template.getKnownPassiveSkills(), template.getActiveEffects(),
                 template.getLevel(), template.getPresenceRadius(), template.getElementalResistances(),

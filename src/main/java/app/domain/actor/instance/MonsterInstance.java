@@ -32,7 +32,6 @@ public final class MonsterInstance extends AbstractCharacter {
 
     private static final Logger log = LoggerFactory.getLogger(MonsterInstance.class);
 
-    private final UUID templateId;
     private final UUID mapId;
     private final Position spawnPosition;
 
@@ -45,13 +44,12 @@ public final class MonsterInstance extends AbstractCharacter {
 
     public volatile MonsterAiEngine.PursuitState pursuit;
 
-    public MonsterInstance(UUID id, String name, UUID templateId, UUID mapId, Map<Attribute, Integer> attributes,
-            int maxHealth, Map<ModifiedStat, Integer> baseStats, Position spawnPosition, Set<ActiveSkill> knownSkills,
+    public MonsterInstance(UUID id, String name, UUID mapId, Map<Attribute, Integer> attributes, int maxHealth,
+            Map<ModifiedStat, Integer> baseStats, Position spawnPosition, Set<ActiveSkill> knownSkills,
             Set<PassiveSkill> knownPassiveSkills, List<ActiveEffect> activeEffects, int level, int presenceRadius,
             Map<SkillElement, Integer> elementalResistances, int xpReward, int goldReward,
             List<LootTableEntry> lootTable) {
         super(id, name, attributes, maxHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects, baseStats);
-        this.templateId = templateId;
         this.mapId = mapId;
         this.spawnPosition = spawnPosition;
         this.level = level;
@@ -163,18 +161,13 @@ public final class MonsterInstance extends AbstractCharacter {
         return elementalResistances;
     }
 
-    public UUID getTemplateId() {
-        return templateId;
-    }
-
     public Position getSpawnPosition() {
         return spawnPosition;
     }
 
     @Override
     public String toString() {
-        return "GameMonster[id=" + getId() + ", name=" + getName() + ", templateId=" + templateId + ", mapId=" + mapId
-                + ", spawnPosition=" + spawnPosition + ", currentHealth=" + getCurrentHealth() + ", maxHealth="
-                + getMaxHealth() + "]";
+        return "GameMonster[id=" + getId() + ", name=" + getName() + ", mapId=" + mapId + ", spawnPosition="
+                + spawnPosition + ", currentHealth=" + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + "]";
     }
 }
