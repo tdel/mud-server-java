@@ -41,14 +41,19 @@ public final class MonsterInstance extends AbstractCharacter {
             Map<Attribute, Integer> attributes, int maxHealth, Position spawnPosition, Set<ActiveSkill> knownSkills,
             Set<PassiveSkill> knownPassiveSkills, List<ActiveEffect> activeEffects) {
         super(id, name, attributes, maxHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects,
-                CombatFormulas.baseStats(template.getPAtk(), template.getMAtk(), template.getPDef(), template.getMDef(),
-                        template.getAccuracyBonus(), template.getEvasionBonus(), template.getCritBonus(), 0,
-                        template.getAtkSpd(), attributes, template.getLevel()));
+                baseStats(template, attributes));
         this.template = Objects.requireNonNull(template);
         this.templateId = template.getId();
         this.mapId = mapId;
         this.spawnPosition = spawnPosition;
-        getMotionSystem().setSpeed(template.getSpeed());
+    }
+
+    private static Map<ModifiedStat, Integer> baseStats(MonsterTemplate template, Map<Attribute, Integer> attributes) {
+        Map<ModifiedStat, Integer> stats = CombatFormulas.baseStats(template.getPAtk(), template.getMAtk(),
+                template.getPDef(), template.getMDef(), template.getAccuracyBonus(), template.getEvasionBonus(),
+                template.getCritBonus(), 0, template.getAtkSpd(), attributes, template.getLevel());
+        stats.put(ModifiedStat.SPEED, template.getSpeed());
+        return stats;
     }
 
     public boolean takeDamage(int amount, CharacterInstance attacker) {

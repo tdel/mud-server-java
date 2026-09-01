@@ -1,7 +1,7 @@
 package app.domain.actor;
 
 public enum ModifiedStat {
-    ACCURACY, EVASION, PATK, PDEF, MATK, MDEF, PCRIT, MCRIT, ATKSPD;
+    ACCURACY, EVASION, PATK, PDEF, MATK, MDEF, PCRIT, MCRIT, ATKSPD, SPEED;
 
     public String label() {
         return switch (this) {
@@ -14,6 +14,7 @@ public enum ModifiedStat {
             case PCRIT -> "P.Crit.";
             case MCRIT -> "M.Crit.";
             case ATKSPD -> "Atk.Spd.";
+            case SPEED -> "Speed";
         };
     }
 }

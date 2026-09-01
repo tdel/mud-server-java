@@ -1,6 +1,7 @@
 package app.domain.actor.system;
 
 import app.domain.actor.AbstractCharacter;
+import app.domain.actor.ModifiedStat;
 import app.domain.actor.event.CharacterPositionChanged;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.instance.CharacterInstance;
@@ -12,13 +13,10 @@ import app.game.engine.MovementEngine;
 
 public final class MotionSystem {
 
-    public static final int DEFAULT_SPEED = 110;
-
     private final AbstractCharacter character;
     private volatile MapInstance currentMap;
     private volatile Position position;
     private volatile double heading;
-    private volatile int speed = DEFAULT_SPEED;
     private volatile MovementEngine.ActiveMovement activeMovement;
 
     public MotionSystem(AbstractCharacter character) {
@@ -61,11 +59,7 @@ public final class MotionSystem {
     }
 
     public int getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(int speed) {
-        this.speed = speed;
+        return character.getStatSystem().getEffective(ModifiedStat.SPEED);
     }
 
     public MovementEngine.ActiveMovement getActiveMovement() {

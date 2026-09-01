@@ -66,11 +66,10 @@ public final class CharacterInstance extends AbstractCharacter {
             Set<ActiveSkill> knownSkills, List<ActiveEffect> activeEffects, List<Subclass> subclasses,
             Set<PassiveSkill> knownPassiveSkills, List<Item> items) {
         super(id, name, attributes, currentHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects,
-                computeBaseStats(attributes, level, items));
+                computeBaseStats(attributes, level, items, race.speed()));
         this.account = account;
         getMotionSystem().setCurrentMap(map);
         this.appearanceSystem = new AppearanceSystem(this, gender, race);
-        getMotionSystem().setSpeed(race.speed());
         this.classSystem = new ClassSystem(this, characterClass, subclasses);
         this.level = level;
         this.xp = xp;
@@ -88,7 +87,7 @@ public final class CharacterInstance extends AbstractCharacter {
     // par recomputeStats() pour les recalculs post-construction (équipement,
     // level up).
     private static Map<ModifiedStat, Integer> computeBaseStats(Map<Attribute, Integer> attributes, int level,
-            List<Item> items) {
+            List<Item> items, int baseSpeed) {
         List<Item> equipped = items.stream().filter(item -> item.getSlot() != null).toList();
         Optional<Item> weapon = equipped.stream().filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
 
@@ -103,8 +102,11 @@ public final class CharacterInstance extends AbstractCharacter {
         int armorWeightPenalty = equipped.stream().filter(item -> item.getSlot() == EquipmentSlot.CHEST).findFirst()
                 .map(item -> CombatFormulas.armorWeightPenalty(item.getArmorCategory())).orElse(0);
 
-        return CombatFormulas.baseStats(weaponPAtk, weaponMAtk, armorPDefSum, armorMDefSum, accuracyItemBonus,
-                evasionItemBonus, critItemBonus, armorWeightPenalty, weaponAtkSpd, attributes, level);
+        Map<ModifiedStat, Integer> stats = CombatFormulas.baseStats(weaponPAtk, weaponMAtk, armorPDefSum, armorMDefSum,
+                accuracyItemBonus, evasionItemBonus, critItemBonus, armorWeightPenalty, weaponAtkSpd, attributes,
+                level);
+        stats.put(ModifiedStat.SPEED, baseSpeed);
+        return stats;
     }
 
     private Map<ModifiedStat, Integer> computeSetBonuses() {
@@ -128,7 +130,9 @@ public final class CharacterInstance extends AbstractCharacter {
     // InventorySystem) ou de niveau (applyLevelUp) : p.atk/m.atk/accuracy/...
     // dépendent de l'arme/armure équipée et de level.
     public void recomputeStats() {
-        getStatSystem().updateBase(computeBaseStats(getAttributes(), getLevel(), inventorySystem.getItems()));
+        int baseSpeed = getStatSystem().getBase(ModifiedStat.SPEED);
+        getStatSystem()
+                .updateBase(computeBaseStats(getAttributes(), getLevel(), inventorySystem.getItems(), baseSpeed));
         getStatSystem().setSetBonuses(computeSetBonuses());
     }
 
