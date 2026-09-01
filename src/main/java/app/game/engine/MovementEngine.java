@@ -17,8 +17,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import app.domain.actor.AbstractCharacter;
-import app.domain.actor.event.AttackBegin;
-import app.domain.actor.event.GamePlayerDied;
+import app.domain.actor.event.CharacterBeginAttack;
+import app.domain.actor.event.CharacterDied;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.message.ingame.CharacterMovementBlocked;
 import app.network.message.ingame.CharacterMovementFinished;
@@ -79,12 +79,12 @@ public class MovementEngine {
     }
 
     @EventListener
-    void onGamePlayerDied(GamePlayerDied event) {
+    void onCharacterDied(CharacterDied event) {
         stopMovement(event.character());
     }
 
     @EventListener
-    void onAttackBegin(AttackBegin event) {
+    void onCharacterBeginAttack(CharacterBeginAttack event) {
         stopMovement(event.attacker());
     }
 

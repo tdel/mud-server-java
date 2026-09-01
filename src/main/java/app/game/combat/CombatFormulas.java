@@ -61,6 +61,7 @@ public final class CombatFormulas {
     public static final double MP_REGEN_RATE = 0.02;
     public static final int BASE_ATK_SPD = 300;
     public static final double ATK_SPD_DELAY_CONSTANT = 500_000.0;
+    public static final double ATTACK_RANGE = 1.0;
 
     private CombatFormulas() {
     }

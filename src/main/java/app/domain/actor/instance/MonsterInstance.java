@@ -17,6 +17,7 @@ import app.domain.SkillElement;
 import app.domain.actor.Attribute;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.ModifiedStat;
+import app.domain.actor.event.CharacterDamaged;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.item.Item;
@@ -24,7 +25,6 @@ import app.domain.item.LootResult;
 import app.domain.item.LootTableEntry;
 import app.domain.map.Position;
 import app.domain.world.PeaceZone;
-import app.game.combat.CombatFormulas;
 import app.game.engine.MonsterAiEngine;
 import app.game.Randomizer;
 
@@ -58,7 +58,8 @@ public final class MonsterInstance extends AbstractCharacter {
         this.lootTable = lootTable;
     }
 
-    public boolean takeDamage(int amount, CharacterInstance attacker) {
+    @Override
+    public boolean takeDamage(int amount, AbstractCharacter attacker) {
         boolean defeated;
         int healthAfter;
         synchronized (this) {
@@ -74,39 +75,11 @@ public final class MonsterInstance extends AbstractCharacter {
         }
         log.debug("monster.take_damage thread={} monsterId={} attacker={} amount={} healthAfter={}",
                 Thread.currentThread().getName(), getId(), attacker.getId(), amount, healthAfter);
+        DomainEventPublisher.publish(new CharacterDamaged(this, attacker, amount));
         if (defeated) {
             DomainEventPublisher.publish(new CharacterDied(this, attacker));
         }
         return defeated;
-    }
-
-    public MonsterAttackOutcome attack(CharacterInstance defender) {
-        double hitChance = CombatFormulas.hitChance(getStatSystem().getEffective(ModifiedStat.ACCURACY),
-                defender.getStatSystem().getEffective(ModifiedStat.EVASION));
-        boolean hit = Randomizer.rollChance(hitChance);
-
-        int damage = 0;
-        boolean critical = false;
-        boolean defeated = false;
-        int healthAfter = defender.getCurrentHealth();
-
-        if (hit) {
-            critical = Randomizer.rollChance(getStatSystem().getEffective(ModifiedStat.PCRIT) / 100.0);
-            damage = CombatFormulas.resolveDamage(getStatSystem().getEffective(ModifiedStat.PATK),
-                    defender.getStatSystem().getEffective(ModifiedStat.PDEF), critical);
-            healthAfter = Math.max(0, defender.getCurrentHealth() - damage);
-            defeated = defender.takeDamage(damage, this);
-        }
-
-        log.info(
-                "combat.attack_resolved attacker={} defender={} hit={} critical={} damage={} defenderHealthAfter={} defeated={}",
-                getId(), defender.getId(), hit, critical, damage, healthAfter, defeated);
-
-        return new MonsterAttackOutcome(hit, critical, damage, healthAfter, defender.getMaxHealth(), defeated);
-    }
-
-    public record MonsterAttackOutcome(boolean hit, boolean critical, int damage, int targetHealthAfter,
-            int targetMaxHealth, boolean targetDefeated) {
     }
 
     private LootResult rollLoot(CharacterInstance killer) {

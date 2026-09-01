@@ -19,14 +19,13 @@ import app.domain.actor.*;
 import app.domain.ActiveEffect;
 import app.domain.actor.system.AppearanceSystem;
 import app.domain.actor.system.ClassSystem;
-import app.domain.actor.system.CombatSystem;
 import app.domain.actor.system.InventorySystem;
+import app.domain.actor.event.CharacterDamaged;
+import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.CharacterGainedXp;
 import app.domain.actor.event.CharacterLeveledUp;
 import app.domain.actor.event.CharacterRegenerated;
 import app.domain.actor.event.DomainEventPublisher;
-import app.domain.actor.event.GamePlayerDamaged;
-import app.domain.actor.event.GamePlayerDied;
 import app.domain.actor.event.GamePlayerMovedToMap;
 import app.domain.actor.event.GamePlayerRespawned;
 import app.game.catalog.LevelCatalogHolder;
@@ -53,7 +52,6 @@ public final class CharacterInstance extends AbstractCharacter {
 
     private Connection connection;
     private final InventorySystem inventorySystem;
-    private final CombatSystem combatSystem;
     private Party party;
     private PendingPartyInvite pendingInvite;
     private int xp;
@@ -74,7 +72,6 @@ public final class CharacterInstance extends AbstractCharacter {
         this.level = level;
         this.xp = xp;
         this.inventorySystem = new InventorySystem(this, gold, items);
-        this.combatSystem = new CombatSystem(this);
         this.maxMana = maxMana;
         this.currentMana = currentMana;
         inventorySystem.recomputeGradePenalty();
@@ -182,10 +179,6 @@ public final class CharacterInstance extends AbstractCharacter {
         this.connection = connection;
     }
 
-    public CombatSystem getCombatSystem() {
-        return combatSystem;
-    }
-
     public Party getParty() {
         return party;
     }
@@ -231,7 +224,7 @@ public final class CharacterInstance extends AbstractCharacter {
 
     @Override
     public void clearCombatTarget() {
-        combatSystem.clearTarget();
+        getCombatSystem().clearTarget();
     }
 
     public int gainMana(int amount) {
@@ -289,6 +282,7 @@ public final class CharacterInstance extends AbstractCharacter {
         DomainEventPublisher.publish(new CharacterLeveledUp(this, level, hpGain));
     }
 
+    @Override
     public boolean takeDamage(int amount, AbstractCharacter attacker) {
         if (getCurrentHealth() <= 0) {
             return false;
@@ -298,10 +292,10 @@ public final class CharacterInstance extends AbstractCharacter {
         }
         setCurrentHealth(Math.max(0, getCurrentHealth() - amount));
         boolean defeated = getCurrentHealth() <= 0;
-        DomainEventPublisher.publish(new GamePlayerDamaged(this, attacker, amount));
+        DomainEventPublisher.publish(new CharacterDamaged(this, attacker, amount));
         if (defeated) {
             getCombatSystem().setTarget(null);
-            DomainEventPublisher.publish(new GamePlayerDied(this, attacker));
+            DomainEventPublisher.publish(new CharacterDied(this, attacker));
         }
         return defeated;
     }

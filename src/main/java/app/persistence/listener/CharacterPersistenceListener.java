@@ -10,14 +10,15 @@ import org.springframework.stereotype.Service;
 
 import app.domain.Party;
 import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.MonsterInstance;
 import app.domain.actor.event.CharacterChoseSubclass;
+import app.domain.actor.event.CharacterDamaged;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.CharacterGainedXp;
 import app.domain.actor.event.CharacterLeveledUp;
 import app.domain.actor.event.CharacterReceivedGold;
 import app.domain.actor.event.CharacterRegenerated;
 import app.domain.actor.event.CharacterSpentGold;
-import app.domain.actor.event.GamePlayerDamaged;
 import app.domain.actor.event.GamePlayerRespawned;
 import app.domain.actor.event.GamePlayerUsedManaPotion;
 import app.domain.actor.event.GamePlayerUsedPotion;
@@ -108,8 +109,11 @@ public class CharacterPersistenceListener {
 
     @EventListener
     void onCharacterDied(CharacterDied event) {
-        CharacterInstance killer = event.killer();
-        int xpReward = event.character().getXpReward();
+        if (!(event.character() instanceof MonsterInstance monster)
+                || !(event.killer() instanceof CharacterInstance killer)) {
+            return;
+        }
+        int xpReward = monster.getXpReward();
         Party party = killer.getParty();
 
         List<CharacterInstance> eligible = party != null
@@ -125,15 +129,18 @@ public class CharacterPersistenceListener {
         }
         killer.getCombatSystem().setTarget(null);
         log.info("combat.kill_credited killer={} monster={} xpReward={} partySize={} perMemberXp={}", killer.getName(),
-                event.character().getName(), xpReward, eligible.size(), perMemberXp);
+                monster.getName(), xpReward, eligible.size(), perMemberXp);
     }
 
     @EventListener
-    void onGamePlayerDamaged(GamePlayerDamaged event) {
-        characterDao.update(event.character());
-        broadcastVitalsToParty(event.character());
-        log.info("combat.damage_taken character={} attacker={} amount={} currentHealth={}", event.character().getName(),
-                event.attacker().getName(), event.amount(), event.character().getCurrentHealth());
+    void onCharacterDamaged(CharacterDamaged event) {
+        if (!(event.character() instanceof CharacterInstance character)) {
+            return;
+        }
+        characterDao.update(character);
+        broadcastVitalsToParty(character);
+        log.info("combat.damage_taken character={} attacker={} amount={} currentHealth={}", character.getName(),
+                event.attacker().getName(), event.amount(), character.getCurrentHealth());
     }
 
     @EventListener

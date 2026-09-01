@@ -10,7 +10,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import app.domain.actor.event.GamePlayerDied;
+import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.GamePlayerRespawned;
 import app.domain.actor.event.PlayerLoadedInWorld;
 import app.domain.actor.event.SkillCast;
@@ -38,8 +38,10 @@ public class RegenManaEngine {
     }
 
     @EventListener
-    void onGamePlayerDied(GamePlayerDied event) {
-        regenerating.remove(event.character().getId());
+    void onCharacterDied(CharacterDied event) {
+        if (event.character() instanceof CharacterInstance character) {
+            regenerating.remove(character.getId());
+        }
     }
 
     @EventListener

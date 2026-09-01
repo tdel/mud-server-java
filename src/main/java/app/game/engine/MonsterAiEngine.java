@@ -11,9 +11,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import app.domain.actor.ModifiedStat;
+import app.domain.actor.event.CharacterBeginAttack;
 import app.domain.actor.event.CharacterDied;
-import app.domain.actor.event.MonsterAttacked;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.map.Position;
@@ -21,7 +20,6 @@ import app.domain.world.CollisionGrid;
 import app.domain.world.MapInstance;
 import app.domain.world.PeaceZone;
 import app.game.combat.CombatFormulas;
-import app.network.message.ingame.AttackResult;
 import app.network.message.ingame.CharacterMovementFinished;
 import app.network.message.ingame.CharacterMovementStarted;
 import app.network.message.ingame.CharacterMovementStopped;
@@ -32,7 +30,6 @@ import app.network.message.ingame.MonsterStartedChasing;
 public class MonsterAiEngine {
 
     public static final double LEASH_RADIUS = 10.0;
-    public static final double ATTACK_RANGE = 1.0;
 
     private static final Logger log = LoggerFactory.getLogger(MonsterAiEngine.class);
 
@@ -41,20 +38,26 @@ public class MonsterAiEngine {
     private final Map<UUID, MonsterInstance> pursuing = new ConcurrentHashMap<>();
 
     @EventListener
-    void onMonsterAttacked(MonsterAttacked event) {
-        aggro(event.monster(), event.attacker());
+    void onCharacterBeginAttack(CharacterBeginAttack event) {
+        if (!(event.defender() instanceof MonsterInstance monster)
+                || !(event.attacker() instanceof CharacterInstance attacker)) {
+            return;
+        }
+        aggro(monster, attacker);
     }
 
     @EventListener
     void onCharacterDied(CharacterDied event) {
-        forget(event.character());
+        if (event.character() instanceof MonsterInstance monster) {
+            forget(monster);
+        }
     }
 
     public void aggro(MonsterInstance monster, CharacterInstance attacker) {
         PursuitState current = monster.pursuit;
         boolean startingChase = current == null || current.state() != State.CHASING;
 
-        monster.pursuit = new PursuitState(State.CHASING, attacker, System.nanoTime(), 0L, false);
+        monster.pursuit = new PursuitState(State.CHASING, attacker, System.nanoTime(), false);
         pursuing.put(monster.getId(), monster);
 
         if (startingChase) {
@@ -108,7 +111,7 @@ public class MonsterAiEngine {
         }
 
         if (monster.getMotionSystem().getPosition()
-                .distanceTo(target.getMotionSystem().getPosition()) <= ATTACK_RANGE) {
+                .distanceTo(target.getMotionSystem().getPosition()) <= CombatFormulas.ATTACK_RANGE) {
             if (state.moving()) {
                 // À portée : le monstre s'arrête de courir pour attaquer, comme un joueur
                 // (voir Attack.java) — sans cette diffusion, le client continuerait
@@ -119,14 +122,10 @@ public class MonsterAiEngine {
                 state = state.withMoving(false);
                 monster.pursuit = state;
             }
-            if (nowMillis < state.nextAttackAt()) {
-                return;
-            }
-            MonsterInstance.MonsterAttackOutcome outcome = monster.attack(target);
-            monster.broadcast(new AttackResult(monster.getId(), monster.getName(), target.getId(), target.getName(),
-                    outcome.hit(), outcome.critical(), outcome.damage(), outcome.targetHealthAfter()), null);
-            monster.pursuit = state.withNextAttackAt(nowMillis + CombatFormulas
-                    .attackCooldown(monster.getStatSystem().getEffective(ModifiedStat.ATKSPD)).toMillis());
+            // Le cooldown est géré en interne par CombatSystem (rejeté silencieusement
+            // via AttackOutcome.OnCooldown tant qu'il n'est pas écoulé) : pas de vérif
+            // manuelle nécessaire ici.
+            monster.getCombatSystem().attack(target);
             return;
         }
 
@@ -181,7 +180,7 @@ public class MonsterAiEngine {
                             monster.getMotionSystem().getPosition().x(), monster.getMotionSystem().getPosition().y()),
                     null);
         }
-        monster.pursuit = new PursuitState(State.RETURNING, null, System.nanoTime(), 0L, false);
+        monster.pursuit = new PursuitState(State.RETURNING, null, System.nanoTime(), false);
         if (target != null) {
             target.send(new MonsterGaveUpChase(monster.getName()));
         }
@@ -205,18 +204,13 @@ public class MonsterAiEngine {
         CHASING, RETURNING
     }
 
-    public record PursuitState(State state, CharacterInstance target, long lastStepAtNanos, long nextAttackAt,
-            boolean moving) {
+    public record PursuitState(State state, CharacterInstance target, long lastStepAtNanos, boolean moving) {
         PursuitState withLastStepAt(long stepAtNanos) {
-            return new PursuitState(state, target, stepAtNanos, nextAttackAt, moving);
-        }
-
-        PursuitState withNextAttackAt(long attackAt) {
-            return new PursuitState(state, target, lastStepAtNanos, attackAt, moving);
+            return new PursuitState(state, target, stepAtNanos, moving);
         }
 
         PursuitState withMoving(boolean moving) {
-            return new PursuitState(state, target, lastStepAtNanos, nextAttackAt, moving);
+            return new PursuitState(state, target, lastStepAtNanos, moving);
         }
     }
 }

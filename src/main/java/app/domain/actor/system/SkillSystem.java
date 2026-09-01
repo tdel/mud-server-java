@@ -19,12 +19,11 @@ import app.domain.actor.AbstractCharacter;
 import app.domain.actor.AbstractNpc;
 import app.domain.actor.Attribute;
 import app.domain.actor.ModifiedStat;
+import app.domain.actor.event.CharacterBeginAttack;
 import app.domain.actor.event.CharacterEffectExpired;
 import app.domain.actor.event.DomainEventPublisher;
-import app.domain.actor.event.MonsterAttacked;
 import app.domain.actor.event.SkillCastBegin;
 import app.domain.actor.instance.CharacterInstance;
-import app.domain.actor.instance.MonsterInstance;
 import app.domain.item.ItemGrade;
 import app.game.Randomizer;
 import app.game.combat.CombatFormulas;
@@ -160,9 +159,7 @@ public final class SkillSystem {
     }
 
     public CastOutcome applyDamageOutcome(AttackRollOutcome roll, AbstractCharacter target) {
-        if (target instanceof MonsterInstance monster && character instanceof CharacterInstance casterPlayer) {
-            DomainEventPublisher.publish(new MonsterAttacked(monster, casterPlayer));
-        }
+        DomainEventPublisher.publish(new CharacterBeginAttack(character, target));
         if (!roll.hit()) {
             return new CastOutcome(false, 0, target.getCurrentHealth(), target.getMaxHealth(), false, false, null);
         }
@@ -201,13 +198,7 @@ public final class SkillSystem {
     }
 
     private boolean applyDamage(AbstractCharacter defender, int damage) {
-        if (defender instanceof CharacterInstance targetPlayer) {
-            return targetPlayer.takeDamage(damage, character);
-        }
-        if (defender instanceof MonsterInstance targetMonster && character instanceof CharacterInstance casterPlayer) {
-            return targetMonster.takeDamage(damage, casterPlayer);
-        }
-        throw new IllegalStateException("Cible de sort non supportée : " + defender.getClass());
+        return defender.takeDamage(damage, character);
     }
 
     public record CastOutcome(boolean hit, int amount, int targetHealthAfter, int targetMaxHealth,

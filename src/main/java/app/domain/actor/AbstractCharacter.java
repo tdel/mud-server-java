@@ -10,6 +10,7 @@ import app.domain.ActiveEffect;
 import app.domain.ActiveSkill;
 import app.domain.PassiveSkill;
 import app.domain.SkillElement;
+import app.domain.actor.system.CombatSystem;
 import app.domain.actor.system.EffectsSystem;
 import app.domain.actor.system.MotionSystem;
 import app.domain.actor.system.SkillSystem;
@@ -24,6 +25,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     private final EffectsSystem effectsSystem = new EffectsSystem(this);
     private final SkillSystem skillSystem = new SkillSystem(this);
     private final MotionSystem motionSystem = new MotionSystem(this);
+    private final CombatSystem combatSystem = new CombatSystem(this);
     private final StatSystem statSystem;
     private int currentHealth;
     private int maxHealth;
@@ -53,6 +55,8 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public abstract int getLevel();
 
+    public abstract boolean takeDamage(int amount, AbstractCharacter attacker);
+
     // Défaut neutre : seul CharacterInstance a des objets équipés susceptibles
     // de porter des résistances élémentaires ; MonsterInstance la surcharge.
     protected Map<SkillElement, Integer> elementalResistanceMap() {
@@ -77,6 +81,10 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public MotionSystem getMotionSystem() {
         return motionSystem;
+    }
+
+    public CombatSystem getCombatSystem() {
+        return combatSystem;
     }
 
     // Défaut neutre : seul CharacterInstance suit une réserve de mana ;

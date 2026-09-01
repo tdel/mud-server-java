@@ -6,9 +6,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import app.domain.Party;
+import app.domain.actor.event.CharacterDamaged;
 import app.domain.actor.event.CharacterDied;
-import app.domain.actor.event.GamePlayerDied;
 import app.domain.actor.event.GamePlayerRespawned;
+import app.domain.actor.instance.MonsterInstance;
 import app.domain.world.MapInstance;
 import app.network.message.ingame.GamePlayerDefeated;
 import app.network.message.ingame.MonsterDefeated;
@@ -18,7 +19,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import app.domain.actor.event.GamePlayerDamaged;
 import app.domain.actor.event.PlayerLoadedInWorld;
 import app.domain.actor.instance.CharacterInstance;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,8 +33,10 @@ public class RegenHealthEngine {
     private final Map<UUID, CharacterInstance> regenerating = new ConcurrentHashMap<>();
 
     @EventListener
-    void onGamePlayerDamaged(GamePlayerDamaged event) {
-        register(event.character());
+    void onCharacterDamaged(CharacterDamaged event) {
+        if (event.character() instanceof CharacterInstance character) {
+            register(character);
+        }
     }
 
     @EventListener
@@ -66,14 +68,17 @@ public class RegenHealthEngine {
 
     @EventListener
     @Transactional
-    void onCharacterDied(CharacterDied event) {
-        MapInstance map = event.character().getMotionSystem().getCurrentMap();
-        map.removeMonster(event.character());
-        event.character().broadcastToMap(new MonsterDefeated(event.character().getName()), null);
-        event.character().getKnownList().clear();
-        log.info("regenhp.monster_removed_from_map monster={} map={}", event.character().getName(), map.getName());
+    void onMonsterDied(CharacterDied event) {
+        if (!(event.character() instanceof MonsterInstance monster)
+                || !(event.killer() instanceof CharacterInstance killer)) {
+            return;
+        }
+        MapInstance map = monster.getMotionSystem().getCurrentMap();
+        map.removeMonster(monster);
+        monster.broadcastToMap(new MonsterDefeated(monster.getName()), null);
+        monster.getKnownList().clear();
+        log.info("regenhp.monster_removed_from_map monster={} map={}", monster.getName(), map.getName());
 
-        CharacterInstance killer = event.killer();
         Party party = killer.getParty();
         List<CharacterInstance> eligible = party != null
                 ? party.getMembers().stream().filter(
@@ -82,18 +87,20 @@ public class RegenHealthEngine {
                 : List.of(killer);
         double multiplier = party != null ? party.shareMultiplier(eligible.size()) : 1.0;
 
-        event.character().grantLootTo(killer, party, eligible, multiplier);
+        monster.grantLootTo(killer, party, eligible, multiplier);
     }
 
     @EventListener
-    void onGamePlayerDied(GamePlayerDied event) {
-        regenerating.remove(event.character().getId());
+    void onPlayerDefeated(CharacterDied event) {
+        if (!(event.character() instanceof CharacterInstance character)) {
+            return;
+        }
+        regenerating.remove(character.getId());
 
-        MapInstance map = event.character().getMotionSystem().getCurrentMap();
-        event.character().broadcast(new GamePlayerDefeated(event.character().getName(), event.killer().getName()),
-                null);
-        log.info("regenhp.player_defeated character={} killer={} map={}", event.character().getName(),
-                event.killer().getName(), map.getName());
+        MapInstance map = character.getMotionSystem().getCurrentMap();
+        character.broadcast(new GamePlayerDefeated(character.getName(), event.killer().getName()), null);
+        log.info("regenhp.player_defeated character={} killer={} map={}", character.getName(), event.killer().getName(),
+                map.getName());
     }
 
     @EventListener

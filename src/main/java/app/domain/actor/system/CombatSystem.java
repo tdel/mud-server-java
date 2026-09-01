@@ -10,26 +10,22 @@ import org.slf4j.LoggerFactory;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.AbstractNpc;
 import app.domain.actor.ModifiedStat;
-import app.domain.actor.event.AttackBegin;
+import app.domain.actor.event.CharacterBeginAttack;
 import app.domain.actor.event.DomainEventPublisher;
-import app.domain.actor.event.MonsterAttacked;
-import app.domain.actor.instance.CharacterInstance;
-import app.domain.actor.instance.MonsterInstance;
 import app.domain.world.PeaceZone;
 import app.game.combat.CombatFormulas;
 import app.game.Randomizer;
-import app.game.engine.MonsterAiEngine;
 import app.network.message.ingame.AttackResult;
 
 public final class CombatSystem {
 
     private static final Logger log = LoggerFactory.getLogger(CombatSystem.class);
 
-    private final CharacterInstance character;
+    private final AbstractCharacter character;
     private volatile AbstractCharacter target;
     private volatile Instant nextAttackAt = Instant.MIN;
 
-    public CombatSystem(CharacterInstance character) {
+    public CombatSystem(AbstractCharacter character) {
         this.character = character;
     }
 
@@ -77,7 +73,7 @@ public final class CombatSystem {
             return new AttackOutcome.ForbiddenZone(peaceZone.getName());
         }
         if (character.getMotionSystem().getPosition()
-                .distanceTo(defender.getMotionSystem().getPosition()) > MonsterAiEngine.ATTACK_RANGE) {
+                .distanceTo(defender.getMotionSystem().getPosition()) > CombatFormulas.ATTACK_RANGE) {
             log.debug("attack.rejected character={} reason=out_of_range target={}", character.getId(),
                     defender.getId());
             return new AttackOutcome.OutOfRange(defender.getName());
@@ -87,11 +83,7 @@ public final class CombatSystem {
             return new AttackOutcome.OnCooldown(remainingCooldown().toMillis());
         }
 
-        DomainEventPublisher.publish(new AttackBegin(character));
-
-        if (defender instanceof MonsterInstance monster) {
-            DomainEventPublisher.publish(new MonsterAttacked(monster, character));
-        }
+        DomainEventPublisher.publish(new CharacterBeginAttack(character, defender));
 
         double hitChance = CombatFormulas.hitChance(character.getStatSystem().getEffective(ModifiedStat.ACCURACY),
                 defender.getStatSystem().getEffective(ModifiedStat.EVASION));
@@ -123,13 +115,7 @@ public final class CombatSystem {
     }
 
     private boolean applyDamage(AbstractCharacter defender, int damage) {
-        if (defender instanceof CharacterInstance targetPlayer) {
-            return targetPlayer.takeDamage(damage, character);
-        }
-        if (defender instanceof MonsterInstance targetMonster) {
-            return targetMonster.takeDamage(damage, character);
-        }
-        throw new IllegalStateException("Cible de combat non supportée : " + defender.getClass());
+        return defender.takeDamage(damage, character);
     }
 
     public sealed interface AttackOutcome {

@@ -1,7 +1,6 @@
 package app.domain.actor.event;
 
-import app.domain.actor.instance.MonsterInstance;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.AbstractCharacter;
 
-public record CharacterDied(MonsterInstance character, CharacterInstance killer) {
+public record CharacterDied(AbstractCharacter character, AbstractCharacter killer) {
 }

@@ -27,6 +27,13 @@ public class AbstractNpc extends AbstractCharacter {
         return template.level();
     }
 
+    // Jamais réellement appelée : CombatSystem.attack() rejette toute cible
+    // instanceof AbstractNpc avant résolution du coup (marchands non attaquables).
+    @Override
+    public boolean takeDamage(int amount, AbstractCharacter attacker) {
+        return false;
+    }
+
     public Optional<NpcDialogue> getDialogue() {
         return Optional.ofNullable(template.dialogue());
     }

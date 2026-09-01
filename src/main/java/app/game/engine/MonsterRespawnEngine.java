@@ -37,7 +37,9 @@ public class MonsterRespawnEngine {
 
     @EventListener
     void onCharacterDied(CharacterDied event) {
-        MonsterInstance monster = event.character();
+        if (!(event.character() instanceof MonsterInstance monster)) {
+            return;
+        }
         MapInstance map = monster.getMotionSystem().getCurrentMap();
         Optional<MonsterSpawn> spawn = map.getMonsterSpawns().stream()
                 .filter(candidate -> candidate.id().equals(monster.getId())).findFirst();
