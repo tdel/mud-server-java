@@ -1,8 +1,6 @@
 package app.network.command.charselect;
 
-import java.util.LinkedHashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.MDC;
@@ -11,7 +9,6 @@ import org.springframework.stereotype.Component;
 import app.network.CommandHandler;
 import app.domain.Account;
 import app.domain.world.WorldInstance;
-import app.domain.actor.Attribute;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.CharacterClass;
 import app.domain.actor.Gender;
@@ -102,14 +99,7 @@ public class CharacterCreate implements CommandHandler {
 
     private void promptClass(Connection connection, Account account, WorldInstance instance, String name,
             Gender gender) {
-        Map<CharacterClass, Integer> hitDiceByClass = new LinkedHashMap<>();
-        Map<CharacterClass, Attribute> primaryAbilityByClass = new LinkedHashMap<>();
-        for (CharacterClass characterClass : CharacterClass.values()) {
-            hitDiceByClass.put(characterClass, characterClass.hitDie());
-            primaryAbilityByClass.put(characterClass, characterClass.primaryAbility());
-        }
-
-        connection.requestBlocking(new ChooseClass(hitDiceByClass, primaryAbilityByClass), line -> {
+        connection.requestBlocking(new ChooseClass(), line -> {
             CharacterClass characterClass = parseClass(line);
 
             if (characterClass == null) {

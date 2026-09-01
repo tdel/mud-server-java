@@ -3,6 +3,7 @@ package app.persistence;
 import static app.persistence.jooq.Tables.CHARACTER;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,6 @@ import app.domain.world.MapInstance;
 import app.domain.world.WorldInstance;
 import app.game.catalog.PassiveSkillCatalog;
 import app.game.catalog.SkillCatalog;
-import app.game.combat.CombatFormulas;
 import app.persistence.jooq.tables.records.CharacterRecord;
 
 @Repository
@@ -59,14 +59,17 @@ public class CharacterDao {
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
                 CHARACTER.INTELLIGENCE, CHARACTER.WIT, CHARACTER.MEN, CHARACTER.XP, CHARACTER.GOLD, CHARACTER.MAX_MANA,
                 CHARACTER.CURRENT_MANA, CHARACTER.SUBCLASS_TIER1, CHARACTER.SUBCLASS_TIER2)
-                .values(character.getId(), character.getAccountId(), character.getName(), character.getCurrentMapId(),
-                        character.getGender().name(), character.getRace().name(), character.getCharacterClass().name(),
-                        character.getLevel(), character.getCurrentHealth(), character.getMaxHealth(),
+                .values(character.getId(), character.getAccountId(), character.getName(),
+                        character.getCurrentMap().getTemplateId(), character.getAppearanceSystem().getGender().name(),
+                        character.getAppearanceSystem().getRace().name(),
+                        character.getClassSystem().getCharacterClass().name(), character.getLevel(),
+                        character.getCurrentHealth(), character.getMaxHealth(),
                         character.getAttribute(Attribute.STRENGTH), character.getAttribute(Attribute.DEXTERITY),
                         character.getAttribute(Attribute.CONSTITUTION), character.getAttribute(Attribute.INTELLIGENCE),
                         character.getAttribute(Attribute.WIT), character.getAttribute(Attribute.MEN), character.getXp(),
                         character.getInventorySystem().getGold(), character.getMaxMana(), character.getCurrentMana(),
-                        name(character.getSubclassTier1()), name(character.getSubclassTier2()))
+                        name(character.getClassSystem().getSubclass(1)),
+                        name(character.getClassSystem().getSubclass(2)))
                 .execute();
     }
 
@@ -98,13 +101,13 @@ public class CharacterDao {
     }
 
     public void update(CharacterInstance character) {
-        dsl.update(CHARACTER).set(CHARACTER.CURRENT_MAP_ID, character.getCurrentMapId())
+        dsl.update(CHARACTER).set(CHARACTER.CURRENT_MAP_ID, character.getCurrentMap().getTemplateId())
                 .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).set(CHARACTER.XP, character.getXp())
                 .set(CHARACTER.LEVEL, character.getLevel()).set(CHARACTER.MAX_HEALTH, character.getMaxHealth())
                 .set(CHARACTER.GOLD, character.getInventorySystem().getGold())
                 .set(CHARACTER.MAX_MANA, character.getMaxMana()).set(CHARACTER.CURRENT_MANA, character.getCurrentMana())
-                .set(CHARACTER.SUBCLASS_TIER1, name(character.getSubclassTier1()))
-                .set(CHARACTER.SUBCLASS_TIER2, name(character.getSubclassTier2()))
+                .set(CHARACTER.SUBCLASS_TIER1, name(character.getClassSystem().getSubclass(1)))
+                .set(CHARACTER.SUBCLASS_TIER2, name(character.getClassSystem().getSubclass(2)))
                 .where(CHARACTER.ID.eq(character.getId())).execute();
     }
 
@@ -136,16 +139,21 @@ public class CharacterDao {
         List<ActiveEffect> activeEffects = characterActiveEffectDao.findByCharacterId(record.getId()).stream()
                 .filter(effect -> effect.expiresAt().isAfter(now)).toList();
 
-        Subclass subclassTier1 = record.getSubclassTier1() == null ? null : Subclass.valueOf(record.getSubclassTier1());
-        Subclass subclassTier2 = record.getSubclassTier2() == null ? null : Subclass.valueOf(record.getSubclassTier2());
+        List<Subclass> subclasses = new ArrayList<>();
+        if (record.getSubclassTier1() != null) {
+            subclasses.add(Subclass.valueOf(record.getSubclassTier1()));
+        }
+        if (record.getSubclassTier2() != null) {
+            subclasses.add(Subclass.valueOf(record.getSubclassTier2()));
+        }
 
-        int maxHealth = CombatFormulas.maxHealth(characterClass.hitDie(), record.getConstitution(), record.getLevel());
-        int maxMana = CombatFormulas.maxMana(characterClass.manaGainPerLevel(), record.getMen(), record.getLevel());
+        int maxHealth = characterClass.maxHealth(record.getConstitution(), record.getLevel());
+        int maxMana = characterClass.maxMana(record.getMen(), record.getLevel());
 
         CharacterInstance character = new CharacterInstance(record.getId(), account, record.getName(), map,
                 Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
                 maxHealth, attributes, record.getXp(), record.getGold(), maxMana, record.getCurrentMana(), knownSkills,
-                activeEffects, subclassTier1, subclassTier2, knownPassiveSkills);
+                activeEffects, subclasses, knownPassiveSkills);
         character.setWorldInstance(instance);
 
         Double posX = record.getPosX();

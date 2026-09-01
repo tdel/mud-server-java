@@ -30,7 +30,7 @@ public class StartingEquipmentEngine {
     @EventListener
     void onNewGamePlayerCreated(NewGamePlayerCreated event) {
         CharacterInstance character = event.character();
-        UUID templateId = switch (character.getCharacterClass()) {
+        UUID templateId = switch (character.getClassSystem().getCharacterClass()) {
             case FIGHTER -> FIGHTER_WEAPON_TEMPLATE_ID;
             case MYSTIC -> MYSTIC_WEAPON_TEMPLATE_ID;
         };

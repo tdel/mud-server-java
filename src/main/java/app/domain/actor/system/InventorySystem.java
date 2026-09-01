@@ -63,6 +63,10 @@ public final class InventorySystem {
         return items.stream().filter(item -> item.getSlot() != null).toList();
     }
 
+    public Optional<Item> getEquippedWeapon() {
+        return getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
+    }
+
     public void addItem(Item item) {
         items.add(item);
     }

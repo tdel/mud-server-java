@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import app.domain.ActiveEffect;
+import app.domain.ActiveSkill;
+import app.domain.PassiveSkill;
 import app.domain.Party;
 import app.domain.SkillElement;
 import app.domain.actor.Attribute;
@@ -41,11 +45,15 @@ public class MonsterTemplate {
     private int atkSpd;
     private int level;
     private Map<SkillElement, Integer> elementalResistances;
+    private Set<ActiveSkill> knownSkills;
+    private Set<PassiveSkill> knownPassiveSkills;
+    private List<ActiveEffect> activeEffects;
 
     public MonsterTemplate(UUID id, String name, String description, int maxHealth, Map<Attribute, Integer> attributes,
             int naturalPAtk, int naturalMAtk, int naturalPDef, int naturalMDef, int accuracyBonus, int evasionBonus,
             int critBonus, int xpReward, int goldReward, List<LootTableEntry> lootTable, int presenceRadius, int speed,
-            int atkSpd, int level, Map<SkillElement, Integer> elementalResistances) {
+            int atkSpd, int level, Map<SkillElement, Integer> elementalResistances, Set<ActiveSkill> knownSkills,
+            Set<PassiveSkill> knownPassiveSkills, List<ActiveEffect> activeEffects) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -66,6 +74,9 @@ public class MonsterTemplate {
         this.atkSpd = atkSpd;
         this.level = level;
         this.elementalResistances = elementalResistances == null ? Map.of() : elementalResistances;
+        this.knownSkills = knownSkills == null ? Set.of() : knownSkills;
+        this.knownPassiveSkills = knownPassiveSkills == null ? Set.of() : knownPassiveSkills;
+        this.activeEffects = activeEffects == null ? List.of() : activeEffects;
     }
 
     public UUID getId() {
@@ -148,6 +159,18 @@ public class MonsterTemplate {
         return elementalResistances;
     }
 
+    public Set<ActiveSkill> getKnownSkills() {
+        return knownSkills;
+    }
+
+    public Set<PassiveSkill> getKnownPassiveSkills() {
+        return knownPassiveSkills;
+    }
+
+    public List<ActiveEffect> getActiveEffects() {
+        return activeEffects;
+    }
+
     public LootResult rollLoot(CharacterInstance killer) {
         List<Item> items = new ArrayList<>();
         for (LootTableEntry entry : lootTable) {
@@ -197,14 +220,17 @@ public class MonsterTemplate {
                 && level == other.level && Objects.equals(id, other.id) && Objects.equals(name, other.name)
                 && Objects.equals(description, other.description) && Objects.equals(attributes, other.attributes)
                 && Objects.equals(lootTable, other.lootTable)
-                && Objects.equals(elementalResistances, other.elementalResistances);
+                && Objects.equals(elementalResistances, other.elementalResistances)
+                && Objects.equals(knownSkills, other.knownSkills)
+                && Objects.equals(knownPassiveSkills, other.knownPassiveSkills)
+                && Objects.equals(activeEffects, other.activeEffects);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, name, description, maxHealth, attributes, naturalPAtk, naturalMAtk, naturalPDef,
                 naturalMDef, accuracyBonus, evasionBonus, critBonus, xpReward, goldReward, lootTable, presenceRadius,
-                speed, atkSpd, level, elementalResistances);
+                speed, atkSpd, level, elementalResistances, knownSkills, knownPassiveSkills, activeEffects);
     }
 
     @Override
@@ -215,7 +241,8 @@ public class MonsterTemplate {
                 + accuracyBonus + ", evasionBonus=" + evasionBonus + ", critBonus=" + critBonus + ", xpReward="
                 + xpReward + ", goldReward=" + goldReward + ", lootTable=" + lootTable + ", presenceRadius="
                 + presenceRadius + ", speed=" + speed + ", atkSpd=" + atkSpd + ", level=" + level
-                + ", elementalResistances=" + elementalResistances + "]";
+                + ", elementalResistances=" + elementalResistances + ", knownSkills=" + knownSkills
+                + ", knownPassiveSkills=" + knownPassiveSkills + ", activeEffects=" + activeEffects + "]";
     }
 
     public record LootTableEntry(ItemTemplate itemTemplate, double dropChance) {

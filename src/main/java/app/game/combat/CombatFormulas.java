@@ -85,17 +85,18 @@ public final class CombatFormulas {
         return Math.max(1, (int) Math.round(armorMDefSum + statBonus(menScore) * BASE_DEF_FACTOR));
     }
 
-    // Pas d'équivalent "objet" pour HP/mana dans ce projet (contrairement à
-    // p.atk/p.def) : le niveau doit rester le moteur direct de la croissance, d'où
-    // un facteur linéaire en level plutôt que le levelFactor() ci-dessus
-    // (+2%/niveau
-    // seulement, calibré pour un système où l'équipement porte la progression).
-    public static int maxHealth(int hitDie, int constitutionScore, int level) {
-        return Math.max(1, (int) Math.round(hitDie * level * statBonus(constitutionScore)));
+    // Courbe quadratique en level (hpBase + hpAdd*level + hpMod*level^2),
+    // reprenant telle quelle la table officielle L2 des PV de base par niveau
+    // (Human Fighter/Mystic, cf. data/class.json) ; le résultat est ensuite
+    // multiplié par statBonus(CON), comme pour p.def/m.def.
+    public static int maxHealth(double hpBase, double hpAdd, double hpMod, int level, int constitutionScore) {
+        double base = hpBase + hpAdd * level + hpMod * level * level;
+        return Math.max(1, (int) Math.round(base * statBonus(constitutionScore)));
     }
 
-    public static int maxMana(int manaGainPerLevel, int menScore, int level) {
-        return Math.max(0, (int) Math.round(manaGainPerLevel * level * statBonus(menScore)));
+    public static int maxMana(double mpBase, double mpAdd, double mpMod, int level, int menScore) {
+        double base = mpBase + mpAdd * level + mpMod * level * level;
+        return Math.max(0, (int) Math.round(base * statBonus(menScore)));
     }
 
     public static int healthRegenPerTick(int maxHealth, int constitutionScore) {

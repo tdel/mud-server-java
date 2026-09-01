@@ -6,7 +6,6 @@ import java.util.UUID;
 import app.network.OutputJsonMessage;
 import app.domain.actor.Attribute;
 import app.domain.actor.instance.CharacterInstance;
-import app.domain.actor.Skill;
 import app.game.engine.MovementEngine;
 import app.network.server.tcpjson.TcpJsonOutput;
 
@@ -26,11 +25,12 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
     public void toJson(TcpJsonOutput output) {
         CharacterInstance c = character;
         output.write("GamePlayerStats",
-                new Payload(c.getId(), c.getName(), c.getGender().label(), c.getLevel(), c.getCharacterClass().label(),
-                        c.getCurrentHealth(), c.getMaxHealth(), c.healthRegenAmountPerTick(), c.getCurrentMana(),
-                        c.getMaxMana(), c.manaRegenAmountPerTick(), c.getEffectivePAtk(), c.getEffectivePDef(),
-                        c.getEffectiveMAtk(), c.getEffectiveMDef(), c.getEffectiveAccuracy(), c.getEffectiveEvasion(),
-                        c.getEffectiveCriticalRate(), c.getEffectiveAtkSpd(), attributeScore(c, Attribute.STRENGTH),
+                new Payload(c.getId(), c.getName(), c.getAppearanceSystem().getGender().label(), c.getLevel(),
+                        c.getClassSystem().getCharacterClass().label(), c.getCurrentHealth(), c.getMaxHealth(),
+                        c.healthRegenAmountPerTick(), c.getCurrentMana(), c.getMaxMana(), c.manaRegenAmountPerTick(),
+                        c.getEffectivePAtk(), c.getEffectivePDef(), c.getEffectiveMAtk(), c.getEffectiveMDef(),
+                        c.getEffectiveAccuracy(), c.getEffectiveEvasion(), c.getEffectiveCriticalRate(),
+                        c.getEffectiveAtkSpd(), attributeScore(c, Attribute.STRENGTH),
                         attributeScore(c, Attribute.DEXTERITY), attributeScore(c, Attribute.CONSTITUTION),
                         attributeScore(c, Attribute.INTELLIGENCE), attributeScore(c, Attribute.WIT),
                         attributeScore(c, Attribute.MEN), MovementEngine.unitsPerSecond(c.getSpeed())),

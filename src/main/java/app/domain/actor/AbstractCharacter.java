@@ -1,10 +1,14 @@
 package app.domain.actor;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
+import app.domain.ActiveEffect;
 import app.domain.ActiveSkill;
+import app.domain.PassiveSkill;
 import app.domain.SkillEffectType;
 import app.domain.SkillElement;
 import app.domain.actor.system.EffectsSystem;
@@ -41,11 +45,15 @@ public abstract class AbstractCharacter extends AbstractObject {
     private final KnownList knownList = new KnownList(this);
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
-            int maxHealth) {
+            int maxHealth, Set<ActiveSkill> knownSkills, Set<PassiveSkill> knownPassiveSkills,
+            List<ActiveEffect> activeEffects) {
         super(id, name);
         this.attributes = new EnumMap<>(attributes);
         this.currentHealth = currentHealth;
         this.maxHealth = maxHealth;
+        knownSkills.forEach(getSkillSystem()::learn);
+        knownPassiveSkills.forEach(getSkillSystem()::learn);
+        activeEffects.forEach(getEffectsSystem()::apply);
     }
 
     public int getAttribute(Attribute attribute) {

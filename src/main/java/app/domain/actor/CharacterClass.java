@@ -4,11 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
+
+import app.game.combat.CombatFormulas;
 
 public enum CharacterClass {
     FIGHTER, MYSTIC;
@@ -30,28 +31,15 @@ public enum CharacterClass {
 
     private Definition definition;
 
-    public int hitDie() {
-        return definition.hitDie();
+    // Courbe L2 retail (Human Fighter/Mystic) : cf. data/class.json et
+    // CombatFormulas.maxHealth/maxMana pour la formule.
+    public int maxHealth(int constitutionScore, int level) {
+        return CombatFormulas.maxHealth(definition.hpBase(), definition.hpAdd(), definition.hpMod(), level,
+                constitutionScore);
     }
 
-    public Set<Attribute> savingThrowProficiencies() {
-        return definition.savingThrows();
-    }
-
-    public Set<Skill> skillProficiencies() {
-        return definition.skills();
-    }
-
-    public Attribute primaryAbility() {
-        return definition.primaryAbility();
-    }
-
-    public Set<ArmorProficiency> armorProficiencies() {
-        return definition.armorProficiencies();
-    }
-
-    public int manaGainPerLevel() {
-        return definition.manaGainPerLevel();
+    public int maxMana(int menScore, int level) {
+        return CombatFormulas.maxMana(definition.mpBase(), definition.mpAdd(), definition.mpMod(), level, menScore);
     }
 
     public Map<Attribute, Integer> baseAttributes() {
@@ -65,16 +53,14 @@ public enum CharacterClass {
         };
     }
 
-    private record Definition(int hitDie, Set<Attribute> savingThrows, Set<Skill> skills, Attribute primaryAbility,
-            Set<ArmorProficiency> armorProficiencies, int manaGainPerLevel, Map<Attribute, Integer> baseAttributes) {
+    private record Definition(double hpBase, double hpAdd, double hpMod, double mpBase, double mpAdd, double mpMod,
+            Map<Attribute, Integer> baseAttributes) {
     }
 
-    private record Json(CharacterClass name, int hitDie, List<Attribute> savingThrows, List<Skill> skills,
-            Attribute primaryAbility, List<ArmorProficiency> armorProficiencies, int manaGainPerLevel,
-            Map<Attribute, Integer> baseAttributes) {
+    private record Json(CharacterClass name, double hpBase, double hpAdd, double hpMod, double mpBase, double mpAdd,
+            double mpMod, Map<Attribute, Integer> baseAttributes) {
         Definition toDefinition() {
-            return new Definition(hitDie, Set.copyOf(savingThrows), Set.copyOf(skills), primaryAbility,
-                    Set.copyOf(armorProficiencies), manaGainPerLevel, Map.copyOf(baseAttributes));
+            return new Definition(hpBase, hpAdd, hpMod, mpBase, mpAdd, mpMod, Map.copyOf(baseAttributes));
         }
     }
 }

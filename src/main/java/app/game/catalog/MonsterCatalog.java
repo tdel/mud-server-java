@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -85,7 +86,8 @@ public class MonsterCatalog {
         }
 
         MonsterInstance monster = new MonsterInstance(spawn.id(), template.getName(), template.getId(), map.getId(),
-                template.getAttributes(), template.getMaxHealth(), spawn.position());
+                template.getAttributes(), template.getMaxHealth(), spawn.position(), template.getKnownSkills(),
+                template.getKnownPassiveSkills(), template.getActiveEffects());
         monster.attachTemplate(template);
         monster.setCurrentMap(map);
         map.placeMonster(monster, spawn.position());
@@ -116,7 +118,8 @@ public class MonsterCatalog {
                             definition.naturalMAtk(), definition.naturalPDef(), definition.naturalMDef(),
                             definition.accuracyBonus(), definition.evasionBonus(), definition.critBonus(),
                             definition.xpReward(), definition.goldReward(), lootTable, definition.presenceRadius(),
-                            definition.speed(), definition.atkSpd(), definition.level(), elementalResistances));
+                            definition.speed(), definition.atkSpd(), definition.level(), elementalResistances, Set.of(),
+                            Set.of(), List.of()));
         }
         log.info("monster.templates_loaded count={}", templates.size());
     }

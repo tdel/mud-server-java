@@ -21,11 +21,11 @@ public class SubclassProgressionEngine {
     @EventListener
     void onCharacterLeveledUp(CharacterLeveledUp event) {
         CharacterInstance character = event.character();
-        Integer pendingTier = character.getPendingSubclassTier();
+        Integer pendingTier = character.getClassSystem().getPendingSubclassTier();
         if (pendingTier == null) {
             return;
         }
-        List<Subclass> options = Subclass.availableAt(character.getCharacterClass(), pendingTier);
+        List<Subclass> options = Subclass.availableAt(character.getClassSystem().getCharacterClass(), pendingTier);
         if (!options.isEmpty()) {
             DomainEventPublisher.publish(new SubclassChoiceAvailable(character, pendingTier, options));
             log.info("character.subclass_choice_pending character={} tier={} options={}", character.getName(),

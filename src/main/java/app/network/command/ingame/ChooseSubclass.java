@@ -38,14 +38,14 @@ public class ChooseSubclass implements CommandHandler {
         }
 
         CharacterInstance character = connection.character();
-        Integer tier = character.getPendingSubclassTier();
+        Integer tier = character.getClassSystem().getPendingSubclassTier();
 
         if (tier == null) {
             connection.send(new NoPendingSubclassChoice());
             return;
         }
 
-        List<Subclass> options = Subclass.availableAt(character.getCharacterClass(), tier);
+        List<Subclass> options = Subclass.availableAt(character.getClassSystem().getCharacterClass(), tier);
         Subclass subclass = parseSubclass(input);
 
         if (subclass == null || !options.contains(subclass)) {
@@ -53,7 +53,7 @@ public class ChooseSubclass implements CommandHandler {
             return;
         }
 
-        character.chooseSubclass(subclass);
+        character.getClassSystem().chooseSubclass(subclass);
     }
 
     private Subclass parseSubclass(String input) {

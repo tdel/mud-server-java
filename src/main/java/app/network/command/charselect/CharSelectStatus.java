@@ -28,11 +28,10 @@ public class CharSelectStatus {
             return;
         }
 
-        connection
-                .send(new CharacterList(
-                        characters
-                                .stream().map(character -> new CharacterList.Entry(character.getName(),
-                                        character.getRace(), character.getCharacterClass(), character.getLevel()))
-                                .toList()));
+        connection.send(new CharacterList(characters.stream()
+                .map(character -> new CharacterList.Entry(character.getName(),
+                        character.getAppearanceSystem().getRace(), character.getClassSystem().getCharacterClass(),
+                        character.getLevel()))
+                .toList()));
     }
 }

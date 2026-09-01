@@ -30,7 +30,8 @@ public class SkillLearningEngine {
     }
 
     private void learnSkillsAt(CharacterInstance character, int level) {
-        for (ActiveSkill activeSkill : SkillCatalogHolder.skillsLearnableAt(character.getCharacterClass(), level)) {
+        for (ActiveSkill activeSkill : SkillCatalogHolder
+                .skillsLearnableAt(character.getClassSystem().getCharacterClass(), level)) {
             ActiveSkill previousTier = character.getSkillSystem().knownSkills().stream()
                     .filter(known -> known.name().equals(activeSkill.name())).findFirst().orElse(null);
             LearnResult result = character.getSkillSystem().learn(activeSkill);

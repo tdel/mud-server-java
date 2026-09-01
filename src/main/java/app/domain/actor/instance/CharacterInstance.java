@@ -17,9 +17,10 @@ import app.domain.ActiveSkill;
 import app.domain.SkillElement;
 import app.domain.actor.*;
 import app.domain.ActiveEffect;
+import app.domain.actor.system.AppearanceSystem;
+import app.domain.actor.system.ClassSystem;
 import app.domain.actor.system.CombatSystem;
 import app.domain.actor.system.InventorySystem;
-import app.domain.actor.event.CharacterChoseSubclass;
 import app.domain.actor.event.CharacterGainedXp;
 import app.domain.actor.event.CharacterLeveledUp;
 import app.domain.actor.event.CharacterRegenerated;
@@ -46,12 +47,9 @@ public final class CharacterInstance extends AbstractCharacter {
 
     private final Account account;
     private WorldInstance worldInstance;
-    private Gender gender;
-    private Race race;
-    private CharacterClass characterClass;
+    private final AppearanceSystem appearanceSystem;
+    private final ClassSystem classSystem;
     private int level;
-    private Subclass subclassTier1;
-    private Subclass subclassTier2;
 
     private Connection connection;
     private final InventorySystem inventorySystem;
@@ -64,49 +62,21 @@ public final class CharacterInstance extends AbstractCharacter {
 
     public CharacterInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
-            Map<Attribute, Integer> attributes, int xp, int gold) {
-        this(id, account, name, map, gender, race, characterClass, level, currentHealth, maxHealth, attributes, xp,
-                gold, 0, 0);
-    }
-
-    public CharacterInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
-            CharacterClass characterClass, int level, int currentHealth, int maxHealth,
-            Map<Attribute, Integer> attributes, int xp, int gold, int maxMana, int currentMana) {
-        this(id, account, name, map, gender, race, characterClass, level, currentHealth, maxHealth, attributes, xp,
-                gold, maxMana, currentMana, Set.of(), List.of());
-    }
-
-    public CharacterInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
-            CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold, int maxMana, int currentMana,
-            Set<ActiveSkill> knownSkills, List<ActiveEffect> activeEffects) {
-        this(id, account, name, map, gender, race, characterClass, level, currentHealth, maxHealth, attributes, xp,
-                gold, maxMana, currentMana, knownSkills, activeEffects, null, null, Set.of());
-    }
-
-    public CharacterInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
-            CharacterClass characterClass, int level, int currentHealth, int maxHealth,
-            Map<Attribute, Integer> attributes, int xp, int gold, int maxMana, int currentMana,
-            Set<ActiveSkill> knownSkills, List<ActiveEffect> activeEffects, Subclass subclassTier1,
-            Subclass subclassTier2, Set<PassiveSkill> knownPassiveSkills) {
-        super(id, name, attributes, currentHealth, maxHealth);
+            Set<ActiveSkill> knownSkills, List<ActiveEffect> activeEffects, List<Subclass> subclasses,
+            Set<PassiveSkill> knownPassiveSkills) {
+        super(id, name, attributes, currentHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects);
         this.account = account;
         setCurrentMap(map);
-        this.gender = gender;
-        this.race = race;
+        this.appearanceSystem = new AppearanceSystem(this, gender, race);
         this.speed = race.speed();
-        this.characterClass = characterClass;
+        this.classSystem = new ClassSystem(this, characterClass, subclasses);
         this.level = level;
-        this.subclassTier1 = subclassTier1;
-        this.subclassTier2 = subclassTier2;
         this.xp = xp;
         this.inventorySystem = new InventorySystem(this, gold);
         this.combatSystem = new CombatSystem(this);
         this.maxMana = maxMana;
         this.currentMana = currentMana;
-        knownSkills.forEach(getSkillSystem()::learn);
-        activeEffects.forEach(getEffectsSystem()::apply);
-        knownPassiveSkills.forEach(getSkillSystem()::learn);
         inventorySystem.recomputeGradePenalty();
     }
 
@@ -118,10 +88,6 @@ public final class CharacterInstance extends AbstractCharacter {
         return account.getId();
     }
 
-    public UUID getCurrentMapId() {
-        return getCurrentMap().getTemplateId();
-    }
-
     public WorldInstance getWorldInstance() {
         return worldInstance;
     }
@@ -130,52 +96,12 @@ public final class CharacterInstance extends AbstractCharacter {
         this.worldInstance = worldInstance;
     }
 
-    public Gender getGender() {
-        return gender;
+    public AppearanceSystem getAppearanceSystem() {
+        return appearanceSystem;
     }
 
-    public Race getRace() {
-        return race;
-    }
-
-    public CharacterClass getCharacterClass() {
-        return characterClass;
-    }
-
-    public Subclass getSubclassTier1() {
-        return subclassTier1;
-    }
-
-    public Subclass getSubclassTier2() {
-        return subclassTier2;
-    }
-
-    // tier 1 (niveau 20) puis tier 2 (niveau 40) restent en attente tant qu'aucune
-    // option n'a été
-    // choisie ; dérivé de l'état plutôt que stocké, pour survivre à une reconnexion
-    // sans champ dédié.
-    public Integer getPendingSubclassTier() {
-        if (subclassTier1 == null && level >= 20) {
-            return 1;
-        }
-        if (subclassTier2 == null && level >= 40) {
-            return 2;
-        }
-        return null;
-    }
-
-    public void chooseSubclass(Subclass subclass) {
-        Integer tier = getPendingSubclassTier();
-        if (tier == null || !Subclass.availableAt(characterClass, tier).contains(subclass)) {
-            throw new IllegalStateException("Choix de sous-classe invalide: " + subclass + " (tier=" + tier
-                    + ", classe=" + characterClass + ")");
-        }
-        if (tier == 1) {
-            subclassTier1 = subclass;
-        } else {
-            subclassTier2 = subclass;
-        }
-        DomainEventPublisher.publish(new CharacterChoseSubclass(this, tier, subclass));
+    public ClassSystem getClassSystem() {
+        return classSystem;
     }
 
     public int getLevel() {
@@ -188,12 +114,12 @@ public final class CharacterInstance extends AbstractCharacter {
 
     @Override
     protected int basePAtk() {
-        return getEquippedWeapon().map(Item::getPAtk).orElse(CombatFormulas.UNARMED_PATK);
+        return inventorySystem.getEquippedWeapon().map(Item::getPAtk).orElse(CombatFormulas.UNARMED_PATK);
     }
 
     @Override
     protected int baseMAtk() {
-        return getEquippedWeapon().map(Item::getMAtk).orElse(0);
+        return inventorySystem.getEquippedWeapon().map(Item::getMAtk).orElse(0);
     }
 
     @Override
@@ -223,7 +149,7 @@ public final class CharacterInstance extends AbstractCharacter {
 
     @Override
     protected int baseAtkSpd() {
-        return getEquippedWeapon().map(Item::getAtkSpd).orElse(CombatFormulas.BASE_ATK_SPD);
+        return inventorySystem.getEquippedWeapon().map(Item::getAtkSpd).orElse(CombatFormulas.BASE_ATK_SPD);
     }
 
     @Override
@@ -255,11 +181,6 @@ public final class CharacterInstance extends AbstractCharacter {
             }
         }
         return modifiers;
-    }
-
-    private Optional<Item> getEquippedWeapon() {
-        return inventorySystem.getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.WEAPON)
-                .findFirst();
     }
 
     public Connection getConnection() {
@@ -362,13 +283,12 @@ public final class CharacterInstance extends AbstractCharacter {
     public void applyLevelUp() {
         level++;
 
-        int newMaxHealth = CombatFormulas.maxHealth(characterClass.hitDie(), getAttribute(Attribute.CONSTITUTION),
-                level);
+        int newMaxHealth = classSystem.getCharacterClass().maxHealth(getAttribute(Attribute.CONSTITUTION), level);
         int hpGain = newMaxHealth - getMaxHealth();
         setMaxHealth(newMaxHealth);
         setCurrentHealth(getCurrentHealth() + hpGain);
 
-        int newMaxMana = CombatFormulas.maxMana(characterClass.manaGainPerLevel(), getAttribute(Attribute.MEN), level);
+        int newMaxMana = classSystem.getCharacterClass().maxMana(getAttribute(Attribute.MEN), level);
         int manaGain = newMaxMana - maxMana;
         maxMana = newMaxMana;
         currentMana += manaGain;
@@ -425,8 +345,9 @@ public final class CharacterInstance extends AbstractCharacter {
     @Override
     public String toString() {
         return "GamePlayer[id=" + getId() + ", accountId=" + getAccountId() + ", name=" + getName() + ", currentMapId="
-                + getCurrentMapId() + ", gender=" + gender + ", race=" + race + ", characterClass=" + characterClass
-                + ", level=" + level + ", xp=" + xp + ", gold=" + inventorySystem.getGold() + ", currentHealth="
-                + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + ", attributes=" + getAttributes() + "]";
+                + getCurrentMap().getTemplateId() + ", gender=" + appearanceSystem.getGender() + ", race="
+                + appearanceSystem.getRace() + ", characterClass=" + classSystem.getCharacterClass() + ", level="
+                + level + ", xp=" + xp + ", gold=" + inventorySystem.getGold() + ", currentHealth=" + getCurrentHealth()
+                + ", maxHealth=" + getMaxHealth() + ", attributes=" + getAttributes() + "]";
     }
 }

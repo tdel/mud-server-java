@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -235,7 +236,8 @@ public class WorldTemplateCatalog {
                 NpcSellerInstance.NpcShop shop = toShop(shortName, definition, itemTemplatesById);
 
                 NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), map.getId(),
-                        spawn.position(), definition.description(), dialogue, shop, definition.level());
+                        spawn.position(), definition.description(), dialogue, shop, definition.level(), Set.of(),
+                        Set.of(), List.of());
                 if (templates.putIfAbsent(template.id(), template) != null) {
                     throw new IllegalStateException("NPC " + definition.id() + " dupliqué dans le monde " + shortName);
                 }

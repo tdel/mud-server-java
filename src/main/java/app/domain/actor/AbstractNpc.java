@@ -17,7 +17,8 @@ public class AbstractNpc extends AbstractCharacter {
     private final NpcTemplate template;
 
     public AbstractNpc(UUID id, NpcTemplate template, MapInstance map) {
-        super(id, template.name(), neutralAttributes(), NOMINAL_HEALTH, NOMINAL_HEALTH);
+        super(id, template.name(), neutralAttributes(), NOMINAL_HEALTH, NOMINAL_HEALTH, template.knownSkills(),
+                template.knownPassiveSkills(), template.activeEffects());
         this.template = Objects.requireNonNull(template);
         setCurrentMap(Objects.requireNonNull(map));
         this.speed = 0;

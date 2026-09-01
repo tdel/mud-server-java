@@ -6,6 +6,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,7 +24,6 @@ import app.domain.actor.event.NewGamePlayerCreated;
 import app.domain.actor.event.PlayerLoadedInWorld;
 import app.domain.actor.event.PlayerRemovedFromWorld;
 import app.domain.map.Position;
-import app.game.combat.CombatFormulas;
 
 public class WorldInstance {
 
@@ -111,12 +111,13 @@ public class WorldInstance {
             scores.merge(bonus.getKey(), bonus.getValue(), Integer::sum);
         }
 
-        int maxHealth = CombatFormulas.maxHealth(characterClass.hitDie(), scores.get(Attribute.CONSTITUTION), 1);
+        int maxHealth = characterClass.maxHealth(scores.get(Attribute.CONSTITUTION), 1);
 
-        int startingMana = CombatFormulas.maxMana(characterClass.manaGainPerLevel(), scores.get(Attribute.MEN), 1);
+        int startingMana = characterClass.maxMana(scores.get(Attribute.MEN), 1);
 
         CharacterInstance character = new CharacterInstance(UUID.randomUUID(), account, name, startingMap, gender, race,
-                characterClass, 1, maxHealth, maxHealth, scores, 0, 0, startingMana, startingMana);
+                characterClass, 1, maxHealth, maxHealth, scores, 0, 0, startingMana, startingMana, Set.of(), List.of(),
+                List.of(), Set.of());
         character.setWorldInstance(this);
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));

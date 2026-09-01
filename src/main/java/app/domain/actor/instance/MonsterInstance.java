@@ -1,12 +1,17 @@
 package app.domain.actor.instance;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import app.domain.ActiveEffect;
+import app.domain.ActiveSkill;
+import app.domain.PassiveSkill;
 import app.domain.SkillElement;
 import app.domain.actor.Attribute;
 import app.domain.actor.AbstractCharacter;
@@ -32,8 +37,9 @@ public final class MonsterInstance extends AbstractCharacter {
     public volatile MonsterAiEngine.PursuitState pursuit;
 
     public MonsterInstance(UUID id, String name, UUID templateId, UUID mapId, Map<Attribute, Integer> attributes,
-            int maxHealth, Position spawnPosition) {
-        super(id, name, attributes, maxHealth, maxHealth);
+            int maxHealth, Position spawnPosition, Set<ActiveSkill> knownSkills, Set<PassiveSkill> knownPassiveSkills,
+            List<ActiveEffect> activeEffects) {
+        super(id, name, attributes, maxHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects);
         this.templateId = templateId;
         this.mapId = mapId;
         this.spawnPosition = spawnPosition;
@@ -171,27 +177,6 @@ public final class MonsterInstance extends AbstractCharacter {
 
     public Position getSpawnPosition() {
         return spawnPosition;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof MonsterInstance other)) {
-            return false;
-        }
-        return getCurrentHealth() == other.getCurrentHealth() && getMaxHealth() == other.getMaxHealth()
-                && Objects.equals(getId(), other.getId()) && Objects.equals(getName(), other.getName())
-                && Objects.equals(templateId, other.templateId) && Objects.equals(mapId, other.mapId)
-                && Objects.equals(spawnPosition, other.spawnPosition)
-                && Objects.equals(getAttributes(), other.getAttributes());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getName(), templateId, mapId, spawnPosition, getAttributes(), getCurrentHealth(),
-                getMaxHealth());
     }
 
     @Override
