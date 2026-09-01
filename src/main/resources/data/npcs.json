@@ -2,7 +2,6 @@
     {
         "id": "a3c8d0f2-5d5f-4d2c-9f2c-3f4e5d6c7b8a",
         "name": "Innkeeper",
-        "description": "A jovial innkeeper wipes a glass behind his counter, against the east wall.",
         "dialogue": {
             "greeting": "Hello, I sell several interesting things, would you like to see?",
             "options": [
@@ -46,7 +45,6 @@
     {
         "id": "dcb67f1e-b178-4062-8393-26abca9b0d66",
         "name": "Blacksmith",
-        "description": "A stocky blacksmith hammers a glowing piece of metal, against the west wall.",
         "dialogue": {
             "greeting": "A weapon, some armor? I've got what you need.",
             "options": [
@@ -106,7 +104,6 @@
     {
         "id": "b0362279-5a46-4461-9672-6f4e0b2cf7e0",
         "name": "Village Guard",
-        "description": "A guard in leather armor watches the gate with a stern eye, spear in hand.",
         "dialogue": {
             "greeting": "Halt! ... Alright, move along.",
             "options": [
@@ -121,7 +118,6 @@
     {
         "id": "318a4b28-4aae-46fa-ab99-2bc62738f1c3",
         "name": "Gate Guard",
-        "description": "A second guard, posted on the other side of the gate, scans the road in the distance.",
         "dialogue": {
             "greeting": "Nothing to report here. Move along.",
             "options": [

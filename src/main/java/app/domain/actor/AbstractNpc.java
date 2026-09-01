@@ -23,10 +23,6 @@ public class AbstractNpc extends AbstractCharacter {
         getMotionSystem().setCurrentMap(Objects.requireNonNull(map));
     }
 
-    public String getDescription() {
-        return template.description();
-    }
-
     public int getLevel() {
         return template.level();
     }

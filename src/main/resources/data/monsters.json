@@ -2,7 +2,6 @@
     {
         "id": "c1a6b8f0-3b3e-4b0a-9f0a-1e2d3c4b5a6f",
         "name": "Goblin",
-        "description": "A small green creature armed with a rusty dagger.",
         "maxHealth": 7,
         "pAtk": 7,
         "pDef": 7,
@@ -39,7 +38,6 @@
     {
         "id": "dcff9d89-1f33-41e2-8011-e5b3b7092f0d",
         "name": "Giant Rat",
-        "description": "A dog-sized rodent with sharp, yellowed teeth.",
         "maxHealth": 7,
         "pAtk": 4,
         "pDef": 4,
@@ -67,7 +65,6 @@
     {
         "id": "e6caeb0d-f861-401b-b0c1-c88e315097c5",
         "name": "Wolf",
-        "description": "A gray wolf with a shaggy coat, lips curled back.",
         "maxHealth": 11,
         "pAtk": 7,
         "pDef": 5,
@@ -95,7 +92,6 @@
     {
         "id": "7dfe22be-6147-45b3-bd07-89711810791d",
         "name": "Skeleton",
-        "description": "A jumble of articulated bones animated by a cold glow in its eye sockets.",
         "maxHealth": 13,
         "pAtk": 7,
         "pDef": 5,
@@ -132,7 +128,6 @@
     {
         "id": "f6630034-a160-4ffc-888e-eb2fee9d9428",
         "name": "Bandit",
-        "description": "A shifty-looking vagrant, hand resting on the pommel of a short sword.",
         "maxHealth": 11,
         "pAtk": 7,
         "pDef": 4,
@@ -173,7 +168,6 @@
     {
         "id": "026ce1a2-091d-4179-b715-65006480cfbe",
         "name": "Giant Spider",
-        "description": "A horse-sized spider weaving a sticky web between the trees.",
         "maxHealth": 26,
         "pAtk": 9,
         "pDef": 6,
@@ -210,7 +204,6 @@
     {
         "id": "49e91691-3a13-4e2b-967f-bc1acf8cf03a",
         "name": "Black Bear",
-        "description": "A massive bear with a dark coat, reared up on its hind legs.",
         "maxHealth": 19,
         "pAtk": 7,
         "pDef": 3,

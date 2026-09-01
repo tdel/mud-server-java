@@ -236,8 +236,7 @@ public class WorldTemplateCatalog {
                 NpcSellerInstance.NpcShop shop = toShop(shortName, definition, itemTemplatesById);
 
                 NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), map.getId(),
-                        spawn.position(), definition.description(), dialogue, shop, definition.level(), Set.of(),
-                        Set.of(), List.of());
+                        spawn.position(), dialogue, shop, definition.level(), Set.of(), Set.of(), List.of());
                 if (templates.putIfAbsent(template.id(), template) != null) {
                     throw new IllegalStateException("NPC " + definition.id() + " dupliqué dans le monde " + shortName);
                 }
@@ -325,7 +324,7 @@ public class WorldTemplateCatalog {
     record WorldManifestDefinition(UUID id, String name, String description, int minPlayers, int maxPlayers) {
     }
 
-    record NpcDefinition(UUID id, String name, String description, DialogueDefinition dialogue, int level) {
+    record NpcDefinition(UUID id, String name, DialogueDefinition dialogue, int level) {
     }
 
     record DialogueDefinition(String greeting, List<DialogueOptionDefinition> options, ShopDefinition shop) {

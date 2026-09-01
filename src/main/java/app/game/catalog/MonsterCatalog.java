@@ -112,9 +112,9 @@ public class MonsterCatalog {
                     ? Map.of()
                     : definition.elementalResistances();
             templates.put(definition.id(),
-                    new MonsterTemplate(definition.id(), definition.name(), definition.description(),
-                            definition.maxHealth(), definition.attributes(), definition.pAtk(), definition.mAtk(),
-                            definition.pDef(), definition.mDef(), definition.accuracyBonus(), definition.evasionBonus(),
+                    new MonsterTemplate(definition.id(), definition.name(), definition.maxHealth(),
+                            definition.attributes(), definition.pAtk(), definition.mAtk(), definition.pDef(),
+                            definition.mDef(), definition.accuracyBonus(), definition.evasionBonus(),
                             definition.critBonus(), definition.xpReward(), definition.goldReward(), lootTable,
                             definition.presenceRadius(), definition.speed(), definition.atkSpd(), definition.level(),
                             elementalResistances, Set.of(), Set.of(), List.of()));
@@ -125,9 +125,9 @@ public class MonsterCatalog {
     record LootTableEntryDefinition(UUID itemTemplateId, double dropChance) {
     }
 
-    record MonsterTemplateDefinition(UUID id, String name, String description, int maxHealth,
-            Map<Attribute, Integer> attributes, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus,
-            int evasionBonus, int critBonus, int xpReward, int goldReward, List<LootTableEntryDefinition> lootTable,
-            int presenceRadius, int speed, int atkSpd, int level, Map<SkillElement, Integer> elementalResistances) {
+    record MonsterTemplateDefinition(UUID id, String name, int maxHealth, Map<Attribute, Integer> attributes, int pAtk,
+            int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus, int critBonus, int xpReward,
+            int goldReward, List<LootTableEntryDefinition> lootTable, int presenceRadius, int speed, int atkSpd,
+            int level, Map<SkillElement, Integer> elementalResistances) {
     }
 }

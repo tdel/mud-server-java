@@ -27,7 +27,6 @@ public class MonsterTemplate {
 
     private UUID id;
     private String name;
-    private String description;
     private int maxHealth;
     private Map<Attribute, Integer> attributes;
     private int pAtk;
@@ -49,14 +48,13 @@ public class MonsterTemplate {
     private Set<PassiveSkill> knownPassiveSkills;
     private List<ActiveEffect> activeEffects;
 
-    public MonsterTemplate(UUID id, String name, String description, int maxHealth, Map<Attribute, Integer> attributes,
-            int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus, int critBonus, int xpReward,
-            int goldReward, List<LootTableEntry> lootTable, int presenceRadius, int speed, int atkSpd, int level,
+    public MonsterTemplate(UUID id, String name, int maxHealth, Map<Attribute, Integer> attributes, int pAtk, int mAtk,
+            int pDef, int mDef, int accuracyBonus, int evasionBonus, int critBonus, int xpReward, int goldReward,
+            List<LootTableEntry> lootTable, int presenceRadius, int speed, int atkSpd, int level,
             Map<SkillElement, Integer> elementalResistances, Set<ActiveSkill> knownSkills,
             Set<PassiveSkill> knownPassiveSkills, List<ActiveEffect> activeEffects) {
         this.id = id;
         this.name = name;
-        this.description = description;
         this.maxHealth = maxHealth;
         this.attributes = attributes;
         this.pAtk = pAtk;
@@ -85,10 +83,6 @@ public class MonsterTemplate {
 
     public String getName() {
         return name;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public int getMaxHealth() {
@@ -217,8 +211,7 @@ public class MonsterTemplate {
                 && critBonus == other.critBonus && xpReward == other.xpReward && goldReward == other.goldReward
                 && presenceRadius == other.presenceRadius && speed == other.speed && atkSpd == other.atkSpd
                 && level == other.level && Objects.equals(id, other.id) && Objects.equals(name, other.name)
-                && Objects.equals(description, other.description) && Objects.equals(attributes, other.attributes)
-                && Objects.equals(lootTable, other.lootTable)
+                && Objects.equals(attributes, other.attributes) && Objects.equals(lootTable, other.lootTable)
                 && Objects.equals(elementalResistances, other.elementalResistances)
                 && Objects.equals(knownSkills, other.knownSkills)
                 && Objects.equals(knownPassiveSkills, other.knownPassiveSkills)
@@ -227,19 +220,19 @@ public class MonsterTemplate {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, maxHealth, attributes, pAtk, mAtk, pDef, mDef, accuracyBonus,
-                evasionBonus, critBonus, xpReward, goldReward, lootTable, presenceRadius, speed, atkSpd, level,
-                elementalResistances, knownSkills, knownPassiveSkills, activeEffects);
+        return Objects.hash(id, name, maxHealth, attributes, pAtk, mAtk, pDef, mDef, accuracyBonus, evasionBonus,
+                critBonus, xpReward, goldReward, lootTable, presenceRadius, speed, atkSpd, level, elementalResistances,
+                knownSkills, knownPassiveSkills, activeEffects);
     }
 
     @Override
     public String toString() {
-        return "MonsterTemplate[id=" + id + ", name=" + name + ", description=" + description + ", maxHealth="
-                + maxHealth + ", attributes=" + attributes + ", pAtk=" + pAtk + ", mAtk=" + mAtk + ", pDef=" + pDef
-                + ", mDef=" + mDef + ", accuracyBonus=" + accuracyBonus + ", evasionBonus=" + evasionBonus
-                + ", critBonus=" + critBonus + ", xpReward=" + xpReward + ", goldReward=" + goldReward + ", lootTable="
-                + lootTable + ", presenceRadius=" + presenceRadius + ", speed=" + speed + ", atkSpd=" + atkSpd
-                + ", level=" + level + ", elementalResistances=" + elementalResistances + ", knownSkills=" + knownSkills
+        return "MonsterTemplate[id=" + id + ", name=" + name + ", maxHealth=" + maxHealth + ", attributes=" + attributes
+                + ", pAtk=" + pAtk + ", mAtk=" + mAtk + ", pDef=" + pDef + ", mDef=" + mDef + ", accuracyBonus="
+                + accuracyBonus + ", evasionBonus=" + evasionBonus + ", critBonus=" + critBonus + ", xpReward="
+                + xpReward + ", goldReward=" + goldReward + ", lootTable=" + lootTable + ", presenceRadius="
+                + presenceRadius + ", speed=" + speed + ", atkSpd=" + atkSpd + ", level=" + level
+                + ", elementalResistances=" + elementalResistances + ", knownSkills=" + knownSkills
                 + ", knownPassiveSkills=" + knownPassiveSkills + ", activeEffects=" + activeEffects + "]";
     }
 

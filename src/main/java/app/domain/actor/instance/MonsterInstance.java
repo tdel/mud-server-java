@@ -111,10 +111,6 @@ public final class MonsterInstance extends AbstractCharacter {
         return template;
     }
 
-    public String getDescription() {
-        return template.getDescription();
-    }
-
     public int getPresenceRadius() {
         return template.getPresenceRadius();
     }
