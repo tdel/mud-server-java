@@ -67,7 +67,7 @@ public class RegenHealthEngine {
     @EventListener
     @Transactional
     void onCharacterDied(CharacterDied event) {
-        MapInstance map = event.character().getCurrentMap();
+        MapInstance map = event.character().getMotionSystem().getCurrentMap();
         map.removeMonster(event.character());
         event.character().broadcastToMap(new MonsterDefeated(event.character().getName()), null);
         event.character().getKnownList().clear();
@@ -76,7 +76,8 @@ public class RegenHealthEngine {
         CharacterInstance killer = event.killer();
         Party party = killer.getParty();
         List<CharacterInstance> eligible = party != null
-                ? party.getMembers().stream().filter(member -> member.getCurrentMap() == killer.getCurrentMap())
+                ? party.getMembers().stream().filter(
+                        member -> member.getMotionSystem().getCurrentMap() == killer.getMotionSystem().getCurrentMap())
                         .toList()
                 : List.of(killer);
         double multiplier = party != null ? party.shareMultiplier(eligible.size()) : 1.0;
@@ -88,7 +89,7 @@ public class RegenHealthEngine {
     void onGamePlayerDied(GamePlayerDied event) {
         regenerating.remove(event.character().getId());
 
-        MapInstance map = event.character().getCurrentMap();
+        MapInstance map = event.character().getMotionSystem().getCurrentMap();
         event.character().broadcast(new GamePlayerDefeated(event.character().getName(), event.killer().getName()),
                 null);
         log.info("regenhp.player_defeated character={} killer={} map={}", event.character().getName(),

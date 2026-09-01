@@ -74,11 +74,11 @@ public class WorldInstance {
     }
 
     public void loadPlayer(CharacterInstance character) {
-        Position savedPosition = character.getPosition();
+        Position savedPosition = character.getMotionSystem().getPosition();
         if (savedPosition != null) {
-            character.getCurrentMap().join(character, savedPosition);
+            character.getMotionSystem().getCurrentMap().join(character, savedPosition);
         } else {
-            character.getCurrentMap().join(character);
+            character.getMotionSystem().getCurrentMap().join(character);
         }
         players.put(character.getId(), character);
         log.info("world.player_loaded thread={} worldId={} character={}", Thread.currentThread().getName(), id,

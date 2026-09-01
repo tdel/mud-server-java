@@ -70,8 +70,8 @@ public class Goto implements CommandHandler {
         }
 
         Position target = new Position(x.get(), y.get());
-        Optional<List<Position>> path = GridPathfinder.findPath(character.getPosition(), target,
-                character.getCurrentMap().getCollisionGrid());
+        Optional<List<Position>> path = GridPathfinder.findPath(character.getMotionSystem().getPosition(), target,
+                character.getMotionSystem().getCurrentMap().getCollisionGrid());
 
         if (path.isEmpty()) {
             log.debug("movement.no_path character={} target=({},{})", character.getId(), target.x(), target.y());
@@ -84,9 +84,9 @@ public class Goto implements CommandHandler {
                 target.y(), waypoints.size());
         movementEngine.startMovement(waypoints, character);
         if (!waypoints.isEmpty()) {
-            connection.send(new MovementStarted(target.x(), target.y(), character.getHeading()));
+            connection.send(new MovementStarted(target.x(), target.y(), character.getMotionSystem().getHeading()));
             character.broadcast(new CharacterMovementStarted(character.getId(), character.getName(), target.x(),
-                    target.y(), character.getHeading()), character);
+                    target.y(), character.getMotionSystem().getHeading()), character);
         }
     }
 

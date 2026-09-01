@@ -75,7 +75,8 @@ public final class CombatSystem {
                     peaceZone.getName(), defender.getId());
             return new AttackOutcome.ForbiddenZone(peaceZone.getName());
         }
-        if (character.getPosition().distanceTo(defender.getPosition()) > MonsterAiEngine.ATTACK_RANGE) {
+        if (character.getMotionSystem().getPosition()
+                .distanceTo(defender.getMotionSystem().getPosition()) > MonsterAiEngine.ATTACK_RANGE) {
             log.debug("attack.rejected character={} reason=out_of_range target={}", character.getId(),
                     defender.getId());
             return new AttackOutcome.OutOfRange(defender.getName());

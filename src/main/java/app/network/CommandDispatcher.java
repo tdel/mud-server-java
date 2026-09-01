@@ -28,7 +28,7 @@ public class CommandDispatcher {
                 return;
             }
             if (connection.state() == ConnectionState.INGAME && action.requiresNotCasting()
-                    && connection.character().isCasting()) {
+                    && connection.character().getSkillSystem().isCasting()) {
                 log.debug("command.rejected verb={} reason=character_casting", actionName);
                 connection.send(new AlreadyCasting());
                 return;

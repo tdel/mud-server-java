@@ -96,6 +96,7 @@ public final class MonsterInstance extends AbstractCharacter {
 
     public void attachTemplate(MonsterTemplate template) {
         this.template = template;
+        getMotionSystem().setSpeed(template.getSpeed());
     }
 
     public MonsterTemplate getTemplate() {
@@ -112,11 +113,6 @@ public final class MonsterInstance extends AbstractCharacter {
 
     public int getLevel() {
         return requireTemplate().getLevel();
-    }
-
-    @Override
-    public int getSpeed() {
-        return requireTemplate().getSpeed();
     }
 
     @Override

@@ -40,7 +40,7 @@ public class PersistenceEngine {
         for (UUID id : new ArrayList<>(dirtyPositions.keySet())) {
             CharacterInstance character = dirtyPositions.remove(id);
             if (character != null) {
-                Position position = character.getPosition();
+                Position position = character.getMotionSystem().getPosition();
                 if (position != null) {
                     characterDao.updatePosition(character.getId(), position.x(), position.y());
                     log.debug("character.position_saved character={} position={}", character.getId(), position);

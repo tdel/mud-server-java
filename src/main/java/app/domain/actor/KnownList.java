@@ -38,7 +38,7 @@ public final class KnownList {
      * join/spawn).
      */
     public void populateSilently() {
-        MapInstance map = owner.getCurrentMap();
+        MapInstance map = owner.getMotionSystem().getCurrentMap();
         synchronized (map) {
             for (AbstractCharacter other : nearbyOthers(map)) {
                 known.add(other);
@@ -49,7 +49,7 @@ public final class KnownList {
 
     /** Retrait bidirectionnel complet (voir leave/disconnect/mort de monstre). */
     public void clear() {
-        MapInstance map = owner.getCurrentMap();
+        MapInstance map = owner.getMotionSystem().getCurrentMap();
         synchronized (map) {
             for (AbstractCharacter other : known) {
                 other.getKnownList().known.remove(owner);
@@ -66,7 +66,7 @@ public final class KnownList {
      * la note de classe ci-dessus).
      */
     public void refresh() {
-        MapInstance map = owner.getCurrentMap();
+        MapInstance map = owner.getMotionSystem().getCurrentMap();
         synchronized (map) {
             Set<AbstractCharacter> current = nearbyOthers(map);
             for (AbstractCharacter other : current) {
@@ -84,7 +84,8 @@ public final class KnownList {
     }
 
     private Set<AbstractCharacter> nearbyOthers(MapInstance map) {
-        Set<AbstractCharacter> nearby = new HashSet<>(map.occupantsWithin(owner.getPosition(), AWARENESS_RANGE));
+        Set<AbstractCharacter> nearby = new HashSet<>(
+                map.occupantsWithin(owner.getMotionSystem().getPosition(), AWARENESS_RANGE));
         nearby.remove(owner);
         return nearby;
     }

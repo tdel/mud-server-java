@@ -36,7 +36,7 @@ public class ProjectileEngine {
     public void launch(AbstractCharacter caster, ActiveSkill activeSkill, AbstractCharacter target,
             SkillSystem.AttackRollOutcome roll) {
         UUID projectileId = UUID.randomUUID();
-        double distance = caster.getPosition().distanceTo(target.getPosition());
+        double distance = caster.getMotionSystem().getPosition().distanceTo(target.getMotionSystem().getPosition());
         long travelDurationMs = Math.max(1, Math.round(distance / activeSkill.projectileSpeed() * 1000));
         long impactAtNanos = System.nanoTime() + travelDurationMs * 1_000_000L;
 
@@ -45,8 +45,10 @@ public class ProjectileEngine {
                 Thread.currentThread().getName(), projectileId, caster.getId(), activeSkill.name(), travelDurationMs);
 
         caster.broadcast(new SkillProjectileLaunched(projectileId, caster.getId(), caster.getName(), activeSkill.id(),
-                activeSkill.name(), caster.getPosition().x(), caster.getPosition().y(), target.getId(),
-                target.getName(), target.getPosition().x(), target.getPosition().y(), travelDurationMs), null);
+                activeSkill.name(), caster.getMotionSystem().getPosition().x(),
+                caster.getMotionSystem().getPosition().y(), target.getId(), target.getName(),
+                target.getMotionSystem().getPosition().x(), target.getMotionSystem().getPosition().y(),
+                travelDurationMs), null);
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)

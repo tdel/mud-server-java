@@ -9,39 +9,24 @@ import java.util.UUID;
 import app.domain.ActiveEffect;
 import app.domain.ActiveSkill;
 import app.domain.PassiveSkill;
-import app.domain.SkillEffectType;
 import app.domain.SkillElement;
 import app.domain.actor.system.EffectsSystem;
+import app.domain.actor.system.MotionSystem;
 import app.domain.actor.system.SkillSystem;
-import app.domain.actor.event.CharacterPositionChanged;
-import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.instance.CharacterInstance;
-import app.domain.actor.event.SkillCastBegin;
-import app.domain.map.Position;
-import app.domain.world.AbstractZone;
 import app.domain.world.MapInstance;
-import app.domain.world.NormalZone;
 import app.game.combat.CombatFormulas;
-import app.game.engine.MovementEngine;
-import app.game.engine.SkillCastEngine;
 import app.network.OutputMessage;
 
 public abstract class AbstractCharacter extends AbstractObject {
 
-    public static final int DEFAULT_SPEED = 110;
-
     private final Map<Attribute, Integer> attributes;
     private final EffectsSystem effectsSystem = new EffectsSystem(this);
     private final SkillSystem skillSystem = new SkillSystem(this);
+    private final MotionSystem motionSystem = new MotionSystem(this);
     private int currentHealth;
     private int maxHealth;
 
-    private volatile MapInstance currentMap;
-    private volatile Position position;
-    private volatile double heading;
-    protected int speed = DEFAULT_SPEED;
-    private volatile MovementEngine.ActiveMovement activeMovement;
-    private volatile SkillCastEngine.ActiveCast activeCast;
     private final KnownList knownList = new KnownList(this);
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
@@ -203,6 +188,10 @@ public abstract class AbstractCharacter extends AbstractObject {
         return skillSystem;
     }
 
+    public MotionSystem getMotionSystem() {
+        return motionSystem;
+    }
+
     // Défaut neutre : seul CharacterInstance suit une réserve de mana ;
     // MonsterInstance/AbstractNpc n'en ont pas encore, donc jamais bloqués par le
     // coût en mana d'un sort.
@@ -250,77 +239,6 @@ public abstract class AbstractCharacter extends AbstractObject {
         return healed;
     }
 
-    public MapInstance getCurrentMap() {
-        return currentMap;
-    }
-
-    public void setCurrentMap(MapInstance currentMap) {
-        this.currentMap = currentMap;
-    }
-
-    public Position getPosition() {
-        return position;
-    }
-
-    public void setPosition(Position position) {
-        this.position = position;
-        AbstractZone newZone = currentMap != null && position != null
-                ? currentMap.zoneAt(position)
-                : NormalZone.INSTANCE;
-        if (newZone != getZone()) {
-            getZone().onObjectExiting(this);
-            setZone(newZone);
-            newZone.onObjectEntering(this);
-        }
-        if (position != null && this instanceof CharacterInstance character) {
-            DomainEventPublisher.publish(new CharacterPositionChanged(character));
-        }
-    }
-
-    public double getHeading() {
-        return heading;
-    }
-
-    public void setHeading(double heading) {
-        this.heading = heading;
-    }
-
-    public int getSpeed() {
-        return speed;
-    }
-
-    public boolean isCasting() {
-        return activeCast != null;
-    }
-
-    public MovementEngine.ActiveMovement getActiveMovement() {
-        return activeMovement;
-    }
-
-    public void updateMovement(MovementEngine.ActiveMovement movement) {
-        this.activeMovement = movement;
-    }
-
-    public void clearMovement() {
-        this.activeMovement = null;
-    }
-
-    public SkillCastEngine.ActiveCast getActiveCast() {
-        return activeCast;
-    }
-
-    public void updateCast(SkillCastEngine.ActiveCast cast) {
-        this.activeCast = cast;
-    }
-
-    public void clearCast() {
-        this.activeCast = null;
-    }
-
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
-
     // No-op par défaut : seul GamePlayer a une Connection à notifier.
     public void send(OutputMessage message) {
     }
@@ -355,6 +273,7 @@ public abstract class AbstractCharacter extends AbstractObject {
      * scopées à {@link #broadcast} pour la bande passante.
      */
     public void broadcastToMap(OutputMessage message, CharacterInstance exclude) {
+        MapInstance currentMap = getMotionSystem().getCurrentMap();
         if (currentMap == null) {
             return;
         }
@@ -362,56 +281,6 @@ public abstract class AbstractCharacter extends AbstractObject {
             if (target != exclude) {
                 target.send(message);
             }
-        }
-    }
-
-    public CastRequestOutcome castSkill(ActiveSkill activeSkill, AbstractCharacter target) {
-        if (!getSkillSystem().hasSkill(activeSkill)) {
-            return new CastRequestOutcome.SkillUnknown(activeSkill.name());
-        }
-        if (target == null) {
-            return new CastRequestOutcome.NoTarget();
-        }
-        if (target instanceof AbstractNpc && activeSkill.effect() == SkillEffectType.DAMAGE) {
-            return new CastRequestOutcome.TargetInvalid(target.getId());
-        }
-        if (activeSkill.range() > 0 && getPosition().distanceTo(target.getPosition()) > activeSkill.range()) {
-            return new CastRequestOutcome.OutOfRange(activeSkill.name(), target.getName());
-        }
-        if (!getSkillSystem().isReady(activeSkill.id())) {
-            return new CastRequestOutcome.OnCooldown(activeSkill.name(),
-                    getSkillSystem().remainingCooldown(activeSkill.id()).toMillis());
-        }
-        if (getCurrentMana() < activeSkill.manaCost()) {
-            return new CastRequestOutcome.InsufficientMana(activeSkill.name(), activeSkill.manaCost(),
-                    getCurrentMana());
-        }
-
-        DomainEventPublisher.publish(new SkillCastBegin(this, activeSkill, target));
-        return new CastRequestOutcome.Started();
-    }
-
-    public sealed interface CastRequestOutcome {
-
-        record Started() implements CastRequestOutcome {
-        }
-
-        record SkillUnknown(String skillName) implements CastRequestOutcome {
-        }
-
-        record NoTarget() implements CastRequestOutcome {
-        }
-
-        record TargetInvalid(UUID targetId) implements CastRequestOutcome {
-        }
-
-        record OutOfRange(String skillName, String targetName) implements CastRequestOutcome {
-        }
-
-        record OnCooldown(String skillName, long remainingMs) implements CastRequestOutcome {
-        }
-
-        record InsufficientMana(String skillName, int required, int current) implements CastRequestOutcome {
         }
     }
 

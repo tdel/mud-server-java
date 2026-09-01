@@ -102,11 +102,11 @@ public class WorldInstanceService {
         }
 
         CharacterInstance character = connection.character();
-        MapInstance map = character.getCurrentMap();
+        MapInstance map = character.getMotionSystem().getCurrentMap();
         WorldInstance instance = character.getWorldInstance();
 
         characterDao.update(character);
-        Position position = character.getPosition();
+        Position position = character.getMotionSystem().getPosition();
         if (position != null) {
             characterDao.updatePosition(character.getId(), position.x(), position.y());
         }

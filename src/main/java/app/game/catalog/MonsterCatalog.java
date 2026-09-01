@@ -89,7 +89,7 @@ public class MonsterCatalog {
                 template.getAttributes(), template.getMaxHealth(), spawn.position(), template.getKnownSkills(),
                 template.getKnownPassiveSkills(), template.getActiveEffects());
         monster.attachTemplate(template);
-        monster.setCurrentMap(map);
+        monster.getMotionSystem().setCurrentMap(map);
         map.placeMonster(monster, spawn.position());
         return monster;
     }

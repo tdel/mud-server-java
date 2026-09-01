@@ -38,7 +38,7 @@ public class MonsterRespawnEngine {
     @EventListener
     void onCharacterDied(CharacterDied event) {
         MonsterInstance monster = event.character();
-        MapInstance map = monster.getCurrentMap();
+        MapInstance map = monster.getMotionSystem().getCurrentMap();
         Optional<MonsterSpawn> spawn = map.getMonsterSpawns().stream()
                 .filter(candidate -> candidate.id().equals(monster.getId())).findFirst();
         if (spawn.isEmpty()) {
@@ -77,9 +77,10 @@ public class MonsterRespawnEngine {
             MonsterInstance monster = monsterCatalog.spawnMonster(freeSpawn.get(), map);
             pending.remove(entry);
             monster.getKnownList().populateSilently();
-            monster.broadcastToMap(new MonsterSpawned(monster.getId(), monster.getName(), monster.getPosition().x(),
-                    monster.getPosition().y(), MovementEngine.unitsPerSecond(monster.getSpeed()),
-                    monster.getCurrentHealth(), monster.getMaxHealth(), monster.getLevel()), null);
+            monster.broadcastToMap(new MonsterSpawned(monster.getId(), monster.getName(),
+                    monster.getMotionSystem().getPosition().x(), monster.getMotionSystem().getPosition().y(),
+                    MovementEngine.unitsPerSecond(monster.getMotionSystem().getSpeed()), monster.getCurrentHealth(),
+                    monster.getMaxHealth(), monster.getLevel()), null);
             log.info("monster.respawned map={} group={} monsterId={}", map.getId(), group.id(), monster.getId());
         }
     }

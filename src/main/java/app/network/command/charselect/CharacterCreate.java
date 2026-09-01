@@ -134,7 +134,7 @@ public class CharacterCreate implements CommandHandler {
         MDC.put("character", character.getName());
 
         connection.send(new NowPlaying(character.getName()));
-        connection.send(new MapView(character.getCurrentMap()));
+        connection.send(new MapView(character.getMotionSystem().getCurrentMap()));
         connection.send(new MapEnter(character));
     }
 }

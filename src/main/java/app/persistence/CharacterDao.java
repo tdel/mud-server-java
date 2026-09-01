@@ -60,7 +60,8 @@ public class CharacterDao {
                 CHARACTER.INTELLIGENCE, CHARACTER.WIT, CHARACTER.MEN, CHARACTER.XP, CHARACTER.GOLD, CHARACTER.MAX_MANA,
                 CHARACTER.CURRENT_MANA, CHARACTER.SUBCLASS_TIER1, CHARACTER.SUBCLASS_TIER2)
                 .values(character.getId(), character.getAccountId(), character.getName(),
-                        character.getCurrentMap().getTemplateId(), character.getAppearanceSystem().getGender().name(),
+                        character.getMotionSystem().getCurrentMap().getTemplateId(),
+                        character.getAppearanceSystem().getGender().name(),
                         character.getAppearanceSystem().getRace().name(),
                         character.getClassSystem().getCharacterClass().name(), character.getLevel(),
                         character.getCurrentHealth(), character.getMaxHealth(),
@@ -101,7 +102,7 @@ public class CharacterDao {
     }
 
     public void update(CharacterInstance character) {
-        dsl.update(CHARACTER).set(CHARACTER.CURRENT_MAP_ID, character.getCurrentMap().getTemplateId())
+        dsl.update(CHARACTER).set(CHARACTER.CURRENT_MAP_ID, character.getMotionSystem().getCurrentMap().getTemplateId())
                 .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).set(CHARACTER.XP, character.getXp())
                 .set(CHARACTER.LEVEL, character.getLevel()).set(CHARACTER.MAX_HEALTH, character.getMaxHealth())
                 .set(CHARACTER.GOLD, character.getInventorySystem().getGold())
@@ -159,7 +160,7 @@ public class CharacterDao {
         Double posX = record.getPosX();
         Double posY = record.getPosY();
         if (posX != null && posY != null) {
-            character.setPosition(new Position(posX, posY));
+            character.getMotionSystem().setPosition(new Position(posX, posY));
         }
 
         return character;

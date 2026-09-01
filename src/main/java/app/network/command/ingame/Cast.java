@@ -7,8 +7,8 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 import app.domain.ActiveSkill;
-import app.domain.actor.AbstractCharacter;
 import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.system.SkillSystem;
 import app.game.catalog.SkillCatalog;
 import app.network.CommandArguments;
 import app.network.CommandHandler;
@@ -78,19 +78,19 @@ public class Cast implements CommandHandler {
             return;
         }
 
-        switch (character.castSkill(activeSkill, character.getCombatSystem().getTarget())) {
-            case AbstractCharacter.CastRequestOutcome.Started ignored -> {
+        switch (character.getSkillSystem().castSkill(activeSkill, character.getCombatSystem().getTarget())) {
+            case SkillSystem.CastRequestOutcome.Started ignored -> {
             }
-            case AbstractCharacter.CastRequestOutcome.SkillUnknown(var skillName) ->
+            case SkillSystem.CastRequestOutcome.SkillUnknown(var skillName) ->
                 connection.send(new SkillNotKnown(skillName));
-            case AbstractCharacter.CastRequestOutcome.NoTarget ignored -> connection.send(new NoTargetSelected());
-            case AbstractCharacter.CastRequestOutcome.TargetInvalid(var targetId) ->
+            case SkillSystem.CastRequestOutcome.NoTarget ignored -> connection.send(new NoTargetSelected());
+            case SkillSystem.CastRequestOutcome.TargetInvalid(var targetId) ->
                 connection.send(new TargetNotFound(targetId.toString()));
-            case AbstractCharacter.CastRequestOutcome.OutOfRange(var skillName, var targetName) ->
+            case SkillSystem.CastRequestOutcome.OutOfRange(var skillName, var targetName) ->
                 connection.send(new SkillOutOfRange(skillName, targetName));
-            case AbstractCharacter.CastRequestOutcome.OnCooldown(var skillName, var remainingMs) ->
+            case SkillSystem.CastRequestOutcome.OnCooldown(var skillName, var remainingMs) ->
                 connection.send(new SkillOnCooldown(skillName, remainingMs));
-            case AbstractCharacter.CastRequestOutcome.InsufficientMana(var skillName, var required, var current) ->
+            case SkillSystem.CastRequestOutcome.InsufficientMana(var skillName, var required, var current) ->
                 connection.send(new NotEnoughMana(skillName, required, current));
         }
     }

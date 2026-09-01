@@ -32,8 +32,8 @@ public record MapEnter(AbstractCharacter character) implements OutputJsonMessage
 
     @Override
     public void toJson(TcpJsonOutput output) {
-        MapInstance map = character.getCurrentMap();
-        Position self = character.getPosition();
+        MapInstance map = character.getMotionSystem().getCurrentMap();
+        Position self = character.getMotionSystem().getPosition();
 
         List<EntityView> characterViews = map.characters().stream()
                 .filter(other -> !other.getId().equals(character.getId())).map(EntityView::of).toList();
@@ -46,11 +46,12 @@ public record MapEnter(AbstractCharacter character) implements OutputJsonMessage
         List<WaypointView> waypoints = remainingWaypoints().stream().map(p -> new WaypointView(p.x(), p.y())).toList();
 
         output.write("MapEnter", new Payload(map.getName(), map.getDescription(), self.x(), self.y(),
-                character.getHeading(), characterViews, monsterViews, npcViews, portals, waypoints), false);
+                character.getMotionSystem().getHeading(), characterViews, monsterViews, npcViews, portals, waypoints),
+                false);
     }
 
     private List<Position> remainingWaypoints() {
-        MovementEngine.ActiveMovement movement = character.getActiveMovement();
+        MovementEngine.ActiveMovement movement = character.getMotionSystem().getActiveMovement();
         return movement == null ? List.of() : movement.remainingWaypoints();
     }
 }

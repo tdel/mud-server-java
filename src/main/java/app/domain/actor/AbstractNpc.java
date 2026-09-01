@@ -20,8 +20,8 @@ public class AbstractNpc extends AbstractCharacter {
         super(id, template.name(), neutralAttributes(), NOMINAL_HEALTH, NOMINAL_HEALTH, template.knownSkills(),
                 template.knownPassiveSkills(), template.activeEffects());
         this.template = Objects.requireNonNull(template);
-        setCurrentMap(Objects.requireNonNull(map));
-        this.speed = 0;
+        getMotionSystem().setCurrentMap(Objects.requireNonNull(map));
+        getMotionSystem().setSpeed(0);
     }
 
     public String getDescription() {
@@ -57,17 +57,18 @@ public class AbstractNpc extends AbstractCharacter {
             return false;
         }
         return Objects.equals(getId(), other.getId()) && Objects.equals(getName(), other.getName())
-                && Objects.equals(getCurrentMap(), other.getCurrentMap());
+                && Objects.equals(getMotionSystem().getCurrentMap(), other.getMotionSystem().getCurrentMap());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getCurrentMap());
+        return Objects.hash(getId(), getName(), getMotionSystem().getCurrentMap());
     }
 
     @Override
     public String toString() {
-        return "GameNpc[id=" + getId() + ", name=" + getName() + ", mapId=" + getCurrentMap().getId() + "]";
+        return "GameNpc[id=" + getId() + ", name=" + getName() + ", mapId=" + getMotionSystem().getCurrentMap().getId()
+                + "]";
     }
 
     public enum NpcDialogueOptionType {

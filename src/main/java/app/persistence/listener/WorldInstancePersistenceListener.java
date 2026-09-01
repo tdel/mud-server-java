@@ -30,7 +30,7 @@ public class WorldInstancePersistenceListener {
     @EventListener
     void onGamePlayerSpawnedToMap(GamePlayerSpawnedToMap event) {
         characterDao.updateCurrentMap(event.character().getId(), event.map().getTemplateId());
-        Position position = event.character().getPosition();
+        Position position = event.character().getMotionSystem().getPosition();
         if (position != null) {
             characterDao.updatePosition(event.character().getId(), position.x(), position.y());
         }

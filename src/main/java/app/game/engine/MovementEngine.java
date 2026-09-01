@@ -52,8 +52,9 @@ public class MovementEngine {
             return;
         }
         synchronized (character) {
-            character.updateMovement(new ActiveMovement(List.copyOf(waypoints), System.nanoTime()));
-            character.setHeading(character.getPosition().headingTo(waypoints.get(0)));
+            character.getMotionSystem().updateMovement(new ActiveMovement(List.copyOf(waypoints), System.nanoTime()));
+            character.getMotionSystem()
+                    .setHeading(character.getMotionSystem().getPosition().headingTo(waypoints.get(0)));
             movingCharacters.put(character.getId(), character);
         }
         log.debug("movement.started thread={} character={} waypoints={}", Thread.currentThread().getName(),
@@ -62,19 +63,19 @@ public class MovementEngine {
 
     public void stopMovement(AbstractCharacter character) {
         synchronized (character) {
-            if (character.getActiveMovement() == null) {
+            if (character.getMotionSystem().getActiveMovement() == null) {
                 return;
             }
-            character.clearMovement();
+            character.getMotionSystem().clearMovement();
             movingCharacters.remove(character.getId());
         }
         log.debug("movement.stopped thread={} character={}", Thread.currentThread().getName(), character.getId());
-        character.send(new MovementStopped(character.getPosition().x(), character.getPosition().y()));
-        character
-                .broadcast(
-                        new CharacterMovementStopped(character.getId(), character.getName(),
-                                character.getPosition().x(), character.getPosition().y()),
-                        character instanceof CharacterInstance player ? player : null);
+        character.send(new MovementStopped(character.getMotionSystem().getPosition().x(),
+                character.getMotionSystem().getPosition().y()));
+        character.broadcast(
+                new CharacterMovementStopped(character.getId(), character.getName(),
+                        character.getMotionSystem().getPosition().x(), character.getMotionSystem().getPosition().y()),
+                character instanceof CharacterInstance player ? player : null);
     }
 
     @EventListener
@@ -110,21 +111,24 @@ public class MovementEngine {
                         movingCharacters.remove(character.getId());
                         log.debug("movement.finished thread={} character={}", Thread.currentThread().getName(),
                                 character.getId());
-                        character.send(new MovementFinished(character.getPosition().x(), character.getPosition().y()));
+                        character.send(new MovementFinished(character.getMotionSystem().getPosition().x(),
+                                character.getMotionSystem().getPosition().y()));
                         if (character instanceof CharacterInstance player) {
                             character.broadcast(new CharacterMovementFinished(character.getId(), character.getName(),
-                                    character.getPosition().x(), character.getPosition().y()), player);
+                                    character.getMotionSystem().getPosition().x(),
+                                    character.getMotionSystem().getPosition().y()), player);
                         }
                     }
                     case BLOCKED_BY_BOUNDS -> {
                         movingCharacters.remove(character.getId());
                         log.debug("movement.blocked thread={} character={}", Thread.currentThread().getName(),
                                 character.getId());
-                        character.send(
-                                new MovementBlockedByBounds(character.getPosition().x(), character.getPosition().y()));
+                        character.send(new MovementBlockedByBounds(character.getMotionSystem().getPosition().x(),
+                                character.getMotionSystem().getPosition().y()));
                         if (character instanceof CharacterInstance player) {
                             character.broadcast(new CharacterMovementBlocked(character.getId(), character.getName(),
-                                    character.getPosition().x(), character.getPosition().y()), player);
+                                    character.getMotionSystem().getPosition().x(),
+                                    character.getMotionSystem().getPosition().y()), player);
                         }
                     }
                 }
@@ -141,34 +145,34 @@ public class MovementEngine {
 
     private MovementStepOutcome updatePosition(AbstractCharacter character, long now) {
         synchronized (character) {
-            ActiveMovement movement = character.getActiveMovement();
+            ActiveMovement movement = character.getMotionSystem().getActiveMovement();
             if (movement == null) {
                 return MovementStepOutcome.NO_MOVEMENT;
             }
 
-            MapInstance map = character.getCurrentMap();
+            MapInstance map = character.getMotionSystem().getCurrentMap();
             CollisionGrid grid = map.getCollisionGrid();
             double dtSeconds = (now - movement.lastTickAtNanos()) / 1_000_000_000.0;
 
-            Position previous = character.getPosition();
+            Position previous = character.getMotionSystem().getPosition();
             StepResult result = ContinuousStep.step(previous, movement.remainingWaypoints(),
-                    unitsPerSecond(character.getSpeed()), dtSeconds, grid);
-            character.setPosition(result.position());
+                    unitsPerSecond(character.getMotionSystem().getSpeed()), dtSeconds, grid);
+            character.getMotionSystem().setPosition(result.position());
             if (!result.position().equals(previous)) {
-                character.setHeading(previous.headingTo(result.position()));
+                character.getMotionSystem().setHeading(previous.headingTo(result.position()));
             }
 
             if (result.blocked()) {
-                character.clearMovement();
+                character.getMotionSystem().clearMovement();
                 return MovementStepOutcome.BLOCKED_BY_BOUNDS;
             }
 
             if (result.remainingWaypoints().isEmpty()) {
-                character.clearMovement();
+                character.getMotionSystem().clearMovement();
                 return MovementStepOutcome.FINISHED;
             }
 
-            character.updateMovement(movement.withRemaining(result.remainingWaypoints(), now));
+            character.getMotionSystem().updateMovement(movement.withRemaining(result.remainingWaypoints(), now));
             return MovementStepOutcome.STEPPED;
         }
     }

@@ -53,7 +53,7 @@ public class Talk implements CommandHandler {
         }
 
         Optional<AbstractNpc> npc = CommandArguments.tryParseUuid(raw)
-                .flatMap(id -> character.getCurrentMap().findNpcById(id));
+                .flatMap(id -> character.getMotionSystem().getCurrentMap().findNpcById(id));
         if (npc.isEmpty()) {
             connection.send(new TargetNotFound(raw));
             return;

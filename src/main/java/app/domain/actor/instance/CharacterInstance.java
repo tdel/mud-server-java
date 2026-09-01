@@ -67,9 +67,9 @@ public final class CharacterInstance extends AbstractCharacter {
             Set<PassiveSkill> knownPassiveSkills) {
         super(id, name, attributes, currentHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects);
         this.account = account;
-        setCurrentMap(map);
+        getMotionSystem().setCurrentMap(map);
         this.appearanceSystem = new AppearanceSystem(this, gender, race);
-        this.speed = race.speed();
+        getMotionSystem().setSpeed(race.speed());
         this.classSystem = new ClassSystem(this, characterClass, subclasses);
         this.level = level;
         this.xp = xp;
@@ -325,7 +325,7 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     public void moveToMap(MapInstance destination, Position targetPosition) {
-        MapInstance previous = getCurrentMap();
+        MapInstance previous = getMotionSystem().getCurrentMap();
         previous.leave(this);
         destination.join(this, targetPosition);
         DomainEventPublisher.publish(new GamePlayerMovedToMap(this, previous, destination));
@@ -345,9 +345,9 @@ public final class CharacterInstance extends AbstractCharacter {
     @Override
     public String toString() {
         return "GamePlayer[id=" + getId() + ", accountId=" + getAccountId() + ", name=" + getName() + ", currentMapId="
-                + getCurrentMap().getTemplateId() + ", gender=" + appearanceSystem.getGender() + ", race="
-                + appearanceSystem.getRace() + ", characterClass=" + classSystem.getCharacterClass() + ", level="
-                + level + ", xp=" + xp + ", gold=" + inventorySystem.getGold() + ", currentHealth=" + getCurrentHealth()
-                + ", maxHealth=" + getMaxHealth() + ", attributes=" + getAttributes() + "]";
+                + getMotionSystem().getCurrentMap().getTemplateId() + ", gender=" + appearanceSystem.getGender()
+                + ", race=" + appearanceSystem.getRace() + ", characterClass=" + classSystem.getCharacterClass()
+                + ", level=" + level + ", xp=" + xp + ", gold=" + inventorySystem.getGold() + ", currentHealth="
+                + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + ", attributes=" + getAttributes() + "]";
     }
 }

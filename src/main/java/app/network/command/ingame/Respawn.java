@@ -48,7 +48,7 @@ public class Respawn implements CommandHandler {
         // ça, le
         // client resterait affiché sur l'ancienne carte (voir Portal.java, même
         // besoin).
-        connection.send(new MapView(character.getCurrentMap()));
+        connection.send(new MapView(character.getMotionSystem().getCurrentMap()));
         connection.send(new MapEnter(character));
     }
 }

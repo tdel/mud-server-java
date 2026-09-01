@@ -42,7 +42,8 @@ public class Portal implements CommandHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
-        Optional<MapPortal> portal = character.getCurrentMap().findPortalAt(character.getPosition());
+        Optional<MapPortal> portal = character.getMotionSystem().getCurrentMap()
+                .findPortalAt(character.getMotionSystem().getPosition());
         if (portal.isEmpty()) {
             connection.send(new NoPortalHere());
             return;
@@ -64,7 +65,7 @@ public class Portal implements CommandHandler {
         movementEngine.stopMovement(character);
 
         character.moveToMap(portal.get().targetMap(), portal.get().targetPosition());
-        connection.send(new MapView(character.getCurrentMap()));
+        connection.send(new MapView(character.getMotionSystem().getCurrentMap()));
         connection.send(new MapEnter(character));
     }
 }

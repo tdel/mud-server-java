@@ -52,7 +52,7 @@ public class SkillCastEngine {
         // (resolveCast) — trop tard, le client continue sinon d'interpoler le
         // déplacement pendant toute la durée de l'incantation.
         movementEngine.stopMovement(caster);
-        caster.updateCast(
+        caster.getSkillSystem().updateCast(
                 new ActiveCast(activeSkill, target, System.nanoTime(), activeSkill.castingTimeMs() * 1_000_000L));
         casting.put(caster.getId(), caster);
         log.debug("activeSkill.cast_started thread={} caster={} activeSkill={} castingTimeMs={}",
@@ -62,11 +62,11 @@ public class SkillCastEngine {
     }
 
     public void cancelCast(AbstractCharacter caster) {
-        ActiveCast activeCast = caster.getActiveCast();
+        ActiveCast activeCast = caster.getSkillSystem().getActiveCast();
         if (activeCast == null) {
             return;
         }
-        caster.clearCast();
+        caster.getSkillSystem().clearCast();
         casting.remove(caster.getId());
         log.debug("activeSkill.cast_cancelled thread={} caster={}", Thread.currentThread().getName(), caster.getId());
         caster.broadcast(new SkillCastCancelled(caster.getId(), caster.getName(), activeCast.activeSkill().id(),
@@ -77,7 +77,7 @@ public class SkillCastEngine {
     void tick() {
         long now = System.nanoTime();
         for (AbstractCharacter caster : casting.values()) {
-            ActiveCast activeCast = caster.getActiveCast();
+            ActiveCast activeCast = caster.getSkillSystem().getActiveCast();
             if (activeCast == null) {
                 casting.remove(caster.getId());
                 continue;
@@ -86,7 +86,7 @@ public class SkillCastEngine {
                 continue;
             }
             casting.remove(caster.getId());
-            caster.clearCast();
+            caster.getSkillSystem().clearCast();
             try {
                 resolveCast(caster, activeCast);
             } catch (Exception e) {
@@ -151,10 +151,11 @@ public class SkillCastEngine {
         if (target == caster) {
             return true;
         }
-        if (target.getCurrentHealth() <= 0 || !caster.getCurrentMap().isPresent(target)) {
+        if (target.getCurrentHealth() <= 0 || !caster.getMotionSystem().getCurrentMap().isPresent(target)) {
             return false;
         }
-        return activeSkill.range() <= 0 || caster.getPosition().distanceTo(target.getPosition()) <= activeSkill.range();
+        return activeSkill.range() <= 0 || caster.getMotionSystem().getPosition()
+                .distanceTo(target.getMotionSystem().getPosition()) <= activeSkill.range();
     }
 
     public record ActiveCast(ActiveSkill activeSkill, AbstractCharacter target, long startedAtNanos,

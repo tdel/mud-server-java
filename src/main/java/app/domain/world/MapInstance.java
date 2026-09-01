@@ -102,14 +102,14 @@ public class MapInstance {
     }
 
     public void join(CharacterInstance character) {
-        character.setHeading(randomHeading());
+        character.getMotionSystem().setHeading(randomHeading());
         join(character, getSpawnPosition());
     }
 
     public void join(CharacterInstance character, Position position) {
         synchronized (this) {
-            character.setCurrentMap(this);
-            character.setPosition(position);
+            character.getMotionSystem().setCurrentMap(this);
+            character.getMotionSystem().setPosition(position);
             clients.put(character.getId(), character);
             log.info("map.joined thread={} mapId={} character={} position={}", Thread.currentThread().getName(), id,
                     character.getId(), position);
@@ -126,7 +126,7 @@ public class MapInstance {
         synchronized (this) {
             clients.remove(character.getId());
             character.getKnownList().clear();
-            character.setPosition(null);
+            character.getMotionSystem().setPosition(null);
         }
         log.info("map.left thread={} mapId={} character={}", Thread.currentThread().getName(), id, character.getId());
     }
@@ -136,7 +136,7 @@ public class MapInstance {
         synchronized (this) {
             clients.remove(character.getId());
             character.getKnownList().clear();
-            character.setPosition(null);
+            character.getMotionSystem().setPosition(null);
         }
         log.info("map.disconnected thread={} mapId={} character={}", Thread.currentThread().getName(), id,
                 character.getId());
@@ -184,8 +184,8 @@ public class MapInstance {
 
     public void placeMonster(MonsterInstance monster, Position position) {
         addMonster(monster);
-        monster.setPosition(position);
-        monster.setHeading(randomHeading());
+        monster.getMotionSystem().setPosition(position);
+        monster.getMotionSystem().setHeading(randomHeading());
     }
 
     public List<AbstractNpc> getNpcs() {
@@ -198,8 +198,8 @@ public class MapInstance {
 
     public void placeNpc(AbstractNpc npc, Position position) {
         addNpc(npc);
-        npc.setPosition(position);
-        npc.setHeading(randomHeading());
+        npc.getMotionSystem().setPosition(position);
+        npc.getMotionSystem().setHeading(randomHeading());
     }
 
     public Optional<AbstractNpc> findNpcById(UUID id) {
@@ -236,17 +236,20 @@ public class MapInstance {
     public List<AbstractCharacter> occupantsWithin(Position center, double radius) {
         List<AbstractCharacter> nearby = new ArrayList<>();
         for (CharacterInstance client : clients.values()) {
-            if (client.getPosition() != null && client.getPosition().distanceTo(center) <= radius) {
+            if (client.getMotionSystem().getPosition() != null
+                    && client.getMotionSystem().getPosition().distanceTo(center) <= radius) {
                 nearby.add(client);
             }
         }
         for (MonsterInstance monster : monsters) {
-            if (monster.getPosition() != null && monster.getPosition().distanceTo(center) <= radius) {
+            if (monster.getMotionSystem().getPosition() != null
+                    && monster.getMotionSystem().getPosition().distanceTo(center) <= radius) {
                 nearby.add(monster);
             }
         }
         for (AbstractNpc npc : npcs) {
-            if (npc.getPosition() != null && npc.getPosition().distanceTo(center) <= radius) {
+            if (npc.getMotionSystem().getPosition() != null
+                    && npc.getMotionSystem().getPosition().distanceTo(center) <= radius) {
                 nearby.add(npc);
             }
         }

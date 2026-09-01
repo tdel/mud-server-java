@@ -13,17 +13,21 @@ import java.util.stream.Collectors;
 import app.domain.ActiveEffect;
 import app.domain.PassiveSkill;
 import app.domain.ActiveSkill;
+import app.domain.SkillEffectType;
 import app.domain.SkillElement;
 import app.domain.actor.AbstractCharacter;
+import app.domain.actor.AbstractNpc;
 import app.domain.actor.Attribute;
 import app.domain.actor.event.CharacterEffectExpired;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.MonsterAttacked;
+import app.domain.actor.event.SkillCastBegin;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.item.ItemGrade;
 import app.game.Randomizer;
 import app.game.combat.CombatFormulas;
+import app.game.engine.SkillCastEngine;
 
 public final class SkillSystem {
 
@@ -31,9 +35,26 @@ public final class SkillSystem {
     private final Set<ActiveSkill> knownSkills = ConcurrentHashMap.newKeySet();
     private final Map<UUID, Instant> nextCastAt = new ConcurrentHashMap<>();
     private final Set<PassiveSkill> knownPassiveSkills = ConcurrentHashMap.newKeySet();
+    private volatile SkillCastEngine.ActiveCast activeCast;
 
     public SkillSystem(AbstractCharacter character) {
         this.character = character;
+    }
+
+    public boolean isCasting() {
+        return activeCast != null;
+    }
+
+    public SkillCastEngine.ActiveCast getActiveCast() {
+        return activeCast;
+    }
+
+    public void updateCast(SkillCastEngine.ActiveCast cast) {
+        this.activeCast = cast;
+    }
+
+    public void clearCast() {
+        this.activeCast = null;
     }
 
     public boolean knows(UUID skillId) {
@@ -191,5 +212,56 @@ public final class SkillSystem {
     }
 
     public record AttackRollOutcome(boolean hit, int amount) {
+    }
+
+    public CastRequestOutcome castSkill(ActiveSkill activeSkill, AbstractCharacter target) {
+        if (!hasSkill(activeSkill)) {
+            return new CastRequestOutcome.SkillUnknown(activeSkill.name());
+        }
+        if (target == null) {
+            return new CastRequestOutcome.NoTarget();
+        }
+        if (target instanceof AbstractNpc && activeSkill.effect() == SkillEffectType.DAMAGE) {
+            return new CastRequestOutcome.TargetInvalid(target.getId());
+        }
+        if (activeSkill.range() > 0 && character.getMotionSystem().getPosition()
+                .distanceTo(target.getMotionSystem().getPosition()) > activeSkill.range()) {
+            return new CastRequestOutcome.OutOfRange(activeSkill.name(), target.getName());
+        }
+        if (!isReady(activeSkill.id())) {
+            return new CastRequestOutcome.OnCooldown(activeSkill.name(),
+                    remainingCooldown(activeSkill.id()).toMillis());
+        }
+        if (character.getCurrentMana() < activeSkill.manaCost()) {
+            return new CastRequestOutcome.InsufficientMana(activeSkill.name(), activeSkill.manaCost(),
+                    character.getCurrentMana());
+        }
+
+        DomainEventPublisher.publish(new SkillCastBegin(character, activeSkill, target));
+        return new CastRequestOutcome.Started();
+    }
+
+    public sealed interface CastRequestOutcome {
+
+        record Started() implements CastRequestOutcome {
+        }
+
+        record SkillUnknown(String skillName) implements CastRequestOutcome {
+        }
+
+        record NoTarget() implements CastRequestOutcome {
+        }
+
+        record TargetInvalid(UUID targetId) implements CastRequestOutcome {
+        }
+
+        record OutOfRange(String skillName, String targetName) implements CastRequestOutcome {
+        }
+
+        record OnCooldown(String skillName, long remainingMs) implements CastRequestOutcome {
+        }
+
+        record InsufficientMana(String skillName, int required, int current) implements CastRequestOutcome {
+        }
     }
 }

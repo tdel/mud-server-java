@@ -44,7 +44,7 @@ public class Examine implements CommandHandler {
         }
 
         Optional<AbstractCharacter> target = CommandArguments.tryParseUuid(raw)
-                .flatMap(id -> character.getCurrentMap().findOccupantById(id));
+                .flatMap(id -> character.getMotionSystem().getCurrentMap().findOccupantById(id));
 
         if (target.isEmpty()) {
             connection.send(new TargetNotFound(raw));

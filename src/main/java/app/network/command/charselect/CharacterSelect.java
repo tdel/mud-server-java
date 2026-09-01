@@ -72,7 +72,7 @@ public class CharacterSelect implements CommandHandler {
         MDC.put("character", loadedChar.getName());
 
         connection.send(new NowPlaying(loadedChar.getName()));
-        connection.send(new MapView(loadedChar.getCurrentMap()));
+        connection.send(new MapView(loadedChar.getMotionSystem().getCurrentMap()));
         connection.send(new MapEnter(loadedChar));
     }
 }
