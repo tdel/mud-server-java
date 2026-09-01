@@ -30,9 +30,10 @@ public final class InventorySystem {
     private final List<Item> items = new CopyOnWriteArrayList<>();
     private int gold;
 
-    public InventorySystem(CharacterInstance character, int gold) {
+    public InventorySystem(CharacterInstance character, int gold, List<Item> items) {
         this.character = character;
         this.gold = gold;
+        this.items.addAll(items);
     }
 
     public int getGold() {
@@ -73,11 +74,6 @@ public final class InventorySystem {
 
     public void removeItem(Item item) {
         items.remove(item);
-    }
-
-    public void replaceItems(List<Item> newItems) {
-        items.clear();
-        items.addAll(newItems);
     }
 
     public void receiveGold(int amount) {
@@ -130,6 +126,7 @@ public final class InventorySystem {
         item.setSlot(slot);
         DomainEventPublisher.publish(new GamePlayerEquippedItem(character, item, slot, previousOccupants));
         recomputeGradePenalty();
+        character.recomputeStats();
         return Optional.of(slot);
     }
 
@@ -137,6 +134,7 @@ public final class InventorySystem {
         item.setSlot(null);
         DomainEventPublisher.publish(new GamePlayerUnequippedItem(character, item));
         recomputeGradePenalty();
+        character.recomputeStats();
     }
 
     // Marqueur unique dans ActiveEffects tant qu'au moins un objet équipé dépasse

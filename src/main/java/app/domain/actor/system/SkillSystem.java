@@ -18,6 +18,7 @@ import app.domain.SkillElement;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.AbstractNpc;
 import app.domain.actor.Attribute;
+import app.domain.actor.ModifiedStat;
 import app.domain.actor.event.CharacterEffectExpired;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.MonsterAttacked;
@@ -144,12 +145,13 @@ public final class SkillSystem {
         if (!rollSkillHit(target)) {
             return new AttackRollOutcome(false, 0);
         }
-        boolean critical = Randomizer.rollChance(character.getEffectiveMagicalCriticalRate() / 100.0);
+        boolean critical = Randomizer.rollChance(character.getStatSystem().getEffective(ModifiedStat.MCRIT) / 100.0);
         // Le power du sort module la puissance magique du lancer, ce qui préserve
         // la progression entre tiers d'un même sort (Flame Strike tier 1 vs tier 5)
         // au lieu de tout aplatir sur le seul m.atk du personnage.
-        int skillPower = character.getEffectiveMAtk() + activeSkill.power();
-        int amount = CombatFormulas.resolveDamage(skillPower, target.getEffectiveMDef(), critical);
+        int skillPower = character.getStatSystem().getEffective(ModifiedStat.MATK) + activeSkill.power();
+        int amount = CombatFormulas.resolveDamage(skillPower, target.getStatSystem().getEffective(ModifiedStat.MDEF),
+                critical);
         if (activeSkill.element() != SkillElement.NONE) {
             amount = CombatFormulas.applyElementalResistance(amount,
                     target.getElementalResistance(activeSkill.element()));
@@ -193,7 +195,8 @@ public final class SkillSystem {
     }
 
     private boolean rollSkillHit(AbstractCharacter target) {
-        double hitChance = CombatFormulas.hitChance(character.getEffectiveAccuracy(), target.getEffectiveEvasion());
+        double hitChance = CombatFormulas.hitChance(character.getStatSystem().getEffective(ModifiedStat.ACCURACY),
+                target.getStatSystem().getEffective(ModifiedStat.EVASION));
         return Randomizer.rollChance(hitChance);
     }
 

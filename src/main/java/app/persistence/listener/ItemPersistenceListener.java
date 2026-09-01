@@ -1,14 +1,11 @@
 package app.persistence.listener;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import app.domain.actor.instance.CharacterInstance;
 import app.domain.item.Item;
 import app.domain.actor.event.CharacterLootedItem;
 import app.domain.actor.event.GamePlayerEquippedItem;
@@ -30,10 +27,6 @@ public class ItemPersistenceListener {
 
     public ItemPersistenceListener(ItemDao itemDao) {
         this.itemDao = itemDao;
-    }
-
-    public List<Item> loadInventory(CharacterInstance character) {
-        return itemDao.findByCharacter(character);
     }
 
     @EventListener

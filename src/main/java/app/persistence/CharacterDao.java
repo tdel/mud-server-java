@@ -25,6 +25,7 @@ import app.domain.actor.CharacterClass;
 import app.domain.actor.Gender;
 import app.domain.actor.Race;
 import app.domain.actor.Subclass;
+import app.domain.item.Item;
 import app.domain.map.Position;
 import app.domain.world.MapInstance;
 import app.domain.world.WorldInstance;
@@ -39,16 +40,18 @@ public class CharacterDao {
     private final CharacterSkillDao characterSkillDao;
     private final CharacterActiveEffectDao characterActiveEffectDao;
     private final CharacterPassiveSkillDao characterPassiveSkillDao;
+    private final ItemDao itemDao;
     private final SkillCatalog skillCatalog;
     private final PassiveSkillCatalog passiveSkillCatalog;
 
     public CharacterDao(DSLContext dsl, CharacterSkillDao characterSkillDao,
             CharacterActiveEffectDao characterActiveEffectDao, CharacterPassiveSkillDao characterPassiveSkillDao,
-            SkillCatalog skillCatalog, PassiveSkillCatalog passiveSkillCatalog) {
+            ItemDao itemDao, SkillCatalog skillCatalog, PassiveSkillCatalog passiveSkillCatalog) {
         this.dsl = dsl;
         this.characterSkillDao = characterSkillDao;
         this.characterActiveEffectDao = characterActiveEffectDao;
         this.characterPassiveSkillDao = characterPassiveSkillDao;
+        this.itemDao = itemDao;
         this.skillCatalog = skillCatalog;
         this.passiveSkillCatalog = passiveSkillCatalog;
     }
@@ -151,10 +154,12 @@ public class CharacterDao {
         int maxHealth = characterClass.maxHealth(record.getConstitution(), record.getLevel());
         int maxMana = characterClass.maxMana(record.getMen(), record.getLevel());
 
+        List<Item> items = itemDao.findByCharacterId(record.getId());
+
         CharacterInstance character = new CharacterInstance(record.getId(), account, record.getName(), map,
                 Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
                 maxHealth, attributes, record.getXp(), record.getGold(), maxMana, record.getCurrentMana(), knownSkills,
-                activeEffects, subclasses, knownPassiveSkills);
+                activeEffects, subclasses, knownPassiveSkills, items);
         character.setWorldInstance(instance);
 
         Double posX = record.getPosX();

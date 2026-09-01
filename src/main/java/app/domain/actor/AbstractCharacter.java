@@ -13,9 +13,9 @@ import app.domain.SkillElement;
 import app.domain.actor.system.EffectsSystem;
 import app.domain.actor.system.MotionSystem;
 import app.domain.actor.system.SkillSystem;
+import app.domain.actor.system.StatSystem;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.world.MapInstance;
-import app.game.combat.CombatFormulas;
 import app.network.OutputMessage;
 
 public abstract class AbstractCharacter extends AbstractObject {
@@ -24,6 +24,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     private final EffectsSystem effectsSystem = new EffectsSystem(this);
     private final SkillSystem skillSystem = new SkillSystem(this);
     private final MotionSystem motionSystem = new MotionSystem(this);
+    private final StatSystem statSystem;
     private int currentHealth;
     private int maxHealth;
 
@@ -31,11 +32,12 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
             int maxHealth, Set<ActiveSkill> knownSkills, Set<PassiveSkill> knownPassiveSkills,
-            List<ActiveEffect> activeEffects) {
+            List<ActiveEffect> activeEffects, Map<ModifiedStat, Integer> initialBaseStats) {
         super(id, name);
         this.attributes = new EnumMap<>(attributes);
         this.currentHealth = currentHealth;
         this.maxHealth = maxHealth;
+        this.statSystem = new StatSystem(effectsSystem, initialBaseStats);
         knownSkills.forEach(getSkillSystem()::learn);
         knownPassiveSkills.forEach(getSkillSystem()::learn);
         activeEffects.forEach(getEffectsSystem()::apply);
@@ -51,44 +53,9 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public abstract int getLevel();
 
-    // Défauts neutres : seul CharacterInstance a des objets équipés (arme,
-    // armure) ; MonsterInstance surcharge depuis son MonsterTemplate.
-    protected int basePAtk() {
-        return CombatFormulas.UNARMED_PATK;
-    }
-
-    protected int baseMAtk() {
-        return 0;
-    }
-
-    protected int basePDefSum() {
-        return 0;
-    }
-
-    protected int baseMDefSum() {
-        return 0;
-    }
-
-    protected int accuracyItemBonus() {
-        return 0;
-    }
-
-    protected int evasionItemBonus() {
-        return 0;
-    }
-
-    protected int armorWeightPenalty() {
-        return 0;
-    }
-
-    protected int critItemBonus() {
-        return 0;
-    }
-
-    protected int baseAtkSpd() {
-        return CombatFormulas.BASE_ATK_SPD;
-    }
-
+    // Défaut neutre : seul CharacterInstance a des objets équipés susceptibles
+    // de porter des résistances élémentaires ; MonsterInstance surcharge depuis
+    // son MonsterTemplate.
     protected Map<SkillElement, Integer> elementalResistanceMap() {
         return Map.of();
     }
@@ -97,91 +64,12 @@ public abstract class AbstractCharacter extends AbstractObject {
         return elementalResistanceMap().getOrDefault(element, 0);
     }
 
-    // Défaut neutre : seul CharacterInstance regroupe des items équipés
-    // susceptibles de former un set.
-    protected Map<ModifiedStat, Integer> setBonusModifiers() {
-        return Map.of();
-    }
-
-    private int setBonus(ModifiedStat stat) {
-        return setBonusModifiers().getOrDefault(stat, 0);
-    }
-
-    public int getPAtk() {
-        return CombatFormulas.physicalAttack(basePAtk(), getAttribute(Attribute.STRENGTH), getLevel());
-    }
-
-    public final int getEffectivePAtk() {
-        return getPAtk() + effectsSystem.totalModifier(ModifiedStat.PATK) + setBonus(ModifiedStat.PATK);
-    }
-
-    public int getMAtk() {
-        return CombatFormulas.magicalAttack(baseMAtk(), getAttribute(Attribute.INTELLIGENCE), getLevel());
-    }
-
-    public final int getEffectiveMAtk() {
-        return getMAtk() + effectsSystem.totalModifier(ModifiedStat.MATK) + setBonus(ModifiedStat.MATK);
-    }
-
-    public int getPDef() {
-        return CombatFormulas.physicalDefense(basePDefSum(), getAttribute(Attribute.CONSTITUTION));
-    }
-
-    public final int getEffectivePDef() {
-        return getPDef() + effectsSystem.totalModifier(ModifiedStat.PDEF) + setBonus(ModifiedStat.PDEF);
-    }
-
-    public int getMDef() {
-        return CombatFormulas.magicalDefense(baseMDefSum(), getAttribute(Attribute.MEN));
-    }
-
-    public final int getEffectiveMDef() {
-        return getMDef() + effectsSystem.totalModifier(ModifiedStat.MDEF) + setBonus(ModifiedStat.MDEF);
-    }
-
-    public int getAccuracy() {
-        return CombatFormulas.accuracy(getLevel(), getAttribute(Attribute.DEXTERITY), accuracyItemBonus());
-    }
-
-    public final int getEffectiveAccuracy() {
-        return getAccuracy() + effectsSystem.totalModifier(ModifiedStat.ACCURACY) + setBonus(ModifiedStat.ACCURACY);
-    }
-
-    public int getEvasion() {
-        return CombatFormulas.evasion(getLevel(), getAttribute(Attribute.DEXTERITY), armorWeightPenalty(),
-                evasionItemBonus());
-    }
-
-    public final int getEffectiveEvasion() {
-        return getEvasion() + effectsSystem.totalModifier(ModifiedStat.EVASION) + setBonus(ModifiedStat.EVASION);
-    }
-
-    public int getCriticalRate() {
-        return CombatFormulas.criticalRate(getAttribute(Attribute.DEXTERITY), critItemBonus());
-    }
-
-    public final int getEffectiveCriticalRate() {
-        return getCriticalRate() + effectsSystem.totalModifier(ModifiedStat.PCRIT);
-    }
-
-    public int getMagicalCriticalRate() {
-        return CombatFormulas.magicCriticalRate(getAttribute(Attribute.WIT), critItemBonus());
-    }
-
-    public final int getEffectiveMagicalCriticalRate() {
-        return getMagicalCriticalRate() + effectsSystem.totalModifier(ModifiedStat.MCRIT);
-    }
-
-    public int getAtkSpd() {
-        return CombatFormulas.attackSpeed(baseAtkSpd(), getAttribute(Attribute.DEXTERITY));
-    }
-
-    public final int getEffectiveAtkSpd() {
-        return getAtkSpd() + effectsSystem.totalModifier(ModifiedStat.ATKSPD) + setBonus(ModifiedStat.ATKSPD);
-    }
-
     public EffectsSystem getEffectsSystem() {
         return effectsSystem;
+    }
+
+    public StatSystem getStatSystem() {
+        return statSystem;
     }
 
     public SkillSystem getSkillSystem() {

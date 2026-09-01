@@ -33,9 +33,11 @@ public class ItemDao {
                 .execute();
     }
 
-    public List<Item> findByCharacter(AbstractCharacter character) {
-        return dsl.selectFrom(ITEM).where(ITEM.CHARACTER_ID.eq(character.getId()))
-                .fetch(record -> toItem(record, character));
+    // Utilisé pour charger l'inventaire AVANT de construire le CharacterInstance
+    // propriétaire (voir CharacterDao.toDomain) : les Item obtenus n'ont pas
+    // encore de character (rattaché ensuite via Item.attachOwner).
+    public List<Item> findByCharacterId(UUID characterId) {
+        return dsl.selectFrom(ITEM).where(ITEM.CHARACTER_ID.eq(characterId)).fetch(record -> toItem(record, null));
     }
 
     public void updateSlot(UUID itemId, EquipmentSlot slot) {

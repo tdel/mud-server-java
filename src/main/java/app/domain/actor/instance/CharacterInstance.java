@@ -64,8 +64,9 @@ public final class CharacterInstance extends AbstractCharacter {
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold, int maxMana, int currentMana,
             Set<ActiveSkill> knownSkills, List<ActiveEffect> activeEffects, List<Subclass> subclasses,
-            Set<PassiveSkill> knownPassiveSkills) {
-        super(id, name, attributes, currentHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects);
+            Set<PassiveSkill> knownPassiveSkills, List<Item> items) {
+        super(id, name, attributes, currentHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects,
+                computeBaseStats(attributes, level, items));
         this.account = account;
         getMotionSystem().setCurrentMap(map);
         this.appearanceSystem = new AppearanceSystem(this, gender, race);
@@ -73,11 +74,62 @@ public final class CharacterInstance extends AbstractCharacter {
         this.classSystem = new ClassSystem(this, characterClass, subclasses);
         this.level = level;
         this.xp = xp;
-        this.inventorySystem = new InventorySystem(this, gold);
+        items.forEach(item -> item.attachOwner(this));
+        this.inventorySystem = new InventorySystem(this, gold, items);
         this.combatSystem = new CombatSystem(this);
         this.maxMana = maxMana;
         this.currentMana = currentMana;
         inventorySystem.recomputeGradePenalty();
+        getStatSystem().setSetBonuses(computeSetBonuses());
+    }
+
+    // Ne dépend que des paramètres reçus (aucun accès à `this`) : appelable
+    // avant super(...) pour fournir la base initiale du StatSystem, et réutilisé
+    // par recomputeStats() pour les recalculs post-construction (équipement,
+    // level up).
+    private static Map<ModifiedStat, Integer> computeBaseStats(Map<Attribute, Integer> attributes, int level,
+            List<Item> items) {
+        List<Item> equipped = items.stream().filter(item -> item.getSlot() != null).toList();
+        Optional<Item> weapon = equipped.stream().filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
+
+        int weaponPAtk = weapon.map(Item::getPAtk).orElse(CombatFormulas.UNARMED_PATK);
+        int weaponMAtk = weapon.map(Item::getMAtk).orElse(0);
+        int weaponAtkSpd = weapon.map(Item::getAtkSpd).orElse(CombatFormulas.BASE_ATK_SPD);
+        int armorPDefSum = equipped.stream().mapToInt(Item::getPDef).sum();
+        int armorMDefSum = equipped.stream().mapToInt(Item::getMDef).sum();
+        int accuracyItemBonus = equipped.stream().mapToInt(Item::getAccuracyBonus).sum();
+        int evasionItemBonus = equipped.stream().mapToInt(Item::getEvasionBonus).sum();
+        int critItemBonus = equipped.stream().mapToInt(Item::getCritBonus).sum();
+        int armorWeightPenalty = equipped.stream().filter(item -> item.getSlot() == EquipmentSlot.CHEST).findFirst()
+                .map(item -> CombatFormulas.armorWeightPenalty(item.getArmorCategory())).orElse(0);
+
+        return CombatFormulas.baseStats(weaponPAtk, weaponMAtk, armorPDefSum, armorMDefSum, accuracyItemBonus,
+                evasionItemBonus, critItemBonus, armorWeightPenalty, weaponAtkSpd, attributes, level);
+    }
+
+    private Map<ModifiedStat, Integer> computeSetBonuses() {
+        Map<String, Long> equippedCountBySetId = inventorySystem.getEquippedItems().stream().map(Item::getSetId)
+                .filter(Objects::nonNull).collect(Collectors.groupingBy(setId -> setId, Collectors.counting()));
+
+        Map<ModifiedStat, Integer> modifiers = new EnumMap<>(ModifiedStat.class);
+        for (Map.Entry<String, Long> entry : equippedCountBySetId.entrySet()) {
+            ItemSet set = ItemSetCatalogHolder.getById(entry.getKey());
+            int piecesEquipped = entry.getValue().intValue();
+            for (Map.Entry<Integer, Map<ModifiedStat, Integer>> tier : set.bonusByPieceCount().entrySet()) {
+                if (piecesEquipped >= tier.getKey()) {
+                    tier.getValue().forEach((stat, amount) -> modifiers.merge(stat, amount, Integer::sum));
+                }
+            }
+        }
+        return modifiers;
+    }
+
+    // Appelé après toute mutation de l'équipement (equip/unequip, voir
+    // InventorySystem) ou de niveau (applyLevelUp) : p.atk/m.atk/accuracy/...
+    // dépendent de l'arme/armure équipée et de level.
+    public void recomputeStats() {
+        getStatSystem().updateBase(computeBaseStats(getAttributes(), getLevel(), inventorySystem.getItems()));
+        getStatSystem().setSetBonuses(computeSetBonuses());
     }
 
     public Account getAccount() {
@@ -113,74 +165,10 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     @Override
-    protected int basePAtk() {
-        return inventorySystem.getEquippedWeapon().map(Item::getPAtk).orElse(CombatFormulas.UNARMED_PATK);
-    }
-
-    @Override
-    protected int baseMAtk() {
-        return inventorySystem.getEquippedWeapon().map(Item::getMAtk).orElse(0);
-    }
-
-    @Override
-    protected int basePDefSum() {
-        return inventorySystem.getEquippedItems().stream().mapToInt(Item::getPDef).sum();
-    }
-
-    @Override
-    protected int baseMDefSum() {
-        return inventorySystem.getEquippedItems().stream().mapToInt(Item::getMDef).sum();
-    }
-
-    @Override
-    protected int accuracyItemBonus() {
-        return inventorySystem.getEquippedItems().stream().mapToInt(Item::getAccuracyBonus).sum();
-    }
-
-    @Override
-    protected int evasionItemBonus() {
-        return inventorySystem.getEquippedItems().stream().mapToInt(Item::getEvasionBonus).sum();
-    }
-
-    @Override
-    protected int critItemBonus() {
-        return inventorySystem.getEquippedItems().stream().mapToInt(Item::getCritBonus).sum();
-    }
-
-    @Override
-    protected int baseAtkSpd() {
-        return inventorySystem.getEquippedWeapon().map(Item::getAtkSpd).orElse(CombatFormulas.BASE_ATK_SPD);
-    }
-
-    @Override
-    protected int armorWeightPenalty() {
-        return inventorySystem.getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.CHEST)
-                .findFirst().map(item -> CombatFormulas.armorWeightPenalty(item.getArmorCategory())).orElse(0);
-    }
-
-    @Override
     protected Map<SkillElement, Integer> elementalResistanceMap() {
         return inventorySystem.getEquippedItems().stream()
                 .flatMap(item -> item.getElementalResistances().entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum));
-    }
-
-    @Override
-    protected Map<ModifiedStat, Integer> setBonusModifiers() {
-        Map<String, Long> equippedCountBySetId = inventorySystem.getEquippedItems().stream().map(Item::getSetId)
-                .filter(Objects::nonNull).collect(Collectors.groupingBy(setId -> setId, Collectors.counting()));
-
-        Map<ModifiedStat, Integer> modifiers = new EnumMap<>(ModifiedStat.class);
-        for (Map.Entry<String, Long> entry : equippedCountBySetId.entrySet()) {
-            ItemSet set = ItemSetCatalogHolder.getById(entry.getKey());
-            int piecesEquipped = entry.getValue().intValue();
-            for (Map.Entry<Integer, Map<ModifiedStat, Integer>> tier : set.bonusByPieceCount().entrySet()) {
-                if (piecesEquipped >= tier.getKey()) {
-                    tier.getValue().forEach((stat, amount) -> modifiers.merge(stat, amount, Integer::sum));
-                }
-            }
-        }
-        return modifiers;
     }
 
     public Connection getConnection() {
@@ -292,6 +280,8 @@ public final class CharacterInstance extends AbstractCharacter {
         int manaGain = newMaxMana - maxMana;
         maxMana = newMaxMana;
         currentMana += manaGain;
+
+        recomputeStats();
 
         DomainEventPublisher.publish(new CharacterLeveledUp(this, level, hpGain));
     }

@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import app.network.OutputJsonMessage;
 import app.domain.actor.Attribute;
+import app.domain.actor.ModifiedStat;
 import app.domain.actor.instance.CharacterInstance;
 import app.game.engine.MovementEngine;
 import app.network.server.tcpjson.TcpJsonOutput;
@@ -27,8 +28,11 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
         output.write("GamePlayerStats", new Payload(c.getId(), c.getName(), c.getAppearanceSystem().getGender().label(),
                 c.getLevel(), c.getClassSystem().getCharacterClass().label(), c.getCurrentHealth(), c.getMaxHealth(),
                 c.healthRegenAmountPerTick(), c.getCurrentMana(), c.getMaxMana(), c.manaRegenAmountPerTick(),
-                c.getEffectivePAtk(), c.getEffectivePDef(), c.getEffectiveMAtk(), c.getEffectiveMDef(),
-                c.getEffectiveAccuracy(), c.getEffectiveEvasion(), c.getEffectiveCriticalRate(), c.getEffectiveAtkSpd(),
+                c.getStatSystem().getEffective(ModifiedStat.PATK), c.getStatSystem().getEffective(ModifiedStat.PDEF),
+                c.getStatSystem().getEffective(ModifiedStat.MATK), c.getStatSystem().getEffective(ModifiedStat.MDEF),
+                c.getStatSystem().getEffective(ModifiedStat.ACCURACY),
+                c.getStatSystem().getEffective(ModifiedStat.EVASION),
+                c.getStatSystem().getEffective(ModifiedStat.PCRIT), c.getStatSystem().getEffective(ModifiedStat.ATKSPD),
                 attributeScore(c, Attribute.STRENGTH), attributeScore(c, Attribute.DEXTERITY),
                 attributeScore(c, Attribute.CONSTITUTION), attributeScore(c, Attribute.INTELLIGENCE),
                 attributeScore(c, Attribute.WIT), attributeScore(c, Attribute.MEN),

@@ -18,20 +18,17 @@ import app.network.message.charselect.NoCharacterNamed;
 import app.network.message.charselect.NowPlaying;
 import app.network.message.ingame.MapEnter;
 import app.network.message.ingame.MapView;
-import app.persistence.listener.ItemPersistenceListener;
 
 @Component
 public class CharacterSelect implements CommandHandler {
 
     private final WorldInstanceService worldInstanceService;
-    private final ItemPersistenceListener itemService;
     private final CharSelectStatus charSelectStatus;
     private final SkillLearningEngine skillLearningEngine;
 
-    public CharacterSelect(WorldInstanceService worldInstanceService, ItemPersistenceListener itemService,
-            CharSelectStatus charSelectStatus, SkillLearningEngine skillLearningEngine) {
+    public CharacterSelect(WorldInstanceService worldInstanceService, CharSelectStatus charSelectStatus,
+            SkillLearningEngine skillLearningEngine) {
         this.worldInstanceService = worldInstanceService;
-        this.itemService = itemService;
         this.charSelectStatus = charSelectStatus;
         this.skillLearningEngine = skillLearningEngine;
     }
@@ -67,7 +64,6 @@ public class CharacterSelect implements CommandHandler {
         CharacterInstance loadedChar = character.get();
         connection.attachCharacter(loadedChar);
         skillLearningEngine.reconcile(loadedChar);
-        loadedChar.getInventorySystem().replaceItems(itemService.loadInventory(loadedChar));
         loadedChar.getWorldInstance().loadPlayer(loadedChar);
         MDC.put("character", loadedChar.getName());
 

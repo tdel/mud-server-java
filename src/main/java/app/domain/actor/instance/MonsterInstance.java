@@ -15,6 +15,7 @@ import app.domain.PassiveSkill;
 import app.domain.SkillElement;
 import app.domain.actor.Attribute;
 import app.domain.actor.AbstractCharacter;
+import app.domain.actor.ModifiedStat;
 import app.domain.actor.template.MonsterTemplate;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.DomainEventPublisher;
@@ -32,17 +33,22 @@ public final class MonsterInstance extends AbstractCharacter {
     private final UUID mapId;
     private final Position spawnPosition;
 
-    private MonsterTemplate template;
+    private final MonsterTemplate template;
 
     public volatile MonsterAiEngine.PursuitState pursuit;
 
-    public MonsterInstance(UUID id, String name, UUID templateId, UUID mapId, Map<Attribute, Integer> attributes,
-            int maxHealth, Position spawnPosition, Set<ActiveSkill> knownSkills, Set<PassiveSkill> knownPassiveSkills,
-            List<ActiveEffect> activeEffects) {
-        super(id, name, attributes, maxHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects);
-        this.templateId = templateId;
+    public MonsterInstance(UUID id, String name, MonsterTemplate template, UUID mapId,
+            Map<Attribute, Integer> attributes, int maxHealth, Position spawnPosition, Set<ActiveSkill> knownSkills,
+            Set<PassiveSkill> knownPassiveSkills, List<ActiveEffect> activeEffects) {
+        super(id, name, attributes, maxHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects,
+                CombatFormulas.baseStats(template.getPAtk(), template.getMAtk(), template.getPDef(), template.getMDef(),
+                        template.getAccuracyBonus(), template.getEvasionBonus(), template.getCritBonus(), 0,
+                        template.getAtkSpd(), attributes, template.getLevel()));
+        this.template = Objects.requireNonNull(template);
+        this.templateId = template.getId();
         this.mapId = mapId;
         this.spawnPosition = spawnPosition;
+        getMotionSystem().setSpeed(template.getSpeed());
     }
 
     public boolean takeDamage(int amount, CharacterInstance attacker) {
@@ -68,7 +74,8 @@ public final class MonsterInstance extends AbstractCharacter {
     }
 
     public MonsterAttackOutcome attack(CharacterInstance defender) {
-        double hitChance = CombatFormulas.hitChance(getEffectiveAccuracy(), defender.getEffectiveEvasion());
+        double hitChance = CombatFormulas.hitChance(getStatSystem().getEffective(ModifiedStat.ACCURACY),
+                defender.getStatSystem().getEffective(ModifiedStat.EVASION));
         boolean hit = Randomizer.rollChance(hitChance);
 
         int damage = 0;
@@ -77,8 +84,9 @@ public final class MonsterInstance extends AbstractCharacter {
         int healthAfter = defender.getCurrentHealth();
 
         if (hit) {
-            critical = Randomizer.rollChance(getEffectiveCriticalRate() / 100.0);
-            damage = CombatFormulas.resolveDamage(getEffectivePAtk(), defender.getEffectivePDef(), critical);
+            critical = Randomizer.rollChance(getStatSystem().getEffective(ModifiedStat.PCRIT) / 100.0);
+            damage = CombatFormulas.resolveDamage(getStatSystem().getEffective(ModifiedStat.PATK),
+                    defender.getStatSystem().getEffective(ModifiedStat.PDEF), critical);
             healthAfter = Math.max(0, defender.getCurrentHealth() - damage);
             defeated = defender.takeDamage(damage, this);
         }
@@ -94,77 +102,25 @@ public final class MonsterInstance extends AbstractCharacter {
             int targetMaxHealth, boolean targetDefeated) {
     }
 
-    public void attachTemplate(MonsterTemplate template) {
-        this.template = template;
-        getMotionSystem().setSpeed(template.getSpeed());
-    }
-
     public MonsterTemplate getTemplate() {
         return template;
     }
 
     public String getDescription() {
-        return requireTemplate().getDescription();
+        return template.getDescription();
     }
 
     public int getPresenceRadius() {
-        return requireTemplate().getPresenceRadius();
+        return template.getPresenceRadius();
     }
 
     public int getLevel() {
-        return requireTemplate().getLevel();
-    }
-
-    @Override
-    protected int basePAtk() {
-        return requireTemplate().getNaturalPAtk();
-    }
-
-    @Override
-    protected int baseMAtk() {
-        return requireTemplate().getNaturalMAtk();
-    }
-
-    @Override
-    protected int basePDefSum() {
-        return requireTemplate().getNaturalPDef();
-    }
-
-    @Override
-    protected int baseMDefSum() {
-        return requireTemplate().getNaturalMDef();
-    }
-
-    @Override
-    protected int accuracyItemBonus() {
-        return requireTemplate().getAccuracyBonus();
-    }
-
-    @Override
-    protected int evasionItemBonus() {
-        return requireTemplate().getEvasionBonus();
-    }
-
-    @Override
-    protected int critItemBonus() {
-        return requireTemplate().getCritBonus();
-    }
-
-    @Override
-    protected int baseAtkSpd() {
-        return requireTemplate().getAtkSpd();
+        return template.getLevel();
     }
 
     @Override
     protected Map<SkillElement, Integer> elementalResistanceMap() {
-        return requireTemplate().getElementalResistances();
-    }
-
-    private MonsterTemplate requireTemplate() {
-        if (template == null) {
-            throw new IllegalStateException("GameMonster " + getId() + " has no MonsterTemplate attached");
-        }
-        return template;
+        return template.getElementalResistances();
     }
 
     public UUID getTemplateId() {

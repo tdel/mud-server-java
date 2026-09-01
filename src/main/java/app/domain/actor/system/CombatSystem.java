@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.AbstractNpc;
+import app.domain.actor.ModifiedStat;
 import app.domain.actor.event.AttackBegin;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.MonsterAttacked;
@@ -92,7 +93,8 @@ public final class CombatSystem {
             DomainEventPublisher.publish(new MonsterAttacked(monster, character));
         }
 
-        double hitChance = CombatFormulas.hitChance(character.getEffectiveAccuracy(), defender.getEffectiveEvasion());
+        double hitChance = CombatFormulas.hitChance(character.getStatSystem().getEffective(ModifiedStat.ACCURACY),
+                defender.getStatSystem().getEffective(ModifiedStat.EVASION));
         boolean hit = Randomizer.rollChance(hitChance);
 
         int damage = 0;
@@ -101,13 +103,15 @@ public final class CombatSystem {
         int healthAfter = defender.getCurrentHealth();
 
         if (hit) {
-            critical = Randomizer.rollChance(character.getEffectiveCriticalRate() / 100.0);
-            damage = CombatFormulas.resolveDamage(character.getEffectivePAtk(), defender.getEffectivePDef(), critical);
+            critical = Randomizer.rollChance(character.getStatSystem().getEffective(ModifiedStat.PCRIT) / 100.0);
+            damage = CombatFormulas.resolveDamage(character.getStatSystem().getEffective(ModifiedStat.PATK),
+                    defender.getStatSystem().getEffective(ModifiedStat.PDEF), critical);
             healthAfter = Math.max(0, defender.getCurrentHealth() - damage);
             defeated = applyDamage(defender, damage);
         }
 
-        nextAttackAt = Instant.now().plus(CombatFormulas.attackCooldown(character.getEffectiveAtkSpd()));
+        nextAttackAt = Instant.now()
+                .plus(CombatFormulas.attackCooldown(character.getStatSystem().getEffective(ModifiedStat.ATKSPD)));
 
         log.info(
                 "combat.attack_resolved attacker={} defender={} hit={} critical={} damage={} defenderHealthAfter={} defeated={}",

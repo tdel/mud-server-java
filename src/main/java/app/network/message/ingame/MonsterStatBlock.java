@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import app.network.OutputJsonMessage;
 import app.domain.actor.Attribute;
+import app.domain.actor.ModifiedStat;
 import app.domain.actor.instance.MonsterInstance;
 import app.network.server.tcpjson.TcpJsonOutput;
 
@@ -22,9 +23,13 @@ public record MonsterStatBlock(MonsterInstance monster) implements OutputJsonMes
     public void toJson(TcpJsonOutput output) {
         MonsterInstance m = monster;
         output.write("MonsterStatBlock", new Payload(m.getId(), m.getName(), m.getDescription(), m.getCurrentHealth(),
-                m.getMaxHealth(), m.getEffectivePAtk(), m.getEffectivePDef(), m.getEffectiveMAtk(),
-                m.getEffectiveMDef(), m.getEffectiveAccuracy(), m.getEffectiveEvasion(), m.getEffectiveCriticalRate(),
-                m.getEffectiveAtkSpd(), attributeScore(m, Attribute.STRENGTH), attributeScore(m, Attribute.DEXTERITY),
+                m.getMaxHealth(), m.getStatSystem().getEffective(ModifiedStat.PATK),
+                m.getStatSystem().getEffective(ModifiedStat.PDEF), m.getStatSystem().getEffective(ModifiedStat.MATK),
+                m.getStatSystem().getEffective(ModifiedStat.MDEF),
+                m.getStatSystem().getEffective(ModifiedStat.ACCURACY),
+                m.getStatSystem().getEffective(ModifiedStat.EVASION),
+                m.getStatSystem().getEffective(ModifiedStat.PCRIT), m.getStatSystem().getEffective(ModifiedStat.ATKSPD),
+                attributeScore(m, Attribute.STRENGTH), attributeScore(m, Attribute.DEXTERITY),
                 attributeScore(m, Attribute.CONSTITUTION), attributeScore(m, Attribute.INTELLIGENCE),
                 attributeScore(m, Attribute.WIT), attributeScore(m, Attribute.MEN)), false);
     }

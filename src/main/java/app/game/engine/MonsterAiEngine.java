@@ -11,6 +11,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import app.domain.actor.ModifiedStat;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.MonsterAttacked;
 import app.domain.actor.instance.CharacterInstance;
@@ -124,8 +125,8 @@ public class MonsterAiEngine {
             MonsterInstance.MonsterAttackOutcome outcome = monster.attack(target);
             monster.broadcast(new AttackResult(monster.getId(), monster.getName(), target.getId(), target.getName(),
                     outcome.hit(), outcome.critical(), outcome.damage(), outcome.targetHealthAfter()), null);
-            monster.pursuit = state.withNextAttackAt(
-                    nowMillis + CombatFormulas.attackCooldown(monster.getEffectiveAtkSpd()).toMillis());
+            monster.pursuit = state.withNextAttackAt(nowMillis + CombatFormulas
+                    .attackCooldown(monster.getStatSystem().getEffective(ModifiedStat.ATKSPD)).toMillis());
             return;
         }
 

@@ -30,10 +30,10 @@ public class MonsterTemplate {
     private String description;
     private int maxHealth;
     private Map<Attribute, Integer> attributes;
-    private int naturalPAtk;
-    private int naturalMAtk;
-    private int naturalPDef;
-    private int naturalMDef;
+    private int pAtk;
+    private int mAtk;
+    private int pDef;
+    private int mDef;
     private int accuracyBonus;
     private int evasionBonus;
     private int critBonus;
@@ -50,19 +50,19 @@ public class MonsterTemplate {
     private List<ActiveEffect> activeEffects;
 
     public MonsterTemplate(UUID id, String name, String description, int maxHealth, Map<Attribute, Integer> attributes,
-            int naturalPAtk, int naturalMAtk, int naturalPDef, int naturalMDef, int accuracyBonus, int evasionBonus,
-            int critBonus, int xpReward, int goldReward, List<LootTableEntry> lootTable, int presenceRadius, int speed,
-            int atkSpd, int level, Map<SkillElement, Integer> elementalResistances, Set<ActiveSkill> knownSkills,
+            int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus, int critBonus, int xpReward,
+            int goldReward, List<LootTableEntry> lootTable, int presenceRadius, int speed, int atkSpd, int level,
+            Map<SkillElement, Integer> elementalResistances, Set<ActiveSkill> knownSkills,
             Set<PassiveSkill> knownPassiveSkills, List<ActiveEffect> activeEffects) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.maxHealth = maxHealth;
         this.attributes = attributes;
-        this.naturalPAtk = naturalPAtk;
-        this.naturalMAtk = naturalMAtk;
-        this.naturalPDef = naturalPDef;
-        this.naturalMDef = naturalMDef;
+        this.pAtk = pAtk;
+        this.mAtk = mAtk;
+        this.pDef = pDef;
+        this.mDef = mDef;
         this.accuracyBonus = accuracyBonus;
         this.evasionBonus = evasionBonus;
         this.critBonus = critBonus;
@@ -99,20 +99,20 @@ public class MonsterTemplate {
         return attributes;
     }
 
-    public int getNaturalPAtk() {
-        return naturalPAtk;
+    public int getPAtk() {
+        return pAtk;
     }
 
-    public int getNaturalMAtk() {
-        return naturalMAtk;
+    public int getMAtk() {
+        return mAtk;
     }
 
-    public int getNaturalPDef() {
-        return naturalPDef;
+    public int getPDef() {
+        return pDef;
     }
 
-    public int getNaturalMDef() {
-        return naturalMDef;
+    public int getMDef() {
+        return mDef;
     }
 
     public int getAccuracyBonus() {
@@ -212,9 +212,8 @@ public class MonsterTemplate {
         if (!(o instanceof MonsterTemplate other)) {
             return false;
         }
-        return maxHealth == other.maxHealth && naturalPAtk == other.naturalPAtk && naturalMAtk == other.naturalMAtk
-                && naturalPDef == other.naturalPDef && naturalMDef == other.naturalMDef
-                && accuracyBonus == other.accuracyBonus && evasionBonus == other.evasionBonus
+        return maxHealth == other.maxHealth && pAtk == other.pAtk && mAtk == other.mAtk && pDef == other.pDef
+                && mDef == other.mDef && accuracyBonus == other.accuracyBonus && evasionBonus == other.evasionBonus
                 && critBonus == other.critBonus && xpReward == other.xpReward && goldReward == other.goldReward
                 && presenceRadius == other.presenceRadius && speed == other.speed && atkSpd == other.atkSpd
                 && level == other.level && Objects.equals(id, other.id) && Objects.equals(name, other.name)
@@ -228,20 +227,19 @@ public class MonsterTemplate {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, maxHealth, attributes, naturalPAtk, naturalMAtk, naturalPDef,
-                naturalMDef, accuracyBonus, evasionBonus, critBonus, xpReward, goldReward, lootTable, presenceRadius,
-                speed, atkSpd, level, elementalResistances, knownSkills, knownPassiveSkills, activeEffects);
+        return Objects.hash(id, name, description, maxHealth, attributes, pAtk, mAtk, pDef, mDef, accuracyBonus,
+                evasionBonus, critBonus, xpReward, goldReward, lootTable, presenceRadius, speed, atkSpd, level,
+                elementalResistances, knownSkills, knownPassiveSkills, activeEffects);
     }
 
     @Override
     public String toString() {
         return "MonsterTemplate[id=" + id + ", name=" + name + ", description=" + description + ", maxHealth="
-                + maxHealth + ", attributes=" + attributes + ", naturalPAtk=" + naturalPAtk + ", naturalMAtk="
-                + naturalMAtk + ", naturalPDef=" + naturalPDef + ", naturalMDef=" + naturalMDef + ", accuracyBonus="
-                + accuracyBonus + ", evasionBonus=" + evasionBonus + ", critBonus=" + critBonus + ", xpReward="
-                + xpReward + ", goldReward=" + goldReward + ", lootTable=" + lootTable + ", presenceRadius="
-                + presenceRadius + ", speed=" + speed + ", atkSpd=" + atkSpd + ", level=" + level
-                + ", elementalResistances=" + elementalResistances + ", knownSkills=" + knownSkills
+                + maxHealth + ", attributes=" + attributes + ", pAtk=" + pAtk + ", mAtk=" + mAtk + ", pDef=" + pDef
+                + ", mDef=" + mDef + ", accuracyBonus=" + accuracyBonus + ", evasionBonus=" + evasionBonus
+                + ", critBonus=" + critBonus + ", xpReward=" + xpReward + ", goldReward=" + goldReward + ", lootTable="
+                + lootTable + ", presenceRadius=" + presenceRadius + ", speed=" + speed + ", atkSpd=" + atkSpd
+                + ", level=" + level + ", elementalResistances=" + elementalResistances + ", knownSkills=" + knownSkills
                 + ", knownPassiveSkills=" + knownPassiveSkills + ", activeEffects=" + activeEffects + "]";
     }
 

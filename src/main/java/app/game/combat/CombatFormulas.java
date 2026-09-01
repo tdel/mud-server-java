@@ -1,7 +1,11 @@
 package app.game.combat;
 
 import java.time.Duration;
+import java.util.EnumMap;
+import java.util.Map;
 
+import app.domain.actor.Attribute;
+import app.domain.actor.ModifiedStat;
 import app.domain.item.ArmorCategory;
 import app.game.Randomizer;
 
@@ -190,5 +194,27 @@ public final class CombatFormulas {
             case MEDIUM -> -4;
             case HEAVY -> -10;
         };
+    }
+
+    // Assemble en une seule map les 9 stats de combat dérivées (p.atk, m.atk,
+    // p.def, m.def, accuracy, evasion, p.crit, m.crit, atk.spd) à partir des
+    // composantes brutes (arme/armure ou équivalent monstre) et des attributs —
+    // consommé par StatSystem, aussi bien pour un CharacterInstance (équipement
+    // réel) qu'un MonsterInstance (stats naturelles du MonsterTemplate).
+    public static Map<ModifiedStat, Integer> baseStats(int weaponPAtk, int weaponMAtk, int armorPDefSum,
+            int armorMDefSum, int accuracyItemBonus, int evasionItemBonus, int critItemBonus, int armorWeightPenalty,
+            int weaponAtkSpd, Map<Attribute, Integer> attributes, int level) {
+        Map<ModifiedStat, Integer> stats = new EnumMap<>(ModifiedStat.class);
+        stats.put(ModifiedStat.PATK, physicalAttack(weaponPAtk, attributes.get(Attribute.STRENGTH), level));
+        stats.put(ModifiedStat.MATK, magicalAttack(weaponMAtk, attributes.get(Attribute.INTELLIGENCE), level));
+        stats.put(ModifiedStat.PDEF, physicalDefense(armorPDefSum, attributes.get(Attribute.CONSTITUTION)));
+        stats.put(ModifiedStat.MDEF, magicalDefense(armorMDefSum, attributes.get(Attribute.MEN)));
+        stats.put(ModifiedStat.ACCURACY, accuracy(level, attributes.get(Attribute.DEXTERITY), accuracyItemBonus));
+        stats.put(ModifiedStat.EVASION,
+                evasion(level, attributes.get(Attribute.DEXTERITY), armorWeightPenalty, evasionItemBonus));
+        stats.put(ModifiedStat.PCRIT, criticalRate(attributes.get(Attribute.DEXTERITY), critItemBonus));
+        stats.put(ModifiedStat.MCRIT, magicCriticalRate(attributes.get(Attribute.WIT), critItemBonus));
+        stats.put(ModifiedStat.ATKSPD, attackSpeed(weaponAtkSpd, attributes.get(Attribute.DEXTERITY)));
+        return stats;
     }
 }

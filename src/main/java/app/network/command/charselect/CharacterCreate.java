@@ -27,19 +27,15 @@ import app.network.message.charselect.NowPlaying;
 import app.network.message.ingame.GamePlayerStats;
 import app.network.message.ingame.MapEnter;
 import app.network.message.ingame.MapView;
-import app.persistence.listener.ItemPersistenceListener;
 
 @Component
 public class CharacterCreate implements CommandHandler {
 
     private final WorldInstanceService worldInstanceService;
-    private final ItemPersistenceListener itemService;
     private final CharSelectStatus charSelectStatus;
 
-    public CharacterCreate(WorldInstanceService worldInstanceService, ItemPersistenceListener itemService,
-            CharSelectStatus charSelectStatus) {
+    public CharacterCreate(WorldInstanceService worldInstanceService, CharSelectStatus charSelectStatus) {
         this.worldInstanceService = worldInstanceService;
-        this.itemService = itemService;
         this.charSelectStatus = charSelectStatus;
     }
 
@@ -129,7 +125,6 @@ public class CharacterCreate implements CommandHandler {
         connection.send(new GamePlayerStats(character));
 
         connection.attachCharacter(character);
-        character.getInventorySystem().replaceItems(itemService.loadInventory(character));
         character.getWorldInstance().loadPlayer(character);
         MDC.put("character", character.getName());
 
