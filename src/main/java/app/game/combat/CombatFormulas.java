@@ -200,7 +200,7 @@ public final class CombatFormulas {
     // p.def, m.def, accuracy, evasion, p.crit, m.crit, atk.spd) à partir des
     // composantes brutes (arme/armure ou équivalent monstre) et des attributs —
     // consommé par StatSystem, aussi bien pour un CharacterInstance (équipement
-    // réel) qu'un MonsterInstance (stats naturelles du MonsterTemplate).
+    // réel) qu'un MonsterInstance (stats naturelles issues de son template).
     public static Map<ModifiedStat, Integer> baseStats(int weaponPAtk, int weaponMAtk, int armorPDefSum,
             int armorMDefSum, int accuracyItemBonus, int evasionItemBonus, int critItemBonus, int armorWeightPenalty,
             int weaponAtkSpd, Map<Attribute, Integer> attributes, int level) {

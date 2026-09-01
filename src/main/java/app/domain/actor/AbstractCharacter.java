@@ -54,8 +54,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     public abstract int getLevel();
 
     // Défaut neutre : seul CharacterInstance a des objets équipés susceptibles
-    // de porter des résistances élémentaires ; MonsterInstance surcharge depuis
-    // son MonsterTemplate.
+    // de porter des résistances élémentaires ; MonsterInstance la surcharge.
     protected Map<SkillElement, Integer> elementalResistanceMap() {
         return Map.of();
     }

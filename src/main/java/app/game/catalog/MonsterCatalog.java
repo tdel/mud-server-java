@@ -17,13 +17,15 @@ import org.springframework.stereotype.Service;
 
 import app.domain.SkillElement;
 import app.domain.actor.Attribute;
+import app.domain.actor.ModifiedStat;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.actor.template.MonsterTemplate;
-import app.domain.actor.template.MonsterTemplate.LootTableEntry;
 import app.domain.item.ItemTemplate;
+import app.domain.item.LootTableEntry;
 import app.domain.MonsterSpawn;
 import app.domain.MonsterSpawnGroup;
 import app.domain.world.MapInstance;
+import app.game.combat.CombatFormulas;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -85,9 +87,16 @@ public class MonsterCatalog {
                     + " référence le template " + spawn.templateId() + ", absent de " + MONSTERS_RESOURCE);
         }
 
-        MonsterInstance monster = new MonsterInstance(spawn.id(), template.getName(), template, map.getId(),
-                template.getAttributes(), template.getMaxHealth(), spawn.position(), template.getKnownSkills(),
-                template.getKnownPassiveSkills(), template.getActiveEffects());
+        Map<ModifiedStat, Integer> baseStats = CombatFormulas.baseStats(template.getPAtk(), template.getMAtk(),
+                template.getPDef(), template.getMDef(), template.getAccuracyBonus(), template.getEvasionBonus(),
+                template.getCritBonus(), 0, template.getAtkSpd(), template.getAttributes(), template.getLevel());
+        baseStats.put(ModifiedStat.SPEED, template.getSpeed());
+
+        MonsterInstance monster = new MonsterInstance(spawn.id(), template.getName(), template.getId(), map.getId(),
+                template.getAttributes(), template.getMaxHealth(), baseStats, spawn.position(),
+                template.getKnownSkills(), template.getKnownPassiveSkills(), template.getActiveEffects(),
+                template.getLevel(), template.getPresenceRadius(), template.getElementalResistances(),
+                template.getXpReward(), template.getGoldReward(), template.getLootTable());
         monster.getMotionSystem().setCurrentMap(map);
         map.placeMonster(monster, spawn.position());
         return monster;

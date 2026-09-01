@@ -1,29 +1,19 @@
 package app.domain.actor.template;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import app.domain.ActiveEffect;
 import app.domain.ActiveSkill;
 import app.domain.PassiveSkill;
-import app.domain.Party;
 import app.domain.SkillElement;
 import app.domain.actor.Attribute;
-import app.domain.actor.instance.CharacterInstance;
-import app.domain.item.Item;
-import app.domain.item.ItemTemplate;
-import app.game.Randomizer;
+import app.domain.item.LootTableEntry;
 
 public class MonsterTemplate {
-
-    private static final Logger log = LoggerFactory.getLogger(MonsterTemplate.class);
 
     private UUID id;
     private String name;
@@ -165,39 +155,6 @@ public class MonsterTemplate {
         return activeEffects;
     }
 
-    public LootResult rollLoot(CharacterInstance killer) {
-        List<Item> items = new ArrayList<>();
-        for (LootTableEntry entry : lootTable) {
-            if (Randomizer.rollChance(entry.dropChance())) {
-                items.add(new Item(UUID.randomUUID(), entry.itemTemplate(), killer, null));
-            }
-        }
-        return new LootResult(goldReward, items);
-    }
-
-    public LootResult grantLootTo(CharacterInstance killer, Party party, List<CharacterInstance> eligibleMembers,
-            double goldShareMultiplier) {
-        LootResult loot = rollLoot(killer);
-
-        if (loot.gold() > 0) {
-            int perMemberGold = (int) (loot.gold() * goldShareMultiplier) / eligibleMembers.size();
-            for (CharacterInstance member : eligibleMembers) {
-                member.getInventorySystem().receiveGold(perMemberGold);
-            }
-            log.info("loot.gold_dropped killer={} totalGold={} partySize={} perMemberGold={}", killer.getName(),
-                    loot.gold(), eligibleMembers.size(), perMemberGold);
-        }
-
-        for (Item item : loot.items()) {
-            CharacterInstance recipient = party != null ? party.nextLootRecipient(eligibleMembers) : killer;
-            recipient.getInventorySystem().receiveLootItem(item);
-            log.info("loot.item_dropped killer={} recipient={} item={}", killer.getName(), recipient.getName(),
-                    item.getName());
-        }
-
-        return loot;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -234,11 +191,5 @@ public class MonsterTemplate {
                 + presenceRadius + ", speed=" + speed + ", atkSpd=" + atkSpd + ", level=" + level
                 + ", elementalResistances=" + elementalResistances + ", knownSkills=" + knownSkills
                 + ", knownPassiveSkills=" + knownPassiveSkills + ", activeEffects=" + activeEffects + "]";
-    }
-
-    public record LootTableEntry(ItemTemplate itemTemplate, double dropChance) {
-    }
-
-    public record LootResult(int gold, List<Item> items) {
     }
 }

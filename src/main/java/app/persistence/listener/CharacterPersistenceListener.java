@@ -109,7 +109,7 @@ public class CharacterPersistenceListener {
     @EventListener
     void onCharacterDied(CharacterDied event) {
         CharacterInstance killer = event.killer();
-        int xpReward = event.character().getTemplate().getXpReward();
+        int xpReward = event.character().getXpReward();
         Party party = killer.getParty();
 
         List<CharacterInstance> eligible = party != null
