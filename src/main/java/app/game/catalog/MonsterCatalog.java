@@ -92,11 +92,11 @@ public class MonsterCatalog {
                 template.getCritBonus(), 0, template.getAtkSpd(), template.getAttributes(), template.getLevel());
         baseStats.put(ModifiedStat.SPEED, template.getSpeed());
 
-        MonsterInstance monster = new MonsterInstance(spawn.id(), template.getName(), map.getId(),
-                template.getAttributes(), template.getMaxHealth(), baseStats, spawn.position(),
-                template.getKnownSkills(), template.getKnownPassiveSkills(), template.getActiveEffects(),
-                template.getLevel(), template.getPresenceRadius(), template.getElementalResistances(),
-                template.getXpReward(), template.getGoldReward(), template.getLootTable());
+        MonsterInstance monster = new MonsterInstance(spawn.id(), template.getName(), template.getAttributes(),
+                template.getMaxHealth(), baseStats, spawn.position(), template.getKnownSkills(),
+                template.getKnownPassiveSkills(), template.getActiveEffects(), template.getLevel(),
+                template.getAggroRadius(), template.getElementalResistances(), template.getXpReward(),
+                template.getGoldReward(), template.getLootTable());
         monster.getMotionSystem().setCurrentMap(map);
         map.placeMonster(monster, spawn.position());
         return monster;
@@ -125,7 +125,7 @@ public class MonsterCatalog {
                             definition.attributes(), definition.pAtk(), definition.mAtk(), definition.pDef(),
                             definition.mDef(), definition.accuracyBonus(), definition.evasionBonus(),
                             definition.critBonus(), definition.xpReward(), definition.goldReward(), lootTable,
-                            definition.presenceRadius(), definition.speed(), definition.atkSpd(), definition.level(),
+                            definition.aggroRadius(), definition.speed(), definition.atkSpd(), definition.level(),
                             elementalResistances, Set.of(), Set.of(), List.of()));
         }
         log.info("monster.templates_loaded count={}", templates.size());
@@ -136,7 +136,7 @@ public class MonsterCatalog {
 
     record MonsterTemplateDefinition(UUID id, String name, int maxHealth, Map<Attribute, Integer> attributes, int pAtk,
             int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus, int critBonus, int xpReward,
-            int goldReward, List<LootTableEntryDefinition> lootTable, int presenceRadius, int speed, int atkSpd,
-            int level, Map<SkillElement, Integer> elementalResistances) {
+            int goldReward, List<LootTableEntryDefinition> lootTable, int aggroRadius, int speed, int atkSpd, int level,
+            Map<SkillElement, Integer> elementalResistances) {
     }
 }

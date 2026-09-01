@@ -29,7 +29,7 @@ public class MonsterTemplate {
     private int xpReward;
     private int goldReward;
     private List<LootTableEntry> lootTable;
-    private int presenceRadius;
+    private int aggroRadius;
     private int speed;
     private int atkSpd;
     private int level;
@@ -40,7 +40,7 @@ public class MonsterTemplate {
 
     public MonsterTemplate(UUID id, String name, int maxHealth, Map<Attribute, Integer> attributes, int pAtk, int mAtk,
             int pDef, int mDef, int accuracyBonus, int evasionBonus, int critBonus, int xpReward, int goldReward,
-            List<LootTableEntry> lootTable, int presenceRadius, int speed, int atkSpd, int level,
+            List<LootTableEntry> lootTable, int aggroRadius, int speed, int atkSpd, int level,
             Map<SkillElement, Integer> elementalResistances, Set<ActiveSkill> knownSkills,
             Set<PassiveSkill> knownPassiveSkills, List<ActiveEffect> activeEffects) {
         this.id = id;
@@ -57,7 +57,7 @@ public class MonsterTemplate {
         this.xpReward = xpReward;
         this.goldReward = goldReward;
         this.lootTable = lootTable;
-        this.presenceRadius = presenceRadius;
+        this.aggroRadius = aggroRadius;
         this.speed = speed;
         this.atkSpd = atkSpd;
         this.level = level;
@@ -123,8 +123,8 @@ public class MonsterTemplate {
         return lootTable;
     }
 
-    public int getPresenceRadius() {
-        return presenceRadius;
+    public int getAggroRadius() {
+        return aggroRadius;
     }
 
     public int getSpeed() {
@@ -166,7 +166,7 @@ public class MonsterTemplate {
         return maxHealth == other.maxHealth && pAtk == other.pAtk && mAtk == other.mAtk && pDef == other.pDef
                 && mDef == other.mDef && accuracyBonus == other.accuracyBonus && evasionBonus == other.evasionBonus
                 && critBonus == other.critBonus && xpReward == other.xpReward && goldReward == other.goldReward
-                && presenceRadius == other.presenceRadius && speed == other.speed && atkSpd == other.atkSpd
+                && aggroRadius == other.aggroRadius && speed == other.speed && atkSpd == other.atkSpd
                 && level == other.level && Objects.equals(id, other.id) && Objects.equals(name, other.name)
                 && Objects.equals(attributes, other.attributes) && Objects.equals(lootTable, other.lootTable)
                 && Objects.equals(elementalResistances, other.elementalResistances)
@@ -178,7 +178,7 @@ public class MonsterTemplate {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, maxHealth, attributes, pAtk, mAtk, pDef, mDef, accuracyBonus, evasionBonus,
-                critBonus, xpReward, goldReward, lootTable, presenceRadius, speed, atkSpd, level, elementalResistances,
+                critBonus, xpReward, goldReward, lootTable, aggroRadius, speed, atkSpd, level, elementalResistances,
                 knownSkills, knownPassiveSkills, activeEffects);
     }
 
@@ -187,9 +187,9 @@ public class MonsterTemplate {
         return "MonsterTemplate[id=" + id + ", name=" + name + ", maxHealth=" + maxHealth + ", attributes=" + attributes
                 + ", pAtk=" + pAtk + ", mAtk=" + mAtk + ", pDef=" + pDef + ", mDef=" + mDef + ", accuracyBonus="
                 + accuracyBonus + ", evasionBonus=" + evasionBonus + ", critBonus=" + critBonus + ", xpReward="
-                + xpReward + ", goldReward=" + goldReward + ", lootTable=" + lootTable + ", presenceRadius="
-                + presenceRadius + ", speed=" + speed + ", atkSpd=" + atkSpd + ", level=" + level
-                + ", elementalResistances=" + elementalResistances + ", knownSkills=" + knownSkills
-                + ", knownPassiveSkills=" + knownPassiveSkills + ", activeEffects=" + activeEffects + "]";
+                + xpReward + ", goldReward=" + goldReward + ", lootTable=" + lootTable + ", aggroRadius=" + aggroRadius
+                + ", speed=" + speed + ", atkSpd=" + atkSpd + ", level=" + level + ", elementalResistances="
+                + elementalResistances + ", knownSkills=" + knownSkills + ", knownPassiveSkills=" + knownPassiveSkills
+                + ", activeEffects=" + activeEffects + "]";
     }
 }

@@ -32,11 +32,10 @@ public final class MonsterInstance extends AbstractCharacter {
 
     private static final Logger log = LoggerFactory.getLogger(MonsterInstance.class);
 
-    private final UUID mapId;
     private final Position spawnPosition;
 
     private final int level;
-    private final int presenceRadius;
+    private final int aggroRadius;
     private final Map<SkillElement, Integer> elementalResistances;
     private final int xpReward;
     private final int goldReward;
@@ -44,16 +43,15 @@ public final class MonsterInstance extends AbstractCharacter {
 
     public volatile MonsterAiEngine.PursuitState pursuit;
 
-    public MonsterInstance(UUID id, String name, UUID mapId, Map<Attribute, Integer> attributes, int maxHealth,
+    public MonsterInstance(UUID id, String name, Map<Attribute, Integer> attributes, int maxHealth,
             Map<ModifiedStat, Integer> baseStats, Position spawnPosition, Set<ActiveSkill> knownSkills,
-            Set<PassiveSkill> knownPassiveSkills, List<ActiveEffect> activeEffects, int level, int presenceRadius,
+            Set<PassiveSkill> knownPassiveSkills, List<ActiveEffect> activeEffects, int level, int aggroRadius,
             Map<SkillElement, Integer> elementalResistances, int xpReward, int goldReward,
             List<LootTableEntry> lootTable) {
         super(id, name, attributes, maxHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects, baseStats);
-        this.mapId = mapId;
         this.spawnPosition = spawnPosition;
         this.level = level;
-        this.presenceRadius = presenceRadius;
+        this.aggroRadius = aggroRadius;
         this.elementalResistances = elementalResistances;
         this.xpReward = xpReward;
         this.goldReward = goldReward;
@@ -148,8 +146,8 @@ public final class MonsterInstance extends AbstractCharacter {
         return xpReward;
     }
 
-    public int getPresenceRadius() {
-        return presenceRadius;
+    public int getAggroRadius() {
+        return aggroRadius;
     }
 
     public int getLevel() {
@@ -167,7 +165,7 @@ public final class MonsterInstance extends AbstractCharacter {
 
     @Override
     public String toString() {
-        return "GameMonster[id=" + getId() + ", name=" + getName() + ", mapId=" + mapId + ", spawnPosition="
-                + spawnPosition + ", currentHealth=" + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + "]";
+        return "GameMonster[id=" + getId() + ", name=" + getName() + ", spawnPosition=" + spawnPosition
+                + ", currentHealth=" + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + "]";
     }
 }

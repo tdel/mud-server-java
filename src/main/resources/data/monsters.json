@@ -30,7 +30,7 @@
                 "dropChance": 0.01
             }
         ],
-        "presenceRadius": 2,
+        "aggroRadius": 2,
         "speed": 55,
         "atkSpd": 300,
         "level": 1
@@ -57,7 +57,7 @@
         },
         "goldReward": 1,
         "lootTable": [],
-        "presenceRadius": 1,
+        "aggroRadius": 1,
         "speed": 55,
         "atkSpd": 300,
         "level": 1
@@ -84,7 +84,7 @@
         },
         "goldReward": 2,
         "lootTable": [],
-        "presenceRadius": 3,
+        "aggroRadius": 3,
         "speed": 75,
         "atkSpd": 300,
         "level": 1
@@ -120,7 +120,7 @@
                 "dropChance": 0.001
             }
         ],
-        "presenceRadius": 2,
+        "aggroRadius": 2,
         "speed": 55,
         "atkSpd": 300,
         "level": 1
@@ -160,7 +160,7 @@
                 "dropChance": 0.02
             }
         ],
-        "presenceRadius": 2,
+        "aggroRadius": 2,
         "speed": 55,
         "atkSpd": 300,
         "level": 1
@@ -196,7 +196,7 @@
                 "dropChance": 0.001
             }
         ],
-        "presenceRadius": 3,
+        "aggroRadius": 3,
         "speed": 55,
         "atkSpd": 300,
         "level": 3
@@ -232,7 +232,7 @@
                 "dropChance": 0.0001
             }
         ],
-        "presenceRadius": 3,
+        "aggroRadius": 3,
         "speed": 75,
         "atkSpd": 300,
         "level": 2
