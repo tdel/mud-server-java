@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import app.domain.ActiveSkill;
 import app.domain.EffectCategory;
+import app.domain.SkillDamageType;
 import app.domain.SkillEffectDefinition;
 import app.domain.SkillEffectType;
 import app.domain.SkillElement;
@@ -96,7 +97,8 @@ public class SkillCatalog {
                 int castingTimeMs = Math.round(definition.castTime() * 1000f);
                 ActiveSkill activeSkill = new ActiveSkill(definition.id(), definition.name(), levels, reuseTimeMs,
                         castingTimeMs, definition.range(), aoeRadius, definition.skillType(), target,
-                        definition.element() == null ? SkillElement.NONE : definition.element(), projectile,
+                        definition.element() == null ? SkillElement.NONE : definition.element(),
+                        definition.damageType() == null ? SkillDamageType.MAGICAL : definition.damageType(), projectile,
                         projectileSpeed, effects);
                 if (activeSkills.containsKey(activeSkill.id())) {
                     throw new IllegalStateException("ActiveSkill " + activeSkill.id() + " (" + activeSkill.name()
@@ -122,11 +124,22 @@ public class SkillCatalog {
 
     // learnableSkillIds(level) mélange sorts actifs et compétences passives
     // (ex: Expertise Grade) ; seuls les ids présents dans activeSkills nous
-    // concernent ici, le reste est géré par PassiveSkillCatalog.
+    // concernent ici, le reste est géré par PassiveSkillCatalog — mais un id qui
+    // n'est ni l'un ni l'autre (donnée de classe désynchronisée de skills.xml,
+    // ex: Rage/Guidance/Bulwark après la migration XML) doit être visible en log
+    // plutôt que silencieusement absorbé.
     public List<LearnableSkill> skillsLearnableAt(CharacterClass characterClass, int level) {
-        return characterClass.learnableSkillIds(level).stream()
-                .filter(learnable -> activeSkills.containsKey(learnable.skillId()))
-                .map(learnable -> new LearnableSkill(getById(learnable.skillId()), learnable.level())).toList();
+        return characterClass.learnableSkillIds(level).stream().filter(learnable -> {
+            if (activeSkills.containsKey(learnable.skillId())) {
+                return true;
+            }
+            if (!PassiveSkillCatalogHolder.isKnownId(learnable.skillId())) {
+                log.warn(
+                        "characterClass.unknown_skill_id characterClass={} skillId={} — absent à la fois de skills.xml (actifs) et des compétences passives connues",
+                        characterClass, learnable.skillId());
+            }
+            return false;
+        }).map(learnable -> new LearnableSkill(getById(learnable.skillId()), learnable.level())).toList();
     }
 
     public record LearnableSkill(ActiveSkill skill, int level) {
@@ -142,7 +155,8 @@ public class SkillCatalog {
     private record SkillDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name,
             @JacksonXmlProperty(localName = "level") @JacksonXmlElementWrapper(useWrapping = false) List<SkillLevelXml> levels,
             Float reuseTime, Float castTime, Integer range, Integer aoeRadius, SkillEffectType skillType,
-            SkillTargetType target, SkillElement element, ProjectileXml projectile, EffectsXml effects) {
+            SkillTargetType target, SkillElement element, SkillDamageType damageType, ProjectileXml projectile,
+            EffectsXml effects) {
     }
 
     // mana/power sont Integer (et non int) car un skill PASSIVE (Expertise Grade)

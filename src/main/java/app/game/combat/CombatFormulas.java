@@ -61,7 +61,10 @@ public final class CombatFormulas {
     public static final double MP_REGEN_RATE = 0.02;
     public static final int BASE_ATK_SPD = 300;
     public static final double ATK_SPD_DELAY_CONSTANT = 500_000.0;
-    public static final double ATTACK_RANGE = 1.0;
+    // 2 unités ≈ 2x largeur d'un personnage + longueur d'une épée longue (1 unité
+    // = 1 case Tiled = 32px) ; couvre aussi confortablement l'adjacence en
+    // diagonale (√2 ≈ 1.41), non couverte par l'ancienne valeur de 1.0.
+    public static final double ATTACK_RANGE = 2.0;
 
     private CombatFormulas() {
     }

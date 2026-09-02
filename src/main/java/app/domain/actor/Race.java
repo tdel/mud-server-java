@@ -33,7 +33,7 @@ public enum Race {
     // joueur pour le moment (human-only).
     public int speed() {
         return switch (this) {
-            case HUMAN -> 110;
+            case HUMAN -> 220;
         };
     }
 

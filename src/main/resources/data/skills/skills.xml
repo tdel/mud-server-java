@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <skills>
+    <skill id="875cbdfc-6be9-5c46-8fb8-3314f7679ccd">
+        <name>Power Strike</name>
+        <level id="1" mana="2" power="10" />
+        <level id="2" mana="3" power="16" />
+        <level id="3" mana="4" power="22" />
+        <level id="4" mana="5" power="28" />
+        <level id="5" mana="6" power="34" />
+        <reuseTime>2</reuseTime>
+        <castTime>0.3</castTime>
+        <range>2</range>
+        <skillType>DAMAGE</skillType>
+        <target>ONE</target>
+        <element>NONE</element>
+        <damageType>PHYSICAL</damageType>
+    </skill>
     <skill id="e85856bd-fe90-5d39-a40a-089be52a89f2">
         <name>Wind Strike</name>
         <level id="1" mana="3" power="8" />

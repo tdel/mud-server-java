@@ -14,29 +14,13 @@
         <WIT>12</WIT>
         <MEN>10</MEN>
     </baseAttributes>
-    <skill id="202e081f-606b-5f6f-902d-0b2ec9316c67">
-        <!-- Rage -->
+    <skill id="875cbdfc-6be9-5c46-8fb8-3314f7679ccd">
+        <!-- Power Strike -->
         <level id="1" playerLevel="1"/>
-        <level id="2" playerLevel="1"/>
-        <level id="3" playerLevel="1"/>
-        <level id="4" playerLevel="1"/>
-        <level id="5" playerLevel="1"/>
-    </skill>
-    <skill id="3992a075-1559-5743-b207-72e55c5aecc4">
-        <!-- Guidance -->
-        <level id="1" playerLevel="1"/>
-        <level id="2" playerLevel="1"/>
-        <level id="3" playerLevel="1"/>
-        <level id="4" playerLevel="1"/>
-        <level id="5" playerLevel="1"/>
-    </skill>
-    <skill id="e57ef942-ca16-5f2b-a529-65f796960258">
-        <!-- Bulwark -->
-        <level id="1" playerLevel="1"/>
-        <level id="2" playerLevel="1"/>
-        <level id="3" playerLevel="1"/>
-        <level id="4" playerLevel="1"/>
-        <level id="5" playerLevel="1"/>
+        <level id="2" playerLevel="4"/>
+        <level id="3" playerLevel="8"/>
+        <level id="4" playerLevel="12"/>
+        <level id="5" playerLevel="16"/>
     </skill>
     <skill id="865a7263-fb06-48ef-89c1-9ccbad268215">
         <!-- Expertise Grade -->

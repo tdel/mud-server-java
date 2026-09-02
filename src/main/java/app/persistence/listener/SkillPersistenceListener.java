@@ -6,11 +6,13 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import app.domain.actor.event.CharacterLearnedPassiveSkill;
 import app.domain.actor.event.CharacterLearnedSkill;
 import app.domain.actor.event.SkillCast;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.message.ingame.SkillLearned;
 import app.persistence.CharacterDao;
+import app.persistence.CharacterPassiveSkillDao;
 import app.persistence.CharacterSkillDao;
 
 @Service
@@ -19,10 +21,13 @@ public class SkillPersistenceListener {
     private static final Logger log = LoggerFactory.getLogger(SkillPersistenceListener.class);
 
     private final CharacterSkillDao characterSkillDao;
+    private final CharacterPassiveSkillDao characterPassiveSkillDao;
     private final CharacterDao characterDao;
 
-    public SkillPersistenceListener(CharacterSkillDao characterSkillDao, CharacterDao characterDao) {
+    public SkillPersistenceListener(CharacterSkillDao characterSkillDao,
+            CharacterPassiveSkillDao characterPassiveSkillDao, CharacterDao characterDao) {
         this.characterSkillDao = characterSkillDao;
+        this.characterPassiveSkillDao = characterPassiveSkillDao;
         this.characterDao = characterDao;
     }
 
@@ -38,6 +43,21 @@ public class SkillPersistenceListener {
         event.character().send(new SkillLearned(event.activeSkill().name(), event.newLevel(), upgraded));
         log.info("character.learned_skill character={} activeSkill={} level={} upgraded={}",
                 event.character().getName(), event.activeSkill().name(), event.newLevel(), upgraded);
+    }
+
+    @EventListener
+    @Transactional
+    void onCharacterLearnedPassiveSkill(CharacterLearnedPassiveSkill event) {
+        boolean upgraded = event.previousLevel() > 0;
+        if (upgraded) {
+            characterPassiveSkillDao.updateLevel(event.character().getId(), event.passiveSkill().id(),
+                    event.newLevel());
+        } else {
+            characterPassiveSkillDao.insert(event.character().getId(), event.passiveSkill().id(), event.newLevel());
+        }
+        event.character().send(new SkillLearned(event.passiveSkill().name(), event.newLevel(), upgraded));
+        log.info("character.learned_passive_skill character={} passiveSkill={} level={} upgraded={}",
+                event.character().getName(), event.passiveSkill().name(), event.newLevel(), upgraded);
     }
 
     @EventListener

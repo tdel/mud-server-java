@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.UUID;
 
 public record ActiveSkill(UUID id, String name, List<SkillLevel> levels, int reuseTimeMs, int castingTimeMs, int range,
-        int aoeRadius, SkillEffectType skillType, SkillTargetType target, SkillElement element, boolean projectile,
-        int projectileSpeed, List<SkillEffectDefinition> effects) {
+        int aoeRadius, SkillEffectType skillType, SkillTargetType target, SkillElement element,
+        SkillDamageType damageType, boolean projectile, int projectileSpeed, List<SkillEffectDefinition> effects) {
 
     public int maxLevel() {
         return levels.size();

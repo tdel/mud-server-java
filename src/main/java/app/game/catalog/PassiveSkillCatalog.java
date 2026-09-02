@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import app.domain.PassiveSkill;
 import app.domain.PassiveSkill.GradeLevel;
 import app.domain.SkillEffectType;
+import app.domain.actor.CharacterClass;
 import app.domain.item.ItemGrade;
 import tools.jackson.core.JacksonException;
 import tools.jackson.dataformat.xml.XmlMapper;
@@ -75,6 +76,21 @@ public class PassiveSkillCatalog {
                     + " absente du cache — warmPassiveSkills() a-t-il été appelé ?");
         }
         return passiveSkill;
+    }
+
+    public boolean isKnownId(UUID passiveSkillId) {
+        return passiveSkills.containsKey(passiveSkillId);
+    }
+
+    // Symétrique de SkillCatalog.skillsLearnableAt, pour les compétences
+    // passives (ex: Expertise Grade) référencées par une classe.
+    public List<LearnablePassiveSkill> passiveSkillsLearnableAt(CharacterClass characterClass, int level) {
+        return characterClass.learnableSkillIds(level).stream()
+                .filter(learnable -> passiveSkills.containsKey(learnable.skillId()))
+                .map(learnable -> new LearnablePassiveSkill(getById(learnable.skillId()), learnable.level())).toList();
+    }
+
+    public record LearnablePassiveSkill(PassiveSkill passiveSkill, int level) {
     }
 
     // skills.xml mélange sorts actifs et compétences passives sous la même racine

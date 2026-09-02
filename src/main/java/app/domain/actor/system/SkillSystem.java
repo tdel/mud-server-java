@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import app.domain.ActiveEffect;
 import app.domain.PassiveSkill;
 import app.domain.ActiveSkill;
+import app.domain.SkillDamageType;
 import app.domain.SkillEffectDefinition;
 import app.domain.SkillEffectType;
 import app.domain.SkillElement;
@@ -178,13 +179,21 @@ public final class SkillSystem {
         if (!rollSkillHit(target)) {
             return new AttackRollOutcome(false, 0);
         }
-        boolean critical = Randomizer.rollChance(character.getStatSystem().getEffective(ModifiedStat.MCRIT) / 100.0);
-        // Le power du sort module la puissance magique du lancer, ce qui préserve
-        // la progression entre levels d'un même sort (Flame Strike level 1 vs level 5)
-        // au lieu de tout aplatir sur le seul m.atk du personnage.
-        int skillPower = character.getStatSystem().getEffective(ModifiedStat.MATK) + activeSkill.powerAt(level);
-        int amount = CombatFormulas.resolveDamage(skillPower, target.getStatSystem().getEffective(ModifiedStat.MDEF),
-                critical);
+        ModifiedStat critStat = activeSkill.damageType() == SkillDamageType.PHYSICAL
+                ? ModifiedStat.PCRIT
+                : ModifiedStat.MCRIT;
+        ModifiedStat atkStat = activeSkill.damageType() == SkillDamageType.PHYSICAL
+                ? ModifiedStat.PATK
+                : ModifiedStat.MATK;
+        ModifiedStat defStat = activeSkill.damageType() == SkillDamageType.PHYSICAL
+                ? ModifiedStat.PDEF
+                : ModifiedStat.MDEF;
+        boolean critical = Randomizer.rollChance(character.getStatSystem().getEffective(critStat) / 100.0);
+        // Le power du sort module la puissance (physique ou magique) du lancer, ce
+        // qui préserve la progression entre levels d'un même sort (level 1 vs level 5)
+        // au lieu de tout aplatir sur le seul p.atk/m.atk du personnage.
+        int skillPower = character.getStatSystem().getEffective(atkStat) + activeSkill.powerAt(level);
+        int amount = CombatFormulas.resolveDamage(skillPower, target.getStatSystem().getEffective(defStat), critical);
         if (activeSkill.element() != SkillElement.NONE) {
             amount = CombatFormulas.applyElementalResistance(amount,
                     target.getElementalResistance(activeSkill.element()));

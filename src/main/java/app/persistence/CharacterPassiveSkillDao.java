@@ -30,4 +30,10 @@ public class CharacterPassiveSkillDao {
                 CHARACTER_PASSIVE_SKILL.PASSIVE_SKILL_ID, CHARACTER_PASSIVE_SKILL.LEVEL)
                 .values(characterId, passiveSkillId, level).execute();
     }
+
+    public void updateLevel(UUID characterId, UUID passiveSkillId, int level) {
+        dsl.update(CHARACTER_PASSIVE_SKILL).set(CHARACTER_PASSIVE_SKILL.LEVEL, level)
+                .where(CHARACTER_PASSIVE_SKILL.CHARACTER_ID.eq(characterId))
+                .and(CHARACTER_PASSIVE_SKILL.PASSIVE_SKILL_ID.eq(passiveSkillId)).execute();
+    }
 }
