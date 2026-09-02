@@ -120,8 +120,12 @@ public class SkillCatalog {
         return activeSkill;
     }
 
+    // learnableSkillIds(level) mélange sorts actifs et compétences passives
+    // (ex: Expertise Grade) ; seuls les ids présents dans activeSkills nous
+    // concernent ici, le reste est géré par PassiveSkillCatalog.
     public List<LearnableSkill> skillsLearnableAt(CharacterClass characterClass, int level) {
         return characterClass.learnableSkillIds(level).stream()
+                .filter(learnable -> activeSkills.containsKey(learnable.skillId()))
                 .map(learnable -> new LearnableSkill(getById(learnable.skillId()), learnable.level())).toList();
     }
 

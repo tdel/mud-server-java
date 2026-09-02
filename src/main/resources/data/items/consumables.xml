@@ -5,7 +5,6 @@
         <type>POTION</type>
         <weight>1</weight>
         <price>50</price>
-        <grade>NOGRADE</grade>
         <consumableEffect>HEALING</consumableEffect>
         <effectAmount>10</effectAmount>
     </consumable>
@@ -14,7 +13,6 @@
         <type>POTION</type>
         <weight>1</weight>
         <price>150</price>
-        <grade>NOGRADE</grade>
         <consumableEffect>HEALING</consumableEffect>
         <effectAmount>25</effectAmount>
     </consumable>
@@ -23,7 +21,6 @@
         <type>POTION</type>
         <weight>1</weight>
         <price>700</price>
-        <grade>NOGRADE</grade>
         <consumableEffect>HEALING</consumableEffect>
         <effectAmount>50</effectAmount>
     </consumable>
@@ -32,7 +29,6 @@
         <type>POTION</type>
         <weight>1</weight>
         <price>2700</price>
-        <grade>NOGRADE</grade>
         <consumableEffect>HEALING</consumableEffect>
         <effectAmount>100</effectAmount>
     </consumable>
@@ -41,7 +37,6 @@
         <type>POTION</type>
         <weight>1</weight>
         <price>60</price>
-        <grade>NOGRADE</grade>
         <consumableEffect>MANA_RESTORE</consumableEffect>
         <effectAmount>10</effectAmount>
     </consumable>

@@ -13,7 +13,6 @@
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
         <price>1</price>
-        <grade>NOGRADE</grade>
     </piece>
     <piece id="b0bc4f00-8f9f-44a4-9b7f-0095ab837218">
         <name>Garnet Earring</name>
@@ -28,7 +27,6 @@
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
         <price>1</price>
-        <grade>NOGRADE</grade>
     </piece>
     <piece id="2f76ba65-4e52-45d0-b6ba-8c932fd699d7">
         <name>Garnet Necklace</name>
@@ -43,7 +41,6 @@
         <critBonus>1</critBonus>
         <atkSpd>0</atkSpd>
         <price>1</price>
-        <grade>NOGRADE</grade>
     </piece>
     <piece id="001d1121-6760-4831-83a3-a72b126f79f3">
         <name>Amber Ring</name>
@@ -58,9 +55,9 @@
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
         <price>15</price>
-        <grade>D</grade>
         <expect>
             <conditions>
+                <!-- Expertise Grade - D -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
             </conditions>
             <actions>
@@ -83,9 +80,9 @@
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
         <price>15</price>
-        <grade>D</grade>
         <expect>
             <conditions>
+                <!-- Expertise Grade - D -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
             </conditions>
             <actions>
@@ -108,9 +105,9 @@
         <critBonus>1</critBonus>
         <atkSpd>0</atkSpd>
         <price>20</price>
-        <grade>D</grade>
         <expect>
             <conditions>
+                <!-- Expertise Grade - D -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
             </conditions>
             <actions>
@@ -133,9 +130,9 @@
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
         <price>800</price>
-        <grade>C</grade>
         <expect>
             <conditions>
+                <!-- Expertise Grade - C -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
             </conditions>
             <actions>
@@ -158,9 +155,9 @@
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
         <price>800</price>
-        <grade>C</grade>
         <expect>
             <conditions>
+                <!-- Expertise Grade - C -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
             </conditions>
             <actions>
@@ -183,9 +180,9 @@
         <critBonus>2</critBonus>
         <atkSpd>0</atkSpd>
         <price>1000</price>
-        <grade>C</grade>
         <expect>
             <conditions>
+                <!-- Expertise Grade - C -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
             </conditions>
             <actions>
@@ -208,9 +205,9 @@
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
         <price>6000</price>
-        <grade>B</grade>
         <expect>
             <conditions>
+                <!-- Expertise Grade - B -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
             </conditions>
             <actions>
@@ -233,9 +230,9 @@
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
         <price>6000</price>
-        <grade>B</grade>
         <expect>
             <conditions>
+                <!-- Expertise Grade - B -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
             </conditions>
             <actions>
@@ -258,9 +255,9 @@
         <critBonus>3</critBonus>
         <atkSpd>0</atkSpd>
         <price>7000</price>
-        <grade>B</grade>
         <expect>
             <conditions>
+                <!-- Expertise Grade - B -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
             </conditions>
             <actions>
@@ -283,9 +280,9 @@
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
         <price>30000</price>
-        <grade>A</grade>
         <expect>
             <conditions>
+                <!-- Expertise Grade - A -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
             </conditions>
             <actions>
@@ -308,9 +305,9 @@
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
         <price>30000</price>
-        <grade>A</grade>
         <expect>
             <conditions>
+                <!-- Expertise Grade - A -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
             </conditions>
             <actions>
@@ -333,9 +330,9 @@
         <critBonus>4</critBonus>
         <atkSpd>0</atkSpd>
         <price>35000</price>
-        <grade>A</grade>
         <expect>
             <conditions>
+                <!-- Expertise Grade - A -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
             </conditions>
             <actions>
@@ -358,9 +355,9 @@
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
         <price>80000</price>
-        <grade>S</grade>
         <expect>
             <conditions>
+                <!-- Expertise Grade - S -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
             </conditions>
             <actions>
@@ -383,9 +380,9 @@
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
         <price>80000</price>
-        <grade>S</grade>
         <expect>
             <conditions>
+                <!-- Expertise Grade - S -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
             </conditions>
             <actions>
@@ -408,9 +405,9 @@
         <critBonus>5</critBonus>
         <atkSpd>0</atkSpd>
         <price>90000</price>
-        <grade>S</grade>
         <expect>
             <conditions>
+                <!-- Expertise Grade - S -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
             </conditions>
             <actions>
@@ -434,9 +431,9 @@
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
         <price>900</price>
-        <grade>C</grade>
         <expect>
             <conditions>
+                <!-- Expertise Grade - C -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
             </conditions>
             <actions>
@@ -463,9 +460,9 @@
         <critBonus>1</critBonus>
         <atkSpd>0</atkSpd>
         <price>1100</price>
-        <grade>C</grade>
         <expect>
             <conditions>
+                <!-- Expertise Grade - C -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
             </conditions>
             <actions>

@@ -37,13 +37,8 @@ public enum CharacterClass {
     private Definition definition;
 
     public List<LearnableSkill> learnableSkillIds(int level) {
-        return definition.skills().stream().filter(entry -> entry.level() != null && entry.playerLevel() == level)
-                .map(entry -> new LearnableSkill(entry.id(), entry.level())).toList();
-    }
-
-    public List<UUID> learnablePassiveSkillIds(int level) {
-        return definition.skills().stream().filter(entry -> entry.level() == null && entry.playerLevel() == level)
-                .map(SkillEntry::id).toList();
+        return definition.skills().stream().flatMap(entry -> entry.level().stream()
+                .filter(l -> l.playerLevel() == level).map(l -> new LearnableSkill(entry.id(), l.id()))).toList();
     }
 
     public record LearnableSkill(UUID skillId, int level) {
@@ -84,8 +79,11 @@ public enum CharacterClass {
         }
     }
 
-    // Une entrée <skill> avec level renseigné est un palier de sort actif
-    // (level 1..N) ; sans level, c'est une compétence passive (pas de palier).
-    private record SkillEntry(@JacksonXmlProperty(isAttribute = true) UUID id, Integer level, int playerLevel) {
+    private record SkillEntry(@JacksonXmlProperty(isAttribute = true) UUID id,
+            @JacksonXmlProperty(localName = "level") @JacksonXmlElementWrapper(useWrapping = false) List<SkillLevel> level) {
+    }
+
+    private record SkillLevel(@JacksonXmlProperty(isAttribute = true) int id,
+            @JacksonXmlProperty(isAttribute = true) int playerLevel) {
     }
 }

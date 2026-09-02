@@ -46,10 +46,13 @@ public class ItemTemplateCatalog {
 
     private final XmlMapper xmlMapper;
     private final SkillCatalog skillCatalog;
+    private final PassiveSkillCatalog passiveSkillCatalog;
 
-    public ItemTemplateCatalog(XmlMapper xmlMapper, SkillCatalog skillCatalog) {
+    public ItemTemplateCatalog(XmlMapper xmlMapper, SkillCatalog skillCatalog,
+            PassiveSkillCatalog passiveSkillCatalog) {
         this.xmlMapper = xmlMapper;
         this.skillCatalog = skillCatalog;
+        this.passiveSkillCatalog = passiveSkillCatalog;
     }
 
     public void warmItemTemplates() {
@@ -63,10 +66,9 @@ public class ItemTemplateCatalog {
 
     private void loadConsumables() {
         for (ConsumableDefinition definition : readResource(CONSUMABLES_RESOURCE, ConsumableDefinition.class)) {
-            ItemGrade grade = definition.grade() == null ? ItemGrade.NOGRADE : definition.grade();
             ItemTemplate template = new ConsumableItem(definition.id(), definition.name(), definition.description(),
-                    definition.type(), definition.weight(), definition.price(), grade, definition.consumableEffect(),
-                    definition.effectAmount());
+                    definition.type(), definition.weight(), definition.price(), ItemGrade.NOGRADE,
+                    definition.consumableEffect(), definition.effectAmount());
             templates.put(template.getId(), template);
         }
     }
@@ -79,8 +81,8 @@ public class ItemTemplateCatalog {
             Map<SkillElement, Integer> elementalResistances = definition.elementalResistances() == null
                     ? Map.of()
                     : definition.elementalResistances();
-            ItemGrade grade = definition.grade() == null ? ItemGrade.NOGRADE : definition.grade();
             ItemExpectation expectation = toItemExpectation(definition.expect());
+            ItemGrade grade = gradeFromExpectation(expectation);
 
             ItemTemplate template = new EquipmentItem(definition.id(), definition.name(), definition.description(),
                     definition.type(), definition.weight(), definition.armorCategory(), definition.pAtk(),
@@ -93,11 +95,21 @@ public class ItemTemplateCatalog {
 
     private void loadOthers() {
         for (OtherDefinition definition : readResource(OTHERS_RESOURCE, OtherDefinition.class)) {
-            ItemGrade grade = definition.grade() == null ? ItemGrade.NOGRADE : definition.grade();
             ItemTemplate template = new ItemTemplate(definition.id(), definition.name(), definition.description(),
-                    definition.type(), definition.weight(), definition.price(), grade);
+                    definition.type(), definition.weight(), definition.price(), ItemGrade.NOGRADE);
             templates.put(template.getId(), template);
         }
+    }
+
+    // Le grade d'un équipement n'est plus une donnée XML séparée : il découle du
+    // niveau de la première compétence requise dans <expect><conditions> (ex:
+    // Expertise Grade niveau 2 => grade C, cf. PassiveSkill.gradeAt).
+    private ItemGrade gradeFromExpectation(ItemExpectation expectation) {
+        if (expectation == null || expectation.conditions().isEmpty()) {
+            return ItemGrade.NOGRADE;
+        }
+        ItemExpectation.SkillRequirement requirement = expectation.conditions().get(0);
+        return passiveSkillCatalog.getById(requirement.skillId()).gradeAt(requirement.level());
     }
 
     private <T> List<T> readResource(String resource, Class<T> elementType) {
@@ -122,19 +134,19 @@ public class ItemTemplateCatalog {
     }
 
     private record ConsumableDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name,
-            String description, ItemType type, int weight, int price, ItemGrade grade,
-            ConsumableEffect consumableEffect, int effectAmount) {
+            String description, ItemType type, int weight, int price, ConsumableEffect consumableEffect,
+            int effectAmount) {
     }
 
     private record EquipmentDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name, String description,
             ItemType type, int weight, ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef,
             int accuracyBonus, int evasionBonus, int critBonus, int atkSpd, int price,
             @JacksonXmlElementWrapper(useWrapping = false) List<UUID> grantedSkillIds,
-            Map<SkillElement, Integer> elementalResistances, ItemGrade grade, String setId, ExpectXml expect) {
+            Map<SkillElement, Integer> elementalResistances, String setId, ExpectXml expect) {
     }
 
     private record OtherDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name, String description,
-            ItemType type, int weight, int price, ItemGrade grade) {
+            ItemType type, int weight, int price) {
     }
 
     private static ItemExpectation toItemExpectation(ExpectXml xml) {
