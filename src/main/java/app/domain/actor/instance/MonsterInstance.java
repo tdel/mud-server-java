@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import app.domain.ActiveEffect;
 import app.domain.ActiveSkill;
@@ -31,8 +32,9 @@ public final class MonsterInstance extends AbstractCharacter {
             Set<PassiveSkill> knownPassiveSkills, List<ActiveEffect> activeEffects, int level, int aggroRadius,
             Map<SkillElement, Integer> elementalResistances, int xpReward, int goldReward,
             List<LootTableEntry> lootTable) {
-        super(id, name, attributes, maxHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects, baseStats,
-                false, xpReward, goldReward, lootTable);
+        super(id, name, attributes, maxHealth, maxHealth,
+                knownSkills.stream().collect(Collectors.toMap(skill -> skill, skill -> 1)), knownPassiveSkills,
+                activeEffects, baseStats, false, xpReward, goldReward, lootTable);
         this.spawnPosition = spawnPosition;
         this.level = level;
         this.aggroRadius = aggroRadius;

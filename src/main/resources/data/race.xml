@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<races>
+    <race>
+        <name>HUMAN</name>
+        <attributes>
+            <STRENGTH>1</STRENGTH>
+            <DEXTERITY>1</DEXTERITY>
+            <CONSTITUTION>1</CONSTITUTION>
+            <INTELLIGENCE>1</INTELLIGENCE>
+            <WIT>1</WIT>
+            <MEN>1</MEN>
+        </attributes>
+        <speed>110</speed>
+    </race>
+</races>

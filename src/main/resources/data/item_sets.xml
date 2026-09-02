@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<itemSets>
+    <itemSet>
+        <id>plate-set</id>
+        <name>Plate Set</name>
+        <bonusByPieceCount>
+            <bonus pieceCount="2">
+                <bonuses>
+                    <PDEF>5</PDEF>
+                </bonuses>
+            </bonus>
+            <bonus pieceCount="3">
+                <bonuses>
+                    <PDEF>12</PDEF>
+                    <EVASION>-3</EVASION>
+                </bonuses>
+            </bonus>
+        </bonusByPieceCount>
+    </itemSet>
+</itemSets>

@@ -8,9 +8,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import app.domain.ActiveEffect;
 import app.domain.EffectCategory;
+import app.domain.StatModifier;
+import app.domain.StatOperator;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.ModifiedStat;
 
@@ -51,11 +54,23 @@ public final class EffectsSystem {
         return Optional.of(soonestToExpire);
     }
 
-    public int totalModifier(ModifiedStat stat) {
+    // Somme de tous les modificateurs ADDITIVE actifs sur ce stat.
+    public int additiveModifier(ModifiedStat stat) {
+        return matchingModifiers(stat).filter(modifier -> modifier.operator() == StatOperator.ADDITIVE)
+                .mapToInt(StatModifier::value).sum();
+    }
+
+    // Produit de (1 + value/100) pour chaque modificateur MULTIPLICATIVE actif sur
+    // ce stat — 1.0 si aucun.
+    public double multiplicativeFactor(ModifiedStat stat) {
+        return matchingModifiers(stat).filter(modifier -> modifier.operator() == StatOperator.MULTIPLICATIVE)
+                .mapToDouble(modifier -> 1.0 + modifier.value() / 100.0).reduce(1.0, (a, b) -> a * b);
+    }
+
+    private Stream<StatModifier> matchingModifiers(ModifiedStat stat) {
         Instant now = Instant.now();
-        return activeEffects.values().stream()
-                .filter(effect -> effect.stat() == stat && now.isBefore(effect.expiresAt()))
-                .mapToInt(ActiveEffect::amount).sum();
+        return activeEffects.values().stream().filter(effect -> now.isBefore(effect.expiresAt()))
+                .flatMap(effect -> effect.modifiers().stream()).filter(modifier -> modifier.stat() == stat);
     }
 
     public List<ActiveEffect> active() {

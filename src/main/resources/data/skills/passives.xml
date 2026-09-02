@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<passives>
+    <passive>
+        <id>865a7263-fb06-48ef-89c1-9ccbad268215</id>
+        <name>Expertise D-Grade</name>
+        <description>Permet de porter armes, armures et bijoux de grade D sans pénalité.</description>
+        <grantsGrade>D</grantsGrade>
+    </passive>
+    <passive>
+        <id>79a543e2-24c5-49d4-b90d-8f7c45c929b5</id>
+        <name>Expertise C-Grade</name>
+        <description>Permet de porter armes, armures et bijoux de grade C sans pénalité.</description>
+        <grantsGrade>C</grantsGrade>
+    </passive>
+    <passive>
+        <id>b056411d-5e82-49b0-833a-1c449615a5c9</id>
+        <name>Expertise B-Grade</name>
+        <description>Permet de porter armes, armures et bijoux de grade B sans pénalité.</description>
+        <grantsGrade>B</grantsGrade>
+    </passive>
+    <passive>
+        <id>77086cb5-2ff2-45a0-8643-62a3c4ed0400</id>
+        <name>Expertise A-Grade</name>
+        <description>Permet de porter armes, armures et bijoux de grade A sans pénalité.</description>
+        <grantsGrade>A</grantsGrade>
+    </passive>
+    <passive>
+        <id>b13d398e-07b4-430c-bfb8-ad7ddf816974</id>
+        <name>Expertise S-Grade</name>
+        <description>Permet de porter armes, armures et bijoux de grade S sans pénalité.</description>
+        <grantsGrade>S</grantsGrade>
+    </passive>
+</passives>

@@ -116,7 +116,7 @@ public class WorldInstance {
         int startingMana = characterClass.maxMana(scores.get(Attribute.MEN), 1);
 
         CharacterInstance character = new CharacterInstance(UUID.randomUUID(), account, name, startingMap, gender, race,
-                characterClass, 1, maxHealth, maxHealth, scores, 0, 0, startingMana, startingMana, Set.of(), List.of(),
+                characterClass, 1, maxHealth, maxHealth, scores, 0, 0, startingMana, startingMana, Map.of(), List.of(),
                 List.of(), Set.of(), List.of());
         character.setWorldInstance(this);
 

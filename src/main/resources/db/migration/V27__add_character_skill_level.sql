@@ -1,0 +1,1 @@
+ALTER TABLE character_skill ADD COLUMN level INTEGER NOT NULL DEFAULT 1;

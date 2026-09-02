@@ -30,8 +30,8 @@ import app.network.message.ingame.MovementStopped;
 @Component
 public class MovementEngine {
 
-    // speed est le run speed L2 (Human ~110, monstres ~55-75, cf. race.json /
-    // monsters.json) — pas une distance de case DnD5e. Le diviseur convertit
+    // speed est le run speed L2 (Human ~110, monstres ~55-75, cf. race.xml /
+    // monsters.xml) — pas une distance de case DnD5e. Le diviseur convertit
     // cette valeur "unités L2" en cases de la CollisionGrid par seconde, calibré
     // pour garder le rythme de déplacement déjà éprouvé sur la grille (un Human à
     // 110 fait ~2.44 case/s).

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<world>
+    <id>f128833b-9a8a-4fb9-9796-33fd9413490d</id>
+    <name>The Village and its Surroundings</name>
+    <description>The starting world: a village, its tavern, and the edge of the forest.</description>
+    <minPlayers>1</minPlayers>
+    <maxPlayers>6</maxPlayers>
+</world>

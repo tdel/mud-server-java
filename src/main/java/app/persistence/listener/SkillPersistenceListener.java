@@ -29,14 +29,15 @@ public class SkillPersistenceListener {
     @EventListener
     @Transactional
     void onCharacterLearnedSkill(CharacterLearnedSkill event) {
-        if (event.previousTier() != null) {
-            characterSkillDao.deleteByCharacterAndSkill(event.character().getId(), event.previousTier().id());
+        boolean upgraded = event.previousLevel() > 0;
+        if (upgraded) {
+            characterSkillDao.updateLevel(event.character().getId(), event.activeSkill().id(), event.newLevel());
+        } else {
+            characterSkillDao.insert(event.character().getId(), event.activeSkill().id(), event.newLevel());
         }
-        characterSkillDao.insert(event.character().getId(), event.activeSkill().id());
-        event.character().send(
-                new SkillLearned(event.activeSkill().name(), event.activeSkill().tier(), event.previousTier() != null));
-        log.info("character.learned_skill character={} activeSkill={} tier={} upgraded={}", event.character().getName(),
-                event.activeSkill().name(), event.activeSkill().tier(), event.previousTier() != null);
+        event.character().send(new SkillLearned(event.activeSkill().name(), event.newLevel(), upgraded));
+        log.info("character.learned_skill character={} activeSkill={} level={} upgraded={}",
+                event.character().getName(), event.activeSkill().name(), event.newLevel(), upgraded);
     }
 
     @EventListener

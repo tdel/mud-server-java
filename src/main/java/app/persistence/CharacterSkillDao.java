@@ -17,18 +17,29 @@ public class CharacterSkillDao {
         this.dsl = dsl;
     }
 
-    public List<UUID> findSkillIdsByCharacter(UUID characterId) {
-        return dsl.select(CHARACTER_SKILL.SKILL_ID).from(CHARACTER_SKILL)
-                .where(CHARACTER_SKILL.CHARACTER_ID.eq(characterId)).fetch(CHARACTER_SKILL.SKILL_ID);
+    public List<CharacterSkillRow> findByCharacter(UUID characterId) {
+        return dsl.select(CHARACTER_SKILL.SKILL_ID, CHARACTER_SKILL.LEVEL).from(CHARACTER_SKILL)
+                .where(CHARACTER_SKILL.CHARACTER_ID.eq(characterId))
+                .fetch(record -> new CharacterSkillRow(record.get(CHARACTER_SKILL.SKILL_ID),
+                        record.get(CHARACTER_SKILL.LEVEL)));
     }
 
-    public void insert(UUID characterId, UUID skillId) {
-        dsl.insertInto(CHARACTER_SKILL, CHARACTER_SKILL.CHARACTER_ID, CHARACTER_SKILL.SKILL_ID)
-                .values(characterId, skillId).execute();
+    public void insert(UUID characterId, UUID skillId, int level) {
+        dsl.insertInto(CHARACTER_SKILL, CHARACTER_SKILL.CHARACTER_ID, CHARACTER_SKILL.SKILL_ID, CHARACTER_SKILL.LEVEL)
+                .values(characterId, skillId, level).execute();
+    }
+
+    public void updateLevel(UUID characterId, UUID skillId, int level) {
+        dsl.update(CHARACTER_SKILL).set(CHARACTER_SKILL.LEVEL, level)
+                .where(CHARACTER_SKILL.CHARACTER_ID.eq(characterId)).and(CHARACTER_SKILL.SKILL_ID.eq(skillId))
+                .execute();
     }
 
     public void deleteByCharacterAndSkill(UUID characterId, UUID skillId) {
         dsl.deleteFrom(CHARACTER_SKILL).where(CHARACTER_SKILL.CHARACTER_ID.eq(characterId))
                 .and(CHARACTER_SKILL.SKILL_ID.eq(skillId)).execute();
+    }
+
+    public record CharacterSkillRow(UUID skillId, int level) {
     }
 }

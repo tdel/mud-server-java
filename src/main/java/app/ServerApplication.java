@@ -26,7 +26,7 @@ public class ServerApplication {
     }
 
     // Ordre significatif : les sorts doivent être chargés avant les item templates,
-    // car ItemTemplateCatalog dénormalise les grantedSkillIds d'items.json en
+    // car ItemTemplateCatalog dénormalise les grantedSkillIds d'items/*.xml en
     // objets
     // ActiveSkill via SkillCatalog.getById dès le chargement (armes/armures
     // magiques

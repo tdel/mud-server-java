@@ -30,20 +30,22 @@ public class ActiveEffectPersistenceListener {
 
     @EventListener
     void onSkillCast(SkillCast event) {
-        boolean modifier = event.activeSkill().effect() == SkillEffectType.BUFF
-                || event.activeSkill().effect() == SkillEffectType.DEBUFF;
+        boolean modifier = event.activeSkill().skillType() == SkillEffectType.BUFF
+                || event.activeSkill().skillType() == SkillEffectType.DEBUFF;
         if (!event.hit() || !modifier || !(event.target() instanceof CharacterInstance targetPlayer)) {
             return;
         }
         characterActiveEffectDao.upsert(targetPlayer.getId(), new ActiveEffect(event.activeSkill().id(),
-                event.activeSkill().name(), event.activeSkill().modifiedStat(), event.amount(), event.expiresAt()));
+                event.activeSkill().name(), event.modifiers(), event.expiresAt()));
 
         Party party = targetPlayer.getParty();
         if (party != null) {
             long secondsRemaining = Duration.between(Instant.now(), event.expiresAt()).toSeconds();
-            party.broadcast(new PartyMemberEffectApplied(targetPlayer.getId(), targetPlayer.getName(),
-                    event.activeSkill().name(), event.activeSkill().modifiedStat().label(), event.amount(),
-                    Math.max(0, secondsRemaining)), targetPlayer);
+            String statLabel = event.modifiers().isEmpty() ? "" : event.modifiers().get(0).stat().label();
+            party.broadcast(
+                    new PartyMemberEffectApplied(targetPlayer.getId(), targetPlayer.getName(),
+                            event.activeSkill().name(), statLabel, event.amount(), Math.max(0, secondsRemaining)),
+                    targetPlayer);
         }
 
         log.info("character.effect_applied character={} activeSkill={} expiresAt={}", targetPlayer.getName(),

@@ -26,7 +26,7 @@ import app.game.Randomizer;
  * Constantes calibrées par simulation déterministe (espérance de dégâts, pas de
  * tirages réels) sur un Fighter/Mystic niveau 1 fraîchement créé (arme de
  * départ, sans armure) contre chaque monstre de {@code data/monsters
- * .json} : viser un hitChance en miroir ~65-70%, une marge de temps-de-mise-
+ * .xml} : viser un hitChance en miroir ~65-70%, une marge de temps-de-mise-
  * à-mort favorable au joueur sur les monstres "starter" (même niveau, faible
  * récompense XP), et une difficulté réelle sur les monstres au-dessus du niveau
  * du joueur. Point de départ à retester après tout changement de contenu
@@ -92,7 +92,7 @@ public final class CombatFormulas {
 
     // Courbe quadratique en level (hpBase + hpAdd*level + hpMod*level^2),
     // reprenant telle quelle la table officielle L2 des PV de base par niveau
-    // (Human Fighter/Mystic, cf. data/class.json) ; le résultat est ensuite
+    // (Human Fighter/Mystic, cf. data/classes/*.xml) ; le résultat est ensuite
     // multiplié par statBonus(CON), comme pour p.def/m.def.
     public static int maxHealth(double hpBase, double hpAdd, double hpMod, int level, int constitutionScore) {
         double base = hpBase + hpAdd * level + hpMod * level * level;

@@ -28,28 +28,29 @@ import app.domain.world.MapInstance;
 import app.game.combat.CombatFormulas;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.xml.XmlMapper;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 
 @Service
 public class MonsterCatalog {
 
     private static final Logger log = LoggerFactory.getLogger(MonsterCatalog.class);
 
-    private static final String MONSTERS_RESOURCE = "/data/monsters.json";
+    private static final String MONSTERS_RESOURCE = "/data/monsters.xml";
 
     private final Map<UUID, MonsterTemplate> templates = new ConcurrentHashMap<>();
 
-    private final ObjectMapper objectMapper;
+    private final XmlMapper xmlMapper;
     private final ItemTemplateCatalog itemTemplateCatalog;
 
-    public MonsterCatalog(ObjectMapper objectMapper, ItemTemplateCatalog itemTemplateCatalog) {
-        this.objectMapper = objectMapper;
+    public MonsterCatalog(XmlMapper xmlMapper, ItemTemplateCatalog itemTemplateCatalog) {
+        this.xmlMapper = xmlMapper;
         this.itemTemplateCatalog = itemTemplateCatalog;
     }
 
     public void warmMonsterTemplates() {
         try (InputStream in = getClass().getResourceAsStream(MONSTERS_RESOURCE)) {
-            List<MonsterTemplateDefinition> definitions = objectMapper.readValue(in,
+            List<MonsterTemplateDefinition> definitions = xmlMapper.readValue(in,
                     new TypeReference<List<MonsterTemplateDefinition>>() {
                     });
             registerTemplates(definitions);
@@ -105,7 +106,10 @@ public class MonsterCatalog {
     private void registerTemplates(List<MonsterTemplateDefinition> definitions) {
         for (MonsterTemplateDefinition definition : definitions) {
             List<LootTableEntry> lootTable = new ArrayList<>();
-            for (LootTableEntryDefinition entryDef : definition.lootTable()) {
+            List<LootTableEntryDefinition> lootTableEntries = definition.lootTable() == null
+                    ? List.of()
+                    : definition.lootTable();
+            for (LootTableEntryDefinition entryDef : lootTableEntries) {
                 if (entryDef.dropChance() < 0 || entryDef.dropChance() > 100) {
                     throw new IllegalStateException("Template " + definition.id() + " a une entrée de lootTable avec "
                             + "dropChance=" + entryDef.dropChance() + " hors de [0, 100] dans " + MONSTERS_RESOURCE);
@@ -113,7 +117,7 @@ public class MonsterCatalog {
                 ItemTemplate itemTemplate = this.itemTemplateCatalog.getById(entryDef.itemTemplateId());
                 if (itemTemplate == null) {
                     throw new IllegalStateException("Template " + definition.id() + " référence l'item "
-                            + entryDef.itemTemplateId() + " dans sa lootTable, absent de data/items.json");
+                            + entryDef.itemTemplateId() + " dans sa lootTable, absent de data/items/*.xml");
                 }
                 lootTable.add(new LootTableEntry(itemTemplate, entryDef.dropChance()));
             }
@@ -136,7 +140,7 @@ public class MonsterCatalog {
 
     record MonsterTemplateDefinition(UUID id, String name, int maxHealth, Map<Attribute, Integer> attributes, int pAtk,
             int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus, int critBonus, int xpReward,
-            int goldReward, List<LootTableEntryDefinition> lootTable, int aggroRadius, int speed, int atkSpd, int level,
-            Map<SkillElement, Integer> elementalResistances) {
+            int goldReward, @JacksonXmlElementWrapper(useWrapping = false) List<LootTableEntryDefinition> lootTable,
+            int aggroRadius, int speed, int atkSpd, int level, Map<SkillElement, Integer> elementalResistances) {
     }
 }

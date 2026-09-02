@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import app.domain.world.MapInstance;
 import app.domain.actor.template.NpcTemplate;
@@ -17,7 +18,8 @@ public class AbstractNpc extends AbstractCharacter {
     private final NpcTemplate template;
 
     public AbstractNpc(UUID id, NpcTemplate template, MapInstance map) {
-        super(id, template.name(), neutralAttributes(), NOMINAL_HEALTH, NOMINAL_HEALTH, template.knownSkills(),
+        super(id, template.name(), neutralAttributes(), NOMINAL_HEALTH, NOMINAL_HEALTH,
+                template.knownSkills().stream().collect(Collectors.toMap(skill -> skill, skill -> 1)),
                 template.knownPassiveSkills(), template.activeEffects(), Map.of(ModifiedStat.SPEED, 0), true, 0, 0,
                 List.of());
         this.template = Objects.requireNonNull(template);

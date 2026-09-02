@@ -8,8 +8,8 @@ import app.network.OutputJsonMessage;
 
 public record KnownSkills(List<Entry> skills) implements OutputJsonMessage {
 
-    public record Entry(UUID id, String name, int tier, String description, int manaCost, int cooldownSeconds,
-            int range, SkillEffectType effect, int durationSeconds, boolean granted) {
+    public record Entry(UUID id, String name, int level, int manaCost, int cooldownSeconds, int range,
+            SkillEffectType skillType, int durationSeconds, boolean granted) {
     }
 
 }

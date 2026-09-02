@@ -35,8 +35,8 @@ public class ActiveEffectEngine {
 
     @EventListener
     void onSkillCast(SkillCast event) {
-        boolean modifier = event.activeSkill().effect() == SkillEffectType.BUFF
-                || event.activeSkill().effect() == SkillEffectType.DEBUFF;
+        boolean modifier = event.activeSkill().skillType() == SkillEffectType.BUFF
+                || event.activeSkill().skillType() == SkillEffectType.DEBUFF;
         if (event.hit() && modifier) {
             register(event.target());
         }

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<npcs>
+    <npc>
+        <id>a3c8d0f2-5d5f-4d2c-9f2c-3f4e5d6c7b8a</id>
+        <name>Innkeeper</name>
+        <dialogue>
+            <greeting>Hello, I sell several interesting things, would you like to see?</greeting>
+            <options>
+                <label>See what you sell</label>
+                <type>SHOP</type>
+            </options>
+            <options>
+                <label>Where are you from?</label>
+                <type>RESPONSE</type>
+                <response>I come from the northern lands, I opened this inn ten years ago.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+            <shop>
+                <items>
+                    <itemTemplateId>019fa0a5-80bf-7e84-87bf-5cf699c00315</itemTemplateId>
+                    <price>50</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fa0a5-80c0-7035-9c2d-113b09a275df</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fcf0d-1f8f-7d01-8e4f-fd592812a1a7</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>3a4a5836-051e-4641-aef8-7b6e6792322e</itemTemplateId>
+                    <price>60</price>
+                </items>
+            </shop>
+        </dialogue>
+        <level>1</level>
+    </npc>
+    <npc>
+        <id>dcb67f1e-b178-4062-8393-26abca9b0d66</id>
+        <name>Blacksmith</name>
+        <dialogue>
+            <greeting>A weapon, some armor? I've got what you need.</greeting>
+            <options>
+                <label>See what you sell</label>
+                <type>SHOP</type>
+            </options>
+            <options>
+                <label>How long have you been smithing?</label>
+                <type>RESPONSE</type>
+                <response>Since I could hold a hammer. My father had the forge before me.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+            <shop>
+                <items>
+                    <itemTemplateId>019fa0a5-80c0-7035-9c2d-113b09a275df</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd</itemTemplateId>
+                    <price>2</price>
+                </items>
+                <items>
+                    <itemTemplateId>019faec6-116d-723d-b04c-76d51a2a2cb7</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fcf0d-1f8c-7d43-9e98-a9944b4ccefe</itemTemplateId>
+                    <price>50</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fcf0d-1f8d-7c4c-9275-33c4af4410a8</itemTemplateId>
+                    <price>1500</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fcf0d-1f8f-7d01-8e4f-fd592812a1a7</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fe3f6-b1ee-78f8-a681-d288c7f87511</itemTemplateId>
+                    <price>500</price>
+                </items>
+            </shop>
+        </dialogue>
+        <level>1</level>
+    </npc>
+    <npc>
+        <id>b0362279-5a46-4461-9672-6f4e0b2cf7e0</id>
+        <name>Village Guard</name>
+        <dialogue>
+            <greeting>Halt! ... Alright, move along.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>2</level>
+    </npc>
+    <npc>
+        <id>318a4b28-4aae-46fa-ab99-2bc62738f1c3</id>
+        <name>Gate Guard</name>
+        <dialogue>
+            <greeting>Nothing to report here. Move along.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>2</level>
+    </npc>
+</npcs>

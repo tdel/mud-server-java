@@ -1,4 +1,0 @@
-[
-  { "name": "FIGHTER", "hpBase": 68.3, "hpAdd": 11.635, "hpMod": 0.065, "mpBase": 24.6, "mpAdd": 5.37, "mpMod": 0.03, "baseAttributes": {"STRENGTH": 15, "DEXTERITY": 13, "CONSTITUTION": 14, "INTELLIGENCE": 8, "WIT": 12, "MEN": 10} },
-  { "name": "MYSTIC", "hpBase": 85.7, "hpAdd": 15.215, "hpMod": 0.085, "mpBase": 32.8, "mpAdd": 7.16, "mpMod": 0.04, "baseAttributes": {"STRENGTH": 8, "DEXTERITY": 12, "CONSTITUTION": 10, "INTELLIGENCE": 15, "WIT": 14, "MEN": 13} }
-]

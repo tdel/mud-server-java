@@ -1,13 +1,14 @@
 package app.domain;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
-import app.domain.actor.ModifiedStat;
-
-public record ActiveEffect(UUID skillId, String skillName, ModifiedStat stat, int amount, Instant expiresAt) {
+public record ActiveEffect(UUID skillId, String skillName, List<StatModifier> modifiers, Instant expiresAt) {
 
     public EffectCategory category() {
-        return amount >= 0 ? EffectCategory.BUFF : EffectCategory.DEBUFF;
+        return modifiers.stream().anyMatch(modifier -> modifier.value() < 0)
+                ? EffectCategory.DEBUFF
+                : EffectCategory.BUFF;
     }
 }

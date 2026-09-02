@@ -9,6 +9,8 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import app.domain.ActiveEffect;
+import app.domain.StatModifier;
+import app.domain.StatOperator;
 import app.domain.actor.ModifiedStat;
 import app.domain.actor.event.CharacterLootedItem;
 import app.domain.actor.event.CharacterReceivedGold;
@@ -151,8 +153,10 @@ public final class InventorySystem {
         boolean overGraded = getEquippedItems().stream()
                 .anyMatch(item -> item.getGrade().ordinal() > character.getSkillSystem().unlockedGrade().ordinal());
         if (overGraded) {
-            character.getEffectsSystem().apply(new ActiveEffect(GRADE_PENALTY_EFFECT_ID, "Grade Penalty",
-                    ModifiedStat.PATK, -1, Instant.now().plus(Duration.ofDays(3650))));
+            character.getEffectsSystem()
+                    .apply(new ActiveEffect(GRADE_PENALTY_EFFECT_ID, "Grade Penalty",
+                            List.of(new StatModifier(ModifiedStat.PATK, -1, StatOperator.ADDITIVE)),
+                            Instant.now().plus(Duration.ofDays(3650))));
         } else {
             character.getEffectsSystem().remove(GRADE_PENALTY_EFFECT_ID);
         }

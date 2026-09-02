@@ -21,27 +21,27 @@ import app.domain.item.ItemGrade;
 import app.domain.item.ItemTemplate;
 import app.domain.item.ItemType;
 import tools.jackson.core.JacksonException;
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.xml.XmlMapper;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 
 @Service
 public class ItemTemplateCatalog {
 
     private static final Logger log = LoggerFactory.getLogger(ItemTemplateCatalog.class);
 
-    private static final String CONSUMABLES_RESOURCE = "/data/items/consumables.json";
-    private static final String ARMORS_RESOURCE = "/data/items/armors.json";
-    private static final String WEAPONS_RESOURCE = "/data/items/weapons.json";
-    private static final String JEWELLERY_RESOURCE = "/data/items/jewellery.json";
-    private static final String OTHERS_RESOURCE = "/data/items/others.json";
+    private static final String CONSUMABLES_RESOURCE = "/data/items/consumables.xml";
+    private static final String ARMORS_RESOURCE = "/data/items/armors.xml";
+    private static final String WEAPONS_RESOURCE = "/data/items/weapons.xml";
+    private static final String JEWELLERY_RESOURCE = "/data/items/jewellery.xml";
+    private static final String OTHERS_RESOURCE = "/data/items/others.xml";
 
     private final Map<UUID, ItemTemplate> templates = new ConcurrentHashMap<>();
 
-    private final ObjectMapper objectMapper;
+    private final XmlMapper xmlMapper;
     private final SkillCatalog skillCatalog;
 
-    public ItemTemplateCatalog(ObjectMapper objectMapper, SkillCatalog skillCatalog) {
-        this.objectMapper = objectMapper;
+    public ItemTemplateCatalog(XmlMapper xmlMapper, SkillCatalog skillCatalog) {
+        this.xmlMapper = xmlMapper;
         this.skillCatalog = skillCatalog;
     }
 
@@ -94,8 +94,7 @@ public class ItemTemplateCatalog {
 
     private <T> List<T> readResource(String resource, Class<T> elementType) {
         try (InputStream in = getClass().getResourceAsStream(resource)) {
-            return objectMapper.readValue(in,
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, elementType));
+            return xmlMapper.readValue(in, xmlMapper.getTypeFactory().constructCollectionType(List.class, elementType));
         } catch (IOException | JacksonException e) {
             throw new IllegalStateException("Impossible de charger " + resource, e);
         }
@@ -120,7 +119,8 @@ public class ItemTemplateCatalog {
 
     private record EquipmentDefinition(UUID id, String name, String description, ItemType type, int weight,
             ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus,
-            int critBonus, int atkSpd, int price, List<UUID> grantedSkillIds,
+            int critBonus, int atkSpd, int price,
+            @JacksonXmlElementWrapper(useWrapping = false) List<UUID> grantedSkillIds,
             Map<SkillElement, Integer> elementalResistances, ItemGrade grade, String setId) {
     }
 

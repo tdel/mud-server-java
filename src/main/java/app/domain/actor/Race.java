@@ -8,17 +8,17 @@ import java.util.Map;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.xml.XmlMapper;
 
 public enum Race {
     HUMAN;
 
-    private static final String RESOURCE = "/data/race.json";
+    private static final String RESOURCE = "/data/race.xml";
 
     static {
         try (InputStream in = Race.class.getResourceAsStream(RESOURCE)) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            List<Json> definitions = objectMapper.readValue(in, new TypeReference<List<Json>>() {
+            XmlMapper xmlMapper = new XmlMapper();
+            List<Json> definitions = xmlMapper.readValue(in, new TypeReference<List<Json>>() {
             });
             for (Json json : definitions) {
                 json.name().definition = json.toDefinition();

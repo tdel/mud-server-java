@@ -34,27 +34,28 @@ import app.game.catalog.tiled.TiledMapLoader.ParsedMap;
 import app.game.catalog.tiled.TiledMapLoader.PortalDraft;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.xml.XmlMapper;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 
 @Service
 public class WorldTemplateCatalog {
 
     private static final Logger log = LoggerFactory.getLogger(WorldTemplateCatalog.class);
 
-    private static final String WORLD_MANIFEST_PATTERN = "classpath*:data/world.json";
+    private static final String WORLD_MANIFEST_PATTERN = "classpath*:data/world.xml";
     private static final String DATA_DIR = "data/";
     private static final String DEFAULT_SHORT_NAME = "default";
 
     private final Map<UUID, WorldTemplateSummary> summariesById = new ConcurrentHashMap<>();
     private final Map<UUID, WorldTemplate> loadedTemplatesById = new ConcurrentHashMap<>();
 
-    private final ObjectMapper objectMapper;
+    private final XmlMapper xmlMapper;
     private final ResourcePatternResolver resourcePatternResolver;
     private final ItemTemplateCatalog itemTemplateCatalog;
 
-    public WorldTemplateCatalog(ObjectMapper objectMapper, ResourcePatternResolver resourcePatternResolver,
+    public WorldTemplateCatalog(XmlMapper xmlMapper, ResourcePatternResolver resourcePatternResolver,
             ItemTemplateCatalog itemTemplateCatalog) {
-        this.objectMapper = objectMapper;
+        this.xmlMapper = xmlMapper;
         this.resourcePatternResolver = resourcePatternResolver;
         this.itemTemplateCatalog = itemTemplateCatalog;
     }
@@ -78,7 +79,7 @@ public class WorldTemplateCatalog {
     }
 
     private WorldTemplateSummary loadSummary(String shortName) {
-        WorldManifestDefinition manifest = readJson("world.json", WorldManifestDefinition.class);
+        WorldManifestDefinition manifest = readXml("world.xml", WorldManifestDefinition.class);
         if (manifest.minPlayers() < 1) {
             throw new IllegalStateException(
                     "Le monde " + shortName + " a un minPlayers invalide (" + manifest.minPlayers() + ")");
@@ -104,12 +105,12 @@ public class WorldTemplateCatalog {
         List<ParsedMap> parsedMaps = readMapFiles();
         Map<UUID, MapTemplate> mapTemplates = buildMapTemplates(shortName, parsedMaps);
 
-        List<NpcDefinition> npcDefinitionList = readJsonList("npcs.json", new TypeReference<List<NpcDefinition>>() {
+        List<NpcDefinition> npcDefinitionList = readXmlList("npcs.xml", new TypeReference<List<NpcDefinition>>() {
         });
         Map<UUID, NpcDefinition> npcDefinitionsById = new LinkedHashMap<>();
         for (NpcDefinition definition : npcDefinitionList) {
             if (npcDefinitionsById.putIfAbsent(definition.id(), definition) != null) {
-                throw new IllegalStateException("NPC " + definition.id() + " dupliqué dans data/npcs.json");
+                throw new IllegalStateException("NPC " + definition.id() + " dupliqué dans data/npcs.xml");
             }
         }
         Map<UUID, NpcTemplate> npcTemplates = buildNpcTemplates(shortName, npcDefinitionsById, mapTemplates,
@@ -229,7 +230,7 @@ public class WorldTemplateCatalog {
                 NpcDefinition definition = definitionsById.get(spawn.npcId());
                 if (definition == null) {
                     throw new IllegalStateException("Spawn " + spawn.id() + " de la map " + map.getId() + " du monde "
-                            + shortName + " référence le NPC " + spawn.npcId() + ", absent de data/npcs.json");
+                            + shortName + " référence le NPC " + spawn.npcId() + ", absent de data/npcs.xml");
                 }
 
                 AbstractNpc.NpcDialogue dialogue = toDialogue(definition);
@@ -279,7 +280,7 @@ public class WorldTemplateCatalog {
             ItemTemplate itemTemplate = itemTemplatesById.get(entry.itemTemplateId());
             if (itemTemplate == null) {
                 throw new IllegalStateException("NPC " + definition.id() + " du monde " + shortName + " vend l'item "
-                        + entry.itemTemplateId() + ", absent de data/items.json");
+                        + entry.itemTemplateId() + ", absent de data/items/*.xml");
             }
             if (entry.price() <= 0) {
                 throw new IllegalStateException("NPC " + definition.id() + " du monde " + shortName + " vend l'item "
@@ -290,17 +291,17 @@ public class WorldTemplateCatalog {
         return new NpcSellerInstance.NpcShop(entries);
     }
 
-    private <T> T readJson(String fileName, Class<T> type) {
+    private <T> T readXml(String fileName, Class<T> type) {
         try (InputStream in = worldFile(fileName).getInputStream()) {
-            return objectMapper.readValue(in, type);
+            return xmlMapper.readValue(in, type);
         } catch (IOException | JacksonException e) {
             throw new IllegalStateException("Impossible de charger " + DATA_DIR + fileName, e);
         }
     }
 
-    private <T> T readJsonList(String fileName, TypeReference<T> typeReference) {
+    private <T> T readXmlList(String fileName, TypeReference<T> typeReference) {
         try (InputStream in = worldFile(fileName).getInputStream()) {
-            return objectMapper.readValue(in, typeReference);
+            return xmlMapper.readValue(in, typeReference);
         } catch (IOException | JacksonException e) {
             throw new IllegalStateException("Impossible de charger " + DATA_DIR + fileName, e);
         }
@@ -327,13 +328,15 @@ public class WorldTemplateCatalog {
     record NpcDefinition(UUID id, String name, DialogueDefinition dialogue, int level) {
     }
 
-    record DialogueDefinition(String greeting, List<DialogueOptionDefinition> options, ShopDefinition shop) {
+    record DialogueDefinition(String greeting,
+            @JacksonXmlElementWrapper(useWrapping = false) List<DialogueOptionDefinition> options,
+            ShopDefinition shop) {
     }
 
     record DialogueOptionDefinition(String label, NpcDialogueOptionType type, String response) {
     }
 
-    record ShopDefinition(List<ShopEntryDefinition> items) {
+    record ShopDefinition(@JacksonXmlElementWrapper(useWrapping = false) List<ShopEntryDefinition> items) {
     }
 
     record ShopEntryDefinition(UUID itemTemplateId, int price) {

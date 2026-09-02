@@ -58,7 +58,7 @@ public final class CharacterInstance extends AbstractCharacter {
     public CharacterInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold, int maxMana, int currentMana,
-            Set<ActiveSkill> knownSkills, List<ActiveEffect> activeEffects, List<Subclass> subclasses,
+            Map<ActiveSkill, Integer> knownSkills, List<ActiveEffect> activeEffects, List<Subclass> subclasses,
             Set<PassiveSkill> knownPassiveSkills, List<Item> items) {
         super(id, name, attributes, currentHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects,
                 computeBaseStats(attributes, level, items, race.speed()), false, 0, 0, List.of());

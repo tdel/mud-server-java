@@ -3,6 +3,7 @@ package app.domain.actor.system;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -13,8 +14,10 @@ import java.util.stream.Collectors;
 import app.domain.ActiveEffect;
 import app.domain.PassiveSkill;
 import app.domain.ActiveSkill;
+import app.domain.SkillEffectDefinition;
 import app.domain.SkillEffectType;
 import app.domain.SkillElement;
+import app.domain.StatModifier;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.AbstractNpc;
 import app.domain.actor.Attribute;
@@ -31,8 +34,11 @@ import app.game.engine.SkillCastEngine;
 
 public final class SkillSystem {
 
+    // Level effectif d'un sort octroyé par un objet équipé mais jamais appris.
+    private static final int GRANTED_SKILL_LEVEL = 1;
+
     private final AbstractCharacter character;
-    private final Set<ActiveSkill> knownSkills = ConcurrentHashMap.newKeySet();
+    private final Map<UUID, Integer> knownSkillLevels = new ConcurrentHashMap<>();
     private final Map<UUID, Instant> nextCastAt = new ConcurrentHashMap<>();
     private final Set<PassiveSkill> knownPassiveSkills = ConcurrentHashMap.newKeySet();
     private volatile SkillCastEngine.ActiveCast activeCast;
@@ -58,21 +64,23 @@ public final class SkillSystem {
     }
 
     public boolean knows(UUID skillId) {
-        return knownSkills.stream().anyMatch(activeSkill -> activeSkill.id().equals(skillId));
+        return knownSkillLevels.containsKey(skillId);
     }
 
-    public LearnResult learn(ActiveSkill activeSkill) {
-        Optional<ActiveSkill> existing = knownSkills.stream().filter(known -> known.name().equals(activeSkill.name()))
-                .findFirst();
-        if (existing.isEmpty()) {
-            knownSkills.add(activeSkill);
+    public int levelOf(UUID skillId) {
+        return knownSkillLevels.getOrDefault(skillId, 0);
+    }
+
+    public LearnResult learn(ActiveSkill activeSkill, int level) {
+        Integer previous = knownSkillLevels.get(activeSkill.id());
+        if (previous == null) {
+            knownSkillLevels.put(activeSkill.id(), level);
             return LearnResult.NEW;
         }
-        if (existing.get().id().equals(activeSkill.id())) {
+        if (previous >= level) {
             return LearnResult.ALREADY_KNOWN;
         }
-        knownSkills.remove(existing.get());
-        knownSkills.add(activeSkill);
+        knownSkillLevels.put(activeSkill.id(), level);
         return LearnResult.UPGRADED;
     }
 
@@ -80,8 +88,12 @@ public final class SkillSystem {
         NEW, UPGRADED, ALREADY_KNOWN
     }
 
-    public Set<ActiveSkill> knownSkills() {
-        return Set.copyOf(knownSkills);
+    public Set<UUID> knownSkillIds() {
+        return Set.copyOf(knownSkillLevels.keySet());
+    }
+
+    public Map<UUID, Integer> knownSkillLevels() {
+        return Map.copyOf(knownSkillLevels);
     }
 
     // Seul CharacterInstance a des objets équipés susceptibles d'accorder des
@@ -96,6 +108,13 @@ public final class SkillSystem {
 
     public boolean hasSkill(ActiveSkill activeSkill) {
         return knows(activeSkill.id()) || getGrantedSkills().contains(activeSkill);
+    }
+
+    // Level courant du sort pour ce personnage : le level appris s'il en connaît
+    // un, sinon le level de base (1) si le sort n'est qu'octroyé par un objet
+    // équipé.
+    public int effectiveLevel(ActiveSkill activeSkill) {
+        return knows(activeSkill.id()) ? levelOf(activeSkill.id()) : GRANTED_SKILL_LEVEL;
     }
 
     public boolean learn(PassiveSkill passiveSkill) {
@@ -120,12 +139,12 @@ public final class SkillSystem {
         return remaining.isNegative() ? Duration.ZERO : remaining;
     }
 
-    public CastOutcome cast(ActiveSkill activeSkill, AbstractCharacter target) {
-        CastOutcome outcome = switch (activeSkill.effect()) {
-            case HEALING -> castHeal(activeSkill);
-            case DAMAGE -> castDamage(activeSkill, target);
-            case BUFF -> castModifier(activeSkill, target, false);
-            case DEBUFF -> castModifier(activeSkill, target, true);
+    public CastOutcome cast(ActiveSkill activeSkill, int level, AbstractCharacter target) {
+        CastOutcome outcome = switch (activeSkill.skillType()) {
+            case HEALING -> castHeal(activeSkill, level);
+            case DAMAGE -> castDamage(activeSkill, level, target);
+            case BUFF -> castModifier(activeSkill, level, target, false);
+            case DEBUFF -> castModifier(activeSkill, level, target, true);
         };
 
         markCooldown(activeSkill);
@@ -140,15 +159,15 @@ public final class SkillSystem {
     // d'attaque et les dégâts sont calculés à la fin de l'incantation, mais leur
     // application (PV décomptés, événement publié) est différée jusqu'à
     // l'impact.
-    public AttackRollOutcome rollDamage(ActiveSkill activeSkill, AbstractCharacter target) {
+    public AttackRollOutcome rollDamage(ActiveSkill activeSkill, int level, AbstractCharacter target) {
         if (!rollSkillHit(target)) {
             return new AttackRollOutcome(false, 0);
         }
         boolean critical = Randomizer.rollChance(character.getStatSystem().getEffective(ModifiedStat.MCRIT) / 100.0);
         // Le power du sort module la puissance magique du lancer, ce qui préserve
-        // la progression entre tiers d'un même sort (Flame Strike tier 1 vs tier 5)
+        // la progression entre levels d'un même sort (Flame Strike level 1 vs level 5)
         // au lieu de tout aplatir sur le seul m.atk du personnage.
-        int skillPower = character.getStatSystem().getEffective(ModifiedStat.MATK) + activeSkill.power();
+        int skillPower = character.getStatSystem().getEffective(ModifiedStat.MATK) + activeSkill.powerAt(level);
         int amount = CombatFormulas.resolveDamage(skillPower, target.getStatSystem().getEffective(ModifiedStat.MDEF),
                 critical);
         if (activeSkill.element() != SkillElement.NONE) {
@@ -161,34 +180,46 @@ public final class SkillSystem {
     public CastOutcome applyDamageOutcome(AttackRollOutcome roll, AbstractCharacter target) {
         DomainEventPublisher.publish(new CharacterBeginAttack(character, target));
         if (!roll.hit()) {
-            return new CastOutcome(false, 0, target.getCurrentHealth(), target.getMaxHealth(), false, false, null);
+            return new CastOutcome(false, 0, target.getCurrentHealth(), target.getMaxHealth(), false, false, null,
+                    List.of());
         }
         boolean defeated = applyDamage(target, roll.amount());
         return new CastOutcome(true, roll.amount(), target.getCurrentHealth(), target.getMaxHealth(), defeated, false,
-                null);
+                null, List.of());
     }
 
-    private CastOutcome castHeal(ActiveSkill activeSkill) {
-        int amount = character.heal(activeSkill.power());
-        return new CastOutcome(true, amount, character.getCurrentHealth(), character.getMaxHealth(), false, true, null);
+    private CastOutcome castHeal(ActiveSkill activeSkill, int level) {
+        int amount = character.heal(activeSkill.powerAt(level));
+        return new CastOutcome(true, amount, character.getCurrentHealth(), character.getMaxHealth(), false, true, null,
+                List.of());
     }
 
-    private CastOutcome castDamage(ActiveSkill activeSkill, AbstractCharacter target) {
-        return applyDamageOutcome(rollDamage(activeSkill, target), target);
+    private CastOutcome castDamage(ActiveSkill activeSkill, int level, AbstractCharacter target) {
+        return applyDamageOutcome(rollDamage(activeSkill, level, target), target);
     }
 
-    private CastOutcome castModifier(ActiveSkill activeSkill, AbstractCharacter target, boolean debuff) {
+    // Un skill BUFF/DEBUFF "pur" ne porte qu'une seule entrée dans effects() : sa
+    // magnitude vient de power(level) du sort (comme avant l'introduction du
+    // schéma par level), le poids de chaque StatModifier.value() permet de
+    // répartir cette magnitude sur plusieurs stats si besoin.
+    private CastOutcome castModifier(ActiveSkill activeSkill, int level, AbstractCharacter target, boolean debuff) {
         if (debuff && (!rollSkillHit(target)
                 || Randomizer.rollChance(CombatFormulas.debuffResistChance(target.getAttribute(Attribute.MEN))))) {
-            return new CastOutcome(false, 0, target.getCurrentHealth(), target.getMaxHealth(), false, false, null);
+            return new CastOutcome(false, 0, target.getCurrentHealth(), target.getMaxHealth(), false, false, null,
+                    List.of());
         }
 
-        int amount = debuff ? -activeSkill.power() : activeSkill.power();
-        Instant expiresAt = Instant.now().plusSeconds(activeSkill.durationSeconds());
-        Optional<ActiveEffect> evicted = target.getEffectsSystem().apply(
-                new ActiveEffect(activeSkill.id(), activeSkill.name(), activeSkill.modifiedStat(), amount, expiresAt));
+        SkillEffectDefinition definition = activeSkill.effects().get(0);
+        int magnitude = debuff ? -activeSkill.powerAt(level) : activeSkill.powerAt(level);
+        List<StatModifier> modifiers = definition.effect().stream()
+                .map(modifier -> new StatModifier(modifier.stat(), magnitude * modifier.value(), modifier.operator()))
+                .toList();
+        Instant expiresAt = Instant.now().plusSeconds(definition.time());
+        Optional<ActiveEffect> evicted = target.getEffectsSystem()
+                .apply(new ActiveEffect(activeSkill.id(), activeSkill.name(), modifiers, expiresAt));
         evicted.ifPresent(effect -> DomainEventPublisher.publish(new CharacterEffectExpired(target, effect)));
-        return new CastOutcome(true, amount, target.getCurrentHealth(), target.getMaxHealth(), false, false, expiresAt);
+        return new CastOutcome(true, magnitude, target.getCurrentHealth(), target.getMaxHealth(), false, false,
+                expiresAt, modifiers);
     }
 
     private boolean rollSkillHit(AbstractCharacter target) {
@@ -202,7 +233,7 @@ public final class SkillSystem {
     }
 
     public record CastOutcome(boolean hit, int amount, int targetHealthAfter, int targetMaxHealth,
-            boolean targetDefeated, boolean selfHeal, Instant effectExpiresAt) {
+            boolean targetDefeated, boolean selfHeal, Instant effectExpiresAt, List<StatModifier> modifiers) {
     }
 
     public record AttackRollOutcome(boolean hit, int amount) {
@@ -215,7 +246,7 @@ public final class SkillSystem {
         if (target == null) {
             return new CastRequestOutcome.NoTarget();
         }
-        if (target instanceof AbstractNpc && activeSkill.effect() == SkillEffectType.DAMAGE) {
+        if (target instanceof AbstractNpc && activeSkill.skillType() == SkillEffectType.DAMAGE) {
             return new CastRequestOutcome.TargetInvalid(target.getId());
         }
         if (activeSkill.range() > 0 && character.getMotionSystem().getPosition()
@@ -226,12 +257,13 @@ public final class SkillSystem {
             return new CastRequestOutcome.OnCooldown(activeSkill.name(),
                     remainingCooldown(activeSkill.id()).toMillis());
         }
-        if (character.getCurrentMana() < activeSkill.manaCost()) {
-            return new CastRequestOutcome.InsufficientMana(activeSkill.name(), activeSkill.manaCost(),
+        int level = effectiveLevel(activeSkill);
+        if (character.getCurrentMana() < activeSkill.manaCostAt(level)) {
+            return new CastRequestOutcome.InsufficientMana(activeSkill.name(), activeSkill.manaCostAt(level),
                     character.getCurrentMana());
         }
 
-        DomainEventPublisher.publish(new SkillCastBegin(character, activeSkill, target));
+        DomainEventPublisher.publish(new SkillCastBegin(character, activeSkill, level, target));
         return new CastRequestOutcome.Started();
     }
 

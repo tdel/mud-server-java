@@ -41,7 +41,6 @@ public class Effects implements CommandHandler {
 
     private EffectView toView(ActiveEffect effect, Instant now) {
         long secondsRemaining = Duration.between(now, effect.expiresAt()).toSeconds();
-        return new EffectView(effect.skillName(), effect.stat().label(), effect.amount(),
-                Math.max(0, secondsRemaining));
+        return new EffectView(effect.skillName(), effect.modifiers(), Math.max(0, secondsRemaining));
     }
 }

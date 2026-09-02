@@ -36,7 +36,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     private final KnownList knownList = new KnownList(this);
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
-            int maxHealth, Set<ActiveSkill> knownSkills, Set<PassiveSkill> knownPassiveSkills,
+            int maxHealth, Map<ActiveSkill, Integer> knownSkills, Set<PassiveSkill> knownPassiveSkills,
             List<ActiveEffect> activeEffects, Map<ModifiedStat, Integer> initialBaseStats, boolean invulnerable,
             int xpReward, int goldReward, List<LootTableEntry> lootTable) {
         super(id, name);
@@ -46,7 +46,7 @@ public abstract class AbstractCharacter extends AbstractObject {
         this.statSystem = new StatSystem(effectsSystem, initialBaseStats);
         this.combatSystem = new CombatSystem(this, invulnerable);
         this.lootSystem = new LootSystem(this, xpReward, goldReward, lootTable);
-        knownSkills.forEach(getSkillSystem()::learn);
+        knownSkills.forEach((skill, level) -> getSkillSystem().learn(skill, level));
         knownPassiveSkills.forEach(getSkillSystem()::learn);
         activeEffects.forEach(getEffectsSystem()::apply);
     }

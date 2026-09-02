@@ -21,7 +21,9 @@ public final class StatSystem {
     }
 
     public int getEffective(ModifiedStat stat) {
-        return getBase(stat) + effectsSystem.totalModifier(stat) + setBonuses.getOrDefault(stat, 0);
+        int flat = getBase(stat) + setBonuses.getOrDefault(stat, 0) + effectsSystem.additiveModifier(stat);
+        double multiplier = effectsSystem.multiplicativeFactor(stat);
+        return (int) Math.round(flat * multiplier);
     }
 
     public void updateBase(Map<ModifiedStat, Integer> newBase) {

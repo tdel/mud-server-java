@@ -10,23 +10,23 @@ import org.springframework.stereotype.Service;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.xml.XmlMapper;
 
 @Service
 public class LevelCatalog {
 
-    private static final String LEVELS_RESOURCE = "/data/levels.json";
+    private static final String LEVELS_RESOURCE = "/data/levels.xml";
 
     private final Map<Integer, Integer> xpRequiredByLevel = new ConcurrentHashMap<>();
-    private final ObjectMapper objectMapper;
+    private final XmlMapper xmlMapper;
 
-    public LevelCatalog(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public LevelCatalog(XmlMapper xmlMapper) {
+        this.xmlMapper = xmlMapper;
     }
 
     public void warmXpThresholds() {
         try (InputStream in = getClass().getResourceAsStream(LEVELS_RESOURCE)) {
-            List<LevelDefinition> definitions = objectMapper.readValue(in, new TypeReference<List<LevelDefinition>>() {
+            List<LevelDefinition> definitions = xmlMapper.readValue(in, new TypeReference<List<LevelDefinition>>() {
             });
             for (LevelDefinition definition : definitions) {
                 xpRequiredByLevel.put(definition.level(), definition.xp());

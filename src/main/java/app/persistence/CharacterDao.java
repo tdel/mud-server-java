@@ -135,8 +135,9 @@ public class CharacterDao {
                 .orElseThrow(() -> new IllegalStateException(
                         "WorldInstance " + instance.getId() + " n'a aucune map de départ"));
 
-        Set<ActiveSkill> knownSkills = characterSkillDao.findSkillIdsByCharacter(record.getId()).stream()
-                .map(skillCatalog::getById).collect(Collectors.toSet());
+        Map<ActiveSkill, Integer> knownSkills = characterSkillDao.findByCharacter(record.getId()).stream()
+                .collect(Collectors.toMap(row -> skillCatalog.getById(row.skillId()),
+                        CharacterSkillDao.CharacterSkillRow::level));
         Set<PassiveSkill> knownPassiveSkills = characterPassiveSkillDao.findPassiveSkillIdsByCharacter(record.getId())
                 .stream().map(passiveSkillCatalog::getById).collect(Collectors.toSet());
         Instant now = Instant.now();

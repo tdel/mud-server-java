@@ -15,31 +15,31 @@ import app.domain.PassiveSkill;
 import app.domain.item.ItemGrade;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.xml.XmlMapper;
 
 @Service
 public class PassiveSkillCatalog {
 
     private static final Logger log = LoggerFactory.getLogger(PassiveSkillCatalog.class);
 
-    private static final String PASSIVE_SKILL_RESOURCE = "/data/skills/passives.json";
+    private static final String PASSIVE_SKILL_RESOURCE = "/data/skills/passives.xml";
 
     private final Map<UUID, PassiveSkill> passiveSkills = new ConcurrentHashMap<>();
 
-    private final ObjectMapper objectMapper;
+    private final XmlMapper xmlMapper;
 
-    public PassiveSkillCatalog(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public PassiveSkillCatalog(XmlMapper xmlMapper) {
+        this.xmlMapper = xmlMapper;
     }
 
     public void warmPassiveSkills() {
         try (InputStream in = getClass().getResourceAsStream(PASSIVE_SKILL_RESOURCE)) {
-            List<PassiveSkillDefinition> definitions = objectMapper.readValue(in,
+            List<PassiveSkillDefinition> definitions = xmlMapper.readValue(in,
                     new TypeReference<List<PassiveSkillDefinition>>() {
                     });
             for (PassiveSkillDefinition definition : definitions) {
                 PassiveSkill passiveSkill = new PassiveSkill(definition.id(), definition.name(),
-                        definition.description(), definition.requiredLevel(), definition.grantsGrade());
+                        definition.description(), definition.grantsGrade());
                 if (passiveSkills.containsKey(passiveSkill.id())) {
                     throw new IllegalStateException("Compétence passive " + passiveSkill.id() + " ("
                             + passiveSkill.name() + ") a un id déjà utilisé par "
@@ -62,7 +62,6 @@ public class PassiveSkillCatalog {
         return passiveSkill;
     }
 
-    private record PassiveSkillDefinition(UUID id, String name, String description, int requiredLevel,
-            ItemGrade grantsGrade) {
+    private record PassiveSkillDefinition(UUID id, String name, String description, ItemGrade grantsGrade) {
     }
 }

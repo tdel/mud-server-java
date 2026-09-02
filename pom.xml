@@ -117,6 +117,17 @@
             <artifactId>spring-boot-starter-json</artifactId>
         </dependency>
 
+        <!-- Lecture des fixtures data/**/*.xml (item_template, monstres, npcs, skills, etc.) :
+             seule version de jackson-dataformat-xml compatible Jackson 3 (groupId tools.jackson,
+             pas com.fasterxml.jackson) à ce jour est une RC, en retard sur le jackson-databind
+             3.1.4 GA tiré par spring-boot-starter-json ci-dessus — version épinglée manuellement
+             car non gérée par le BOM Spring Boot. -->
+        <dependency>
+            <groupId>tools.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <version>3.0.0-rc4</version>
+        </dependency>
+
         <!-- Tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

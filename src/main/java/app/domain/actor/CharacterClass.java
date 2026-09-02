@@ -4,34 +4,51 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import tools.jackson.core.JacksonException;
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.xml.XmlMapper;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 
 import app.game.combat.CombatFormulas;
 
 public enum CharacterClass {
     FIGHTER, MYSTIC;
 
-    private static final String RESOURCE = "/data/class.json";
+    private static final String RESOURCE_DIR = "/data/classes/";
 
     static {
-        try (InputStream in = CharacterClass.class.getResourceAsStream(RESOURCE)) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            List<Json> definitions = objectMapper.readValue(in, new TypeReference<List<Json>>() {
-            });
-            for (Json json : definitions) {
-                json.name().definition = json.toDefinition();
+        XmlMapper xmlMapper = new XmlMapper();
+        for (CharacterClass characterClass : values()) {
+            String resource = RESOURCE_DIR + characterClass.name().toLowerCase() + ".xml";
+            try (InputStream in = CharacterClass.class.getResourceAsStream(resource)) {
+                if (in == null) {
+                    throw new IllegalStateException("Ressource introuvable : " + resource);
+                }
+                Json json = xmlMapper.readValue(in, Json.class);
+                characterClass.definition = json.toDefinition();
+            } catch (IOException | JacksonException e) {
+                throw new IllegalStateException("Impossible de charger " + resource, e);
             }
-        } catch (IOException | JacksonException e) {
-            throw new IllegalStateException("Impossible de charger " + RESOURCE, e);
         }
     }
 
     private Definition definition;
 
-    // Courbe L2 retail (Human Fighter/Mystic) : cf. data/class.json et
+    public List<LearnableSkill> learnableSkillIds(int level) {
+        return definition.skills().stream().filter(skillLevel -> skillLevel.requiredLevel() == level)
+                .map(skillLevel -> new LearnableSkill(skillLevel.id(), skillLevel.level())).toList();
+    }
+
+    public List<UUID> learnablePassiveSkillIds(int level) {
+        return definition.passiveSkills().stream().filter(skillLevel -> skillLevel.requiredLevel() == level)
+                .map(SkillLevel::id).toList();
+    }
+
+    public record LearnableSkill(UUID skillId, int level) {
+    }
+
+    // Courbe L2 retail (Human Fighter/Mystic) : cf. data/classes/*.xml et
     // CombatFormulas.maxHealth/maxMana pour la formule.
     public int maxHealth(int constitutionScore, int level) {
         return CombatFormulas.maxHealth(definition.hpBase(), definition.hpAdd(), definition.hpMod(), level,
@@ -54,13 +71,24 @@ public enum CharacterClass {
     }
 
     private record Definition(double hpBase, double hpAdd, double hpMod, double mpBase, double mpAdd, double mpMod,
-            Map<Attribute, Integer> baseAttributes) {
+            Map<Attribute, Integer> baseAttributes, List<ActiveSkillLevel> skills, List<SkillLevel> passiveSkills) {
     }
 
-    private record Json(CharacterClass name, double hpBase, double hpAdd, double hpMod, double mpBase, double mpAdd,
-            double mpMod, Map<Attribute, Integer> baseAttributes) {
+    private record Json(double hpBase, double hpAdd, double hpMod, double mpBase, double mpAdd, double mpMod,
+            Map<Attribute, Integer> baseAttributes,
+            @JacksonXmlElementWrapper(useWrapping = false) List<ActiveSkillLevel> skills,
+            @JacksonXmlElementWrapper(useWrapping = false) List<SkillLevel> passiveSkills) {
         Definition toDefinition() {
-            return new Definition(hpBase, hpAdd, hpMod, mpBase, mpAdd, mpMod, Map.copyOf(baseAttributes));
+            return new Definition(hpBase, hpAdd, hpMod, mpBase, mpAdd, mpMod, Map.copyOf(baseAttributes),
+                    List.copyOf(skills), List.copyOf(passiveSkills));
         }
+    }
+
+    private record SkillLevel(UUID id, int requiredLevel) {
+    }
+
+    // Un sort actif se déclinant sur plusieurs levels (1..N), chaque entrée fixe le
+    // niveau de personnage requis pour débloquer ce level précis du sort.
+    private record ActiveSkillLevel(UUID id, int level, int requiredLevel) {
     }
 }

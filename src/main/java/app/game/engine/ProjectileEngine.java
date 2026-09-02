@@ -33,14 +33,14 @@ public class ProjectileEngine {
 
     private final Map<UUID, InFlightProjectile> projectiles = new ConcurrentHashMap<>();
 
-    public void launch(AbstractCharacter caster, ActiveSkill activeSkill, AbstractCharacter target,
+    public void launch(AbstractCharacter caster, ActiveSkill activeSkill, int level, AbstractCharacter target,
             SkillSystem.AttackRollOutcome roll) {
         UUID projectileId = UUID.randomUUID();
         double distance = caster.getMotionSystem().getPosition().distanceTo(target.getMotionSystem().getPosition());
         long travelDurationMs = Math.max(1, Math.round(distance / activeSkill.projectileSpeed() * 1000));
         long impactAtNanos = System.nanoTime() + travelDurationMs * 1_000_000L;
 
-        projectiles.put(projectileId, new InFlightProjectile(caster, activeSkill, target, roll, impactAtNanos));
+        projectiles.put(projectileId, new InFlightProjectile(caster, activeSkill, level, target, roll, impactAtNanos));
         log.debug("projectile.launched thread={} projectileId={} caster={} activeSkill={} travelDurationMs={}",
                 Thread.currentThread().getName(), projectileId, caster.getId(), activeSkill.name(), travelDurationMs);
 
@@ -78,11 +78,14 @@ public class ProjectileEngine {
         }
 
         SkillSystem.CastOutcome outcome = caster.getSkillSystem().applyDamageOutcome(projectile.roll(), target);
+        if (outcome.hit()) {
+            SkillEffectApplier.applySecondaryEffects(activeSkill, target);
+        }
 
         caster.send(new CastResult(activeSkill.id(), activeSkill.name(), target.getId(), target.getName(),
                 outcome.selfHeal(), outcome.hit(), outcome.amount(), outcome.targetHealthAfter(),
-                outcome.targetMaxHealth(), outcome.targetDefeated(), activeSkill.manaCost(), caster.getCurrentMana(),
-                caster.getMaxMana()));
+                outcome.targetMaxHealth(), outcome.targetDefeated(), activeSkill.manaCostAt(projectile.level()),
+                caster.getCurrentMana(), caster.getMaxMana()));
         caster.broadcast(
                 new SkillCastAnnounced(caster.getId(), caster.getName(), activeSkill.id(), activeSkill.name(),
                         target.getId(), target.getName(), outcome.selfHeal(), outcome.hit(), outcome.amount(),
@@ -93,7 +96,7 @@ public class ProjectileEngine {
         }
     }
 
-    public record InFlightProjectile(AbstractCharacter caster, ActiveSkill activeSkill, AbstractCharacter target,
-            SkillSystem.AttackRollOutcome roll, long impactAtNanos) {
+    public record InFlightProjectile(AbstractCharacter caster, ActiveSkill activeSkill, int level,
+            AbstractCharacter target, SkillSystem.AttackRollOutcome roll, long impactAtNanos) {
     }
 }

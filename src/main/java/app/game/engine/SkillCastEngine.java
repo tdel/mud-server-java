@@ -1,5 +1,6 @@
 package app.game.engine;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,12 +13,14 @@ import org.springframework.stereotype.Component;
 
 import app.domain.ActiveSkill;
 import app.domain.SkillEffectType;
+import app.domain.SkillTargetType;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.system.SkillSystem;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.SkillCast;
 import app.domain.actor.event.SkillCastBegin;
 import app.domain.actor.instance.CharacterInstance;
+import app.domain.map.Position;
 import app.network.message.ingame.CastResult;
 import app.network.message.ingame.SkillCastAnnounced;
 import app.network.message.ingame.SkillCastCancelled;
@@ -43,17 +46,17 @@ public class SkillCastEngine {
 
     @EventListener
     void onSkillCastBegin(SkillCastBegin event) {
-        beginCast(event.caster(), event.activeSkill(), event.target());
+        beginCast(event.caster(), event.activeSkill(), event.level(), event.target());
     }
 
-    private void beginCast(AbstractCharacter caster, ActiveSkill activeSkill, AbstractCharacter target) {
+    private void beginCast(AbstractCharacter caster, ActiveSkill activeSkill, int level, AbstractCharacter target) {
         // On incante sans marcher : le déplacement en cours est arrêté ici (avant même
         // le délai d'incantation) plutôt qu'à la résolution différée du sort
         // (resolveCast) — trop tard, le client continue sinon d'interpoler le
         // déplacement pendant toute la durée de l'incantation.
         movementEngine.stopMovement(caster);
-        caster.getSkillSystem().updateCast(
-                new ActiveCast(activeSkill, target, System.nanoTime(), activeSkill.castingTimeMs() * 1_000_000L));
+        caster.getSkillSystem().updateCast(new ActiveCast(activeSkill, level, target, System.nanoTime(),
+                activeSkill.castingTimeMs() * 1_000_000L));
         casting.put(caster.getId(), caster);
         log.debug("activeSkill.cast_started thread={} caster={} activeSkill={} castingTimeMs={}",
                 Thread.currentThread().getName(), caster.getId(), activeSkill.name(), activeSkill.castingTimeMs());
@@ -97,46 +100,74 @@ public class SkillCastEngine {
 
     private void resolveCast(AbstractCharacter caster, ActiveCast activeCast) {
         ActiveSkill activeSkill = activeCast.activeSkill();
-        AbstractCharacter target = activeCast.target();
+        int level = activeCast.level();
+        AbstractCharacter primaryTarget = activeCast.target();
 
         if (caster.getCurrentHealth() <= 0) {
             return;
         }
-        if (!isTargetStillValid(caster, activeSkill, target)) {
+        if (!isTargetStillValid(caster, activeSkill, primaryTarget)) {
             caster.send(new SkillFizzled(activeSkill.id(), activeSkill.name(), "La cible n'est plus valide."));
             return;
         }
-        if (!caster.trySpendMana(activeSkill.manaCost())) {
+        if (!caster.trySpendMana(activeSkill.manaCostAt(level))) {
             caster.send(new SkillFizzled(activeSkill.id(), activeSkill.name(), "Plus assez de mana."));
             return;
         }
 
-        if (activeSkill.effect() == SkillEffectType.DAMAGE && activeSkill.projectile()) {
-            SkillSystem.AttackRollOutcome roll = caster.getSkillSystem().rollDamage(activeSkill, target);
+        if (activeSkill.skillType() == SkillEffectType.DAMAGE && activeSkill.projectile()) {
+            SkillSystem.AttackRollOutcome roll = caster.getSkillSystem().rollDamage(activeSkill, level, primaryTarget);
             caster.getSkillSystem().markCooldown(activeSkill);
-            DomainEventPublisher
-                    .publish(new SkillCast(caster, activeSkill, target, roll.amount(), false, roll.hit(), null));
-            projectileEngine.launch(caster, activeSkill, target, roll);
+            DomainEventPublisher.publish(new SkillCast(caster, activeSkill, level, primaryTarget, roll.amount(), false,
+                    roll.hit(), null, List.of()));
+            projectileEngine.launch(caster, activeSkill, level, primaryTarget, roll);
             return;
         }
 
-        SkillSystem.CastOutcome outcome = caster.getSkillSystem().cast(activeSkill, target);
-        DomainEventPublisher.publish(new SkillCast(caster, activeSkill, target, outcome.amount(),
-                outcome.targetDefeated(), outcome.hit(), outcome.effectExpiresAt()));
+        List<AbstractCharacter> targets = activeSkill.target() == SkillTargetType.AOE
+                ? resolveAoeTargets(caster, activeSkill, primaryTarget)
+                : List.of(primaryTarget);
 
-        if (activeSkill.effect() == SkillEffectType.BUFF || activeSkill.effect() == SkillEffectType.DEBUFF) {
-            boolean beneficial = activeSkill.effect() == SkillEffectType.BUFF;
+        // cast(...) marque le cooldown à chaque appel (une fois par cible touchée en
+        // AOE) : les timestamps successifs sont assez proches pour ne pas dériver.
+        boolean anyHit = false;
+        for (AbstractCharacter target : targets) {
+            if (target != primaryTarget && !isTargetStillValid(caster, activeSkill, target)) {
+                continue;
+            }
+            anyHit |= resolveCastOnTarget(caster, activeSkill, level, target);
+        }
+        if (!anyHit && targets.size() > 1) {
+            log.debug("activeSkill.aoe_no_target_hit caster={} activeSkill={}", caster.getId(), activeSkill.name());
+        }
+    }
+
+    // Applique le sort sur UNE cible (mono-cible, ou une cible d'un groupe AOE) et
+    // diffuse les messages réseau correspondants. Retourne si la cible a
+    // effectivement été touchée.
+    private boolean resolveCastOnTarget(AbstractCharacter caster, ActiveSkill activeSkill, int level,
+            AbstractCharacter target) {
+        SkillSystem.CastOutcome outcome = caster.getSkillSystem().cast(activeSkill, level, target);
+        DomainEventPublisher.publish(new SkillCast(caster, activeSkill, level, target, outcome.amount(),
+                outcome.targetDefeated(), outcome.hit(), outcome.effectExpiresAt(), outcome.modifiers()));
+        if (outcome.hit()) {
+            SkillEffectApplier.applySecondaryEffects(activeSkill, target);
+        }
+
+        if (activeSkill.skillType() == SkillEffectType.BUFF || activeSkill.skillType() == SkillEffectType.DEBUFF) {
+            boolean beneficial = activeSkill.skillType() == SkillEffectType.BUFF;
+            int durationSeconds = activeSkill.effects().isEmpty() ? 0 : activeSkill.effects().get(0).time();
             caster.broadcast(new SkillModifierAnnounced(caster.getId(), caster.getName(), activeSkill.id(),
                     activeSkill.name(), target.getId(), target.getName(), target == caster, beneficial, outcome.hit(),
-                    activeSkill.modifiedStat(), outcome.amount(), activeSkill.durationSeconds(), activeSkill.manaCost(),
+                    outcome.modifiers(), outcome.amount(), durationSeconds, activeSkill.manaCostAt(level),
                     caster.getCurrentMana(), caster.getMaxMana()), null);
-            return;
+            return outcome.hit();
         }
 
         caster.send(new CastResult(activeSkill.id(), activeSkill.name(), target.getId(), target.getName(),
                 outcome.selfHeal(), outcome.hit(), outcome.amount(), outcome.targetHealthAfter(),
-                outcome.targetMaxHealth(), outcome.targetDefeated(), activeSkill.manaCost(), caster.getCurrentMana(),
-                caster.getMaxMana()));
+                outcome.targetMaxHealth(), outcome.targetDefeated(), activeSkill.manaCostAt(level),
+                caster.getCurrentMana(), caster.getMaxMana()));
         caster.broadcast(
                 new SkillCastAnnounced(caster.getId(), caster.getName(), activeSkill.id(), activeSkill.name(),
                         target.getId(), target.getName(), outcome.selfHeal(), outcome.hit(), outcome.amount(),
@@ -145,6 +176,14 @@ public class SkillCastEngine {
         if (outcome.targetDefeated()) {
             caster.clearCombatTarget();
         }
+        return outcome.hit();
+    }
+
+    private List<AbstractCharacter> resolveAoeTargets(AbstractCharacter caster, ActiveSkill activeSkill,
+            AbstractCharacter primaryTarget) {
+        double radius = activeSkill.aoeRadius() > 0 ? activeSkill.aoeRadius() : activeSkill.range();
+        Position center = primaryTarget.getMotionSystem().getPosition();
+        return caster.getMotionSystem().getCurrentMap().occupantsWithin(center, radius);
     }
 
     private boolean isTargetStillValid(AbstractCharacter caster, ActiveSkill activeSkill, AbstractCharacter target) {
@@ -158,7 +197,7 @@ public class SkillCastEngine {
                 .distanceTo(target.getMotionSystem().getPosition()) <= activeSkill.range();
     }
 
-    public record ActiveCast(ActiveSkill activeSkill, AbstractCharacter target, long startedAtNanos,
+    public record ActiveCast(ActiveSkill activeSkill, int level, AbstractCharacter target, long startedAtNanos,
             long castingTimeNanos) {
     }
 }
