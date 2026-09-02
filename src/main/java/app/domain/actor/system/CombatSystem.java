@@ -106,8 +106,8 @@ public final class CombatSystem {
             defeated = applyDamage(defender, damage);
         }
 
-        nextAttackAt = Instant.now()
-                .plus(CombatFormulas.attackCooldown(character.getStatSystem().getEffective(ModifiedStat.ATKSPD)));
+        Duration cooldown = CombatFormulas.attackCooldown(character.getStatSystem().getEffective(ModifiedStat.ATKSPD));
+        nextAttackAt = Instant.now().plus(cooldown);
 
         log.info(
                 "combat.attack_resolved attacker={} defender={} hit={} critical={} damage={} defenderHealthAfter={} defeated={}",
@@ -115,7 +115,7 @@ public final class CombatSystem {
 
         character.broadcast(new AttackResult(character.getId(), character.getName(), defender.getId(),
                 defender.getName(), hit, critical, damage, healthAfter), null);
-        return new AttackOutcome.Success();
+        return new AttackOutcome.Success(cooldown.toMillis());
     }
 
     private boolean applyDamage(AbstractCharacter defender, int damage) {
@@ -152,7 +152,7 @@ public final class CombatSystem {
 
     public sealed interface AttackOutcome {
 
-        record Success() implements AttackOutcome {
+        record Success(long cooldownMs) implements AttackOutcome {
         }
 
         record NoTarget() implements AttackOutcome {

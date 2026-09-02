@@ -42,8 +42,8 @@ public class Attack implements CommandHandler {
     public void onReceive(Connection connection, String argument) {
         CharacterInstance character = connection.character();
         switch (character.getCombatSystem().attack(character.getCombatSystem().getTarget())) {
-            case CombatSystem.AttackOutcome.Success ignored -> {
-            }
+            case CombatSystem.AttackOutcome.Success(var cooldownMs) ->
+                connection.send(new AttackOnCooldown(cooldownMs));
             case CombatSystem.AttackOutcome.NoTarget ignored -> connection.send(new NoTargetSelected());
             case CombatSystem.AttackOutcome.TargetInvalid(var targetId) ->
                 connection.send(new TargetNotFound(targetId.toString()));

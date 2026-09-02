@@ -27,6 +27,7 @@ import app.network.message.ingame.SkillCastCancelled;
 import app.network.message.ingame.SkillCastStarted;
 import app.network.message.ingame.SkillFizzled;
 import app.network.message.ingame.SkillModifierAnnounced;
+import app.network.message.ingame.SkillOnCooldown;
 
 @Component
 public class SkillCastEngine {
@@ -114,6 +115,10 @@ public class SkillCastEngine {
             caster.send(new SkillFizzled(activeSkill.id(), activeSkill.name(), "Plus assez de mana."));
             return;
         }
+
+        // Passé ce point le sort va jusqu'au jet (hit ou miss) : le cooldown
+        // s'applique dans tous les cas, il faut donc en informer le client ici.
+        caster.send(new SkillOnCooldown(activeSkill.name(), activeSkill.reuseTimeMs()));
 
         if (activeSkill.skillType() == SkillEffectType.DAMAGE && activeSkill.projectile()) {
             SkillSystem.AttackRollOutcome roll = caster.getSkillSystem().rollDamage(activeSkill, level, primaryTarget);
