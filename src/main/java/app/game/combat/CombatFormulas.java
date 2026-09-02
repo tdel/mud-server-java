@@ -41,22 +41,43 @@ public final class CombatFormulas {
     public static final double BASE_DEF_FACTOR = 6.0;
     public static final double ACCURACY_FACTOR = 3.0;
     public static final double EVASION_FACTOR = 3.0;
-    public static final int BASE_ACCURACY = 45;
-    public static final int BASE_EVASION = 15;
+    // Écart accuracy/evasion volontairement faible (contrairement à un ancien
+    // 45/15) : depuis le passage de hitChance() à la formule additive L2J
+    // (calcHitMiss), l'écart pèse directement en points de pourcentage (facteur
+    // HIT_CHANCE_FACTOR) plutôt que comme un ratio auto-limité — un écart de 30
+    // saturait quasi toujours le hitChance à MAX_HIT_CHANCE, quel que soit DEX.
+    public static final int BASE_ACCURACY = 30;
+    public static final int BASE_EVASION = 36;
     public static final int BASE_CRIT_RATE = 8;
     public static final int MIN_CRIT_RATE = 1;
     public static final int MAX_CRIT_RATE = 90;
     public static final double MIN_HIT_CHANCE = 0.20;
     public static final double MAX_HIT_CHANCE = 0.98;
+    // calcHitMiss L2J : chance = clamp(80 + 2*(accuracy-evasion), [20,98]) %.
+    public static final double HIT_CHANCE_BASE = 0.80;
+    public static final double HIT_CHANCE_FACTOR = 0.02;
     public static final double CRITICAL_MULTIPLIER = 2.0;
+    // calcMagicDam L2J : un coup critique magique multiplie les dégâts par 4, pas
+    // par 2 comme au physique.
+    public static final double MAGIC_CRITICAL_MULTIPLIER = 4.0;
+    // Constantes de ratio de calcPhysDam/calcMagicDam (L2J) : dégâts physiques =
+    // 70*atk/def, dégâts magiques = 91*sqrt(mAtk)/mDef*power(du sort).
+    public static final double PHYSICAL_DAMAGE_CONSTANT = 70.0;
+    public static final double MAGICAL_DAMAGE_CONSTANT = 91.0;
     public static final double ELEMENT_RESIST_FACTOR = 0.01;
     public static final double MIN_ELEMENT_MULTIPLIER = 0.1;
     public static final double MAX_ELEMENT_MULTIPLIER = 2.0;
     public static final int ENCHANT_ATK_BONUS_PER_LEVEL = 2;
     public static final int ENCHANT_DEF_BONUS_PER_LEVEL = 1;
+    // Multiplicateur de m.atk dans la formule de heal L2J (handler
+    // net.sf.l2j...skillhandlers.Heal) une fois les spiritshots retirés : sans
+    // charge (sps/bsps), ce chemin retombe systématiquement sur mAtkMul=2.
+    public static final double HEAL_MATK_MULTIPLIER = 2.0;
     public static final int BASE_DEBUFF_RESIST = 5;
     public static final double DEBUFF_RESIST_FACTOR = 3.0;
     public static final int MAX_DEBUFF_RESIST = 70;
+    // Fraction du pool max régénérée par tick de RegenHealthEngine/RegenManaEngine
+    // (toutes les 3s, période retail L2J HpTask/MpTask — cf. TICK_INTERVAL_MS).
     public static final double HP_REGEN_RATE = 0.02;
     public static final double MP_REGEN_RATE = 0.02;
     public static final int BASE_ATK_SPD = 300;
@@ -139,18 +160,47 @@ public final class CombatFormulas {
         return Math.clamp(raw, MIN_CRIT_RATE, MAX_CRIT_RATE);
     }
 
+    // calcHitMiss L2J, débarrassée des bonus de hauteur/nuit/position (pas d'axe
+    // Z, pas de cycle jour-nuit, pas de gestion de dos/face dans ce projet).
     public static double hitChance(int accuracy, int evasion) {
-        double chance = (double) accuracy / (accuracy + evasion);
+        double chance = HIT_CHANCE_BASE + HIT_CHANCE_FACTOR * (accuracy - evasion);
         return Math.clamp(chance, MIN_HIT_CHANCE, MAX_HIT_CHANCE);
     }
 
-    public static int resolveDamage(int attackerAtk, int defenderDef, boolean critical) {
-        double base = attackerAtk * ((double) attackerAtk / (attackerAtk + defenderDef))
-                * Randomizer.randomVariance(0.9, 1.1);
+    // calcPhysDam L2J, débarrassée des soulshots, du blocage au bouclier, des
+    // vulnérabilités par type d'arme/race de monstre et du bonus PvP (aucun de
+    // ces mécanismes n'existe dans ce projet) : attackerAtk inclut déjà le
+    // power(level) du sort le cas échéant (cf. SkillSystem.rollDamage).
+    public static int resolvePhysicalDamage(int attackerAtk, int defenderDef, boolean critical) {
+        double damage = PHYSICAL_DAMAGE_CONSTANT * attackerAtk / defenderDef * Randomizer.randomVariance(0.9, 1.1);
         if (critical) {
-            base *= CRITICAL_MULTIPLIER;
+            damage *= CRITICAL_MULTIPLIER;
         }
-        return Math.max(1, (int) Math.round(base));
+        return Math.max(1, (int) Math.round(damage));
+    }
+
+    // calcMagicDam L2J, débarrassée des soulshots/blessed-spiritshots, du
+    // blocage au bouclier, du système de résistance/échec magique
+    // (ALT_GAME_MAGICFAILURES) et du bonus PvP : le power(level) du sort est un
+    // facteur multiplicatif du ratio sqrt(m.atk)/m.def (pas additif comme au
+    // physique), et un coup critique magique multiplie par 4 au lieu de 2. Pas
+    // de variance aléatoire : l'original n'en applique pas au magique.
+    public static int resolveMagicalDamage(int magicalAttack, int defenderDef, int skillPower, boolean critical) {
+        double damage = MAGICAL_DAMAGE_CONSTANT * Math.sqrt(magicalAttack) / defenderDef * skillPower;
+        if (critical) {
+            damage *= MAGIC_CRITICAL_MULTIPLIER;
+        }
+        return Math.max(1, (int) Math.round(damage));
+    }
+
+    // Formule L2J (handler skillhandlers.Heal) débarrassée des spiritshots/
+    // blessed-spiritshots, de HEAL_PROFICIENCY/HEAL_EFFECTIVNESS (stats non
+    // implémentées ici) et des variantes HEAL_STATIC/HEAL_PERCENT (un seul type
+    // HEALING côté projet) : il reste power(level) + sqrt(mAtkMul * m.atk), le
+    // reliquat de la branche "sans charge" de l'original.
+    public static int resolveHeal(int power, int magicalAttack) {
+        double amount = power + Math.sqrt(HEAL_MATK_MULTIPLIER * magicalAttack);
+        return Math.max(0, (int) Math.round(amount));
     }
 
     // Chance (0.0-1.0) qu'un debuff soit résisté, indépendamment du jet de

@@ -1,203 +1,147 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monsters>
-    <monster id="c1a6b8f0-3b3e-4b0a-9f0a-1e2d3c4b5a6f">
-        <name>Goblin</name>
-        <maxHealth>7</maxHealth>
-        <pAtk>7</pAtk>
-        <pDef>7</pDef>
+    <monster id="dc803de5-e456-4e20-bbdc-ad16faf99af9">
+        <name>Gremlin</name>
+        <maxHealth>38</maxHealth>
+        <pAtk>1</pAtk>
+        <pDef>34</pDef>
         <mAtk>0</mAtk>
-        <mDef>0</mDef>
+        <mDef>17</mDef>
         <accuracyBonus>0</accuracyBonus>
         <evasionBonus>0</evasionBonus>
         <critBonus>0</critBonus>
-        <xpReward>50</xpReward>
+        <xpReward>30</xpReward>
         <attributes>
-            <STR>8</STR>
-            <DEX>14</DEX>
-            <CON>10</CON>
-            <INT>10</INT>
+            <STR>10</STR>
+            <DEX>12</DEX>
+            <CON>11</CON>
+            <INT>9</INT>
+            <WIT>10</WIT>
+            <MEN>9</MEN>
+        </attributes>
+        <loot>
+            <gold>6</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
+            <item templateId="ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd" chance="0.02" />
+        </loot>
+        <aggroRadius>2</aggroRadius>
+        <speed>55</speed>
+        <atkSpd>280</atkSpd>
+        <level>1</level>
+    </monster>
+    <monster id="8d3b7335-abf5-420e-abf7-3de4160f95ac">
+        <name>Young Keltir</name>
+        <maxHealth>44</maxHealth>
+        <pAtk>1</pAtk>
+        <pDef>38</pDef>
+        <mAtk>0</mAtk>
+        <mDef>15</mDef>
+        <accuracyBonus>-2</accuracyBonus>
+        <evasionBonus>-3</evasionBonus>
+        <critBonus>0</critBonus>
+        <xpReward>32</xpReward>
+        <attributes>
+            <STR>12</STR>
+            <DEX>9</DEX>
+            <CON>14</CON>
+            <INT>6</INT>
             <WIT>8</WIT>
             <MEN>8</MEN>
         </attributes>
         <loot>
-            <gold>5</gold>
-            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
-            <item templateId="019fa0a5-80c0-7035-9c2d-113b09a275df" chance="0.01" />
-        </loot>
-        <aggroRadius>2</aggroRadius>
-        <speed>55</speed>
-        <atkSpd>300</atkSpd>
-        <level>1</level>
-    </monster>
-    <monster id="dcff9d89-1f33-41e2-8011-e5b3b7092f0d">
-        <name>Giant Rat</name>
-        <maxHealth>7</maxHealth>
-        <pAtk>4</pAtk>
-        <pDef>4</pDef>
-        <mAtk>0</mAtk>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <xpReward>25</xpReward>
-        <attributes>
-            <STR>7</STR>
-            <DEX>15</DEX>
-            <CON>11</CON>
-            <INT>2</INT>
-            <WIT>10</WIT>
-            <MEN>4</MEN>
-        </attributes>
-        <loot>
-            <gold>1</gold>
+            <gold>4</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.08" />
         </loot>
         <aggroRadius>1</aggroRadius>
-        <speed>55</speed>
-        <atkSpd>300</atkSpd>
+        <speed>45</speed>
+        <atkSpd>260</atkSpd>
         <level>1</level>
     </monster>
-    <monster id="e6caeb0d-f861-401b-b0c1-c88e315097c5">
-        <name>Wolf</name>
-        <maxHealth>11</maxHealth>
-        <pAtk>7</pAtk>
-        <pDef>5</pDef>
+    <monster id="e8553837-b812-4826-8740-72df0d9280fd">
+        <name>Elpy</name>
+        <maxHealth>28</maxHealth>
+        <pAtk>1</pAtk>
+        <pDef>28</pDef>
         <mAtk>0</mAtk>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <xpReward>50</xpReward>
+        <mDef>18</mDef>
+        <accuracyBonus>2</accuracyBonus>
+        <evasionBonus>6</evasionBonus>
+        <critBonus>2</critBonus>
+        <xpReward>30</xpReward>
         <attributes>
-            <STR>12</STR>
-            <DEX>15</DEX>
-            <CON>12</CON>
-            <INT>3</INT>
-            <WIT>12</WIT>
-            <MEN>6</MEN>
-        </attributes>
-        <loot>
-            <gold>2</gold>
-        </loot>
-        <aggroRadius>3</aggroRadius>
-        <speed>75</speed>
-        <atkSpd>300</atkSpd>
-        <level>1</level>
-    </monster>
-    <monster id="7dfe22be-6147-45b3-bd07-89711810791d">
-        <name>Skeleton</name>
-        <maxHealth>13</maxHealth>
-        <pAtk>7</pAtk>
-        <pDef>5</pDef>
-        <mAtk>0</mAtk>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <xpReward>50</xpReward>
-        <attributes>
-            <STR>10</STR>
-            <DEX>14</DEX>
-            <CON>15</CON>
-            <INT>6</INT>
-            <WIT>8</WIT>
-            <MEN>5</MEN>
-        </attributes>
-        <loot>
-            <gold>8</gold>
-            <item templateId="019fa0a5-80c0-7035-9c2d-113b09a275df" chance="0.05" />
-            <item templateId="019faec6-116d-723d-b04c-76d51a2a2cb7" chance="0.001" />
-        </loot>
-        <aggroRadius>2</aggroRadius>
-        <speed>55</speed>
-        <atkSpd>300</atkSpd>
-        <level>1</level>
-    </monster>
-    <monster id="f6630034-a160-4ffc-888e-eb2fee9d9428">
-        <name>Bandit</name>
-        <maxHealth>11</maxHealth>
-        <pAtk>7</pAtk>
-        <pDef>4</pDef>
-        <mAtk>0</mAtk>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <xpReward>25</xpReward>
-        <attributes>
-            <STR>11</STR>
-            <DEX>12</DEX>
-            <CON>12</CON>
-            <INT>10</INT>
-            <WIT>10</WIT>
-            <MEN>10</MEN>
-        </attributes>
-        <loot>
-            <gold>15</gold>
-            <item templateId="019fa0a5-80c0-7035-9c2d-113b09a275df" chance="0.1" />
-            <item templateId="019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518" chance="0.05" />
-            <item templateId="019faec6-116d-723d-b04c-76d51a2a2cb7" chance="0.02" />
-        </loot>
-        <aggroRadius>2</aggroRadius>
-        <speed>55</speed>
-        <atkSpd>300</atkSpd>
-        <level>1</level>
-    </monster>
-    <monster id="026ce1a2-091d-4179-b715-65006480cfbe">
-        <name>Giant Spider</name>
-        <maxHealth>26</maxHealth>
-        <pAtk>9</pAtk>
-        <pDef>6</pDef>
-        <mAtk>0</mAtk>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <xpReward>200</xpReward>
-        <attributes>
-            <STR>14</STR>
+            <STR>7</STR>
             <DEX>16</DEX>
-            <CON>12</CON>
-            <INT>2</INT>
+            <CON>8</CON>
+            <INT>9</INT>
             <WIT>11</WIT>
-            <MEN>4</MEN>
-        </attributes>
-        <loot>
-            <gold>20</gold>
-            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
-            <item templateId="019fcf0d-1f8f-7d01-8e4f-fd592812a1a7" chance="0.001" />
-        </loot>
-        <aggroRadius>3</aggroRadius>
-        <speed>55</speed>
-        <atkSpd>300</atkSpd>
-        <level>3</level>
-    </monster>
-    <monster id="49e91691-3a13-4e2b-967f-bc1acf8cf03a">
-        <name>Black Bear</name>
-        <maxHealth>19</maxHealth>
-        <pAtk>7</pAtk>
-        <pDef>3</pDef>
-        <mAtk>0</mAtk>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <xpReward>100</xpReward>
-        <attributes>
-            <STR>15</STR>
-            <DEX>10</DEX>
-            <CON>14</CON>
-            <INT>2</INT>
-            <WIT>12</WIT>
             <MEN>7</MEN>
         </attributes>
         <loot>
-            <gold>10</gold>
+            <gold>3</gold>
             <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.05" />
-            <item templateId="019fcf0d-1f8d-7c4c-9275-33c4af4410a8" chance="0.0001" />
         </loot>
-        <aggroRadius>3</aggroRadius>
-        <speed>75</speed>
+        <aggroRadius>1</aggroRadius>
+        <speed>70</speed>
         <atkSpd>300</atkSpd>
+        <level>1</level>
+    </monster>
+    <monster id="0a88e27c-5487-40d5-b494-b7ea49148171">
+        <name>Fox</name>
+        <maxHealth>44</maxHealth>
+        <pAtk>1</pAtk>
+        <pDef>36</pDef>
+        <mAtk>0</mAtk>
+        <mDef>17</mDef>
+        <accuracyBonus>1</accuracyBonus>
+        <evasionBonus>4</evasionBonus>
+        <critBonus>3</critBonus>
+        <xpReward>60</xpReward>
+        <attributes>
+            <STR>9</STR>
+            <DEX>15</DEX>
+            <CON>10</CON>
+            <INT>7</INT>
+            <WIT>10</WIT>
+            <MEN>7</MEN>
+        </attributes>
+        <loot>
+            <gold>8</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
+            <item templateId="019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518" chance="0.02" />
+        </loot>
+        <aggroRadius>2</aggroRadius>
+        <speed>70</speed>
+        <atkSpd>300</atkSpd>
+        <level>2</level>
+    </monster>
+    <monster id="de87e00a-eb3f-4885-b6a4-922c426d5fb8">
+        <name>Brown Keltir</name>
+        <maxHealth>55</maxHealth>
+        <pAtk>1</pAtk>
+        <pDef>47</pDef>
+        <mAtk>0</mAtk>
+        <mDef>16</mDef>
+        <accuracyBonus>-2</accuracyBonus>
+        <evasionBonus>-3</evasionBonus>
+        <critBonus>0</critBonus>
+        <xpReward>65</xpReward>
+        <attributes>
+            <STR>14</STR>
+            <DEX>9</DEX>
+            <CON>16</CON>
+            <INT>6</INT>
+            <WIT>8</WIT>
+            <MEN>8</MEN>
+        </attributes>
+        <loot>
+            <gold>10</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
+            <item templateId="019faec6-116d-723d-b04c-76d51a2a2cb7" chance="0.02" />
+            <item templateId="019fcf0d-1f8f-7d01-8e4f-fd592812a1a7" chance="0.005" />
+        </loot>
+        <aggroRadius>2</aggroRadius>
+        <speed>45</speed>
+        <atkSpd>260</atkSpd>
         <level>2</level>
     </monster>
 </monsters>

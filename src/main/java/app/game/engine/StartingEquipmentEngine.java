@@ -18,8 +18,13 @@ public class StartingEquipmentEngine {
 
     private static final Logger log = LoggerFactory.getLogger(StartingEquipmentEngine.class);
 
-    private static final UUID FIGHTER_WEAPON_TEMPLATE_ID = UUID.fromString("019fa0a5-80c0-7035-9c2d-113b09a275df");
-    private static final UUID MYSTIC_WEAPON_TEMPLATE_ID = UUID.fromString("ac9fe757-ab75-47ef-b413-8844d5c5ed73");
+    // Wooden Sword / Wooden Staff : les seules armes NOGRADE du catalogue (pas de
+    // <expect> dans weapons.xml) — un Short Sword/Basic Wizard Staff (grade D)
+    // déclencherait immédiatement le malus "Grade Penalty" (Expertise Grade
+    // niveau 1 ne s'apprend qu'au niveau 20, cf. fighter.xml/mystic.xml), ce qui
+    // punirait un personnage fraîchement créé.
+    private static final UUID FIGHTER_WEAPON_TEMPLATE_ID = UUID.fromString("558543a4-39d4-4f36-ac1e-2881deac24a6");
+    private static final UUID MYSTIC_WEAPON_TEMPLATE_ID = UUID.fromString("7b268503-d3f0-43eb-9144-bbb008d6ddeb");
 
     private final ItemTemplateCatalog itemTemplateCatalog;
 

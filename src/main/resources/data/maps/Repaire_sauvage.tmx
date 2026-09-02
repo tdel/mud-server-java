@@ -79,7 +79,7 @@
   </object>
   <object id="3" name="" type="monsterSpawn" x="576.0" y="448.0">
    <properties>
-         <property name="templateId" value="f6630034-a160-4ffc-888e-eb2fee9d9428"/>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
          <property name="spawnGroup" value="Repaire_sauvage"/>
    </properties>
   </object>

@@ -85,7 +85,7 @@
   </object>
   <object id="3" name="" type="monsterSpawn" x="704.0" y="832.0">
    <properties>
-         <property name="templateId" value="7dfe22be-6147-45b3-bd07-89711810791d"/>
+         <property name="templateId" value="e8553837-b812-4826-8740-72df0d9280fd"/>
          <property name="spawnGroup" value="Cimetière_abandonné"/>
    </properties>
   </object>

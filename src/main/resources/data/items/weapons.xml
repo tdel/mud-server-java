@@ -473,4 +473,82 @@
         <atkSpd>300</atkSpd>
         <price>1</price>
     </weapon>
+    <weapon id="1d4e6f80-2a9c-4b7e-8d1f-5c3a7e9b0d2f">
+        <name>Staff of the Magus</name>
+        <description>A polished staff favored by battle-mages, humming with contained power.</description>
+        <type>WEAPON</type>
+        <weight>2</weight>
+        <pAtk>6</pAtk>
+        <mAtk>22</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>280</atkSpd>
+        <price>4500</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - B -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
+    </weapon>
+    <weapon id="2e5f7a91-3b0d-4c8f-9e2a-6d4b8f0c1e3a">
+        <name>Archmage's Staff</name>
+        <description>Carved with sigils that channel the wielder's will into raw destruction.</description>
+        <type>WEAPON</type>
+        <weight>2</weight>
+        <pAtk>7</pAtk>
+        <mAtk>30</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>280</atkSpd>
+        <price>32000</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - A -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
+    </weapon>
+    <weapon id="3f6a8b02-4c1e-4d9a-8f3b-7e5c9a1d2f4b">
+        <name>Staff of Arcana</name>
+        <description>A relic staff said to have channeled the spells of an archmage long turned to dust.</description>
+        <type>WEAPON</type>
+        <weight>2</weight>
+        <pAtk>8</pAtk>
+        <mAtk>40</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <atkSpd>290</atkSpd>
+        <price>80000</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - S -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
+    </weapon>
 </weapons>

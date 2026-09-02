@@ -100,7 +100,7 @@ public final class CombatSystem {
 
         if (hit) {
             critical = Randomizer.rollChance(character.getStatSystem().getEffective(ModifiedStat.PCRIT) / 100.0);
-            damage = CombatFormulas.resolveDamage(character.getStatSystem().getEffective(ModifiedStat.PATK),
+            damage = CombatFormulas.resolvePhysicalDamage(character.getStatSystem().getEffective(ModifiedStat.PATK),
                     defender.getStatSystem().getEffective(ModifiedStat.PDEF), critical);
             healthAfter = Math.max(0, defender.getCurrentHealth() - damage);
             defeated = applyDamage(defender, damage);

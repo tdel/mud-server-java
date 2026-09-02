@@ -7,8 +7,8 @@
         <level id="3" mana="4" power="22" />
         <level id="4" mana="5" power="28" />
         <level id="5" mana="6" power="34" />
-        <reuseTime>2</reuseTime>
-        <castTime>0.3</castTime>
+        <reuseTime>4</reuseTime>
+        <castTime>1</castTime>
         <range>2</range>
         <skillType>DAMAGE</skillType>
         <target>ONE</target>
@@ -22,8 +22,8 @@
         <level id="3" mana="5" power="18" />
         <level id="4" mana="6" power="23" />
         <level id="5" mana="7" power="28" />
-        <reuseTime>3</reuseTime>
-        <castTime>0.5</castTime>
+        <reuseTime>4</reuseTime>
+        <castTime>4</castTime>
         <range>6</range>
         <skillType>DAMAGE</skillType>
         <target>ONE</target>
@@ -37,8 +37,8 @@
         <level id="3" mana="5" power="16" />
         <level id="4" mana="6" power="20" />
         <level id="5" mana="7" power="24" />
-        <reuseTime>2</reuseTime>
-        <castTime>0.5</castTime>
+        <reuseTime>4</reuseTime>
+        <castTime>2</castTime>
         <range>6</range>
         <skillType>HEALING</skillType>
         <target>ONE</target>
@@ -51,8 +51,8 @@
         <level id="3" mana="6" power="7" />
         <level id="4" mana="8" power="9" />
         <level id="5" mana="10" power="11" />
-        <reuseTime>2</reuseTime>
-        <castTime>0.6</castTime>
+        <reuseTime>4</reuseTime>
+        <castTime>4</castTime>
         <range>6</range>
         <skillType>BUFF</skillType>
         <target>ONE</target>

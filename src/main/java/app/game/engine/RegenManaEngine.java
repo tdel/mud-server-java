@@ -21,7 +21,9 @@ public class RegenManaEngine {
 
     private static final Logger log = LoggerFactory.getLogger(RegenManaEngine.class);
 
-    private static final long TICK_INTERVAL_MS = 1_000L;
+    // Période retail L2J (MpTask) : régénération passive toutes les 3 secondes,
+    // pas 1 seconde.
+    private static final long TICK_INTERVAL_MS = 3_000L;
 
     private final Map<UUID, CharacterInstance> regenerating = new ConcurrentHashMap<>();
 

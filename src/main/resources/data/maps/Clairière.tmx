@@ -87,19 +87,19 @@
   </object>
   <object id="4" name="" type="monsterSpawn" x="704.0" y="320.0">
    <properties>
-         <property name="templateId" value="c1a6b8f0-3b3e-4b0a-9f0a-1e2d3c4b5a6f"/>
+         <property name="templateId" value="8d3b7335-abf5-420e-abf7-3de4160f95ac"/>
          <property name="spawnGroup" value="Clairière"/>
    </properties>
   </object>
   <object id="5" name="" type="monsterSpawn" x="1344.0" y="832.0">
    <properties>
-         <property name="templateId" value="7dfe22be-6147-45b3-bd07-89711810791d"/>
+         <property name="templateId" value="dc803de5-e456-4e20-bbdc-ad16faf99af9"/>
          <property name="spawnGroup" value="Clairière"/>
    </properties>
   </object>
   <object id="6" name="" type="monsterSpawn" x="1600.0" y="448.0">
    <properties>
-         <property name="templateId" value="49e91691-3a13-4e2b-967f-bc1acf8cf03a"/>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
          <property name="spawnGroup" value="Clairière"/>
    </properties>
   </object>

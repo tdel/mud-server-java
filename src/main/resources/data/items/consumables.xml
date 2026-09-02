@@ -40,4 +40,28 @@
         <consumableEffect>MANA_RESTORE</consumableEffect>
         <effectAmount>10</effectAmount>
     </consumable>
+    <consumable id="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e">
+        <name>Greater Mana Potion</name>
+        <type>POTION</type>
+        <weight>1</weight>
+        <price>180</price>
+        <consumableEffect>MANA_RESTORE</consumableEffect>
+        <effectAmount>25</effectAmount>
+    </consumable>
+    <consumable id="8d2f0b5c-3e7a-4f9b-8d4c-6a2b8e0c1d3f">
+        <name>Major Mana Potion</name>
+        <type>POTION</type>
+        <weight>1</weight>
+        <price>840</price>
+        <consumableEffect>MANA_RESTORE</consumableEffect>
+        <effectAmount>50</effectAmount>
+    </consumable>
+    <consumable id="9e3a1c6d-4f8b-4a0c-9e5d-7b3c9f1d2e4a">
+        <name>Supreme Mana Potion</name>
+        <type>POTION</type>
+        <weight>1</weight>
+        <price>3240</price>
+        <consumableEffect>MANA_RESTORE</consumableEffect>
+        <effectAmount>100</effectAmount>
+    </consumable>
 </consumables>

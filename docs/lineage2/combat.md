@@ -36,8 +36,10 @@ CON→P.Def and MEN→M.Def, just applied to the vitals pool instead of a defens
 |---|---|---|
 | Max HP | `(classHpBase + classHpAdd*level + classHpMod*level²) * statBonus(CON)` | class curve (`hpBase`/`hpAdd`/`hpMod`), level, CON |
 | Max Mana | `(classMpBase + classMpAdd*level + classMpMod*level²) * statBonus(MEN)` | class curve (`mpBase`/`mpAdd`/`mpMod`), level, MEN |
-| HP regen/tick | `maxHealth * HP_REGEN_RATE * statBonus(CON)` | max HP, CON |
-| Mana regen/tick | `maxMana * MP_REGEN_RATE * statBonus(MEN)` | max mana, MEN |
+| HP regen/tick (3s) | `maxHealth * HP_REGEN_RATE * statBonus(CON)` | max HP, CON |
+| Mana regen/tick (3s) | `maxMana * MP_REGEN_RATE * statBonus(MEN)` | max mana, MEN |
+
+The tick period is **3 seconds** (`RegenHealthEngine`/`RegenManaEngine`'s `TICK_INTERVAL_MS`), matching retail L2J's `HpTask`/`MpTask` period — not an arbitrary rate. Passive regen without sitting/buffs therefore takes roughly `50 / statBonus(CON or MEN)` ticks (~2.5 minutes at neutral CON/MEN) to refill from empty, in line with the retail pace.
 
 The 6 per-class curve coefficients live in `data/class.json` (`CharacterClass.maxHealth`/
 `maxMana`, backed by `CombatFormulas.maxHealth`/`maxMana`) — no more DnD5e `hitDie`/
@@ -52,19 +54,21 @@ fully derived stat, without the larger refactor a truly always-derived HP/mana w
 
 ## Resolving a hit
 
-Used identically for a melee attack and a damage skill (physical uses P.Atk/P.Def, magic uses M.Atk/M.Def):
+Hit/evasion resolution is shared between a melee attack and a damage skill; the damage formula itself then diverges between physical and magic, each ported from L2J's `Formulas.calcPhysDam`/`calcMagicDam` (`net.sf.l2j.gameserver.skills.Formulas`) with the mechanics this project doesn't implement stripped out (soulshots/blessed-spiritshots, shield block, weapon-type/monster-race vulnerability stats, the optional magic-failure system, PvP damage bonuses):
 
-1. `hitChance = accuracy / (accuracy + evasion)`, clamped to `[0.20, 0.98]` — accuracy/evasion are opposed, never a guaranteed hit or miss.
+1. `hitChance = clamp(0.80 + 0.02 * (accuracy - evasion), [0.20, 0.98])` (`CombatFormulas.hitChance`) — L2J's `calcHitMiss` stripped of its height/day-night/facing modifiers (no Z axis, no day/night cycle, no front/back facing in this project).
 2. Roll `DiceRoller.rollChance(hitChance)`. Miss → 0 damage.
-3. On a hit, roll critical independently: `DiceRoller.rollChance(criticalRate / 100.0)` — melee/`CombatSystem` and monster attacks use effective P.Crit, damage skills (`SkillSystem.rollDamage`) use effective M.Crit.
-4. Roll damage variance: `DiceRoller.randomVariance(0.9, 1.1)`.
-5. `damage = max(1, round(atk * (atk / (atk + def)) * variance * (critical ? 2.0 : 1.0)))`.
-
-A skill's `power` (a flat, per-tier integer from `data/skills/skills.json`) is added to the caster's effective M.Atk before this resolution, so skill tiers of the same name (e.g. a damage skill's tier 1 vs tier 5) still scale meaningfully instead of all hitting identically — a deliberate refinement over a pure "read M.Atk only" approach, since the L2-inspired ratio formula alone would otherwise flatten tier progression.
+3. On a hit, roll critical independently: `DiceRoller.rollChance(criticalRate / 100.0)` — melee/`CombatSystem` and monster attacks use effective P.Crit; damage skills (`SkillSystem.rollDamage`) use effective P.Crit for a `SkillDamageType.PHYSICAL` skill, effective M.Crit for `MAGICAL`.
+4. **Physical** (melee, or a `PHYSICAL` skill) — `CombatFormulas.resolvePhysicalDamage`: `damage = max(1, round(70 * atk / def * DiceRoller.randomVariance(0.9, 1.1) * (critical ? 2.0 : 1.0)))`. A skill's `power` (a flat, per-tier integer from `data/skills/skills.xml`) is added to the caster's effective P.Atk before this ratio, so skill tiers of the same name still scale meaningfully instead of all hitting identically; melee has no skill, so `atk` is just effective P.Atk.
+5. **Magic** (a `MAGICAL` skill only — melee is never magic) — `CombatFormulas.resolveMagicalDamage`: `damage = max(1, round(91 * sqrt(mAtk) / mDef * power(level) * (critical ? 4.0 : 1.0)))`. Unlike physical, `power` is a *multiplicative* factor of the ratio (not added to M.Atk), a magic critical multiplies by 4 instead of 2, and there is no random variance — all three quirks are carried over as-is from the L2J source rather than smoothed into the physical shape.
 
 ## Elemental resistance
 
-A damage skill whose `Skill.element()` (`SkillElement`: FIRE/WATER/WIND/EARTH/HOLY/DARK, or NONE for a physical/neutral skill) is not `NONE` has `CombatFormulas.applyElementalResistance(rawDamage, resistScore)` applied on top of step 5 above, in `SkillSystem.rollDamage`: `multiplier = clamp(1 - resistScore * 0.01, [0.1, 2.0])`, `damage = max(1, round(rawDamage * multiplier))`. `resistScore` reads `target.getElementalResistance(element)` — a positive score (resistance) reduces damage down to ×0.1, a negative one (vulnerability) amplifies it up to ×2. It sums `ItemTemplate.elementalResistances`/`MonsterTemplate.elementalResistances` (see `docs/lineage2/equipment.md`) across a character's equipped items, or reads a monster's natural resistances directly — never persisted, computed on the fly like every other derived stat. Melee/`CombatSystem` damage is untouched: elemental resistance only applies to skill damage, since melee has no element.
+A damage skill whose `Skill.element()` (`SkillElement`: FIRE/WATER/WIND/EARTH/HOLY/DARK, or NONE for a physical/neutral skill) is not `NONE` has `CombatFormulas.applyElementalResistance(rawDamage, resistScore)` applied on top of step 4/5 above, in `SkillSystem.rollDamage`: `multiplier = clamp(1 - resistScore * 0.01, [0.1, 2.0])`, `damage = max(1, round(rawDamage * multiplier))`. `resistScore` reads `target.getElementalResistance(element)` — a positive score (resistance) reduces damage down to ×0.1, a negative one (vulnerability) amplifies it up to ×2. It sums `ItemTemplate.elementalResistances`/`MonsterTemplate.elementalResistances` (see `docs/lineage2/equipment.md`) across a character's equipped items, or reads a monster's natural resistances directly — never persisted, computed on the fly like every other derived stat. Melee/`CombatSystem` damage is untouched: elemental resistance only applies to skill damage, since melee has no element.
+
+## Healing
+
+A `SkillEffectType.HEALING` skill (`SkillSystem.castHeal`) heals the skill's actual target (not always the caster) for `power(level) + sqrt(2 * casterMAtk)` (`CombatFormulas.resolveHeal`), clamped to the target's missing HP by `AbstractCharacter.heal`. Ported from L2J's `Heal` skill handler (`net.sf.l2j...handler.skillhandlers.Heal`) with soulshot/blessed-spiritshot bonuses, the `HEAL_PROFICIENCY`/`HEAL_EFFECTIVNESS` stats, and the `HEAL_STATIC`/`HEAL_PERCENT` skill-type variants removed (this project has none of them; the `mAtkMul` the original computes always collapses to `2` once shots are gone) — a heal is never resisted, there's no defense-stat mitigation.
 
 ## Buffs/debuffs
 

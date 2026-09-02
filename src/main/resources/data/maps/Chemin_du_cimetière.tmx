@@ -93,7 +93,7 @@
   </object>
   <object id="4" name="" type="monsterSpawn" x="1216.0" y="448.0">
    <properties>
-         <property name="templateId" value="f6630034-a160-4ffc-888e-eb2fee9d9428"/>
+         <property name="templateId" value="dc803de5-e456-4e20-bbdc-ad16faf99af9"/>
          <property name="spawnGroup" value="Chemin_du_cimetière"/>
    </properties>
   </object>

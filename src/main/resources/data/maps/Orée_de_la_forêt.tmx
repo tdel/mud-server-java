@@ -93,13 +93,13 @@
   </object>
   <object id="4" name="" type="monsterSpawn" x="704.0" y="320.0">
    <properties>
-         <property name="templateId" value="e6caeb0d-f861-401b-b0c1-c88e315097c5"/>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
          <property name="spawnGroup" value="Orée_de_la_forêt"/>
    </properties>
   </object>
   <object id="5" name="" type="monsterSpawn" x="1216.0" y="832.0">
    <properties>
-         <property name="templateId" value="026ce1a2-091d-4179-b715-65006480cfbe"/>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
          <property name="spawnGroup" value="Orée_de_la_forêt"/>
    </properties>
   </object>

@@ -155,7 +155,7 @@ public final class SkillSystem {
 
     public CastOutcome cast(ActiveSkill activeSkill, int level, AbstractCharacter target) {
         CastOutcome outcome = switch (activeSkill.skillType()) {
-            case HEALING -> castHeal(activeSkill, level);
+            case HEALING -> castHeal(activeSkill, level, target);
             case DAMAGE -> castDamage(activeSkill, level, target);
             case BUFF -> castModifier(activeSkill, level, target, false);
             case DEBUFF -> castModifier(activeSkill, level, target, true);
@@ -179,21 +179,23 @@ public final class SkillSystem {
         if (!rollSkillHit(target)) {
             return new AttackRollOutcome(false, 0);
         }
-        ModifiedStat critStat = activeSkill.damageType() == SkillDamageType.PHYSICAL
-                ? ModifiedStat.PCRIT
-                : ModifiedStat.MCRIT;
-        ModifiedStat atkStat = activeSkill.damageType() == SkillDamageType.PHYSICAL
-                ? ModifiedStat.PATK
-                : ModifiedStat.MATK;
-        ModifiedStat defStat = activeSkill.damageType() == SkillDamageType.PHYSICAL
-                ? ModifiedStat.PDEF
-                : ModifiedStat.MDEF;
+        boolean physical = activeSkill.damageType() == SkillDamageType.PHYSICAL;
+        ModifiedStat critStat = physical ? ModifiedStat.PCRIT : ModifiedStat.MCRIT;
         boolean critical = Randomizer.rollChance(character.getStatSystem().getEffective(critStat) / 100.0);
-        // Le power du sort module la puissance (physique ou magique) du lancer, ce
-        // qui préserve la progression entre levels d'un même sort (level 1 vs level 5)
-        // au lieu de tout aplatir sur le seul p.atk/m.atk du personnage.
-        int skillPower = character.getStatSystem().getEffective(atkStat) + activeSkill.powerAt(level);
-        int amount = CombatFormulas.resolveDamage(skillPower, target.getStatSystem().getEffective(defStat), critical);
+        int amount;
+        if (physical) {
+            // calcPhysDam L2J : le power du sort s'ajoute au p.atk avant le ratio
+            // atk/def, ce qui préserve la progression entre levels d'un même sort.
+            int skillPower = character.getStatSystem().getEffective(ModifiedStat.PATK) + activeSkill.powerAt(level);
+            amount = CombatFormulas.resolvePhysicalDamage(skillPower,
+                    target.getStatSystem().getEffective(ModifiedStat.PDEF), critical);
+        } else {
+            // calcMagicDam L2J : le power du sort est un facteur multiplicatif du
+            // ratio sqrt(m.atk)/m.def, pas additif comme au physique.
+            int magicalAttack = character.getStatSystem().getEffective(ModifiedStat.MATK);
+            amount = CombatFormulas.resolveMagicalDamage(magicalAttack,
+                    target.getStatSystem().getEffective(ModifiedStat.MDEF), activeSkill.powerAt(level), critical);
+        }
         if (activeSkill.element() != SkillElement.NONE) {
             amount = CombatFormulas.applyElementalResistance(amount,
                     target.getElementalResistance(activeSkill.element()));
@@ -212,10 +214,14 @@ public final class SkillSystem {
                 null, List.of());
     }
 
-    private CastOutcome castHeal(ActiveSkill activeSkill, int level) {
-        int amount = character.heal(activeSkill.powerAt(level));
-        return new CastOutcome(true, amount, character.getCurrentHealth(), character.getMaxHealth(), false, true, null,
-                List.of());
+    // Formule L2J (cf. CombatFormulas.resolveHeal) : pas de mitigation par une
+    // stat de défense de la cible, un heal n'est jamais résisté.
+    private CastOutcome castHeal(ActiveSkill activeSkill, int level, AbstractCharacter target) {
+        int healPower = CombatFormulas.resolveHeal(activeSkill.powerAt(level),
+                character.getStatSystem().getEffective(ModifiedStat.MATK));
+        int amount = target.heal(healPower);
+        return new CastOutcome(true, amount, target.getCurrentHealth(), target.getMaxHealth(), false,
+                target == character, null, List.of());
     }
 
     private CastOutcome castDamage(ActiveSkill activeSkill, int level, AbstractCharacter target) {
