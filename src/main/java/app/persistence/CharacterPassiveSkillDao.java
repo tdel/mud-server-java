@@ -2,8 +2,9 @@ package app.persistence;
 
 import static app.persistence.jooq.Tables.CHARACTER_PASSIVE_SKILL;
 
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
@@ -17,14 +18,16 @@ public class CharacterPassiveSkillDao {
         this.dsl = dsl;
     }
 
-    public List<UUID> findPassiveSkillIdsByCharacter(UUID characterId) {
-        return dsl.select(CHARACTER_PASSIVE_SKILL.PASSIVE_SKILL_ID).from(CHARACTER_PASSIVE_SKILL)
-                .where(CHARACTER_PASSIVE_SKILL.CHARACTER_ID.eq(characterId))
-                .fetch(CHARACTER_PASSIVE_SKILL.PASSIVE_SKILL_ID);
+    public Map<UUID, Integer> findPassiveSkillLevelsByCharacter(UUID characterId) {
+        return dsl.select(CHARACTER_PASSIVE_SKILL.PASSIVE_SKILL_ID, CHARACTER_PASSIVE_SKILL.LEVEL)
+                .from(CHARACTER_PASSIVE_SKILL).where(CHARACTER_PASSIVE_SKILL.CHARACTER_ID.eq(characterId)).fetch()
+                .stream().collect(Collectors.toMap(row -> row.get(CHARACTER_PASSIVE_SKILL.PASSIVE_SKILL_ID),
+                        row -> row.get(CHARACTER_PASSIVE_SKILL.LEVEL)));
     }
 
-    public void insert(UUID characterId, UUID passiveSkillId) {
+    public void insert(UUID characterId, UUID passiveSkillId, int level) {
         dsl.insertInto(CHARACTER_PASSIVE_SKILL, CHARACTER_PASSIVE_SKILL.CHARACTER_ID,
-                CHARACTER_PASSIVE_SKILL.PASSIVE_SKILL_ID).values(characterId, passiveSkillId).execute();
+                CHARACTER_PASSIVE_SKILL.PASSIVE_SKILL_ID, CHARACTER_PASSIVE_SKILL.LEVEL)
+                .values(characterId, passiveSkillId, level).execute();
     }
 }

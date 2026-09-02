@@ -2,11 +2,9 @@ package app.domain.world;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -106,18 +104,15 @@ public class WorldInstance {
         MapInstance startingMap = startingMapInstance()
                 .orElseThrow(() -> new IllegalStateException("WorldInstance " + id + " n'a aucune map de départ"));
 
-        Map<Attribute, Integer> scores = new EnumMap<>(characterClass.baseAttributes());
-        for (Map.Entry<Attribute, Integer> bonus : race.attributeScoreBonuses().entrySet()) {
-            scores.merge(bonus.getKey(), bonus.getValue(), Integer::sum);
-        }
+        Map<Attribute, Integer> scores = characterClass.baseAttributes();
 
-        int maxHealth = characterClass.maxHealth(scores.get(Attribute.CONSTITUTION), 1);
+        int maxHealth = characterClass.maxHealth(scores.get(Attribute.CON), 1);
 
         int startingMana = characterClass.maxMana(scores.get(Attribute.MEN), 1);
 
         CharacterInstance character = new CharacterInstance(UUID.randomUUID(), account, name, startingMap, gender, race,
                 characterClass, 1, maxHealth, maxHealth, scores, 0, 0, startingMana, startingMana, Map.of(), List.of(),
-                List.of(), Set.of(), List.of());
+                List.of(), Map.of(), List.of());
         character.setWorldInstance(this);
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));

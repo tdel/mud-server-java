@@ -33,9 +33,8 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
                 c.getStatSystem().getEffective(ModifiedStat.ACCURACY),
                 c.getStatSystem().getEffective(ModifiedStat.EVASION),
                 c.getStatSystem().getEffective(ModifiedStat.PCRIT), c.getStatSystem().getEffective(ModifiedStat.ATKSPD),
-                attributeScore(c, Attribute.STRENGTH), attributeScore(c, Attribute.DEXTERITY),
-                attributeScore(c, Attribute.CONSTITUTION), attributeScore(c, Attribute.INTELLIGENCE),
-                attributeScore(c, Attribute.WIT), attributeScore(c, Attribute.MEN),
+                attributeScore(c, Attribute.STR), attributeScore(c, Attribute.DEX), attributeScore(c, Attribute.CON),
+                attributeScore(c, Attribute.INT), attributeScore(c, Attribute.WIT), attributeScore(c, Attribute.MEN),
                 MovementEngine.unitsPerSecond(c.getMotionSystem().getSpeed())), false);
     }
 

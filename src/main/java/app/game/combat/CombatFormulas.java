@@ -206,16 +206,16 @@ public final class CombatFormulas {
             int armorMDefSum, int accuracyItemBonus, int evasionItemBonus, int critItemBonus, int armorWeightPenalty,
             int weaponAtkSpd, Map<Attribute, Integer> attributes, int level) {
         Map<ModifiedStat, Integer> stats = new EnumMap<>(ModifiedStat.class);
-        stats.put(ModifiedStat.PATK, physicalAttack(weaponPAtk, attributes.get(Attribute.STRENGTH), level));
-        stats.put(ModifiedStat.MATK, magicalAttack(weaponMAtk, attributes.get(Attribute.INTELLIGENCE), level));
-        stats.put(ModifiedStat.PDEF, physicalDefense(armorPDefSum, attributes.get(Attribute.CONSTITUTION)));
+        stats.put(ModifiedStat.PATK, physicalAttack(weaponPAtk, attributes.get(Attribute.STR), level));
+        stats.put(ModifiedStat.MATK, magicalAttack(weaponMAtk, attributes.get(Attribute.INT), level));
+        stats.put(ModifiedStat.PDEF, physicalDefense(armorPDefSum, attributes.get(Attribute.CON)));
         stats.put(ModifiedStat.MDEF, magicalDefense(armorMDefSum, attributes.get(Attribute.MEN)));
-        stats.put(ModifiedStat.ACCURACY, accuracy(level, attributes.get(Attribute.DEXTERITY), accuracyItemBonus));
+        stats.put(ModifiedStat.ACCURACY, accuracy(level, attributes.get(Attribute.DEX), accuracyItemBonus));
         stats.put(ModifiedStat.EVASION,
-                evasion(level, attributes.get(Attribute.DEXTERITY), armorWeightPenalty, evasionItemBonus));
-        stats.put(ModifiedStat.PCRIT, criticalRate(attributes.get(Attribute.DEXTERITY), critItemBonus));
+                evasion(level, attributes.get(Attribute.DEX), armorWeightPenalty, evasionItemBonus));
+        stats.put(ModifiedStat.PCRIT, criticalRate(attributes.get(Attribute.DEX), critItemBonus));
         stats.put(ModifiedStat.MCRIT, magicCriticalRate(attributes.get(Attribute.WIT), critItemBonus));
-        stats.put(ModifiedStat.ATKSPD, attackSpeed(weaponAtkSpd, attributes.get(Attribute.DEXTERITY)));
+        stats.put(ModifiedStat.ATKSPD, attackSpeed(weaponAtkSpd, attributes.get(Attribute.DEX)));
         return stats;
     }
 }

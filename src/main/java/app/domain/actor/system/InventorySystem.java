@@ -4,14 +4,13 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import app.domain.ActiveEffect;
 import app.domain.StatModifier;
-import app.domain.StatOperator;
-import app.domain.actor.ModifiedStat;
 import app.domain.actor.event.CharacterLootedItem;
 import app.domain.actor.event.CharacterReceivedGold;
 import app.domain.actor.event.CharacterSpentGold;
@@ -21,8 +20,10 @@ import app.domain.actor.event.GamePlayerUnequippedItem;
 import app.domain.actor.event.ItemDiscarded;
 import app.domain.actor.event.ItemPurchased;
 import app.domain.actor.instance.CharacterInstance;
+import app.domain.item.EquipmentItem;
 import app.domain.item.EquipmentSlot;
 import app.domain.item.Item;
+import app.domain.item.ItemExpectation;
 
 public final class InventorySystem {
 
@@ -140,25 +141,34 @@ public final class InventorySystem {
         character.recomputeStats();
     }
 
-    // Marqueur unique dans ActiveEffects tant qu'au moins un objet équipé dépasse
-    // le grade débloqué par les compétences passives connues (SkillSystem). Pas
+    // Marqueur unique dans ActiveEffects tant qu'au moins un objet équipé a un
+    // ItemExpectation (cf. EquipmentItem.getExpectation) non rempli — typiquement
+    // un grade au-delà de l'expertise débloquée (SkillSystem.passiveLevelOf). Pas
     // de vraie expiration (le malus dure tant que l'objet reste équipé) : on
     // recalcule/rafraîchit à chaque equip/unequip plutôt que de s'appuyer sur un
-    // minuteur. ModifiedStat.PATK/amount=-1 est un placeholder inerte, requis
-    // uniquement pour que ActiveEffect.category() retombe côté DEBUFF — le vrai
-    // calcul des malus par stat (p.atk, atk.spd, évasion, vitesse, régénération...)
-    // sera implémenté séparément, en lisant l'équipement + l'expertise directement
-    // plutôt que la valeur de cet effet.
+    // minuteur. Les actions des ItemExpectation non remplies sont fusionnées en un
+    // seul ActiveEffect (id fixe) plutôt qu'un effet par objet.
     public void recomputeGradePenalty() {
-        boolean overGraded = getEquippedItems().stream()
-                .anyMatch(item -> item.getGrade().ordinal() > character.getSkillSystem().unlockedGrade().ordinal());
-        if (overGraded) {
-            character.getEffectsSystem()
-                    .apply(new ActiveEffect(GRADE_PENALTY_EFFECT_ID, "Grade Penalty",
-                            List.of(new StatModifier(ModifiedStat.PATK, -1, StatOperator.ADDITIVE)),
-                            Instant.now().plus(Duration.ofDays(3650))));
-        } else {
+        List<ItemExpectation.ExpectationEffect> unmetActions = getEquippedItems().stream().map(Item::getTemplate)
+                .filter(EquipmentItem.class::isInstance).map(EquipmentItem.class::cast)
+                .map(EquipmentItem::getExpectation).filter(Objects::nonNull)
+                .filter(expectation -> !isSatisfied(expectation)).flatMap(expectation -> expectation.actions().stream())
+                .toList();
+
+        if (unmetActions.isEmpty()) {
             character.getEffectsSystem().remove(GRADE_PENALTY_EFFECT_ID);
+            return;
         }
+
+        List<StatModifier> modifiers = unmetActions.stream().flatMap(action -> action.modifiers().stream()).toList();
+        Duration duration = unmetActions.stream().map(ItemExpectation.ExpectationEffect::duration)
+                .max(Duration::compareTo).orElse(Duration.ZERO);
+        character.getEffectsSystem().apply(new ActiveEffect(GRADE_PENALTY_EFFECT_ID, unmetActions.get(0).name(),
+                modifiers, Instant.now().plus(duration)));
+    }
+
+    private boolean isSatisfied(ItemExpectation expectation) {
+        return expectation.conditions().stream().allMatch(
+                condition -> character.getSkillSystem().passiveLevelOf(condition.skillId()) >= condition.level());
     }
 }

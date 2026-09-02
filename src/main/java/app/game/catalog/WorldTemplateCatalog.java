@@ -36,15 +36,25 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.dataformat.xml.XmlMapper;
 import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 @Service
 public class WorldTemplateCatalog {
 
     private static final Logger log = LoggerFactory.getLogger(WorldTemplateCatalog.class);
 
-    private static final String WORLD_MANIFEST_PATTERN = "classpath*:data/world.xml";
     private static final String DATA_DIR = "data/";
     private static final String DEFAULT_SHORT_NAME = "default";
+    private static final String NPC_SHOPS_RESOURCE = "npc/shops/npcs-shop.xml";
+    private static final String NPC_OTHERS_RESOURCE = "npc/others.xml";
+
+    // Monde unique matérialisé au démarrage (cf. "Warm-up & in-memory caches"
+    // dans CLAUDE.md) : plus de manifeste world.xml, ces valeurs sont figées ici.
+    private static final UUID DEFAULT_WORLD_ID = UUID.fromString("f128833b-9a8a-4fb9-9796-33fd9413490d");
+    private static final String DEFAULT_WORLD_NAME = "The Village and its Surroundings";
+    private static final String DEFAULT_WORLD_DESCRIPTION = "The starting world: a village, its tavern, and the edge of the forest.";
+    private static final int DEFAULT_MIN_PLAYERS = 1;
+    private static final int DEFAULT_MAX_PLAYERS = 6;
 
     private final Map<UUID, WorldTemplateSummary> summariesById = new ConcurrentHashMap<>();
     private final Map<UUID, WorldTemplate> loadedTemplatesById = new ConcurrentHashMap<>();
@@ -61,35 +71,11 @@ public class WorldTemplateCatalog {
     }
 
     public void warmWorldTemplates() {
-        Resource[] manifests;
-        try {
-            manifests = resourcePatternResolver.getResources(WORLD_MANIFEST_PATTERN);
-        } catch (IOException e) {
-            throw new IllegalStateException("Impossible d'énumérer " + WORLD_MANIFEST_PATTERN, e);
-        }
-        if (manifests.length != 1) {
-            throw new IllegalStateException("Un seul monde est supporté (retour au monde unique) : " + manifests.length
-                    + " trouvé(s) sous " + WORLD_MANIFEST_PATTERN);
-        }
-
-        WorldTemplateSummary summary = loadSummary(DEFAULT_SHORT_NAME);
+        WorldTemplateSummary summary = new WorldTemplateSummary(DEFAULT_WORLD_ID, DEFAULT_SHORT_NAME,
+                DEFAULT_WORLD_NAME, DEFAULT_WORLD_DESCRIPTION, DEFAULT_MIN_PLAYERS, DEFAULT_MAX_PLAYERS);
         summariesById.clear();
         summariesById.put(summary.id(), summary);
         log.info("world.templates_loaded count={}", summariesById.size());
-    }
-
-    private WorldTemplateSummary loadSummary(String shortName) {
-        WorldManifestDefinition manifest = readXml("world.xml", WorldManifestDefinition.class);
-        if (manifest.minPlayers() < 1) {
-            throw new IllegalStateException(
-                    "Le monde " + shortName + " a un minPlayers invalide (" + manifest.minPlayers() + ")");
-        }
-        if (manifest.maxPlayers() < manifest.minPlayers()) {
-            throw new IllegalStateException("Le monde " + shortName + " a un maxPlayers (" + manifest.maxPlayers()
-                    + ") inférieur à son minPlayers (" + manifest.minPlayers() + ")");
-        }
-        return new WorldTemplateSummary(manifest.id(), shortName, manifest.name(), manifest.description(),
-                manifest.minPlayers(), manifest.maxPlayers());
     }
 
     private WorldTemplate loadFullTemplate(UUID id) {
@@ -105,12 +91,16 @@ public class WorldTemplateCatalog {
         List<ParsedMap> parsedMaps = readMapFiles();
         Map<UUID, MapTemplate> mapTemplates = buildMapTemplates(shortName, parsedMaps);
 
-        List<NpcDefinition> npcDefinitionList = readXmlList("npcs.xml", new TypeReference<List<NpcDefinition>>() {
-        });
+        List<NpcDefinition> npcDefinitionList = new ArrayList<>();
+        npcDefinitionList.addAll(readXmlList(NPC_SHOPS_RESOURCE, new TypeReference<List<NpcDefinition>>() {
+        }));
+        npcDefinitionList.addAll(readXmlList(NPC_OTHERS_RESOURCE, new TypeReference<List<NpcDefinition>>() {
+        }));
         Map<UUID, NpcDefinition> npcDefinitionsById = new LinkedHashMap<>();
         for (NpcDefinition definition : npcDefinitionList) {
             if (npcDefinitionsById.putIfAbsent(definition.id(), definition) != null) {
-                throw new IllegalStateException("NPC " + definition.id() + " dupliqué dans data/npcs.xml");
+                throw new IllegalStateException(
+                        "NPC " + definition.id() + " dupliqué dans data/npc/npcs-shop.xml ou data/npc/others.xml");
             }
         }
         Map<UUID, NpcTemplate> npcTemplates = buildNpcTemplates(shortName, npcDefinitionsById, mapTemplates,
@@ -291,14 +281,6 @@ public class WorldTemplateCatalog {
         return new NpcSellerInstance.NpcShop(entries);
     }
 
-    private <T> T readXml(String fileName, Class<T> type) {
-        try (InputStream in = worldFile(fileName).getInputStream()) {
-            return xmlMapper.readValue(in, type);
-        } catch (IOException | JacksonException e) {
-            throw new IllegalStateException("Impossible de charger " + DATA_DIR + fileName, e);
-        }
-    }
-
     private <T> T readXmlList(String fileName, TypeReference<T> typeReference) {
         try (InputStream in = worldFile(fileName).getInputStream()) {
             return xmlMapper.readValue(in, typeReference);
@@ -322,10 +304,8 @@ public class WorldTemplateCatalog {
         return Optional.of(loadedTemplatesById.computeIfAbsent(id, this::loadFullTemplate));
     }
 
-    record WorldManifestDefinition(UUID id, String name, String description, int minPlayers, int maxPlayers) {
-    }
-
-    record NpcDefinition(UUID id, String name, DialogueDefinition dialogue, int level) {
+    record NpcDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name, DialogueDefinition dialogue,
+            int level) {
     }
 
     record DialogueDefinition(String greeting,

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jewellery>
-    <piece>
-        <id>0f50e068-ab87-41aa-9169-5eaa17a3c7ce</id>
+    <piece id="0f50e068-ab87-41aa-9169-5eaa17a3c7ce">
         <name>Garnet Ring</name>
         <type>RING</type>
         <weight>0</weight>
@@ -16,8 +15,7 @@
         <price>1</price>
         <grade>NOGRADE</grade>
     </piece>
-    <piece>
-        <id>b0bc4f00-8f9f-44a4-9b7f-0095ab837218</id>
+    <piece id="b0bc4f00-8f9f-44a4-9b7f-0095ab837218">
         <name>Garnet Earring</name>
         <type>EARRING</type>
         <weight>0</weight>
@@ -32,8 +30,7 @@
         <price>1</price>
         <grade>NOGRADE</grade>
     </piece>
-    <piece>
-        <id>2f76ba65-4e52-45d0-b6ba-8c932fd699d7</id>
+    <piece id="2f76ba65-4e52-45d0-b6ba-8c932fd699d7">
         <name>Garnet Necklace</name>
         <type>NECKLACE</type>
         <weight>0</weight>
@@ -48,8 +45,7 @@
         <price>1</price>
         <grade>NOGRADE</grade>
     </piece>
-    <piece>
-        <id>001d1121-6760-4831-83a3-a72b126f79f3</id>
+    <piece id="001d1121-6760-4831-83a3-a72b126f79f3">
         <name>Amber Ring</name>
         <type>RING</type>
         <weight>0</weight>
@@ -63,9 +59,18 @@
         <atkSpd>0</atkSpd>
         <price>15</price>
         <grade>D</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </piece>
-    <piece>
-        <id>bedb6df2-7bab-443c-8a3c-e97b9150d977</id>
+    <piece id="bedb6df2-7bab-443c-8a3c-e97b9150d977">
         <name>Amber Earring</name>
         <type>EARRING</type>
         <weight>0</weight>
@@ -79,9 +84,18 @@
         <atkSpd>0</atkSpd>
         <price>15</price>
         <grade>D</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </piece>
-    <piece>
-        <id>57201423-ae58-4cb7-a6c4-9bf856a76d4a</id>
+    <piece id="57201423-ae58-4cb7-a6c4-9bf856a76d4a">
         <name>Amber Necklace</name>
         <type>NECKLACE</type>
         <weight>0</weight>
@@ -95,9 +109,18 @@
         <atkSpd>0</atkSpd>
         <price>20</price>
         <grade>D</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </piece>
-    <piece>
-        <id>40c0606e-29cc-448e-8906-8e229f0d5079</id>
+    <piece id="40c0606e-29cc-448e-8906-8e229f0d5079">
         <name>Amethyst Ring</name>
         <type>RING</type>
         <weight>0</weight>
@@ -111,9 +134,18 @@
         <atkSpd>0</atkSpd>
         <price>800</price>
         <grade>C</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </piece>
-    <piece>
-        <id>eb8c7be8-e57b-417e-bc9f-cf572a4f0948</id>
+    <piece id="eb8c7be8-e57b-417e-bc9f-cf572a4f0948">
         <name>Amethyst Earring</name>
         <type>EARRING</type>
         <weight>0</weight>
@@ -127,9 +159,18 @@
         <atkSpd>0</atkSpd>
         <price>800</price>
         <grade>C</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </piece>
-    <piece>
-        <id>5da404a5-8f6e-4b67-9d06-556efdbddbd3</id>
+    <piece id="5da404a5-8f6e-4b67-9d06-556efdbddbd3">
         <name>Amethyst Necklace</name>
         <type>NECKLACE</type>
         <weight>0</weight>
@@ -143,9 +184,18 @@
         <atkSpd>0</atkSpd>
         <price>1000</price>
         <grade>C</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </piece>
-    <piece>
-        <id>8b8b10e8-b13b-49a8-afdc-65472e39e136</id>
+    <piece id="8b8b10e8-b13b-49a8-afdc-65472e39e136">
         <name>Sapphire Ring</name>
         <type>RING</type>
         <weight>0</weight>
@@ -159,9 +209,18 @@
         <atkSpd>0</atkSpd>
         <price>6000</price>
         <grade>B</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </piece>
-    <piece>
-        <id>2e9e1a18-8f89-4f7a-b85f-c3ca11614f85</id>
+    <piece id="2e9e1a18-8f89-4f7a-b85f-c3ca11614f85">
         <name>Sapphire Earring</name>
         <type>EARRING</type>
         <weight>0</weight>
@@ -175,9 +234,18 @@
         <atkSpd>0</atkSpd>
         <price>6000</price>
         <grade>B</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </piece>
-    <piece>
-        <id>23710f30-4a41-4726-a0a6-76583de080cb</id>
+    <piece id="23710f30-4a41-4726-a0a6-76583de080cb">
         <name>Sapphire Necklace</name>
         <type>NECKLACE</type>
         <weight>0</weight>
@@ -191,9 +259,18 @@
         <atkSpd>0</atkSpd>
         <price>7000</price>
         <grade>B</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </piece>
-    <piece>
-        <id>e7e19ee4-f854-43fb-8c0e-f37b32cbc10c</id>
+    <piece id="e7e19ee4-f854-43fb-8c0e-f37b32cbc10c">
         <name>Ruby Ring</name>
         <type>RING</type>
         <weight>0</weight>
@@ -207,9 +284,18 @@
         <atkSpd>0</atkSpd>
         <price>30000</price>
         <grade>A</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </piece>
-    <piece>
-        <id>fde9c197-b9ef-42d5-8515-7576fd092320</id>
+    <piece id="fde9c197-b9ef-42d5-8515-7576fd092320">
         <name>Ruby Earring</name>
         <type>EARRING</type>
         <weight>0</weight>
@@ -223,9 +309,18 @@
         <atkSpd>0</atkSpd>
         <price>30000</price>
         <grade>A</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </piece>
-    <piece>
-        <id>426b9236-e36a-4d68-8162-8099a626d4ee</id>
+    <piece id="426b9236-e36a-4d68-8162-8099a626d4ee">
         <name>Ruby Necklace</name>
         <type>NECKLACE</type>
         <weight>0</weight>
@@ -239,9 +334,18 @@
         <atkSpd>0</atkSpd>
         <price>35000</price>
         <grade>A</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </piece>
-    <piece>
-        <id>45df80ea-904d-4adc-89bb-9b9b3ceab8a7</id>
+    <piece id="45df80ea-904d-4adc-89bb-9b9b3ceab8a7">
         <name>Diamond Ring</name>
         <type>RING</type>
         <weight>0</weight>
@@ -255,9 +359,18 @@
         <atkSpd>0</atkSpd>
         <price>80000</price>
         <grade>S</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </piece>
-    <piece>
-        <id>2b43840f-ad9c-4920-b9bc-71bbb3b76d81</id>
+    <piece id="2b43840f-ad9c-4920-b9bc-71bbb3b76d81">
         <name>Diamond Earring</name>
         <type>EARRING</type>
         <weight>0</weight>
@@ -271,9 +384,18 @@
         <atkSpd>0</atkSpd>
         <price>80000</price>
         <grade>S</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </piece>
-    <piece>
-        <id>0cbf8abf-6f61-43d3-9d16-a1b6275ffddc</id>
+    <piece id="0cbf8abf-6f61-43d3-9d16-a1b6275ffddc">
         <name>Diamond Necklace</name>
         <type>NECKLACE</type>
         <weight>0</weight>
@@ -287,9 +409,18 @@
         <atkSpd>0</atkSpd>
         <price>90000</price>
         <grade>S</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </piece>
-    <piece>
-        <id>4fd68627-1909-41f1-bc99-1b7efd1d1187</id>
+    <piece id="4fd68627-1909-41f1-bc99-1b7efd1d1187">
         <name>Ring of Embers</name>
         <description>A band set with a smoldering coal that never cools.</description>
         <type>RING</type>
@@ -304,12 +435,21 @@
         <atkSpd>0</atkSpd>
         <price>900</price>
         <grade>C</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
         <elementalResistances>
             <FIRE>15</FIRE>
         </elementalResistances>
     </piece>
-    <piece>
-        <id>38f3fa2b-1a76-47ce-9d9a-84c126846873</id>
+    <piece id="38f3fa2b-1a76-47ce-9d9a-84c126846873">
         <name>Necklace of the Depths</name>
         <description>A pendant carved from deep-sea coral, cold to the touch.</description>
         <type>NECKLACE</type>
@@ -324,6 +464,16 @@
         <atkSpd>0</atkSpd>
         <price>1100</price>
         <grade>C</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
         <elementalResistances>
             <WATER>15</WATER>
         </elementalResistances>

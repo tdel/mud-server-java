@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monsters>
-    <monster>
-        <id>c1a6b8f0-3b3e-4b0a-9f0a-1e2d3c4b5a6f</id>
+    <monster id="c1a6b8f0-3b3e-4b0a-9f0a-1e2d3c4b5a6f">
         <name>Goblin</name>
         <maxHealth>7</maxHealth>
         <pAtk>7</pAtk>
@@ -13,29 +12,24 @@
         <critBonus>0</critBonus>
         <xpReward>50</xpReward>
         <attributes>
-            <STRENGTH>8</STRENGTH>
-            <DEXTERITY>14</DEXTERITY>
-            <CONSTITUTION>10</CONSTITUTION>
-            <INTELLIGENCE>10</INTELLIGENCE>
+            <STR>8</STR>
+            <DEX>14</DEX>
+            <CON>10</CON>
+            <INT>10</INT>
             <WIT>8</WIT>
             <MEN>8</MEN>
         </attributes>
-        <goldReward>5</goldReward>
-        <lootTable>
-            <itemTemplateId>019fa0a5-80bf-7e84-87bf-5cf699c00315</itemTemplateId>
-            <dropChance>0.1</dropChance>
-        </lootTable>
-        <lootTable>
-            <itemTemplateId>019fa0a5-80c0-7035-9c2d-113b09a275df</itemTemplateId>
-            <dropChance>0.01</dropChance>
-        </lootTable>
+        <loot>
+            <gold>5</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
+            <item templateId="019fa0a5-80c0-7035-9c2d-113b09a275df" chance="0.01" />
+        </loot>
         <aggroRadius>2</aggroRadius>
         <speed>55</speed>
         <atkSpd>300</atkSpd>
         <level>1</level>
     </monster>
-    <monster>
-        <id>dcff9d89-1f33-41e2-8011-e5b3b7092f0d</id>
+    <monster id="dcff9d89-1f33-41e2-8011-e5b3b7092f0d">
         <name>Giant Rat</name>
         <maxHealth>7</maxHealth>
         <pAtk>4</pAtk>
@@ -47,21 +41,22 @@
         <critBonus>0</critBonus>
         <xpReward>25</xpReward>
         <attributes>
-            <STRENGTH>7</STRENGTH>
-            <DEXTERITY>15</DEXTERITY>
-            <CONSTITUTION>11</CONSTITUTION>
-            <INTELLIGENCE>2</INTELLIGENCE>
+            <STR>7</STR>
+            <DEX>15</DEX>
+            <CON>11</CON>
+            <INT>2</INT>
             <WIT>10</WIT>
             <MEN>4</MEN>
         </attributes>
-        <goldReward>1</goldReward>
+        <loot>
+            <gold>1</gold>
+        </loot>
         <aggroRadius>1</aggroRadius>
         <speed>55</speed>
         <atkSpd>300</atkSpd>
         <level>1</level>
     </monster>
-    <monster>
-        <id>e6caeb0d-f861-401b-b0c1-c88e315097c5</id>
+    <monster id="e6caeb0d-f861-401b-b0c1-c88e315097c5">
         <name>Wolf</name>
         <maxHealth>11</maxHealth>
         <pAtk>7</pAtk>
@@ -73,21 +68,22 @@
         <critBonus>0</critBonus>
         <xpReward>50</xpReward>
         <attributes>
-            <STRENGTH>12</STRENGTH>
-            <DEXTERITY>15</DEXTERITY>
-            <CONSTITUTION>12</CONSTITUTION>
-            <INTELLIGENCE>3</INTELLIGENCE>
+            <STR>12</STR>
+            <DEX>15</DEX>
+            <CON>12</CON>
+            <INT>3</INT>
             <WIT>12</WIT>
             <MEN>6</MEN>
         </attributes>
-        <goldReward>2</goldReward>
+        <loot>
+            <gold>2</gold>
+        </loot>
         <aggroRadius>3</aggroRadius>
         <speed>75</speed>
         <atkSpd>300</atkSpd>
         <level>1</level>
     </monster>
-    <monster>
-        <id>7dfe22be-6147-45b3-bd07-89711810791d</id>
+    <monster id="7dfe22be-6147-45b3-bd07-89711810791d">
         <name>Skeleton</name>
         <maxHealth>13</maxHealth>
         <pAtk>7</pAtk>
@@ -99,29 +95,24 @@
         <critBonus>0</critBonus>
         <xpReward>50</xpReward>
         <attributes>
-            <STRENGTH>10</STRENGTH>
-            <DEXTERITY>14</DEXTERITY>
-            <CONSTITUTION>15</CONSTITUTION>
-            <INTELLIGENCE>6</INTELLIGENCE>
+            <STR>10</STR>
+            <DEX>14</DEX>
+            <CON>15</CON>
+            <INT>6</INT>
             <WIT>8</WIT>
             <MEN>5</MEN>
         </attributes>
-        <goldReward>8</goldReward>
-        <lootTable>
-            <itemTemplateId>019fa0a5-80c0-7035-9c2d-113b09a275df</itemTemplateId>
-            <dropChance>0.05</dropChance>
-        </lootTable>
-        <lootTable>
-            <itemTemplateId>019faec6-116d-723d-b04c-76d51a2a2cb7</itemTemplateId>
-            <dropChance>0.001</dropChance>
-        </lootTable>
+        <loot>
+            <gold>8</gold>
+            <item templateId="019fa0a5-80c0-7035-9c2d-113b09a275df" chance="0.05" />
+            <item templateId="019faec6-116d-723d-b04c-76d51a2a2cb7" chance="0.001" />
+        </loot>
         <aggroRadius>2</aggroRadius>
         <speed>55</speed>
         <atkSpd>300</atkSpd>
         <level>1</level>
     </monster>
-    <monster>
-        <id>f6630034-a160-4ffc-888e-eb2fee9d9428</id>
+    <monster id="f6630034-a160-4ffc-888e-eb2fee9d9428">
         <name>Bandit</name>
         <maxHealth>11</maxHealth>
         <pAtk>7</pAtk>
@@ -133,33 +124,25 @@
         <critBonus>0</critBonus>
         <xpReward>25</xpReward>
         <attributes>
-            <STRENGTH>11</STRENGTH>
-            <DEXTERITY>12</DEXTERITY>
-            <CONSTITUTION>12</CONSTITUTION>
-            <INTELLIGENCE>10</INTELLIGENCE>
+            <STR>11</STR>
+            <DEX>12</DEX>
+            <CON>12</CON>
+            <INT>10</INT>
             <WIT>10</WIT>
             <MEN>10</MEN>
         </attributes>
-        <goldReward>15</goldReward>
-        <lootTable>
-            <itemTemplateId>019fa0a5-80c0-7035-9c2d-113b09a275df</itemTemplateId>
-            <dropChance>0.1</dropChance>
-        </lootTable>
-        <lootTable>
-            <itemTemplateId>019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518</itemTemplateId>
-            <dropChance>0.05</dropChance>
-        </lootTable>
-        <lootTable>
-            <itemTemplateId>019faec6-116d-723d-b04c-76d51a2a2cb7</itemTemplateId>
-            <dropChance>0.02</dropChance>
-        </lootTable>
+        <loot>
+            <gold>15</gold>
+            <item templateId="019fa0a5-80c0-7035-9c2d-113b09a275df" chance="0.1" />
+            <item templateId="019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518" chance="0.05" />
+            <item templateId="019faec6-116d-723d-b04c-76d51a2a2cb7" chance="0.02" />
+        </loot>
         <aggroRadius>2</aggroRadius>
         <speed>55</speed>
         <atkSpd>300</atkSpd>
         <level>1</level>
     </monster>
-    <monster>
-        <id>026ce1a2-091d-4179-b715-65006480cfbe</id>
+    <monster id="026ce1a2-091d-4179-b715-65006480cfbe">
         <name>Giant Spider</name>
         <maxHealth>26</maxHealth>
         <pAtk>9</pAtk>
@@ -171,29 +154,24 @@
         <critBonus>0</critBonus>
         <xpReward>200</xpReward>
         <attributes>
-            <STRENGTH>14</STRENGTH>
-            <DEXTERITY>16</DEXTERITY>
-            <CONSTITUTION>12</CONSTITUTION>
-            <INTELLIGENCE>2</INTELLIGENCE>
+            <STR>14</STR>
+            <DEX>16</DEX>
+            <CON>12</CON>
+            <INT>2</INT>
             <WIT>11</WIT>
             <MEN>4</MEN>
         </attributes>
-        <goldReward>20</goldReward>
-        <lootTable>
-            <itemTemplateId>019fa0a5-80bf-7e84-87bf-5cf699c00315</itemTemplateId>
-            <dropChance>0.1</dropChance>
-        </lootTable>
-        <lootTable>
-            <itemTemplateId>019fcf0d-1f8f-7d01-8e4f-fd592812a1a7</itemTemplateId>
-            <dropChance>0.001</dropChance>
-        </lootTable>
+        <loot>
+            <gold>20</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
+            <item templateId="019fcf0d-1f8f-7d01-8e4f-fd592812a1a7" chance="0.001" />
+        </loot>
         <aggroRadius>3</aggroRadius>
         <speed>55</speed>
         <atkSpd>300</atkSpd>
         <level>3</level>
     </monster>
-    <monster>
-        <id>49e91691-3a13-4e2b-967f-bc1acf8cf03a</id>
+    <monster id="49e91691-3a13-4e2b-967f-bc1acf8cf03a">
         <name>Black Bear</name>
         <maxHealth>19</maxHealth>
         <pAtk>7</pAtk>
@@ -205,22 +183,18 @@
         <critBonus>0</critBonus>
         <xpReward>100</xpReward>
         <attributes>
-            <STRENGTH>15</STRENGTH>
-            <DEXTERITY>10</DEXTERITY>
-            <CONSTITUTION>14</CONSTITUTION>
-            <INTELLIGENCE>2</INTELLIGENCE>
+            <STR>15</STR>
+            <DEX>10</DEX>
+            <CON>14</CON>
+            <INT>2</INT>
             <WIT>12</WIT>
             <MEN>7</MEN>
         </attributes>
-        <goldReward>10</goldReward>
-        <lootTable>
-            <itemTemplateId>019fa0a5-80bf-7e84-87bf-5cf699c00315</itemTemplateId>
-            <dropChance>0.05</dropChance>
-        </lootTable>
-        <lootTable>
-            <itemTemplateId>019fcf0d-1f8d-7c4c-9275-33c4af4410a8</itemTemplateId>
-            <dropChance>0.0001</dropChance>
-        </lootTable>
+        <loot>
+            <gold>10</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.05" />
+            <item templateId="019fcf0d-1f8d-7c4c-9275-33c4af4410a8" chance="0.0001" />
+        </loot>
         <aggroRadius>3</aggroRadius>
         <speed>75</speed>
         <atkSpd>300</atkSpd>

@@ -28,9 +28,9 @@ public record MonsterStatBlock(MonsterInstance monster) implements OutputJsonMes
                 m.getStatSystem().getEffective(ModifiedStat.ACCURACY),
                 m.getStatSystem().getEffective(ModifiedStat.EVASION),
                 m.getStatSystem().getEffective(ModifiedStat.PCRIT), m.getStatSystem().getEffective(ModifiedStat.ATKSPD),
-                attributeScore(m, Attribute.STRENGTH), attributeScore(m, Attribute.DEXTERITY),
-                attributeScore(m, Attribute.CONSTITUTION), attributeScore(m, Attribute.INTELLIGENCE),
-                attributeScore(m, Attribute.WIT), attributeScore(m, Attribute.MEN)), false);
+                attributeScore(m, Attribute.STR), attributeScore(m, Attribute.DEX), attributeScore(m, Attribute.CON),
+                attributeScore(m, Attribute.INT), attributeScore(m, Attribute.WIT), attributeScore(m, Attribute.MEN)),
+                false);
     }
 
     private static AttributeScore attributeScore(MonsterInstance m, Attribute attribute) {

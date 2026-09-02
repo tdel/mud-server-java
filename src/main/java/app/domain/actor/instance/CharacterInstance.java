@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -59,7 +58,7 @@ public final class CharacterInstance extends AbstractCharacter {
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold, int maxMana, int currentMana,
             Map<ActiveSkill, Integer> knownSkills, List<ActiveEffect> activeEffects, List<Subclass> subclasses,
-            Set<PassiveSkill> knownPassiveSkills, List<Item> items) {
+            Map<PassiveSkill, Integer> knownPassiveSkills, List<Item> items) {
         super(id, name, attributes, currentHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects,
                 computeBaseStats(attributes, level, items, race.speed()), false, 0, 0, List.of());
         this.account = account;
@@ -231,7 +230,7 @@ public final class CharacterInstance extends AbstractCharacter {
     }
 
     public int healthRegenAmountPerTick() {
-        return CombatFormulas.healthRegenPerTick(getMaxHealth(), getAttribute(Attribute.CONSTITUTION));
+        return CombatFormulas.healthRegenPerTick(getMaxHealth(), getAttribute(Attribute.CON));
     }
 
     public int manaRegenAmountPerTick() {
@@ -264,7 +263,7 @@ public final class CharacterInstance extends AbstractCharacter {
     public void applyLevelUp() {
         level++;
 
-        int newMaxHealth = classSystem.getCharacterClass().maxHealth(getAttribute(Attribute.CONSTITUTION), level);
+        int newMaxHealth = classSystem.getCharacterClass().maxHealth(getAttribute(Attribute.CON), level);
         int hpGain = newMaxHealth - getMaxHealth();
         setMaxHealth(newMaxHealth);
         setCurrentHealth(getCurrentHealth() + hpGain);

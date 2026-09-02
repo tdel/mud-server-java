@@ -33,8 +33,9 @@ public final class MonsterInstance extends AbstractCharacter {
             Map<SkillElement, Integer> elementalResistances, int xpReward, int goldReward,
             List<LootTableEntry> lootTable) {
         super(id, name, attributes, maxHealth, maxHealth,
-                knownSkills.stream().collect(Collectors.toMap(skill -> skill, skill -> 1)), knownPassiveSkills,
-                activeEffects, baseStats, false, xpReward, goldReward, lootTable);
+                knownSkills.stream().collect(Collectors.toMap(skill -> skill, skill -> 1)),
+                knownPassiveSkills.stream().collect(Collectors.toMap(skill -> skill, skill -> 1)), activeEffects,
+                baseStats, false, xpReward, goldReward, lootTable);
         this.spawnPosition = spawnPosition;
         this.level = level;
         this.aggroRadius = aggroRadius;

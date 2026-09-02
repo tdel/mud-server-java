@@ -57,8 +57,8 @@ public class Skills implements CommandHandler {
     }
 
     private KnownSkills.Entry toEntry(ActiveSkill skill, int level, boolean granted) {
-        return new KnownSkills.Entry(skill.id(), skill.name(), level, skill.manaCostAt(level), skill.cooldownSeconds(),
-                skill.range(), skill.skillType(), skill.effects().isEmpty() ? 0 : skill.effects().get(0).time(),
-                granted);
+        return new KnownSkills.Entry(skill.id(), skill.name(), level, skill.manaCostAt(level),
+                skill.reuseTimeMs() / 1000, skill.range(), skill.skillType(),
+                skill.effects().isEmpty() ? 0 : skill.effects().get(0).time(), granted);
     }
 }

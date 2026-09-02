@@ -12,17 +12,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import app.domain.PassiveSkill;
+import app.domain.PassiveSkill.GradeLevel;
+import app.domain.SkillEffectType;
 import app.domain.item.ItemGrade;
 import tools.jackson.core.JacksonException;
-import tools.jackson.core.type.TypeReference;
 import tools.jackson.dataformat.xml.XmlMapper;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 @Service
 public class PassiveSkillCatalog {
 
     private static final Logger log = LoggerFactory.getLogger(PassiveSkillCatalog.class);
 
-    private static final String PASSIVE_SKILL_RESOURCE = "/data/skills/passives.xml";
+    private static final String PASSIVE_SKILL_RESOURCE = "/data/skills/skills.xml";
 
     private final Map<UUID, PassiveSkill> passiveSkills = new ConcurrentHashMap<>();
 
@@ -34,12 +37,24 @@ public class PassiveSkillCatalog {
 
     public void warmPassiveSkills() {
         try (InputStream in = getClass().getResourceAsStream(PASSIVE_SKILL_RESOURCE)) {
-            List<PassiveSkillDefinition> definitions = xmlMapper.readValue(in,
-                    new TypeReference<List<PassiveSkillDefinition>>() {
-                    });
-            for (PassiveSkillDefinition definition : definitions) {
-                PassiveSkill passiveSkill = new PassiveSkill(definition.id(), definition.name(),
-                        definition.description(), definition.grantsGrade());
+            SkillsDocument document = xmlMapper.readValue(in, SkillsDocument.class);
+            for (SkillDefinition definition : document.skills()) {
+                if (definition.skillType() != SkillEffectType.PASSIVE) {
+                    continue;
+                }
+                if (definition.levels() == null || definition.levels().isEmpty()) {
+                    throw new IllegalStateException("Compétence passive " + definition.id() + " (" + definition.name()
+                            + ") n'a aucun level dans " + PASSIVE_SKILL_RESOURCE);
+                }
+                List<GradeLevel> levels = definition.levels().stream().map(l -> new GradeLevel(l.id(), l.value()))
+                        .toList();
+                for (int i = 0; i < levels.size(); i++) {
+                    if (levels.get(i).level() != i + 1 || levels.get(i).grade() == null) {
+                        throw new IllegalStateException("Compétence passive " + definition.id() + " ("
+                                + definition.name() + ") a des levels invalides dans " + PASSIVE_SKILL_RESOURCE);
+                    }
+                }
+                PassiveSkill passiveSkill = new PassiveSkill(definition.id(), definition.name(), levels);
                 if (passiveSkills.containsKey(passiveSkill.id())) {
                     throw new IllegalStateException("Compétence passive " + passiveSkill.id() + " ("
                             + passiveSkill.name() + ") a un id déjà utilisé par "
@@ -62,6 +77,19 @@ public class PassiveSkillCatalog {
         return passiveSkill;
     }
 
-    private record PassiveSkillDefinition(UUID id, String name, String description, ItemGrade grantsGrade) {
+    // skills.xml mélange sorts actifs et compétences passives sous la même racine
+    // <skills>/<skill> ; seul <skillType>PASSIVE</skillType> distingue ces
+    // dernières (cf. SkillCatalog, qui les ignore symétriquement).
+    private record SkillsDocument(
+            @JacksonXmlProperty(localName = "skill") @JacksonXmlElementWrapper(useWrapping = false) List<SkillDefinition> skills) {
+    }
+
+    private record SkillDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name,
+            SkillEffectType skillType,
+            @JacksonXmlProperty(localName = "level") @JacksonXmlElementWrapper(useWrapping = false) List<LevelXml> levels) {
+    }
+
+    private record LevelXml(@JacksonXmlProperty(isAttribute = true) int id,
+            @JacksonXmlProperty(isAttribute = true) ItemGrade value) {
     }
 }

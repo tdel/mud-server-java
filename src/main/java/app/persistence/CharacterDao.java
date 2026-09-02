@@ -8,7 +8,6 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -67,10 +66,10 @@ public class CharacterDao {
                         character.getAppearanceSystem().getGender().name(),
                         character.getAppearanceSystem().getRace().name(),
                         character.getClassSystem().getCharacterClass().name(), character.getLevel(),
-                        character.getCurrentHealth(), character.getMaxHealth(),
-                        character.getAttribute(Attribute.STRENGTH), character.getAttribute(Attribute.DEXTERITY),
-                        character.getAttribute(Attribute.CONSTITUTION), character.getAttribute(Attribute.INTELLIGENCE),
-                        character.getAttribute(Attribute.WIT), character.getAttribute(Attribute.MEN), character.getXp(),
+                        character.getCurrentHealth(), character.getMaxHealth(), character.getAttribute(Attribute.STR),
+                        character.getAttribute(Attribute.DEX), character.getAttribute(Attribute.CON),
+                        character.getAttribute(Attribute.INT), character.getAttribute(Attribute.WIT),
+                        character.getAttribute(Attribute.MEN), character.getXp(),
                         character.getInventorySystem().getGold(), character.getMaxMana(), character.getCurrentMana(),
                         name(character.getClassSystem().getSubclass(1)),
                         name(character.getClassSystem().getSubclass(2)))
@@ -121,10 +120,10 @@ public class CharacterDao {
 
     private CharacterInstance toDomain(CharacterRecord record, Account account, WorldInstance instance) {
         Map<Attribute, Integer> attributes = new EnumMap<>(Attribute.class);
-        attributes.put(Attribute.STRENGTH, record.getStrength());
-        attributes.put(Attribute.DEXTERITY, record.getDexterity());
-        attributes.put(Attribute.CONSTITUTION, record.getConstitution());
-        attributes.put(Attribute.INTELLIGENCE, record.getIntelligence());
+        attributes.put(Attribute.STR, record.getStrength());
+        attributes.put(Attribute.DEX, record.getDexterity());
+        attributes.put(Attribute.CON, record.getConstitution());
+        attributes.put(Attribute.INT, record.getIntelligence());
         attributes.put(Attribute.WIT, record.getWit());
         attributes.put(Attribute.MEN, record.getMen());
 
@@ -138,8 +137,9 @@ public class CharacterDao {
         Map<ActiveSkill, Integer> knownSkills = characterSkillDao.findByCharacter(record.getId()).stream()
                 .collect(Collectors.toMap(row -> skillCatalog.getById(row.skillId()),
                         CharacterSkillDao.CharacterSkillRow::level));
-        Set<PassiveSkill> knownPassiveSkills = characterPassiveSkillDao.findPassiveSkillIdsByCharacter(record.getId())
-                .stream().map(passiveSkillCatalog::getById).collect(Collectors.toSet());
+        Map<PassiveSkill, Integer> knownPassiveSkills = characterPassiveSkillDao
+                .findPassiveSkillLevelsByCharacter(record.getId()).entrySet().stream()
+                .collect(Collectors.toMap(entry -> passiveSkillCatalog.getById(entry.getKey()), Map.Entry::getValue));
         Instant now = Instant.now();
         List<ActiveEffect> activeEffects = characterActiveEffectDao.findByCharacterId(record.getId()).stream()
                 .filter(effect -> effect.expiresAt().isAfter(now)).toList();

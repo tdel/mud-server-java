@@ -16,13 +16,16 @@ import app.domain.EffectCategory;
 import app.domain.SkillEffectDefinition;
 import app.domain.SkillEffectType;
 import app.domain.SkillElement;
+import app.domain.SkillLevel;
 import app.domain.SkillTargetType;
 import app.domain.StatModifier;
+import app.domain.StatOperator;
 import app.domain.actor.CharacterClass;
+import app.domain.actor.ModifiedStat;
 import tools.jackson.core.JacksonException;
-import tools.jackson.core.type.TypeReference;
 import tools.jackson.dataformat.xml.XmlMapper;
 import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 @Service
 public class SkillCatalog {
@@ -41,20 +44,39 @@ public class SkillCatalog {
 
     public void warmSkills() {
         try (InputStream in = getClass().getResourceAsStream(SKILL_RESOURCE)) {
-            List<SkillDefinition> definitions = xmlMapper.readValue(in, new TypeReference<List<SkillDefinition>>() {
-            });
-            for (SkillDefinition definition : definitions) {
-                if (definition.projectile() && definition.projectileSpeed() <= 0) {
-                    throw new IllegalStateException("ActiveSkill " + definition.id() + " (" + definition.name()
-                            + ") est un projectile mais n'a pas de projectileSpeed positif dans " + SKILL_RESOURCE);
+            SkillsDocument document = xmlMapper.readValue(in, SkillsDocument.class);
+            for (SkillDefinition definition : document.skills()) {
+                if (definition.skillType() == SkillEffectType.PASSIVE) {
+                    // Compétence passive (ex: Expertise Grade) : hors du champ de SkillCatalog,
+                    // gérée symétriquement par PassiveSkillCatalog.
+                    continue;
                 }
-                if (definition.power().size() != definition.manaCost().size()) {
+                if (definition.levels() == null || definition.levels().isEmpty()) {
                     throw new IllegalStateException("ActiveSkill " + definition.id() + " (" + definition.name()
-                            + ") a des tableaux power/manaCost de longueurs différentes dans " + SKILL_RESOURCE);
+                            + ") n'a aucun level dans " + SKILL_RESOURCE);
                 }
-                if (definition.power().isEmpty()) {
+                if (definition.reuseTime() == null || definition.castTime() == null || definition.range() == null) {
                     throw new IllegalStateException("ActiveSkill " + definition.id() + " (" + definition.name()
-                            + ") n'a aucun level (power vide) dans " + SKILL_RESOURCE);
+                            + ") n'a pas reuseTime/castTime/range dans " + SKILL_RESOURCE);
+                }
+                List<SkillLevel> levels = definition.levels().stream().map(l -> {
+                    if (l.mana() == null || l.power() == null) {
+                        throw new IllegalStateException("ActiveSkill " + definition.id() + " (" + definition.name()
+                                + ") a un level sans mana/power dans " + SKILL_RESOURCE);
+                    }
+                    return new SkillLevel(l.id(), l.mana(), l.power());
+                }).toList();
+                for (int i = 0; i < levels.size(); i++) {
+                    if (levels.get(i).level() != i + 1) {
+                        throw new IllegalStateException("ActiveSkill " + definition.id() + " (" + definition.name()
+                                + ") a des level id non séquentiels dans " + SKILL_RESOURCE);
+                    }
+                }
+                boolean projectile = definition.projectile() != null;
+                int projectileSpeed = projectile ? definition.projectile().speed() : 0;
+                if (projectile && projectileSpeed <= 0) {
+                    throw new IllegalStateException("ActiveSkill " + definition.id() + " (" + definition.name()
+                            + ") est un projectile mais n'a pas de speed positif dans " + SKILL_RESOURCE);
                 }
                 int aoeRadius = definition.aoeRadius() == null ? 0 : definition.aoeRadius();
                 SkillTargetType target = definition.target() == null ? SkillTargetType.ONE : definition.target();
@@ -65,14 +87,17 @@ public class SkillCatalog {
                 }
                 List<SkillEffectDefinition> effects = definition.effects() == null
                         ? List.of()
-                        : definition.effects().stream().map(
-                                e -> new SkillEffectDefinition(e.name(), e.time(), e.power(), e.type(), e.effect()))
+                        : definition.effects().effect().stream()
+                                .map(e -> new SkillEffectDefinition(e.name(), e.time(),
+                                        e.power() == null ? 0 : e.power(), e.type(), e.apply().stream()
+                                                .map(a -> new StatModifier(a.stat(), a.value(), a.op())).toList()))
                                 .toList();
-                ActiveSkill activeSkill = new ActiveSkill(definition.id(), definition.name(), definition.manaCost(),
-                        definition.cooldownSeconds(), definition.castingTimeMs(), definition.range(), aoeRadius,
-                        definition.skillType(), target, definition.power(),
-                        definition.element() == null ? SkillElement.NONE : definition.element(),
-                        definition.projectile(), definition.projectileSpeed(), effects);
+                int reuseTimeMs = Math.round(definition.reuseTime() * 1000f);
+                int castingTimeMs = Math.round(definition.castTime() * 1000f);
+                ActiveSkill activeSkill = new ActiveSkill(definition.id(), definition.name(), levels, reuseTimeMs,
+                        castingTimeMs, definition.range(), aoeRadius, definition.skillType(), target,
+                        definition.element() == null ? SkillElement.NONE : definition.element(), projectile,
+                        projectileSpeed, effects);
                 if (activeSkills.containsKey(activeSkill.id())) {
                     throw new IllegalStateException("ActiveSkill " + activeSkill.id() + " (" + activeSkill.name()
                             + ") a un id déjà utilisé par " + activeSkills.get(activeSkill.id()).name() + " dans "
@@ -103,15 +128,47 @@ public class SkillCatalog {
     public record LearnableSkill(ActiveSkill skill, int level) {
     }
 
-    private record SkillDefinition(UUID id, String name,
-            @JacksonXmlElementWrapper(useWrapping = false) List<Integer> manaCost, int cooldownSeconds,
-            int castingTimeMs, int range, Integer aoeRadius, SkillEffectType skillType, SkillTargetType target,
-            @JacksonXmlElementWrapper(useWrapping = false) List<Integer> power, SkillElement element,
-            boolean projectile, int projectileSpeed,
-            @JacksonXmlElementWrapper(useWrapping = false) List<SkillEffectDefinitionXml> effects) {
+    // skills.xml mélange sorts actifs et compétences passives sous la même racine
+    // <skills>/<skill> ; skillType==PASSIVE (Expertise Grade) est ignoré ci-dessus
+    // et géré par PassiveSkillCatalog à la place.
+    private record SkillsDocument(
+            @JacksonXmlProperty(localName = "skill") @JacksonXmlElementWrapper(useWrapping = false) List<SkillDefinition> skills) {
     }
 
-    private record SkillEffectDefinitionXml(String name, int time, int power, EffectCategory type,
-            @JacksonXmlElementWrapper(useWrapping = false) List<StatModifier> effect) {
+    private record SkillDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name,
+            @JacksonXmlProperty(localName = "level") @JacksonXmlElementWrapper(useWrapping = false) List<SkillLevelXml> levels,
+            Float reuseTime, Float castTime, Integer range, Integer aoeRadius, SkillEffectType skillType,
+            SkillTargetType target, SkillElement element, ProjectileXml projectile, EffectsXml effects) {
+    }
+
+    // mana/power sont Integer (et non int) car un skill PASSIVE (Expertise Grade)
+    // partage ce même schéma <level> mais n'en a pas — cf. warmSkills(), qui
+    // saute ces définitions avant de déréférencer mana/power.
+    private record SkillLevelXml(@JacksonXmlProperty(isAttribute = true) int id,
+            @JacksonXmlProperty(isAttribute = true) Integer mana,
+            @JacksonXmlProperty(isAttribute = true) Integer power) {
+    }
+
+    private record ProjectileXml(@JacksonXmlProperty(isAttribute = true) int speed) {
+    }
+
+    // <effects> est un objet imbriqué unique (pas une liste répétée) car
+    // @JacksonXmlElementWrapper combiné à un @JacksonXmlProperty(localName=...)
+    // différent du nom du composant du record casse la désérialisation
+    // (tools.jackson.dataformat.xml) ; on retombe donc sur le même schéma
+    // "liste non wrappée avec localName" qui, lui, fonctionne (cf. levels/apply).
+    private record EffectsXml(
+            @JacksonXmlProperty(localName = "effect") @JacksonXmlElementWrapper(useWrapping = false) List<SkillEffectDefinitionXml> effect) {
+    }
+
+    private record SkillEffectDefinitionXml(@JacksonXmlProperty(isAttribute = true) String name,
+            @JacksonXmlProperty(isAttribute = true) int time, @JacksonXmlProperty(isAttribute = true) Integer power,
+            @JacksonXmlProperty(isAttribute = true) EffectCategory type,
+            @JacksonXmlProperty(localName = "apply") @JacksonXmlElementWrapper(useWrapping = false) List<StatModifierXml> apply) {
+    }
+
+    private record StatModifierXml(@JacksonXmlProperty(isAttribute = true) ModifiedStat stat,
+            @JacksonXmlProperty(isAttribute = true) int value,
+            @JacksonXmlProperty(isAttribute = true) StatOperator op) {
     }
 }

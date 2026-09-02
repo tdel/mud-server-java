@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <npcs>
-    <npc>
-        <id>a3c8d0f2-5d5f-4d2c-9f2c-3f4e5d6c7b8a</id>
+    <npc id="a3c8d0f2-5d5f-4d2c-9f2c-3f4e5d6c7b8a">
         <name>Innkeeper</name>
         <dialogue>
             <greeting>Hello, I sell several interesting things, would you like to see?</greeting>
@@ -39,8 +38,7 @@
         </dialogue>
         <level>1</level>
     </npc>
-    <npc>
-        <id>dcb67f1e-b178-4062-8393-26abca9b0d66</id>
+    <npc id="dcb67f1e-b178-4062-8393-26abca9b0d66">
         <name>Blacksmith</name>
         <dialogue>
             <greeting>A weapon, some armor? I've got what you need.</greeting>
@@ -93,29 +91,5 @@
             </shop>
         </dialogue>
         <level>1</level>
-    </npc>
-    <npc>
-        <id>b0362279-5a46-4461-9672-6f4e0b2cf7e0</id>
-        <name>Village Guard</name>
-        <dialogue>
-            <greeting>Halt! ... Alright, move along.</greeting>
-            <options>
-                <label>Goodbye</label>
-                <type>LEAVE</type>
-            </options>
-        </dialogue>
-        <level>2</level>
-    </npc>
-    <npc>
-        <id>318a4b28-4aae-46fa-ab99-2bc62738f1c3</id>
-        <name>Gate Guard</name>
-        <dialogue>
-            <greeting>Nothing to report here. Move along.</greeting>
-            <options>
-                <label>Goodbye</label>
-                <type>LEAVE</type>
-            </options>
-        </dialogue>
-        <level>2</level>
     </npc>
 </npcs>

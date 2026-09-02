@@ -1,14 +1,14 @@
 package app.domain.actor;
 
 public enum Attribute {
-    STRENGTH, DEXTERITY, CONSTITUTION, INTELLIGENCE, WIT, MEN;
+    STR, DEX, CON, INT, WIT, MEN;
 
     public String label() {
         return switch (this) {
-            case STRENGTH -> "Strength";
-            case DEXTERITY -> "Dexterity";
-            case CONSTITUTION -> "Constitution";
-            case INTELLIGENCE -> "Intelligence";
+            case STR -> "Strength";
+            case DEX -> "Dexterity";
+            case CON -> "Constitution";
+            case INT -> "Intelligence";
             case WIT -> "Wit";
             case MEN -> "Mental";
         };

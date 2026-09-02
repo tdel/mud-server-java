@@ -3,7 +3,6 @@ package app.domain.actor;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import app.domain.ActiveEffect;
@@ -36,7 +35,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     private final KnownList knownList = new KnownList(this);
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
-            int maxHealth, Map<ActiveSkill, Integer> knownSkills, Set<PassiveSkill> knownPassiveSkills,
+            int maxHealth, Map<ActiveSkill, Integer> knownSkills, Map<PassiveSkill, Integer> knownPassiveSkills,
             List<ActiveEffect> activeEffects, Map<ModifiedStat, Integer> initialBaseStats, boolean invulnerable,
             int xpReward, int goldReward, List<LootTableEntry> lootTable) {
         super(id, name);
@@ -47,7 +46,7 @@ public abstract class AbstractCharacter extends AbstractObject {
         this.combatSystem = new CombatSystem(this, invulnerable);
         this.lootSystem = new LootSystem(this, xpReward, goldReward, lootTable);
         knownSkills.forEach((skill, level) -> getSkillSystem().learn(skill, level));
-        knownPassiveSkills.forEach(getSkillSystem()::learn);
+        knownPassiveSkills.forEach((passiveSkill, level) -> getSkillSystem().learn(passiveSkill, level));
         activeEffects.forEach(getEffectsSystem()::apply);
     }
 

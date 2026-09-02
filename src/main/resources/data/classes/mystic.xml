@@ -7,366 +7,350 @@
     <mpAdd>7.16</mpAdd>
     <mpMod>0.04</mpMod>
     <baseAttributes>
-        <STRENGTH>8</STRENGTH>
-        <DEXTERITY>12</DEXTERITY>
-        <CONSTITUTION>10</CONSTITUTION>
-        <INTELLIGENCE>15</INTELLIGENCE>
+        <STR>8</STR>
+        <DEX>12</DEX>
+        <CON>10</CON>
+        <INT>15</INT>
         <WIT>14</WIT>
         <MEN>13</MEN>
     </baseAttributes>
-    <skills>
-        <id>e85856bd-fe90-5d39-a40a-089be52a89f2</id>
+    <skill id="e85856bd-fe90-5d39-a40a-089be52a89f2">
+        <!-- Wind Strike -->
         <level>1</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>e85856bd-fe90-5d39-a40a-089be52a89f2</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="e85856bd-fe90-5d39-a40a-089be52a89f2">
+        <!-- Wind Strike -->
         <level>2</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>e85856bd-fe90-5d39-a40a-089be52a89f2</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="e85856bd-fe90-5d39-a40a-089be52a89f2">
+        <!-- Wind Strike -->
         <level>3</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>e85856bd-fe90-5d39-a40a-089be52a89f2</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="e85856bd-fe90-5d39-a40a-089be52a89f2">
+        <!-- Wind Strike -->
         <level>4</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>e85856bd-fe90-5d39-a40a-089be52a89f2</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="e85856bd-fe90-5d39-a40a-089be52a89f2">
+        <!-- Wind Strike -->
         <level>5</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>0bbb38f7-3ff3-5366-9792-40b28e3760db</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="0bbb38f7-3ff3-5366-9792-40b28e3760db">
+        <!-- Aqua Strike -->
         <level>1</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>0bbb38f7-3ff3-5366-9792-40b28e3760db</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="0bbb38f7-3ff3-5366-9792-40b28e3760db">
+        <!-- Aqua Strike -->
         <level>2</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>0bbb38f7-3ff3-5366-9792-40b28e3760db</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="0bbb38f7-3ff3-5366-9792-40b28e3760db">
+        <!-- Aqua Strike -->
         <level>3</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>0bbb38f7-3ff3-5366-9792-40b28e3760db</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="0bbb38f7-3ff3-5366-9792-40b28e3760db">
+        <!-- Aqua Strike -->
         <level>4</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>0bbb38f7-3ff3-5366-9792-40b28e3760db</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="0bbb38f7-3ff3-5366-9792-40b28e3760db">
+        <!-- Aqua Strike -->
         <level>5</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>2127fbac-35aa-4897-a07d-bd619c4ec5b0</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="2127fbac-35aa-4897-a07d-bd619c4ec5b0">
+        <!-- Flame Strike -->
         <level>1</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>2127fbac-35aa-4897-a07d-bd619c4ec5b0</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="2127fbac-35aa-4897-a07d-bd619c4ec5b0">
+        <!-- Flame Strike -->
         <level>2</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>2127fbac-35aa-4897-a07d-bd619c4ec5b0</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="2127fbac-35aa-4897-a07d-bd619c4ec5b0">
+        <!-- Flame Strike -->
         <level>3</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>2127fbac-35aa-4897-a07d-bd619c4ec5b0</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="2127fbac-35aa-4897-a07d-bd619c4ec5b0">
+        <!-- Flame Strike -->
         <level>4</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>2127fbac-35aa-4897-a07d-bd619c4ec5b0</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="2127fbac-35aa-4897-a07d-bd619c4ec5b0">
+        <!-- Flame Strike -->
         <level>5</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>de9b9e05-c9c0-54f4-947a-962700dddce3</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="de9b9e05-c9c0-54f4-947a-962700dddce3">
+        <!-- Solar Strike -->
         <level>1</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>de9b9e05-c9c0-54f4-947a-962700dddce3</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="de9b9e05-c9c0-54f4-947a-962700dddce3">
+        <!-- Solar Strike -->
         <level>2</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>de9b9e05-c9c0-54f4-947a-962700dddce3</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="de9b9e05-c9c0-54f4-947a-962700dddce3">
+        <!-- Solar Strike -->
         <level>3</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>de9b9e05-c9c0-54f4-947a-962700dddce3</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="de9b9e05-c9c0-54f4-947a-962700dddce3">
+        <!-- Solar Strike -->
         <level>4</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>de9b9e05-c9c0-54f4-947a-962700dddce3</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="de9b9e05-c9c0-54f4-947a-962700dddce3">
+        <!-- Solar Strike -->
         <level>5</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>76eda883-8345-5989-a034-45c6e443f846</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="76eda883-8345-5989-a034-45c6e443f846">
+        <!-- Death Spike -->
         <level>1</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>76eda883-8345-5989-a034-45c6e443f846</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="76eda883-8345-5989-a034-45c6e443f846">
+        <!-- Death Spike -->
         <level>2</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>76eda883-8345-5989-a034-45c6e443f846</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="76eda883-8345-5989-a034-45c6e443f846">
+        <!-- Death Spike -->
         <level>3</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>76eda883-8345-5989-a034-45c6e443f846</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="76eda883-8345-5989-a034-45c6e443f846">
+        <!-- Death Spike -->
         <level>4</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>76eda883-8345-5989-a034-45c6e443f846</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="76eda883-8345-5989-a034-45c6e443f846">
+        <!-- Death Spike -->
         <level>5</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>c2956152-d234-5ef4-8890-95eec06bdfd0</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="c2956152-d234-5ef4-8890-95eec06bdfd0">
+        <!-- Twister -->
         <level>1</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>c2956152-d234-5ef4-8890-95eec06bdfd0</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="c2956152-d234-5ef4-8890-95eec06bdfd0">
+        <!-- Twister -->
         <level>2</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>c2956152-d234-5ef4-8890-95eec06bdfd0</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="c2956152-d234-5ef4-8890-95eec06bdfd0">
+        <!-- Twister -->
         <level>3</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>c2956152-d234-5ef4-8890-95eec06bdfd0</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="c2956152-d234-5ef4-8890-95eec06bdfd0">
+        <!-- Twister -->
         <level>4</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>1c8f7ecc-cd5b-580d-a8ec-7bb7cbd37ee8</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="1c8f7ecc-cd5b-580d-a8ec-7bb7cbd37ee8">
+        <!-- Prominence -->
         <level>1</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>1c8f7ecc-cd5b-580d-a8ec-7bb7cbd37ee8</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="1c8f7ecc-cd5b-580d-a8ec-7bb7cbd37ee8">
+        <!-- Prominence -->
         <level>2</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>1c8f7ecc-cd5b-580d-a8ec-7bb7cbd37ee8</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="1c8f7ecc-cd5b-580d-a8ec-7bb7cbd37ee8">
+        <!-- Prominence -->
         <level>3</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>1c8f7ecc-cd5b-580d-a8ec-7bb7cbd37ee8</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="1c8f7ecc-cd5b-580d-a8ec-7bb7cbd37ee8">
+        <!-- Prominence -->
         <level>4</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>e287e606-621f-48c5-b8dc-613fa98709d3</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="e287e606-621f-48c5-b8dc-613fa98709d3">
+        <!-- Heal -->
         <level>1</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>e287e606-621f-48c5-b8dc-613fa98709d3</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="e287e606-621f-48c5-b8dc-613fa98709d3">
+        <!-- Heal -->
         <level>2</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>e287e606-621f-48c5-b8dc-613fa98709d3</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="e287e606-621f-48c5-b8dc-613fa98709d3">
+        <!-- Heal -->
         <level>3</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>e287e606-621f-48c5-b8dc-613fa98709d3</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="e287e606-621f-48c5-b8dc-613fa98709d3">
+        <!-- Heal -->
         <level>4</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>e287e606-621f-48c5-b8dc-613fa98709d3</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="e287e606-621f-48c5-b8dc-613fa98709d3">
+        <!-- Heal -->
         <level>5</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>e1eff4f2-f0d0-5445-8147-ab00037fd70e</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="e1eff4f2-f0d0-5445-8147-ab00037fd70e">
+        <!-- Mass Heal -->
         <level>1</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>e1eff4f2-f0d0-5445-8147-ab00037fd70e</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="e1eff4f2-f0d0-5445-8147-ab00037fd70e">
+        <!-- Mass Heal -->
         <level>2</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>e1eff4f2-f0d0-5445-8147-ab00037fd70e</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="e1eff4f2-f0d0-5445-8147-ab00037fd70e">
+        <!-- Mass Heal -->
         <level>3</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>e1eff4f2-f0d0-5445-8147-ab00037fd70e</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="e1eff4f2-f0d0-5445-8147-ab00037fd70e">
+        <!-- Mass Heal -->
         <level>4</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>8ab3ee13-989b-5ea7-884e-5b548202a39f</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="8ab3ee13-989b-5ea7-884e-5b548202a39f">
+        <!-- Might -->
         <level>1</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>8ab3ee13-989b-5ea7-884e-5b548202a39f</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="8ab3ee13-989b-5ea7-884e-5b548202a39f">
+        <!-- Might -->
         <level>2</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>8ab3ee13-989b-5ea7-884e-5b548202a39f</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="8ab3ee13-989b-5ea7-884e-5b548202a39f">
+        <!-- Might -->
         <level>3</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>8ab3ee13-989b-5ea7-884e-5b548202a39f</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="8ab3ee13-989b-5ea7-884e-5b548202a39f">
+        <!-- Might -->
         <level>4</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>8ab3ee13-989b-5ea7-884e-5b548202a39f</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="8ab3ee13-989b-5ea7-884e-5b548202a39f">
+        <!-- Might -->
         <level>5</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f">
+        <!-- Focus -->
         <level>1</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f">
+        <!-- Focus -->
         <level>2</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f">
+        <!-- Focus -->
         <level>3</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f">
+        <!-- Focus -->
         <level>4</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f">
+        <!-- Focus -->
         <level>5</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>7ee36cfc-4ac5-5d5b-88ef-18ee1c8e890d</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="7ee36cfc-4ac5-5d5b-88ef-18ee1c8e890d">
+        <!-- Empower -->
         <level>1</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>7ee36cfc-4ac5-5d5b-88ef-18ee1c8e890d</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="7ee36cfc-4ac5-5d5b-88ef-18ee1c8e890d">
+        <!-- Empower -->
         <level>2</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>7ee36cfc-4ac5-5d5b-88ef-18ee1c8e890d</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="7ee36cfc-4ac5-5d5b-88ef-18ee1c8e890d">
+        <!-- Empower -->
         <level>3</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>7ee36cfc-4ac5-5d5b-88ef-18ee1c8e890d</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="7ee36cfc-4ac5-5d5b-88ef-18ee1c8e890d">
+        <!-- Empower -->
         <level>4</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>7ee36cfc-4ac5-5d5b-88ef-18ee1c8e890d</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="7ee36cfc-4ac5-5d5b-88ef-18ee1c8e890d">
+        <!-- Empower -->
         <level>5</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e">
+        <!-- Curse: Doom -->
         <level>1</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e">
+        <!-- Curse: Doom -->
         <level>2</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e">
+        <!-- Curse: Doom -->
         <level>3</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e">
+        <!-- Curse: Doom -->
         <level>4</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e">
+        <!-- Curse: Doom -->
         <level>5</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>0d9a1af2-0395-52bb-8839-174372a6beea</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="0d9a1af2-0395-52bb-8839-174372a6beea">
+        <!-- Curse: Weakness -->
         <level>1</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>0d9a1af2-0395-52bb-8839-174372a6beea</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="0d9a1af2-0395-52bb-8839-174372a6beea">
+        <!-- Curse: Weakness -->
         <level>2</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>0d9a1af2-0395-52bb-8839-174372a6beea</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="0d9a1af2-0395-52bb-8839-174372a6beea">
+        <!-- Curse: Weakness -->
         <level>3</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>0d9a1af2-0395-52bb-8839-174372a6beea</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="0d9a1af2-0395-52bb-8839-174372a6beea">
+        <!-- Curse: Weakness -->
         <level>4</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <skills>
-        <id>0d9a1af2-0395-52bb-8839-174372a6beea</id>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="0d9a1af2-0395-52bb-8839-174372a6beea">
+        <!-- Curse: Weakness -->
         <level>5</level>
-        <requiredLevel>1</requiredLevel>
-    </skills>
-    <passiveSkills>
-        <id>865a7263-fb06-48ef-89c1-9ccbad268215</id>
-        <requiredLevel>1</requiredLevel>
-    </passiveSkills>
-    <passiveSkills>
-        <id>79a543e2-24c5-49d4-b90d-8f7c45c929b5</id>
-        <requiredLevel>1</requiredLevel>
-    </passiveSkills>
-    <passiveSkills>
-        <id>b056411d-5e82-49b0-833a-1c449615a5c9</id>
-        <requiredLevel>1</requiredLevel>
-    </passiveSkills>
-    <passiveSkills>
-        <id>77086cb5-2ff2-45a0-8643-62a3c4ed0400</id>
-        <requiredLevel>1</requiredLevel>
-    </passiveSkills>
-    <passiveSkills>
-        <id>b13d398e-07b4-430c-bfb8-ad7ddf816974</id>
-        <requiredLevel>1</requiredLevel>
-    </passiveSkills>
+        <playerLevel>1</playerLevel>
+    </skill>
+    <skill id="865a7263-fb06-48ef-89c1-9ccbad268215">
+        <!-- Expertise Grade -->
+        <playerLevel>1</playerLevel>
+    </skill>
 </class>

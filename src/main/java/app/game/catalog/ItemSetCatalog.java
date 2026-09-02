@@ -16,6 +16,7 @@ import app.domain.item.ItemSet;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.dataformat.xml.XmlMapper;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 @Service
@@ -23,7 +24,7 @@ public class ItemSetCatalog {
 
     private static final Logger log = LoggerFactory.getLogger(ItemSetCatalog.class);
 
-    private static final String ITEM_SET_RESOURCE = "/data/item_sets.xml";
+    private static final String ITEM_SET_RESOURCE = "/data/items/item_sets.xml";
 
     private final Map<String, ItemSet> sets = new ConcurrentHashMap<>();
 
@@ -38,8 +39,8 @@ public class ItemSetCatalog {
             List<ItemSetDefinition> definitions = xmlMapper.readValue(in, new TypeReference<List<ItemSetDefinition>>() {
             });
             for (ItemSetDefinition definition : definitions) {
-                Map<Integer, Map<ModifiedStat, Integer>> bonusByPieceCount = definition.bonusByPieceCount().stream()
-                        .collect(Collectors.toMap(PieceBonusDefinition::pieceCount, PieceBonusDefinition::bonuses));
+                Map<Integer, Map<ModifiedStat, Integer>> bonusByPieceCount = definition.set().pieces().stream()
+                        .collect(Collectors.toMap(PieceBonusDefinition::count, PieceBonusDefinition::bonuses));
                 sets.put(definition.id(), new ItemSet(definition.id(), definition.name(), bonusByPieceCount));
             }
             log.info("item.sets_loaded count={}", sets.size());
@@ -57,10 +58,14 @@ public class ItemSetCatalog {
         return set;
     }
 
-    private record ItemSetDefinition(String id, String name, List<PieceBonusDefinition> bonusByPieceCount) {
+    private record ItemSetDefinition(@JacksonXmlProperty(isAttribute = true) String id, String name,
+            SetDefinition set) {
     }
 
-    private record PieceBonusDefinition(@JacksonXmlProperty(isAttribute = true) int pieceCount,
+    private record SetDefinition(@JacksonXmlElementWrapper(useWrapping = false) List<PieceBonusDefinition> pieces) {
+    }
+
+    private record PieceBonusDefinition(@JacksonXmlProperty(isAttribute = true) int count,
             Map<ModifiedStat, Integer> bonuses) {
     }
 }

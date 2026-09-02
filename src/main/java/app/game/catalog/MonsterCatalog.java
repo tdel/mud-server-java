@@ -30,6 +30,7 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.dataformat.xml.XmlMapper;
 import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 @Service
 public class MonsterCatalog {
@@ -106,20 +107,20 @@ public class MonsterCatalog {
     private void registerTemplates(List<MonsterTemplateDefinition> definitions) {
         for (MonsterTemplateDefinition definition : definitions) {
             List<LootTableEntry> lootTable = new ArrayList<>();
-            List<LootTableEntryDefinition> lootTableEntries = definition.lootTable() == null
+            List<ItemDropDefinition> itemDrops = definition.loot().item() == null
                     ? List.of()
-                    : definition.lootTable();
-            for (LootTableEntryDefinition entryDef : lootTableEntries) {
-                if (entryDef.dropChance() < 0 || entryDef.dropChance() > 100) {
-                    throw new IllegalStateException("Template " + definition.id() + " a une entrée de lootTable avec "
-                            + "dropChance=" + entryDef.dropChance() + " hors de [0, 100] dans " + MONSTERS_RESOURCE);
+                    : definition.loot().item();
+            for (ItemDropDefinition drop : itemDrops) {
+                if (drop.chance() < 0 || drop.chance() > 100) {
+                    throw new IllegalStateException("Template " + definition.id() + " a une entrée de loot avec "
+                            + "chance=" + drop.chance() + " hors de [0, 100] dans " + MONSTERS_RESOURCE);
                 }
-                ItemTemplate itemTemplate = this.itemTemplateCatalog.getById(entryDef.itemTemplateId());
+                ItemTemplate itemTemplate = this.itemTemplateCatalog.getById(drop.templateId());
                 if (itemTemplate == null) {
                     throw new IllegalStateException("Template " + definition.id() + " référence l'item "
-                            + entryDef.itemTemplateId() + " dans sa lootTable, absent de data/items/*.xml");
+                            + drop.templateId() + " dans son loot, absent de data/items/*.xml");
                 }
-                lootTable.add(new LootTableEntry(itemTemplate, entryDef.dropChance()));
+                lootTable.add(new LootTableEntry(itemTemplate, drop.chance()));
             }
             Map<SkillElement, Integer> elementalResistances = definition.elementalResistances() == null
                     ? Map.of()
@@ -128,19 +129,23 @@ public class MonsterCatalog {
                     new MonsterTemplate(definition.id(), definition.name(), definition.maxHealth(),
                             definition.attributes(), definition.pAtk(), definition.mAtk(), definition.pDef(),
                             definition.mDef(), definition.accuracyBonus(), definition.evasionBonus(),
-                            definition.critBonus(), definition.xpReward(), definition.goldReward(), lootTable,
+                            definition.critBonus(), definition.xpReward(), definition.loot().gold(), lootTable,
                             definition.aggroRadius(), definition.speed(), definition.atkSpd(), definition.level(),
                             elementalResistances, Set.of(), Set.of(), List.of()));
         }
         log.info("monster.templates_loaded count={}", templates.size());
     }
 
-    record LootTableEntryDefinition(UUID itemTemplateId, double dropChance) {
+    record ItemDropDefinition(@JacksonXmlProperty(isAttribute = true) UUID templateId,
+            @JacksonXmlProperty(isAttribute = true) double chance) {
     }
 
-    record MonsterTemplateDefinition(UUID id, String name, int maxHealth, Map<Attribute, Integer> attributes, int pAtk,
-            int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus, int critBonus, int xpReward,
-            int goldReward, @JacksonXmlElementWrapper(useWrapping = false) List<LootTableEntryDefinition> lootTable,
-            int aggroRadius, int speed, int atkSpd, int level, Map<SkillElement, Integer> elementalResistances) {
+    record LootDefinition(int gold, @JacksonXmlElementWrapper(useWrapping = false) List<ItemDropDefinition> item) {
+    }
+
+    record MonsterTemplateDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name, int maxHealth,
+            Map<Attribute, Integer> attributes, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus,
+            int evasionBonus, int critBonus, int xpReward, LootDefinition loot, int aggroRadius, int speed, int atkSpd,
+            int level, Map<SkillElement, Integer> elementalResistances) {
     }
 }

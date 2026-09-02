@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <weapons>
-    <weapon>
-        <id>019fa0a5-80c0-7035-9c2d-113b09a275df</id>
+    <weapon id="019fa0a5-80c0-7035-9c2d-113b09a275df">
         <name>Short Sword</name>
         <type>WEAPON</type>
         <weight>1</weight>
@@ -15,9 +14,18 @@
         <atkSpd>300</atkSpd>
         <price>10</price>
         <grade>D</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </weapon>
-    <weapon>
-        <id>ac9fe757-ab75-47ef-b413-8844d5c5ed73</id>
+    <weapon id="ac9fe757-ab75-47ef-b413-8844d5c5ed73">
         <name>Basic Wizard Staff</name>
         <type>WEAPON</type>
         <weight>1</weight>
@@ -31,9 +39,18 @@
         <atkSpd>280</atkSpd>
         <price>10</price>
         <grade>D</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </weapon>
-    <weapon>
-        <id>ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd</id>
+    <weapon id="ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd">
         <name>Dagger</name>
         <type>WEAPON</type>
         <weight>1</weight>
@@ -47,9 +64,18 @@
         <atkSpd>340</atkSpd>
         <price>2</price>
         <grade>D</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </weapon>
-    <weapon>
-        <id>019fe3f6-b1ee-78f8-a681-d288c7f87511</id>
+    <weapon id="019fe3f6-b1ee-78f8-a681-d288c7f87511">
         <name>Long Sword +1</name>
         <type>WEAPON</type>
         <weight>3</weight>
@@ -63,9 +89,18 @@
         <atkSpd>300</atkSpd>
         <price>500</price>
         <grade>C</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </weapon>
-    <weapon>
-        <id>019fe3f6-b1f0-7e00-a18d-ee3ac38f9332</id>
+    <weapon id="019fe3f6-b1f0-7e00-a18d-ee3ac38f9332">
         <name>Long Sword +2</name>
         <type>WEAPON</type>
         <weight>3</weight>
@@ -79,9 +114,18 @@
         <atkSpd>300</atkSpd>
         <price>4000</price>
         <grade>B</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </weapon>
-    <weapon>
-        <id>6f1c2a3e-8b4d-4e7a-9c2f-1a3d5e7b9c1f</id>
+    <weapon id="6f1c2a3e-8b4d-4e7a-9c2f-1a3d5e7b9c1f">
         <name>Wand of Flames</name>
         <description>A wand engraved with fiery runes; wielding it lets you conjure a bolt of flame.</description>
         <type>WEAPON</type>
@@ -96,10 +140,19 @@
         <atkSpd>280</atkSpd>
         <price>100</price>
         <grade>C</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
         <grantedSkillIds>2127fbac-35aa-4897-a07d-bd619c4ec5b0</grantedSkillIds>
     </weapon>
-    <weapon>
-        <id>7a2d3b4f-9c5e-4f8b-8d3a-2b4e6f8a0c2d</id>
+    <weapon id="7a2d3b4f-9c5e-4f8b-8d3a-2b4e6f8a0c2d">
         <name>Staff of Healing</name>
         <description>A white wooden staff that channels healing energy on contact.</description>
         <type>WEAPON</type>
@@ -114,10 +167,19 @@
         <atkSpd>280</atkSpd>
         <price>150</price>
         <grade>C</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
         <grantedSkillIds>e287e606-621f-48c5-b8dc-613fa98709d3</grantedSkillIds>
     </weapon>
-    <weapon>
-        <id>558543a4-39d4-4f36-ac1e-2881deac24a6</id>
+    <weapon id="558543a4-39d4-4f36-ac1e-2881deac24a6">
         <name>Wooden Sword</name>
         <type>WEAPON</type>
         <weight>1</weight>
@@ -132,8 +194,7 @@
         <price>1</price>
         <grade>NOGRADE</grade>
     </weapon>
-    <weapon>
-        <id>45785ec3-8118-4938-b614-3e3a03dabc5e</id>
+    <weapon id="45785ec3-8118-4938-b614-3e3a03dabc5e">
         <name>Saber</name>
         <type>WEAPON</type>
         <weight>2</weight>
@@ -147,9 +208,18 @@
         <atkSpd>320</atkSpd>
         <price>15</price>
         <grade>D</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </weapon>
-    <weapon>
-        <id>21a73422-e8ee-49ba-8137-05b49a5dbea5</id>
+    <weapon id="21a73422-e8ee-49ba-8137-05b49a5dbea5">
         <name>Battle Axe</name>
         <type>WEAPON</type>
         <weight>4</weight>
@@ -163,9 +233,18 @@
         <atkSpd>250</atkSpd>
         <price>40</price>
         <grade>D</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </weapon>
-    <weapon>
-        <id>7ad6443f-65cf-4761-b894-5fa8dc859e2e</id>
+    <weapon id="7ad6443f-65cf-4761-b894-5fa8dc859e2e">
         <name>Tsurugi</name>
         <type>WEAPON</type>
         <weight>3</weight>
@@ -179,9 +258,18 @@
         <atkSpd>300</atkSpd>
         <price>800</price>
         <grade>C</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </weapon>
-    <weapon>
-        <id>84349095-9c39-49e4-9f0a-1819dc7d1748</id>
+    <weapon id="84349095-9c39-49e4-9f0a-1819dc7d1748">
         <name>Sword of Valhalla</name>
         <type>WEAPON</type>
         <weight>3</weight>
@@ -195,9 +283,18 @@
         <atkSpd>300</atkSpd>
         <price>1200</price>
         <grade>C</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </weapon>
-    <weapon>
-        <id>2f7c7759-45c8-4652-aea5-f244e1b11fc5</id>
+    <weapon id="2f7c7759-45c8-4652-aea5-f244e1b11fc5">
         <name>Hammer of Ruin</name>
         <type>WEAPON</type>
         <weight>8</weight>
@@ -211,9 +308,18 @@
         <atkSpd>220</atkSpd>
         <price>6000</price>
         <grade>B</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </weapon>
-    <weapon>
-        <id>7b732096-7d14-434b-b7d6-1569dd6ee37b</id>
+    <weapon id="7b732096-7d14-434b-b7d6-1569dd6ee37b">
         <name>Sword of Miracle</name>
         <type>WEAPON</type>
         <weight>3</weight>
@@ -227,9 +333,18 @@
         <atkSpd>300</atkSpd>
         <price>7000</price>
         <grade>B</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </weapon>
-    <weapon>
-        <id>fa447243-9fbf-40a4-9801-e28af85d9aac</id>
+    <weapon id="fa447243-9fbf-40a4-9801-e28af85d9aac">
         <name>Tallum Blade</name>
         <type>WEAPON</type>
         <weight>2</weight>
@@ -243,9 +358,18 @@
         <atkSpd>310</atkSpd>
         <price>35000</price>
         <grade>A</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </weapon>
-    <weapon>
-        <id>dbdbe1db-48f7-43c0-8aa6-177fe50bc04f</id>
+    <weapon id="dbdbe1db-48f7-43c0-8aa6-177fe50bc04f">
         <name>Dynasty Sword</name>
         <type>WEAPON</type>
         <weight>3</weight>
@@ -259,9 +383,18 @@
         <atkSpd>300</atkSpd>
         <price>80000</price>
         <grade>S</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </weapon>
-    <weapon>
-        <id>b1d88de4-2eb3-4665-864b-4309cdc0736c</id>
+    <weapon id="b1d88de4-2eb3-4665-864b-4309cdc0736c">
         <name>Dynasty Dagger</name>
         <type>WEAPON</type>
         <weight>1</weight>
@@ -275,9 +408,18 @@
         <atkSpd>380</atkSpd>
         <price>75000</price>
         <grade>S</grade>
+        <expect>
+            <conditions>
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
+            </conditions>
+            <actions>
+                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
+                    <apply stat="PATK" value="-1" op="ADDITIVE" />
+                </effect>
+            </actions>
+        </expect>
     </weapon>
-    <weapon>
-        <id>f42c73a9-d99f-4812-9798-8cd2d08b70a6</id>
+    <weapon id="f42c73a9-d99f-4812-9798-8cd2d08b70a6">
         <name>Wooden Dagger</name>
         <type>WEAPON</type>
         <weight>1</weight>
@@ -292,8 +434,7 @@
         <price>1</price>
         <grade>NOGRADE</grade>
     </weapon>
-    <weapon>
-        <id>7b268503-d3f0-43eb-9144-bbb008d6ddeb</id>
+    <weapon id="7b268503-d3f0-43eb-9144-bbb008d6ddeb">
         <name>Wooden Staff</name>
         <type>WEAPON</type>
         <weight>1</weight>
@@ -308,8 +449,7 @@
         <price>1</price>
         <grade>NOGRADE</grade>
     </weapon>
-    <weapon>
-        <id>f3c8a065-ac0d-4913-9774-41098a6e088d</id>
+    <weapon id="f3c8a065-ac0d-4913-9774-41098a6e088d">
         <name>Wooden Club</name>
         <type>WEAPON</type>
         <weight>3</weight>
@@ -324,8 +464,7 @@
         <price>1</price>
         <grade>NOGRADE</grade>
     </weapon>
-    <weapon>
-        <id>3c966b19-8f40-4791-9dd7-3a489f090f7b</id>
+    <weapon id="3c966b19-8f40-4791-9dd7-3a489f090f7b">
         <name>Wooden Bow</name>
         <type>WEAPON</type>
         <weight>2</weight>

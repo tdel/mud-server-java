@@ -1,476 +1,292 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <skills>
-    <skill>
-        <id>e85856bd-fe90-5d39-a40a-089be52a89f2</id>
+    <skill id="e85856bd-fe90-5d39-a40a-089be52a89f2">
         <name>Wind Strike</name>
-        <manaCost>3</manaCost>
-        <manaCost>4</manaCost>
-        <manaCost>5</manaCost>
-        <manaCost>6</manaCost>
-        <manaCost>7</manaCost>
-        <cooldownSeconds>3</cooldownSeconds>
-        <castingTimeMs>500</castingTimeMs>
+        <level id="1" mana="3" power="8" />
+        <level id="2" mana="4" power="13" />
+        <level id="3" mana="5" power="18" />
+        <level id="4" mana="6" power="23" />
+        <level id="5" mana="7" power="28" />
+        <reuseTime>3</reuseTime>
+        <castTime>0.5</castTime>
         <range>6</range>
-        <aoeRadius>0</aoeRadius>
         <skillType>DAMAGE</skillType>
         <target>ONE</target>
-        <power>8</power>
-        <power>13</power>
-        <power>18</power>
-        <power>23</power>
-        <power>28</power>
         <element>WIND</element>
-        <projectile>true</projectile>
-        <projectileSpeed>20</projectileSpeed>
+        <projectile speed="20" />
     </skill>
-    <skill>
-        <id>0bbb38f7-3ff3-5366-9792-40b28e3760db</id>
+    <skill id="0bbb38f7-3ff3-5366-9792-40b28e3760db">
         <name>Aqua Strike</name>
-        <manaCost>3</manaCost>
-        <manaCost>4</manaCost>
-        <manaCost>5</manaCost>
-        <manaCost>6</manaCost>
-        <manaCost>7</manaCost>
-        <cooldownSeconds>3</cooldownSeconds>
-        <castingTimeMs>500</castingTimeMs>
+        <level id="1" mana="3" power="9" />
+        <level id="2" mana="4" power="14" />
+        <level id="3" mana="5" power="19" />
+        <level id="4" mana="6" power="24" />
+        <level id="5" mana="7" power="29" />
+        <reuseTime>3</reuseTime>
+        <castTime>0.5</castTime>
         <range>6</range>
-        <aoeRadius>0</aoeRadius>
         <skillType>DAMAGE</skillType>
         <target>ONE</target>
-        <power>9</power>
-        <power>14</power>
-        <power>19</power>
-        <power>24</power>
-        <power>29</power>
         <element>WATER</element>
-        <projectile>true</projectile>
-        <projectileSpeed>20</projectileSpeed>
+        <projectile speed="20" />
     </skill>
-    <skill>
-        <id>2127fbac-35aa-4897-a07d-bd619c4ec5b0</id>
+    <skill id="2127fbac-35aa-4897-a07d-bd619c4ec5b0">
         <name>Flame Strike</name>
-        <manaCost>3</manaCost>
-        <manaCost>4</manaCost>
-        <manaCost>5</manaCost>
-        <manaCost>6</manaCost>
-        <manaCost>7</manaCost>
-        <cooldownSeconds>3</cooldownSeconds>
-        <castingTimeMs>500</castingTimeMs>
+        <level id="1" mana="3" power="8" />
+        <level id="2" mana="4" power="13" />
+        <level id="3" mana="5" power="18" />
+        <level id="4" mana="6" power="23" />
+        <level id="5" mana="7" power="28" />
+        <reuseTime>3</reuseTime>
+        <castTime>0.5</castTime>
         <range>6</range>
-        <aoeRadius>0</aoeRadius>
         <skillType>DAMAGE</skillType>
         <target>ONE</target>
-        <power>8</power>
-        <power>13</power>
-        <power>18</power>
-        <power>23</power>
-        <power>28</power>
         <element>FIRE</element>
-        <projectile>true</projectile>
-        <projectileSpeed>20</projectileSpeed>
+        <projectile speed="20" />
     </skill>
-    <skill>
-        <id>de9b9e05-c9c0-54f4-947a-962700dddce3</id>
+    <skill id="de9b9e05-c9c0-54f4-947a-962700dddce3">
         <name>Solar Strike</name>
-        <manaCost>3</manaCost>
-        <manaCost>4</manaCost>
-        <manaCost>5</manaCost>
-        <manaCost>6</manaCost>
-        <manaCost>7</manaCost>
-        <cooldownSeconds>3</cooldownSeconds>
-        <castingTimeMs>550</castingTimeMs>
+        <level id="1" mana="3" power="9" />
+        <level id="2" mana="4" power="14" />
+        <level id="3" mana="5" power="19" />
+        <level id="4" mana="6" power="24" />
+        <level id="5" mana="7" power="29" />
+        <reuseTime>3</reuseTime>
+        <castTime>0.55</castTime>
         <range>6</range>
-        <aoeRadius>0</aoeRadius>
         <skillType>DAMAGE</skillType>
         <target>ONE</target>
-        <power>9</power>
-        <power>14</power>
-        <power>19</power>
-        <power>24</power>
-        <power>29</power>
         <element>HOLY</element>
-        <projectile>true</projectile>
-        <projectileSpeed>20</projectileSpeed>
+        <projectile speed="20" />
     </skill>
-    <skill>
-        <id>76eda883-8345-5989-a034-45c6e443f846</id>
+    <skill id="76eda883-8345-5989-a034-45c6e443f846">
         <name>Death Spike</name>
-        <manaCost>4</manaCost>
-        <manaCost>5</manaCost>
-        <manaCost>6</manaCost>
-        <manaCost>8</manaCost>
-        <manaCost>10</manaCost>
-        <cooldownSeconds>3</cooldownSeconds>
-        <castingTimeMs>550</castingTimeMs>
+        <level id="1" mana="4" power="9" />
+        <level id="2" mana="5" power="14" />
+        <level id="3" mana="6" power="19" />
+        <level id="4" mana="8" power="24" />
+        <level id="5" mana="10" power="29" />
+        <reuseTime>3</reuseTime>
+        <castTime>0.55</castTime>
         <range>6</range>
-        <aoeRadius>0</aoeRadius>
         <skillType>DAMAGE</skillType>
         <target>ONE</target>
-        <power>9</power>
-        <power>14</power>
-        <power>19</power>
-        <power>24</power>
-        <power>29</power>
         <element>DARK</element>
-        <projectile>true</projectile>
-        <projectileSpeed>20</projectileSpeed>
+        <projectile speed="20" />
     </skill>
-    <skill>
-        <id>c2956152-d234-5ef4-8890-95eec06bdfd0</id>
+    <skill id="c2956152-d234-5ef4-8890-95eec06bdfd0">
         <name>Twister</name>
-        <manaCost>8</manaCost>
-        <manaCost>10</manaCost>
-        <manaCost>12</manaCost>
-        <manaCost>16</manaCost>
-        <cooldownSeconds>9</cooldownSeconds>
-        <castingTimeMs>800</castingTimeMs>
+        <level id="1" mana="8" power="22" />
+        <level id="2" mana="10" power="28" />
+        <level id="3" mana="12" power="34" />
+        <level id="4" mana="16" power="40" />
+        <reuseTime>9</reuseTime>
+        <castTime>0.8</castTime>
         <range>6</range>
-        <aoeRadius>0</aoeRadius>
         <skillType>DAMAGE</skillType>
         <target>ONE</target>
-        <power>22</power>
-        <power>28</power>
-        <power>34</power>
-        <power>40</power>
         <element>WIND</element>
-        <projectile>false</projectile>
-        <projectileSpeed>0</projectileSpeed>
     </skill>
-    <skill>
-        <id>1c8f7ecc-cd5b-580d-a8ec-7bb7cbd37ee8</id>
+    <skill id="1c8f7ecc-cd5b-580d-a8ec-7bb7cbd37ee8">
         <name>Prominence</name>
-        <manaCost>8</manaCost>
-        <manaCost>10</manaCost>
-        <manaCost>12</manaCost>
-        <manaCost>16</manaCost>
-        <cooldownSeconds>9</cooldownSeconds>
-        <castingTimeMs>800</castingTimeMs>
+        <level id="1" mana="8" power="24" />
+        <level id="2" mana="10" power="30" />
+        <level id="3" mana="12" power="36" />
+        <level id="4" mana="16" power="42" />
+        <reuseTime>9</reuseTime>
+        <castTime>0.8</castTime>
         <range>6</range>
-        <aoeRadius>0</aoeRadius>
         <skillType>DAMAGE</skillType>
         <target>ONE</target>
-        <power>24</power>
-        <power>30</power>
-        <power>36</power>
-        <power>42</power>
         <element>FIRE</element>
-        <projectile>false</projectile>
-        <projectileSpeed>0</projectileSpeed>
     </skill>
-    <skill>
-        <id>e287e606-621f-48c5-b8dc-613fa98709d3</id>
+    <skill id="e287e606-621f-48c5-b8dc-613fa98709d3">
         <name>Heal</name>
-        <manaCost>3</manaCost>
-        <manaCost>4</manaCost>
-        <manaCost>5</manaCost>
-        <manaCost>6</manaCost>
-        <manaCost>7</manaCost>
-        <cooldownSeconds>2</cooldownSeconds>
-        <castingTimeMs>500</castingTimeMs>
+        <level id="1" mana="3" power="8" />
+        <level id="2" mana="4" power="12" />
+        <level id="3" mana="5" power="16" />
+        <level id="4" mana="6" power="20" />
+        <level id="5" mana="7" power="24" />
+        <reuseTime>2</reuseTime>
+        <castTime>0.5</castTime>
         <range>6</range>
-        <aoeRadius>0</aoeRadius>
         <skillType>HEALING</skillType>
         <target>ONE</target>
-        <power>8</power>
-        <power>12</power>
-        <power>16</power>
-        <power>20</power>
-        <power>24</power>
         <element>NONE</element>
-        <projectile>false</projectile>
-        <projectileSpeed>0</projectileSpeed>
     </skill>
-    <skill>
-        <id>e1eff4f2-f0d0-5445-8147-ab00037fd70e</id>
+    <skill id="e1eff4f2-f0d0-5445-8147-ab00037fd70e">
         <name>Mass Heal</name>
-        <manaCost>8</manaCost>
-        <manaCost>10</manaCost>
-        <manaCost>12</manaCost>
-        <manaCost>16</manaCost>
-        <cooldownSeconds>8</cooldownSeconds>
-        <castingTimeMs>800</castingTimeMs>
+        <level id="1" mana="8" power="18" />
+        <level id="2" mana="10" power="23" />
+        <level id="3" mana="12" power="28" />
+        <level id="4" mana="16" power="33" />
+        <reuseTime>8</reuseTime>
+        <castTime>0.8</castTime>
         <range>6</range>
-        <aoeRadius>0</aoeRadius>
         <skillType>HEALING</skillType>
         <target>ONE</target>
-        <power>18</power>
-        <power>23</power>
-        <power>28</power>
-        <power>33</power>
         <element>NONE</element>
-        <projectile>false</projectile>
-        <projectileSpeed>0</projectileSpeed>
     </skill>
-    <skill>
-        <id>8ab3ee13-989b-5ea7-884e-5b548202a39f</id>
+    <skill id="8ab3ee13-989b-5ea7-884e-5b548202a39f">
         <name>Might</name>
-        <manaCost>4</manaCost>
-        <manaCost>5</manaCost>
-        <manaCost>6</manaCost>
-        <manaCost>8</manaCost>
-        <manaCost>10</manaCost>
-        <cooldownSeconds>2</cooldownSeconds>
-        <castingTimeMs>600</castingTimeMs>
+        <level id="1" mana="4" power="3" />
+        <level id="2" mana="5" power="5" />
+        <level id="3" mana="6" power="7" />
+        <level id="4" mana="8" power="9" />
+        <level id="5" mana="10" power="11" />
+        <reuseTime>2</reuseTime>
+        <castTime>0.6</castTime>
         <range>6</range>
-        <aoeRadius>0</aoeRadius>
         <skillType>BUFF</skillType>
         <target>ONE</target>
-        <power>3</power>
-        <power>5</power>
-        <power>7</power>
-        <power>9</power>
-        <power>11</power>
         <element>NONE</element>
-        <projectile>false</projectile>
-        <projectileSpeed>0</projectileSpeed>
         <effects>
-            <name>Might</name>
-            <time>60</time>
-            <power>0</power>
-            <type>BUFF</type>
-            <effect>
-                <stat>PATK</stat>
-                <value>1</value>
-                <operator>ADDITIVE</operator>
+            <effect name="Might" time="60" type="BUFF">
+                <apply stat="PATK" value="1" op="ADDITIVE" />
             </effect>
         </effects>
     </skill>
-    <skill>
-        <id>2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f</id>
+    <skill id="2f9d8c1a-6b3e-4a2d-9c7f-1e4b5a8d3c6f">
         <name>Focus</name>
-        <manaCost>4</manaCost>
-        <manaCost>5</manaCost>
-        <manaCost>6</manaCost>
-        <manaCost>8</manaCost>
-        <manaCost>10</manaCost>
-        <cooldownSeconds>2</cooldownSeconds>
-        <castingTimeMs>600</castingTimeMs>
+        <level id="1" mana="4" power="3" />
+        <level id="2" mana="5" power="5" />
+        <level id="3" mana="6" power="7" />
+        <level id="4" mana="8" power="9" />
+        <level id="5" mana="10" power="11" />
+        <reuseTime>2</reuseTime>
+        <castTime>0.6</castTime>
         <range>6</range>
-        <aoeRadius>0</aoeRadius>
         <skillType>BUFF</skillType>
         <target>ONE</target>
-        <power>3</power>
-        <power>5</power>
-        <power>7</power>
-        <power>9</power>
-        <power>11</power>
         <element>NONE</element>
-        <projectile>false</projectile>
-        <projectileSpeed>0</projectileSpeed>
         <effects>
-            <name>Focus</name>
-            <time>60</time>
-            <power>0</power>
-            <type>BUFF</type>
-            <effect>
-                <stat>ACCURACY</stat>
-                <value>1</value>
-                <operator>ADDITIVE</operator>
+            <effect name="Focus" time="60" type="BUFF">
+                <apply stat="ACCURACY" value="1" op="ADDITIVE" />
             </effect>
         </effects>
     </skill>
-    <skill>
-        <id>7ee36cfc-4ac5-5d5b-88ef-18ee1c8e890d</id>
+    <skill id="7ee36cfc-4ac5-5d5b-88ef-18ee1c8e890d">
         <name>Empower</name>
-        <manaCost>4</manaCost>
-        <manaCost>5</manaCost>
-        <manaCost>6</manaCost>
-        <manaCost>8</manaCost>
-        <manaCost>10</manaCost>
-        <cooldownSeconds>2</cooldownSeconds>
-        <castingTimeMs>600</castingTimeMs>
+        <level id="1" mana="4" power="3" />
+        <level id="2" mana="5" power="5" />
+        <level id="3" mana="6" power="7" />
+        <level id="4" mana="8" power="9" />
+        <level id="5" mana="10" power="11" />
+        <reuseTime>2</reuseTime>
+        <castTime>0.6</castTime>
         <range>6</range>
-        <aoeRadius>0</aoeRadius>
         <skillType>BUFF</skillType>
         <target>ONE</target>
-        <power>3</power>
-        <power>5</power>
-        <power>7</power>
-        <power>9</power>
-        <power>11</power>
         <element>NONE</element>
-        <projectile>false</projectile>
-        <projectileSpeed>0</projectileSpeed>
         <effects>
-            <name>Empower</name>
-            <time>60</time>
-            <power>0</power>
-            <type>BUFF</type>
-            <effect>
-                <stat>MATK</stat>
-                <value>1</value>
-                <operator>ADDITIVE</operator>
+            <effect name="Empower" time="60" type="BUFF">
+                <apply stat="MATK" value="1" op="ADDITIVE" />
             </effect>
         </effects>
     </skill>
-    <skill>
-        <id>8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e</id>
+    <skill id="8a1e3f7c-4d2b-4c9a-8e6f-2b7d9a5c1f4e">
         <name>Curse: Doom</name>
-        <manaCost>4</manaCost>
-        <manaCost>5</manaCost>
-        <manaCost>6</manaCost>
-        <manaCost>8</manaCost>
-        <manaCost>10</manaCost>
-        <cooldownSeconds>3</cooldownSeconds>
-        <castingTimeMs>600</castingTimeMs>
+        <level id="1" mana="4" power="3" />
+        <level id="2" mana="5" power="5" />
+        <level id="3" mana="6" power="7" />
+        <level id="4" mana="8" power="9" />
+        <level id="5" mana="10" power="11" />
+        <reuseTime>3</reuseTime>
+        <castTime>0.6</castTime>
         <range>6</range>
-        <aoeRadius>0</aoeRadius>
         <skillType>DEBUFF</skillType>
         <target>ONE</target>
-        <power>3</power>
-        <power>5</power>
-        <power>7</power>
-        <power>9</power>
-        <power>11</power>
         <element>NONE</element>
-        <projectile>false</projectile>
-        <projectileSpeed>0</projectileSpeed>
         <effects>
-            <name>Curse: Doom</name>
-            <time>60</time>
-            <power>0</power>
-            <type>DEBUFF</type>
-            <effect>
-                <stat>ACCURACY</stat>
-                <value>1</value>
-                <operator>ADDITIVE</operator>
+            <effect name="Curse: Doom" time="60" type="DEBUFF">
+                <apply stat="ACCURACY" value="1" op="ADDITIVE" />
             </effect>
         </effects>
     </skill>
-    <skill>
-        <id>0d9a1af2-0395-52bb-8839-174372a6beea</id>
+    <skill id="0d9a1af2-0395-52bb-8839-174372a6beea">
         <name>Curse: Weakness</name>
-        <manaCost>4</manaCost>
-        <manaCost>5</manaCost>
-        <manaCost>6</manaCost>
-        <manaCost>8</manaCost>
-        <manaCost>10</manaCost>
-        <cooldownSeconds>3</cooldownSeconds>
-        <castingTimeMs>600</castingTimeMs>
+        <level id="1" mana="4" power="3" />
+        <level id="2" mana="5" power="5" />
+        <level id="3" mana="6" power="7" />
+        <level id="4" mana="8" power="9" />
+        <level id="5" mana="10" power="11" />
+        <reuseTime>3</reuseTime>
+        <castTime>0.6</castTime>
         <range>6</range>
-        <aoeRadius>0</aoeRadius>
         <skillType>DEBUFF</skillType>
         <target>ONE</target>
-        <power>3</power>
-        <power>5</power>
-        <power>7</power>
-        <power>9</power>
-        <power>11</power>
         <element>NONE</element>
-        <projectile>false</projectile>
-        <projectileSpeed>0</projectileSpeed>
         <effects>
-            <name>Curse: Weakness</name>
-            <time>60</time>
-            <power>0</power>
-            <type>DEBUFF</type>
-            <effect>
-                <stat>PATK</stat>
-                <value>1</value>
-                <operator>ADDITIVE</operator>
+            <effect name="Curse: Weakness" time="60" type="DEBUFF">
+                <apply stat="PATK" value="1" op="ADDITIVE" />
             </effect>
         </effects>
     </skill>
-    <skill>
-        <id>202e081f-606b-5f6f-902d-0b2ec9316c67</id>
+    <skill id="202e081f-606b-5f6f-902d-0b2ec9316c67">
         <name>Rage</name>
-        <manaCost>3</manaCost>
-        <manaCost>4</manaCost>
-        <manaCost>5</manaCost>
-        <manaCost>6</manaCost>
-        <manaCost>7</manaCost>
-        <cooldownSeconds>2</cooldownSeconds>
-        <castingTimeMs>400</castingTimeMs>
+        <level id="1" mana="3" power="3" />
+        <level id="2" mana="4" power="5" />
+        <level id="3" mana="5" power="7" />
+        <level id="4" mana="6" power="9" />
+        <level id="5" mana="7" power="11" />
+        <reuseTime>2</reuseTime>
+        <castTime>0.4</castTime>
         <range>0</range>
-        <aoeRadius>0</aoeRadius>
         <skillType>BUFF</skillType>
         <target>ONE</target>
-        <power>3</power>
-        <power>5</power>
-        <power>7</power>
-        <power>9</power>
-        <power>11</power>
         <element>NONE</element>
-        <projectile>false</projectile>
-        <projectileSpeed>0</projectileSpeed>
         <effects>
-            <name>Rage</name>
-            <time>60</time>
-            <power>0</power>
-            <type>BUFF</type>
-            <effect>
-                <stat>PATK</stat>
-                <value>1</value>
-                <operator>ADDITIVE</operator>
+            <effect name="Rage" time="60" type="BUFF">
+                <apply stat="PATK" value="1" op="ADDITIVE" />
             </effect>
         </effects>
     </skill>
-    <skill>
-        <id>3992a075-1559-5743-b207-72e55c5aecc4</id>
+    <skill id="3992a075-1559-5743-b207-72e55c5aecc4">
         <name>Guidance</name>
-        <manaCost>3</manaCost>
-        <manaCost>4</manaCost>
-        <manaCost>5</manaCost>
-        <manaCost>6</manaCost>
-        <manaCost>7</manaCost>
-        <cooldownSeconds>2</cooldownSeconds>
-        <castingTimeMs>400</castingTimeMs>
+        <level id="1" mana="3" power="3" />
+        <level id="2" mana="4" power="5" />
+        <level id="3" mana="5" power="7" />
+        <level id="4" mana="6" power="9" />
+        <level id="5" mana="7" power="11" />
+        <reuseTime>2</reuseTime>
+        <castTime>0.4</castTime>
         <range>0</range>
-        <aoeRadius>0</aoeRadius>
         <skillType>BUFF</skillType>
         <target>ONE</target>
-        <power>3</power>
-        <power>5</power>
-        <power>7</power>
-        <power>9</power>
-        <power>11</power>
         <element>NONE</element>
-        <projectile>false</projectile>
-        <projectileSpeed>0</projectileSpeed>
         <effects>
-            <name>Guidance</name>
-            <time>60</time>
-            <power>0</power>
-            <type>BUFF</type>
-            <effect>
-                <stat>ACCURACY</stat>
-                <value>1</value>
-                <operator>ADDITIVE</operator>
+            <effect name="Guidance" time="60" type="BUFF">
+                <apply stat="ACCURACY" value="1" op="ADDITIVE" />
             </effect>
         </effects>
     </skill>
-    <skill>
-        <id>e57ef942-ca16-5f2b-a529-65f796960258</id>
+    <skill id="e57ef942-ca16-5f2b-a529-65f796960258">
         <name>Bulwark</name>
-        <manaCost>3</manaCost>
-        <manaCost>4</manaCost>
-        <manaCost>5</manaCost>
-        <manaCost>6</manaCost>
-        <manaCost>7</manaCost>
-        <cooldownSeconds>2</cooldownSeconds>
-        <castingTimeMs>400</castingTimeMs>
+        <level id="1" mana="3" power="3" />
+        <level id="2" mana="4" power="5" />
+        <level id="3" mana="5" power="7" />
+        <level id="4" mana="6" power="9" />
+        <level id="5" mana="7" power="11" />
+        <reuseTime>2</reuseTime>
+        <castTime>0.4</castTime>
         <range>0</range>
-        <aoeRadius>0</aoeRadius>
         <skillType>BUFF</skillType>
         <target>ONE</target>
-        <power>3</power>
-        <power>5</power>
-        <power>7</power>
-        <power>9</power>
-        <power>11</power>
         <element>NONE</element>
-        <projectile>false</projectile>
-        <projectileSpeed>0</projectileSpeed>
         <effects>
-            <name>Bulwark</name>
-            <time>60</time>
-            <power>0</power>
-            <type>BUFF</type>
-            <effect>
-                <stat>PDEF</stat>
-                <value>1</value>
-                <operator>ADDITIVE</operator>
+            <effect name="Bulwark" time="60" type="BUFF">
+                <apply stat="PDEF" value="1" op="ADDITIVE" />
             </effect>
         </effects>
+    </skill>
+    <skill id="865a7263-fb06-48ef-89c1-9ccbad268215">
+        <name>Expertise Grade</name>
+        <level id="1" value="D" />
+        <level id="2" value="C" />
+        <level id="3" value="B" />
+        <level id="4" value="A" />
+        <level id="5" value="S" />
+        <skillType>PASSIVE</skillType>
     </skill>
 </skills>

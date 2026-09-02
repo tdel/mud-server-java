@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.dataformat.xml.XmlMapper;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 @Service
 public class LevelCatalog {
@@ -29,7 +30,7 @@ public class LevelCatalog {
             List<LevelDefinition> definitions = xmlMapper.readValue(in, new TypeReference<List<LevelDefinition>>() {
             });
             for (LevelDefinition definition : definitions) {
-                xpRequiredByLevel.put(definition.level(), definition.xp());
+                xpRequiredByLevel.put(definition.id(), definition.xp());
             }
         } catch (IOException | JacksonException e) {
             throw new IllegalStateException("Impossible de charger " + LEVELS_RESOURCE, e);
@@ -49,6 +50,7 @@ public class LevelCatalog {
         return xpRequiredByLevel.size();
     }
 
-    private record LevelDefinition(int level, int xp) {
+    private record LevelDefinition(@JacksonXmlProperty(isAttribute = true) int id,
+            @JacksonXmlProperty(isAttribute = true) int xp) {
     }
 }

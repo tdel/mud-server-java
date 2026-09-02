@@ -29,6 +29,7 @@ import app.domain.actor.event.SkillCastBegin;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.item.ItemGrade;
 import app.game.Randomizer;
+import app.game.catalog.PassiveSkillCatalogHolder;
 import app.game.combat.CombatFormulas;
 import app.game.engine.SkillCastEngine;
 
@@ -40,7 +41,7 @@ public final class SkillSystem {
     private final AbstractCharacter character;
     private final Map<UUID, Integer> knownSkillLevels = new ConcurrentHashMap<>();
     private final Map<UUID, Instant> nextCastAt = new ConcurrentHashMap<>();
-    private final Set<PassiveSkill> knownPassiveSkills = ConcurrentHashMap.newKeySet();
+    private final Map<UUID, Integer> knownPassiveSkillLevels = new ConcurrentHashMap<>();
     private volatile SkillCastEngine.ActiveCast activeCast;
 
     public SkillSystem(AbstractCharacter character) {
@@ -117,17 +118,29 @@ public final class SkillSystem {
         return knows(activeSkill.id()) ? levelOf(activeSkill.id()) : GRANTED_SKILL_LEVEL;
     }
 
-    public boolean learn(PassiveSkill passiveSkill) {
-        return knownPassiveSkills.add(passiveSkill);
+    public boolean learn(PassiveSkill passiveSkill, int level) {
+        Integer previous = knownPassiveSkillLevels.get(passiveSkill.id());
+        if (previous != null && previous >= level) {
+            return false;
+        }
+        knownPassiveSkillLevels.put(passiveSkill.id(), level);
+        return true;
     }
 
-    public Set<PassiveSkill> knownPassiveSkills() {
-        return Set.copyOf(knownPassiveSkills);
+    public int passiveLevelOf(UUID passiveSkillId) {
+        return knownPassiveSkillLevels.getOrDefault(passiveSkillId, 0);
     }
 
+    public Map<UUID, Integer> knownPassiveSkillLevels() {
+        return Map.copyOf(knownPassiveSkillLevels);
+    }
+
+    // Le grade débloqué est dérivé du level connu de chaque compétence passive
+    // (ex: Expertise Grade), pas de son id — cf. PassiveSkill.gradeAt(level).
     public ItemGrade unlockedGrade() {
-        return knownPassiveSkills.stream().map(PassiveSkill::grantsGrade).max(Comparator.comparingInt(Enum::ordinal))
-                .orElse(ItemGrade.NOGRADE);
+        return knownPassiveSkillLevels.entrySet().stream()
+                .map(entry -> PassiveSkillCatalogHolder.getById(entry.getKey()).gradeAt(entry.getValue()))
+                .max(Comparator.comparingInt(Enum::ordinal)).orElse(ItemGrade.NOGRADE);
     }
 
     public boolean isReady(UUID skillId) {
@@ -145,6 +158,8 @@ public final class SkillSystem {
             case DAMAGE -> castDamage(activeSkill, level, target);
             case BUFF -> castModifier(activeSkill, level, target, false);
             case DEBUFF -> castModifier(activeSkill, level, target, true);
+            case PASSIVE -> throw new IllegalStateException(
+                    "ActiveSkill " + activeSkill.id() + " (" + activeSkill.name() + ") est PASSIVE, non castable");
         };
 
         markCooldown(activeSkill);
@@ -152,7 +167,7 @@ public final class SkillSystem {
     }
 
     public void markCooldown(ActiveSkill activeSkill) {
-        nextCastAt.put(activeSkill.id(), Instant.now().plusSeconds(activeSkill.cooldownSeconds()));
+        nextCastAt.put(activeSkill.id(), Instant.now().plusMillis(activeSkill.reuseTimeMs()));
     }
 
     // Pour les sorts projectiles (cf. game.engine.ProjectileEngine) : le jet

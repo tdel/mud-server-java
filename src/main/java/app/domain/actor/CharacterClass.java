@@ -9,6 +9,7 @@ import java.util.UUID;
 import tools.jackson.core.JacksonException;
 import tools.jackson.dataformat.xml.XmlMapper;
 import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 import app.game.combat.CombatFormulas;
 
@@ -36,13 +37,13 @@ public enum CharacterClass {
     private Definition definition;
 
     public List<LearnableSkill> learnableSkillIds(int level) {
-        return definition.skills().stream().filter(skillLevel -> skillLevel.requiredLevel() == level)
-                .map(skillLevel -> new LearnableSkill(skillLevel.id(), skillLevel.level())).toList();
+        return definition.skills().stream().filter(entry -> entry.level() != null && entry.playerLevel() == level)
+                .map(entry -> new LearnableSkill(entry.id(), entry.level())).toList();
     }
 
     public List<UUID> learnablePassiveSkillIds(int level) {
-        return definition.passiveSkills().stream().filter(skillLevel -> skillLevel.requiredLevel() == level)
-                .map(SkillLevel::id).toList();
+        return definition.skills().stream().filter(entry -> entry.level() == null && entry.playerLevel() == level)
+                .map(SkillEntry::id).toList();
     }
 
     public record LearnableSkill(UUID skillId, int level) {
@@ -71,24 +72,20 @@ public enum CharacterClass {
     }
 
     private record Definition(double hpBase, double hpAdd, double hpMod, double mpBase, double mpAdd, double mpMod,
-            Map<Attribute, Integer> baseAttributes, List<ActiveSkillLevel> skills, List<SkillLevel> passiveSkills) {
+            Map<Attribute, Integer> baseAttributes, List<SkillEntry> skills) {
     }
 
     private record Json(double hpBase, double hpAdd, double hpMod, double mpBase, double mpAdd, double mpMod,
             Map<Attribute, Integer> baseAttributes,
-            @JacksonXmlElementWrapper(useWrapping = false) List<ActiveSkillLevel> skills,
-            @JacksonXmlElementWrapper(useWrapping = false) List<SkillLevel> passiveSkills) {
+            @JacksonXmlElementWrapper(useWrapping = false) List<SkillEntry> skill) {
         Definition toDefinition() {
             return new Definition(hpBase, hpAdd, hpMod, mpBase, mpAdd, mpMod, Map.copyOf(baseAttributes),
-                    List.copyOf(skills), List.copyOf(passiveSkills));
+                    List.copyOf(skill));
         }
     }
 
-    private record SkillLevel(UUID id, int requiredLevel) {
-    }
-
-    // Un sort actif se déclinant sur plusieurs levels (1..N), chaque entrée fixe le
-    // niveau de personnage requis pour débloquer ce level précis du sort.
-    private record ActiveSkillLevel(UUID id, int level, int requiredLevel) {
+    // Une entrée <skill> avec level renseigné est un palier de sort actif
+    // (level 1..N) ; sans level, c'est une compétence passive (pas de palier).
+    private record SkillEntry(@JacksonXmlProperty(isAttribute = true) UUID id, Integer level, int playerLevel) {
     }
 }

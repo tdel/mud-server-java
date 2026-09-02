@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <consumables>
-    <consumable>
-        <id>019fa0a5-80bf-7e84-87bf-5cf699c00315</id>
+    <consumable id="019fa0a5-80bf-7e84-87bf-5cf699c00315">
         <name>Healing Potion</name>
         <type>POTION</type>
         <weight>1</weight>
@@ -10,8 +9,7 @@
         <consumableEffect>HEALING</consumableEffect>
         <effectAmount>10</effectAmount>
     </consumable>
-    <consumable>
-        <id>6aeb7483-2694-4388-8c6b-f841fd5e48b4</id>
+    <consumable id="6aeb7483-2694-4388-8c6b-f841fd5e48b4">
         <name>Greater Healing Potion</name>
         <type>POTION</type>
         <weight>1</weight>
@@ -20,8 +18,7 @@
         <consumableEffect>HEALING</consumableEffect>
         <effectAmount>25</effectAmount>
     </consumable>
-    <consumable>
-        <id>f9083584-d5af-458c-bb9b-3ee7714452e3</id>
+    <consumable id="f9083584-d5af-458c-bb9b-3ee7714452e3">
         <name>Major Healing Potion</name>
         <type>POTION</type>
         <weight>1</weight>
@@ -30,8 +27,7 @@
         <consumableEffect>HEALING</consumableEffect>
         <effectAmount>50</effectAmount>
     </consumable>
-    <consumable>
-        <id>58373f5a-2f2a-4039-8a52-05ac333dd57f</id>
+    <consumable id="58373f5a-2f2a-4039-8a52-05ac333dd57f">
         <name>Supreme Healing Potion</name>
         <type>POTION</type>
         <weight>1</weight>
@@ -40,8 +36,7 @@
         <consumableEffect>HEALING</consumableEffect>
         <effectAmount>100</effectAmount>
     </consumable>
-    <consumable>
-        <id>3a4a5836-051e-4641-aef8-7b6e6792322e</id>
+    <consumable id="3a4a5836-051e-4641-aef8-7b6e6792322e">
         <name>Mana Potion</name>
         <type>POTION</type>
         <weight>1</weight>

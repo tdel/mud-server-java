@@ -1,163 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <levels>
-    <level>
-        <level>1</level>
-        <xp>0</xp>
-    </level>
-    <level>
-        <level>2</level>
-        <xp>300</xp>
-    </level>
-    <level>
-        <level>3</level>
-        <xp>900</xp>
-    </level>
-    <level>
-        <level>4</level>
-        <xp>2700</xp>
-    </level>
-    <level>
-        <level>5</level>
-        <xp>6500</xp>
-    </level>
-    <level>
-        <level>6</level>
-        <xp>14000</xp>
-    </level>
-    <level>
-        <level>7</level>
-        <xp>23000</xp>
-    </level>
-    <level>
-        <level>8</level>
-        <xp>34000</xp>
-    </level>
-    <level>
-        <level>9</level>
-        <xp>48000</xp>
-    </level>
-    <level>
-        <level>10</level>
-        <xp>64000</xp>
-    </level>
-    <level>
-        <level>11</level>
-        <xp>85000</xp>
-    </level>
-    <level>
-        <level>12</level>
-        <xp>100000</xp>
-    </level>
-    <level>
-        <level>13</level>
-        <xp>120000</xp>
-    </level>
-    <level>
-        <level>14</level>
-        <xp>140000</xp>
-    </level>
-    <level>
-        <level>15</level>
-        <xp>165000</xp>
-    </level>
-    <level>
-        <level>16</level>
-        <xp>195000</xp>
-    </level>
-    <level>
-        <level>17</level>
-        <xp>225000</xp>
-    </level>
-    <level>
-        <level>18</level>
-        <xp>265000</xp>
-    </level>
-    <level>
-        <level>19</level>
-        <xp>305000</xp>
-    </level>
-    <level>
-        <level>20</level>
-        <xp>355000</xp>
-    </level>
-    <level>
-        <level>21</level>
-        <xp>405000</xp>
-    </level>
-    <level>
-        <level>22</level>
-        <xp>470000</xp>
-    </level>
-    <level>
-        <level>23</level>
-        <xp>550000</xp>
-    </level>
-    <level>
-        <level>24</level>
-        <xp>645000</xp>
-    </level>
-    <level>
-        <level>25</level>
-        <xp>755000</xp>
-    </level>
-    <level>
-        <level>26</level>
-        <xp>880000</xp>
-    </level>
-    <level>
-        <level>27</level>
-        <xp>1020000</xp>
-    </level>
-    <level>
-        <level>28</level>
-        <xp>1175000</xp>
-    </level>
-    <level>
-        <level>29</level>
-        <xp>1345000</xp>
-    </level>
-    <level>
-        <level>30</level>
-        <xp>1530000</xp>
-    </level>
-    <level>
-        <level>31</level>
-        <xp>1730000</xp>
-    </level>
-    <level>
-        <level>32</level>
-        <xp>1945000</xp>
-    </level>
-    <level>
-        <level>33</level>
-        <xp>2175000</xp>
-    </level>
-    <level>
-        <level>34</level>
-        <xp>2420000</xp>
-    </level>
-    <level>
-        <level>35</level>
-        <xp>2680000</xp>
-    </level>
-    <level>
-        <level>36</level>
-        <xp>2955000</xp>
-    </level>
-    <level>
-        <level>37</level>
-        <xp>3245000</xp>
-    </level>
-    <level>
-        <level>38</level>
-        <xp>3550000</xp>
-    </level>
-    <level>
-        <level>39</level>
-        <xp>3870000</xp>
-    </level>
-    <level>
-        <level>40</level>
-        <xp>4205000</xp>
-    </level>
+    <level id="1" xp="0" />
+    <level id="2" xp="300" />
+    <level id="3" xp="900" />
+    <level id="4" xp="2700" />
+    <level id="5" xp="6500" />
+    <level id="6" xp="14000" />
+    <level id="7" xp="23000" />
+    <level id="8" xp="34000" />
+    <level id="9" xp="48000" />
+    <level id="10" xp="64000" />
+    <level id="11" xp="85000" />
+    <level id="12" xp="100000" />
+    <level id="13" xp="120000" />
+    <level id="14" xp="140000" />
+    <level id="15" xp="165000" />
+    <level id="16" xp="195000" />
+    <level id="17" xp="225000" />
+    <level id="18" xp="265000" />
+    <level id="19" xp="305000" />
+    <level id="20" xp="355000" />
+    <level id="21" xp="405000" />
+    <level id="22" xp="470000" />
+    <level id="23" xp="550000" />
+    <level id="24" xp="645000" />
+    <level id="25" xp="755000" />
+    <level id="26" xp="880000" />
+    <level id="27" xp="1020000" />
+    <level id="28" xp="1175000" />
+    <level id="29" xp="1345000" />
+    <level id="30" xp="1530000" />
+    <level id="31" xp="1730000" />
+    <level id="32" xp="1945000" />
+    <level id="33" xp="2175000" />
+    <level id="34" xp="2420000" />
+    <level id="35" xp="2680000" />
+    <level id="36" xp="2955000" />
+    <level id="37" xp="3245000" />
+    <level id="38" xp="3550000" />
+    <level id="39" xp="3870000" />
+    <level id="40" xp="4205000" />
 </levels>

@@ -20,8 +20,8 @@ public class AbstractNpc extends AbstractCharacter {
     public AbstractNpc(UUID id, NpcTemplate template, MapInstance map) {
         super(id, template.name(), neutralAttributes(), NOMINAL_HEALTH, NOMINAL_HEALTH,
                 template.knownSkills().stream().collect(Collectors.toMap(skill -> skill, skill -> 1)),
-                template.knownPassiveSkills(), template.activeEffects(), Map.of(ModifiedStat.SPEED, 0), true, 0, 0,
-                List.of());
+                template.knownPassiveSkills().stream().collect(Collectors.toMap(skill -> skill, skill -> 1)),
+                template.activeEffects(), Map.of(ModifiedStat.SPEED, 0), true, 0, 0, List.of());
         this.template = Objects.requireNonNull(template);
         getMotionSystem().setCurrentMap(Objects.requireNonNull(map));
     }

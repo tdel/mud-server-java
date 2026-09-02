@@ -22,11 +22,13 @@ public class EquipmentItem extends ItemTemplate {
     private List<ActiveSkill> grantedSkills;
     private Map<SkillElement, Integer> elementalResistances;
     private String setId;
+    private ItemExpectation expectation;
 
     public EquipmentItem(UUID id, String name, String description, ItemType type, int weight,
             ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus,
             int critBonus, int atkSpd, int price, List<ActiveSkill> grantedSkills,
-            Map<SkillElement, Integer> elementalResistances, ItemGrade grade, String setId) {
+            Map<SkillElement, Integer> elementalResistances, ItemGrade grade, String setId,
+            ItemExpectation expectation) {
         super(id, name, description, type, weight, price, grade);
         this.armorCategory = armorCategory;
         this.pAtk = pAtk;
@@ -40,6 +42,7 @@ public class EquipmentItem extends ItemTemplate {
         this.grantedSkills = grantedSkills == null ? List.of() : grantedSkills;
         this.elementalResistances = elementalResistances == null ? Map.of() : elementalResistances;
         this.setId = setId;
+        this.expectation = expectation;
     }
 
     public ArmorCategory getArmorCategory() {
@@ -138,6 +141,14 @@ public class EquipmentItem extends ItemTemplate {
         this.setId = setId;
     }
 
+    public ItemExpectation getExpectation() {
+        return expectation;
+    }
+
+    public void setExpectation(ItemExpectation expectation) {
+        this.expectation = expectation;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -151,13 +162,13 @@ public class EquipmentItem extends ItemTemplate {
                 && critBonus == other.critBonus && atkSpd == other.atkSpd && armorCategory == other.armorCategory
                 && Objects.equals(grantedSkills, other.grantedSkills)
                 && Objects.equals(elementalResistances, other.elementalResistances)
-                && Objects.equals(setId, other.setId);
+                && Objects.equals(setId, other.setId) && Objects.equals(expectation, other.expectation);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), armorCategory, pAtk, mAtk, pDef, mDef, accuracyBonus, evasionBonus,
-                critBonus, atkSpd, grantedSkills, elementalResistances, setId);
+                critBonus, atkSpd, grantedSkills, elementalResistances, setId, expectation);
     }
 
     @Override
@@ -165,6 +176,7 @@ public class EquipmentItem extends ItemTemplate {
         return "EquipmentItem[" + super.toString() + ", armorCategory=" + armorCategory + ", pAtk=" + pAtk + ", mAtk="
                 + mAtk + ", pDef=" + pDef + ", mDef=" + mDef + ", accuracyBonus=" + accuracyBonus + ", evasionBonus="
                 + evasionBonus + ", critBonus=" + critBonus + ", atkSpd=" + atkSpd + ", grantedSkills=" + grantedSkills
-                + ", elementalResistances=" + elementalResistances + ", setId=" + setId + "]";
+                + ", elementalResistances=" + elementalResistances + ", setId=" + setId + ", expectation=" + expectation
+                + "]";
     }
 }
