@@ -279,6 +279,10 @@ public final class SkillSystem {
         if (target instanceof AbstractNpc && activeSkill.skillType() == SkillEffectType.DAMAGE) {
             return new CastRequestOutcome.TargetInvalid(target.getId());
         }
+        if (target == character && (activeSkill.skillType() == SkillEffectType.DAMAGE
+                || activeSkill.skillType() == SkillEffectType.DEBUFF)) {
+            return new CastRequestOutcome.TargetInvalid(target.getId());
+        }
         if (activeSkill.range() > 0 && character.getMotionSystem().getPosition()
                 .distanceTo(target.getMotionSystem().getPosition()) > activeSkill.range()) {
             return new CastRequestOutcome.OutOfRange(activeSkill.name(), target.getName());
