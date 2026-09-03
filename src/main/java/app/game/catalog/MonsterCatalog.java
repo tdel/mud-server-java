@@ -101,6 +101,8 @@ public class MonsterCatalog {
                 template.getGoldReward(), template.getLootTable());
         monster.getMotionSystem().setCurrentMap(map);
         map.placeMonster(monster, spawn.position());
+        log.info("monster.spawned name={} map={} position={} id={}", monster.getName(), map.getName(), spawn.position(),
+                monster.getId());
         return monster;
     }
 
