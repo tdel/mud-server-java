@@ -251,7 +251,18 @@ public final class CharacterInstance extends AbstractCharacter {
 
     public void gainXp(int amount) {
         this.xp += amount;
-        send(new XpGained(amount));
+        // xpForNextLevel reflète le niveau ACTUEL (avant la boucle de level-up
+        // ci-dessous) :
+        // si ce gain déclenche une montée de niveau, le ratio xp/xpForNextLevel calculé
+        // côté
+        // client peut dépasser 1 pour cet unique message — sans conséquence, il se
+        // corrige au
+        // prochain XpGained/GamePlayerStats une fois le nouveau niveau atteint.
+        int xpForCurrentLevel = LevelCatalogHolder.xpRequiredForLevel(level);
+        int xpForNextLevel = level < LevelCatalogHolder.maxLevel()
+                ? LevelCatalogHolder.xpRequiredForLevel(level + 1)
+                : xpForCurrentLevel;
+        send(new XpGained(amount, xp, xpForCurrentLevel, xpForNextLevel));
 
         while (level < LevelCatalogHolder.maxLevel() && xp >= LevelCatalogHolder.xpRequiredForLevel(level + 1)) {
             applyLevelUp();

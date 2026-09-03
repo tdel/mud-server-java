@@ -10,12 +10,12 @@ import app.network.OutputJsonMessage;
 import app.network.server.tcpjson.TcpJsonOutput;
 
 /**
- * Photo de la map envoyée au chargement (création/sélection de personnage,
- * portail, réapparition) — pas à chaque déplacement. Liste TOUS les occupants
- * de la map (pas seulement la KnownList du personnage) : la sélection d'une
- * cible ne doit pas dépendre de la portée de perception, seules les diffusions
- * de mouvement/combat/chat en cours de partie restent scopées à la KnownList
- * pour la bande passante (voir AbstractCharacter.broadcastToMap).
+ * Photo de la map elle-même envoyée au chargement (création/sélection de
+ * personnage, portail, réapparition) — pas à chaque déplacement. Ne transmet
+ * plus la liste des occupants (personnages/monstres/PNJ) : celle-ci arrive
+ * séparément, scopée à AWARENESS_RANGE, via {@link EntityAppeared} poussé par
+ * {@link app.domain.actor.KnownList#populate()} au moment du join qui précède
+ * l'envoi de ce message (voir MapInstance.join).
  */
 public record MapEnter(AbstractCharacter character) implements OutputJsonMessage {
 
@@ -26,8 +26,7 @@ public record MapEnter(AbstractCharacter character) implements OutputJsonMessage
     }
 
     public record Payload(String mapName, String mapDescription, double selfX, double selfY, double selfHeading,
-            List<EntityView> characters, List<EntityView> monsters, List<EntityView> npcs, List<PortalView> portals,
-            List<WaypointView> remainingWaypoints) {
+            List<PortalView> portals, List<WaypointView> remainingWaypoints) {
     }
 
     @Override
@@ -35,19 +34,13 @@ public record MapEnter(AbstractCharacter character) implements OutputJsonMessage
         MapInstance map = character.getMotionSystem().getCurrentMap();
         Position self = character.getMotionSystem().getPosition();
 
-        List<EntityView> characterViews = map.characters().stream()
-                .filter(other -> !other.getId().equals(character.getId())).map(EntityView::of).toList();
-        List<EntityView> monsterViews = map.getMonsters().stream().map(EntityView::of).toList();
-        List<EntityView> npcViews = map.getNpcs().stream().map(EntityView::of).toList();
-
         List<PortalView> portals = map.getPortals().stream().map(portal -> new PortalView(portal.position().x(),
                 portal.position().y(), portal.direction(), portal.targetMap().getName())).toList();
 
         List<WaypointView> waypoints = remainingWaypoints().stream().map(p -> new WaypointView(p.x(), p.y())).toList();
 
         output.write("MapEnter", new Payload(map.getName(), map.getDescription(), self.x(), self.y(),
-                character.getMotionSystem().getHeading(), characterViews, monsterViews, npcViews, portals, waypoints),
-                false);
+                character.getMotionSystem().getHeading(), portals, waypoints), false);
     }
 
     private List<Position> remainingWaypoints() {

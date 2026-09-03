@@ -10,10 +10,9 @@ import app.network.server.tcpjson.TcpJsonOutput;
 /**
  * Carte statique complète d'une map (grille de collision + portails), envoyée
  * une fois au client à l'entrée de la map (voir Portal, CharacterCreate,
- * CharacterSelect) — contrairement à {@link MapEnter}, qui liste toutes les
- * entités dynamiques de la map au même instant (voir GamePlayerJoinedMap/
- * GamePlayerLeftMap/MonsterSpawned/MonsterDefeated pour leurs arrivées/départs
- * ultérieurs).
+ * CharacterSelect) — contrairement aux entités dynamiques de la map, poussées
+ * séparément et scopées à AWARENESS_RANGE via {@link EntityAppeared}/
+ * {@link EntityDisappeared} (voir {@link app.domain.actor.KnownList}).
  */
 public record MapView(MapInstance map) implements OutputJsonMessage {
 
