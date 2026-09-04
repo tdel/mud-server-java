@@ -11,7 +11,7 @@ import app.domain.map.Position;
 import app.domain.actor.AbstractNpc;
 import app.domain.actor.instance.NpcSellerInstance;
 
-public record NpcTemplate(UUID id, String name, UUID mapTemplateId, Position position, AbstractNpc.NpcDialogue dialogue,
-        NpcSellerInstance.NpcShop shop, int level, Set<ActiveSkill> knownSkills, Set<PassiveSkill> knownPassiveSkills,
-        List<ActiveEffect> activeEffects) {
+public record NpcTemplate(UUID id, String name, String title, UUID mapTemplateId, Position position,
+        AbstractNpc.NpcDialogue dialogue, NpcSellerInstance.NpcShop shop, int level, Set<ActiveSkill> knownSkills,
+        Set<PassiveSkill> knownPassiveSkills, List<ActiveEffect> activeEffects) {
 }

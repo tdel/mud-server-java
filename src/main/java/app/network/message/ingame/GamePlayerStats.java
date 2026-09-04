@@ -7,6 +7,7 @@ import app.network.OutputJsonMessage;
 import app.domain.actor.Attribute;
 import app.domain.actor.ModifiedStat;
 import app.domain.actor.instance.CharacterInstance;
+import app.domain.item.ItemGrade;
 import app.game.catalog.LevelCatalogHolder;
 import app.game.engine.MovementEngine;
 import app.network.server.tcpjson.TcpJsonOutput;
@@ -16,11 +17,19 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
     public record AttributeScore(int score, int modifier) {
     }
 
-    public record Payload(UUID id, String name, String gender, int level, String characterClass, int currentHealth,
-            int maxHealth, int healthRegenPerSecond, int currentMana, int maxMana, int manaRegenPerSecond, int pAtk,
-            int pDef, int mAtk, int mDef, int accuracy, int evasion, int criticalRate, int atkSpd,
-            AttributeScore strength, AttributeScore dexterity, AttributeScore constitution, AttributeScore intelligence,
-            AttributeScore wit, AttributeScore men, double speed, int xp, int xpForCurrentLevel, int xpForNextLevel) {
+    // activeSoulshotGrade/activeSpiritshotGrade : null si l'auto-use est désactivé
+    // pour cette
+    // catégorie (même convention que ShotGradeChanged.grade) — sans ce champ, un
+    // client qui
+    // se reconnecte n'a aucun moyen de savoir que le toggle persisté côté serveur
+    // (voir
+    // CharacterDao) est actif tant qu'il n'a pas reçu un ShotUsed/ShotGradeChanged.
+    public record Payload(UUID id, String name, String title, String gender, int level, String characterClass,
+            int currentHealth, int maxHealth, int healthRegenPerSecond, int currentMana, int maxMana,
+            int manaRegenPerSecond, int pAtk, int pDef, int mAtk, int mDef, int accuracy, int evasion, int criticalRate,
+            int atkSpd, AttributeScore strength, AttributeScore dexterity, AttributeScore constitution,
+            AttributeScore intelligence, AttributeScore wit, AttributeScore men, double speed, int xp,
+            int xpForCurrentLevel, int xpForNextLevel, ItemGrade activeSoulshotGrade, ItemGrade activeSpiritshotGrade) {
     }
 
     @Override
@@ -35,8 +44,9 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
         int xpForNextLevel = c.getLevel() < LevelCatalogHolder.maxLevel()
                 ? LevelCatalogHolder.xpRequiredForLevel(c.getLevel() + 1)
                 : xpForCurrentLevel;
-        output.write("GamePlayerStats", new Payload(c.getId(), c.getName(), c.getAppearanceSystem().getGender().label(),
-                c.getLevel(), c.getClassSystem().getCharacterClass().label(), c.getCurrentHealth(), c.getMaxHealth(),
+        output.write("GamePlayerStats", new Payload(c.getId(), c.getName(), c.getTitle(),
+                c.getAppearanceSystem().getGender().label(), c.getLevel(),
+                c.getClassSystem().getCharacterClass().label(), c.getCurrentHealth(), c.getMaxHealth(),
                 c.healthRegenAmountPerTick(), c.getCurrentMana(), c.getMaxMana(), c.manaRegenAmountPerTick(),
                 c.getStatSystem().getEffective(ModifiedStat.PATK), c.getStatSystem().getEffective(ModifiedStat.PDEF),
                 c.getStatSystem().getEffective(ModifiedStat.MATK), c.getStatSystem().getEffective(ModifiedStat.MDEF),
@@ -46,7 +56,7 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
                 attributeScore(c, Attribute.STR), attributeScore(c, Attribute.DEX), attributeScore(c, Attribute.CON),
                 attributeScore(c, Attribute.INT), attributeScore(c, Attribute.WIT), attributeScore(c, Attribute.MEN),
                 MovementEngine.unitsPerSecond(c.getMotionSystem().getSpeed()), c.getXp(), xpForCurrentLevel,
-                xpForNextLevel), false);
+                xpForNextLevel, c.getActiveSoulshotGrade(), c.getActiveSpiritshotGrade()), false);
     }
 
     private static AttributeScore attributeScore(CharacterInstance c, Attribute attribute) {

@@ -226,8 +226,9 @@ public class WorldTemplateCatalog {
                 AbstractNpc.NpcDialogue dialogue = toDialogue(definition);
                 NpcSellerInstance.NpcShop shop = toShop(shortName, definition, itemTemplatesById);
 
-                NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), map.getId(),
-                        spawn.position(), dialogue, shop, definition.level(), Set.of(), Set.of(), List.of());
+                NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), definition.title(),
+                        map.getId(), spawn.position(), dialogue, shop, definition.level(), Set.of(), Set.of(),
+                        List.of());
                 if (templates.putIfAbsent(template.id(), template) != null) {
                     throw new IllegalStateException("NPC " + definition.id() + " dupliqué dans le monde " + shortName);
                 }
@@ -304,8 +305,8 @@ public class WorldTemplateCatalog {
         return Optional.of(loadedTemplatesById.computeIfAbsent(id, this::loadFullTemplate));
     }
 
-    record NpcDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name, DialogueDefinition dialogue,
-            int level) {
+    record NpcDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name, String title,
+            DialogueDefinition dialogue, int level) {
     }
 
     record DialogueDefinition(String greeting,

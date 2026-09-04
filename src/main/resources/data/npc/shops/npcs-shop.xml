@@ -2,6 +2,7 @@
 <npcs>
     <npc id="a3c8d0f2-5d5f-4d2c-9f2c-3f4e5d6c7b8a">
         <name>Innkeeper</name>
+        <title>General Shop</title>
         <dialogue>
             <greeting>Hello, I sell several interesting things, would you like to see?</greeting>
             <options>
@@ -48,6 +49,7 @@
     </npc>
     <npc id="dcb67f1e-b178-4062-8393-26abca9b0d66">
         <name>Blacksmith</name>
+        <title>Blacksmith</title>
         <dialogue>
             <greeting>A weapon, some armor? I've got what you need.</greeting>
             <options>

@@ -2,6 +2,7 @@
 <npcs>
     <npc id="b0362279-5a46-4461-9672-6f4e0b2cf7e0">
         <name>Village Guard</name>
+        <title>City Guard</title>
         <dialogue>
             <greeting>Halt! ... Alright, move along.</greeting>
             <options>
@@ -13,6 +14,7 @@
     </npc>
     <npc id="318a4b28-4aae-46fa-ab99-2bc62738f1c3">
         <name>Gate Guard</name>
+        <title>City Guard</title>
         <dialogue>
             <greeting>Nothing to report here. Move along.</greeting>
             <options>
