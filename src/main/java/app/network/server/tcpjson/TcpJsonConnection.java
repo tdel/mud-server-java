@@ -35,6 +35,22 @@ public class TcpJsonConnection implements Connection, TcpJsonOutput {
     private final AuthWorld authWorld;
     private final WorldInstanceService worldInstanceService;
 
+    // AbstractCharacter.broadcast() appelle send(message) une fois par
+    // destinataire de la KnownList avec le MÊME objet message — sans ce cache,
+    // write() ré-encode en JSON (Jackson) un contenu strictement identique à
+    // chaque itération. Le cache est scopé par thread (et non un champ statique
+    // unique) : chaque broadcast tourne entièrement sur un seul thread (celui de
+    // la commande du joueur, ou l'un des threads du pool @Scheduled), donc deux
+    // diffusions concurrentes sur deux threads différents ne se marchent jamais
+    // dessus. L'égalité par référence sur payload est sûre par construction :
+    // seule une boucle broadcast() réutilise le même objet message d'un appel à
+    // l'autre ; un payload différent (y compris un DTO fraîchement construit par
+    // un toJson surchargé, ex. MapEnter.Payload) invalide simplement le cache.
+    private record CachedEncode(Object payloadRef, String type, boolean secure, byte[] json) {
+    }
+
+    private static final ThreadLocal<CachedEncode> LAST_ENCODE = new ThreadLocal<>();
+
     private ConnectionState state = ConnectionState.CONNECTED;
     private CharacterInstance player;
     private Account account;
@@ -114,15 +130,27 @@ public class TcpJsonConnection implements Connection, TcpJsonOutput {
 
     @Override
     public void write(String type, Object payload, boolean secure) {
-        log.info("message.sent type={} connectionId={} state={} character={} account={}", type, connectionId, state,
+        log.debug("message.sent type={} connectionId={} state={} character={} account={}", type, connectionId, state,
                 state == ConnectionState.INGAME ? player.getName() : "-",
                 state != ConnectionState.CONNECTED ? account.getLogin() : "-");
         try {
-            String json = objectMapper.writeValueAsString(new TcpJsonEnvelope(type, payload, secure));
-            channel.writeAndFlush(Unpooled.copiedBuffer(json + "\n", StandardCharsets.UTF_8));
+            byte[] json = encode(type, payload, secure);
+            channel.writeAndFlush(Unpooled.wrappedBuffer(json));
         } catch (Exception e) {
             log.error("tcpjson.serialize_failed type={}", type, e);
         }
+    }
+
+    private byte[] encode(String type, Object payload, boolean secure) throws Exception {
+        CachedEncode cached = LAST_ENCODE.get();
+        if (cached != null && cached.payloadRef() == payload && cached.type().equals(type)
+                && cached.secure() == secure) {
+            return cached.json();
+        }
+        String json = objectMapper.writeValueAsString(new TcpJsonEnvelope(type, payload, secure));
+        byte[] encoded = (json + "\n").getBytes(StandardCharsets.UTF_8);
+        LAST_ENCODE.set(new CachedEncode(payload, type, secure, encoded));
+        return encoded;
     }
 
     @Override

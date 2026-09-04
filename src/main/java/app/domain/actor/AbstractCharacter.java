@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import app.domain.ActiveEffect;
 import app.domain.ActiveSkill;
 import app.domain.PassiveSkill;
@@ -21,6 +24,8 @@ import app.domain.world.MapInstance;
 import app.network.OutputMessage;
 
 public abstract class AbstractCharacter extends AbstractObject {
+
+    private static final Logger log = LoggerFactory.getLogger(AbstractCharacter.class);
 
     private final Map<Attribute, Integer> attributes;
     private final EffectsSystem effectsSystem = new EffectsSystem(this);
@@ -160,14 +165,18 @@ public abstract class AbstractCharacter extends AbstractObject {
      * dans sa propre KnownList).
      */
     public void broadcast(OutputMessage message, CharacterInstance exclude) {
+        int recipients = 0;
         for (AbstractCharacter known : knownList.asList()) {
             if (known instanceof CharacterInstance target && target != exclude) {
                 target.send(message);
+                recipients++;
             }
         }
         if (this instanceof CharacterInstance self && self != exclude) {
             self.send(message);
+            recipients++;
         }
+        log.info("character.broadcast type={} recipients={}", message.getClass().getSimpleName(), recipients);
     }
 
     /**
