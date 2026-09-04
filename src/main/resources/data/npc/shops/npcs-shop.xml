@@ -34,6 +34,14 @@
                     <itemTemplateId>3a4a5836-051e-4641-aef8-7b6e6792322e</itemTemplateId>
                     <price>60</price>
                 </items>
+                <items>
+                    <itemTemplateId>4623f73d-821b-4dc4-b723-b9353bdca64c</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>03c6440a-24d6-426a-bf0a-d3d046c9ad37</itemTemplateId>
+                    <price>10</price>
+                </items>
             </shop>
         </dialogue>
         <level>1</level>
