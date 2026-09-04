@@ -1,14 +1,10 @@
 package app.network;
 
-import java.util.function.Consumer;
-
 import app.domain.Account;
 import app.domain.world.WorldInstance;
 import app.domain.actor.instance.CharacterInstance;
 
 public interface Connection {
-
-    void requestBlocking(OutputMessage message, Consumer<String> handler);
 
     ConnectionState state();
 

@@ -34,6 +34,6 @@ public record MapView(MapInstance map) implements OutputJsonMessage {
                 portal.position().y(), portal.triggerRadius(), portal.direction(), portal.targetMap().getName()))
                 .toList();
 
-        output.write("MapView", new Payload(map.getId().toString(), map.getName(), gridView, portals), false);
+        output.write("MapView", new Payload(map.getId().toString(), map.getName(), gridView, portals));
     }
 }

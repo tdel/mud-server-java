@@ -74,10 +74,9 @@ public class TcpJsonSessionHandler extends SimpleChannelInboundHandler<String> {
 
     private void runConnectionLoop(TcpJsonConnection connection, BlockingQueue<String> inbox) {
         MDC.put(MDC_CONNECTION_ID, connection.getConnectionId());
-        connection.write("Welcome",
-                Map.of("message", "Welcome to mud-server-java. Send {\"verb\":\"login\",\"argument\":\"<name>\"} "
-                        + "or {\"verb\":\"register\",\"argument\":\"<name>\"} to begin."),
-                false);
+        connection.write("Welcome", Map.of("message",
+                "Welcome to mud-server-java. Send {\"verb\":\"login\",\"argument\":\"<name>|<password>\"} "
+                        + "or {\"verb\":\"register\",\"argument\":\"<name>|<password>|<confirmation>\"} to begin."));
         try {
             while (true) {
                 String line = inbox.take();

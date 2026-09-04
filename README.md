@@ -77,28 +77,25 @@ message JSON, terminé par `\n`.
 {"verb": "go", "argument": "nord 2"}
 ```
 
-`verb` est traité insensible à la casse. Quand le serveur attend une réponse ponctuelle
-(ex. confirmation), la ligne suivante est interprétée comme une réponse et non comme une
-commande :
-
-```json
-{"reply": "yes"}
-```
+`verb` est traité insensible à la casse. Toutes les commandes sont stateless : un
+handler ne fige jamais la connexion dans l'attente d'une ligne de réponse ad hoc — les
+valeurs multiples (login/mot de passe, choix de personnage, ...) sont passées en un seul
+appel, séparées par `|` (ex. `login <name>|<password>`). C'est au client (Godot) de gérer
+ses propres écrans/prompts et le masquage des champs sensibles.
 
 **Sortie (serveur → client)** — chaque message est enveloppé ainsi :
 
 ```json
-{"type": "<NomDeLaClasse>", "payload": { ... }, "secure": false}
+{"type": "<NomDeLaClasse>", "payload": { ... }}
 ```
 
 `type` est le nom simple de la classe Java du message (ex. `Chat`, `XpGained`,
-`Inventory`) ; `secure` vaut `true` pour les messages sensibles (ex. mot de passe) à ne
-pas logger/afficher en clair. La plupart des messages sérialisent directement leurs
-champs comme `payload` :
+`Inventory`). La plupart des messages sérialisent directement leurs champs comme
+`payload` :
 
 ```json
-{"type": "XpGained", "payload": {"amount": 50}, "secure": false}
-{"type": "Chat", "payload": {"speakerLogin": "aldric", "text": "salut"}, "secure": false}
+{"type": "XpGained", "payload": {"amount": 50}}
+{"type": "Chat", "payload": {"speakerLogin": "aldric", "text": "salut"}}
 ```
 
 Quatre messages construisent un `payload` dédié plutôt que de sérialiser l'objet
@@ -120,7 +117,7 @@ domaine brut :
   `maxHealth`, `armorClass`, les six caractéristiques en `{score, modifier}`.
 
 En cas d'erreur de parsing ou d'exécution, le serveur répond avec `{"type": "Error",
-"payload": {"message": "..."}, "secure": false}` sans fermer la connexion.
+"payload": {"message": "..."}}` sans fermer la connexion.
 
 ## Stack
 

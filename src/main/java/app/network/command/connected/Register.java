@@ -7,20 +7,18 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 
 import app.network.CommandHandler;
-import app.domain.Account;
 import app.game.AuthWorld;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
-import app.network.message.connected.AccountCreated;
-import app.network.message.connected.ConfirmPassword;
 import app.network.message.connected.InvalidPassword;
 import app.network.message.connected.LoginAlreadyTaken;
 import app.network.message.connected.PasswordMismatch;
-import app.network.message.connected.RequestPassword;
 
 @Component
 public class Register implements CommandHandler {
+
+    private static final String USAGE = "register <name>|<password>|<confirmation>";
 
     private final AuthWorld authWorld;
 
@@ -40,9 +38,17 @@ public class Register implements CommandHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        String login = argument.trim();
+        String[] parts = argument.split("\\|", -1);
+        if (parts.length != 3) {
+            connection.send(new Usage(USAGE));
+            return;
+        }
+
+        String login = parts[0].trim();
+        String password = parts[1];
+        String confirmation = parts[2];
         if (login.isEmpty()) {
-            connection.send(new Usage("register <name>"));
+            connection.send(new Usage(USAGE));
             return;
         }
 
@@ -51,33 +57,21 @@ public class Register implements CommandHandler {
             return;
         }
 
-        connection.requestBlocking(new RequestPassword(), password -> onPasswordEntered(connection, login, password));
-    }
-
-    private void onPasswordEntered(Connection connection, String login, String password) {
         List<String> reasons = authWorld.validatePassword(password);
         if (!reasons.isEmpty()) {
             connection.send(new InvalidPassword(reasons));
             return;
         }
 
-        connection.requestBlocking(new ConfirmPassword(),
-                confirmation -> onPasswordConfirmed(connection, login, password, confirmation));
-    }
-
-    private void onPasswordConfirmed(Connection connection, String login, String password, String confirmation) {
         if (!password.equals(confirmation)) {
             connection.send(new PasswordMismatch());
             return;
         }
 
-        Account account;
         try {
-            account = authWorld.registerAccount(connection, login, password);
+            authWorld.registerAccount(connection, login, password);
         } catch (DuplicateKeyException e) {
             connection.send(new LoginAlreadyTaken(login));
-            return;
         }
-
     }
 }

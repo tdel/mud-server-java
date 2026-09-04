@@ -16,11 +16,9 @@ import app.network.message.ingame.NotEnoughGold;
 import app.network.message.ingame.ShopItemNotFound;
 import app.network.message.ingame.TargetNotFound;
 
-// Contrepartie stateless du chemin d'achat de Talk (qui reste inchangé pour le
-// client texte, un item à la fois via requestBlocking) : un seul argument
-// "<npcUuid>|<itemTemplateUuidOuNom>|<quantité>", résolu et vérifié ici, la
-// solvabilité/le débit restant entièrement dans NpcSellerInstance.sell (achat
-// tout-ou-rien, cf. son commentaire).
+// Achat en une commande stateless : "<npcUuid>|<itemTemplateUuidOuNom>|<quantité>",
+// résolu et vérifié ici, la solvabilité/le débit restant entièrement dans
+// NpcSellerInstance.sell (achat tout-ou-rien, cf. son commentaire).
 @Component
 public class Buy implements CommandHandler {
 

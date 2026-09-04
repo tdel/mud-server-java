@@ -16,11 +16,9 @@ import app.network.message.Usage;
 import app.network.message.ingame.ShopCatalog;
 import app.network.message.ingame.TargetNotFound;
 
-// Contrepartie stateless de Talk (qui garde son propre chemin "SHOP" via
-// requestBlocking, inchangé, pour le client texte) : envoie directement le
-// catalogue sans figer la connexion dans une boucle de prompt bloquante, pour
-// coexister avec les commandes normales (déplacement, attaque, ...) pendant
-// qu'une fenêtre d'achat GUI reste ouverte côté client 3D.
+// Envoie directement le catalogue, sans figer la connexion dans un prompt,
+// pour coexister avec les commandes normales (déplacement, attaque, ...)
+// pendant qu'une fenêtre d'achat GUI reste ouverte côté client Godot.
 @Component
 public class Shop implements CommandHandler {
 

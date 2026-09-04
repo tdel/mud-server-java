@@ -40,7 +40,7 @@ public record MapEnter(AbstractCharacter character) implements OutputJsonMessage
         List<WaypointView> waypoints = remainingWaypoints().stream().map(p -> new WaypointView(p.x(), p.y())).toList();
 
         output.write("MapEnter", new Payload(map.getName(), map.getDescription(), self.x(), self.y(),
-                character.getMotionSystem().getHeading(), portals, waypoints), false);
+                character.getMotionSystem().getHeading(), portals, waypoints));
     }
 
     private List<Position> remainingWaypoints() {

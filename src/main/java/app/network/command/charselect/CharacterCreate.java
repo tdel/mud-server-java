@@ -18,8 +18,6 @@ import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
 import app.network.message.charselect.CharacterCreated;
-import app.network.message.charselect.ChooseClass;
-import app.network.message.charselect.ChooseGender;
 import app.network.message.charselect.InvalidClass;
 import app.network.message.charselect.InvalidGender;
 import app.network.message.charselect.CharacterNameTaken;
@@ -30,6 +28,8 @@ import app.network.message.ingame.MapView;
 
 @Component
 public class CharacterCreate implements CommandHandler {
+
+    private static final String USAGE = "character-create <name>|<gender>|<classe>";
 
     private final WorldInstanceService worldInstanceService;
     private final CharSelectStatus charSelectStatus;
@@ -51,10 +51,15 @@ public class CharacterCreate implements CommandHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        String name = argument.trim();
+        String[] parts = argument.split("\\|", -1);
+        if (parts.length != 3) {
+            connection.send(new Usage(USAGE));
+            return;
+        }
 
+        String name = parts[0].trim();
         if (name.isEmpty()) {
-            connection.send(new Usage("character-create <name>"));
+            connection.send(new Usage(USAGE));
             return;
         }
 
@@ -67,21 +72,19 @@ public class CharacterCreate implements CommandHandler {
             return;
         }
 
-        promptGender(connection, account, instance, name);
-    }
+        Gender gender = parseGender(parts[1]);
+        if (gender == null) {
+            connection.send(new InvalidGender(parts[1].trim()));
+            return;
+        }
 
-    private void promptGender(Connection connection, Account account, WorldInstance instance, String name) {
-        connection.requestBlocking(new ChooseGender(), line -> {
-            Gender gender = parseGender(line);
+        CharacterClass characterClass = parseClass(parts[2]);
+        if (characterClass == null) {
+            connection.send(new InvalidClass(parts[2].trim()));
+            return;
+        }
 
-            if (gender == null) {
-                connection.send(new InvalidGender(line.trim()));
-                promptGender(connection, account, instance, name);
-                return;
-            }
-
-            promptClass(connection, account, instance, name, gender);
-        });
+        createCharacter(connection, account, instance, name, gender, characterClass);
     }
 
     private Gender parseGender(String input) {
@@ -91,21 +94,6 @@ public class CharacterCreate implements CommandHandler {
         } catch (IllegalArgumentException e) {
             return null;
         }
-    }
-
-    private void promptClass(Connection connection, Account account, WorldInstance instance, String name,
-            Gender gender) {
-        connection.requestBlocking(new ChooseClass(), line -> {
-            CharacterClass characterClass = parseClass(line);
-
-            if (characterClass == null) {
-                connection.send(new InvalidClass(line.trim()));
-                promptClass(connection, account, instance, name, gender);
-                return;
-            }
-
-            createCharacter(connection, account, instance, name, gender, characterClass);
-        });
     }
 
     private CharacterClass parseClass(String input) {

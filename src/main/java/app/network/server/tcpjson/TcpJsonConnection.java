@@ -2,7 +2,6 @@ package app.network.server.tcpjson;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +21,6 @@ import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.OutputJsonMessage;
 import app.network.OutputMessage;
-import app.network.SecureOutputMessage;
 
 public class TcpJsonConnection implements Connection, TcpJsonOutput {
 
@@ -46,7 +44,7 @@ public class TcpJsonConnection implements Connection, TcpJsonOutput {
     // seule une boucle broadcast() réutilise le même objet message d'un appel à
     // l'autre ; un payload différent (y compris un DTO fraîchement construit par
     // un toJson surchargé, ex. MapEnter.Payload) invalide simplement le cache.
-    private record CachedEncode(Object payloadRef, String type, boolean secure, byte[] json) {
+    private record CachedEncode(Object payloadRef, String type, byte[] json) {
     }
 
     private static final ThreadLocal<CachedEncode> LAST_ENCODE = new ThreadLocal<>();
@@ -55,8 +53,6 @@ public class TcpJsonConnection implements Connection, TcpJsonOutput {
     private CharacterInstance player;
     private Account account;
     private WorldInstance worldInstance;
-    private Consumer<String> pendingLine;
-    private boolean pendingLineSecure;
 
     public TcpJsonConnection(String connectionId, Channel channel, ObjectMapper objectMapper,
             CommandDispatcher commandDispatcher, AuthWorld authWorld, WorldInstanceService worldInstanceService) {
@@ -73,25 +69,14 @@ public class TcpJsonConnection implements Connection, TcpJsonOutput {
     }
 
     public void handleLine(String rawLine) {
-        boolean secureLine = false;
         try {
-            if (pendingLine != null) {
-                Consumer<String> handler = pendingLine;
-                secureLine = pendingLineSecure;
-                pendingLine = null;
-                pendingLineSecure = false;
-                TcpJsonReply reply = objectMapper.readValue(rawLine, TcpJsonReply.class);
-                handler.accept(reply.reply());
-                return;
-            }
-
             TcpJsonCommand command = objectMapper.readValue(rawLine, TcpJsonCommand.class);
             String verb = command.verb() == null ? "" : command.verb().toLowerCase();
             String argument = command.argument() == null ? "" : command.argument();
             commandDispatcher.dispatch(this, verb, argument);
         } catch (Exception e) {
-            log.error("tcpjson.command.failed line={}", secureLine ? "[REDACTED]" : rawLine, e);
-            write("Error", Map.of("message", "Something went wrong processing that command. Please try again."), false);
+            log.error("tcpjson.command.failed line={}", rawLine, e);
+            write("Error", Map.of("message", "Something went wrong processing that command. Please try again."));
         }
     }
 
@@ -114,13 +99,6 @@ public class TcpJsonConnection implements Connection, TcpJsonOutput {
     }
 
     @Override
-    public void requestBlocking(OutputMessage message, Consumer<String> handler) {
-        this.send(message);
-        this.pendingLineSecure = message instanceof SecureOutputMessage;
-        this.pendingLine = handler;
-    }
-
-    @Override
     public void send(OutputMessage message) {
         if (!(message instanceof OutputJsonMessage jsonMessage)) {
             throw new IllegalArgumentException("Message non supporté par le transport TCP/JSON : " + message);
@@ -129,27 +107,26 @@ public class TcpJsonConnection implements Connection, TcpJsonOutput {
     }
 
     @Override
-    public void write(String type, Object payload, boolean secure) {
+    public void write(String type, Object payload) {
         log.debug("message.sent type={} connectionId={} state={} character={} account={}", type, connectionId, state,
                 state == ConnectionState.INGAME ? player.getName() : "-",
                 state != ConnectionState.CONNECTED ? account.getLogin() : "-");
         try {
-            byte[] json = encode(type, payload, secure);
+            byte[] json = encode(type, payload);
             channel.writeAndFlush(Unpooled.wrappedBuffer(json));
         } catch (Exception e) {
             log.error("tcpjson.serialize_failed type={}", type, e);
         }
     }
 
-    private byte[] encode(String type, Object payload, boolean secure) throws Exception {
+    private byte[] encode(String type, Object payload) throws Exception {
         CachedEncode cached = LAST_ENCODE.get();
-        if (cached != null && cached.payloadRef() == payload && cached.type().equals(type)
-                && cached.secure() == secure) {
+        if (cached != null && cached.payloadRef() == payload && cached.type().equals(type)) {
             return cached.json();
         }
-        String json = objectMapper.writeValueAsString(new TcpJsonEnvelope(type, payload, secure));
+        String json = objectMapper.writeValueAsString(new TcpJsonEnvelope(type, payload));
         byte[] encoded = (json + "\n").getBytes(StandardCharsets.UTF_8);
-        LAST_ENCODE.set(new CachedEncode(payload, type, secure, encoded));
+        LAST_ENCODE.set(new CachedEncode(payload, type, encoded));
         return encoded;
     }
 

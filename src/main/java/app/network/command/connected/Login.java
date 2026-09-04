@@ -16,13 +16,12 @@ import app.network.message.Usage;
 import app.network.message.connected.AccountAlreadyConnected;
 import app.network.message.connected.AccountNotFound;
 import app.network.message.connected.IncorrectPassword;
-import app.network.message.connected.RequestPassword;
-import app.network.message.connected.WelcomeBack;
 
 @Component
 public class Login implements CommandHandler {
 
     private static final Logger log = LoggerFactory.getLogger(Login.class);
+    private static final String USAGE = "login <name>|<password>";
 
     private final AuthWorld authWorld;
 
@@ -42,9 +41,16 @@ public class Login implements CommandHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        String login = argument.trim();
-        if (login.isEmpty()) {
-            connection.send(new Usage("login <name>"));
+        String[] parts = argument.split("\\|", -1);
+        if (parts.length != 2) {
+            connection.send(new Usage(USAGE));
+            return;
+        }
+
+        String login = parts[0].trim();
+        String password = parts[1];
+        if (login.isEmpty() || password.isEmpty()) {
+            connection.send(new Usage(USAGE));
             return;
         }
 
@@ -55,12 +61,7 @@ public class Login implements CommandHandler {
             return;
         }
 
-        connection.requestBlocking(new RequestPassword(),
-                password -> onPasswordEntered(connection, account.get(), login, password));
-    }
-
-    private void onPasswordEntered(Connection connection, Account account, String login, String password) {
-        if (!authWorld.checkPassword(account, password)) {
+        if (!authWorld.checkPassword(account.get(), password)) {
             log.warn("auth.login_failed account={} reason=bad_password", login);
             connection.send(new IncorrectPassword());
             return;
@@ -75,13 +76,13 @@ public class Login implements CommandHandler {
         // vraiment aujourd'hui si ce compte est doublé. À corriger en rendant cet
         // enregistrement atomique (ex. ConcurrentHashMap.putIfAbsent par accountId
         // dans AuthWorld) plutôt qu'un scan puis un put séparé.
-        if (authWorld.isAlreadyConnected(account.getId())) {
+        if (authWorld.isAlreadyConnected(account.get().getId())) {
             log.warn("auth.login_failed account={} reason=already_connected", login);
             connection.send(new AccountAlreadyConnected(login));
             return;
         }
 
-        authWorld.enterWorld(connection, account);
+        authWorld.enterWorld(connection, account.get());
         log.info("auth.login_succeeded account={}", login);
     }
 }

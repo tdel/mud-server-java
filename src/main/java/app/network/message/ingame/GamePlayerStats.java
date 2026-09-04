@@ -56,7 +56,7 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
                 attributeScore(c, Attribute.STR), attributeScore(c, Attribute.DEX), attributeScore(c, Attribute.CON),
                 attributeScore(c, Attribute.INT), attributeScore(c, Attribute.WIT), attributeScore(c, Attribute.MEN),
                 MovementEngine.unitsPerSecond(c.getMotionSystem().getSpeed()), c.getXp(), xpForCurrentLevel,
-                xpForNextLevel, c.getActiveSoulshotGrade(), c.getActiveSpiritshotGrade()), false);
+                xpForNextLevel, c.getActiveSoulshotGrade(), c.getActiveSpiritshotGrade()));
     }
 
     private static AttributeScore attributeScore(CharacterInstance c, Attribute attribute) {

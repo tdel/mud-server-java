@@ -58,15 +58,6 @@ public class AbstractNpc extends AbstractCharacter {
     }
 
     public record NpcDialogue(String greeting, List<NpcDialogueOption> options) {
-
-        public Optional<NpcDialogueOption> resolveOption(String input) {
-            try {
-                int index = Integer.parseInt(input.trim());
-                return index >= 1 && index <= options.size() ? Optional.of(options.get(index - 1)) : Optional.empty();
-            } catch (NumberFormatException e) {
-                return Optional.empty();
-            }
-        }
     }
 
     public record NpcDialogueOption(String label, NpcDialogueOptionType type, String response) {
