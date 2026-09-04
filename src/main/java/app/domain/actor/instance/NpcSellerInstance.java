@@ -44,16 +44,37 @@ public final class NpcSellerInstance extends AbstractNpc {
     }
 
     public PurchaseOutcome sell(CharacterInstance buyer, String input) {
+        return sell(buyer, input, 1);
+    }
+
+    // Une pile stackable (soulshot/spiritshot) est achetée en un seul Item de
+    // quantité `quantity` (un seul débit/événement d'achat) ; un objet non
+    // stackable (arme, potion, ...) est acheté un exemplaire à la fois en boucle
+    // (un Item par exemplaire, cf. ItemType.stackable) — la solvabilité totale est
+    // vérifiée une seule fois en amont pour que l'achat reste tout-ou-rien.
+    public PurchaseOutcome sell(CharacterInstance buyer, String input, int quantity) {
         Optional<NpcShopEntry> entry = resolveEntry(input);
         if (entry.isEmpty()) {
             return new PurchaseOutcome.EntryNotFound();
         }
 
-        Item item = new Item(UUID.randomUUID(), entry.get().itemTemplate(), buyer, null);
-        boolean bought = buyer.getInventorySystem().buyItem(item, entry.get().price());
-        return bought
-                ? new PurchaseOutcome.Purchased(item, entry.get().price())
-                : new PurchaseOutcome.InsufficientGold(entry.get().price());
+        int qty = Math.max(1, quantity);
+        ItemTemplate template = entry.get().itemTemplate();
+        int unitPrice = entry.get().price();
+        int totalPrice = unitPrice * qty;
+        if (buyer.getInventorySystem().getGold() < totalPrice) {
+            return new PurchaseOutcome.InsufficientGold(totalPrice);
+        }
+
+        if (template.getType().stackable()) {
+            Item item = new Item(UUID.randomUUID(), template, buyer, null, 0, qty);
+            buyer.getInventorySystem().buyItem(item, totalPrice);
+        } else {
+            for (int i = 0; i < qty; i++) {
+                buyer.getInventorySystem().buyItem(new Item(UUID.randomUUID(), template, buyer, null), unitPrice);
+            }
+        }
+        return new PurchaseOutcome.Purchased();
     }
 
     public record NpcShop(List<NpcShopEntry> items) {
@@ -64,7 +85,7 @@ public final class NpcSellerInstance extends AbstractNpc {
 
     public sealed interface PurchaseOutcome {
 
-        record Purchased(Item item, int price) implements PurchaseOutcome {
+        record Purchased() implements PurchaseOutcome {
         }
 
         record EntryNotFound() implements PurchaseOutcome {

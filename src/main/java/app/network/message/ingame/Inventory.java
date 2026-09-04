@@ -17,7 +17,7 @@ public record Inventory(List<Entry> items, int gold) implements OutputJsonMessag
     // qui lèverait une ClassCastException sur un template non-équipement).
     public record Entry(UUID id, String name, ItemGrade grade, EquipmentSlot slot, ItemType type, String description,
             int weight, ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus,
-            int evasionBonus, int critBonus, int atkSpd, int enchant) {
+            int evasionBonus, int critBonus, int atkSpd, int enchant, int quantity) {
     }
 
 }
