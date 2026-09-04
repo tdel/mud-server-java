@@ -25,6 +25,7 @@ import app.domain.actor.Gender;
 import app.domain.actor.Race;
 import app.domain.actor.Subclass;
 import app.domain.item.Item;
+import app.domain.item.ItemGrade;
 import app.domain.map.Position;
 import app.domain.world.MapInstance;
 import app.domain.world.WorldInstance;
@@ -60,7 +61,8 @@ public class CharacterDao {
                 CHARACTER.GENDER, CHARACTER.RACE, CHARACTER.CHARACTER_CLASS, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH,
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
                 CHARACTER.INTELLIGENCE, CHARACTER.WIT, CHARACTER.MEN, CHARACTER.XP, CHARACTER.GOLD, CHARACTER.MAX_MANA,
-                CHARACTER.CURRENT_MANA, CHARACTER.SUBCLASS_TIER1, CHARACTER.SUBCLASS_TIER2)
+                CHARACTER.CURRENT_MANA, CHARACTER.SUBCLASS_TIER1, CHARACTER.SUBCLASS_TIER2,
+                CHARACTER.ACTIVE_SOULSHOT_GRADE, CHARACTER.ACTIVE_SPIRITSHOT_GRADE)
                 .values(character.getId(), character.getAccountId(), character.getName(),
                         character.getMotionSystem().getCurrentMap().getTemplateId(),
                         character.getAppearanceSystem().getGender().name(),
@@ -72,12 +74,21 @@ public class CharacterDao {
                         character.getAttribute(Attribute.MEN), character.getXp(),
                         character.getInventorySystem().getGold(), character.getMaxMana(), character.getCurrentMana(),
                         name(character.getClassSystem().getSubclass(1)),
-                        name(character.getClassSystem().getSubclass(2)))
+                        name(character.getClassSystem().getSubclass(2)), gradeName(character.getActiveSoulshotGrade()),
+                        gradeName(character.getActiveSpiritshotGrade()))
                 .execute();
     }
 
     private static String name(Subclass subclass) {
         return subclass == null ? null : subclass.name();
+    }
+
+    private static String gradeName(ItemGrade grade) {
+        return grade == null ? null : grade.name();
+    }
+
+    private static ItemGrade parseGrade(String grade) {
+        return grade == null ? null : ItemGrade.valueOf(grade);
     }
 
     public List<CharacterInstance> findAllByAccount(Account account, WorldInstance instance) {
@@ -111,6 +122,8 @@ public class CharacterDao {
                 .set(CHARACTER.MAX_MANA, character.getMaxMana()).set(CHARACTER.CURRENT_MANA, character.getCurrentMana())
                 .set(CHARACTER.SUBCLASS_TIER1, name(character.getClassSystem().getSubclass(1)))
                 .set(CHARACTER.SUBCLASS_TIER2, name(character.getClassSystem().getSubclass(2)))
+                .set(CHARACTER.ACTIVE_SOULSHOT_GRADE, gradeName(character.getActiveSoulshotGrade()))
+                .set(CHARACTER.ACTIVE_SPIRITSHOT_GRADE, gradeName(character.getActiveSpiritshotGrade()))
                 .where(CHARACTER.ID.eq(character.getId())).execute();
     }
 
@@ -160,7 +173,8 @@ public class CharacterDao {
         CharacterInstance character = new CharacterInstance(record.getId(), account, record.getName(), map,
                 Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
                 maxHealth, attributes, record.getXp(), record.getGold(), maxMana, record.getCurrentMana(), knownSkills,
-                activeEffects, subclasses, knownPassiveSkills, items);
+                activeEffects, subclasses, knownPassiveSkills, items, parseGrade(record.getActiveSoulshotGrade()),
+                parseGrade(record.getActiveSpiritshotGrade()));
         character.setWorldInstance(instance);
 
         Double posX = record.getPosX();

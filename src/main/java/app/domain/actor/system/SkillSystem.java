@@ -153,10 +153,10 @@ public final class SkillSystem {
         return remaining.isNegative() ? Duration.ZERO : remaining;
     }
 
-    public CastOutcome cast(ActiveSkill activeSkill, int level, AbstractCharacter target) {
+    public CastOutcome cast(ActiveSkill activeSkill, int level, AbstractCharacter target, boolean shotCharged) {
         CastOutcome outcome = switch (activeSkill.skillType()) {
-            case HEALING -> castHeal(activeSkill, level, target);
-            case DAMAGE -> castDamage(activeSkill, level, target);
+            case HEALING -> castHeal(activeSkill, level, target, shotCharged);
+            case DAMAGE -> castDamage(activeSkill, level, target, shotCharged);
             case BUFF -> castModifier(activeSkill, level, target, false);
             case DEBUFF -> castModifier(activeSkill, level, target, true);
             case PASSIVE -> throw new IllegalStateException(
@@ -175,7 +175,8 @@ public final class SkillSystem {
     // d'attaque et les dégâts sont calculés à la fin de l'incantation, mais leur
     // application (PV décomptés, événement publié) est différée jusqu'à
     // l'impact.
-    public AttackRollOutcome rollDamage(ActiveSkill activeSkill, int level, AbstractCharacter target) {
+    public AttackRollOutcome rollDamage(ActiveSkill activeSkill, int level, AbstractCharacter target,
+            boolean shotCharged) {
         if (!rollSkillHit(target)) {
             return new AttackRollOutcome(false, 0);
         }
@@ -188,13 +189,14 @@ public final class SkillSystem {
             // atk/def, ce qui préserve la progression entre levels d'un même sort.
             int skillPower = character.getStatSystem().getEffective(ModifiedStat.PATK) + activeSkill.powerAt(level);
             amount = CombatFormulas.resolvePhysicalDamage(skillPower,
-                    target.getStatSystem().getEffective(ModifiedStat.PDEF), critical);
+                    target.getStatSystem().getEffective(ModifiedStat.PDEF), critical, shotCharged);
         } else {
             // calcMagicDam L2J : le power du sort est un facteur multiplicatif du
             // ratio sqrt(m.atk)/m.def, pas additif comme au physique.
             int magicalAttack = character.getStatSystem().getEffective(ModifiedStat.MATK);
             amount = CombatFormulas.resolveMagicalDamage(magicalAttack,
-                    target.getStatSystem().getEffective(ModifiedStat.MDEF), activeSkill.powerAt(level), critical);
+                    target.getStatSystem().getEffective(ModifiedStat.MDEF), activeSkill.powerAt(level), critical,
+                    shotCharged);
         }
         if (activeSkill.element() != SkillElement.NONE) {
             amount = CombatFormulas.applyElementalResistance(amount,
@@ -216,16 +218,16 @@ public final class SkillSystem {
 
     // Formule L2J (cf. CombatFormulas.resolveHeal) : pas de mitigation par une
     // stat de défense de la cible, un heal n'est jamais résisté.
-    private CastOutcome castHeal(ActiveSkill activeSkill, int level, AbstractCharacter target) {
+    private CastOutcome castHeal(ActiveSkill activeSkill, int level, AbstractCharacter target, boolean shotCharged) {
         int healPower = CombatFormulas.resolveHeal(activeSkill.powerAt(level),
-                character.getStatSystem().getEffective(ModifiedStat.MATK));
+                character.getStatSystem().getEffective(ModifiedStat.MATK), shotCharged);
         int amount = target.heal(healPower);
         return new CastOutcome(true, amount, target.getCurrentHealth(), target.getMaxHealth(), false,
                 target == character, null, List.of());
     }
 
-    private CastOutcome castDamage(ActiveSkill activeSkill, int level, AbstractCharacter target) {
-        return applyDamageOutcome(rollDamage(activeSkill, level, target), target);
+    private CastOutcome castDamage(ActiveSkill activeSkill, int level, AbstractCharacter target, boolean shotCharged) {
+        return applyDamageOutcome(rollDamage(activeSkill, level, target, shotCharged), target);
     }
 
     // Un skill BUFF/DEBUFF "pur" ne porte qu'une seule entrée dans effects() : sa

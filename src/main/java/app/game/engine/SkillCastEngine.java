@@ -12,15 +12,21 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import app.domain.ActiveSkill;
+import app.domain.SkillDamageType;
 import app.domain.SkillEffectType;
 import app.domain.SkillTargetType;
 import app.domain.actor.AbstractCharacter;
+import app.domain.actor.system.InventorySystem;
 import app.domain.actor.system.SkillSystem;
 import app.domain.actor.event.DomainEventPublisher;
+import app.domain.actor.event.ShotGradeDepleted;
 import app.domain.actor.event.SkillCast;
 import app.domain.actor.event.SkillCastBegin;
 import app.domain.actor.instance.CharacterInstance;
+import app.domain.item.ItemGrade;
+import app.domain.item.ItemType;
 import app.domain.map.Position;
+import app.game.combat.CombatFormulas;
 import app.network.message.ingame.CastResult;
 import app.network.message.ingame.SkillCastAnnounced;
 import app.network.message.ingame.SkillCastCancelled;
@@ -56,13 +62,43 @@ public class SkillCastEngine {
         // (resolveCast) — trop tard, le client continue sinon d'interpoler le
         // déplacement pendant toute la durée de l'incantation.
         movementEngine.stopMovement(caster);
-        caster.getSkillSystem().updateCast(new ActiveCast(activeSkill, level, target, System.nanoTime(),
-                activeSkill.castingTimeMs() * 1_000_000L));
+
+        // Le soulshot/spiritshot est consommé au début du cast (pas à sa résolution) :
+        // c'est le seul moment qui permet d'appliquer la réduction de temps
+        // d'incantation du spiritshot à ActiveCast.castingTimeNanos, et de
+        // déclencher l'animation client dès le lancement du sort plutôt qu'à sa
+        // résolution, plusieurs secondes plus tard.
+        boolean shotCharged = false;
+        long castingTimeNanos = activeSkill.castingTimeMs() * 1_000_000L;
+        if (caster instanceof CharacterInstance player) {
+            ItemType shotType = activeSkill.damageType() == SkillDamageType.PHYSICAL
+                    ? ItemType.SOULSHOT
+                    : ItemType.SPIRITSHOT;
+            ItemGrade activeGrade = shotType == ItemType.SOULSHOT
+                    ? player.getActiveSoulshotGrade()
+                    : player.getActiveSpiritshotGrade();
+            if (activeGrade != null) {
+                var outcome = player.getInventorySystem().consumeShot(shotType, activeGrade);
+                if (outcome instanceof InventorySystem.ConsumeShotOutcome.OutOfStock) {
+                    DomainEventPublisher.publish(new ShotGradeDepleted(player, shotType, activeGrade));
+                } else {
+                    shotCharged = true;
+                    if (shotType == ItemType.SPIRITSHOT) {
+                        castingTimeNanos = Math
+                                .round(castingTimeNanos * (1 - CombatFormulas.SPIRITSHOT_CASTING_TIME_REDUCTION));
+                    }
+                }
+            }
+        }
+
+        caster.getSkillSystem().updateCast(
+                new ActiveCast(activeSkill, level, target, System.nanoTime(), castingTimeNanos, shotCharged));
         casting.put(caster.getId(), caster);
-        log.debug("activeSkill.cast_started thread={} caster={} activeSkill={} castingTimeMs={}",
-                Thread.currentThread().getName(), caster.getId(), activeSkill.name(), activeSkill.castingTimeMs());
+        log.debug("activeSkill.cast_started thread={} caster={} activeSkill={} castingTimeMs={} shotCharged={}",
+                Thread.currentThread().getName(), caster.getId(), activeSkill.name(), castingTimeNanos / 1_000_000L,
+                shotCharged);
         caster.broadcast(new SkillCastStarted(caster.getId(), caster.getName(), activeSkill.id(), activeSkill.name(),
-                target.getId(), target.getName(), activeSkill.castingTimeMs()), null);
+                target.getId(), target.getName(), (int) (castingTimeNanos / 1_000_000L)), null);
     }
 
     public void cancelCast(AbstractCharacter caster) {
@@ -121,7 +157,8 @@ public class SkillCastEngine {
         caster.send(new SkillOnCooldown(activeSkill.name(), activeSkill.reuseTimeMs()));
 
         if (activeSkill.skillType() == SkillEffectType.DAMAGE && activeSkill.projectile()) {
-            SkillSystem.AttackRollOutcome roll = caster.getSkillSystem().rollDamage(activeSkill, level, primaryTarget);
+            SkillSystem.AttackRollOutcome roll = caster.getSkillSystem().rollDamage(activeSkill, level, primaryTarget,
+                    activeCast.shotCharged());
             caster.getSkillSystem().markCooldown(activeSkill);
             DomainEventPublisher.publish(new SkillCast(caster, activeSkill, level, primaryTarget, roll.amount(), false,
                     roll.hit(), null, List.of()));
@@ -140,7 +177,7 @@ public class SkillCastEngine {
             if (target != primaryTarget && !isTargetStillValid(caster, activeSkill, target)) {
                 continue;
             }
-            anyHit |= resolveCastOnTarget(caster, activeSkill, level, target);
+            anyHit |= resolveCastOnTarget(caster, activeSkill, level, target, activeCast.shotCharged());
         }
         if (!anyHit && targets.size() > 1) {
             log.debug("activeSkill.aoe_no_target_hit caster={} activeSkill={}", caster.getId(), activeSkill.name());
@@ -151,8 +188,8 @@ public class SkillCastEngine {
     // diffuse les messages réseau correspondants. Retourne si la cible a
     // effectivement été touchée.
     private boolean resolveCastOnTarget(AbstractCharacter caster, ActiveSkill activeSkill, int level,
-            AbstractCharacter target) {
-        SkillSystem.CastOutcome outcome = caster.getSkillSystem().cast(activeSkill, level, target);
+            AbstractCharacter target, boolean shotCharged) {
+        SkillSystem.CastOutcome outcome = caster.getSkillSystem().cast(activeSkill, level, target, shotCharged);
         DomainEventPublisher.publish(new SkillCast(caster, activeSkill, level, target, outcome.amount(),
                 outcome.targetDefeated(), outcome.hit(), outcome.effectExpiresAt(), outcome.modifiers()));
         if (outcome.hit()) {
@@ -203,6 +240,6 @@ public class SkillCastEngine {
     }
 
     public record ActiveCast(ActiveSkill activeSkill, int level, AbstractCharacter target, long startedAtNanos,
-            long castingTimeNanos) {
+            long castingTimeNanos, boolean shotCharged) {
     }
 }

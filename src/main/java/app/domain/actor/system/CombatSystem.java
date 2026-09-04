@@ -14,6 +14,9 @@ import app.domain.actor.event.CharacterBeginAttack;
 import app.domain.actor.event.CharacterDamaged;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.DomainEventPublisher;
+import app.domain.actor.event.ShotGradeDepleted;
+import app.domain.actor.instance.CharacterInstance;
+import app.domain.item.ItemType;
 import app.domain.world.PeaceZone;
 import app.game.combat.CombatFormulas;
 import app.game.Randomizer;
@@ -89,6 +92,20 @@ public final class CombatSystem {
 
         DomainEventPublisher.publish(new CharacterBeginAttack(character, defender));
 
+        // Le soulshot est consommé à chaque tentative d'attaque (hit ou miss), comme
+        // en L2J — d'où sa place ici, avant le jet de touche, une fois l'attaque
+        // garantie de se produire (toutes les guards ci-dessus déjà passées).
+        boolean shotCharged = false;
+        if (character instanceof CharacterInstance player && player.getActiveSoulshotGrade() != null) {
+            var outcome = player.getInventorySystem().consumeShot(ItemType.SOULSHOT, player.getActiveSoulshotGrade());
+            if (outcome instanceof InventorySystem.ConsumeShotOutcome.OutOfStock) {
+                DomainEventPublisher
+                        .publish(new ShotGradeDepleted(player, ItemType.SOULSHOT, player.getActiveSoulshotGrade()));
+            } else {
+                shotCharged = true;
+            }
+        }
+
         double hitChance = CombatFormulas.hitChance(character.getStatSystem().getEffective(ModifiedStat.ACCURACY),
                 defender.getStatSystem().getEffective(ModifiedStat.EVASION));
         boolean hit = Randomizer.rollChance(hitChance);
@@ -101,7 +118,7 @@ public final class CombatSystem {
         if (hit) {
             critical = Randomizer.rollChance(character.getStatSystem().getEffective(ModifiedStat.PCRIT) / 100.0);
             damage = CombatFormulas.resolvePhysicalDamage(character.getStatSystem().getEffective(ModifiedStat.PATK),
-                    defender.getStatSystem().getEffective(ModifiedStat.PDEF), critical);
+                    defender.getStatSystem().getEffective(ModifiedStat.PDEF), critical, shotCharged);
             healthAfter = Math.max(0, defender.getCurrentHealth() - damage);
             defeated = applyDamage(defender, damage);
         }

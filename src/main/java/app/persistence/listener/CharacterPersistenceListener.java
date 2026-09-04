@@ -23,7 +23,11 @@ import app.domain.actor.event.GamePlayerRespawned;
 import app.domain.actor.event.GamePlayerUsedManaPotion;
 import app.domain.actor.event.GamePlayerUsedPotion;
 import app.domain.actor.event.NewGamePlayerCreated;
+import app.domain.actor.event.ShotActivated;
+import app.domain.actor.event.ShotGradeDepleted;
+import app.domain.actor.event.ShotGradeToggled;
 import app.domain.actor.event.SubclassChoiceAvailable;
+import app.domain.item.ItemType;
 import app.network.message.ingame.CharacterUsedItem;
 import app.network.message.ingame.GoldLooted;
 import app.network.message.ingame.GoldSpent;
@@ -33,6 +37,11 @@ import app.network.message.ingame.PartyMemberVitalsUpdated;
 import app.network.message.ingame.PlayerLeveledUp;
 import app.network.message.ingame.PlayerRespawned;
 import app.network.message.ingame.RegenTick;
+import app.network.message.ingame.ShotGradeChanged;
+import app.network.message.ingame.ShotOutOfStock;
+import app.network.message.ingame.ShotUsed;
+import app.network.message.ingame.SoulshotUsed;
+import app.network.message.ingame.SpiritshotUsed;
 import app.network.message.ingame.SubclassChoiceOffered;
 import app.network.message.ingame.SubclassChosen;
 import app.persistence.CharacterDao;
@@ -192,6 +201,42 @@ public class CharacterPersistenceListener {
         broadcastVitalsToParty(character);
         log.info("character.regenerated character={} hpRestored={} manaRestored={}", character.getName(),
                 event.hpRestored(), event.manaRestored());
+    }
+
+    @EventListener
+    void onShotActivated(ShotActivated event) {
+        CharacterInstance character = event.character();
+        character.send(new ShotUsed(event.shotType(), event.grade(), event.remainingQuantity()));
+        if (event.shotType() == ItemType.SOULSHOT) {
+            character.broadcast(new SoulshotUsed(character.getId(), character.getName(), event.grade()), character);
+        } else {
+            character.broadcast(new SpiritshotUsed(character.getId(), character.getName(), event.grade()), character);
+        }
+        log.info("character.shot_activated character={} shotType={} grade={} remaining={}", character.getName(),
+                event.shotType(), event.grade(), event.remainingQuantity());
+    }
+
+    @EventListener
+    void onShotGradeToggled(ShotGradeToggled event) {
+        CharacterInstance character = event.character();
+        characterDao.update(character);
+        character.send(new ShotGradeChanged(event.shotType(), event.newGrade()));
+        log.info("character.shot_grade_toggled character={} shotType={} newGrade={}", character.getName(),
+                event.shotType(), event.newGrade());
+    }
+
+    @EventListener
+    void onShotGradeDepleted(ShotGradeDepleted event) {
+        CharacterInstance character = event.character();
+        if (event.shotType() == ItemType.SOULSHOT) {
+            character.setActiveSoulshotGrade(null);
+        } else {
+            character.setActiveSpiritshotGrade(null);
+        }
+        characterDao.update(character);
+        character.send(new ShotOutOfStock(event.shotType(), event.grade()));
+        log.info("character.shot_grade_depleted character={} shotType={} grade={}", character.getName(),
+                event.shotType(), event.grade());
     }
 
     private void broadcastVitalsToParty(CharacterInstance character) {

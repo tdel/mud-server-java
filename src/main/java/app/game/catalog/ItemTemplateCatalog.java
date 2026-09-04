@@ -41,6 +41,7 @@ public class ItemTemplateCatalog {
     private static final String WEAPONS_RESOURCE = "/data/items/weapons.xml";
     private static final String JEWELLERY_RESOURCE = "/data/items/jewellery.xml";
     private static final String OTHERS_RESOURCE = "/data/items/others.xml";
+    private static final String SHOTS_RESOURCE = "/data/items/shots.xml";
 
     private final Map<UUID, ItemTemplate> templates = new ConcurrentHashMap<>();
 
@@ -61,6 +62,7 @@ public class ItemTemplateCatalog {
         loadEquipment(WEAPONS_RESOURCE);
         loadEquipment(JEWELLERY_RESOURCE);
         loadOthers();
+        loadShots();
         log.info("item.templates_loaded count={}", templates.size());
     }
 
@@ -83,12 +85,13 @@ public class ItemTemplateCatalog {
                     : definition.elementalResistances();
             ItemExpectation expectation = toItemExpectation(definition.expect());
             ItemGrade grade = gradeFromExpectation(expectation);
+            int shotConsumption = definition.shotConsumption() == null ? 1 : definition.shotConsumption();
 
             ItemTemplate template = new EquipmentItem(definition.id(), definition.name(), definition.description(),
                     definition.type(), definition.weight(), definition.armorCategory(), definition.pAtk(),
                     definition.mAtk(), definition.pDef(), definition.mDef(), definition.accuracyBonus(),
                     definition.evasionBonus(), definition.critBonus(), definition.atkSpd(), definition.price(),
-                    grantedSkills, elementalResistances, grade, definition.setId(), expectation);
+                    grantedSkills, elementalResistances, grade, definition.setId(), expectation, shotConsumption);
             templates.put(template.getId(), template);
         }
     }
@@ -97,6 +100,17 @@ public class ItemTemplateCatalog {
         for (OtherDefinition definition : readResource(OTHERS_RESOURCE, OtherDefinition.class)) {
             ItemTemplate template = new ItemTemplate(definition.id(), definition.name(), definition.description(),
                     definition.type(), definition.weight(), definition.price(), ItemGrade.NOGRADE);
+            templates.put(template.getId(), template);
+        }
+    }
+
+    // Contrairement à OtherDefinition (KEY/TOOL/MISC, toujours NOGRADE), un
+    // soulshot/spiritshot porte son propre grade — dédié plutôt que fusionné dans
+    // others.xml pour rester générique sur les grades futurs (D/C/B/A/S).
+    private void loadShots() {
+        for (ShotDefinition definition : readResource(SHOTS_RESOURCE, ShotDefinition.class)) {
+            ItemTemplate template = new ItemTemplate(definition.id(), definition.name(), definition.description(),
+                    definition.type(), definition.weight(), definition.price(), definition.grade());
             templates.put(template.getId(), template);
         }
     }
@@ -142,11 +156,15 @@ public class ItemTemplateCatalog {
             ItemType type, int weight, ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef,
             int accuracyBonus, int evasionBonus, int critBonus, int atkSpd, int price,
             @JacksonXmlElementWrapper(useWrapping = false) List<UUID> grantedSkillIds,
-            Map<SkillElement, Integer> elementalResistances, String setId, ExpectXml expect) {
+            Map<SkillElement, Integer> elementalResistances, String setId, ExpectXml expect, Integer shotConsumption) {
     }
 
     private record OtherDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name, String description,
             ItemType type, int weight, int price) {
+    }
+
+    private record ShotDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name, String description,
+            ItemType type, int weight, int price, ItemGrade grade) {
     }
 
     private static ItemExpectation toItemExpectation(ExpectXml xml) {

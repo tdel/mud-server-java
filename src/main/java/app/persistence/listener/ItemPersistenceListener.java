@@ -14,6 +14,7 @@ import app.domain.actor.event.GamePlayerUsedManaPotion;
 import app.domain.actor.event.GamePlayerUsedPotion;
 import app.domain.actor.event.ItemDiscarded;
 import app.domain.actor.event.ItemPurchased;
+import app.domain.actor.event.ShotActivated;
 import app.network.message.ingame.EquipmentLooted;
 import app.network.message.ingame.ItemBought;
 import app.persistence.ItemDao;
@@ -55,17 +56,37 @@ public class ItemPersistenceListener {
 
     @EventListener
     void onCharacterLootedItem(CharacterLootedItem event) {
-        itemDao.insert(event.item());
+        if (event.merged()) {
+            itemDao.updateQuantity(event.item().getId(), event.item().getQuantity());
+        } else {
+            itemDao.insert(event.item());
+        }
         event.character().send(new EquipmentLooted(event.item().getName(), event.item().getGrade()));
-        log.info("item.looted item={} character={}", event.item().getName(), event.character().getName());
+        log.info("item.looted item={} character={} merged={}", event.item().getName(), event.character().getName(),
+                event.merged());
     }
 
     @EventListener
     void onItemPurchased(ItemPurchased event) {
-        itemDao.insert(event.item());
+        if (event.merged()) {
+            itemDao.updateQuantity(event.item().getId(), event.item().getQuantity());
+        } else {
+            itemDao.insert(event.item());
+        }
         event.character().send(new ItemBought(event.item().getName(), event.item().getGrade(), event.price()));
-        log.info("item.purchased item={} character={} price={}", event.item().getName(), event.character().getName(),
-                event.price());
+        log.info("item.purchased item={} character={} price={} merged={}", event.item().getName(),
+                event.character().getName(), event.price(), event.merged());
+    }
+
+    @EventListener
+    void onShotActivated(ShotActivated event) {
+        if (event.remainingQuantity() <= 0) {
+            itemDao.delete(event.item().getId());
+        } else {
+            itemDao.updateQuantity(event.item().getId(), event.remainingQuantity());
+        }
+        log.info("item.shot_consumed item={} character={} shotType={} grade={} remaining={}", event.item().getId(),
+                event.character().getName(), event.shotType(), event.grade(), event.remainingQuantity());
     }
 
     @EventListener

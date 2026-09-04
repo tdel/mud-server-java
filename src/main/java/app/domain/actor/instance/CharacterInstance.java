@@ -27,6 +27,7 @@ import app.domain.actor.event.GamePlayerMovedToMap;
 import app.domain.actor.event.GamePlayerRespawned;
 import app.game.catalog.LevelCatalogHolder;
 import app.domain.item.EquipmentSlot;
+import app.domain.item.ItemGrade;
 import app.domain.item.ItemSet;
 import app.domain.map.Position;
 import app.domain.item.Item;
@@ -53,12 +54,15 @@ public final class CharacterInstance extends AbstractCharacter {
     private int xp;
     private int maxMana;
     private int currentMana;
+    private volatile ItemGrade activeSoulshotGrade;
+    private volatile ItemGrade activeSpiritshotGrade;
 
     public CharacterInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold, int maxMana, int currentMana,
             Map<ActiveSkill, Integer> knownSkills, List<ActiveEffect> activeEffects, List<Subclass> subclasses,
-            Map<PassiveSkill, Integer> knownPassiveSkills, List<Item> items) {
+            Map<PassiveSkill, Integer> knownPassiveSkills, List<Item> items, ItemGrade activeSoulshotGrade,
+            ItemGrade activeSpiritshotGrade) {
         super(id, name, attributes, currentHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects,
                 computeBaseStats(attributes, level, items, race.speed()), false, 0, 0, List.of());
         this.account = account;
@@ -70,6 +74,8 @@ public final class CharacterInstance extends AbstractCharacter {
         this.inventorySystem = new InventorySystem(this, gold, items);
         this.maxMana = maxMana;
         this.currentMana = currentMana;
+        this.activeSoulshotGrade = activeSoulshotGrade;
+        this.activeSpiritshotGrade = activeSpiritshotGrade;
         inventorySystem.recomputeGradePenalty();
         getStatSystem().setSetBonuses(computeSetBonuses());
     }
@@ -309,6 +315,22 @@ public final class CharacterInstance extends AbstractCharacter {
 
     public InventorySystem getInventorySystem() {
         return inventorySystem;
+    }
+
+    public ItemGrade getActiveSoulshotGrade() {
+        return activeSoulshotGrade;
+    }
+
+    public void setActiveSoulshotGrade(ItemGrade activeSoulshotGrade) {
+        this.activeSoulshotGrade = activeSoulshotGrade;
+    }
+
+    public ItemGrade getActiveSpiritshotGrade() {
+        return activeSpiritshotGrade;
+    }
+
+    public void setActiveSpiritshotGrade(ItemGrade activeSpiritshotGrade) {
+        this.activeSpiritshotGrade = activeSpiritshotGrade;
     }
 
     @Override

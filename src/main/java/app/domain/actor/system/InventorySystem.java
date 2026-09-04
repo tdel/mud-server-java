@@ -19,11 +19,14 @@ import app.domain.actor.event.GamePlayerEquippedItem;
 import app.domain.actor.event.GamePlayerUnequippedItem;
 import app.domain.actor.event.ItemDiscarded;
 import app.domain.actor.event.ItemPurchased;
+import app.domain.actor.event.ShotActivated;
 import app.domain.actor.instance.CharacterInstance;
 import app.domain.item.EquipmentItem;
 import app.domain.item.EquipmentSlot;
 import app.domain.item.Item;
 import app.domain.item.ItemExpectation;
+import app.domain.item.ItemGrade;
+import app.domain.item.ItemType;
 
 public final class InventorySystem {
 
@@ -80,15 +83,29 @@ public final class InventorySystem {
         items.remove(item);
     }
 
+    // Un item stackable (soulshot/spiritshot) n'a qu'une seule pile par type+grade
+    // dans l'inventaire — jamais équipé, donc getSlot() == null suffit à
+    // identifier la pile.
+    public Optional<Item> findStackable(ItemType type, ItemGrade grade) {
+        return items.stream()
+                .filter(item -> item.getSlot() == null && item.getType() == type && item.getGrade() == grade)
+                .findFirst();
+    }
+
     public void receiveGold(int amount) {
         addGold(amount);
         DomainEventPublisher.publish(new CharacterReceivedGold(character, amount));
     }
 
     public void receiveLootItem(Item item) {
+        Optional<Item> stack = mergeIntoExistingStack(item);
+        if (stack.isPresent()) {
+            DomainEventPublisher.publish(new CharacterLootedItem(character, stack.get(), true));
+            return;
+        }
         item.setCharacter(character);
         addItem(item);
-        DomainEventPublisher.publish(new CharacterLootedItem(character, item));
+        DomainEventPublisher.publish(new CharacterLootedItem(character, item, false));
     }
 
     public boolean buyItem(Item item, int price) {
@@ -96,10 +113,60 @@ public final class InventorySystem {
             return false;
         }
         DomainEventPublisher.publish(new CharacterSpentGold(character, price));
+        Optional<Item> stack = mergeIntoExistingStack(item);
+        if (stack.isPresent()) {
+            DomainEventPublisher.publish(new ItemPurchased(character, stack.get(), price, true));
+            return true;
+        }
         item.setCharacter(character);
         addItem(item);
-        DomainEventPublisher.publish(new ItemPurchased(character, item, price));
+        DomainEventPublisher.publish(new ItemPurchased(character, item, price, false));
         return true;
+    }
+
+    // Fusionne un item stackable fraîchement acquis (loot/achat) dans une pile
+    // existante s'il y en a déjà une — sinon laisse l'appelant l'ajouter comme
+    // nouvel item. Retourne la pile mise à jour si un merge a eu lieu.
+    private Optional<Item> mergeIntoExistingStack(Item item) {
+        if (!item.getType().stackable()) {
+            return Optional.empty();
+        }
+        return findStackable(item.getType(), item.getGrade()).map(existing -> {
+            existing.setQuantity(existing.getQuantity() + item.getQuantity());
+            return existing;
+        });
+    }
+
+    // Nombre de charges consommées par activation : porté par l'arme équipée
+    // (cf. EquipmentItem.getShotConsumption), à mains nues 1 charge — jamais une
+    // constante fixe, cf. plan Soulshot/Spiritshot.
+    public ConsumeShotOutcome consumeShot(ItemType shotType, ItemGrade grade) {
+        Optional<Item> stack = findStackable(shotType, grade);
+        if (stack.isEmpty()) {
+            return new ConsumeShotOutcome.OutOfStock();
+        }
+        Item item = stack.get();
+        int count = getEquippedWeapon().map(Item::getShotConsumption).orElse(1);
+        if (item.getQuantity() < count) {
+            return new ConsumeShotOutcome.OutOfStock();
+        }
+        int remaining = item.getQuantity() - count;
+        if (remaining <= 0) {
+            removeItem(item);
+        } else {
+            item.setQuantity(remaining);
+        }
+        DomainEventPublisher.publish(new ShotActivated(character, item, shotType, grade, Math.max(0, remaining)));
+        return new ConsumeShotOutcome.Consumed(item, count);
+    }
+
+    public sealed interface ConsumeShotOutcome {
+
+        record Consumed(Item item, int count) implements ConsumeShotOutcome {
+        }
+
+        record OutOfStock() implements ConsumeShotOutcome {
+        }
     }
 
     public void discardItem(Item item) {

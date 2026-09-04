@@ -20,17 +20,24 @@ public class Item {
     private AbstractCharacter character;
     private EquipmentSlot slot;
     private int enchant;
+    private int quantity;
 
     public Item(UUID id, ItemTemplate template, AbstractCharacter character, EquipmentSlot slot) {
-        this(id, template, character, slot, 0);
+        this(id, template, character, slot, 0, 1);
     }
 
     public Item(UUID id, ItemTemplate template, AbstractCharacter character, EquipmentSlot slot, int enchant) {
+        this(id, template, character, slot, enchant, 1);
+    }
+
+    public Item(UUID id, ItemTemplate template, AbstractCharacter character, EquipmentSlot slot, int enchant,
+            int quantity) {
         this.id = id;
         this.template = Objects.requireNonNull(template);
         this.character = character;
         this.slot = slot;
         setEnchant(enchant);
+        setQuantity(quantity);
     }
 
     public ItemTemplate getTemplate() {
@@ -99,6 +106,18 @@ public class Item {
 
     public int getAtkSpd() {
         return equipment().getAtkSpd();
+    }
+
+    public int getShotConsumption() {
+        return equipment().getShotConsumption();
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = Math.max(1, quantity);
     }
 
     public Map<SkillElement, Integer> getElementalResistances() {

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shots>
+    <shot id="4623f73d-821b-4dc4-b723-b9353bdca64c">
+        <name>Soulshot : Aucun grade</name>
+        <description>Une charge d'énergie qui amplifie le prochain coup porté ou le prochain skill physique lancé.</description>
+        <type>SOULSHOT</type>
+        <weight>0</weight>
+        <price>10</price>
+        <grade>NOGRADE</grade>
+    </shot>
+    <shot id="03c6440a-24d6-426a-bf0a-d3d046c9ad37">
+        <name>Spiritshot : Aucun grade</name>
+        <description>Une charge d'énergie qui amplifie le prochain skill magique lancé ou le prochain soin.</description>
+        <type>SPIRITSHOT</type>
+        <weight>0</weight>
+        <price>10</price>
+        <grade>NOGRADE</grade>
+    </shot>
+</shots>

@@ -112,7 +112,7 @@ public class WorldInstance {
 
         CharacterInstance character = new CharacterInstance(UUID.randomUUID(), account, name, startingMap, gender, race,
                 characterClass, 1, maxHealth, maxHealth, scores, 0, 0, startingMana, startingMana, Map.of(), List.of(),
-                List.of(), Map.of(), List.of());
+                List.of(), Map.of(), List.of(), null, null);
         character.setWorldInstance(this);
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));

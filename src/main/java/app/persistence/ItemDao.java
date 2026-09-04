@@ -27,9 +27,9 @@ public class ItemDao {
     }
 
     public void insert(Item item) {
-        dsl.insertInto(ITEM, ITEM.ID, ITEM.TEMPLATE_ID, ITEM.CHARACTER_ID, ITEM.SLOT, ITEM.ENCHANT)
+        dsl.insertInto(ITEM, ITEM.ID, ITEM.TEMPLATE_ID, ITEM.CHARACTER_ID, ITEM.SLOT, ITEM.ENCHANT, ITEM.QUANTITY)
                 .values(item.getId(), item.getTemplateId(), item.getCharacterId(),
-                        item.getSlot() == null ? null : item.getSlot().name(), item.getEnchant())
+                        item.getSlot() == null ? null : item.getSlot().name(), item.getEnchant(), item.getQuantity())
                 .execute();
     }
 
@@ -44,6 +44,10 @@ public class ItemDao {
         dsl.update(ITEM).set(ITEM.SLOT, slot == null ? null : slot.name()).where(ITEM.ID.eq(itemId)).execute();
     }
 
+    public void updateQuantity(UUID itemId, int quantity) {
+        dsl.update(ITEM).set(ITEM.QUANTITY, quantity).where(ITEM.ID.eq(itemId)).execute();
+    }
+
     public void delete(UUID itemId) {
         dsl.deleteFrom(ITEM).where(ITEM.ID.eq(itemId)).execute();
     }
@@ -52,6 +56,6 @@ public class ItemDao {
         ItemTemplate template = itemTemplateCatalog.getById(record.getTemplateId());
         String slot = record.getSlot();
         return new Item(record.getId(), template, character, slot == null ? null : EquipmentSlot.valueOf(slot),
-                record.getEnchant());
+                record.getEnchant(), record.getQuantity());
     }
 }

@@ -57,6 +57,16 @@ public final class CombatFormulas {
     public static final double HIT_CHANCE_BASE = 0.80;
     public static final double HIT_CHANCE_FACTOR = 0.02;
     public static final double CRITICAL_MULTIPLIER = 2.0;
+    // Valeurs L2J vérifiées (soulshot : dégâts physiques finaux x2 ; spiritshot :
+    // m.atk x2 avant la racine carrée de resolveMagicalDamage/resolveHeal, ce qui
+    // donne un gain réel de dégâts x√2 — même comportement que L2J puisque m.atk y
+    // est aussi sous racine).
+    public static final double SOULSHOT_MULTIPLIER = 2.0;
+    public static final double SPIRITSHOT_MULTIPLIER = 2.0;
+    // Le spiritshot réduit le temps d'incantation de 30% (la stat affichée ne
+    // change pas, seul le cast en cours est raccourci) ; le soulshot n'affecte ni
+    // la vitesse d'attaque, ni le temps d'incantation, ni le reuse.
+    public static final double SPIRITSHOT_CASTING_TIME_REDUCTION = 0.30;
     // calcMagicDam L2J : un coup critique magique multiplie les dégâts par 4, pas
     // par 2 comme au physique.
     public static final double MAGIC_CRITICAL_MULTIPLIER = 4.0;
@@ -171,10 +181,13 @@ public final class CombatFormulas {
     // vulnérabilités par type d'arme/race de monstre et du bonus PvP (aucun de
     // ces mécanismes n'existe dans ce projet) : attackerAtk inclut déjà le
     // power(level) du sort le cas échéant (cf. SkillSystem.rollDamage).
-    public static int resolvePhysicalDamage(int attackerAtk, int defenderDef, boolean critical) {
+    public static int resolvePhysicalDamage(int attackerAtk, int defenderDef, boolean critical, boolean shotCharged) {
         double damage = PHYSICAL_DAMAGE_CONSTANT * attackerAtk / defenderDef * Randomizer.randomVariance(0.9, 1.1);
         if (critical) {
             damage *= CRITICAL_MULTIPLIER;
+        }
+        if (shotCharged) {
+            damage *= SOULSHOT_MULTIPLIER;
         }
         return Math.max(1, (int) Math.round(damage));
     }
@@ -185,8 +198,10 @@ public final class CombatFormulas {
     // facteur multiplicatif du ratio sqrt(m.atk)/m.def (pas additif comme au
     // physique), et un coup critique magique multiplie par 4 au lieu de 2. Pas
     // de variance aléatoire : l'original n'en applique pas au magique.
-    public static int resolveMagicalDamage(int magicalAttack, int defenderDef, int skillPower, boolean critical) {
-        double damage = MAGICAL_DAMAGE_CONSTANT * Math.sqrt(magicalAttack) / defenderDef * skillPower;
+    public static int resolveMagicalDamage(int magicalAttack, int defenderDef, int skillPower, boolean critical,
+            boolean shotCharged) {
+        double effectiveMagicalAttack = shotCharged ? magicalAttack * SPIRITSHOT_MULTIPLIER : magicalAttack;
+        double damage = MAGICAL_DAMAGE_CONSTANT * Math.sqrt(effectiveMagicalAttack) / defenderDef * skillPower;
         if (critical) {
             damage *= MAGIC_CRITICAL_MULTIPLIER;
         }
@@ -198,8 +213,9 @@ public final class CombatFormulas {
     // implémentées ici) et des variantes HEAL_STATIC/HEAL_PERCENT (un seul type
     // HEALING côté projet) : il reste power(level) + sqrt(mAtkMul * m.atk), le
     // reliquat de la branche "sans charge" de l'original.
-    public static int resolveHeal(int power, int magicalAttack) {
-        double amount = power + Math.sqrt(HEAL_MATK_MULTIPLIER * magicalAttack);
+    public static int resolveHeal(int power, int magicalAttack, boolean shotCharged) {
+        double effectiveMagicalAttack = shotCharged ? magicalAttack * SPIRITSHOT_MULTIPLIER : magicalAttack;
+        double amount = power + Math.sqrt(HEAL_MATK_MULTIPLIER * effectiveMagicalAttack);
         return Math.max(0, (int) Math.round(amount));
     }
 
