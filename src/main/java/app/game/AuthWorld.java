@@ -2,8 +2,8 @@ package app.game;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,7 +30,7 @@ public class AuthWorld {
     private static final int MIN_PASSWORD_LENGTH = 8;
     private static final int MAX_PASSWORD_LENGTH = 128;
 
-    private final Set<Connection> connections = ConcurrentHashMap.newKeySet();
+    private final Map<UUID, Connection> connectionsByAccount = new ConcurrentHashMap<>();
 
     private final AccountDao accountDao;
     private final PasswordEncoder passwordEncoder;
@@ -77,39 +77,45 @@ public class AuthWorld {
 
         connection.send(new AccountCreated(account.getLogin()));
 
-        enterWorld(connection, account);
+        // Un compte tout juste créé a un UUID neuf : ne peut jamais déjà être dans
+        // connectionsByAccount.
+        tryEnterWorld(connection, account);
         log.info("account.registered account={}", login);
 
         return account;
     }
 
-    public void enterWorld(Connection connection, Account account) {
+    // putIfAbsent rend l'attribution connexion<->compte atomique : ferme le TOCTOU
+    // qu'un scan
+    // (isAlreadyConnected) suivi d'un add séparé laissait ouvert entre deux logins
+    // simultanés.
+    public boolean tryEnterWorld(Connection connection, Account account) {
+        Connection previous = connectionsByAccount.putIfAbsent(account.getId(), connection);
+        if (previous != null) {
+            log.warn("auth.duplicate_connection_detected thread={} accountId={}", Thread.currentThread().getName(),
+                    account.getId());
+            return false;
+        }
+
         connection.setAccount(account);
-        connections.add(connection);
         connection.attachWorldInstance(worldInstanceService.getDefaultInstance());
         MDC.put("account", account.getLogin());
         log.info("auth.entered_world thread={} account={}", Thread.currentThread().getName(), account.getLogin());
 
         connection.send(new WelcomeBack(account.getLogin()));
         charSelectStatus.show(connection, account);
+        return true;
     }
 
     public void exitWorld(Connection connection) {
-        connections.remove(connection);
-        String login = connection.account() != null ? connection.account().getLogin() : null;
+        Account account = connection.account();
+        if (account != null) {
+            connectionsByAccount.remove(account.getId(), connection);
+        }
+        String login = account != null ? account.getLogin() : null;
         connection.setAccount(null);
         connection.setState(ConnectionState.CONNECTED);
         log.info("auth.exited_world thread={} account={}", Thread.currentThread().getName(), login);
         MDC.remove("account");
-    }
-
-    public boolean isAlreadyConnected(UUID accountId) {
-        boolean alreadyConnected = connections.stream()
-                .anyMatch(connection -> connection.account().getId().equals(accountId));
-        if (alreadyConnected) {
-            log.warn("auth.duplicate_connection_detected thread={} accountId={}", Thread.currentThread().getName(),
-                    accountId);
-        }
-        return alreadyConnected;
     }
 }

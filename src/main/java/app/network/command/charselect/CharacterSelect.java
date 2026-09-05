@@ -14,6 +14,7 @@ import app.game.engine.SkillLearningEngine;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
+import app.network.message.charselect.CharacterCurrentlyInGame;
 import app.network.message.charselect.NoCharacterNamed;
 import app.network.message.charselect.NowPlaying;
 import app.network.message.ingame.MapEnter;
@@ -62,9 +63,15 @@ public class CharacterSelect implements CommandHandler {
         }
 
         CharacterInstance loadedChar = character.get();
+
+        if (!loadedChar.getWorldInstance().loadPlayer(loadedChar)) {
+            connection.send(new CharacterCurrentlyInGame(name));
+            charSelectStatus.show(connection, account);
+            return;
+        }
+
         connection.attachCharacter(loadedChar);
         skillLearningEngine.reconcile(loadedChar);
-        loadedChar.getWorldInstance().loadPlayer(loadedChar);
         MDC.put("character", loadedChar.getName());
 
         connection.send(new NowPlaying(loadedChar.getName()));

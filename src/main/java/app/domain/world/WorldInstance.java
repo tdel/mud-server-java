@@ -71,17 +71,28 @@ public class WorldInstance {
         return mapInstances.values().stream().filter(map -> Boolean.TRUE.equals(map.isStartingMap())).findFirst();
     }
 
-    public void loadPlayer(CharacterInstance character) {
+    // putIfAbsent avant tout join sur la map : ferme le TOCTOU d'un personnage
+    // chargé deux fois
+    // (ex. reconnexion après un crash réseau dont le cleanup n'a pas encore tourné)
+    // — un rejet ne
+    // doit laisser aucune trace sur la map, donc le check précède le join, jamais
+    // l'inverse.
+    public boolean loadPlayer(CharacterInstance character) {
+        if (players.putIfAbsent(character.getId(), character) != null) {
+            log.warn("world.player_already_loaded worldId={} character={}", id, character.getId());
+            return false;
+        }
+
         Position savedPosition = character.getMotionSystem().getPosition();
         if (savedPosition != null) {
             character.getMotionSystem().getCurrentMap().join(character, savedPosition);
         } else {
             character.getMotionSystem().getCurrentMap().join(character);
         }
-        players.put(character.getId(), character);
         log.info("world.player_loaded thread={} worldId={} character={}", Thread.currentThread().getName(), id,
                 character.getId());
         DomainEventPublisher.publish(new PlayerLoadedInWorld(character));
+        return true;
     }
 
     public void removePlayer(CharacterInstance character) {
