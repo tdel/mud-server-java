@@ -27,7 +27,7 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
     public record Payload(UUID id, String name, String title, String gender, int level, String characterClass,
             int currentHealth, int maxHealth, int healthRegenPerSecond, int currentMana, int maxMana,
             int manaRegenPerSecond, int pAtk, int pDef, int mAtk, int mDef, int accuracy, int evasion, int criticalRate,
-            int atkSpd, AttributeScore strength, AttributeScore dexterity, AttributeScore constitution,
+            int atkSpd, int castSpd, AttributeScore strength, AttributeScore dexterity, AttributeScore constitution,
             AttributeScore intelligence, AttributeScore wit, AttributeScore men, double speed, int xp,
             int xpForCurrentLevel, int xpForNextLevel, ItemGrade activeSoulshotGrade, ItemGrade activeSpiritshotGrade,
             int karma, int pkCount, int pvpCount, boolean pvpFlagged) {
@@ -54,6 +54,7 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
                 c.getStatSystem().getEffective(ModifiedStat.ACCURACY),
                 c.getStatSystem().getEffective(ModifiedStat.EVASION),
                 c.getStatSystem().getEffective(ModifiedStat.PCRIT), c.getStatSystem().getEffective(ModifiedStat.ATKSPD),
+                c.getStatSystem().getEffective(ModifiedStat.CASTSPD),
                 attributeScore(c, Attribute.STR), attributeScore(c, Attribute.DEX), attributeScore(c, Attribute.CON),
                 attributeScore(c, Attribute.INT), attributeScore(c, Attribute.WIT), attributeScore(c, Attribute.MEN),
                 MovementEngine.unitsPerSecond(c.getMotionSystem().getSpeed()), c.getXp(), xpForCurrentLevel,

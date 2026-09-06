@@ -16,6 +16,7 @@ import app.domain.SkillDamageType;
 import app.domain.SkillEffectType;
 import app.domain.SkillTargetType;
 import app.domain.actor.AbstractCharacter;
+import app.domain.actor.ModifiedStat;
 import app.domain.actor.system.InventorySystem;
 import app.domain.actor.system.SkillSystem;
 import app.domain.actor.event.DomainEventPublisher;
@@ -69,7 +70,16 @@ public class SkillCastEngine {
         // déclencher l'animation client dès le lancement du sort plutôt qu'à sa
         // résolution, plusieurs secondes plus tard.
         boolean shotCharged = false;
-        long castingTimeNanos = activeSkill.castingTimeMs() * 1_000_000L;
+        // ActiveSkill.castingTimeMs() est calibré pour un cast.spd neutre
+        // (CombatFormulas.BASE_CAST_SPD) : effectiveCastingTimeMs() applique le ratio
+        // L2J (BASE_CAST_SPD / cast.spd effectif) pour raccourcir/allonger
+        // l'incantation réelle selon WIT (et les buffs/debuffs éventuels sur
+        // ModifiedStat.CASTSPD, déjà couverts par StatSystem.getEffective) — vaut
+        // aussi bien pour un joueur qu'un monstre lanceur de sort (tous deux passent
+        // par CombatFormulas.baseStats(), voir CharacterInstance/MonsterCatalog).
+        int castSpd = caster.getStatSystem().getEffective(ModifiedStat.CASTSPD);
+        long castingTimeNanos = CombatFormulas.effectiveCastingTimeMs(activeSkill.castingTimeMs(), castSpd)
+                * 1_000_000L;
         if (caster instanceof CharacterInstance player) {
             ItemType shotType = activeSkill.damageType() == SkillDamageType.PHYSICAL
                     ? ItemType.SOULSHOT

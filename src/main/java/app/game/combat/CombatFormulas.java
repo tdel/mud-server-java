@@ -92,6 +92,11 @@ public final class CombatFormulas {
     public static final double MP_REGEN_RATE = 0.02;
     public static final int BASE_ATK_SPD = 300;
     public static final double ATK_SPD_DELAY_CONSTANT = 500_000.0;
+    // Valeur de base canonique L2J (cf. baseMAtkSpd des templates de classe officiels,
+    // quasi tous à 333 pour la vitesse d'incantation neutre) — contrairement à
+    // BASE_ATK_SPD ci-dessus (qui n'est qu'un delta appliqué à weaponAtkSpd, propre à
+    // l'arme), cette constante EST la valeur de référence de castSpeed() elle-même.
+    public static final int BASE_CAST_SPD = 333;
     // 2 unités ≈ 2x largeur d'un personnage + longueur d'une épée longue (1 unité
     // = 1 case Tiled = 32px) ; couvre aussi confortablement l'adjacence en
     // diagonale (√2 ≈ 1.41), non couverte par l'ancienne valeur de 1.0.
@@ -255,6 +260,27 @@ public final class CombatFormulas {
         return Duration.ofMillis(Math.round(ATK_SPD_DELAY_CONSTANT / Math.max(1, atkSpd)));
     }
 
+    // m.atk.spd (cast.spd) suit WIT comme m.crit (même statBonus), SANS dépendance à
+    // l'arme contrairement à atk.spd/attackSpeed ci-dessus : en L2 (et L2J), la
+    // vitesse d'incantation est une valeur de base par personnage (BASE_CAST_SPD),
+    // pas une caractéristique de l'arme équipée — seuls WIT et les buffs/debuffs
+    // (déjà couverts par EffectsSystem via StatSystem.getEffective, gratuitement pour
+    // cette nouvelle stat) la font varier.
+    public static int castSpeed(int witScore) {
+        return Math.max(1, (int) Math.round(BASE_CAST_SPD * statBonus(witScore)));
+    }
+
+    // Formule L2J (Skill.calcHitTime côté client officiel/L2J applique le même
+    // ratio) : durée réelle d'incantation = durée d'auteur du sort (calibrée pour un
+    // cast.spd neutre, BASE_CAST_SPD) * BASE_CAST_SPD / cast.spd effectif — à la
+    // différence d'attackCooldown ci-dessus (délai absolu dérivé d'une seule
+    // constante), la référence ici est ActiveSkill.castingTimeMs(), propre à chaque
+    // sort : plus cast.spd dépasse BASE_CAST_SPD (WIT élevé), plus l'incantation
+    // réelle se raccourcit proportionnellement par rapport à cette durée d'auteur.
+    public static long effectiveCastingTimeMs(long authoredCastingTimeMs, int castSpd) {
+        return Math.round(authoredCastingTimeMs * (double) BASE_CAST_SPD / Math.max(1, castSpd));
+    }
+
     public static int armorWeightPenalty(ArmorCategory category) {
         if (category == null) {
             return 0;
@@ -266,8 +292,8 @@ public final class CombatFormulas {
         };
     }
 
-    // Assemble en une seule map les 9 stats de combat dérivées (p.atk, m.atk,
-    // p.def, m.def, accuracy, evasion, p.crit, m.crit, atk.spd) à partir des
+    // Assemble en une seule map les 10 stats de combat dérivées (p.atk, m.atk,
+    // p.def, m.def, accuracy, evasion, p.crit, m.crit, atk.spd, cast.spd) à partir des
     // composantes brutes (arme/armure ou équivalent monstre) et des attributs —
     // consommé par StatSystem, aussi bien pour un CharacterInstance (équipement
     // réel) qu'un MonsterInstance (stats naturelles issues de son template).
@@ -285,6 +311,7 @@ public final class CombatFormulas {
         stats.put(ModifiedStat.PCRIT, criticalRate(attributes.get(Attribute.DEX), critItemBonus));
         stats.put(ModifiedStat.MCRIT, magicCriticalRate(attributes.get(Attribute.WIT), critItemBonus));
         stats.put(ModifiedStat.ATKSPD, attackSpeed(weaponAtkSpd, attributes.get(Attribute.DEX)));
+        stats.put(ModifiedStat.CASTSPD, castSpeed(attributes.get(Attribute.WIT)));
         return stats;
     }
 }
