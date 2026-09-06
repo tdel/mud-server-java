@@ -17,6 +17,7 @@ import app.network.message.Usage;
 import app.network.message.charselect.CharacterCurrentlyInGame;
 import app.network.message.charselect.NoCharacterNamed;
 import app.network.message.charselect.NowPlaying;
+import app.network.message.ingame.GamePlayerStats;
 import app.network.message.ingame.MapEnter;
 import app.network.message.ingame.MapView;
 
@@ -64,16 +65,24 @@ public class CharacterSelect implements CommandHandler {
 
         CharacterInstance loadedChar = character.get();
 
-        if (!loadedChar.getWorldInstance().loadPlayer(loadedChar)) {
+        // Réservation atomique avant d'attacher la connexion (ferme le TOCTOU de
+        // double-login), mais rejoint la map (joinWorld, qui déclenche
+        // KnownList.populate()/EntityAppeared) seulement APRÈS attachCharacter() :
+        // sinon ce message part vers une connexion encore nulle et est perdu
+        // silencieusement (CharacterInstance.send() no-op si connection == null),
+        // laissant PNJ/monstres invisibles au client jusqu'au prochain déplacement.
+        if (!loadedChar.getWorldInstance().reservePlayer(loadedChar)) {
             connection.send(new CharacterCurrentlyInGame(name));
             charSelectStatus.show(connection, account);
             return;
         }
 
         connection.attachCharacter(loadedChar);
+        loadedChar.getWorldInstance().joinWorld(loadedChar);
         skillLearningEngine.reconcile(loadedChar);
         MDC.put("character", loadedChar.getName());
 
+        connection.send(new GamePlayerStats(loadedChar));
         connection.send(new NowPlaying(loadedChar.getName()));
         connection.send(new MapView(loadedChar.getMotionSystem().getCurrentMap()));
         connection.send(new MapEnter(loadedChar));
