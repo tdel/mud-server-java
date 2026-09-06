@@ -1,0 +1,60 @@
+package app.game.engine;
+
+import java.util.Collection;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import app.domain.actor.event.CharacterBeginAttack;
+import app.domain.actor.instance.CharacterInstance;
+import app.game.WorldInstanceService;
+
+@Component
+public class PvpEngine {
+
+    private static final Logger log = LoggerFactory.getLogger(PvpEngine.class);
+
+    private static final long TICK_INTERVAL_MS = 5_000L;
+
+    private final WorldInstanceService worldInstanceService;
+
+    public PvpEngine(WorldInstanceService worldInstanceService) {
+        this.worldInstanceService = worldInstanceService;
+    }
+
+    // Un joueur sans karma qui attaque un autre joueur devient (ou reste) flaggé
+    // PvP ; attaquer un joueur qui a du karma (un PK) ne flagge pas l'attaquant.
+    // CharacterBeginAttack est publié par CombatSystem et SkillSystem, donc cette
+    // règle couvre aussi bien le corps-à-corps que les sorts offensifs.
+    @EventListener
+    void onCharacterBeginAttack(CharacterBeginAttack event) {
+        if (!(event.attacker() instanceof CharacterInstance attacker)
+                || !(event.defender() instanceof CharacterInstance defender)) {
+            return;
+        }
+        if (defender.getKarma() > 0) {
+            return;
+        }
+        attacker.flagPvp();
+    }
+
+    @Scheduled(fixedRate = TICK_INTERVAL_MS)
+    void tick() {
+        if (!worldInstanceService.isDefaultWorldMaterialized()) {
+            return;
+        }
+        expireFlags(worldInstanceService.getDefaultInstance().onlineCharacters());
+    }
+
+    void expireFlags(Collection<CharacterInstance> onlineCharacters) {
+        for (CharacterInstance character : onlineCharacters) {
+            if (character.isPvpFlagExpired()) {
+                character.clearPvpFlag();
+                log.info("pvp.flag_expired character={}", character.getId());
+            }
+        }
+    }
+}

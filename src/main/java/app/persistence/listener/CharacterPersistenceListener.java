@@ -15,14 +15,19 @@ import app.domain.actor.event.CharacterChoseSubclass;
 import app.domain.actor.event.CharacterDamaged;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.CharacterGainedXp;
+import app.domain.actor.event.CharacterKarmaChanged;
 import app.domain.actor.event.CharacterLeveledUp;
 import app.domain.actor.event.CharacterReceivedGold;
+import app.domain.actor.event.CharacterRecordedPlayerKill;
+import app.domain.actor.event.CharacterRecordedPvpKill;
 import app.domain.actor.event.CharacterRegenerated;
 import app.domain.actor.event.CharacterSpentGold;
 import app.domain.actor.event.GamePlayerRespawned;
 import app.domain.actor.event.GamePlayerUsedManaPotion;
 import app.domain.actor.event.GamePlayerUsedPotion;
 import app.domain.actor.event.NewGamePlayerCreated;
+import app.domain.actor.event.PlayerPvpFlagCleared;
+import app.domain.actor.event.PlayerPvpFlagged;
 import app.domain.actor.event.ShotActivated;
 import app.domain.actor.event.ShotGradeDepleted;
 import app.domain.actor.event.ShotGradeToggled;
@@ -32,10 +37,14 @@ import app.network.message.ingame.CharacterUsedItem;
 import app.network.message.ingame.GoldLooted;
 import app.network.message.ingame.GoldSpent;
 import app.network.message.ingame.ItemUsed;
+import app.network.message.ingame.KarmaChanged;
 import app.network.message.ingame.ManaPotionUsed;
 import app.network.message.ingame.PartyMemberVitalsUpdated;
+import app.network.message.ingame.PlayerKillRecorded;
 import app.network.message.ingame.PlayerLeveledUp;
 import app.network.message.ingame.PlayerRespawned;
+import app.network.message.ingame.PvpFlagChanged;
+import app.network.message.ingame.PvpKillRecorded;
 import app.network.message.ingame.RegenTick;
 import app.network.message.ingame.ShotGradeChanged;
 import app.network.message.ingame.ShotOutOfStock;
@@ -50,6 +59,11 @@ import app.persistence.CharacterDao;
 public class CharacterPersistenceListener {
 
     private static final Logger log = LoggerFactory.getLogger(CharacterPersistenceListener.class);
+
+    // Valeurs de départ façon L2J, à ajuster selon l'équilibrage souhaité.
+    private static final int KARMA_GAIN_PER_PK = 100;
+    private static final int KARMA_LOSS_ON_DEATH = 100;
+    private static final int KARMA_LOSS_PER_MONSTER_KILL = 1;
 
     private final CharacterDao characterDao;
 
@@ -137,8 +151,32 @@ public class CharacterPersistenceListener {
             member.gainXp(perMemberXp);
         }
         killer.getCombatSystem().setTarget(null);
+        killer.addKarma(-KARMA_LOSS_PER_MONSTER_KILL);
         log.info("combat.kill_credited killer={} monster={} xpReward={} partySize={} perMemberXp={}", killer.getName(),
                 monster.getName(), xpReward, eligible.size(), perMemberXp);
+    }
+
+    // Filtre le miroir de onCharacterDied ci-dessus (victime ET tueur joueurs, pas
+    // de monstre) : les deux listeners partagent CharacterDied sans dépendance
+    // d'ordre entre eux, chacun ne traitant que son propre cas (cf. CLAUDE.md).
+    @EventListener
+    void onPlayerKilledPlayer(CharacterDied event) {
+        if (!(event.character() instanceof CharacterInstance victim)
+                || !(event.killer() instanceof CharacterInstance killer)) {
+            return;
+        }
+        if (victim.isPvpFlagged()) {
+            killer.recordPvpKill();
+        } else {
+            killer.recordPlayerKill();
+            killer.addKarma(KARMA_GAIN_PER_PK);
+        }
+        if (victim.getKarma() > 0) {
+            victim.addKarma(-KARMA_LOSS_ON_DEATH);
+        }
+        killer.getCombatSystem().setTarget(null);
+        log.info("pvp.player_killed victim={} killer={} victimWasPvpFlagged={} killerKarma={}", victim.getName(),
+                killer.getName(), victim.isPvpFlagged(), killer.getKarma());
     }
 
     @EventListener
@@ -237,6 +275,49 @@ public class CharacterPersistenceListener {
         character.send(new ShotOutOfStock(event.shotType(), event.grade()));
         log.info("character.shot_grade_depleted character={} shotType={} grade={}", character.getName(),
                 event.shotType(), event.grade());
+    }
+
+    @EventListener
+    void onCharacterKarmaChanged(CharacterKarmaChanged event) {
+        CharacterInstance character = event.character();
+        characterDao.update(character);
+        character.send(new KarmaChanged(event.newKarma()));
+        log.info("character.karma_changed character={} newKarma={}", character.getName(), event.newKarma());
+    }
+
+    @EventListener
+    void onCharacterRecordedPlayerKill(CharacterRecordedPlayerKill event) {
+        CharacterInstance character = event.character();
+        characterDao.update(character);
+        character.send(new PlayerKillRecorded(character.getPkCount()));
+        log.info("character.pk_recorded character={} pkCount={}", character.getName(), character.getPkCount());
+    }
+
+    @EventListener
+    void onCharacterRecordedPvpKill(CharacterRecordedPvpKill event) {
+        CharacterInstance character = event.character();
+        characterDao.update(character);
+        character.send(new PvpKillRecorded(character.getPvpCount()));
+        log.info("character.pvp_kill_recorded character={} pvpCount={}", character.getName(), character.getPvpCount());
+    }
+
+    // Seul le booléen est persisté, pas l'échéance (voir CharacterInstance) : à la
+    // reconnexion, un personnage flaggé reprend pour 10 minutes pleines plutôt
+    // que le temps qu'il lui restait à la déconnexion.
+    @EventListener
+    void onPlayerPvpFlagged(PlayerPvpFlagged event) {
+        CharacterInstance character = event.character();
+        characterDao.update(character);
+        character.broadcast(new PvpFlagChanged(character.getId(), character.getName(), true), null);
+        log.info("character.pvp_flagged character={}", character.getName());
+    }
+
+    @EventListener
+    void onPlayerPvpFlagCleared(PlayerPvpFlagCleared event) {
+        CharacterInstance character = event.character();
+        characterDao.update(character);
+        character.broadcast(new PvpFlagChanged(character.getId(), character.getName(), false), null);
+        log.info("character.pvp_flag_cleared character={}", character.getName());
     }
 
     private void broadcastVitalsToParty(CharacterInstance character) {

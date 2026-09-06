@@ -77,12 +77,23 @@ public class WorldInstance {
     // — un rejet ne
     // doit laisser aucune trace sur la map, donc le check précède le join, jamais
     // l'inverse.
-    public boolean loadPlayer(CharacterInstance character) {
+    //
+    // Séparé de joinWorld() (2026-09-05) : la sélection d'un personnage existant
+    // (CharacterSelect) a besoin de réserver le slot AVANT d'attacher la connexion
+    // (pour garder cette protection anti double-login) mais de ne rejoindre la map
+    // (et donc déclencher KnownList.populate()/EntityAppeared) qu'APRÈS l'avoir
+    // attachée, sous peine que ce message parte vers une connexion encore nulle et
+    // soit perdu silencieusement (CharacterInstance.send() no-op si connection ==
+    // null).
+    public boolean reservePlayer(CharacterInstance character) {
         if (players.putIfAbsent(character.getId(), character) != null) {
             log.warn("world.player_already_loaded worldId={} character={}", id, character.getId());
             return false;
         }
+        return true;
+    }
 
+    public void joinWorld(CharacterInstance character) {
         Position savedPosition = character.getMotionSystem().getPosition();
         if (savedPosition != null) {
             character.getMotionSystem().getCurrentMap().join(character, savedPosition);
@@ -92,6 +103,13 @@ public class WorldInstance {
         log.info("world.player_loaded thread={} worldId={} character={}", Thread.currentThread().getName(), id,
                 character.getId());
         DomainEventPublisher.publish(new PlayerLoadedInWorld(character));
+    }
+
+    public boolean loadPlayer(CharacterInstance character) {
+        if (!reservePlayer(character)) {
+            return false;
+        }
+        joinWorld(character);
         return true;
     }
 
@@ -123,7 +141,7 @@ public class WorldInstance {
 
         CharacterInstance character = new CharacterInstance(UUID.randomUUID(), account, name, startingMap, gender, race,
                 characterClass, 1, maxHealth, maxHealth, scores, 0, 0, startingMana, startingMana, Map.of(), List.of(),
-                List.of(), Map.of(), List.of(), null, null);
+                List.of(), Map.of(), List.of(), null, null, 0, 0, 0, false);
         character.setWorldInstance(this);
 
         DomainEventPublisher.publish(new NewGamePlayerCreated(character));

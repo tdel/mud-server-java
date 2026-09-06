@@ -29,7 +29,8 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
             int manaRegenPerSecond, int pAtk, int pDef, int mAtk, int mDef, int accuracy, int evasion, int criticalRate,
             int atkSpd, AttributeScore strength, AttributeScore dexterity, AttributeScore constitution,
             AttributeScore intelligence, AttributeScore wit, AttributeScore men, double speed, int xp,
-            int xpForCurrentLevel, int xpForNextLevel, ItemGrade activeSoulshotGrade, ItemGrade activeSpiritshotGrade) {
+            int xpForCurrentLevel, int xpForNextLevel, ItemGrade activeSoulshotGrade, ItemGrade activeSpiritshotGrade,
+            int karma, int pkCount, int pvpCount, boolean pvpFlagged) {
     }
 
     @Override
@@ -56,7 +57,8 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
                 attributeScore(c, Attribute.STR), attributeScore(c, Attribute.DEX), attributeScore(c, Attribute.CON),
                 attributeScore(c, Attribute.INT), attributeScore(c, Attribute.WIT), attributeScore(c, Attribute.MEN),
                 MovementEngine.unitsPerSecond(c.getMotionSystem().getSpeed()), c.getXp(), xpForCurrentLevel,
-                xpForNextLevel, c.getActiveSoulshotGrade(), c.getActiveSpiritshotGrade()));
+                xpForNextLevel, c.getActiveSoulshotGrade(), c.getActiveSpiritshotGrade(), c.getKarma(), c.getPkCount(),
+                c.getPvpCount(), c.isPvpFlagged()));
     }
 
     private static AttributeScore attributeScore(CharacterInstance c, Attribute attribute) {

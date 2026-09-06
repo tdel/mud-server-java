@@ -5,13 +5,15 @@ import java.util.UUID;
 
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.AbstractNpc;
+import app.domain.actor.instance.CharacterInstance;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.actor.instance.NpcSellerInstance;
 import app.domain.map.Position;
 import app.game.engine.MovementEngine;
 
 public record EntityView(UUID id, String name, String title, String kind, double x, double y, double heading,
-        double speed, int currentHealth, int maxHealth, int level, Double targetX, Double targetY, boolean hasShop) {
+        double speed, int currentHealth, int maxHealth, int level, Double targetX, Double targetY, boolean hasShop,
+        boolean pvpFlagged) {
 
     public static EntityView of(AbstractCharacter character) {
         MovementEngine.ActiveMovement movement = character.getMotionSystem().getActiveMovement();
@@ -37,6 +39,7 @@ public record EntityView(UUID id, String name, String title, String kind, double
                 character.getMotionSystem().getHeading(),
                 MovementEngine.unitsPerSecond(character.getMotionSystem().getSpeed()), character.getCurrentHealth(),
                 character.getMaxHealth(), character.getLevel(), targetX, targetY,
-                character instanceof NpcSellerInstance);
+                character instanceof NpcSellerInstance,
+                character instanceof CharacterInstance player && player.isPvpFlagged());
     }
 }

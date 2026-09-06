@@ -62,7 +62,8 @@ public class CharacterDao {
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
                 CHARACTER.INTELLIGENCE, CHARACTER.WIT, CHARACTER.MEN, CHARACTER.XP, CHARACTER.GOLD, CHARACTER.MAX_MANA,
                 CHARACTER.CURRENT_MANA, CHARACTER.SUBCLASS_TIER1, CHARACTER.SUBCLASS_TIER2,
-                CHARACTER.ACTIVE_SOULSHOT_GRADE, CHARACTER.ACTIVE_SPIRITSHOT_GRADE)
+                CHARACTER.ACTIVE_SOULSHOT_GRADE, CHARACTER.ACTIVE_SPIRITSHOT_GRADE, CHARACTER.KARMA, CHARACTER.PK_COUNT,
+                CHARACTER.PVP_COUNT, CHARACTER.PVP_FLAGGED)
                 .values(character.getId(), character.getAccountId(), character.getName(),
                         character.getMotionSystem().getCurrentMap().getTemplateId(),
                         character.getAppearanceSystem().getGender().name(),
@@ -75,7 +76,8 @@ public class CharacterDao {
                         character.getInventorySystem().getGold(), character.getMaxMana(), character.getCurrentMana(),
                         name(character.getClassSystem().getSubclass(1)),
                         name(character.getClassSystem().getSubclass(2)), gradeName(character.getActiveSoulshotGrade()),
-                        gradeName(character.getActiveSpiritshotGrade()))
+                        gradeName(character.getActiveSpiritshotGrade()), character.getKarma(), character.getPkCount(),
+                        character.getPvpCount(), character.isPvpFlagged())
                 .execute();
     }
 
@@ -124,6 +126,8 @@ public class CharacterDao {
                 .set(CHARACTER.SUBCLASS_TIER2, name(character.getClassSystem().getSubclass(2)))
                 .set(CHARACTER.ACTIVE_SOULSHOT_GRADE, gradeName(character.getActiveSoulshotGrade()))
                 .set(CHARACTER.ACTIVE_SPIRITSHOT_GRADE, gradeName(character.getActiveSpiritshotGrade()))
+                .set(CHARACTER.KARMA, character.getKarma()).set(CHARACTER.PK_COUNT, character.getPkCount())
+                .set(CHARACTER.PVP_COUNT, character.getPvpCount()).set(CHARACTER.PVP_FLAGGED, character.isPvpFlagged())
                 .where(CHARACTER.ID.eq(character.getId())).execute();
     }
 
@@ -174,7 +178,8 @@ public class CharacterDao {
                 Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
                 maxHealth, attributes, record.getXp(), record.getGold(), maxMana, record.getCurrentMana(), knownSkills,
                 activeEffects, subclasses, knownPassiveSkills, items, parseGrade(record.getActiveSoulshotGrade()),
-                parseGrade(record.getActiveSpiritshotGrade()));
+                parseGrade(record.getActiveSpiritshotGrade()), record.getKarma(), record.getPkCount(),
+                record.getPvpCount(), record.getPvpFlagged());
         character.setWorldInstance(instance);
 
         Double posX = record.getPosX();
