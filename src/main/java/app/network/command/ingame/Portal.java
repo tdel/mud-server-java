@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import app.game.engine.MovementEngine;
 import app.network.CommandHandler;
-import app.domain.world.MapPortal;
+import app.domain.MapPortal;
 import app.domain.actor.instance.CharacterInstance;
 import app.network.Connection;
 import app.network.ConnectionState;

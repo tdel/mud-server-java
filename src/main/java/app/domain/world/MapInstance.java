@@ -14,6 +14,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import app.domain.MapPortal;
 import app.domain.MonsterSpawn;
 import app.domain.MonsterSpawnGroup;
 import app.domain.actor.AbstractCharacter;
@@ -42,6 +43,15 @@ public class MapInstance {
     private final Map<UUID, CharacterInstance> clients = new ConcurrentHashMap<>();
     private final List<MonsterInstance> monsters = new CopyOnWriteArrayList<>();
     private final List<AbstractNpc> npcs = new CopyOnWriteArrayList<>();
+
+    // Résolus paresseusement puis mémoïsés : toMapPortal a besoin que
+    // worldInstance.mapInstances soit déjà renseigné (voir
+    // WorldInstance.setMapInstances), ce qui n'est vrai qu'une fois toutes les
+    // MapInstance du monde construites — impossible à garantir dans ce
+    // constructeur. Une fois résolus, les mêmes instances de MapPortal sont
+    // toujours renvoyées, ce qui permet à KnownList de les suivre dans un Set par
+    // identité (voir KnownList.nearbyPortals).
+    private List<MapPortal> portals;
 
     public MapInstance(UUID id, MapTemplate template, WorldInstance worldInstance) {
         this.id = id;
@@ -206,14 +216,16 @@ public class MapInstance {
         return npcs.stream().filter(npc -> npc.getId().equals(id)).findFirst();
     }
 
-    public List<MapPortal> getPortals() {
-        return template.getPortals().stream().map(this::toMapPortal).toList();
+    public synchronized List<MapPortal> getPortals() {
+        if (portals == null) {
+            portals = template.getPortals().stream().map(this::toMapPortal).toList();
+        }
+        return portals;
     }
 
     public Optional<MapPortal> findPortalAt(Position position) {
-        return template.getPortals().stream()
-                .filter(portal -> portal.position().distanceTo(position) <= portal.triggerRadius()).findFirst()
-                .map(this::toMapPortal);
+        return getPortals().stream().filter(portal -> portal.position().distanceTo(position) <= portal.triggerRadius())
+                .findFirst();
     }
 
     private MapPortal toMapPortal(MapTemplatePortal portal) {

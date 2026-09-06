@@ -8,21 +8,19 @@ import app.network.OutputJsonMessage;
 import app.network.server.tcpjson.TcpJsonOutput;
 
 /**
- * Carte statique complète d'une map (grille de collision + portails), envoyée
- * une fois au client à l'entrée de la map (voir Portal, CharacterCreate,
- * CharacterSelect) — contrairement aux entités dynamiques de la map, poussées
+ * Carte statique complète d'une map (grille de collision), envoyée une fois au
+ * client à l'entrée de la map (voir Portal, CharacterCreate, CharacterSelect) —
+ * contrairement aux entités dynamiques de la map (et aux portails), poussées
  * séparément et scopées à AWARENESS_RANGE via {@link EntityAppeared}/
- * {@link EntityDisappeared} (voir {@link app.domain.actor.KnownList}).
+ * {@link EntityDisappeared} et {@link PortalAppeared}/{@link PortalDisappeared}
+ * (voir {@link app.domain.actor.KnownList}).
  */
 public record MapView(MapInstance map) implements OutputJsonMessage {
 
     public record CollisionGridView(int width, int height, double cellSize, List<String> walkableRows) {
     }
 
-    public record PortalView(double x, double y, double triggerRadius, String direction, String targetMapName) {
-    }
-
-    public record Payload(String mapId, String mapName, CollisionGridView grid, List<PortalView> portals) {
+    public record Payload(String mapId, String mapName, CollisionGridView grid) {
     }
 
     @Override
@@ -30,10 +28,7 @@ public record MapView(MapInstance map) implements OutputJsonMessage {
         CollisionGrid grid = map.getCollisionGrid();
         CollisionGridView gridView = new CollisionGridView(grid.width(), grid.height(), grid.cellSize(),
                 grid.toWalkableRows());
-        List<PortalView> portals = map.getPortals().stream().map(portal -> new PortalView(portal.position().x(),
-                portal.position().y(), portal.triggerRadius(), portal.direction(), portal.targetMap().getName()))
-                .toList();
 
-        output.write("MapView", new Payload(map.getId().toString(), map.getName(), gridView, portals));
+        output.write("MapView", new Payload(map.getId().toString(), map.getName(), gridView));
     }
 }

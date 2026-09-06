@@ -5,21 +5,29 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import app.domain.MapPortal;
+import app.domain.map.Position;
 import app.domain.world.MapInstance;
 import app.network.message.ingame.EntityAppeared;
 import app.network.message.ingame.EntityDisappeared;
 import app.network.message.ingame.EntityView;
+import app.network.message.ingame.PortalAppeared;
+import app.network.message.ingame.PortalDisappeared;
+import app.network.message.ingame.PortalView;
 
 /**
  * Ensemble des entités actuellement visibles (à portée de perception) pour un
  * {@link AbstractCharacter}. La relation est symétrique : si A connaît B, B
  * connaît A — une seule instance par personnage suffit, chaque mise à jour
  * touche donc toujours les deux côtés. C'est le seul canal par lequel un client
- * apprend la présence d'une entité sur la carte (voir MapEnter, qui ne transmet
- * plus que la carte et l'état du personnage courant) : chaque évolution de
- * cette liste — spawn ({@link #populate}), déplacement ({@link #refresh}),
- * départ définitif ({@link #clear}) — pousse un
+ * apprend la présence d'une entité sur la carte (voir MapEnter/MapView, qui ne
+ * transmettent plus que la carte et l'état du personnage courant) : chaque
+ * évolution de cette liste — spawn ({@link #populate}), déplacement
+ * ({@link #refresh}), départ définitif ({@link #clear}) — pousse un
  * {@link EntityAppeared}/{@link EntityDisappeared} aux deux parties concernées.
+ * Les {@link MapPortal} suivent le même principe mais à sens unique (un portail
+ * ne "connaît" pas les personnages en retour) via
+ * {@link PortalAppeared}/{@link PortalDisappeared}.
  */
 public final class KnownList {
 
@@ -31,6 +39,10 @@ public final class KnownList {
 
     private final AbstractCharacter owner;
     private final Set<AbstractCharacter> known = ConcurrentHashMap.newKeySet();
+    // Egalité par identité (MapPortal ne redéfinit pas equals/hashCode) : suffit
+    // puisque MapInstance.getPortals() mémoïse et renvoie toujours les mêmes
+    // instances (voir MapInstance.portals).
+    private final Set<MapPortal> knownPortals = ConcurrentHashMap.newKeySet();
 
     public KnownList(AbstractCharacter owner) {
         this.owner = owner;
@@ -48,15 +60,19 @@ public final class KnownList {
     public void populate() {
         MapInstance map = owner.getMotionSystem().getCurrentMap();
         Set<AbstractCharacter> nearby;
+        Set<MapPortal> nearbyPortals;
         synchronized (map) {
             nearby = nearbyOthers(map);
             for (AbstractCharacter other : nearby) {
                 known.add(other);
                 other.getKnownList().known.add(owner);
             }
+            nearbyPortals = nearbyPortals(map);
+            knownPortals.addAll(nearbyPortals);
         }
         notifyAppeared(owner, nearby);
         notifyAppearedToEach(nearby, owner);
+        notifyPortalsAppeared(owner, nearbyPortals);
     }
 
     /** Retrait bidirectionnel complet (voir leave/disconnect/mort de monstre). */
@@ -69,6 +85,7 @@ public final class KnownList {
                 other.getKnownList().known.remove(owner);
             }
             known.clear();
+            knownPortals.clear();
         }
         notifyDisappearedToEach(previouslyKnown, owner);
     }
@@ -82,6 +99,8 @@ public final class KnownList {
         MapInstance map = owner.getMotionSystem().getCurrentMap();
         Set<AbstractCharacter> appeared = new HashSet<>();
         Set<AbstractCharacter> disappeared = new HashSet<>();
+        Set<MapPortal> portalsAppeared = new HashSet<>();
+        Set<MapPortal> portalsDisappeared = new HashSet<>();
         synchronized (map) {
             Set<AbstractCharacter> current = nearbyOthers(map);
             for (AbstractCharacter other : current) {
@@ -97,11 +116,25 @@ public final class KnownList {
                     disappeared.add(other);
                 }
             }
+            Set<MapPortal> currentPortals = nearbyPortals(map);
+            for (MapPortal portal : currentPortals) {
+                if (knownPortals.add(portal)) {
+                    portalsAppeared.add(portal);
+                }
+            }
+            for (MapPortal portal : List.copyOf(knownPortals)) {
+                if (!currentPortals.contains(portal)) {
+                    knownPortals.remove(portal);
+                    portalsDisappeared.add(portal);
+                }
+            }
         }
         notifyAppeared(owner, appeared);
         notifyAppearedToEach(appeared, owner);
         notifyDisappeared(owner, disappeared);
         notifyDisappearedToEach(disappeared, owner);
+        notifyPortalsAppeared(owner, portalsAppeared);
+        notifyPortalsDisappeared(owner, portalsDisappeared);
     }
 
     private static void notifyAppeared(AbstractCharacter observer, Set<AbstractCharacter> subjects) {
@@ -141,5 +174,31 @@ public final class KnownList {
                 map.occupantsWithin(owner.getMotionSystem().getPosition(), AWARENESS_RANGE));
         nearby.remove(owner);
         return nearby;
+    }
+
+    // Contrairement aux AbstractCharacter, un portail est statique et ne
+    // "connaît" pas owner en retour (pas de KnownList, pas de send()) : la
+    // relation reste à sens unique, pas de bidirectionnalité à maintenir ici.
+    private Set<MapPortal> nearbyPortals(MapInstance map) {
+        Position position = owner.getMotionSystem().getPosition();
+        Set<MapPortal> nearby = new HashSet<>();
+        for (MapPortal portal : map.getPortals()) {
+            if (portal.position().distanceTo(position) <= AWARENESS_RANGE) {
+                nearby.add(portal);
+            }
+        }
+        return nearby;
+    }
+
+    private static void notifyPortalsAppeared(AbstractCharacter observer, Set<MapPortal> portals) {
+        if (!portals.isEmpty()) {
+            observer.send(new PortalAppeared(portals.stream().map(PortalView::of).toList()));
+        }
+    }
+
+    private static void notifyPortalsDisappeared(AbstractCharacter observer, Set<MapPortal> portals) {
+        if (!portals.isEmpty()) {
+            observer.send(new PortalDisappeared(portals.stream().map(MapPortal::getId).toList()));
+        }
     }
 }
