@@ -9,8 +9,6 @@ public abstract class AbstractObject {
 
     private final UUID id;
     private String name;
-    // Nom du clan pour un joueur (pas encore implémenté), fonction pour un PNJ
-    // (ex. "Blacksmith", "City Guard") ; null si aucun titre n'est défini.
     private String title;
     private AbstractZone zone = NormalZone.INSTANCE;
 

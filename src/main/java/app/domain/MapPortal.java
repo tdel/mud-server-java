@@ -17,11 +17,9 @@ import app.domain.world.MapInstance;
  */
 public class MapPortal extends AbstractObject {
 
-    // Un seul type de portail existe pour l'instant (MapTemplatePortal ne porte
-    // pas encore de nom/titre authorable côté données) — d'où ces constantes
-    // plutôt qu'un champ par portail.
-    private static final String PORTAL_NAME = "Clairière";
-    private static final String PORTAL_TITLE = "Téléporteur";
+    // Tous les portails partagent le même nom ; le titre distingue la
+    // destination (voir KnownList, qui affiche nom + titre).
+    private static final String PORTAL_NAME = "Teleport";
 
     private final Position position;
     private final String direction;
@@ -33,7 +31,7 @@ public class MapPortal extends AbstractObject {
     public MapPortal(Position position, String direction, MapInstance sourceMap, MapInstance targetMap,
             Position targetPosition, double triggerRadius) {
         super(deterministicId(sourceMap.getId(), position), PORTAL_NAME);
-        setTitle(PORTAL_TITLE);
+        setTitle(targetMap.getName());
         this.position = position;
         this.direction = direction;
         this.sourceMap = sourceMap;
