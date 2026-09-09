@@ -24,7 +24,7 @@ public class WorldInstancePersistenceListener {
     @EventListener
     void onGamePlayerMovedToMap(GamePlayerMovedToMap event) {
         characterDao.updateCurrentMap(event.character().getId(), event.to().getTemplateId());
-        log.debug("map.player_moved character={} to={}", event.character().getName(), event.to().getName());
+        log.debug("dao.world.GamePlayerMovedToMap object={} [to={}]", event.character().getId(), event.to().getName());
     }
 
     @EventListener
@@ -34,6 +34,7 @@ public class WorldInstancePersistenceListener {
         if (position != null) {
             characterDao.updatePosition(event.character().getId(), position.x(), position.y());
         }
-        log.info("map.player_spawned character={} map={}", event.character().getName(), event.map().getName());
+        log.info("dao.world.GamePlayerSpawnedToMap object={} [map={}]", event.character().getId(),
+                event.map().getName());
     }
 }

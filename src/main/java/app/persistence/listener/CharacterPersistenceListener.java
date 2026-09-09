@@ -41,8 +41,9 @@ public class CharacterPersistenceListener {
     @Order(1)
     void onNewGamePlayerCreated(NewGamePlayerCreated event) {
         characterDao.insert(event.character());
-        log.info("character.created character={} accountId={} race={} class={}", event.character().getName(),
-                event.character().getAccountId(), event.character().getAppearanceSystem().getRace(),
+        log.info("dao.character.NewGamePlayerCreated object={} [accountId={}, race={}, class={}]",
+                event.character().getId(), event.character().getAccountId(),
+                event.character().getAppearanceSystem().getRace(),
                 event.character().getClassSystem().getCharacterClass());
     }
 
@@ -50,30 +51,30 @@ public class CharacterPersistenceListener {
     void onCharacterGainedXp(CharacterGainedXp event) {
         PlayerInstance character = event.character();
         characterDao.update(character);
-        log.info("character.xp_gained character={} amount={} newXp={} newLevel={}", character.getName(), event.amount(),
-                character.getLevelingSystem().getXp(), character.getLevel());
+        log.info("dao.character.CharacterGainedXp object={} [amount={}, newXp={}, newLevel={}]", character.getId(),
+                event.amount(), character.getLevelingSystem().getXp(), character.getLevel());
     }
 
     @EventListener
     void onCharacterChoseSubclass(CharacterChoseSubclass event) {
         PlayerInstance character = event.character();
         characterDao.update(character);
-        log.info("character.subclass_chosen character={} tier={} subclass={}", character.getName(), event.tier(),
-                event.subclass());
+        log.info("dao.character.CharacterChoseSubclass object={} [tier={}, subclass={}]", character.getId(),
+                event.tier(), event.subclass());
     }
 
     @EventListener
     void onCharacterReceivedGold(CharacterReceivedGold event) {
         characterDao.update(event.character());
-        log.info("character.gold_received character={} amount={} newGold={}", event.character().getName(),
+        log.info("dao.character.CharacterReceivedGold object={} [amount={}, newGold={}]", event.character().getId(),
                 event.amount(), event.character().getInventorySystem().getGold());
     }
 
     @EventListener
     void onCharacterSpentGold(CharacterSpentGold event) {
         characterDao.update(event.character());
-        log.info("character.gold_spent character={} amount={} newGold={}", event.character().getName(), event.amount(),
-                event.character().getInventorySystem().getGold());
+        log.info("dao.character.CharacterSpentGold object={} [amount={}, newGold={}]", event.character().getId(),
+                event.amount(), event.character().getInventorySystem().getGold());
     }
 
     @EventListener
@@ -82,15 +83,16 @@ public class CharacterPersistenceListener {
             return;
         }
         characterDao.update(character);
-        log.info("combat.damage_taken character={} attacker={} amount={} currentHealth={}", character.getName(),
-                event.attacker().getName(), event.amount(), character.getResourceSystem().getCurrentHealth());
+        log.info("dao.character.CharacterDamaged object={} [attacker={}, amount={}, currentHealth={}]",
+                character.getId(), event.attacker().getName(), event.amount(),
+                character.getResourceSystem().getCurrentHealth());
     }
 
     @EventListener
     void onGamePlayerRespawned(GamePlayerRespawned event) {
         PlayerInstance character = event.character();
         characterDao.update(character);
-        log.info("character.respawned character={} map={}", character.getName(),
+        log.info("dao.character.GamePlayerRespawned object={} [map={}]", character.getId(),
                 character.getMotionSystem().getCurrentMap().getName());
     }
 
@@ -98,7 +100,7 @@ public class CharacterPersistenceListener {
     void onGamePlayerUsedPotion(GamePlayerUsedPotion event) {
         PlayerInstance character = event.character();
         characterDao.update(character);
-        log.info("character.used_potion character={} item={} healedAmount={}", character.getName(),
+        log.info("dao.character.GamePlayerUsedPotion object={} [item={}, healedAmount={}]", character.getId(),
                 event.item().getName(), event.healedAmount());
     }
 
@@ -106,7 +108,7 @@ public class CharacterPersistenceListener {
     void onGamePlayerUsedManaPotion(GamePlayerUsedManaPotion event) {
         PlayerInstance character = event.character();
         characterDao.update(character);
-        log.info("character.used_mana_potion character={} item={} restoredAmount={}", character.getName(),
+        log.info("dao.character.GamePlayerUsedManaPotion object={} [item={}, restoredAmount={}]", character.getId(),
                 event.item().getName(), event.restoredAmount());
     }
 
@@ -114,7 +116,7 @@ public class CharacterPersistenceListener {
     void onCharacterRegenerated(CharacterRegenerated event) {
         PlayerInstance character = event.character();
         characterDao.update(character);
-        log.info("character.regenerated character={} hpRestored={} manaRestored={}", character.getName(),
+        log.info("dao.character.CharacterRegenerated object={} [hpRestored={}, manaRestored={}]", character.getId(),
                 event.hpRestored(), event.manaRestored());
     }
 
@@ -122,7 +124,7 @@ public class CharacterPersistenceListener {
     void onShotGradeToggled(ShotGradeToggled event) {
         PlayerInstance character = event.character();
         characterDao.update(character);
-        log.info("character.shot_grade_toggled character={} shotType={} newGrade={}", character.getName(),
+        log.info("dao.character.ShotGradeToggled object={} [shotType={}, newGrade={}]", character.getId(),
                 event.shotType(), event.newGrade());
     }
 
@@ -130,7 +132,7 @@ public class CharacterPersistenceListener {
     void onShotGradeDepleted(ShotGradeDepleted event) {
         PlayerInstance character = event.character();
         characterDao.update(character);
-        log.info("character.shot_grade_depleted character={} shotType={} grade={}", character.getName(),
+        log.info("dao.character.ShotGradeDepleted object={} [shotType={}, grade={}]", character.getId(),
                 event.shotType(), event.grade());
     }
 
@@ -138,14 +140,14 @@ public class CharacterPersistenceListener {
     void onCharacterKarmaChanged(CharacterKarmaChanged event) {
         PlayerInstance character = event.character();
         characterDao.update(character);
-        log.info("character.karma_changed character={} newKarma={}", character.getName(), event.newKarma());
+        log.info("dao.character.CharacterKarmaChanged object={} [newKarma={}]", character.getId(), event.newKarma());
     }
 
     @EventListener
     void onCharacterRecordedPlayerKill(CharacterRecordedPlayerKill event) {
         PlayerInstance character = event.character();
         characterDao.update(character);
-        log.info("character.pk_recorded character={} pkCount={}", character.getName(),
+        log.info("dao.character.CharacterRecordedPlayerKill object={} [pkCount={}]", character.getId(),
                 character.getPvpSystem().getPkCount());
     }
 
@@ -153,7 +155,7 @@ public class CharacterPersistenceListener {
     void onCharacterRecordedPvpKill(CharacterRecordedPvpKill event) {
         PlayerInstance character = event.character();
         characterDao.update(character);
-        log.info("character.pvp_kill_recorded character={} pvpCount={}", character.getName(),
+        log.info("dao.character.CharacterRecordedPvpKill object={} [pvpCount={}]", character.getId(),
                 character.getPvpSystem().getPvpCount());
     }
 
@@ -164,14 +166,14 @@ public class CharacterPersistenceListener {
     void onPlayerPvpFlagged(PlayerPvpFlagged event) {
         PlayerInstance character = event.character();
         characterDao.update(character);
-        log.info("character.pvp_flagged character={}", character.getName());
+        log.info("dao.character.PlayerPvpFlagged object={} [flagged=true]", character.getId());
     }
 
     @EventListener
     void onPlayerPvpFlagCleared(PlayerPvpFlagCleared event) {
         PlayerInstance character = event.character();
         characterDao.update(character);
-        log.info("character.pvp_flag_cleared character={}", character.getName());
+        log.info("dao.character.PlayerPvpFlagCleared object={} [flagged=false]", character.getId());
     }
 
 }

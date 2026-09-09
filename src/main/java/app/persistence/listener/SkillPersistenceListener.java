@@ -41,8 +41,8 @@ public class SkillPersistenceListener {
             characterSkillDao.insert(event.character().getId(), event.activeSkill().id(), event.newLevel());
         }
         event.character().send(new SkillLearned(event.activeSkill().name(), event.newLevel(), upgraded));
-        log.info("character.learned_skill character={} activeSkill={} level={} upgraded={}",
-                event.character().getName(), event.activeSkill().name(), event.newLevel(), upgraded);
+        log.info("dao.skill.CharacterLearnedSkill object={} [activeSkill={}, level={}, upgraded={}]",
+                event.character().getId(), event.activeSkill().name(), event.newLevel(), upgraded);
     }
 
     @EventListener
@@ -56,8 +56,8 @@ public class SkillPersistenceListener {
             characterPassiveSkillDao.insert(event.character().getId(), event.passiveSkill().id(), event.newLevel());
         }
         event.character().send(new SkillLearned(event.passiveSkill().name(), event.newLevel(), upgraded));
-        log.info("character.learned_passive_skill character={} passiveSkill={} level={} upgraded={}",
-                event.character().getName(), event.passiveSkill().name(), event.newLevel(), upgraded);
+        log.info("dao.skill.CharacterLearnedPassiveSkill object={} [passiveSkill={}, level={}, upgraded={}]",
+                event.character().getId(), event.passiveSkill().name(), event.newLevel(), upgraded);
     }
 
     @EventListener
@@ -65,7 +65,7 @@ public class SkillPersistenceListener {
         if (event.caster() instanceof PlayerInstance caster) {
             characterDao.update(caster);
         }
-        log.info("activeSkill.cast caster={} activeSkill={} amount={} targetDefeated={}", event.caster().getName(),
+        log.info("dao.skill.SkillCast object={} [activeSkill={}, amount={}, targetDefeated={}]", event.caster().getId(),
                 event.activeSkill().name(), event.amount(), event.targetDefeated());
     }
 }

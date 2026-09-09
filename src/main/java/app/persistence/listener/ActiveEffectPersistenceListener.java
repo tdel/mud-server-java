@@ -33,7 +33,7 @@ public class ActiveEffectPersistenceListener {
         characterActiveEffectDao.upsert(targetPlayer.getId(), new ActiveEffect(event.activeSkill().id(),
                 event.activeSkill().name(), event.modifiers(), event.expiresAt()));
 
-        log.info("character.effect_applied character={} activeSkill={} expiresAt={}", targetPlayer.getName(),
+        log.info("dao.activeeffect.SkillCast object={} [activeSkill={}, expiresAt={}]", targetPlayer.getId(),
                 event.activeSkill().name(), event.expiresAt());
     }
 
@@ -43,7 +43,7 @@ public class ActiveEffectPersistenceListener {
             return;
         }
         characterActiveEffectDao.delete(targetPlayer.getId(), event.effect().skillId());
-        log.info("character.effect_expired character={} activeSkill={}", targetPlayer.getName(),
+        log.info("dao.activeeffect.CharacterEffectExpired object={} [activeSkill={}]", targetPlayer.getId(),
                 event.effect().skillName());
     }
 }
