@@ -72,7 +72,7 @@ public class ProjectileEngine {
         ActiveSkill activeSkill = projectile.activeSkill();
         AbstractCharacter target = projectile.target();
 
-        if (target.getCurrentHealth() <= 0) {
+        if (target.getResourceSystem().getCurrentHealth() <= 0) {
             caster.send(new SkillProjectileFizzled(projectileId, activeSkill.id(), activeSkill.name()));
             return;
         }
@@ -85,7 +85,7 @@ public class ProjectileEngine {
         caster.send(new CastResult(activeSkill.id(), activeSkill.name(), target.getId(), target.getName(),
                 outcome.selfHeal(), outcome.hit(), outcome.amount(), outcome.targetHealthAfter(),
                 outcome.targetMaxHealth(), outcome.targetDefeated(), activeSkill.manaCostAt(projectile.level()),
-                caster.getCurrentMana(), caster.getMaxMana()));
+                caster.getResourceSystem().getCurrentMana(), caster.getResourceSystem().getMaxMana()));
         caster.broadcast(
                 new SkillCastAnnounced(caster.getId(), caster.getName(), activeSkill.id(), activeSkill.name(),
                         target.getId(), target.getName(), outcome.selfHeal(), outcome.hit(), outcome.amount(),

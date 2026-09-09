@@ -22,9 +22,10 @@ public record MonsterStatBlock(MonsterInstance monster) implements OutputJsonMes
     @Override
     public void toJson(TcpJsonOutput output) {
         MonsterInstance m = monster;
-        output.write("MonsterStatBlock", new Payload(m.getId(), m.getName(), m.getCurrentHealth(), m.getMaxHealth(),
-                m.getStatSystem().getEffective(ModifiedStat.PATK), m.getStatSystem().getEffective(ModifiedStat.PDEF),
-                m.getStatSystem().getEffective(ModifiedStat.MATK), m.getStatSystem().getEffective(ModifiedStat.MDEF),
+        output.write("MonsterStatBlock", new Payload(m.getId(), m.getName(), m.getResourceSystem().getCurrentHealth(),
+                m.getResourceSystem().getMaxHealth(), m.getStatSystem().getEffective(ModifiedStat.PATK),
+                m.getStatSystem().getEffective(ModifiedStat.PDEF), m.getStatSystem().getEffective(ModifiedStat.MATK),
+                m.getStatSystem().getEffective(ModifiedStat.MDEF),
                 m.getStatSystem().getEffective(ModifiedStat.ACCURACY),
                 m.getStatSystem().getEffective(ModifiedStat.EVASION),
                 m.getStatSystem().getEffective(ModifiedStat.PCRIT), m.getStatSystem().getEffective(ModifiedStat.ATKSPD),

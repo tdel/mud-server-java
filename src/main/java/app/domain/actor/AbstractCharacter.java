@@ -16,6 +16,7 @@ import app.domain.actor.system.CombatSystem;
 import app.domain.actor.system.EffectsSystem;
 import app.domain.actor.system.LootSystem;
 import app.domain.actor.system.MotionSystem;
+import app.domain.actor.system.ResourceSystem;
 import app.domain.actor.system.SkillSystem;
 import app.domain.actor.system.StatSystem;
 import app.domain.actor.instance.PlayerInstance;
@@ -34,8 +35,7 @@ public abstract class AbstractCharacter extends AbstractObject {
     private final CombatSystem combatSystem;
     private final StatSystem statSystem;
     private final LootSystem lootSystem;
-    private int currentHealth;
-    private int maxHealth;
+    private final ResourceSystem resourceSystem;
 
     private final KnownList knownList = new KnownList(this);
 
@@ -45,8 +45,7 @@ public abstract class AbstractCharacter extends AbstractObject {
             int xpReward, int goldReward, List<LootTableEntry> lootTable) {
         super(id, name);
         this.attributes = new EnumMap<>(attributes);
-        this.currentHealth = currentHealth;
-        this.maxHealth = maxHealth;
+        this.resourceSystem = new ResourceSystem(this, currentHealth, maxHealth);
         this.statSystem = new StatSystem(effectsSystem, initialBaseStats);
         this.combatSystem = new CombatSystem(this, invulnerable);
         this.lootSystem = new LootSystem(this, xpReward, goldReward, lootTable);
@@ -103,19 +102,8 @@ public abstract class AbstractCharacter extends AbstractObject {
         return lootSystem;
     }
 
-    // Défaut neutre : seul PlayerInstance suit une réserve de mana ;
-    // MonsterInstance/AbstractNpc n'en ont pas encore, donc jamais bloqués par le
-    // coût en mana d'un sort.
-    public int getCurrentMana() {
-        return Integer.MAX_VALUE;
-    }
-
-    public int getMaxMana() {
-        return Integer.MAX_VALUE;
-    }
-
-    public boolean trySpendMana(int amount) {
-        return true;
+    public ResourceSystem getResourceSystem() {
+        return resourceSystem;
     }
 
     // Défaut neutre : seul PlayerInstance a une CharacterCombat dont la cible
@@ -126,28 +114,6 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     public Map<Attribute, Integer> getAttributes() {
         return Map.copyOf(attributes);
-    }
-
-    public int getCurrentHealth() {
-        return currentHealth;
-    }
-
-    public void setCurrentHealth(int currentHealth) {
-        this.currentHealth = currentHealth;
-    }
-
-    public int getMaxHealth() {
-        return maxHealth;
-    }
-
-    public void setMaxHealth(int maxHealth) {
-        this.maxHealth = maxHealth;
-    }
-
-    public int heal(int amount) {
-        int healed = Math.min(amount, maxHealth - currentHealth);
-        currentHealth += healed;
-        return healed;
     }
 
     // No-op par défaut : seul GamePlayer a une Connection à notifier.

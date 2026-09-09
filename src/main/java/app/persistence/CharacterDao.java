@@ -69,11 +69,12 @@ public class CharacterDao {
                         character.getAppearanceSystem().getGender().name(),
                         character.getAppearanceSystem().getRace().name(),
                         character.getClassSystem().getCharacterClass().name(), character.getLevel(),
-                        character.getCurrentHealth(), character.getMaxHealth(), character.getAttribute(Attribute.STR),
-                        character.getAttribute(Attribute.DEX), character.getAttribute(Attribute.CON),
-                        character.getAttribute(Attribute.INT), character.getAttribute(Attribute.WIT),
-                        character.getAttribute(Attribute.MEN), character.getXp(),
-                        character.getInventorySystem().getGold(), character.getMaxMana(), character.getCurrentMana(),
+                        character.getResourceSystem().getCurrentHealth(), character.getResourceSystem().getMaxHealth(),
+                        character.getAttribute(Attribute.STR), character.getAttribute(Attribute.DEX),
+                        character.getAttribute(Attribute.CON), character.getAttribute(Attribute.INT),
+                        character.getAttribute(Attribute.WIT), character.getAttribute(Attribute.MEN),
+                        character.getLevelingSystem().getXp(), character.getInventorySystem().getGold(),
+                        character.getResourceSystem().getMaxMana(), character.getResourceSystem().getCurrentMana(),
                         name(character.getClassSystem().getSubclass(1)),
                         name(character.getClassSystem().getSubclass(2)), gradeName(character.getActiveSoulshotGrade()),
                         gradeName(character.getActiveSpiritshotGrade()), character.getPvpSystem().getKarma(),
@@ -119,10 +120,12 @@ public class CharacterDao {
 
     public void update(PlayerInstance character) {
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_MAP_ID, character.getMotionSystem().getCurrentMap().getTemplateId())
-                .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).set(CHARACTER.XP, character.getXp())
-                .set(CHARACTER.LEVEL, character.getLevel()).set(CHARACTER.MAX_HEALTH, character.getMaxHealth())
+                .set(CHARACTER.CURRENT_HEALTH, character.getResourceSystem().getCurrentHealth())
+                .set(CHARACTER.XP, character.getLevelingSystem().getXp()).set(CHARACTER.LEVEL, character.getLevel())
+                .set(CHARACTER.MAX_HEALTH, character.getResourceSystem().getMaxHealth())
                 .set(CHARACTER.GOLD, character.getInventorySystem().getGold())
-                .set(CHARACTER.MAX_MANA, character.getMaxMana()).set(CHARACTER.CURRENT_MANA, character.getCurrentMana())
+                .set(CHARACTER.MAX_MANA, character.getResourceSystem().getMaxMana())
+                .set(CHARACTER.CURRENT_MANA, character.getResourceSystem().getCurrentMana())
                 .set(CHARACTER.SUBCLASS_TIER1, name(character.getClassSystem().getSubclass(1)))
                 .set(CHARACTER.SUBCLASS_TIER2, name(character.getClassSystem().getSubclass(2)))
                 .set(CHARACTER.ACTIVE_SOULSHOT_GRADE, gradeName(character.getActiveSoulshotGrade()))

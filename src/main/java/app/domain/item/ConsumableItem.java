@@ -28,13 +28,13 @@ public class ConsumableItem extends ItemTemplate {
     }
 
     private void heal(PlayerInstance character, Item item) {
-        int healed = character.heal(effectAmount);
+        int healed = character.getResourceSystem().heal(effectAmount);
         character.getInventorySystem().removeItem(item);
         DomainEventPublisher.publish(new GamePlayerUsedPotion(character, item, healed));
     }
 
     private void restoreMana(PlayerInstance character, Item item) {
-        int restored = character.gainMana(effectAmount);
+        int restored = character.getResourceSystem().gainMana(effectAmount);
         character.getInventorySystem().removeItem(item);
         DomainEventPublisher.publish(new GamePlayerUsedManaPotion(character, item, restored));
     }

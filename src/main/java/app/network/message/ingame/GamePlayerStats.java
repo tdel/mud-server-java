@@ -47,19 +47,22 @@ public record GamePlayerStats(PlayerInstance character) implements OutputJsonMes
                 : xpForCurrentLevel;
         output.write("GamePlayerStats", new Payload(c.getId(), c.getName(), c.getTitle(),
                 c.getAppearanceSystem().getGender().label(), c.getLevel(),
-                c.getClassSystem().getCharacterClass().label(), c.getCurrentHealth(), c.getMaxHealth(),
-                c.healthRegenAmountPerTick(), c.getCurrentMana(), c.getMaxMana(), c.manaRegenAmountPerTick(),
-                c.getStatSystem().getEffective(ModifiedStat.PATK), c.getStatSystem().getEffective(ModifiedStat.PDEF),
-                c.getStatSystem().getEffective(ModifiedStat.MATK), c.getStatSystem().getEffective(ModifiedStat.MDEF),
+                c.getClassSystem().getCharacterClass().label(), c.getResourceSystem().getCurrentHealth(),
+                c.getResourceSystem().getMaxHealth(), c.getResourceSystem().healthRegenAmountPerTick(),
+                c.getResourceSystem().getCurrentMana(), c.getResourceSystem().getMaxMana(),
+                c.getResourceSystem().manaRegenAmountPerTick(), c.getStatSystem().getEffective(ModifiedStat.PATK),
+                c.getStatSystem().getEffective(ModifiedStat.PDEF), c.getStatSystem().getEffective(ModifiedStat.MATK),
+                c.getStatSystem().getEffective(ModifiedStat.MDEF),
                 c.getStatSystem().getEffective(ModifiedStat.ACCURACY),
                 c.getStatSystem().getEffective(ModifiedStat.EVASION),
                 c.getStatSystem().getEffective(ModifiedStat.PCRIT), c.getStatSystem().getEffective(ModifiedStat.ATKSPD),
                 c.getStatSystem().getEffective(ModifiedStat.CASTSPD), attributeScore(c, Attribute.STR),
                 attributeScore(c, Attribute.DEX), attributeScore(c, Attribute.CON), attributeScore(c, Attribute.INT),
                 attributeScore(c, Attribute.WIT), attributeScore(c, Attribute.MEN),
-                MovementEngine.unitsPerSecond(c.getMotionSystem().getSpeed()), c.getXp(), xpForCurrentLevel,
-                xpForNextLevel, c.getActiveSoulshotGrade(), c.getActiveSpiritshotGrade(), c.getPvpSystem().getKarma(),
-                c.getPvpSystem().getPkCount(), c.getPvpSystem().getPvpCount(), c.getPvpSystem().isPvpFlagged()));
+                MovementEngine.unitsPerSecond(c.getMotionSystem().getSpeed()), c.getLevelingSystem().getXp(),
+                xpForCurrentLevel, xpForNextLevel, c.getActiveSoulshotGrade(), c.getActiveSpiritshotGrade(),
+                c.getPvpSystem().getKarma(), c.getPvpSystem().getPkCount(), c.getPvpSystem().getPvpCount(),
+                c.getPvpSystem().isPvpFlagged()));
     }
 
     private static AttributeScore attributeScore(PlayerInstance c, Attribute attribute) {

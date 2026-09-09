@@ -56,7 +56,7 @@ public class RegenHealthEngine {
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
     void tick() {
         for (PlayerInstance character : regenerating.values()) {
-            character.regenerate(character.healthRegenAmountPerTick(), 0);
+            character.getResourceSystem().regenerate(character.getResourceSystem().healthRegenAmountPerTick(), 0);
 
             if (isFull(character)) {
                 regenerating.remove(character.getId());
@@ -65,7 +65,7 @@ public class RegenHealthEngine {
     }
 
     private boolean isFull(PlayerInstance character) {
-        return character.getCurrentHealth() >= character.getMaxHealth();
+        return character.getResourceSystem().getCurrentHealth() >= character.getResourceSystem().getMaxHealth();
     }
 
     @EventListener

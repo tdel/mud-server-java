@@ -150,14 +150,14 @@ public class SkillCastEngine {
         int level = activeCast.level();
         AbstractCharacter primaryTarget = activeCast.target();
 
-        if (caster.getCurrentHealth() <= 0) {
+        if (caster.getResourceSystem().getCurrentHealth() <= 0) {
             return;
         }
         if (!isTargetStillValid(caster, activeSkill, primaryTarget)) {
             caster.send(new SkillFizzled(activeSkill.id(), activeSkill.name(), "La cible n'est plus valide."));
             return;
         }
-        if (!caster.trySpendMana(activeSkill.manaCostAt(level))) {
+        if (!caster.getResourceSystem().trySpendMana(activeSkill.manaCostAt(level))) {
             caster.send(new SkillFizzled(activeSkill.id(), activeSkill.name(), "Plus assez de mana."));
             return;
         }
@@ -209,17 +209,19 @@ public class SkillCastEngine {
         if (activeSkill.skillType() == SkillEffectType.BUFF || activeSkill.skillType() == SkillEffectType.DEBUFF) {
             boolean beneficial = activeSkill.skillType() == SkillEffectType.BUFF;
             int durationSeconds = activeSkill.effects().isEmpty() ? 0 : activeSkill.effects().get(0).time();
-            caster.broadcast(new SkillModifierAnnounced(caster.getId(), caster.getName(), activeSkill.id(),
-                    activeSkill.name(), target.getId(), target.getName(), target == caster, beneficial, outcome.hit(),
-                    outcome.modifiers(), outcome.amount(), durationSeconds, activeSkill.manaCostAt(level),
-                    caster.getCurrentMana(), caster.getMaxMana()), null);
+            caster.broadcast(
+                    new SkillModifierAnnounced(caster.getId(), caster.getName(), activeSkill.id(), activeSkill.name(),
+                            target.getId(), target.getName(), target == caster, beneficial, outcome.hit(),
+                            outcome.modifiers(), outcome.amount(), durationSeconds, activeSkill.manaCostAt(level),
+                            caster.getResourceSystem().getCurrentMana(), caster.getResourceSystem().getMaxMana()),
+                    null);
             return outcome.hit();
         }
 
         caster.send(new CastResult(activeSkill.id(), activeSkill.name(), target.getId(), target.getName(),
                 outcome.selfHeal(), outcome.hit(), outcome.amount(), outcome.targetHealthAfter(),
                 outcome.targetMaxHealth(), outcome.targetDefeated(), activeSkill.manaCostAt(level),
-                caster.getCurrentMana(), caster.getMaxMana()));
+                caster.getResourceSystem().getCurrentMana(), caster.getResourceSystem().getMaxMana()));
         caster.broadcast(
                 new SkillCastAnnounced(caster.getId(), caster.getName(), activeSkill.id(), activeSkill.name(),
                         target.getId(), target.getName(), outcome.selfHeal(), outcome.hit(), outcome.amount(),
@@ -242,7 +244,8 @@ public class SkillCastEngine {
         if (target == caster) {
             return true;
         }
-        if (target.getCurrentHealth() <= 0 || !caster.getMotionSystem().getCurrentMap().isPresent(target)) {
+        if (target.getResourceSystem().getCurrentHealth() <= 0
+                || !caster.getMotionSystem().getCurrentMap().isPresent(target)) {
             return false;
         }
         return activeSkill.range() <= 0 || caster.getMotionSystem().getPosition()

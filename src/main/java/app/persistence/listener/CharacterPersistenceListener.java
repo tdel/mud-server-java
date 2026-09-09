@@ -81,7 +81,7 @@ public class CharacterPersistenceListener {
         PlayerInstance character = event.character();
         characterDao.update(character);
         log.info("character.xp_gained character={} amount={} newXp={} newLevel={}", character.getName(), event.amount(),
-                character.getXp(), character.getLevel());
+                character.getLevelingSystem().getXp(), character.getLevel());
     }
 
     @EventListener
@@ -144,7 +144,7 @@ public class CharacterPersistenceListener {
         double multiplier = party != null ? party.shareMultiplier(eligible.size()) : 1.0;
         int perMemberXp = (int) (xpReward * multiplier) / eligible.size();
         for (PlayerInstance member : eligible) {
-            member.gainXp(perMemberXp);
+            member.getLevelingSystem().gainXp(perMemberXp);
         }
         killer.getCombatSystem().setTarget(null);
         killer.getPvpSystem().addKarma(-PvPSystem.KARMA_LOSS_PER_MONSTER_KILL);
@@ -183,7 +183,7 @@ public class CharacterPersistenceListener {
         characterDao.update(character);
         broadcastVitalsToParty(character);
         log.info("combat.damage_taken character={} attacker={} amount={} currentHealth={}", character.getName(),
-                event.attacker().getName(), event.amount(), character.getCurrentHealth());
+                event.attacker().getName(), event.amount(), character.getResourceSystem().getCurrentHealth());
     }
 
     @EventListener
@@ -193,8 +193,8 @@ public class CharacterPersistenceListener {
 
         character.send(new PlayerRespawned(character.getMotionSystem().getCurrentMap().getName(),
                 character.getMotionSystem().getPosition().x(), character.getMotionSystem().getPosition().y(),
-                character.getCurrentHealth(), character.getMaxHealth(), character.getCurrentMana(),
-                character.getMaxMana()));
+                character.getResourceSystem().getCurrentHealth(), character.getResourceSystem().getMaxHealth(),
+                character.getResourceSystem().getCurrentMana(), character.getResourceSystem().getMaxMana()));
         broadcastVitalsToParty(character);
         log.info("character.respawned character={} map={}", character.getName(),
                 character.getMotionSystem().getCurrentMap().getName());
@@ -205,7 +205,8 @@ public class CharacterPersistenceListener {
         PlayerInstance character = event.character();
         characterDao.update(character);
         character.send(new ItemUsed(event.item().getId(), event.item().getName(), event.item().getGrade(),
-                event.healedAmount(), character.getCurrentHealth(), character.getMaxHealth()));
+                event.healedAmount(), character.getResourceSystem().getCurrentHealth(),
+                character.getResourceSystem().getMaxHealth()));
         character.broadcast(new CharacterUsedItem(character.getId(), character.getName(), event.item().getId(),
                 event.item().getName()), character);
         broadcastVitalsToParty(character);
@@ -218,7 +219,8 @@ public class CharacterPersistenceListener {
         PlayerInstance character = event.character();
         characterDao.update(character);
         character.send(new ManaPotionUsed(event.item().getId(), event.item().getName(), event.item().getGrade(),
-                event.restoredAmount(), character.getCurrentMana(), character.getMaxMana()));
+                event.restoredAmount(), character.getResourceSystem().getCurrentMana(),
+                character.getResourceSystem().getMaxMana()));
         character.broadcast(new CharacterUsedItem(character.getId(), character.getName(), event.item().getId(),
                 event.item().getName()), character);
         broadcastVitalsToParty(character);
@@ -230,8 +232,9 @@ public class CharacterPersistenceListener {
     void onCharacterRegenerated(CharacterRegenerated event) {
         PlayerInstance character = event.character();
         characterDao.update(character);
-        character.send(new RegenTick(event.hpRestored(), event.manaRestored(), character.getCurrentHealth(),
-                character.getMaxHealth(), character.getCurrentMana(), character.getMaxMana()));
+        character.send(new RegenTick(event.hpRestored(), event.manaRestored(),
+                character.getResourceSystem().getCurrentHealth(), character.getResourceSystem().getMaxHealth(),
+                character.getResourceSystem().getCurrentMana(), character.getResourceSystem().getMaxMana()));
         broadcastVitalsToParty(character);
         log.info("character.regenerated character={} hpRestored={} manaRestored={}", character.getName(),
                 event.hpRestored(), event.manaRestored());
@@ -321,9 +324,9 @@ public class CharacterPersistenceListener {
     private void broadcastVitalsToParty(PlayerInstance character) {
         Party party = character.getParty();
         if (party != null) {
-            party.broadcast(
-                    new PartyMemberVitalsUpdated(character.getId(), character.getName(), character.getCurrentHealth(),
-                            character.getMaxHealth(), character.getCurrentMana(), character.getMaxMana()),
+            party.broadcast(new PartyMemberVitalsUpdated(character.getId(), character.getName(),
+                    character.getResourceSystem().getCurrentHealth(), character.getResourceSystem().getMaxHealth(),
+                    character.getResourceSystem().getCurrentMana(), character.getResourceSystem().getMaxMana()),
                     character);
         }
     }

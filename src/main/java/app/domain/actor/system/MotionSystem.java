@@ -4,6 +4,8 @@ import app.domain.actor.AbstractCharacter;
 import app.domain.actor.ModifiedStat;
 import app.domain.actor.event.CharacterPositionChanged;
 import app.domain.actor.event.DomainEventPublisher;
+import app.domain.actor.event.GamePlayerMovedToMap;
+import app.domain.actor.event.GamePlayerRespawned;
 import app.domain.actor.instance.PlayerInstance;
 import app.domain.map.Position;
 import app.domain.world.AbstractZone;
@@ -72,5 +74,30 @@ public final class MotionSystem {
 
     public void clearMovement() {
         this.activeMovement = null;
+    }
+
+    // Seul un joueur peut changer de map (leave/join ne connaissent que
+    // PlayerInstance ; les monstres sont ajoutés/retirés d'une MapInstance
+    // directement par MonsterRespawnEngine, pas via ce mécanisme) : no-op sinon,
+    // même convention que les défauts neutres d'AbstractCharacter (trySpendMana,
+    // clearCombatTarget).
+    public void moveToMap(MapInstance destination, Position targetPosition) {
+        if (!(character instanceof PlayerInstance player)) {
+            return;
+        }
+        MapInstance previous = currentMap;
+        previous.leave(player);
+        destination.join(player, targetPosition);
+        DomainEventPublisher.publish(new GamePlayerMovedToMap(player, previous, destination));
+    }
+
+    public void respawn(MapInstance destination, Position position) {
+        if (!(character instanceof PlayerInstance player)) {
+            return;
+        }
+        character.getResourceSystem().setCurrentHealth(Math.max(1, character.getResourceSystem().getMaxHealth() / 4));
+        player.getResourceSystem().setCurrentMana(0);
+        moveToMap(destination, position);
+        DomainEventPublisher.publish(new GamePlayerRespawned(player));
     }
 }

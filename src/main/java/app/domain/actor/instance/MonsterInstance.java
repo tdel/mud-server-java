@@ -62,6 +62,7 @@ public final class MonsterInstance extends AbstractCharacter {
     @Override
     public String toString() {
         return "GameMonster[id=" + getId() + ", name=" + getName() + ", spawnPosition=" + spawnPosition
-                + ", currentHealth=" + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + "]";
+                + ", currentHealth=" + getResourceSystem().getCurrentHealth() + ", maxHealth="
+                + getResourceSystem().getMaxHealth() + "]";
     }
 }

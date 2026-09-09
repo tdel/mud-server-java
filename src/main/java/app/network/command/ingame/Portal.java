@@ -64,7 +64,7 @@ public class Portal implements CommandHandler {
         // redéplacer (voir aussi Game._rebuild_map côté client, même correctif local).
         movementEngine.stopMovement(character);
 
-        character.moveToMap(portal.get().targetMap(), portal.get().targetPosition());
+        character.getMotionSystem().moveToMap(portal.get().targetMap(), portal.get().targetPosition());
         connection.send(new MapView(character.getMotionSystem().getCurrentMap()));
         connection.send(new MapEnter(character));
     }

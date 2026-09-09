@@ -19,18 +19,11 @@ import app.domain.ActiveEffect;
 import app.domain.actor.system.AppearanceSystem;
 import app.domain.actor.system.ClassSystem;
 import app.domain.actor.system.InventorySystem;
+import app.domain.actor.system.LevelingSystem;
 import app.domain.actor.system.PvPSystem;
-import app.domain.actor.event.CharacterGainedXp;
-import app.domain.actor.event.CharacterLeveledUp;
-import app.domain.actor.event.CharacterRegenerated;
-import app.domain.actor.event.DomainEventPublisher;
-import app.domain.actor.event.GamePlayerMovedToMap;
-import app.domain.actor.event.GamePlayerRespawned;
-import app.game.catalog.LevelCatalogHolder;
 import app.domain.item.EquipmentSlot;
 import app.domain.item.ItemGrade;
 import app.domain.item.ItemSet;
-import app.domain.map.Position;
 import app.domain.item.Item;
 import app.domain.world.MapInstance;
 import app.domain.world.WorldInstance;
@@ -38,7 +31,6 @@ import app.game.catalog.ItemSetCatalogHolder;
 import app.game.combat.CombatFormulas;
 import app.network.Connection;
 import app.network.OutputMessage;
-import app.network.message.ingame.XpGained;
 
 public final class PlayerInstance extends AbstractCharacter {
 
@@ -46,15 +38,12 @@ public final class PlayerInstance extends AbstractCharacter {
     private WorldInstance worldInstance;
     private final AppearanceSystem appearanceSystem;
     private final ClassSystem classSystem;
-    private int level;
+    private final LevelingSystem levelingSystem;
 
     private Connection connection;
     private final InventorySystem inventorySystem;
     private Party party;
     private PendingPartyInvite pendingInvite;
-    private int xp;
-    private int maxMana;
-    private int currentMana;
     private volatile ItemGrade activeSoulshotGrade;
     private volatile ItemGrade activeSpiritshotGrade;
     private final PvPSystem pvpSystem;
@@ -71,11 +60,10 @@ public final class PlayerInstance extends AbstractCharacter {
         getMotionSystem().setCurrentMap(map);
         this.appearanceSystem = new AppearanceSystem(this, gender, race);
         this.classSystem = new ClassSystem(this, characterClass, subclasses);
-        this.level = level;
-        this.xp = xp;
+        this.levelingSystem = new LevelingSystem(this, level, xp);
         this.inventorySystem = new InventorySystem(this, gold, items);
-        this.maxMana = maxMana;
-        this.currentMana = currentMana;
+        getResourceSystem().setMaxMana(maxMana);
+        getResourceSystem().setCurrentMana(currentMana);
         this.activeSoulshotGrade = activeSoulshotGrade;
         this.activeSpiritshotGrade = activeSpiritshotGrade;
         this.pvpSystem = new PvPSystem(this, karma, pkCount, pvpCount, pvpFlagged);
@@ -161,12 +149,13 @@ public final class PlayerInstance extends AbstractCharacter {
         return classSystem;
     }
 
+    @Override
     public int getLevel() {
-        return level;
+        return levelingSystem.getLevel();
     }
 
-    public void setLevel(int level) {
-        this.level = level;
+    public LevelingSystem getLevelingSystem() {
+        return levelingSystem;
     }
 
     @Override
@@ -201,119 +190,8 @@ public final class PlayerInstance extends AbstractCharacter {
     }
 
     @Override
-    public int getMaxMana() {
-        return maxMana;
-    }
-
-    public void setMaxMana(int maxMana) {
-        this.maxMana = maxMana;
-    }
-
-    @Override
-    public int getCurrentMana() {
-        return currentMana;
-    }
-
-    public void setCurrentMana(int currentMana) {
-        this.currentMana = currentMana;
-    }
-
-    @Override
-    public boolean trySpendMana(int amount) {
-        if (currentMana < amount) {
-            return false;
-        }
-        currentMana -= amount;
-        return true;
-    }
-
-    @Override
     public void clearCombatTarget() {
         getCombatSystem().clearTarget();
-    }
-
-    public int gainMana(int amount) {
-        int gained = Math.min(amount, maxMana - currentMana);
-        currentMana += gained;
-        return gained;
-    }
-
-    public int healthRegenAmountPerTick() {
-        return CombatFormulas.healthRegenPerTick(getMaxHealth(), getAttribute(Attribute.CON));
-    }
-
-    public int manaRegenAmountPerTick() {
-        return CombatFormulas.manaRegenPerTick(getMaxMana(), getAttribute(Attribute.MEN));
-    }
-
-    public void regenerate(int hpAmount, int manaAmount) {
-        int healed = heal(hpAmount);
-        int manaGained = gainMana(manaAmount);
-        if (healed > 0 || manaGained > 0) {
-            DomainEventPublisher.publish(new CharacterRegenerated(this, healed, manaGained));
-        }
-    }
-
-    public int getXp() {
-        return xp;
-    }
-
-    public void gainXp(int amount) {
-        this.xp += amount;
-        // xpForNextLevel reflète le niveau ACTUEL (avant la boucle de level-up
-        // ci-dessous) :
-        // si ce gain déclenche une montée de niveau, le ratio xp/xpForNextLevel calculé
-        // côté
-        // client peut dépasser 1 pour cet unique message — sans conséquence, il se
-        // corrige au
-        // prochain XpGained/GamePlayerStats une fois le nouveau niveau atteint.
-        int xpForCurrentLevel = LevelCatalogHolder.xpRequiredForLevel(level);
-        int xpForNextLevel = level < LevelCatalogHolder.maxLevel()
-                ? LevelCatalogHolder.xpRequiredForLevel(level + 1)
-                : xpForCurrentLevel;
-        send(new XpGained(amount, xp, xpForCurrentLevel, xpForNextLevel));
-
-        while (level < LevelCatalogHolder.maxLevel() && xp >= LevelCatalogHolder.xpRequiredForLevel(level + 1)) {
-            applyLevelUp();
-        }
-
-        DomainEventPublisher.publish(new CharacterGainedXp(this, amount));
-    }
-
-    public void applyLevelUp() {
-        level++;
-
-        int newMaxHealth = classSystem.getCharacterClass().maxHealth(getAttribute(Attribute.CON), level);
-        int hpGain = newMaxHealth - getMaxHealth();
-        setMaxHealth(newMaxHealth);
-        setCurrentHealth(getCurrentHealth() + hpGain);
-
-        int newMaxMana = classSystem.getCharacterClass().maxMana(getAttribute(Attribute.MEN), level);
-        int manaGain = newMaxMana - maxMana;
-        maxMana = newMaxMana;
-        currentMana += manaGain;
-
-        recomputeStats();
-
-        DomainEventPublisher.publish(new CharacterLeveledUp(this, level, hpGain));
-    }
-
-    public void respawn(MapInstance destination, Position position) {
-        setCurrentHealth(Math.max(1, getMaxHealth() / 4));
-        setCurrentMana(0);
-        moveToMap(destination, position);
-        DomainEventPublisher.publish(new GamePlayerRespawned(this));
-    }
-
-    public void moveToMap(MapInstance destination) {
-        moveToMap(destination, destination.getSpawnPosition());
-    }
-
-    public void moveToMap(MapInstance destination, Position targetPosition) {
-        MapInstance previous = getMotionSystem().getCurrentMap();
-        previous.leave(this);
-        destination.join(this, targetPosition);
-        DomainEventPublisher.publish(new GamePlayerMovedToMap(this, previous, destination));
     }
 
     public InventorySystem getInventorySystem() {
@@ -352,7 +230,8 @@ public final class PlayerInstance extends AbstractCharacter {
         return "GamePlayer[id=" + getId() + ", accountId=" + getAccountId() + ", name=" + getName() + ", currentMapId="
                 + getMotionSystem().getCurrentMap().getTemplateId() + ", gender=" + appearanceSystem.getGender()
                 + ", race=" + appearanceSystem.getRace() + ", characterClass=" + classSystem.getCharacterClass()
-                + ", level=" + level + ", xp=" + xp + ", gold=" + inventorySystem.getGold() + ", currentHealth="
-                + getCurrentHealth() + ", maxHealth=" + getMaxHealth() + ", attributes=" + getAttributes() + "]";
+                + ", level=" + levelingSystem.getLevel() + ", xp=" + levelingSystem.getXp() + ", gold="
+                + inventorySystem.getGold() + ", currentHealth=" + getResourceSystem().getCurrentHealth()
+                + ", maxHealth=" + getResourceSystem().getMaxHealth() + ", attributes=" + getAttributes() + "]";
     }
 }

@@ -208,12 +208,12 @@ public final class SkillSystem {
     public CastOutcome applyDamageOutcome(AttackRollOutcome roll, AbstractCharacter target) {
         DomainEventPublisher.publish(new CharacterBeginAttack(character, target));
         if (!roll.hit()) {
-            return new CastOutcome(false, 0, target.getCurrentHealth(), target.getMaxHealth(), false, false, null,
-                    List.of());
+            return new CastOutcome(false, 0, target.getResourceSystem().getCurrentHealth(),
+                    target.getResourceSystem().getMaxHealth(), false, false, null, List.of());
         }
         boolean defeated = applyDamage(target, roll.amount());
-        return new CastOutcome(true, roll.amount(), target.getCurrentHealth(), target.getMaxHealth(), defeated, false,
-                null, List.of());
+        return new CastOutcome(true, roll.amount(), target.getResourceSystem().getCurrentHealth(),
+                target.getResourceSystem().getMaxHealth(), defeated, false, null, List.of());
     }
 
     // Formule L2J (cf. CombatFormulas.resolveHeal) : pas de mitigation par une
@@ -221,9 +221,9 @@ public final class SkillSystem {
     private CastOutcome castHeal(ActiveSkill activeSkill, int level, AbstractCharacter target, boolean shotCharged) {
         int healPower = CombatFormulas.resolveHeal(activeSkill.powerAt(level),
                 character.getStatSystem().getEffective(ModifiedStat.MATK), shotCharged);
-        int amount = target.heal(healPower);
-        return new CastOutcome(true, amount, target.getCurrentHealth(), target.getMaxHealth(), false,
-                target == character, null, List.of());
+        int amount = target.getResourceSystem().heal(healPower);
+        return new CastOutcome(true, amount, target.getResourceSystem().getCurrentHealth(),
+                target.getResourceSystem().getMaxHealth(), false, target == character, null, List.of());
     }
 
     private CastOutcome castDamage(ActiveSkill activeSkill, int level, AbstractCharacter target, boolean shotCharged) {
@@ -237,8 +237,8 @@ public final class SkillSystem {
     private CastOutcome castModifier(ActiveSkill activeSkill, int level, AbstractCharacter target, boolean debuff) {
         if (debuff && (!rollSkillHit(target)
                 || Randomizer.rollChance(CombatFormulas.debuffResistChance(target.getAttribute(Attribute.MEN))))) {
-            return new CastOutcome(false, 0, target.getCurrentHealth(), target.getMaxHealth(), false, false, null,
-                    List.of());
+            return new CastOutcome(false, 0, target.getResourceSystem().getCurrentHealth(),
+                    target.getResourceSystem().getMaxHealth(), false, false, null, List.of());
         }
 
         SkillEffectDefinition definition = activeSkill.effects().get(0);
@@ -250,8 +250,8 @@ public final class SkillSystem {
         Optional<ActiveEffect> evicted = target.getEffectsSystem()
                 .apply(new ActiveEffect(activeSkill.id(), activeSkill.name(), modifiers, expiresAt));
         evicted.ifPresent(effect -> DomainEventPublisher.publish(new CharacterEffectExpired(target, effect)));
-        return new CastOutcome(true, magnitude, target.getCurrentHealth(), target.getMaxHealth(), false, false,
-                expiresAt, modifiers);
+        return new CastOutcome(true, magnitude, target.getResourceSystem().getCurrentHealth(),
+                target.getResourceSystem().getMaxHealth(), false, false, expiresAt, modifiers);
     }
 
     private boolean rollSkillHit(AbstractCharacter target) {
@@ -294,9 +294,9 @@ public final class SkillSystem {
                     remainingCooldown(activeSkill.id()).toMillis());
         }
         int level = effectiveLevel(activeSkill);
-        if (character.getCurrentMana() < activeSkill.manaCostAt(level)) {
+        if (character.getResourceSystem().getCurrentMana() < activeSkill.manaCostAt(level)) {
             return new CastRequestOutcome.InsufficientMana(activeSkill.name(), activeSkill.manaCostAt(level),
-                    character.getCurrentMana());
+                    character.getResourceSystem().getCurrentMana());
         }
 
         DomainEventPublisher.publish(new SkillCastBegin(character, activeSkill, level, target));

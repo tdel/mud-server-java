@@ -61,7 +61,7 @@ public final class CombatSystem {
         if (defender == null) {
             return new AttackOutcome.NoTarget();
         }
-        if (defender.getCurrentHealth() <= 0) {
+        if (defender.getResourceSystem().getCurrentHealth() <= 0) {
             log.debug("attack.rejected character={} reason=target_dead target={}", character.getId(), defender.getId());
             setTarget(null);
             return new AttackOutcome.TargetInvalid(defender.getId());
@@ -113,13 +113,13 @@ public final class CombatSystem {
         int damage = 0;
         boolean critical = false;
         boolean defeated = false;
-        int healthAfter = defender.getCurrentHealth();
+        int healthAfter = defender.getResourceSystem().getCurrentHealth();
 
         if (hit) {
             critical = Randomizer.rollChance(character.getStatSystem().getEffective(ModifiedStat.PCRIT) / 100.0);
             damage = CombatFormulas.resolvePhysicalDamage(character.getStatSystem().getEffective(ModifiedStat.PATK),
                     defender.getStatSystem().getEffective(ModifiedStat.PDEF), critical, shotCharged);
-            healthAfter = Math.max(0, defender.getCurrentHealth() - damage);
+            healthAfter = Math.max(0, defender.getResourceSystem().getCurrentHealth() - damage);
             defeated = applyDamage(defender, damage);
         }
 
@@ -150,15 +150,16 @@ public final class CombatSystem {
         }
         boolean defeated;
         synchronized (character) {
-            if (character.getCurrentHealth() <= 0 || character.getZone() instanceof PeaceZone) {
+            if (character.getResourceSystem().getCurrentHealth() <= 0 || character.getZone() instanceof PeaceZone) {
                 return false;
             }
-            character.setCurrentHealth(Math.max(0, character.getCurrentHealth() - amount));
-            defeated = character.getCurrentHealth() <= 0;
+            character.getResourceSystem()
+                    .setCurrentHealth(Math.max(0, character.getResourceSystem().getCurrentHealth() - amount));
+            defeated = character.getResourceSystem().getCurrentHealth() <= 0;
         }
         log.debug("character.take_damage thread={} character={} attacker={} amount={} healthAfter={}",
                 Thread.currentThread().getName(), character.getId(), attacker.getId(), amount,
-                character.getCurrentHealth());
+                character.getResourceSystem().getCurrentHealth());
         DomainEventPublisher.publish(new CharacterDamaged(character, attacker, amount));
         if (defeated) {
             clearTarget();

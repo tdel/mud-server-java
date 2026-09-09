@@ -62,7 +62,7 @@ public class RegenManaEngine {
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
     void tick() {
         for (PlayerInstance character : regenerating.values()) {
-            character.regenerate(0, character.manaRegenAmountPerTick());
+            character.getResourceSystem().regenerate(0, character.getResourceSystem().manaRegenAmountPerTick());
 
             if (isFull(character)) {
                 regenerating.remove(character.getId());
@@ -72,6 +72,6 @@ public class RegenManaEngine {
     }
 
     private boolean isFull(PlayerInstance character) {
-        return character.getCurrentMana() >= character.getMaxMana();
+        return character.getResourceSystem().getCurrentMana() >= character.getResourceSystem().getMaxMana();
     }
 }

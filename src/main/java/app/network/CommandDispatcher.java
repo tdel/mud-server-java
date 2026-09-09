@@ -22,7 +22,7 @@ public class CommandDispatcher {
     public void dispatch(Connection connection, String actionName, String argument) {
         registry.find(connection.state(), actionName).ifPresentOrElse(action -> {
             if (connection.state() == ConnectionState.INGAME && action.requiresAlive()
-                    && connection.character().getCurrentHealth() <= 0) {
+                    && connection.character().getResourceSystem().getCurrentHealth() <= 0) {
                 log.debug("command.rejected verb={} reason=character_dead", actionName);
                 connection.send(new CharacterIsDead());
                 return;

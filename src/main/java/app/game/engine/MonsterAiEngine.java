@@ -95,7 +95,7 @@ public class MonsterAiEngine {
         PlayerInstance target = state.target();
         MapInstance map = monster.getMotionSystem().getCurrentMap();
 
-        if (target == null || target.getCurrentHealth() <= 0 || !map.isPresent(target)) {
+        if (target == null || target.getResourceSystem().getCurrentHealth() <= 0 || !map.isPresent(target)) {
             giveUpChase(monster, state, target);
             return;
         }

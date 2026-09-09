@@ -32,7 +32,7 @@ public class Respawn implements CommandHandler {
     public void onReceive(Connection connection, String argument) {
         PlayerInstance character = connection.character();
 
-        if (character.getCurrentHealth() > 0) {
+        if (character.getResourceSystem().getCurrentHealth() > 0) {
             connection.send(new CharacterNotDead());
             return;
         }
@@ -42,7 +42,7 @@ public class Respawn implements CommandHandler {
             connection.send(new StartingMapNotConfigured());
             return;
         }
-        character.respawn(startingMap.get(), startingMap.get().getSpawnPosition());
+        character.getMotionSystem().respawn(startingMap.get(), startingMap.get().getSpawnPosition());
 
         // La starting map peut différer de la map où le personnage est mort : sans
         // ça, le
