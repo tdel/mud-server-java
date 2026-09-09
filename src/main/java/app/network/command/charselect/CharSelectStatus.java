@@ -31,7 +31,7 @@ public class CharSelectStatus {
         connection.send(new CharacterList(characters.stream()
                 .map(character -> new CharacterList.Entry(character.getName(),
                         character.getAppearanceSystem().getRace(), character.getClassSystem().getCharacterClass(),
-                        character.getLevel()))
+                        character.getLevelingSystem().getLevel()))
                 .toList()));
     }
 }

@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import app.domain.world.MapInstance;
 import app.domain.actor.system.DialogueSystem;
 import app.domain.actor.template.NpcTemplate;
+import app.game.catalog.LevelCatalogHolder;
 
 public class AbstractNpc extends AbstractCharacter {
 
@@ -22,15 +23,12 @@ public class AbstractNpc extends AbstractCharacter {
         super(id, template.name(), neutralAttributes(), NOMINAL_HEALTH, NOMINAL_HEALTH,
                 template.knownSkills().stream().collect(Collectors.toMap(skill -> skill, skill -> 1)),
                 template.knownPassiveSkills().stream().collect(Collectors.toMap(skill -> skill, skill -> 1)),
-                template.activeEffects(), Map.of(ModifiedStat.SPEED, 0), true, 0, 0, List.of());
+                template.activeEffects(), Map.of(ModifiedStat.SPEED, 0), true, 0, 0, List.of(),
+                LevelCatalogHolder.maxLevel(), 0);
         this.template = Objects.requireNonNull(template);
         this.dialogueSystem = new DialogueSystem(template.dialogue());
         setTitle(template.title());
         getMotionSystem().setCurrentMap(Objects.requireNonNull(map));
-    }
-
-    public int getLevel() {
-        return template.level();
     }
 
     public DialogueSystem getDialogueSystem() {

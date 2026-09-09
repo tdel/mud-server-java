@@ -39,7 +39,7 @@ public record EntityView(UUID id, String name, String title, String kind, double
                 character.getMotionSystem().getHeading(),
                 MovementEngine.unitsPerSecond(character.getMotionSystem().getSpeed()),
                 character.getResourceSystem().getCurrentHealth(), character.getResourceSystem().getMaxHealth(),
-                character.getLevel(), targetX, targetY, character instanceof NpcSellerInstance,
+                character.getLevelingSystem().getLevel(), targetX, targetY, character instanceof NpcSellerInstance,
                 character instanceof PlayerInstance player && player.getPvpSystem().isPvpFlagged());
     }
 }

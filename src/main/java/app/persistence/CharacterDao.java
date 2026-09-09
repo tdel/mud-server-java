@@ -68,7 +68,7 @@ public class CharacterDao {
                         character.getMotionSystem().getCurrentMap().getTemplateId(),
                         character.getAppearanceSystem().getGender().name(),
                         character.getAppearanceSystem().getRace().name(),
-                        character.getClassSystem().getCharacterClass().name(), character.getLevel(),
+                        character.getClassSystem().getCharacterClass().name(), character.getLevelingSystem().getLevel(),
                         character.getResourceSystem().getCurrentHealth(), character.getResourceSystem().getMaxHealth(),
                         character.getAttributeSystem().getAttribute(Attribute.STR),
                         character.getAttributeSystem().getAttribute(Attribute.DEX),
@@ -125,7 +125,8 @@ public class CharacterDao {
     public void update(PlayerInstance character) {
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_MAP_ID, character.getMotionSystem().getCurrentMap().getTemplateId())
                 .set(CHARACTER.CURRENT_HEALTH, character.getResourceSystem().getCurrentHealth())
-                .set(CHARACTER.XP, character.getLevelingSystem().getXp()).set(CHARACTER.LEVEL, character.getLevel())
+                .set(CHARACTER.XP, character.getLevelingSystem().getXp())
+                .set(CHARACTER.LEVEL, character.getLevelingSystem().getLevel())
                 .set(CHARACTER.MAX_HEALTH, character.getResourceSystem().getMaxHealth())
                 .set(CHARACTER.GOLD, character.getInventorySystem().getGold())
                 .set(CHARACTER.MAX_MANA, character.getResourceSystem().getMaxMana())

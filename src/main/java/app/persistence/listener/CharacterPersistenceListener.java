@@ -52,7 +52,7 @@ public class CharacterPersistenceListener {
         PlayerInstance character = event.character();
         characterDao.update(character);
         log.info("dao.character.CharacterGainedXp object={} [amount={}, newXp={}, newLevel={}]", character.getId(),
-                event.amount(), character.getLevelingSystem().getXp(), character.getLevel());
+                event.amount(), character.getLevelingSystem().getXp(), character.getLevelingSystem().getLevel());
     }
 
     @EventListener

@@ -14,7 +14,6 @@ import app.domain.ActiveEffect;
 import app.domain.actor.system.AppearanceSystem;
 import app.domain.actor.system.ClassSystem;
 import app.domain.actor.system.InventorySystem;
-import app.domain.actor.system.LevelingSystem;
 import app.domain.actor.system.PartySystem;
 import app.domain.actor.system.PvPSystem;
 import app.domain.item.ItemGrade;
@@ -30,7 +29,6 @@ public final class PlayerInstance extends AbstractCharacter {
     private WorldInstance worldInstance;
     private final AppearanceSystem appearanceSystem;
     private final ClassSystem classSystem;
-    private final LevelingSystem levelingSystem;
 
     private Connection connection;
     private final InventorySystem inventorySystem;
@@ -44,12 +42,12 @@ public final class PlayerInstance extends AbstractCharacter {
             Map<PassiveSkill, Integer> knownPassiveSkills, List<Item> items, ItemGrade activeSoulshotGrade,
             ItemGrade activeSpiritshotGrade, int karma, int pkCount, int pvpCount, boolean pvpFlagged) {
         super(id, name, attributes, currentHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects,
-                InventorySystem.computeBaseStats(attributes, level, items, race.speed()), false, 0, 0, List.of());
+                InventorySystem.computeBaseStats(attributes, level, items, race.speed()), false, 0, 0, List.of(), level,
+                xp);
         this.account = account;
         getMotionSystem().setCurrentMap(map);
         this.appearanceSystem = new AppearanceSystem(this, gender, race);
         this.classSystem = new ClassSystem(this, characterClass, subclasses);
-        this.levelingSystem = new LevelingSystem(this, level, xp);
         this.inventorySystem = new InventorySystem(this, gold, items, activeSoulshotGrade, activeSpiritshotGrade);
         getResourceSystem().setMaxMana(maxMana);
         getResourceSystem().setCurrentMana(currentMana);
@@ -80,15 +78,6 @@ public final class PlayerInstance extends AbstractCharacter {
 
     public ClassSystem getClassSystem() {
         return classSystem;
-    }
-
-    @Override
-    public int getLevel() {
-        return levelingSystem.getLevel();
-    }
-
-    public LevelingSystem getLevelingSystem() {
-        return levelingSystem;
     }
 
     @Override
@@ -135,7 +124,7 @@ public final class PlayerInstance extends AbstractCharacter {
         return "GamePlayer[id=" + getId() + ", accountId=" + getAccountId() + ", name=" + getName() + ", currentMapId="
                 + getMotionSystem().getCurrentMap().getTemplateId() + ", gender=" + appearanceSystem.getGender()
                 + ", race=" + appearanceSystem.getRace() + ", characterClass=" + classSystem.getCharacterClass()
-                + ", level=" + levelingSystem.getLevel() + ", xp=" + levelingSystem.getXp() + ", gold="
+                + ", level=" + getLevelingSystem().getLevel() + ", xp=" + getLevelingSystem().getXp() + ", gold="
                 + inventorySystem.getGold() + ", currentHealth=" + getResourceSystem().getCurrentHealth()
                 + ", maxHealth=" + getResourceSystem().getMaxHealth() + ", attributes="
                 + getAttributeSystem().getAttributes() + "]";

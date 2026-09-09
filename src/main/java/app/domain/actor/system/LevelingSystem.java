@@ -1,5 +1,6 @@
 package app.domain.actor.system;
 
+import app.domain.actor.AbstractCharacter;
 import app.domain.actor.Attribute;
 import app.domain.actor.event.CharacterGainedXp;
 import app.domain.actor.event.CharacterLeveledUp;
@@ -11,11 +12,11 @@ import app.network.message.ingame.XpGained;
 
 public final class LevelingSystem {
 
-    private final PlayerInstance character;
+    private final AbstractCharacter character;
     private int level;
     private int xp;
 
-    public LevelingSystem(PlayerInstance character, int level, int xp) {
+    public LevelingSystem(AbstractCharacter character, int level, int xp) {
         this.character = character;
         this.level = level;
         this.xp = xp;
@@ -30,6 +31,10 @@ public final class LevelingSystem {
     }
 
     public void gainXp(int amount) {
+        // gainXp n'est appelé que sur des PlayerInstance (LootSystem) : seuls les
+        // joueurs gagnent de l'XP et montent de niveau.
+        PlayerInstance player = (PlayerInstance) character;
+
         this.xp += amount;
         // xpForNextLevel reflète le niveau ACTUEL (avant la boucle de level-up
         // ci-dessous) :
@@ -45,31 +50,31 @@ public final class LevelingSystem {
         character.send(new XpGained(amount, xp, xpForCurrentLevel, xpForNextLevel));
 
         while (level < LevelCatalogHolder.maxLevel() && xp >= LevelCatalogHolder.xpRequiredForLevel(level + 1)) {
-            applyLevelUp();
+            applyLevelUp(player);
         }
 
-        DomainEventPublisher.publish(new CharacterGainedXp(character, amount));
+        DomainEventPublisher.publish(new CharacterGainedXp(player, amount));
     }
 
-    public void applyLevelUp() {
+    public void applyLevelUp(PlayerInstance player) {
         level++;
 
-        int newMaxHealth = character.getClassSystem().getCharacterClass()
+        int newMaxHealth = player.getClassSystem().getCharacterClass()
                 .maxHealth(character.getAttributeSystem().getAttribute(Attribute.CON), level);
         int hpGain = newMaxHealth - character.getResourceSystem().getMaxHealth();
         character.getResourceSystem().setMaxHealth(newMaxHealth);
         character.getResourceSystem().setCurrentHealth(character.getResourceSystem().getCurrentHealth() + hpGain);
 
-        int newMaxMana = character.getClassSystem().getCharacterClass()
+        int newMaxMana = player.getClassSystem().getCharacterClass()
                 .maxMana(character.getAttributeSystem().getAttribute(Attribute.MEN), level);
         int manaGain = newMaxMana - character.getResourceSystem().getMaxMana();
         character.getResourceSystem().setMaxMana(newMaxMana);
         character.getResourceSystem().setCurrentMana(character.getResourceSystem().getCurrentMana() + manaGain);
 
         character.getStatSystem().recomputeStats(character.getAttributeSystem().getAttributes(), level,
-                character.getInventorySystem());
+                player.getInventorySystem());
 
         character.broadcast(new PlayerLeveledUp(character.getName(), level), null);
-        DomainEventPublisher.publish(new CharacterLeveledUp(character, level, hpGain));
+        DomainEventPublisher.publish(new CharacterLeveledUp(player, level, hpGain));
     }
 }

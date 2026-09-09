@@ -36,17 +36,17 @@ public record GamePlayerStats(PlayerInstance character) implements OutputJsonMes
     @Override
     public void toJson(TcpJsonOutput output) {
         PlayerInstance c = character;
-        int xpForCurrentLevel = LevelCatalogHolder.xpRequiredForLevel(c.getLevel());
+        int xpForCurrentLevel = LevelCatalogHolder.xpRequiredForLevel(c.getLevelingSystem().getLevel());
         // Au niveau max, il n'y a pas de "niveau suivant" (xpRequiredForLevel lèverait
         // une
         // exception) : on répète le seuil courant pour que le client affiche une barre
         // pleine
         // plutôt que de diviser par zéro (xpForNextLevel - xpForCurrentLevel == 0).
-        int xpForNextLevel = c.getLevel() < LevelCatalogHolder.maxLevel()
-                ? LevelCatalogHolder.xpRequiredForLevel(c.getLevel() + 1)
+        int xpForNextLevel = c.getLevelingSystem().getLevel() < LevelCatalogHolder.maxLevel()
+                ? LevelCatalogHolder.xpRequiredForLevel(c.getLevelingSystem().getLevel() + 1)
                 : xpForCurrentLevel;
         output.write("GamePlayerStats", new Payload(c.getId(), c.getName(), c.getTitle(),
-                c.getAppearanceSystem().getGender().label(), c.getLevel(),
+                c.getAppearanceSystem().getGender().label(), c.getLevelingSystem().getLevel(),
                 c.getClassSystem().getCharacterClass().label(), c.getResourceSystem().getCurrentHealth(),
                 c.getResourceSystem().getMaxHealth(), c.getResourceSystem().healthRegenAmountPerTick(),
                 c.getResourceSystem().getCurrentMana(), c.getResourceSystem().getMaxMana(),

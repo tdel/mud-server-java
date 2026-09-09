@@ -24,8 +24,8 @@ public class SkillLearningEngine {
 
     @EventListener
     void onNewGamePlayerCreated(NewGamePlayerCreated event) {
-        learnSkillsAt(event.character(), event.character().getLevel());
-        learnPassiveSkillsAt(event.character(), event.character().getLevel());
+        learnSkillsAt(event.character(), event.character().getLevelingSystem().getLevel());
+        learnPassiveSkillsAt(event.character(), event.character().getLevelingSystem().getLevel());
     }
 
     @EventListener
@@ -63,7 +63,7 @@ public class SkillLearningEngine {
     }
 
     public void reconcile(PlayerInstance character) {
-        for (int level = 1; level <= character.getLevel(); level++) {
+        for (int level = 1; level <= character.getLevelingSystem().getLevel(); level++) {
             learnSkillsAt(character, level);
             learnPassiveSkillsAt(character, level);
         }

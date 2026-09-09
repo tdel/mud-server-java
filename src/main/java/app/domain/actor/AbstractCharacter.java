@@ -14,6 +14,7 @@ import app.domain.SkillElement;
 import app.domain.actor.system.AttributeSystem;
 import app.domain.actor.system.CombatSystem;
 import app.domain.actor.system.EffectsSystem;
+import app.domain.actor.system.LevelingSystem;
 import app.domain.actor.system.LootSystem;
 import app.domain.actor.system.MotionSystem;
 import app.domain.actor.system.ResourceSystem;
@@ -36,21 +37,23 @@ public abstract class AbstractCharacter extends AbstractObject {
     private final StatSystem statSystem;
     private final LootSystem lootSystem;
     private final ResourceSystem resourceSystem;
+    private final LevelingSystem levelingSystem;
 
     private final KnownList knownList = new KnownList(this);
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
             int maxHealth, Map<ActiveSkill, Integer> knownSkills, Map<PassiveSkill, Integer> knownPassiveSkills,
             List<ActiveEffect> activeEffects, Map<ModifiedStat, Integer> initialBaseStats, boolean invulnerable,
-            int xpReward, int goldReward, List<LootTableEntry> lootTable) {
+            int xpReward, int goldReward, List<LootTableEntry> lootTable, int level, int xp) {
         super(id, name);
         this.attributeSystem = new AttributeSystem(attributes);
         this.resourceSystem = new ResourceSystem(this, currentHealth, maxHealth);
         this.statSystem = new StatSystem(effectsSystem, initialBaseStats);
         this.combatSystem = new CombatSystem(this, invulnerable);
         this.lootSystem = new LootSystem(this, xpReward, goldReward, lootTable);
-        knownSkills.forEach((skill, level) -> getSkillSystem().learn(skill, level));
-        knownPassiveSkills.forEach((passiveSkill, level) -> getSkillSystem().learn(passiveSkill, level));
+        this.levelingSystem = new LevelingSystem(this, level, xp);
+        knownSkills.forEach((skill, level2) -> getSkillSystem().learn(skill, level2));
+        knownPassiveSkills.forEach((passiveSkill, level2) -> getSkillSystem().learn(passiveSkill, level2));
         activeEffects.forEach(getEffectsSystem()::apply);
     }
 
@@ -58,7 +61,9 @@ public abstract class AbstractCharacter extends AbstractObject {
         return attributeSystem;
     }
 
-    public abstract int getLevel();
+    public LevelingSystem getLevelingSystem() {
+        return levelingSystem;
+    }
 
     public boolean takeDamage(int amount, AbstractCharacter attacker) {
         return combatSystem.takeDamage(amount, attacker);

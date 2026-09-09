@@ -13,6 +13,7 @@ public record NpcDescription(AbstractNpc npc) implements OutputJsonMessage {
 
     @Override
     public void toJson(TcpJsonOutput output) {
-        output.write("NpcDescription", new Payload(npc.getId(), npc.getName(), npc.getTitle(), npc.getLevel()));
+        output.write("NpcDescription",
+                new Payload(npc.getId(), npc.getName(), npc.getTitle(), npc.getLevelingSystem().getLevel()));
     }
 }

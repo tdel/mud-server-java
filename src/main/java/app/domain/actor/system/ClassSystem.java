@@ -41,10 +41,10 @@ public final class ClassSystem {
 
     public Integer getPendingSubclassTier() {
         int nextTier = subclasses.size() + 1;
-        if (nextTier == 1 && character.getLevel() >= TIER1_LEVEL) {
+        if (nextTier == 1 && character.getLevelingSystem().getLevel() >= TIER1_LEVEL) {
             return 1;
         }
-        if (nextTier == 2 && character.getLevel() >= TIER2_LEVEL) {
+        if (nextTier == 2 && character.getLevelingSystem().getLevel() >= TIER2_LEVEL) {
             return 2;
         }
         return null;
