@@ -1,5 +1,7 @@
 package app.game.engine;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 
 import app.game.WorldInstanceService;
@@ -9,10 +11,21 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import app.domain.Party;
 import app.domain.PendingPartyInvite;
+import app.domain.SkillEffectType;
+import app.domain.actor.event.CharacterDamaged;
+import app.domain.actor.event.CharacterLeveledUp;
+import app.domain.actor.event.CharacterRegenerated;
+import app.domain.actor.event.GamePlayerRespawned;
+import app.domain.actor.event.GamePlayerUsedManaPotion;
+import app.domain.actor.event.GamePlayerUsedPotion;
 import app.domain.actor.event.PlayerRemovedFromWorld;
+import app.domain.actor.event.SkillCast;
 import app.domain.actor.instance.PlayerInstance;
 import app.network.message.ingame.PartyInviteDeclined;
+import app.network.message.ingame.PartyMemberEffectApplied;
+import app.network.message.ingame.PartyMemberVitalsUpdated;
 
 @Component
 public class PartyEngine {
@@ -55,6 +68,69 @@ public class PartyEngine {
         character.setPendingInvite(null);
         if (character.getParty() != null) {
             character.getParty().removeAndNotify(character);
+        }
+    }
+
+    @EventListener
+    void onCharacterDamaged(CharacterDamaged event) {
+        if (event.character() instanceof PlayerInstance character) {
+            broadcastVitals(character);
+        }
+    }
+
+    @EventListener
+    void onCharacterLeveledUp(CharacterLeveledUp event) {
+        broadcastVitals(event.character());
+    }
+
+    @EventListener
+    void onGamePlayerRespawned(GamePlayerRespawned event) {
+        broadcastVitals(event.character());
+    }
+
+    @EventListener
+    void onGamePlayerUsedPotion(GamePlayerUsedPotion event) {
+        broadcastVitals(event.character());
+    }
+
+    @EventListener
+    void onGamePlayerUsedManaPotion(GamePlayerUsedManaPotion event) {
+        broadcastVitals(event.character());
+    }
+
+    @EventListener
+    void onCharacterRegenerated(CharacterRegenerated event) {
+        broadcastVitals(event.character());
+    }
+
+    // Filtre le miroir de ActiveEffectPersistenceListener.onSkillCast (cible
+    // joueur ET buff/debuff appliqué) : les deux listeners partagent SkillCast
+    // sans dépendance d'ordre entre eux (cf. CLAUDE.md).
+    @EventListener
+    void onSkillCast(SkillCast event) {
+        boolean modifier = event.activeSkill().skillType() == SkillEffectType.BUFF
+                || event.activeSkill().skillType() == SkillEffectType.DEBUFF;
+        if (!event.hit() || !modifier || !(event.target() instanceof PlayerInstance targetPlayer)) {
+            return;
+        }
+        Party party = targetPlayer.getParty();
+        if (party != null) {
+            long secondsRemaining = Duration.between(Instant.now(), event.expiresAt()).toSeconds();
+            String statLabel = event.modifiers().isEmpty() ? "" : event.modifiers().get(0).stat().label();
+            party.broadcast(
+                    new PartyMemberEffectApplied(targetPlayer.getId(), targetPlayer.getName(),
+                            event.activeSkill().name(), statLabel, event.amount(), Math.max(0, secondsRemaining)),
+                    targetPlayer);
+        }
+    }
+
+    private void broadcastVitals(PlayerInstance character) {
+        Party party = character.getParty();
+        if (party != null) {
+            party.broadcast(new PartyMemberVitalsUpdated(character.getId(), character.getName(),
+                    character.getResourceSystem().getCurrentHealth(), character.getResourceSystem().getMaxHealth(),
+                    character.getResourceSystem().getCurrentMana(), character.getResourceSystem().getMaxMana()),
+                    character);
         }
     }
 }
