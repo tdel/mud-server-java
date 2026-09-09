@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import app.domain.actor.event.CharacterBeginAttack;
+import app.domain.actor.event.CharacterDied;
 import app.domain.actor.instance.PlayerInstance;
 import app.game.WorldInstanceService;
 
@@ -39,6 +40,22 @@ public class PvpEngine {
             return;
         }
         attacker.getPvpSystem().flagPvp();
+    }
+
+    // Filtre le miroir de
+    // MonsterAiEngine/CharacterPersistenceListener.onCharacterDied
+    // (victime ET tueur joueurs, pas de monstre) : les listeners partagent
+    // CharacterDied sans dépendance d'ordre entre eux (cf. CLAUDE.md).
+    @EventListener
+    void onCharacterDied(CharacterDied event) {
+        if (!(event.character() instanceof PlayerInstance victim)
+                || !(event.killer() instanceof PlayerInstance killer)) {
+            return;
+        }
+        boolean victimWasPvpFlagged = victim.getPvpSystem().isPvpFlagged();
+        killer.getPvpSystem().resolvePlayerKill(victim);
+        log.info("pvp.player_killed victim={} killer={} victimWasPvpFlagged={} killerKarma={}", victim.getName(),
+                killer.getName(), victimWasPvpFlagged, killer.getPvpSystem().getKarma());
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)

@@ -10,6 +10,10 @@ import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.PlayerPvpFlagCleared;
 import app.domain.actor.event.PlayerPvpFlagged;
 import app.domain.actor.instance.PlayerInstance;
+import app.network.message.ingame.KarmaChanged;
+import app.network.message.ingame.PlayerKillRecorded;
+import app.network.message.ingame.PvpFlagChanged;
+import app.network.message.ingame.PvpKillRecorded;
 
 public final class PvPSystem {
 
@@ -62,6 +66,7 @@ public final class PvPSystem {
         pvpFlagExpiresAt = Instant.now().plus(PVP_FLAG_DURATION);
         if (!pvpFlagged) {
             pvpFlagged = true;
+            character.broadcast(new PvpFlagChanged(character.getId(), character.getName(), true), null);
             DomainEventPublisher.publish(new PlayerPvpFlagged(character));
         }
     }
@@ -73,6 +78,7 @@ public final class PvPSystem {
     public void clearPvpFlag() {
         pvpFlagged = false;
         pvpFlagExpiresAt = null;
+        character.broadcast(new PvpFlagChanged(character.getId(), character.getName(), false), null);
         DomainEventPublisher.publish(new PlayerPvpFlagCleared(character));
     }
 
@@ -81,17 +87,37 @@ public final class PvPSystem {
         int newKarma = Math.max(0, karma + amount);
         if (newKarma != karma) {
             karma = newKarma;
+            character.send(new KarmaChanged(karma));
             DomainEventPublisher.publish(new CharacterKarmaChanged(character, karma));
         }
     }
 
     public void recordPlayerKill() {
         pkCount++;
+        character.send(new PlayerKillRecorded(pkCount));
         DomainEventPublisher.publish(new CharacterRecordedPlayerKill(character));
     }
 
     public void recordPvpKill() {
         pvpCount++;
+        character.send(new PvpKillRecorded(pvpCount));
         DomainEventPublisher.publish(new CharacterRecordedPvpKill(character));
+    }
+
+    // Conséquences PvP d'un kill joueur contre joueur : côté tueur (this),
+    // kill PK ou PvP selon le flag de la victime au moment du kill ; côté
+    // victime, perte de karma si elle en avait. Appelé par PvpEngine en
+    // réaction à CharacterDied.
+    public void resolvePlayerKill(PlayerInstance victim) {
+        if (victim.getPvpSystem().isPvpFlagged()) {
+            recordPvpKill();
+        } else {
+            recordPlayerKill();
+            addKarma(KARMA_GAIN_PER_PK);
+        }
+        if (victim.getPvpSystem().getKarma() > 0) {
+            victim.getPvpSystem().addKarma(-KARMA_LOSS_ON_DEATH);
+        }
+        character.getCombatSystem().setTarget(null);
     }
 }
