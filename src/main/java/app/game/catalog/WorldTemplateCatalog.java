@@ -24,8 +24,8 @@ import app.domain.world.MapTemplatePortal;
 import app.domain.world.PeaceZone;
 import app.domain.world.WorldTemplate;
 import app.domain.world.WorldTemplateSummary;
-import app.domain.actor.AbstractNpc;
-import app.domain.actor.AbstractNpc.NpcDialogueOptionType;
+import app.domain.actor.system.DialogueSystem;
+import app.domain.actor.system.DialogueSystem.NpcDialogueOptionType;
 import app.domain.actor.system.SellSystem;
 import app.domain.actor.template.NpcTemplate;
 import app.game.catalog.tiled.TiledMap;
@@ -223,7 +223,7 @@ public class WorldTemplateCatalog {
                             + shortName + " référence le NPC " + spawn.npcId() + ", absent de data/npcs.xml");
                 }
 
-                AbstractNpc.NpcDialogue dialogue = toDialogue(definition);
+                DialogueSystem.NpcDialogue dialogue = toDialogue(definition);
                 SellSystem.NpcShop shop = toShop(shortName, definition, itemTemplatesById);
 
                 NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), definition.title(),
@@ -237,15 +237,15 @@ public class WorldTemplateCatalog {
         return Map.copyOf(templates);
     }
 
-    private AbstractNpc.NpcDialogue toDialogue(NpcDefinition definition) {
+    private DialogueSystem.NpcDialogue toDialogue(NpcDefinition definition) {
         DialogueDefinition dialogueDef = definition.dialogue();
         if (dialogueDef == null) {
             return null;
         }
 
-        List<AbstractNpc.NpcDialogueOption> options = dialogueDef.options().stream()
-                .map(o -> new AbstractNpc.NpcDialogueOption(o.label(), o.type(), o.response())).toList();
-        return new AbstractNpc.NpcDialogue(dialogueDef.greeting(), options);
+        List<DialogueSystem.NpcDialogueOption> options = dialogueDef.options().stream()
+                .map(o -> new DialogueSystem.NpcDialogueOption(o.label(), o.type(), o.response())).toList();
+        return new DialogueSystem.NpcDialogue(dialogueDef.greeting(), options);
     }
 
     private SellSystem.NpcShop toShop(String shortName, NpcDefinition definition,

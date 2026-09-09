@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.UUID;
 
 import app.network.OutputJsonMessage;
-import app.domain.actor.AbstractNpc;
+import app.domain.actor.system.DialogueSystem;
 
 public record DialogueOptions(UUID npcId, String npcName, String greeting,
-        List<AbstractNpc.NpcDialogueOption> options) implements OutputJsonMessage {
+        List<DialogueSystem.NpcDialogueOption> options) implements OutputJsonMessage {
 
 }

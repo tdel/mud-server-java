@@ -4,11 +4,11 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import app.domain.world.MapInstance;
+import app.domain.actor.system.DialogueSystem;
 import app.domain.actor.template.NpcTemplate;
 
 public class AbstractNpc extends AbstractCharacter {
@@ -16,6 +16,7 @@ public class AbstractNpc extends AbstractCharacter {
     private static final int NOMINAL_HEALTH = 1;
 
     private final NpcTemplate template;
+    private final DialogueSystem dialogueSystem;
 
     public AbstractNpc(UUID id, NpcTemplate template, MapInstance map) {
         super(id, template.name(), neutralAttributes(), NOMINAL_HEALTH, NOMINAL_HEALTH,
@@ -23,6 +24,7 @@ public class AbstractNpc extends AbstractCharacter {
                 template.knownPassiveSkills().stream().collect(Collectors.toMap(skill -> skill, skill -> 1)),
                 template.activeEffects(), Map.of(ModifiedStat.SPEED, 0), true, 0, 0, List.of());
         this.template = Objects.requireNonNull(template);
+        this.dialogueSystem = new DialogueSystem(template.dialogue());
         setTitle(template.title());
         getMotionSystem().setCurrentMap(Objects.requireNonNull(map));
     }
@@ -31,8 +33,8 @@ public class AbstractNpc extends AbstractCharacter {
         return template.level();
     }
 
-    public Optional<NpcDialogue> getDialogue() {
-        return Optional.ofNullable(template.dialogue());
+    public DialogueSystem getDialogueSystem() {
+        return dialogueSystem;
     }
 
     protected NpcTemplate getTemplate() {
@@ -51,15 +53,5 @@ public class AbstractNpc extends AbstractCharacter {
     public String toString() {
         return "GameNpc[id=" + getId() + ", name=" + getName() + ", mapId=" + getMotionSystem().getCurrentMap().getId()
                 + "]";
-    }
-
-    public enum NpcDialogueOptionType {
-        RESPONSE, SHOP, LEAVE
-    }
-
-    public record NpcDialogue(String greeting, List<NpcDialogueOption> options) {
-    }
-
-    public record NpcDialogueOption(String label, NpcDialogueOptionType type, String response) {
     }
 }

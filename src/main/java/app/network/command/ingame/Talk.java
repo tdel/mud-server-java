@@ -9,6 +9,7 @@ import app.network.CommandArguments;
 import app.network.CommandHandler;
 import app.domain.actor.AbstractNpc;
 import app.domain.actor.instance.PlayerInstance;
+import app.domain.actor.system.DialogueSystem;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
@@ -51,7 +52,7 @@ public class Talk implements CommandHandler {
             return;
         }
 
-        Optional<AbstractNpc.NpcDialogue> dialogue = npc.get().getDialogue();
+        Optional<DialogueSystem.NpcDialogue> dialogue = npc.get().getDialogueSystem().getDialogue();
         if (dialogue.isEmpty()) {
             connection.send(new NpcDescription(npc.get()));
             return;
