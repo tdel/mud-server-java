@@ -11,7 +11,7 @@ import app.domain.actor.Subclass;
 import app.domain.actor.event.CharacterLeveledUp;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.SubclassChoiceAvailable;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 
 @Component
 public class SubclassProgressionEngine {
@@ -20,7 +20,7 @@ public class SubclassProgressionEngine {
 
     @EventListener
     void onCharacterLeveledUp(CharacterLeveledUp event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         Integer pendingTier = character.getClassSystem().getPendingSubclassTier();
         if (pendingTier == null) {
             return;

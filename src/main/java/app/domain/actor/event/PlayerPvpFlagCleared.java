@@ -1,6 +1,6 @@
 package app.domain.actor.event;
 
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 
-public record PlayerPvpFlagCleared(CharacterInstance character) {
+public record PlayerPvpFlagCleared(PlayerInstance character) {
 }

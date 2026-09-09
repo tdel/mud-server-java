@@ -11,7 +11,7 @@ import app.domain.actor.event.CharacterLearnedSkill;
 import app.domain.actor.event.CharacterLeveledUp;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.NewGamePlayerCreated;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.game.catalog.PassiveSkillCatalog;
 import app.game.catalog.PassiveSkillCatalogHolder;
 import app.game.catalog.SkillCatalog;
@@ -34,7 +34,7 @@ public class SkillLearningEngine {
         learnPassiveSkillsAt(event.character(), event.newLevel());
     }
 
-    private void learnSkillsAt(CharacterInstance character, int level) {
+    private void learnSkillsAt(PlayerInstance character, int level) {
         for (SkillCatalog.LearnableSkill entry : SkillCatalogHolder
                 .skillsLearnableAt(character.getClassSystem().getCharacterClass(), level)) {
             int previousLevel = character.getSkillSystem().levelOf(entry.skill().id());
@@ -48,7 +48,7 @@ public class SkillLearningEngine {
         }
     }
 
-    private void learnPassiveSkillsAt(CharacterInstance character, int level) {
+    private void learnPassiveSkillsAt(PlayerInstance character, int level) {
         for (PassiveSkillCatalog.LearnablePassiveSkill entry : PassiveSkillCatalogHolder
                 .passiveSkillsLearnableAt(character.getClassSystem().getCharacterClass(), level)) {
             int previousLevel = character.getSkillSystem().passiveLevelOf(entry.passiveSkill().id());
@@ -62,7 +62,7 @@ public class SkillLearningEngine {
         }
     }
 
-    public void reconcile(CharacterInstance character) {
+    public void reconcile(PlayerInstance character) {
         for (int level = 1; level <= character.getLevel(); level++) {
             learnSkillsAt(character, level);
             learnPassiveSkillsAt(character, level);

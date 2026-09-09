@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import app.domain.Party;
 import app.domain.actor.AbstractCharacter;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.item.Item;
 import app.domain.item.LootResult;
 import app.domain.item.LootTableEntry;
@@ -29,7 +29,7 @@ public final class LootSystem {
         this.lootTable = lootTable;
     }
 
-    private LootResult rollLoot(CharacterInstance killer) {
+    private LootResult rollLoot(PlayerInstance killer) {
         List<Item> items = new ArrayList<>();
         for (LootTableEntry entry : lootTable) {
             if (Randomizer.rollChance(entry.dropChance())) {
@@ -39,13 +39,13 @@ public final class LootSystem {
         return new LootResult(goldReward, items);
     }
 
-    public LootResult grantLootTo(CharacterInstance killer, Party party, List<CharacterInstance> eligibleMembers,
+    public LootResult grantLootTo(PlayerInstance killer, Party party, List<PlayerInstance> eligibleMembers,
             double goldShareMultiplier) {
         LootResult loot = rollLoot(killer);
 
         if (loot.gold() > 0) {
             int perMemberGold = (int) (loot.gold() * goldShareMultiplier) / eligibleMembers.size();
-            for (CharacterInstance member : eligibleMembers) {
+            for (PlayerInstance member : eligibleMembers) {
                 member.getInventorySystem().receiveGold(perMemberGold);
             }
             log.info("loot.gold_dropped killer={} totalGold={} partySize={} perMemberGold={}", killer.getName(),
@@ -53,7 +53,7 @@ public final class LootSystem {
         }
 
         for (Item item : loot.items()) {
-            CharacterInstance recipient = party != null ? party.nextLootRecipient(eligibleMembers) : killer;
+            PlayerInstance recipient = party != null ? party.nextLootRecipient(eligibleMembers) : killer;
             recipient.getInventorySystem().receiveLootItem(item);
             log.info("loot.item_dropped killer={} recipient={} item={}", killer.getName(), recipient.getName(),
                     item.getName());

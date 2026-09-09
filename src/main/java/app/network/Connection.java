@@ -2,7 +2,7 @@ package app.network;
 
 import app.domain.Account;
 import app.domain.world.WorldInstance;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 
 public interface Connection {
 
@@ -14,9 +14,9 @@ public interface Connection {
 
     void close();
 
-    void attachCharacter(CharacterInstance character);
+    void attachCharacter(PlayerInstance character);
 
-    CharacterInstance character();
+    PlayerInstance character();
 
     void setAccount(Account account);
 

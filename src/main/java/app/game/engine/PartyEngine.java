@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 import app.domain.PendingPartyInvite;
 import app.domain.actor.event.PlayerRemovedFromWorld;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.network.message.ingame.PartyInviteDeclined;
 
 @Component
@@ -36,9 +36,9 @@ public class PartyEngine {
         expireInvites(worldInstanceService.getDefaultInstance().onlineCharacters());
     }
 
-    void expireInvites(Collection<CharacterInstance> onlineCharacters) {
+    void expireInvites(Collection<PlayerInstance> onlineCharacters) {
         long now = System.currentTimeMillis();
-        for (CharacterInstance character : onlineCharacters) {
+        for (PlayerInstance character : onlineCharacters) {
             PendingPartyInvite invite = character.getPendingInvite();
             if (invite != null && now - invite.sentAtMillis() >= INVITE_TIMEOUT_MS) {
                 character.setPendingInvite(null);
@@ -51,7 +51,7 @@ public class PartyEngine {
 
     @EventListener
     void onPlayerRemovedFromWorld(PlayerRemovedFromWorld event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         character.setPendingInvite(null);
         if (character.getParty() != null) {
             character.getParty().removeAndNotify(character);

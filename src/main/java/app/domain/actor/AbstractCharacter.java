@@ -18,7 +18,7 @@ import app.domain.actor.system.LootSystem;
 import app.domain.actor.system.MotionSystem;
 import app.domain.actor.system.SkillSystem;
 import app.domain.actor.system.StatSystem;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.item.LootTableEntry;
 import app.domain.world.MapInstance;
 import app.network.OutputMessage;
@@ -69,7 +69,7 @@ public abstract class AbstractCharacter extends AbstractObject {
         return combatSystem.takeDamage(amount, attacker);
     }
 
-    // Défaut neutre : seul CharacterInstance a des objets équipés susceptibles
+    // Défaut neutre : seul PlayerInstance a des objets équipés susceptibles
     // de porter des résistances élémentaires ; MonsterInstance la surcharge.
     protected Map<SkillElement, Integer> elementalResistanceMap() {
         return Map.of();
@@ -103,7 +103,7 @@ public abstract class AbstractCharacter extends AbstractObject {
         return lootSystem;
     }
 
-    // Défaut neutre : seul CharacterInstance suit une réserve de mana ;
+    // Défaut neutre : seul PlayerInstance suit une réserve de mana ;
     // MonsterInstance/AbstractNpc n'en ont pas encore, donc jamais bloqués par le
     // coût en mana d'un sort.
     public int getCurrentMana() {
@@ -118,7 +118,7 @@ public abstract class AbstractCharacter extends AbstractObject {
         return true;
     }
 
-    // Défaut neutre : seul CharacterInstance a une CharacterCombat dont la cible
+    // Défaut neutre : seul PlayerInstance a une CharacterCombat dont la cible
     // doit être effacée après un kill ; le ciblage d'un MonsterInstance (pursuit,
     // MonsterAiEngine) se recalcule de lui-même au prochain tick d'IA.
     public void clearCombatTarget() {
@@ -164,15 +164,15 @@ public abstract class AbstractCharacter extends AbstractObject {
      * d'une action reçoit toujours sa propre diffusion, même s'il n'apparaît pas
      * dans sa propre KnownList).
      */
-    public void broadcast(OutputMessage message, CharacterInstance exclude) {
+    public void broadcast(OutputMessage message, PlayerInstance exclude) {
         int recipients = 0;
         for (AbstractCharacter known : knownList.asList()) {
-            if (known instanceof CharacterInstance target && target != exclude) {
+            if (known instanceof PlayerInstance target && target != exclude) {
                 target.send(message);
                 recipients++;
             }
         }
-        if (this instanceof CharacterInstance self && self != exclude) {
+        if (this instanceof PlayerInstance self && self != exclude) {
             self.send(message);
             recipients++;
         }
@@ -187,12 +187,12 @@ public abstract class AbstractCharacter extends AbstractObject {
      * contrairement aux diffusions de mouvement/combat/chat qui, elles, restent
      * scopées à {@link #broadcast} pour la bande passante.
      */
-    public void broadcastToMap(OutputMessage message, CharacterInstance exclude) {
+    public void broadcastToMap(OutputMessage message, PlayerInstance exclude) {
         MapInstance currentMap = getMotionSystem().getCurrentMap();
         if (currentMap == null) {
             return;
         }
-        for (CharacterInstance target : currentMap.characters()) {
+        for (PlayerInstance target : currentMap.characters()) {
             if (target != exclude) {
                 target.send(message);
             }

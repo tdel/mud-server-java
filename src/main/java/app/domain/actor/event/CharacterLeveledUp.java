@@ -1,6 +1,6 @@
 package app.domain.actor.event;
 
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 
-public record CharacterLeveledUp(CharacterInstance character, int newLevel, int hpGained) {
+public record CharacterLeveledUp(PlayerInstance character, int newLevel, int hpGained) {
 }

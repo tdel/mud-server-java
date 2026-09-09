@@ -1,7 +1,7 @@
 package app.domain.world;
 
 import app.domain.actor.AbstractCharacter;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.map.Position;
 import app.network.message.ingame.PeaceZoneEntered;
 import app.network.message.ingame.PeaceZoneExited;
@@ -49,14 +49,14 @@ public final class PeaceZone extends AbstractZone {
 
     @Override
     public void onObjectEntering(AbstractCharacter character) {
-        if (character instanceof CharacterInstance player) {
+        if (character instanceof PlayerInstance player) {
             player.send(new PeaceZoneEntered(name, DESCRIPTION));
         }
     }
 
     @Override
     public void onObjectExiting(AbstractCharacter character) {
-        if (character instanceof CharacterInstance player) {
+        if (character instanceof PlayerInstance player) {
             player.send(new PeaceZoneExited(name));
         }
     }

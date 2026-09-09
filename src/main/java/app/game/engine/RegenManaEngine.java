@@ -14,7 +14,7 @@ import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.GamePlayerRespawned;
 import app.domain.actor.event.PlayerLoadedInWorld;
 import app.domain.actor.event.SkillCast;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 
 @Component
 public class RegenManaEngine {
@@ -25,11 +25,11 @@ public class RegenManaEngine {
     // pas 1 seconde.
     private static final long TICK_INTERVAL_MS = 3_000L;
 
-    private final Map<UUID, CharacterInstance> regenerating = new ConcurrentHashMap<>();
+    private final Map<UUID, PlayerInstance> regenerating = new ConcurrentHashMap<>();
 
     @EventListener
     void onSkillCast(SkillCast event) {
-        if (event.caster() instanceof CharacterInstance character) {
+        if (event.caster() instanceof PlayerInstance character) {
             register(character);
         }
     }
@@ -41,7 +41,7 @@ public class RegenManaEngine {
 
     @EventListener
     void onCharacterDied(CharacterDied event) {
-        if (event.character() instanceof CharacterInstance character) {
+        if (event.character() instanceof PlayerInstance character) {
             regenerating.remove(character.getId());
         }
     }
@@ -51,7 +51,7 @@ public class RegenManaEngine {
         register(event.character());
     }
 
-    public void register(CharacterInstance character) {
+    public void register(PlayerInstance character) {
         if (isFull(character)) {
             return;
         }
@@ -61,7 +61,7 @@ public class RegenManaEngine {
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
     void tick() {
-        for (CharacterInstance character : regenerating.values()) {
+        for (PlayerInstance character : regenerating.values()) {
             character.regenerate(0, character.manaRegenAmountPerTick());
 
             if (isFull(character)) {
@@ -71,7 +71,7 @@ public class RegenManaEngine {
         }
     }
 
-    private boolean isFull(CharacterInstance character) {
+    private boolean isFull(PlayerInstance character) {
         return character.getCurrentMana() >= character.getMaxMana();
     }
 }

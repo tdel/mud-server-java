@@ -11,7 +11,7 @@ import app.network.CommandHandler;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.actor.AbstractNpc;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
@@ -35,7 +35,7 @@ public class Examine implements CommandHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        CharacterInstance character = connection.character();
+        PlayerInstance character = connection.character();
         String raw = argument.trim();
 
         if (raw.isEmpty()) {
@@ -52,7 +52,7 @@ public class Examine implements CommandHandler {
         }
 
         switch (target.get()) {
-            case CharacterInstance p -> connection.send(new GamePlayerStats(p));
+            case PlayerInstance p -> connection.send(new GamePlayerStats(p));
             case MonsterInstance m -> connection.send(new MonsterStatBlock(m));
             case AbstractNpc n -> connection.send(new NpcDescription(n));
             default -> connection.send(new TargetNotFound(raw));

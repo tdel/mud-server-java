@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import app.game.engine.MovementEngine;
 import app.network.CommandHandler;
 import app.domain.MapPortal;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.ingame.NoPortalHere;
@@ -41,7 +41,7 @@ public class Portal implements CommandHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        CharacterInstance character = connection.character();
+        PlayerInstance character = connection.character();
         Optional<MapPortal> portal = character.getMotionSystem().getCurrentMap()
                 .findPortalAt(character.getMotionSystem().getPosition());
         if (portal.isEmpty()) {

@@ -1,9 +1,9 @@
 package app.domain.actor.event;
 
 import app.domain.item.Item;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 
 // merged=true : item était un stack existant (item = la pile mise à jour, quantité déjà
 // incrémentée) — le listener de persistance doit alors faire un updateQuantity, pas un insert.
-public record CharacterLootedItem(CharacterInstance character, Item item, boolean merged) {
+public record CharacterLootedItem(PlayerInstance character, Item item, boolean merged) {
 }

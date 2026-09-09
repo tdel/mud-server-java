@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import app.network.CommandHandler;
 import app.domain.Account;
 import app.domain.world.WorldInstance;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.actor.CharacterClass;
 import app.domain.actor.Gender;
 import app.domain.actor.Race;
@@ -107,7 +107,7 @@ public class CharacterCreate implements CommandHandler {
 
     private void createCharacter(Connection connection, Account account, WorldInstance instance, String name,
             Gender gender, CharacterClass characterClass) {
-        CharacterInstance character = instance.createCharacter(account, name, gender, Race.HUMAN, characterClass);
+        PlayerInstance character = instance.createCharacter(account, name, gender, Race.HUMAN, characterClass);
 
         connection.send(new CharacterCreated(name));
         connection.send(new GamePlayerStats(character));

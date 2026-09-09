@@ -20,7 +20,7 @@ import app.domain.actor.event.CharacterEffectExpired;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.PlayerLoadedInWorld;
 import app.domain.actor.event.SkillCast;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.network.message.ingame.PartyMemberEffectExpired;
 import app.network.message.ingame.SkillModifierExpired;
 
@@ -47,7 +47,7 @@ public class ActiveEffectEngine {
         event.character().broadcast(new SkillModifierExpired(event.character().getName(), event.effect().skillName()),
                 null);
 
-        if (event.character() instanceof CharacterInstance character) {
+        if (event.character() instanceof PlayerInstance character) {
             Party party = character.getParty();
             if (party != null) {
                 party.broadcast(new PartyMemberEffectExpired(character.getId(), character.getName(),

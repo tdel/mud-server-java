@@ -1,6 +1,6 @@
 package app.domain.actor.event;
 
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 
-public record CharacterGainedXp(CharacterInstance character, int amount) {
+public record CharacterGainedXp(PlayerInstance character, int amount) {
 }

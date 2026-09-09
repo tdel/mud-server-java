@@ -7,7 +7,7 @@ This codebase keeps domain objects (`domain/actor/GamePlayer`, `domain/Room`, `d
 
 1. **Event record**: add one file under `domain/actor/event/`, named as a past-tense fact (`ItemPickedUp`, `CharacterGainedXp`, `GamePlayerEquippedItem`), carrying exactly the data listeners need — usually the actor plus whatever changed. Give it a short French Javadoc stating which method publishes it and any invariant already guaranteed by the time it's published (e.g. `ItemPickedUp`: "publié une fois que `pickUpItem` a déjà tranché, sous verrou `synchronized(item)`, que `character` remporte l'item — jamais avant"). Look at an existing event in the same package for the exact shape.
 
-2. **Publish it from the domain object**: add or extend a method on the owning domain object (e.g. `CharacterInstance`) that:
+2. **Publish it from the domain object**: add or extend a method on the owning domain object (e.g. `PlayerInstance`) that:
    - applies the state change in memory first,
    - then calls `DomainEventPublisher.publish(new YourEvent(...))` — never the other way around, and never call a DAO from here.
    If the mutation is racy under concurrent virtual threads (two connections could plausibly reach it at once — item ownership is the canonical example, character-owned state usually isn't, see CLAUDE.md's "Virtual-thread architecture"), guard the state change with `synchronized` on the specific contended object, not on `this`/the whole domain object.

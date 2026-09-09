@@ -13,7 +13,7 @@ import app.domain.SkillEffectType;
 import app.domain.ActiveEffect;
 import app.domain.actor.event.CharacterEffectExpired;
 import app.domain.actor.event.SkillCast;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.network.message.ingame.PartyMemberEffectApplied;
 import app.persistence.CharacterActiveEffectDao;
 
@@ -32,7 +32,7 @@ public class ActiveEffectPersistenceListener {
     void onSkillCast(SkillCast event) {
         boolean modifier = event.activeSkill().skillType() == SkillEffectType.BUFF
                 || event.activeSkill().skillType() == SkillEffectType.DEBUFF;
-        if (!event.hit() || !modifier || !(event.target() instanceof CharacterInstance targetPlayer)) {
+        if (!event.hit() || !modifier || !(event.target() instanceof PlayerInstance targetPlayer)) {
             return;
         }
         characterActiveEffectDao.upsert(targetPlayer.getId(), new ActiveEffect(event.activeSkill().id(),
@@ -54,7 +54,7 @@ public class ActiveEffectPersistenceListener {
 
     @EventListener
     void onCharacterEffectExpired(CharacterEffectExpired event) {
-        if (!(event.character() instanceof CharacterInstance targetPlayer)) {
+        if (!(event.character() instanceof PlayerInstance targetPlayer)) {
             return;
         }
         characterActiveEffectDao.delete(targetPlayer.getId(), event.effect().skillId());

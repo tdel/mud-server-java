@@ -6,13 +6,13 @@ import java.util.UUID;
 import app.network.OutputJsonMessage;
 import app.domain.actor.Attribute;
 import app.domain.actor.ModifiedStat;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.item.ItemGrade;
 import app.game.catalog.LevelCatalogHolder;
 import app.game.engine.MovementEngine;
 import app.network.server.tcpjson.TcpJsonOutput;
 
-public record GamePlayerStats(CharacterInstance character) implements OutputJsonMessage {
+public record GamePlayerStats(PlayerInstance character) implements OutputJsonMessage {
 
     public record AttributeScore(int score, int modifier) {
     }
@@ -35,7 +35,7 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
 
     @Override
     public void toJson(TcpJsonOutput output) {
-        CharacterInstance c = character;
+        PlayerInstance c = character;
         int xpForCurrentLevel = LevelCatalogHolder.xpRequiredForLevel(c.getLevel());
         // Au niveau max, il n'y a pas de "niveau suivant" (xpRequiredForLevel lèverait
         // une
@@ -54,15 +54,15 @@ public record GamePlayerStats(CharacterInstance character) implements OutputJson
                 c.getStatSystem().getEffective(ModifiedStat.ACCURACY),
                 c.getStatSystem().getEffective(ModifiedStat.EVASION),
                 c.getStatSystem().getEffective(ModifiedStat.PCRIT), c.getStatSystem().getEffective(ModifiedStat.ATKSPD),
-                c.getStatSystem().getEffective(ModifiedStat.CASTSPD),
-                attributeScore(c, Attribute.STR), attributeScore(c, Attribute.DEX), attributeScore(c, Attribute.CON),
-                attributeScore(c, Attribute.INT), attributeScore(c, Attribute.WIT), attributeScore(c, Attribute.MEN),
+                c.getStatSystem().getEffective(ModifiedStat.CASTSPD), attributeScore(c, Attribute.STR),
+                attributeScore(c, Attribute.DEX), attributeScore(c, Attribute.CON), attributeScore(c, Attribute.INT),
+                attributeScore(c, Attribute.WIT), attributeScore(c, Attribute.MEN),
                 MovementEngine.unitsPerSecond(c.getMotionSystem().getSpeed()), c.getXp(), xpForCurrentLevel,
                 xpForNextLevel, c.getActiveSoulshotGrade(), c.getActiveSpiritshotGrade(), c.getKarma(), c.getPkCount(),
                 c.getPvpCount(), c.isPvpFlagged()));
     }
 
-    private static AttributeScore attributeScore(CharacterInstance c, Attribute attribute) {
+    private static AttributeScore attributeScore(PlayerInstance c, Attribute attribute) {
         return new AttributeScore(c.getAttribute(attribute), c.getModifier(attribute));
     }
 }

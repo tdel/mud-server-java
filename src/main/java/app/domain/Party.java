@@ -7,7 +7,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.network.OutputMessage;
 import app.network.message.ingame.NewPartyLeader;
 import app.network.message.ingame.PartyMemberLeft;
@@ -24,12 +24,12 @@ public class Party {
             7, 2.3, 8, 2.4);
 
     private final UUID id;
-    private volatile CharacterInstance leader;
-    private final List<CharacterInstance> members = new CopyOnWriteArrayList<>();
+    private volatile PlayerInstance leader;
+    private final List<PlayerInstance> members = new CopyOnWriteArrayList<>();
     private volatile LootMode lootMode = LootMode.ROUND_ROBIN;
     private final AtomicInteger lootTurnCursor = new AtomicInteger(-1);
 
-    public Party(CharacterInstance leader) {
+    public Party(PlayerInstance leader) {
         this.id = UUID.randomUUID();
         this.leader = leader;
         members.add(leader);
@@ -40,11 +40,11 @@ public class Party {
         return id;
     }
 
-    public CharacterInstance getLeader() {
+    public PlayerInstance getLeader() {
         return leader;
     }
 
-    public List<CharacterInstance> getMembers() {
+    public List<PlayerInstance> getMembers() {
         return List.copyOf(members);
     }
 
@@ -72,7 +72,7 @@ public class Party {
         this.lootMode = lootMode;
     }
 
-    public CharacterInstance nextLootRecipient(List<CharacterInstance> eligibleMembers) {
+    public PlayerInstance nextLootRecipient(List<PlayerInstance> eligibleMembers) {
         if (eligibleMembers.isEmpty()) {
             return null;
         }
@@ -84,7 +84,7 @@ public class Party {
         int start = lootTurnCursor.get();
         for (int i = 1; i <= size; i++) {
             int index = Math.floorMod(start + i, size);
-            CharacterInstance candidate = members.get(index);
+            PlayerInstance candidate = members.get(index);
             if (eligibleMembers.contains(candidate)) {
                 lootTurnCursor.set(index);
                 return candidate;
@@ -93,20 +93,20 @@ public class Party {
         return eligibleMembers.get(0);
     }
 
-    public boolean isLeader(CharacterInstance character) {
+    public boolean isLeader(PlayerInstance character) {
         return leader == character;
     }
 
-    public boolean isMember(CharacterInstance character) {
+    public boolean isMember(PlayerInstance character) {
         return members.contains(character);
     }
 
-    public void addMember(CharacterInstance character) {
+    public void addMember(PlayerInstance character) {
         members.add(character);
         character.setParty(this);
     }
 
-    public void remove(CharacterInstance character) {
+    public void remove(PlayerInstance character) {
         members.remove(character);
         character.setParty(null);
         if (members.isEmpty()) {
@@ -118,7 +118,7 @@ public class Party {
         }
     }
 
-    public void removeAndNotify(CharacterInstance character) {
+    public void removeAndNotify(PlayerInstance character) {
         boolean wasLeader = isLeader(character);
         remove(character);
         if (!isEmpty()) {
@@ -130,15 +130,15 @@ public class Party {
     }
 
     public void disband() {
-        for (CharacterInstance member : members) {
+        for (PlayerInstance member : members) {
             member.setParty(null);
         }
         members.clear();
         leader = null;
     }
 
-    public void broadcast(OutputMessage message, CharacterInstance exclude) {
-        for (CharacterInstance member : members) {
+    public void broadcast(OutputMessage message, PlayerInstance exclude) {
+        for (PlayerInstance member : members) {
             if (member != exclude) {
                 member.send(message);
             }

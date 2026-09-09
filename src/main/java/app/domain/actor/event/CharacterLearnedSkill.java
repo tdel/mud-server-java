@@ -1,8 +1,8 @@
 package app.domain.actor.event;
 
 import app.domain.ActiveSkill;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 
-public record CharacterLearnedSkill(CharacterInstance character, ActiveSkill activeSkill, int newLevel,
+public record CharacterLearnedSkill(PlayerInstance character, ActiveSkill activeSkill, int newLevel,
         int previousLevel) {
 }

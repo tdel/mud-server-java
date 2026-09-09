@@ -20,7 +20,7 @@ import app.domain.actor.event.GamePlayerUnequippedItem;
 import app.domain.actor.event.ItemDiscarded;
 import app.domain.actor.event.ItemPurchased;
 import app.domain.actor.event.ShotActivated;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.item.EquipmentItem;
 import app.domain.item.EquipmentSlot;
 import app.domain.item.Item;
@@ -32,11 +32,11 @@ public final class InventorySystem {
 
     private static final UUID GRADE_PENALTY_EFFECT_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
 
-    private final CharacterInstance character;
+    private final PlayerInstance character;
     private final List<Item> items = new CopyOnWriteArrayList<>();
     private int gold;
 
-    public InventorySystem(CharacterInstance character, int gold, List<Item> items) {
+    public InventorySystem(PlayerInstance character, int gold, List<Item> items) {
         this.character = character;
         this.gold = gold;
         this.items.addAll(items);

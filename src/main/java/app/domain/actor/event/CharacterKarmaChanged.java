@@ -1,6 +1,6 @@
 package app.domain.actor.event;
 
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 
-public record CharacterKarmaChanged(CharacterInstance character, int newKarma) {
+public record CharacterKarmaChanged(PlayerInstance character, int newKarma) {
 }

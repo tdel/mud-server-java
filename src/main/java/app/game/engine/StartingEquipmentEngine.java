@@ -8,7 +8,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import app.domain.actor.event.NewGamePlayerCreated;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.item.Item;
 import app.domain.item.ItemTemplate;
 import app.game.catalog.ItemTemplateCatalog;
@@ -34,7 +34,7 @@ public class StartingEquipmentEngine {
 
     @EventListener
     void onNewGamePlayerCreated(NewGamePlayerCreated event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         UUID templateId = switch (character.getClassSystem().getCharacterClass()) {
             case FIGHTER -> FIGHTER_WEAPON_TEMPLATE_ID;
             case MYSTIC -> MYSTIC_WEAPON_TEMPLATE_ID;

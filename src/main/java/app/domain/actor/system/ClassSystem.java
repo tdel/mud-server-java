@@ -7,7 +7,7 @@ import app.domain.actor.CharacterClass;
 import app.domain.actor.Subclass;
 import app.domain.actor.event.CharacterChoseSubclass;
 import app.domain.actor.event.DomainEventPublisher;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 
 public final class ClassSystem {
 
@@ -16,11 +16,11 @@ public final class ClassSystem {
     private static final int TIER1_LEVEL = 20;
     private static final int TIER2_LEVEL = 40;
 
-    private final CharacterInstance character;
+    private final PlayerInstance character;
     private final CharacterClass characterClass;
     private final List<Subclass> subclasses = new ArrayList<>();
 
-    public ClassSystem(CharacterInstance character, CharacterClass characterClass, List<Subclass> subclasses) {
+    public ClassSystem(PlayerInstance character, CharacterClass characterClass, List<Subclass> subclasses) {
         this.character = character;
         this.characterClass = characterClass;
         this.subclasses.addAll(subclasses);

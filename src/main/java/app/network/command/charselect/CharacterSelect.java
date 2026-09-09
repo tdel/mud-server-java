@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import app.network.CommandHandler;
 import app.domain.Account;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.game.WorldInstanceService;
 import app.game.engine.SkillLearningEngine;
 import app.network.Connection;
@@ -56,20 +56,20 @@ public class CharacterSelect implements CommandHandler {
 
         Account account = connection.account();
 
-        Optional<CharacterInstance> character = worldInstanceService.findCharacterByName(account, name);
+        Optional<PlayerInstance> character = worldInstanceService.findCharacterByName(account, name);
         if (character.isEmpty()) {
             connection.send(new NoCharacterNamed(name));
             charSelectStatus.show(connection, account);
             return;
         }
 
-        CharacterInstance loadedChar = character.get();
+        PlayerInstance loadedChar = character.get();
 
         // Réservation atomique avant d'attacher la connexion (ferme le TOCTOU de
         // double-login), mais rejoint la map (joinWorld, qui déclenche
         // KnownList.populate()/EntityAppeared) seulement APRÈS attachCharacter() :
         // sinon ce message part vers une connexion encore nulle et est perdu
-        // silencieusement (CharacterInstance.send() no-op si connection == null),
+        // silencieusement (PlayerInstance.send() no-op si connection == null),
         // laissant PNJ/monstres invisibles au client jusqu'au prochain déplacement.
         if (!loadedChar.getWorldInstance().reservePlayer(loadedChar)) {
             connection.send(new CharacterCurrentlyInGame(name));

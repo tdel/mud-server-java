@@ -1,6 +1,6 @@
 package app.domain;
 
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 
-public record PendingPartyInvite(Party party, CharacterInstance inviter, long sentAtMillis) {
+public record PendingPartyInvite(Party party, PlayerInstance inviter, long sentAtMillis) {
 }

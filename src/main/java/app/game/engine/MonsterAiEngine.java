@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import app.domain.actor.event.CharacterBeginAttack;
 import app.domain.actor.event.CharacterDied;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.map.Position;
 import app.domain.world.CollisionGrid;
@@ -40,7 +40,7 @@ public class MonsterAiEngine {
     @EventListener
     void onCharacterBeginAttack(CharacterBeginAttack event) {
         if (!(event.defender() instanceof MonsterInstance monster)
-                || !(event.attacker() instanceof CharacterInstance attacker)) {
+                || !(event.attacker() instanceof PlayerInstance attacker)) {
             return;
         }
         aggro(monster, attacker);
@@ -53,7 +53,7 @@ public class MonsterAiEngine {
         }
     }
 
-    public void aggro(MonsterInstance monster, CharacterInstance attacker) {
+    public void aggro(MonsterInstance monster, PlayerInstance attacker) {
         PursuitState current = monster.pursuit;
         boolean startingChase = current == null || current.state() != State.CHASING;
 
@@ -92,7 +92,7 @@ public class MonsterAiEngine {
     }
 
     private void tickChasing(MonsterInstance monster, PursuitState state, long nowMillis, long nowNanos) {
-        CharacterInstance target = state.target();
+        PlayerInstance target = state.target();
         MapInstance map = monster.getMotionSystem().getCurrentMap();
 
         if (target == null || target.getCurrentHealth() <= 0 || !map.isPresent(target)) {
@@ -172,7 +172,7 @@ public class MonsterAiEngine {
         }
     }
 
-    private void giveUpChase(MonsterInstance monster, PursuitState state, CharacterInstance target) {
+    private void giveUpChase(MonsterInstance monster, PursuitState state, PlayerInstance target) {
         log.info("monster.ai.give_up thread={} monsterId={}", Thread.currentThread().getName(), monster.getId());
         if (state.moving()) {
             monster.broadcast(
@@ -204,7 +204,7 @@ public class MonsterAiEngine {
         CHASING, RETURNING
     }
 
-    public record PursuitState(State state, CharacterInstance target, long lastStepAtNanos, boolean moving) {
+    public record PursuitState(State state, PlayerInstance target, long lastStepAtNanos, boolean moving) {
         PursuitState withLastStepAt(long stepAtNanos) {
             return new PursuitState(state, target, stepAtNanos, moving);
         }

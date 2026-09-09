@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.map.GridPathfinder;
 import app.domain.map.Position;
 import app.game.engine.MovementEngine;
@@ -53,7 +53,7 @@ public class Goto implements CommandHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        CharacterInstance character = connection.character();
+        PlayerInstance character = connection.character();
 
         String[] tokens = argument.trim().split("\\s+");
 

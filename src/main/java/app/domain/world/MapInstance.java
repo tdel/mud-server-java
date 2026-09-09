@@ -20,7 +20,7 @@ import app.domain.MonsterSpawnGroup;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.actor.AbstractNpc;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.GamePlayerSpawnedToMap;
 import app.domain.map.Position;
@@ -40,7 +40,7 @@ public class MapInstance {
     private final MapTemplate template;
     private final WorldInstance worldInstance;
 
-    private final Map<UUID, CharacterInstance> clients = new ConcurrentHashMap<>();
+    private final Map<UUID, PlayerInstance> clients = new ConcurrentHashMap<>();
     private final List<MonsterInstance> monsters = new CopyOnWriteArrayList<>();
     private final List<AbstractNpc> npcs = new CopyOnWriteArrayList<>();
 
@@ -111,12 +111,12 @@ public class MapInstance {
         return ThreadLocalRandom.current().nextDouble(0, Math.PI * 2);
     }
 
-    public void join(CharacterInstance character) {
+    public void join(PlayerInstance character) {
         character.getMotionSystem().setHeading(randomHeading());
         join(character, getSpawnPosition());
     }
 
-    public void join(CharacterInstance character, Position position) {
+    public void join(PlayerInstance character, Position position) {
         synchronized (this) {
             character.getMotionSystem().setCurrentMap(this);
             character.getMotionSystem().setPosition(position);
@@ -131,7 +131,7 @@ public class MapInstance {
                 new GamePlayerJoinedMap(character.getId(), character.getName(), position.x(), position.y()), character);
     }
 
-    public void leave(CharacterInstance character) {
+    public void leave(PlayerInstance character) {
         character.broadcastToMap(new GamePlayerLeftMap(character.getName()), character);
         synchronized (this) {
             clients.remove(character.getId());
@@ -141,7 +141,7 @@ public class MapInstance {
         log.info("map.left thread={} mapId={} character={}", Thread.currentThread().getName(), id, character.getId());
     }
 
-    public void disconnect(CharacterInstance character) {
+    public void disconnect(PlayerInstance character) {
         character.broadcastToMap(new GamePlayerDisconnected(character.getName()), character);
         synchronized (this) {
             clients.remove(character.getId());
@@ -153,7 +153,7 @@ public class MapInstance {
     }
 
     public Optional<AbstractCharacter> findOccupantById(UUID id) {
-        CharacterInstance client = clients.get(id);
+        PlayerInstance client = clients.get(id);
         if (client != null) {
             return Optional.of(client);
         }
@@ -164,7 +164,7 @@ public class MapInstance {
         return findNpcById(id).map(AbstractCharacter.class::cast);
     }
 
-    public List<CharacterInstance> characters() {
+    public List<PlayerInstance> characters() {
         return new ArrayList<>(clients.values());
     }
 
@@ -238,7 +238,7 @@ public class MapInstance {
 
     public boolean isPresent(AbstractCharacter character) {
         return switch (character) {
-            case CharacterInstance c -> clients.containsKey(c.getId());
+            case PlayerInstance c -> clients.containsKey(c.getId());
             case MonsterInstance m -> monsters.contains(m);
             case AbstractNpc n -> npcs.contains(n);
             default -> false;
@@ -247,7 +247,7 @@ public class MapInstance {
 
     public List<AbstractCharacter> occupantsWithin(Position center, double radius) {
         List<AbstractCharacter> nearby = new ArrayList<>();
-        for (CharacterInstance client : clients.values()) {
+        for (PlayerInstance client : clients.values()) {
             if (client.getMotionSystem().getPosition() != null
                     && client.getMotionSystem().getPosition().distanceTo(center) <= radius) {
                 nearby.add(client);

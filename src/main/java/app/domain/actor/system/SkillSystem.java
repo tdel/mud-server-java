@@ -27,7 +27,7 @@ import app.domain.actor.event.CharacterBeginAttack;
 import app.domain.actor.event.CharacterEffectExpired;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.SkillCastBegin;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.item.ItemGrade;
 import app.game.Randomizer;
 import app.game.catalog.PassiveSkillCatalogHolder;
@@ -98,10 +98,10 @@ public final class SkillSystem {
         return Map.copyOf(knownSkillLevels);
     }
 
-    // Seul CharacterInstance a des objets équipés susceptibles d'accorder des
+    // Seul PlayerInstance a des objets équipés susceptibles d'accorder des
     // sorts ; MonsterInstance/AbstractNpc n'en accordent jamais.
     public Set<ActiveSkill> getGrantedSkills() {
-        if (!(character instanceof CharacterInstance player)) {
+        if (!(character instanceof PlayerInstance player)) {
             return Set.of();
         }
         return player.getInventorySystem().getEquippedItems().stream().flatMap(item -> item.getGrantedSkills().stream())

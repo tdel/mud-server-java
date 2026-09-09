@@ -6,7 +6,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import app.network.CommandHandler;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.item.EquipmentItem;
 import app.domain.item.Item;
 import app.network.Connection;
@@ -27,7 +27,7 @@ public class Inventory implements CommandHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        CharacterInstance character = connection.character();
+        PlayerInstance character = connection.character();
 
         List<Item> items = character.getInventorySystem().getItems();
         List<app.network.message.ingame.Inventory.Entry> entries = items.stream().map(Inventory::toEntry).toList();

@@ -14,7 +14,7 @@ import io.netty.channel.Channel;
 import app.network.CommandDispatcher;
 import app.domain.Account;
 import app.domain.world.WorldInstance;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.game.AuthWorld;
 import app.game.WorldInstanceService;
 import app.network.Connection;
@@ -50,7 +50,7 @@ public class TcpJsonConnection implements Connection, TcpJsonOutput {
     private static final ThreadLocal<CachedEncode> LAST_ENCODE = new ThreadLocal<>();
 
     private ConnectionState state = ConnectionState.CONNECTED;
-    private CharacterInstance player;
+    private PlayerInstance player;
     private Account account;
     private WorldInstance worldInstance;
 
@@ -146,14 +146,14 @@ public class TcpJsonConnection implements Connection, TcpJsonOutput {
     }
 
     @Override
-    public void attachCharacter(CharacterInstance character) {
+    public void attachCharacter(PlayerInstance character) {
         this.player = character;
         character.setConnection(this);
         this.setState(ConnectionState.INGAME);
     }
 
     @Override
-    public CharacterInstance character() {
+    public PlayerInstance character() {
         if (state != ConnectionState.INGAME) {
             throw new IllegalStateException("Connection " + connectionId + " n'est pas en état INGAME (" + state + ")");
         }

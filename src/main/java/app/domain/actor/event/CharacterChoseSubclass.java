@@ -1,7 +1,7 @@
 package app.domain.actor.event;
 
 import app.domain.actor.Subclass;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 
-public record CharacterChoseSubclass(CharacterInstance character, int tier, Subclass subclass) {
+public record CharacterChoseSubclass(PlayerInstance character, int tier, Subclass subclass) {
 }

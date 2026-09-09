@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import app.domain.Party;
 import app.domain.PendingPartyInvite;
 import app.domain.actor.AbstractCharacter;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
@@ -35,7 +35,7 @@ public class PartyInvite implements CommandHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        CharacterInstance character = connection.character();
+        PlayerInstance character = connection.character();
         AbstractCharacter selected = character.getCombatSystem().getTarget();
 
         if (selected == null) {
@@ -46,7 +46,7 @@ public class PartyInvite implements CommandHandler {
             connection.send(new CannotInviteSelf());
             return;
         }
-        if (!(selected instanceof CharacterInstance target)
+        if (!(selected instanceof PlayerInstance target)
                 || !connection.worldInstance().isCharacterInGame(target.getId())) {
             connection.send(new TargetNotFound(selected.getId().toString()));
             return;

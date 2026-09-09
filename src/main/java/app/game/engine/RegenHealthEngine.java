@@ -20,7 +20,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import app.domain.actor.event.PlayerLoadedInWorld;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
@@ -32,11 +32,11 @@ public class RegenHealthEngine {
     // pas 1 seconde.
     private static final long TICK_INTERVAL_MS = 3_000L;
 
-    private final Map<UUID, CharacterInstance> regenerating = new ConcurrentHashMap<>();
+    private final Map<UUID, PlayerInstance> regenerating = new ConcurrentHashMap<>();
 
     @EventListener
     void onCharacterDamaged(CharacterDamaged event) {
-        if (event.character() instanceof CharacterInstance character) {
+        if (event.character() instanceof PlayerInstance character) {
             register(character);
         }
     }
@@ -46,7 +46,7 @@ public class RegenHealthEngine {
         register(event.character());
     }
 
-    public void register(CharacterInstance character) {
+    public void register(PlayerInstance character) {
         if (isFull(character)) {
             return;
         }
@@ -55,7 +55,7 @@ public class RegenHealthEngine {
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
     void tick() {
-        for (CharacterInstance character : regenerating.values()) {
+        for (PlayerInstance character : regenerating.values()) {
             character.regenerate(character.healthRegenAmountPerTick(), 0);
 
             if (isFull(character)) {
@@ -64,7 +64,7 @@ public class RegenHealthEngine {
         }
     }
 
-    private boolean isFull(CharacterInstance character) {
+    private boolean isFull(PlayerInstance character) {
         return character.getCurrentHealth() >= character.getMaxHealth();
     }
 
@@ -72,7 +72,7 @@ public class RegenHealthEngine {
     @Transactional
     void onMonsterDied(CharacterDied event) {
         if (!(event.character() instanceof MonsterInstance monster)
-                || !(event.killer() instanceof CharacterInstance killer)) {
+                || !(event.killer() instanceof PlayerInstance killer)) {
             return;
         }
         MapInstance map = monster.getMotionSystem().getCurrentMap();
@@ -82,7 +82,7 @@ public class RegenHealthEngine {
         log.info("regenhp.monster_removed_from_map monster={} map={}", monster.getName(), map.getName());
 
         Party party = killer.getParty();
-        List<CharacterInstance> eligible = party != null
+        List<PlayerInstance> eligible = party != null
                 ? party.getMembers().stream().filter(
                         member -> member.getMotionSystem().getCurrentMap() == killer.getMotionSystem().getCurrentMap())
                         .toList()
@@ -94,7 +94,7 @@ public class RegenHealthEngine {
 
     @EventListener
     void onPlayerDefeated(CharacterDied event) {
-        if (!(event.character() instanceof CharacterInstance character)) {
+        if (!(event.character() instanceof PlayerInstance character)) {
             return;
         }
         regenerating.remove(character.getId());

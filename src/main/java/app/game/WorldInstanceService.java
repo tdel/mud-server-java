@@ -22,7 +22,7 @@ import app.domain.world.WorldInstance;
 import app.domain.world.WorldTemplate;
 import app.domain.world.WorldTemplateSummary;
 import app.domain.actor.AbstractNpc;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.actor.instance.NpcSellerInstance;
 import app.domain.actor.template.NpcTemplate;
 import app.domain.map.Position;
@@ -88,11 +88,11 @@ public class WorldInstanceService {
         return defaultInstance != null;
     }
 
-    public List<CharacterInstance> findCharactersFor(Account account) {
+    public List<PlayerInstance> findCharactersFor(Account account) {
         return characterDao.findAllByAccount(account, getDefaultInstance());
     }
 
-    public Optional<CharacterInstance> findCharacterByName(Account account, String name) {
+    public Optional<PlayerInstance> findCharacterByName(Account account, String name) {
         return characterDao.findByAccountAndName(account, getDefaultInstance(), name);
     }
 
@@ -101,7 +101,7 @@ public class WorldInstanceService {
             return;
         }
 
-        CharacterInstance character = connection.character();
+        PlayerInstance character = connection.character();
         MapInstance map = character.getMotionSystem().getCurrentMap();
         WorldInstance instance = character.getWorldInstance();
 

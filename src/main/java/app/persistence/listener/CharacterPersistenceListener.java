@@ -9,7 +9,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import app.domain.Party;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.actor.event.CharacterChoseSubclass;
 import app.domain.actor.event.CharacterDamaged;
@@ -82,7 +82,7 @@ public class CharacterPersistenceListener {
 
     @EventListener
     void onCharacterGainedXp(CharacterGainedXp event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         characterDao.update(character);
         log.info("character.xp_gained character={} amount={} newXp={} newLevel={}", character.getName(), event.amount(),
                 character.getXp(), character.getLevel());
@@ -90,7 +90,7 @@ public class CharacterPersistenceListener {
 
     @EventListener
     void onCharacterLeveledUp(CharacterLeveledUp event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         character.broadcast(new PlayerLeveledUp(character.getName(), event.newLevel()), null);
         broadcastVitalsToParty(character);
         log.info("character.leveled_up character={} newLevel={} hpGained={}", character.getName(), event.newLevel(),
@@ -99,7 +99,7 @@ public class CharacterPersistenceListener {
 
     @EventListener
     void onSubclassChoiceAvailable(SubclassChoiceAvailable event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         character.send(new SubclassChoiceOffered(event.tier(), event.options()));
         log.info("character.subclass_choice_available character={} tier={} options={}", character.getName(),
                 event.tier(), event.options());
@@ -107,7 +107,7 @@ public class CharacterPersistenceListener {
 
     @EventListener
     void onCharacterChoseSubclass(CharacterChoseSubclass event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         characterDao.update(character);
         character.send(new SubclassChosen(event.tier(), event.subclass()));
         log.info("character.subclass_chosen character={} tier={} subclass={}", character.getName(), event.tier(),
@@ -133,13 +133,13 @@ public class CharacterPersistenceListener {
     @EventListener
     void onCharacterDied(CharacterDied event) {
         if (!(event.character() instanceof MonsterInstance monster)
-                || !(event.killer() instanceof CharacterInstance killer)) {
+                || !(event.killer() instanceof PlayerInstance killer)) {
             return;
         }
         int xpReward = monster.getLootSystem().getXpReward();
         Party party = killer.getParty();
 
-        List<CharacterInstance> eligible = party != null
+        List<PlayerInstance> eligible = party != null
                 ? party.getMembers().stream().filter(
                         member -> member.getMotionSystem().getCurrentMap() == killer.getMotionSystem().getCurrentMap())
                         .toList()
@@ -147,7 +147,7 @@ public class CharacterPersistenceListener {
 
         double multiplier = party != null ? party.shareMultiplier(eligible.size()) : 1.0;
         int perMemberXp = (int) (xpReward * multiplier) / eligible.size();
-        for (CharacterInstance member : eligible) {
+        for (PlayerInstance member : eligible) {
             member.gainXp(perMemberXp);
         }
         killer.getCombatSystem().setTarget(null);
@@ -161,8 +161,8 @@ public class CharacterPersistenceListener {
     // d'ordre entre eux, chacun ne traitant que son propre cas (cf. CLAUDE.md).
     @EventListener
     void onPlayerKilledPlayer(CharacterDied event) {
-        if (!(event.character() instanceof CharacterInstance victim)
-                || !(event.killer() instanceof CharacterInstance killer)) {
+        if (!(event.character() instanceof PlayerInstance victim)
+                || !(event.killer() instanceof PlayerInstance killer)) {
             return;
         }
         if (victim.isPvpFlagged()) {
@@ -181,7 +181,7 @@ public class CharacterPersistenceListener {
 
     @EventListener
     void onCharacterDamaged(CharacterDamaged event) {
-        if (!(event.character() instanceof CharacterInstance character)) {
+        if (!(event.character() instanceof PlayerInstance character)) {
             return;
         }
         characterDao.update(character);
@@ -192,7 +192,7 @@ public class CharacterPersistenceListener {
 
     @EventListener
     void onGamePlayerRespawned(GamePlayerRespawned event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         characterDao.update(character);
 
         character.send(new PlayerRespawned(character.getMotionSystem().getCurrentMap().getName(),
@@ -206,7 +206,7 @@ public class CharacterPersistenceListener {
 
     @EventListener
     void onGamePlayerUsedPotion(GamePlayerUsedPotion event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         characterDao.update(character);
         character.send(new ItemUsed(event.item().getId(), event.item().getName(), event.item().getGrade(),
                 event.healedAmount(), character.getCurrentHealth(), character.getMaxHealth()));
@@ -219,7 +219,7 @@ public class CharacterPersistenceListener {
 
     @EventListener
     void onGamePlayerUsedManaPotion(GamePlayerUsedManaPotion event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         characterDao.update(character);
         character.send(new ManaPotionUsed(event.item().getId(), event.item().getName(), event.item().getGrade(),
                 event.restoredAmount(), character.getCurrentMana(), character.getMaxMana()));
@@ -232,7 +232,7 @@ public class CharacterPersistenceListener {
 
     @EventListener
     void onCharacterRegenerated(CharacterRegenerated event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         characterDao.update(character);
         character.send(new RegenTick(event.hpRestored(), event.manaRestored(), character.getCurrentHealth(),
                 character.getMaxHealth(), character.getCurrentMana(), character.getMaxMana()));
@@ -243,7 +243,7 @@ public class CharacterPersistenceListener {
 
     @EventListener
     void onShotActivated(ShotActivated event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         character.send(new ShotUsed(event.shotType(), event.grade(), event.remainingQuantity()));
         if (event.shotType() == ItemType.SOULSHOT) {
             character.broadcast(new SoulshotUsed(character.getId(), character.getName(), event.grade()), character);
@@ -256,7 +256,7 @@ public class CharacterPersistenceListener {
 
     @EventListener
     void onShotGradeToggled(ShotGradeToggled event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         characterDao.update(character);
         character.send(new ShotGradeChanged(event.shotType(), event.newGrade()));
         log.info("character.shot_grade_toggled character={} shotType={} newGrade={}", character.getName(),
@@ -265,7 +265,7 @@ public class CharacterPersistenceListener {
 
     @EventListener
     void onShotGradeDepleted(ShotGradeDepleted event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         if (event.shotType() == ItemType.SOULSHOT) {
             character.setActiveSoulshotGrade(null);
         } else {
@@ -279,7 +279,7 @@ public class CharacterPersistenceListener {
 
     @EventListener
     void onCharacterKarmaChanged(CharacterKarmaChanged event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         characterDao.update(character);
         character.send(new KarmaChanged(event.newKarma()));
         log.info("character.karma_changed character={} newKarma={}", character.getName(), event.newKarma());
@@ -287,7 +287,7 @@ public class CharacterPersistenceListener {
 
     @EventListener
     void onCharacterRecordedPlayerKill(CharacterRecordedPlayerKill event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         characterDao.update(character);
         character.send(new PlayerKillRecorded(character.getPkCount()));
         log.info("character.pk_recorded character={} pkCount={}", character.getName(), character.getPkCount());
@@ -295,18 +295,18 @@ public class CharacterPersistenceListener {
 
     @EventListener
     void onCharacterRecordedPvpKill(CharacterRecordedPvpKill event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         characterDao.update(character);
         character.send(new PvpKillRecorded(character.getPvpCount()));
         log.info("character.pvp_kill_recorded character={} pvpCount={}", character.getName(), character.getPvpCount());
     }
 
-    // Seul le booléen est persisté, pas l'échéance (voir CharacterInstance) : à la
+    // Seul le booléen est persisté, pas l'échéance (voir PlayerInstance) : à la
     // reconnexion, un personnage flaggé reprend pour 10 minutes pleines plutôt
     // que le temps qu'il lui restait à la déconnexion.
     @EventListener
     void onPlayerPvpFlagged(PlayerPvpFlagged event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         characterDao.update(character);
         character.broadcast(new PvpFlagChanged(character.getId(), character.getName(), true), null);
         log.info("character.pvp_flagged character={}", character.getName());
@@ -314,13 +314,13 @@ public class CharacterPersistenceListener {
 
     @EventListener
     void onPlayerPvpFlagCleared(PlayerPvpFlagCleared event) {
-        CharacterInstance character = event.character();
+        PlayerInstance character = event.character();
         characterDao.update(character);
         character.broadcast(new PvpFlagChanged(character.getId(), character.getName(), false), null);
         log.info("character.pvp_flag_cleared character={}", character.getName());
     }
 
-    private void broadcastVitalsToParty(CharacterInstance character) {
+    private void broadcastVitalsToParty(PlayerInstance character) {
         Party party = character.getParty();
         if (party != null) {
             party.broadcast(

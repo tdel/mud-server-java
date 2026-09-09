@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import app.domain.Account;
 import app.domain.actor.Attribute;
 import app.domain.actor.CharacterClass;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.actor.Gender;
 import app.domain.actor.Race;
 import app.domain.actor.event.DomainEventPublisher;
@@ -35,7 +35,7 @@ public class WorldInstance {
 
     private Map<UUID, MapInstance> mapInstances = Map.of();
 
-    private final Map<UUID, CharacterInstance> players = new ConcurrentHashMap<>();
+    private final Map<UUID, PlayerInstance> players = new ConcurrentHashMap<>();
 
     public WorldInstance(UUID id, UUID worldTemplateId, Instant createdAt) {
         this.id = id;
@@ -83,9 +83,9 @@ public class WorldInstance {
     // (pour garder cette protection anti double-login) mais de ne rejoindre la map
     // (et donc déclencher KnownList.populate()/EntityAppeared) qu'APRÈS l'avoir
     // attachée, sous peine que ce message parte vers une connexion encore nulle et
-    // soit perdu silencieusement (CharacterInstance.send() no-op si connection ==
+    // soit perdu silencieusement (PlayerInstance.send() no-op si connection ==
     // null).
-    public boolean reservePlayer(CharacterInstance character) {
+    public boolean reservePlayer(PlayerInstance character) {
         if (players.putIfAbsent(character.getId(), character) != null) {
             log.warn("world.player_already_loaded worldId={} character={}", id, character.getId());
             return false;
@@ -93,7 +93,7 @@ public class WorldInstance {
         return true;
     }
 
-    public void joinWorld(CharacterInstance character) {
+    public void joinWorld(PlayerInstance character) {
         Position savedPosition = character.getMotionSystem().getPosition();
         if (savedPosition != null) {
             character.getMotionSystem().getCurrentMap().join(character, savedPosition);
@@ -105,7 +105,7 @@ public class WorldInstance {
         DomainEventPublisher.publish(new PlayerLoadedInWorld(character));
     }
 
-    public boolean loadPlayer(CharacterInstance character) {
+    public boolean loadPlayer(PlayerInstance character) {
         if (!reservePlayer(character)) {
             return false;
         }
@@ -113,14 +113,14 @@ public class WorldInstance {
         return true;
     }
 
-    public void removePlayer(CharacterInstance character) {
+    public void removePlayer(PlayerInstance character) {
         players.remove(character.getId());
         log.info("world.player_removed thread={} worldId={} character={}", Thread.currentThread().getName(), id,
                 character.getId());
         DomainEventPublisher.publish(new PlayerRemovedFromWorld(character));
     }
 
-    public Collection<CharacterInstance> onlineCharacters() {
+    public Collection<PlayerInstance> onlineCharacters() {
         return List.copyOf(players.values());
     }
 
@@ -128,7 +128,7 @@ public class WorldInstance {
         return players.containsKey(characterId);
     }
 
-    public CharacterInstance createCharacter(Account account, String name, Gender gender, Race race,
+    public PlayerInstance createCharacter(Account account, String name, Gender gender, Race race,
             CharacterClass characterClass) {
         MapInstance startingMap = startingMapInstance()
                 .orElseThrow(() -> new IllegalStateException("WorldInstance " + id + " n'a aucune map de départ"));
@@ -139,7 +139,7 @@ public class WorldInstance {
 
         int startingMana = characterClass.maxMana(scores.get(Attribute.MEN), 1);
 
-        CharacterInstance character = new CharacterInstance(UUID.randomUUID(), account, name, startingMap, gender, race,
+        PlayerInstance character = new PlayerInstance(UUID.randomUUID(), account, name, startingMap, gender, race,
                 characterClass, 1, maxHealth, maxHealth, scores, 0, 0, startingMana, startingMana, Map.of(), List.of(),
                 List.of(), Map.of(), List.of(), null, null, 0, 0, 0, false);
         character.setWorldInstance(this);

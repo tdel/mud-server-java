@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import app.domain.actor.event.CharacterPositionChanged;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.map.Position;
 import app.persistence.CharacterDao;
 
@@ -23,7 +23,7 @@ public class PersistenceEngine {
 
     private static final long TICK_INTERVAL_MS = 60_000L;
 
-    private final Map<UUID, CharacterInstance> dirtyPositions = new ConcurrentHashMap<>();
+    private final Map<UUID, PlayerInstance> dirtyPositions = new ConcurrentHashMap<>();
     private final CharacterDao characterDao;
 
     public PersistenceEngine(CharacterDao characterDao) {
@@ -38,7 +38,7 @@ public class PersistenceEngine {
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
     void tick() {
         for (UUID id : new ArrayList<>(dirtyPositions.keySet())) {
-            CharacterInstance character = dirtyPositions.remove(id);
+            PlayerInstance character = dirtyPositions.remove(id);
             if (character != null) {
                 Position position = character.getMotionSystem().getPosition();
                 if (position != null) {

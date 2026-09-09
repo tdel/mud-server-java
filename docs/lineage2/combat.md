@@ -21,7 +21,7 @@ Every `AbstractCharacter` exposes 7 derived stats, computed on the fly from its 
 
 Each stat has an `effective` variant (`getEffectivePAtk()`, etc.) that adds any active buff/debuff from `EffectsSystem` (`ModifiedStat.PATK/PDEF/MATK/MDEF/ACCURACY/EVASION/PCRIT/MCRIT`) — this is what combat resolution actually reads, exactly like `getEffectiveArmorClass()` did before. M.Crit (`CombatFormulas.magicCriticalRate`, driven by WIT) is a straight mirror of P.Crit's DEX formula: WIT had no formula reading it at all before this — the only attribute of the six that was otherwise inert.
 
-`AbstractCharacter` exposes these via 8 `protected` hooks (`basePAtk()`, `baseMAtk()`, `basePDefSum()`, `baseMDefSum()`, `accuracyItemBonus()`, `evasionItemBonus()`, `armorWeightPenalty()`, `critItemBonus()`) with neutral defaults; `CharacterInstance` sums its equipped items, `MonsterInstance` reads its `MonsterTemplate`'s natural values (monsters keep a full STR/DEX/CON/INT/WIT/MEN block, same as players — their "weapon+armor" is just baked into the template's natural pAtk/pDef/etc.).
+`AbstractCharacter` exposes these via 8 `protected` hooks (`basePAtk()`, `baseMAtk()`, `basePDefSum()`, `baseMDefSum()`, `accuracyItemBonus()`, `evasionItemBonus()`, `armorWeightPenalty()`, `critItemBonus()`) with neutral defaults; `PlayerInstance` sums its equipped items, `MonsterInstance` reads its `MonsterTemplate`'s natural values (monsters keep a full STR/DEX/CON/INT/WIT/MEN block, same as players — their "weapon+armor" is just baked into the template's natural pAtk/pDef/etc.).
 
 ## Health & Mana pools
 
@@ -45,7 +45,7 @@ The 6 per-class curve coefficients live in `data/class.json` (`CharacterClass.ma
 `maxMana`, backed by `CombatFormulas.maxHealth`/`maxMana`) — no more DnD5e `hitDie`/
 `manaGainPerLevel`/`primaryAbility` fields, all three were removed as dead SRD leftovers once
 this curve replaced them. Unlike p.atk/p.def, `maxHealth`/`maxMana` stay **persisted fields**
-(`CharacterInstance`, recomputed at character creation, level-up, and on every DB load in
+(`PlayerInstance`, recomputed at character creation, level-up, and on every DB load in
 `CharacterDao.toDomain`) rather than recomputed on every read: CON/MEN never change after
 character creation in this project (no stat allocation, no attribute-granting gear, no passive
 skill grants one yet either), so recomputing only at those three points is equivalent to a

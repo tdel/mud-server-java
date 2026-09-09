@@ -23,7 +23,7 @@ import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.ShotGradeDepleted;
 import app.domain.actor.event.SkillCast;
 import app.domain.actor.event.SkillCastBegin;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.item.ItemGrade;
 import app.domain.item.ItemType;
 import app.domain.map.Position;
@@ -76,11 +76,11 @@ public class SkillCastEngine {
         // l'incantation réelle selon WIT (et les buffs/debuffs éventuels sur
         // ModifiedStat.CASTSPD, déjà couverts par StatSystem.getEffective) — vaut
         // aussi bien pour un joueur qu'un monstre lanceur de sort (tous deux passent
-        // par CombatFormulas.baseStats(), voir CharacterInstance/MonsterCatalog).
+        // par CombatFormulas.baseStats(), voir PlayerInstance/MonsterCatalog).
         int castSpd = caster.getStatSystem().getEffective(ModifiedStat.CASTSPD);
         long castingTimeNanos = CombatFormulas.effectiveCastingTimeMs(activeSkill.castingTimeMs(), castSpd)
                 * 1_000_000L;
-        if (caster instanceof CharacterInstance player) {
+        if (caster instanceof PlayerInstance player) {
             ItemType shotType = activeSkill.damageType() == SkillDamageType.PHYSICAL
                     ? ItemType.SOULSHOT
                     : ItemType.SPIRITSHOT;
@@ -224,7 +224,7 @@ public class SkillCastEngine {
                 new SkillCastAnnounced(caster.getId(), caster.getName(), activeSkill.id(), activeSkill.name(),
                         target.getId(), target.getName(), outcome.selfHeal(), outcome.hit(), outcome.amount(),
                         outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()),
-                caster instanceof CharacterInstance player ? player : null);
+                caster instanceof PlayerInstance player ? player : null);
         if (outcome.targetDefeated()) {
             caster.clearCombatTarget();
         }

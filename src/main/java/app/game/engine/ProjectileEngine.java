@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import app.domain.ActiveSkill;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.system.SkillSystem;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.network.message.ingame.CastResult;
 import app.network.message.ingame.SkillCastAnnounced;
 import app.network.message.ingame.SkillProjectileFizzled;
@@ -90,7 +90,7 @@ public class ProjectileEngine {
                 new SkillCastAnnounced(caster.getId(), caster.getName(), activeSkill.id(), activeSkill.name(),
                         target.getId(), target.getName(), outcome.selfHeal(), outcome.hit(), outcome.amount(),
                         outcome.targetHealthAfter(), outcome.targetMaxHealth(), outcome.targetDefeated()),
-                caster instanceof CharacterInstance player ? player : null);
+                caster instanceof PlayerInstance player ? player : null);
         if (outcome.targetDefeated()) {
             caster.clearCombatTarget();
         }

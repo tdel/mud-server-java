@@ -43,7 +43,7 @@ public final class NpcSellerInstance extends AbstractNpc {
                 .findFirst();
     }
 
-    public PurchaseOutcome sell(CharacterInstance buyer, String input) {
+    public PurchaseOutcome sell(PlayerInstance buyer, String input) {
         return sell(buyer, input, 1);
     }
 
@@ -52,7 +52,7 @@ public final class NpcSellerInstance extends AbstractNpc {
     // stackable (arme, potion, ...) est acheté un exemplaire à la fois en boucle
     // (un Item par exemplaire, cf. ItemType.stackable) — la solvabilité totale est
     // vérifiée une seule fois en amont pour que l'achat reste tout-ou-rien.
-    public PurchaseOutcome sell(CharacterInstance buyer, String input, int quantity) {
+    public PurchaseOutcome sell(PlayerInstance buyer, String input, int quantity) {
         Optional<NpcShopEntry> entry = resolveEntry(input);
         if (entry.isEmpty()) {
             return new PurchaseOutcome.EntryNotFound();

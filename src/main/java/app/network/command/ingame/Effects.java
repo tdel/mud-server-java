@@ -8,7 +8,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import app.domain.ActiveEffect;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
@@ -30,7 +30,7 @@ public class Effects implements CommandHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        CharacterInstance character = connection.character();
+        PlayerInstance character = connection.character();
         Instant now = Instant.now();
 
         List<EffectView> views = character.getEffectsSystem().active().stream().map(effect -> toView(effect, now))

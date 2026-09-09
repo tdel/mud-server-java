@@ -15,7 +15,7 @@ import app.domain.actor.event.CharacterDamaged;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.ShotGradeDepleted;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.item.ItemType;
 import app.domain.world.PeaceZone;
 import app.game.combat.CombatFormulas;
@@ -96,7 +96,7 @@ public final class CombatSystem {
         // en L2J — d'où sa place ici, avant le jet de touche, une fois l'attaque
         // garantie de se produire (toutes les guards ci-dessus déjà passées).
         boolean shotCharged = false;
-        if (character instanceof CharacterInstance player && player.getActiveSoulshotGrade() != null) {
+        if (character instanceof PlayerInstance player && player.getActiveSoulshotGrade() != null) {
             var outcome = player.getInventorySystem().consumeShot(ItemType.SOULSHOT, player.getActiveSoulshotGrade());
             if (outcome instanceof InventorySystem.ConsumeShotOutcome.OutOfStock) {
                 DomainEventPublisher
@@ -139,7 +139,7 @@ public final class CombatSystem {
         return defender.takeDamage(damage, character);
     }
 
-    // Logique commune à CharacterInstance et MonsterInstance :
+    // Logique commune à PlayerInstance et MonsterInstance :
     // synchronized(character)
     // couvre le cas monstre (attaqué par un joueur en même temps que
     // MonsterAiEngine

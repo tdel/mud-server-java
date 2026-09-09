@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import app.network.CommandArguments;
 import app.network.CommandHandler;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.item.Item;
 import app.domain.item.ItemGrade;
 import app.network.Connection;
@@ -42,7 +42,7 @@ public class Drop implements CommandHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        CharacterInstance character = connection.character();
+        PlayerInstance character = connection.character();
 
         String raw = argument.trim();
 

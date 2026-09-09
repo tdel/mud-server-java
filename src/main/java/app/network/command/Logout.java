@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import app.domain.Account;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.game.AuthWorld;
 import app.game.WorldInstanceService;
 import app.network.CommandHandler;
@@ -44,7 +44,7 @@ public class Logout implements CommandHandler {
         Account account = connection.account();
 
         if (connection.state() == ConnectionState.INGAME) {
-            CharacterInstance character = connection.character();
+            PlayerInstance character = connection.character();
             worldInstanceService.exitGame(connection);
             connection.send(new StoppedPlaying(character.getName()));
         }

@@ -1,6 +1,6 @@
 package app.domain.actor.event;
 
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 
-public record CharacterRegenerated(CharacterInstance character, int hpRestored, int manaRestored) {
+public record CharacterRegenerated(PlayerInstance character, int hpRestored, int manaRestored) {
 }

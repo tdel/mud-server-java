@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import app.network.CommandArguments;
 import app.network.CommandHandler;
 import app.domain.actor.AbstractCharacter;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.ingame.TargetDeselected;
@@ -30,7 +30,7 @@ public class Select implements CommandHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        CharacterInstance character = connection.character();
+        PlayerInstance character = connection.character();
         String raw = argument.trim();
 
         if (raw.isEmpty()) {

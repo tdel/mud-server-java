@@ -1,6 +1,6 @@
 package app.domain.actor.event;
 
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 
-public record CharacterReceivedGold(CharacterInstance character, int amount) {
+public record CharacterReceivedGold(PlayerInstance character, int amount) {
 }

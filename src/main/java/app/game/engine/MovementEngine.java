@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.event.CharacterBeginAttack;
 import app.domain.actor.event.CharacterDied;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.network.message.ingame.CharacterMovementBlocked;
 import app.network.message.ingame.CharacterMovementFinished;
 import app.network.message.ingame.CharacterMovementStopped;
@@ -75,7 +75,7 @@ public class MovementEngine {
         character.broadcast(
                 new CharacterMovementStopped(character.getId(), character.getName(),
                         character.getMotionSystem().getPosition().x(), character.getMotionSystem().getPosition().y()),
-                character instanceof CharacterInstance player ? player : null);
+                character instanceof PlayerInstance player ? player : null);
     }
 
     @EventListener
@@ -113,7 +113,7 @@ public class MovementEngine {
                                 character.getId());
                         character.send(new MovementFinished(character.getMotionSystem().getPosition().x(),
                                 character.getMotionSystem().getPosition().y()));
-                        if (character instanceof CharacterInstance player) {
+                        if (character instanceof PlayerInstance player) {
                             character.broadcast(new CharacterMovementFinished(character.getId(), character.getName(),
                                     character.getMotionSystem().getPosition().x(),
                                     character.getMotionSystem().getPosition().y()), player);
@@ -125,7 +125,7 @@ public class MovementEngine {
                                 character.getId());
                         character.send(new MovementBlockedByBounds(character.getMotionSystem().getPosition().x(),
                                 character.getMotionSystem().getPosition().y()));
-                        if (character instanceof CharacterInstance player) {
+                        if (character instanceof PlayerInstance player) {
                             character.broadcast(new CharacterMovementBlocked(character.getId(), character.getName(),
                                     character.getMotionSystem().getPosition().x(),
                                     character.getMotionSystem().getPosition().y()), player);

@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import app.domain.actor.event.CharacterBeginAttack;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.game.WorldInstanceService;
 
 @Component
@@ -31,8 +31,8 @@ public class PvpEngine {
     // règle couvre aussi bien le corps-à-corps que les sorts offensifs.
     @EventListener
     void onCharacterBeginAttack(CharacterBeginAttack event) {
-        if (!(event.attacker() instanceof CharacterInstance attacker)
-                || !(event.defender() instanceof CharacterInstance defender)) {
+        if (!(event.attacker() instanceof PlayerInstance attacker)
+                || !(event.defender() instanceof PlayerInstance defender)) {
             return;
         }
         if (defender.getKarma() > 0) {
@@ -49,8 +49,8 @@ public class PvpEngine {
         expireFlags(worldInstanceService.getDefaultInstance().onlineCharacters());
     }
 
-    void expireFlags(Collection<CharacterInstance> onlineCharacters) {
-        for (CharacterInstance character : onlineCharacters) {
+    void expireFlags(Collection<PlayerInstance> onlineCharacters) {
+        for (PlayerInstance character : onlineCharacters) {
             if (character.isPvpFlagExpired()) {
                 character.clearPvpFlag();
                 log.info("pvp.flag_expired character={}", character.getId());

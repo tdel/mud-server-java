@@ -1,7 +1,7 @@
 package app.domain.actor.event;
 
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.world.MapInstance;
 
-public record GamePlayerSpawnedToMap(CharacterInstance character, MapInstance map) {
+public record GamePlayerSpawnedToMap(PlayerInstance character, MapInstance map) {
 }

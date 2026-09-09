@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.AbstractNpc;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.actor.instance.NpcSellerInstance;
 import app.domain.map.Position;
@@ -40,6 +40,6 @@ public record EntityView(UUID id, String name, String title, String kind, double
                 MovementEngine.unitsPerSecond(character.getMotionSystem().getSpeed()), character.getCurrentHealth(),
                 character.getMaxHealth(), character.getLevel(), targetX, targetY,
                 character instanceof NpcSellerInstance,
-                character instanceof CharacterInstance player && player.isPvpFlagged());
+                character instanceof PlayerInstance player && player.isPvpFlagged());
     }
 }

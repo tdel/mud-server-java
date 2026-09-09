@@ -4,7 +4,7 @@ import app.domain.actor.AbstractCharacter;
 import app.domain.actor.ModifiedStat;
 import app.domain.actor.event.CharacterPositionChanged;
 import app.domain.actor.event.DomainEventPublisher;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.map.Position;
 import app.domain.world.AbstractZone;
 import app.domain.world.MapInstance;
@@ -45,7 +45,7 @@ public final class MotionSystem {
             character.setZone(newZone);
             newZone.onObjectEntering(character);
         }
-        if (position != null && character instanceof CharacterInstance ci) {
+        if (position != null && character instanceof PlayerInstance ci) {
             DomainEventPublisher.publish(new CharacterPositionChanged(ci));
         }
     }

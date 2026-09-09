@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import app.network.CommandHandler;
 import app.domain.Account;
 import app.domain.world.WorldInstance;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.game.WorldInstanceService;
 import app.network.Connection;
 import app.network.ConnectionState;
@@ -59,7 +59,7 @@ public class CharacterDelete implements CommandHandler {
         Account account = connection.account();
         WorldInstance instance = connection.worldInstance();
 
-        Optional<CharacterInstance> character = worldInstanceService.findCharacterByName(account, name);
+        Optional<PlayerInstance> character = worldInstanceService.findCharacterByName(account, name);
         if (character.isEmpty()) {
             connection.send(new NoCharacterNamed(name));
             charSelectStatus.show(connection, account);

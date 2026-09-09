@@ -1,7 +1,7 @@
 package app.domain.actor.event;
 
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.item.Item;
 
-public record ItemDiscarded(CharacterInstance character, Item item) {
+public record ItemDiscarded(PlayerInstance character, Item item) {
 }

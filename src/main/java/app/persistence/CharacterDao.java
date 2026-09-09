@@ -19,7 +19,7 @@ import app.domain.PassiveSkill;
 import app.domain.ActiveSkill;
 import app.domain.actor.Attribute;
 import app.domain.ActiveEffect;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.actor.CharacterClass;
 import app.domain.actor.Gender;
 import app.domain.actor.Race;
@@ -56,7 +56,7 @@ public class CharacterDao {
         this.passiveSkillCatalog = passiveSkillCatalog;
     }
 
-    public void insert(CharacterInstance character) {
+    public void insert(PlayerInstance character) {
         dsl.insertInto(CHARACTER, CHARACTER.ID, CHARACTER.ACCOUNT_ID, CHARACTER.NAME, CHARACTER.CURRENT_MAP_ID,
                 CHARACTER.GENDER, CHARACTER.RACE, CHARACTER.CHARACTER_CLASS, CHARACTER.LEVEL, CHARACTER.CURRENT_HEALTH,
                 CHARACTER.MAX_HEALTH, CHARACTER.STRENGTH, CHARACTER.DEXTERITY, CHARACTER.CONSTITUTION,
@@ -93,7 +93,7 @@ public class CharacterDao {
         return grade == null ? null : ItemGrade.valueOf(grade);
     }
 
-    public List<CharacterInstance> findAllByAccount(Account account, WorldInstance instance) {
+    public List<PlayerInstance> findAllByAccount(Account account, WorldInstance instance) {
         // toDomain déclenche des requêtes imbriquées (sorts/effets) : .fetch() sans
         // mapper
         // matérialise le Result et libère la connexion avant le mapping, indispensable
@@ -102,7 +102,7 @@ public class CharacterDao {
                 .stream().map(record -> toDomain(record, account, instance)).toList();
     }
 
-    public Optional<CharacterInstance> findByAccountAndName(Account account, WorldInstance instance, String name) {
+    public Optional<PlayerInstance> findByAccountAndName(Account account, WorldInstance instance, String name) {
         return dsl.selectFrom(CHARACTER).where(CHARACTER.ACCOUNT_ID.eq(account.getId())).and(CHARACTER.NAME.eq(name))
                 .fetchOptional().map(record -> toDomain(record, account, instance));
     }
@@ -116,7 +116,7 @@ public class CharacterDao {
                 .execute();
     }
 
-    public void update(CharacterInstance character) {
+    public void update(PlayerInstance character) {
         dsl.update(CHARACTER).set(CHARACTER.CURRENT_MAP_ID, character.getMotionSystem().getCurrentMap().getTemplateId())
                 .set(CHARACTER.CURRENT_HEALTH, character.getCurrentHealth()).set(CHARACTER.XP, character.getXp())
                 .set(CHARACTER.LEVEL, character.getLevel()).set(CHARACTER.MAX_HEALTH, character.getMaxHealth())
@@ -135,7 +135,7 @@ public class CharacterDao {
         dsl.deleteFrom(CHARACTER).where(CHARACTER.ID.eq(characterId)).execute();
     }
 
-    private CharacterInstance toDomain(CharacterRecord record, Account account, WorldInstance instance) {
+    private PlayerInstance toDomain(CharacterRecord record, Account account, WorldInstance instance) {
         Map<Attribute, Integer> attributes = new EnumMap<>(Attribute.class);
         attributes.put(Attribute.STR, record.getStrength());
         attributes.put(Attribute.DEX, record.getDexterity());
@@ -174,7 +174,7 @@ public class CharacterDao {
 
         List<Item> items = itemDao.findByCharacterId(record.getId());
 
-        CharacterInstance character = new CharacterInstance(record.getId(), account, record.getName(), map,
+        PlayerInstance character = new PlayerInstance(record.getId(), account, record.getName(), map,
                 Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
                 maxHealth, attributes, record.getXp(), record.getGold(), maxMana, record.getCurrentMana(), knownSkills,
                 activeEffects, subclasses, knownPassiveSkills, items, parseGrade(record.getActiveSoulshotGrade()),

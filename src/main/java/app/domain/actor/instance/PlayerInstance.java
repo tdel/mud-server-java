@@ -46,7 +46,7 @@ import app.network.Connection;
 import app.network.OutputMessage;
 import app.network.message.ingame.XpGained;
 
-public final class CharacterInstance extends AbstractCharacter {
+public final class PlayerInstance extends AbstractCharacter {
 
     // Comme en L2J : le flag PvP retombe après 10 minutes sans nouvelle attaque
     // sur un autre joueur (voir PvpEngine, qui parcourt les personnages en ligne
@@ -78,7 +78,7 @@ public final class CharacterInstance extends AbstractCharacter {
     private volatile boolean pvpFlagged;
     private volatile Instant pvpFlagExpiresAt;
 
-    public CharacterInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
+    public PlayerInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
             Map<Attribute, Integer> attributes, int xp, int gold, int maxMana, int currentMana,
             Map<ActiveSkill, Integer> knownSkills, List<ActiveEffect> activeEffects, List<Subclass> subclasses,

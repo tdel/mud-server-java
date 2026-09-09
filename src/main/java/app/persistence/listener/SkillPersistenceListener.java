@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import app.domain.actor.event.CharacterLearnedPassiveSkill;
 import app.domain.actor.event.CharacterLearnedSkill;
 import app.domain.actor.event.SkillCast;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.network.message.ingame.SkillLearned;
 import app.persistence.CharacterDao;
 import app.persistence.CharacterPassiveSkillDao;
@@ -62,7 +62,7 @@ public class SkillPersistenceListener {
 
     @EventListener
     void onSkillCast(SkillCast event) {
-        if (event.caster() instanceof CharacterInstance caster) {
+        if (event.caster() instanceof PlayerInstance caster) {
             characterDao.update(caster);
         }
         log.info("activeSkill.cast caster={} activeSkill={} amount={} targetDefeated={}", event.caster().getName(),

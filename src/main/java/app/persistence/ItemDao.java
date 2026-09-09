@@ -33,7 +33,7 @@ public class ItemDao {
                 .execute();
     }
 
-    // Utilisé pour charger l'inventaire AVANT de construire le CharacterInstance
+    // Utilisé pour charger l'inventaire AVANT de construire le PlayerInstance
     // propriétaire (voir CharacterDao.toDomain) : les Item obtenus n'ont pas
     // encore de character (rattaché ensuite via Item.attachOwner).
     public List<Item> findByCharacterId(UUID characterId) {

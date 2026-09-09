@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import app.domain.Party;
 import app.network.CommandHandler;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.game.WorldInstanceService;
 import app.network.Connection;
 import app.network.ConnectionState;
@@ -41,7 +41,7 @@ public class Say implements CommandHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        CharacterInstance character = connection.character();
+        PlayerInstance character = connection.character();
         String raw = argument.trim();
 
         if (raw.isEmpty()) {
@@ -63,7 +63,7 @@ public class Say implements CommandHandler {
         connection.send(new YouSaid(raw));
     }
 
-    private void handleWhisper(Connection connection, CharacterInstance character, String rest) {
+    private void handleWhisper(Connection connection, PlayerInstance character, String rest) {
         String trimmed = rest.trim();
         int separator = trimmed.indexOf(' ');
         String targetName = separator == -1 ? trimmed : trimmed.substring(0, separator);
@@ -79,7 +79,7 @@ public class Say implements CommandHandler {
             return;
         }
 
-        Optional<CharacterInstance> target = connection.worldInstance().onlineCharacters().stream()
+        Optional<PlayerInstance> target = connection.worldInstance().onlineCharacters().stream()
                 .filter(candidate -> candidate.getName().equalsIgnoreCase(targetName)).findFirst();
 
         if (target.isEmpty()) {
@@ -92,7 +92,7 @@ public class Say implements CommandHandler {
         target.get().send(whisper);
     }
 
-    private void handleParty(Connection connection, CharacterInstance character, String message) {
+    private void handleParty(Connection connection, PlayerInstance character, String message) {
         if (message.isEmpty()) {
             connection.send(new SayNothing());
             return;

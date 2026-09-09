@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import app.domain.Account;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.game.WorldInstanceService;
 import app.network.Connection;
 import app.network.message.charselect.CharacterList;
@@ -21,7 +21,7 @@ public class CharSelectStatus {
     }
 
     public void show(Connection connection, Account account) {
-        List<CharacterInstance> characters = worldInstanceService.findCharactersFor(account);
+        List<PlayerInstance> characters = worldInstanceService.findCharactersFor(account);
 
         if (characters.isEmpty()) {
             connection.send(new NoCharacters());

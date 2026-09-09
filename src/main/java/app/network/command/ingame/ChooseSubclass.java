@@ -7,7 +7,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import app.domain.actor.Subclass;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
@@ -37,7 +37,7 @@ public class ChooseSubclass implements CommandHandler {
             return;
         }
 
-        CharacterInstance character = connection.character();
+        PlayerInstance character = connection.character();
         Integer tier = character.getClassSystem().getPendingSubclassTier();
 
         if (tier == null) {

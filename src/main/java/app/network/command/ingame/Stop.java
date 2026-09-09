@@ -7,7 +7,7 @@ import app.game.engine.SkillCastEngine;
 import org.springframework.stereotype.Component;
 
 import app.network.CommandHandler;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.network.Connection;
 import app.network.ConnectionState;
 
@@ -34,7 +34,7 @@ public class Stop implements CommandHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        CharacterInstance character = connection.character();
+        PlayerInstance character = connection.character();
 
         movementEngine.stopMovement(character);
         skillCastEngine.cancelCast(character);

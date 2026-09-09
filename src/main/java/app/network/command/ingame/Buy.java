@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import app.network.CommandArguments;
 import app.network.CommandHandler;
-import app.domain.actor.instance.CharacterInstance;
+import app.domain.actor.instance.PlayerInstance;
 import app.domain.actor.instance.NpcSellerInstance;
 import app.network.Connection;
 import app.network.ConnectionState;
@@ -41,7 +41,7 @@ public class Buy implements CommandHandler {
 
     @Override
     public void onReceive(Connection connection, String argument) {
-        CharacterInstance character = connection.character();
+        PlayerInstance character = connection.character();
         String[] parts = argument.trim().split("\\|", -1);
         if (parts.length != 3) {
             connection.send(new Usage(USAGE));

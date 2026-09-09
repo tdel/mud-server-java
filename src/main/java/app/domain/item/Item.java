@@ -146,9 +146,9 @@ public class Item {
     }
 
     // Contrairement à setCharacter (item fraîchement loot/acheté, jamais encore
-    // équipé), rattache un Item déjà chargé depuis la DB à son CharacterInstance
+    // équipé), rattache un Item déjà chargé depuis la DB à son PlayerInstance
     // sans toucher au slot — utilisé quand l'inventaire est chargé AVANT que le
-    // CharacterInstance n'existe (voir CharacterDao.toDomain), pour ne pas perdre
+    // PlayerInstance n'existe (voir CharacterDao.toDomain), pour ne pas perdre
     // l'état équipé/déséquipé déjà connu.
     public void attachOwner(AbstractCharacter character) {
         this.character = character;
