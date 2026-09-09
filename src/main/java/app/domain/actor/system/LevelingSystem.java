@@ -66,7 +66,7 @@ public final class LevelingSystem {
         character.getResourceSystem().setMaxMana(newMaxMana);
         character.getResourceSystem().setCurrentMana(character.getResourceSystem().getCurrentMana() + manaGain);
 
-        character.recomputeStats();
+        character.getStatSystem().recomputeStats(character.getAttributes(), level, character.getInventorySystem());
 
         character.broadcast(new PlayerLeveledUp(character.getName(), level), null);
         DomainEventPublisher.publish(new CharacterLeveledUp(character, level, hpGain));

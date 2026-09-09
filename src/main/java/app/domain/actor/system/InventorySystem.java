@@ -3,14 +3,19 @@ package app.domain.actor.system;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 import app.domain.ActiveEffect;
 import app.domain.StatModifier;
+import app.domain.actor.Attribute;
+import app.domain.actor.ModifiedStat;
 import app.domain.actor.event.CharacterLootedItem;
 import app.domain.actor.event.CharacterReceivedGold;
 import app.domain.actor.event.CharacterSpentGold;
@@ -26,7 +31,10 @@ import app.domain.item.EquipmentSlot;
 import app.domain.item.Item;
 import app.domain.item.ItemExpectation;
 import app.domain.item.ItemGrade;
+import app.domain.item.ItemSet;
 import app.domain.item.ItemType;
+import app.game.catalog.ItemSetCatalogHolder;
+import app.game.combat.CombatFormulas;
 import app.network.message.ingame.GoldLooted;
 import app.network.message.ingame.GoldSpent;
 import app.network.message.ingame.ShotUsed;
@@ -232,7 +240,7 @@ public final class InventorySystem {
         item.setSlot(slot);
         DomainEventPublisher.publish(new GamePlayerEquippedItem(character, item, slot, previousOccupants));
         recomputeGradePenalty();
-        character.recomputeStats();
+        character.getStatSystem().recomputeStats(character.getAttributes(), character.getLevel(), this);
         return Optional.of(slot);
     }
 
@@ -240,7 +248,51 @@ public final class InventorySystem {
         item.setSlot(null);
         DomainEventPublisher.publish(new GamePlayerUnequippedItem(character, item));
         recomputeGradePenalty();
-        character.recomputeStats();
+        character.getStatSystem().recomputeStats(character.getAttributes(), character.getLevel(), this);
+    }
+
+    // Ne dépend que des paramètres reçus (aucun accès à `this`) : appelable
+    // avant que le InventorySystem du personnage n'existe (PlayerInstance
+    // l'appelle avant super(...)), et réutilisée par
+    // StatSystem.recomputeStats() pour les recalculs post-construction.
+    public static Map<ModifiedStat, Integer> computeBaseStats(Map<Attribute, Integer> attributes, int level,
+            List<Item> items, int baseSpeed) {
+        List<Item> equipped = items.stream().filter(item -> item.getSlot() != null).toList();
+        Optional<Item> weapon = equipped.stream().filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
+
+        int weaponPAtk = weapon.map(Item::getPAtk).orElse(CombatFormulas.UNARMED_PATK);
+        int weaponMAtk = weapon.map(Item::getMAtk).orElse(0);
+        int weaponAtkSpd = weapon.map(Item::getAtkSpd).orElse(CombatFormulas.BASE_ATK_SPD);
+        int armorPDefSum = equipped.stream().mapToInt(Item::getPDef).sum();
+        int armorMDefSum = equipped.stream().mapToInt(Item::getMDef).sum();
+        int accuracyItemBonus = equipped.stream().mapToInt(Item::getAccuracyBonus).sum();
+        int evasionItemBonus = equipped.stream().mapToInt(Item::getEvasionBonus).sum();
+        int critItemBonus = equipped.stream().mapToInt(Item::getCritBonus).sum();
+        int armorWeightPenalty = equipped.stream().filter(item -> item.getSlot() == EquipmentSlot.CHEST).findFirst()
+                .map(item -> CombatFormulas.armorWeightPenalty(item.getArmorCategory())).orElse(0);
+
+        Map<ModifiedStat, Integer> stats = CombatFormulas.baseStats(weaponPAtk, weaponMAtk, armorPDefSum, armorMDefSum,
+                accuracyItemBonus, evasionItemBonus, critItemBonus, armorWeightPenalty, weaponAtkSpd, attributes,
+                level);
+        stats.put(ModifiedStat.SPEED, baseSpeed);
+        return stats;
+    }
+
+    public Map<ModifiedStat, Integer> computeSetBonuses() {
+        Map<String, Long> equippedCountBySetId = getEquippedItems().stream().map(Item::getSetId)
+                .filter(Objects::nonNull).collect(Collectors.groupingBy(setId -> setId, Collectors.counting()));
+
+        Map<ModifiedStat, Integer> modifiers = new EnumMap<>(ModifiedStat.class);
+        for (Map.Entry<String, Long> entry : equippedCountBySetId.entrySet()) {
+            ItemSet set = ItemSetCatalogHolder.getById(entry.getKey());
+            int piecesEquipped = entry.getValue().intValue();
+            for (Map.Entry<Integer, Map<ModifiedStat, Integer>> tier : set.bonusByPieceCount().entrySet()) {
+                if (piecesEquipped >= tier.getKey()) {
+                    tier.getValue().forEach((stat, amount) -> modifiers.merge(stat, amount, Integer::sum));
+                }
+            }
+        }
+        return modifiers;
     }
 
     // Marqueur unique dans ActiveEffects tant qu'au moins un objet équipé a un
