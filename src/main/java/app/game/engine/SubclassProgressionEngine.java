@@ -12,6 +12,7 @@ import app.domain.actor.event.CharacterLeveledUp;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.SubclassChoiceAvailable;
 import app.domain.actor.instance.PlayerInstance;
+import app.network.message.ingame.SubclassChoiceOffered;
 
 @Component
 public class SubclassProgressionEngine {
@@ -27,6 +28,7 @@ public class SubclassProgressionEngine {
         }
         List<Subclass> options = Subclass.availableAt(character.getClassSystem().getCharacterClass(), pendingTier);
         if (!options.isEmpty()) {
+            character.send(new SubclassChoiceOffered(pendingTier, options));
             DomainEventPublisher.publish(new SubclassChoiceAvailable(character, pendingTier, options));
             log.info("character.subclass_choice_pending character={} tier={} options={}", character.getName(),
                     pendingTier, options);

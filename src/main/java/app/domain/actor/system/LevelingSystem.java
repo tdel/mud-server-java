@@ -6,6 +6,7 @@ import app.domain.actor.event.CharacterLeveledUp;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.instance.PlayerInstance;
 import app.game.catalog.LevelCatalogHolder;
+import app.network.message.ingame.PlayerLeveledUp;
 import app.network.message.ingame.XpGained;
 
 public final class LevelingSystem {
@@ -67,6 +68,7 @@ public final class LevelingSystem {
 
         character.recomputeStats();
 
+        character.broadcast(new PlayerLeveledUp(character.getName(), level), null);
         DomainEventPublisher.publish(new CharacterLeveledUp(character, level, hpGain));
     }
 }

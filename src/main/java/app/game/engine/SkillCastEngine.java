@@ -35,6 +35,7 @@ import app.network.message.ingame.SkillCastStarted;
 import app.network.message.ingame.SkillFizzled;
 import app.network.message.ingame.SkillModifierAnnounced;
 import app.network.message.ingame.SkillOnCooldown;
+import app.network.message.ingame.ShotOutOfStock;
 
 @Component
 public class SkillCastEngine {
@@ -90,6 +91,12 @@ public class SkillCastEngine {
             if (activeGrade != null) {
                 var outcome = player.getInventorySystem().consumeShot(shotType, activeGrade);
                 if (outcome instanceof InventorySystem.ConsumeShotOutcome.OutOfStock) {
+                    if (shotType == ItemType.SOULSHOT) {
+                        player.setActiveSoulshotGrade(null);
+                    } else {
+                        player.setActiveSpiritshotGrade(null);
+                    }
+                    player.send(new ShotOutOfStock(shotType, activeGrade));
                     DomainEventPublisher.publish(new ShotGradeDepleted(player, shotType, activeGrade));
                 } else {
                     shotCharged = true;

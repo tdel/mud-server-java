@@ -15,6 +15,7 @@ import app.network.ConnectionState;
 import app.network.CommandHandler;
 import app.network.message.Usage;
 import app.network.message.ingame.InvalidShotGrade;
+import app.network.message.ingame.ShotGradeChanged;
 
 @Component
 public class Soulshot implements CommandHandler {
@@ -41,6 +42,7 @@ public class Soulshot implements CommandHandler {
 
         if (ShotGradeArgument.OFF.equalsIgnoreCase(raw)) {
             character.setActiveSoulshotGrade(null);
+            character.send(new ShotGradeChanged(ItemType.SOULSHOT, null));
             DomainEventPublisher.publish(new ShotGradeToggled(character, ItemType.SOULSHOT, null));
             return;
         }
@@ -53,6 +55,7 @@ public class Soulshot implements CommandHandler {
 
         ItemGrade newGrade = requested.get() == character.getActiveSoulshotGrade() ? null : requested.get();
         character.setActiveSoulshotGrade(newGrade);
+        character.send(new ShotGradeChanged(ItemType.SOULSHOT, newGrade));
         DomainEventPublisher.publish(new ShotGradeToggled(character, ItemType.SOULSHOT, newGrade));
     }
 }

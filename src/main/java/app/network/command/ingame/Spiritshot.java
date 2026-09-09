@@ -15,6 +15,7 @@ import app.network.ConnectionState;
 import app.network.CommandHandler;
 import app.network.message.Usage;
 import app.network.message.ingame.InvalidShotGrade;
+import app.network.message.ingame.ShotGradeChanged;
 
 @Component
 public class Spiritshot implements CommandHandler {
@@ -41,6 +42,7 @@ public class Spiritshot implements CommandHandler {
 
         if (ShotGradeArgument.OFF.equalsIgnoreCase(raw)) {
             character.setActiveSpiritshotGrade(null);
+            character.send(new ShotGradeChanged(ItemType.SPIRITSHOT, null));
             DomainEventPublisher.publish(new ShotGradeToggled(character, ItemType.SPIRITSHOT, null));
             return;
         }
@@ -53,6 +55,7 @@ public class Spiritshot implements CommandHandler {
 
         ItemGrade newGrade = requested.get() == character.getActiveSpiritshotGrade() ? null : requested.get();
         character.setActiveSpiritshotGrade(newGrade);
+        character.send(new ShotGradeChanged(ItemType.SPIRITSHOT, newGrade));
         DomainEventPublisher.publish(new ShotGradeToggled(character, ItemType.SPIRITSHOT, newGrade));
     }
 }

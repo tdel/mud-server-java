@@ -10,6 +10,7 @@ import app.domain.actor.event.CharacterDamaged;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.GamePlayerRespawned;
 import app.domain.actor.instance.MonsterInstance;
+import app.domain.actor.system.PvPSystem;
 import app.domain.world.MapInstance;
 import app.network.message.ingame.GamePlayerDefeated;
 import app.network.message.ingame.MonsterDefeated;
@@ -90,6 +91,9 @@ public class RegenHealthEngine {
         double multiplier = party != null ? party.shareMultiplier(eligible.size()) : 1.0;
 
         monster.getLootSystem().grantLootTo(killer, party, eligible, multiplier);
+        monster.getLootSystem().grantXpTo(killer.getName(), eligible, multiplier);
+        killer.getCombatSystem().setTarget(null);
+        killer.getPvpSystem().addKarma(-PvPSystem.KARMA_LOSS_PER_MONSTER_KILL);
     }
 
     @EventListener

@@ -8,6 +8,7 @@ import app.domain.actor.Subclass;
 import app.domain.actor.event.CharacterChoseSubclass;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.instance.PlayerInstance;
+import app.network.message.ingame.SubclassChosen;
 
 public final class ClassSystem {
 
@@ -56,6 +57,7 @@ public final class ClassSystem {
                     + ", classe=" + characterClass + ")");
         }
         subclasses.add(subclass);
+        character.send(new SubclassChosen(tier, subclass));
         DomainEventPublisher.publish(new CharacterChoseSubclass(character, tier, subclass));
     }
 }

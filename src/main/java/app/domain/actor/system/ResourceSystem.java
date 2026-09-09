@@ -6,6 +6,7 @@ import app.domain.actor.event.CharacterRegenerated;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.instance.PlayerInstance;
 import app.game.combat.CombatFormulas;
+import app.network.message.ingame.RegenTick;
 
 // Gère les réserves vitales d'un personnage (vie, mana ; pourra accueillir
 // endurance/stamina etc. plus tard). La vie s'applique à tout AbstractCharacter
@@ -94,6 +95,7 @@ public final class ResourceSystem {
         int healed = heal(hpAmount);
         int manaGained = gainMana(manaAmount);
         if ((healed > 0 || manaGained > 0) && character instanceof PlayerInstance player) {
+            player.send(new RegenTick(healed, manaGained, currentHealth, maxHealth, currentMana, maxMana));
             DomainEventPublisher.publish(new CharacterRegenerated(player, healed, manaGained));
         }
     }

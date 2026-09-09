@@ -27,6 +27,11 @@ import app.domain.item.Item;
 import app.domain.item.ItemExpectation;
 import app.domain.item.ItemGrade;
 import app.domain.item.ItemType;
+import app.network.message.ingame.GoldLooted;
+import app.network.message.ingame.GoldSpent;
+import app.network.message.ingame.ShotUsed;
+import app.network.message.ingame.SoulshotUsed;
+import app.network.message.ingame.SpiritshotUsed;
 
 public final class InventorySystem {
 
@@ -94,6 +99,7 @@ public final class InventorySystem {
 
     public void receiveGold(int amount) {
         addGold(amount);
+        character.send(new GoldLooted(amount));
         DomainEventPublisher.publish(new CharacterReceivedGold(character, amount));
     }
 
@@ -112,6 +118,7 @@ public final class InventorySystem {
         if (!trySpendGold(price)) {
             return false;
         }
+        character.send(new GoldSpent(price));
         DomainEventPublisher.publish(new CharacterSpentGold(character, price));
         Optional<Item> stack = mergeIntoExistingStack(item);
         if (stack.isPresent()) {
@@ -156,7 +163,14 @@ public final class InventorySystem {
         } else {
             item.setQuantity(remaining);
         }
-        DomainEventPublisher.publish(new ShotActivated(character, item, shotType, grade, Math.max(0, remaining)));
+        int remainingQuantity = Math.max(0, remaining);
+        character.send(new ShotUsed(shotType, grade, remainingQuantity));
+        if (shotType == ItemType.SOULSHOT) {
+            character.broadcast(new SoulshotUsed(character.getId(), character.getName(), grade), character);
+        } else {
+            character.broadcast(new SpiritshotUsed(character.getId(), character.getName(), grade), character);
+        }
+        DomainEventPublisher.publish(new ShotActivated(character, item, shotType, grade, remainingQuantity));
         return new ConsumeShotOutcome.Consumed(item, count);
     }
 

@@ -12,6 +12,7 @@ import app.domain.world.AbstractZone;
 import app.domain.world.MapInstance;
 import app.domain.world.NormalZone;
 import app.game.engine.MovementEngine;
+import app.network.message.ingame.PlayerRespawned;
 
 public final class MotionSystem {
 
@@ -98,6 +99,10 @@ public final class MotionSystem {
         character.getResourceSystem().setCurrentHealth(Math.max(1, character.getResourceSystem().getMaxHealth() / 4));
         player.getResourceSystem().setCurrentMana(0);
         moveToMap(destination, position);
+        player.send(new PlayerRespawned(player.getMotionSystem().getCurrentMap().getName(),
+                player.getMotionSystem().getPosition().x(), player.getMotionSystem().getPosition().y(),
+                player.getResourceSystem().getCurrentHealth(), player.getResourceSystem().getMaxHealth(),
+                player.getResourceSystem().getCurrentMana(), player.getResourceSystem().getMaxMana()));
         DomainEventPublisher.publish(new GamePlayerRespawned(player));
     }
 }

@@ -7,6 +7,9 @@ import app.domain.actor.instance.PlayerInstance;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.GamePlayerUsedManaPotion;
 import app.domain.actor.event.GamePlayerUsedPotion;
+import app.network.message.ingame.CharacterUsedItem;
+import app.network.message.ingame.ItemUsed;
+import app.network.message.ingame.ManaPotionUsed;
 
 public class ConsumableItem extends ItemTemplate {
 
@@ -30,12 +33,20 @@ public class ConsumableItem extends ItemTemplate {
     private void heal(PlayerInstance character, Item item) {
         int healed = character.getResourceSystem().heal(effectAmount);
         character.getInventorySystem().removeItem(item);
+        character.send(new ItemUsed(item.getId(), item.getName(), item.getGrade(), healed,
+                character.getResourceSystem().getCurrentHealth(), character.getResourceSystem().getMaxHealth()));
+        character.broadcast(new CharacterUsedItem(character.getId(), character.getName(), item.getId(), item.getName()),
+                character);
         DomainEventPublisher.publish(new GamePlayerUsedPotion(character, item, healed));
     }
 
     private void restoreMana(PlayerInstance character, Item item) {
         int restored = character.getResourceSystem().gainMana(effectAmount);
         character.getInventorySystem().removeItem(item);
+        character.send(new ManaPotionUsed(item.getId(), item.getName(), item.getGrade(), restored,
+                character.getResourceSystem().getCurrentMana(), character.getResourceSystem().getMaxMana()));
+        character.broadcast(new CharacterUsedItem(character.getId(), character.getName(), item.getId(), item.getName()),
+                character);
         DomainEventPublisher.publish(new GamePlayerUsedManaPotion(character, item, restored));
     }
 }

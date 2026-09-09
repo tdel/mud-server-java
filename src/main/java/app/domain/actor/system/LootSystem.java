@@ -62,6 +62,15 @@ public final class LootSystem {
         return loot;
     }
 
+    public void grantXpTo(String killerName, List<PlayerInstance> eligibleMembers, double xpShareMultiplier) {
+        int perMemberXp = (int) (xpReward * xpShareMultiplier) / eligibleMembers.size();
+        for (PlayerInstance member : eligibleMembers) {
+            member.getLevelingSystem().gainXp(perMemberXp);
+        }
+        log.info("loot.xp_granted killer={} xpReward={} partySize={} perMemberXp={}", killerName, xpReward,
+                eligibleMembers.size(), perMemberXp);
+    }
+
     public int getXpReward() {
         return xpReward;
     }
