@@ -50,7 +50,7 @@ public class Shop implements CommandHandler {
             return;
         }
 
-        List<ShopCatalog.Entry> entries = seller.get().shop().items().stream()
+        List<ShopCatalog.Entry> entries = seller.get().getSellSystem().shop().items().stream()
                 .map(entry -> new ShopCatalog.Entry(entry.itemTemplate().getId(), entry.itemTemplate().getName(),
                         entry.itemTemplate().getGrade(), entry.price()))
                 .toList();

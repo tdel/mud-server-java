@@ -26,7 +26,7 @@ import app.domain.world.WorldTemplate;
 import app.domain.world.WorldTemplateSummary;
 import app.domain.actor.AbstractNpc;
 import app.domain.actor.AbstractNpc.NpcDialogueOptionType;
-import app.domain.actor.instance.NpcSellerInstance;
+import app.domain.actor.system.SellSystem;
 import app.domain.actor.template.NpcTemplate;
 import app.game.catalog.tiled.TiledMap;
 import app.game.catalog.tiled.TiledMapLoader;
@@ -224,7 +224,7 @@ public class WorldTemplateCatalog {
                 }
 
                 AbstractNpc.NpcDialogue dialogue = toDialogue(definition);
-                NpcSellerInstance.NpcShop shop = toShop(shortName, definition, itemTemplatesById);
+                SellSystem.NpcShop shop = toShop(shortName, definition, itemTemplatesById);
 
                 NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), definition.title(),
                         map.getId(), spawn.position(), dialogue, shop, definition.level(), Set.of(), Set.of(),
@@ -248,7 +248,7 @@ public class WorldTemplateCatalog {
         return new AbstractNpc.NpcDialogue(dialogueDef.greeting(), options);
     }
 
-    private NpcSellerInstance.NpcShop toShop(String shortName, NpcDefinition definition,
+    private SellSystem.NpcShop toShop(String shortName, NpcDefinition definition,
             Map<UUID, ItemTemplate> itemTemplatesById) {
         DialogueDefinition dialogueDef = definition.dialogue();
         if (dialogueDef == null) {
@@ -266,7 +266,7 @@ public class WorldTemplateCatalog {
                     + " a une option SHOP mais aucun catalogue \"shop\"");
         }
 
-        List<NpcSellerInstance.NpcShopEntry> entries = new ArrayList<>();
+        List<SellSystem.NpcShopEntry> entries = new ArrayList<>();
         for (ShopEntryDefinition entry : shopDef.items()) {
             ItemTemplate itemTemplate = itemTemplatesById.get(entry.itemTemplateId());
             if (itemTemplate == null) {
@@ -277,9 +277,9 @@ public class WorldTemplateCatalog {
                 throw new IllegalStateException("NPC " + definition.id() + " du monde " + shortName + " vend l'item "
                         + entry.itemTemplateId() + " à un prix invalide (" + entry.price() + ")");
             }
-            entries.add(new NpcSellerInstance.NpcShopEntry(itemTemplate, entry.price()));
+            entries.add(new SellSystem.NpcShopEntry(itemTemplate, entry.price()));
         }
-        return new NpcSellerInstance.NpcShop(entries);
+        return new SellSystem.NpcShop(entries);
     }
 
     private <T> T readXmlList(String fileName, TypeReference<T> typeReference) {

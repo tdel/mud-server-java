@@ -9,6 +9,7 @@ import app.network.CommandArguments;
 import app.network.CommandHandler;
 import app.domain.actor.instance.PlayerInstance;
 import app.domain.actor.instance.NpcSellerInstance;
+import app.domain.actor.system.SellSystem;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
@@ -18,7 +19,7 @@ import app.network.message.ingame.TargetNotFound;
 
 // Achat en une commande stateless : "<npcUuid>|<itemTemplateUuidOuNom>|<quantité>",
 // résolu et vérifié ici, la solvabilité/le débit restant entièrement dans
-// NpcSellerInstance.sell (achat tout-ou-rien, cf. son commentaire).
+// SellSystem.sell (achat tout-ou-rien, cf. son commentaire).
 @Component
 public class Buy implements CommandHandler {
 
@@ -70,13 +71,11 @@ public class Buy implements CommandHandler {
             return;
         }
 
-        switch (seller.get().sell(character, itemArg, quantity)) {
-            case NpcSellerInstance.PurchaseOutcome.Purchased ignored -> {
+        switch (seller.get().getSellSystem().sell(character, itemArg, quantity)) {
+            case SellSystem.PurchaseOutcome.Purchased ignored -> {
             }
-            case NpcSellerInstance.PurchaseOutcome.EntryNotFound ignored ->
-                connection.send(new ShopItemNotFound(itemArg));
-            case NpcSellerInstance.PurchaseOutcome.InsufficientGold(int price) ->
-                connection.send(new NotEnoughGold(price));
+            case SellSystem.PurchaseOutcome.EntryNotFound ignored -> connection.send(new ShopItemNotFound(itemArg));
+            case SellSystem.PurchaseOutcome.InsufficientGold(int price) -> connection.send(new NotEnoughGold(price));
         }
     }
 }
