@@ -32,6 +32,7 @@ import app.domain.actor.event.ShotActivated;
 import app.domain.actor.event.ShotGradeDepleted;
 import app.domain.actor.event.ShotGradeToggled;
 import app.domain.actor.event.SubclassChoiceAvailable;
+import app.domain.actor.system.PvPSystem;
 import app.domain.item.ItemType;
 import app.network.message.ingame.CharacterUsedItem;
 import app.network.message.ingame.GoldLooted;
@@ -59,11 +60,6 @@ import app.persistence.CharacterDao;
 public class CharacterPersistenceListener {
 
     private static final Logger log = LoggerFactory.getLogger(CharacterPersistenceListener.class);
-
-    // Valeurs de départ façon L2J, à ajuster selon l'équilibrage souhaité.
-    private static final int KARMA_GAIN_PER_PK = 100;
-    private static final int KARMA_LOSS_ON_DEATH = 100;
-    private static final int KARMA_LOSS_PER_MONSTER_KILL = 1;
 
     private final CharacterDao characterDao;
 
@@ -151,7 +147,7 @@ public class CharacterPersistenceListener {
             member.gainXp(perMemberXp);
         }
         killer.getCombatSystem().setTarget(null);
-        killer.addKarma(-KARMA_LOSS_PER_MONSTER_KILL);
+        killer.getPvpSystem().addKarma(-PvPSystem.KARMA_LOSS_PER_MONSTER_KILL);
         log.info("combat.kill_credited killer={} monster={} xpReward={} partySize={} perMemberXp={}", killer.getName(),
                 monster.getName(), xpReward, eligible.size(), perMemberXp);
     }
@@ -165,18 +161,18 @@ public class CharacterPersistenceListener {
                 || !(event.killer() instanceof PlayerInstance killer)) {
             return;
         }
-        if (victim.isPvpFlagged()) {
-            killer.recordPvpKill();
+        if (victim.getPvpSystem().isPvpFlagged()) {
+            killer.getPvpSystem().recordPvpKill();
         } else {
-            killer.recordPlayerKill();
-            killer.addKarma(KARMA_GAIN_PER_PK);
+            killer.getPvpSystem().recordPlayerKill();
+            killer.getPvpSystem().addKarma(PvPSystem.KARMA_GAIN_PER_PK);
         }
-        if (victim.getKarma() > 0) {
-            victim.addKarma(-KARMA_LOSS_ON_DEATH);
+        if (victim.getPvpSystem().getKarma() > 0) {
+            victim.getPvpSystem().addKarma(-PvPSystem.KARMA_LOSS_ON_DEATH);
         }
         killer.getCombatSystem().setTarget(null);
         log.info("pvp.player_killed victim={} killer={} victimWasPvpFlagged={} killerKarma={}", victim.getName(),
-                killer.getName(), victim.isPvpFlagged(), killer.getKarma());
+                killer.getName(), victim.getPvpSystem().isPvpFlagged(), killer.getPvpSystem().getKarma());
     }
 
     @EventListener
@@ -289,16 +285,18 @@ public class CharacterPersistenceListener {
     void onCharacterRecordedPlayerKill(CharacterRecordedPlayerKill event) {
         PlayerInstance character = event.character();
         characterDao.update(character);
-        character.send(new PlayerKillRecorded(character.getPkCount()));
-        log.info("character.pk_recorded character={} pkCount={}", character.getName(), character.getPkCount());
+        character.send(new PlayerKillRecorded(character.getPvpSystem().getPkCount()));
+        log.info("character.pk_recorded character={} pkCount={}", character.getName(),
+                character.getPvpSystem().getPkCount());
     }
 
     @EventListener
     void onCharacterRecordedPvpKill(CharacterRecordedPvpKill event) {
         PlayerInstance character = event.character();
         characterDao.update(character);
-        character.send(new PvpKillRecorded(character.getPvpCount()));
-        log.info("character.pvp_kill_recorded character={} pvpCount={}", character.getName(), character.getPvpCount());
+        character.send(new PvpKillRecorded(character.getPvpSystem().getPvpCount()));
+        log.info("character.pvp_kill_recorded character={} pvpCount={}", character.getName(),
+                character.getPvpSystem().getPvpCount());
     }
 
     // Seul le booléen est persisté, pas l'échéance (voir PlayerInstance) : à la

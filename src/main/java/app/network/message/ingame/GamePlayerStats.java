@@ -58,8 +58,8 @@ public record GamePlayerStats(PlayerInstance character) implements OutputJsonMes
                 attributeScore(c, Attribute.DEX), attributeScore(c, Attribute.CON), attributeScore(c, Attribute.INT),
                 attributeScore(c, Attribute.WIT), attributeScore(c, Attribute.MEN),
                 MovementEngine.unitsPerSecond(c.getMotionSystem().getSpeed()), c.getXp(), xpForCurrentLevel,
-                xpForNextLevel, c.getActiveSoulshotGrade(), c.getActiveSpiritshotGrade(), c.getKarma(), c.getPkCount(),
-                c.getPvpCount(), c.isPvpFlagged()));
+                xpForNextLevel, c.getActiveSoulshotGrade(), c.getActiveSpiritshotGrade(), c.getPvpSystem().getKarma(),
+                c.getPvpSystem().getPkCount(), c.getPvpSystem().getPvpCount(), c.getPvpSystem().isPvpFlagged()));
     }
 
     private static AttributeScore attributeScore(PlayerInstance c, Attribute attribute) {

@@ -1,7 +1,5 @@
 package app.domain.actor.instance;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -21,17 +19,13 @@ import app.domain.ActiveEffect;
 import app.domain.actor.system.AppearanceSystem;
 import app.domain.actor.system.ClassSystem;
 import app.domain.actor.system.InventorySystem;
+import app.domain.actor.system.PvPSystem;
 import app.domain.actor.event.CharacterGainedXp;
-import app.domain.actor.event.CharacterKarmaChanged;
 import app.domain.actor.event.CharacterLeveledUp;
-import app.domain.actor.event.CharacterRecordedPlayerKill;
-import app.domain.actor.event.CharacterRecordedPvpKill;
 import app.domain.actor.event.CharacterRegenerated;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.GamePlayerMovedToMap;
 import app.domain.actor.event.GamePlayerRespawned;
-import app.domain.actor.event.PlayerPvpFlagCleared;
-import app.domain.actor.event.PlayerPvpFlagged;
 import app.game.catalog.LevelCatalogHolder;
 import app.domain.item.EquipmentSlot;
 import app.domain.item.ItemGrade;
@@ -48,11 +42,6 @@ import app.network.message.ingame.XpGained;
 
 public final class PlayerInstance extends AbstractCharacter {
 
-    // Comme en L2J : le flag PvP retombe après 10 minutes sans nouvelle attaque
-    // sur un autre joueur (voir PvpEngine, qui parcourt les personnages en ligne
-    // toutes les 5s pour comparer à pvpFlagExpiresAt).
-    private static final Duration PVP_FLAG_DURATION = Duration.ofMinutes(10);
-
     private final Account account;
     private WorldInstance worldInstance;
     private final AppearanceSystem appearanceSystem;
@@ -68,15 +57,7 @@ public final class PlayerInstance extends AbstractCharacter {
     private int currentMana;
     private volatile ItemGrade activeSoulshotGrade;
     private volatile ItemGrade activeSpiritshotGrade;
-    private int karma;
-    private int pkCount;
-    private int pvpCount;
-    // Le booléen est persisté (character.pvp_flagged) pour survivre à une
-    // déconnexion, mais pas l'échéance : par simplification, un personnage qui se
-    // reconnecte flaggé reprend pour 10 minutes pleines plutôt que de reprendre le
-    // temps restant au moment de sa déconnexion (voir le constructeur).
-    private volatile boolean pvpFlagged;
-    private volatile Instant pvpFlagExpiresAt;
+    private final PvPSystem pvpSystem;
 
     public PlayerInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
@@ -97,11 +78,7 @@ public final class PlayerInstance extends AbstractCharacter {
         this.currentMana = currentMana;
         this.activeSoulshotGrade = activeSoulshotGrade;
         this.activeSpiritshotGrade = activeSpiritshotGrade;
-        this.karma = karma;
-        this.pkCount = pkCount;
-        this.pvpCount = pvpCount;
-        this.pvpFlagged = pvpFlagged;
-        this.pvpFlagExpiresAt = pvpFlagged ? Instant.now().plus(PVP_FLAG_DURATION) : null;
+        this.pvpSystem = new PvPSystem(this, karma, pkCount, pvpCount, pvpFlagged);
         inventorySystem.recomputeGradePenalty();
         getStatSystem().setSetBonuses(computeSetBonuses());
     }
@@ -343,6 +320,10 @@ public final class PlayerInstance extends AbstractCharacter {
         return inventorySystem;
     }
 
+    public PvPSystem getPvpSystem() {
+        return pvpSystem;
+    }
+
     public ItemGrade getActiveSoulshotGrade() {
         return activeSoulshotGrade;
     }
@@ -357,63 +338,6 @@ public final class PlayerInstance extends AbstractCharacter {
 
     public void setActiveSpiritshotGrade(ItemGrade activeSpiritshotGrade) {
         this.activeSpiritshotGrade = activeSpiritshotGrade;
-    }
-
-    public int getKarma() {
-        return karma;
-    }
-
-    public int getPkCount() {
-        return pkCount;
-    }
-
-    public int getPvpCount() {
-        return pvpCount;
-    }
-
-    public boolean isPvpFlagged() {
-        return pvpFlagged;
-    }
-
-    // Pose ou prolonge le flag PvP ; ne republie l'événement qu'à la transition
-    // non-flaggé -> flaggé, pour ne pas spammer un événement à chaque attaque
-    // d'un joueur déjà flaggé (PvpEngine appelle cette méthode depuis
-    // CharacterBeginAttack).
-    public void flagPvp() {
-        pvpFlagExpiresAt = Instant.now().plus(PVP_FLAG_DURATION);
-        if (!pvpFlagged) {
-            pvpFlagged = true;
-            DomainEventPublisher.publish(new PlayerPvpFlagged(this));
-        }
-    }
-
-    public boolean isPvpFlagExpired() {
-        return pvpFlagged && Instant.now().isAfter(pvpFlagExpiresAt);
-    }
-
-    public void clearPvpFlag() {
-        pvpFlagged = false;
-        pvpFlagExpiresAt = null;
-        DomainEventPublisher.publish(new PlayerPvpFlagCleared(this));
-    }
-
-    // Le karma ne descend jamais sous 0 (convention L2J : 0 = "innocent").
-    public void addKarma(int amount) {
-        int newKarma = Math.max(0, karma + amount);
-        if (newKarma != karma) {
-            karma = newKarma;
-            DomainEventPublisher.publish(new CharacterKarmaChanged(this, karma));
-        }
-    }
-
-    public void recordPlayerKill() {
-        pkCount++;
-        DomainEventPublisher.publish(new CharacterRecordedPlayerKill(this));
-    }
-
-    public void recordPvpKill() {
-        pvpCount++;
-        DomainEventPublisher.publish(new CharacterRecordedPvpKill(this));
     }
 
     @Override

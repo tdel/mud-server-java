@@ -76,8 +76,9 @@ public class CharacterDao {
                         character.getInventorySystem().getGold(), character.getMaxMana(), character.getCurrentMana(),
                         name(character.getClassSystem().getSubclass(1)),
                         name(character.getClassSystem().getSubclass(2)), gradeName(character.getActiveSoulshotGrade()),
-                        gradeName(character.getActiveSpiritshotGrade()), character.getKarma(), character.getPkCount(),
-                        character.getPvpCount(), character.isPvpFlagged())
+                        gradeName(character.getActiveSpiritshotGrade()), character.getPvpSystem().getKarma(),
+                        character.getPvpSystem().getPkCount(), character.getPvpSystem().getPvpCount(),
+                        character.getPvpSystem().isPvpFlagged())
                 .execute();
     }
 
@@ -126,8 +127,10 @@ public class CharacterDao {
                 .set(CHARACTER.SUBCLASS_TIER2, name(character.getClassSystem().getSubclass(2)))
                 .set(CHARACTER.ACTIVE_SOULSHOT_GRADE, gradeName(character.getActiveSoulshotGrade()))
                 .set(CHARACTER.ACTIVE_SPIRITSHOT_GRADE, gradeName(character.getActiveSpiritshotGrade()))
-                .set(CHARACTER.KARMA, character.getKarma()).set(CHARACTER.PK_COUNT, character.getPkCount())
-                .set(CHARACTER.PVP_COUNT, character.getPvpCount()).set(CHARACTER.PVP_FLAGGED, character.isPvpFlagged())
+                .set(CHARACTER.KARMA, character.getPvpSystem().getKarma())
+                .set(CHARACTER.PK_COUNT, character.getPvpSystem().getPkCount())
+                .set(CHARACTER.PVP_COUNT, character.getPvpSystem().getPvpCount())
+                .set(CHARACTER.PVP_FLAGGED, character.getPvpSystem().isPvpFlagged())
                 .where(CHARACTER.ID.eq(character.getId())).execute();
     }
 

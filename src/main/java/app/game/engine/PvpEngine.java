@@ -35,10 +35,10 @@ public class PvpEngine {
                 || !(event.defender() instanceof PlayerInstance defender)) {
             return;
         }
-        if (defender.getKarma() > 0) {
+        if (defender.getPvpSystem().getKarma() > 0) {
             return;
         }
-        attacker.flagPvp();
+        attacker.getPvpSystem().flagPvp();
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
@@ -51,8 +51,8 @@ public class PvpEngine {
 
     void expireFlags(Collection<PlayerInstance> onlineCharacters) {
         for (PlayerInstance character : onlineCharacters) {
-            if (character.isPvpFlagExpired()) {
-                character.clearPvpFlag();
+            if (character.getPvpSystem().isPvpFlagExpired()) {
+                character.getPvpSystem().clearPvpFlag();
                 log.info("pvp.flag_expired character={}", character.getId());
             }
         }
