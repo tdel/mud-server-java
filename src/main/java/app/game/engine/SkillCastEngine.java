@@ -86,15 +86,15 @@ public class SkillCastEngine {
                     ? ItemType.SOULSHOT
                     : ItemType.SPIRITSHOT;
             ItemGrade activeGrade = shotType == ItemType.SOULSHOT
-                    ? player.getActiveSoulshotGrade()
-                    : player.getActiveSpiritshotGrade();
+                    ? player.getInventorySystem().getActiveSoulshotGrade()
+                    : player.getInventorySystem().getActiveSpiritshotGrade();
             if (activeGrade != null) {
                 var outcome = player.getInventorySystem().consumeShot(shotType, activeGrade);
                 if (outcome instanceof InventorySystem.ConsumeShotOutcome.OutOfStock) {
                     if (shotType == ItemType.SOULSHOT) {
-                        player.setActiveSoulshotGrade(null);
+                        player.getInventorySystem().setActiveSoulshotGrade(null);
                     } else {
-                        player.setActiveSpiritshotGrade(null);
+                        player.getInventorySystem().setActiveSpiritshotGrade(null);
                     }
                     player.send(new ShotOutOfStock(shotType, activeGrade));
                     DomainEventPublisher.publish(new ShotGradeDepleted(player, shotType, activeGrade));

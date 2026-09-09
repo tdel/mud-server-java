@@ -40,12 +40,33 @@ public final class InventorySystem {
     private final PlayerInstance character;
     private final List<Item> items = new CopyOnWriteArrayList<>();
     private int gold;
+    private volatile ItemGrade activeSoulshotGrade;
+    private volatile ItemGrade activeSpiritshotGrade;
 
-    public InventorySystem(PlayerInstance character, int gold, List<Item> items) {
+    public InventorySystem(PlayerInstance character, int gold, List<Item> items, ItemGrade activeSoulshotGrade,
+            ItemGrade activeSpiritshotGrade) {
         this.character = character;
         this.gold = gold;
         this.items.addAll(items);
         items.forEach(item -> item.attachOwner(this.character));
+        this.activeSoulshotGrade = activeSoulshotGrade;
+        this.activeSpiritshotGrade = activeSpiritshotGrade;
+    }
+
+    public ItemGrade getActiveSoulshotGrade() {
+        return activeSoulshotGrade;
+    }
+
+    public void setActiveSoulshotGrade(ItemGrade activeSoulshotGrade) {
+        this.activeSoulshotGrade = activeSoulshotGrade;
+    }
+
+    public ItemGrade getActiveSpiritshotGrade() {
+        return activeSpiritshotGrade;
+    }
+
+    public void setActiveSpiritshotGrade(ItemGrade activeSpiritshotGrade) {
+        this.activeSpiritshotGrade = activeSpiritshotGrade;
     }
 
     public int getGold() {

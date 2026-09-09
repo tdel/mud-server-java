@@ -9,9 +9,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import app.domain.Account;
-import app.domain.Party;
 import app.domain.PassiveSkill;
-import app.domain.PendingPartyInvite;
 import app.domain.ActiveSkill;
 import app.domain.SkillElement;
 import app.domain.actor.*;
@@ -20,6 +18,7 @@ import app.domain.actor.system.AppearanceSystem;
 import app.domain.actor.system.ClassSystem;
 import app.domain.actor.system.InventorySystem;
 import app.domain.actor.system.LevelingSystem;
+import app.domain.actor.system.PartySystem;
 import app.domain.actor.system.PvPSystem;
 import app.domain.item.EquipmentSlot;
 import app.domain.item.ItemGrade;
@@ -42,10 +41,7 @@ public final class PlayerInstance extends AbstractCharacter {
 
     private Connection connection;
     private final InventorySystem inventorySystem;
-    private Party party;
-    private PendingPartyInvite pendingInvite;
-    private volatile ItemGrade activeSoulshotGrade;
-    private volatile ItemGrade activeSpiritshotGrade;
+    private final PartySystem partySystem = new PartySystem();
     private final PvPSystem pvpSystem;
 
     public PlayerInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
@@ -61,11 +57,9 @@ public final class PlayerInstance extends AbstractCharacter {
         this.appearanceSystem = new AppearanceSystem(this, gender, race);
         this.classSystem = new ClassSystem(this, characterClass, subclasses);
         this.levelingSystem = new LevelingSystem(this, level, xp);
-        this.inventorySystem = new InventorySystem(this, gold, items);
+        this.inventorySystem = new InventorySystem(this, gold, items, activeSoulshotGrade, activeSpiritshotGrade);
         getResourceSystem().setMaxMana(maxMana);
         getResourceSystem().setCurrentMana(currentMana);
-        this.activeSoulshotGrade = activeSoulshotGrade;
-        this.activeSpiritshotGrade = activeSpiritshotGrade;
         this.pvpSystem = new PvPSystem(this, karma, pkCount, pvpCount, pvpFlagged);
         inventorySystem.recomputeGradePenalty();
         getStatSystem().setSetBonuses(computeSetBonuses());
@@ -173,20 +167,8 @@ public final class PlayerInstance extends AbstractCharacter {
         this.connection = connection;
     }
 
-    public Party getParty() {
-        return party;
-    }
-
-    public void setParty(Party party) {
-        this.party = party;
-    }
-
-    public PendingPartyInvite getPendingInvite() {
-        return pendingInvite;
-    }
-
-    public void setPendingInvite(PendingPartyInvite pendingInvite) {
-        this.pendingInvite = pendingInvite;
+    public PartySystem getPartySystem() {
+        return partySystem;
     }
 
     @Override
@@ -200,22 +182,6 @@ public final class PlayerInstance extends AbstractCharacter {
 
     public PvPSystem getPvpSystem() {
         return pvpSystem;
-    }
-
-    public ItemGrade getActiveSoulshotGrade() {
-        return activeSoulshotGrade;
-    }
-
-    public void setActiveSoulshotGrade(ItemGrade activeSoulshotGrade) {
-        this.activeSoulshotGrade = activeSoulshotGrade;
-    }
-
-    public ItemGrade getActiveSpiritshotGrade() {
-        return activeSpiritshotGrade;
-    }
-
-    public void setActiveSpiritshotGrade(ItemGrade activeSpiritshotGrade) {
-        this.activeSpiritshotGrade = activeSpiritshotGrade;
     }
 
     @Override

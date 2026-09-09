@@ -41,7 +41,7 @@ public class Spiritshot implements CommandHandler {
         }
 
         if (ShotGradeArgument.OFF.equalsIgnoreCase(raw)) {
-            character.setActiveSpiritshotGrade(null);
+            character.getInventorySystem().setActiveSpiritshotGrade(null);
             character.send(new ShotGradeChanged(ItemType.SPIRITSHOT, null));
             DomainEventPublisher.publish(new ShotGradeToggled(character, ItemType.SPIRITSHOT, null));
             return;
@@ -53,8 +53,10 @@ public class Spiritshot implements CommandHandler {
             return;
         }
 
-        ItemGrade newGrade = requested.get() == character.getActiveSpiritshotGrade() ? null : requested.get();
-        character.setActiveSpiritshotGrade(newGrade);
+        ItemGrade newGrade = requested.get() == character.getInventorySystem().getActiveSpiritshotGrade()
+                ? null
+                : requested.get();
+        character.getInventorySystem().setActiveSpiritshotGrade(newGrade);
         character.send(new ShotGradeChanged(ItemType.SPIRITSHOT, newGrade));
         DomainEventPublisher.publish(new ShotGradeToggled(character, ItemType.SPIRITSHOT, newGrade));
     }

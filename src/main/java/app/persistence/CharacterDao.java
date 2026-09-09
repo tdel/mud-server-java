@@ -76,10 +76,11 @@ public class CharacterDao {
                         character.getLevelingSystem().getXp(), character.getInventorySystem().getGold(),
                         character.getResourceSystem().getMaxMana(), character.getResourceSystem().getCurrentMana(),
                         name(character.getClassSystem().getSubclass(1)),
-                        name(character.getClassSystem().getSubclass(2)), gradeName(character.getActiveSoulshotGrade()),
-                        gradeName(character.getActiveSpiritshotGrade()), character.getPvpSystem().getKarma(),
-                        character.getPvpSystem().getPkCount(), character.getPvpSystem().getPvpCount(),
-                        character.getPvpSystem().isPvpFlagged())
+                        name(character.getClassSystem().getSubclass(2)),
+                        gradeName(character.getInventorySystem().getActiveSoulshotGrade()),
+                        gradeName(character.getInventorySystem().getActiveSpiritshotGrade()),
+                        character.getPvpSystem().getKarma(), character.getPvpSystem().getPkCount(),
+                        character.getPvpSystem().getPvpCount(), character.getPvpSystem().isPvpFlagged())
                 .execute();
     }
 
@@ -128,8 +129,10 @@ public class CharacterDao {
                 .set(CHARACTER.CURRENT_MANA, character.getResourceSystem().getCurrentMana())
                 .set(CHARACTER.SUBCLASS_TIER1, name(character.getClassSystem().getSubclass(1)))
                 .set(CHARACTER.SUBCLASS_TIER2, name(character.getClassSystem().getSubclass(2)))
-                .set(CHARACTER.ACTIVE_SOULSHOT_GRADE, gradeName(character.getActiveSoulshotGrade()))
-                .set(CHARACTER.ACTIVE_SPIRITSHOT_GRADE, gradeName(character.getActiveSpiritshotGrade()))
+                .set(CHARACTER.ACTIVE_SOULSHOT_GRADE,
+                        gradeName(character.getInventorySystem().getActiveSoulshotGrade()))
+                .set(CHARACTER.ACTIVE_SPIRITSHOT_GRADE,
+                        gradeName(character.getInventorySystem().getActiveSpiritshotGrade()))
                 .set(CHARACTER.KARMA, character.getPvpSystem().getKarma())
                 .set(CHARACTER.PK_COUNT, character.getPvpSystem().getPkCount())
                 .set(CHARACTER.PVP_COUNT, character.getPvpSystem().getPvpCount())

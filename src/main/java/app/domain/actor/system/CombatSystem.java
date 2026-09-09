@@ -16,6 +16,7 @@ import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.ShotGradeDepleted;
 import app.domain.actor.instance.PlayerInstance;
+import app.domain.item.ItemGrade;
 import app.domain.item.ItemType;
 import app.domain.world.PeaceZone;
 import app.game.combat.CombatFormulas;
@@ -96,11 +97,12 @@ public final class CombatSystem {
         // en L2J — d'où sa place ici, avant le jet de touche, une fois l'attaque
         // garantie de se produire (toutes les guards ci-dessus déjà passées).
         boolean shotCharged = false;
-        if (character instanceof PlayerInstance player && player.getActiveSoulshotGrade() != null) {
-            var outcome = player.getInventorySystem().consumeShot(ItemType.SOULSHOT, player.getActiveSoulshotGrade());
+        if (character instanceof PlayerInstance player
+                && player.getInventorySystem().getActiveSoulshotGrade() != null) {
+            ItemGrade grade = player.getInventorySystem().getActiveSoulshotGrade();
+            var outcome = player.getInventorySystem().consumeShot(ItemType.SOULSHOT, grade);
             if (outcome instanceof InventorySystem.ConsumeShotOutcome.OutOfStock) {
-                DomainEventPublisher
-                        .publish(new ShotGradeDepleted(player, ItemType.SOULSHOT, player.getActiveSoulshotGrade()));
+                DomainEventPublisher.publish(new ShotGradeDepleted(player, ItemType.SOULSHOT, grade));
             } else {
                 shotCharged = true;
             }
