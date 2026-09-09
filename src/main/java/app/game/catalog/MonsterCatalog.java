@@ -97,8 +97,7 @@ public class MonsterCatalog {
         MonsterInstance monster = new MonsterInstance(spawn.id(), template.getName(), template.getAttributes(),
                 template.getMaxHealth(), baseStats, spawn.position(), template.getKnownSkills(),
                 template.getKnownPassiveSkills(), template.getActiveEffects(), template.getLevel(),
-                template.getAggroRadius(), template.getElementalResistances(), template.getXpReward(),
-                template.getGoldReward(), template.getLootTable());
+                template.getAggroRadius(), template.getXpReward(), template.getGoldReward(), template.getLootTable());
         monster.getMotionSystem().setCurrentMap(map);
         map.placeMonster(monster, spawn.position());
         log.info("monster.spawned name={} map={} position={} id={}", monster.getName(), map.getName(), spawn.position(),

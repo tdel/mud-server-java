@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import app.domain.ActiveEffect;
 import app.domain.ActiveSkill;
 import app.domain.PassiveSkill;
-import app.domain.SkillElement;
 import app.domain.actor.Attribute;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.ModifiedStat;
@@ -22,31 +21,23 @@ public final class MonsterInstance extends AbstractCharacter {
     private final Position spawnPosition;
 
     private final int aggroRadius;
-    private final Map<SkillElement, Integer> elementalResistances;
 
     public volatile MonsterAiEngine.PursuitState pursuit;
 
     public MonsterInstance(UUID id, String name, Map<Attribute, Integer> attributes, int maxHealth,
             Map<ModifiedStat, Integer> baseStats, Position spawnPosition, Set<ActiveSkill> knownSkills,
             Set<PassiveSkill> knownPassiveSkills, List<ActiveEffect> activeEffects, int level, int aggroRadius,
-            Map<SkillElement, Integer> elementalResistances, int xpReward, int goldReward,
-            List<LootTableEntry> lootTable) {
+            int xpReward, int goldReward, List<LootTableEntry> lootTable) {
         super(id, name, attributes, maxHealth, maxHealth,
                 knownSkills.stream().collect(Collectors.toMap(skill -> skill, skill -> 1)),
                 knownPassiveSkills.stream().collect(Collectors.toMap(skill -> skill, skill -> 1)), activeEffects,
-                baseStats, false, xpReward, goldReward, lootTable, level, 0);
+                baseStats, false, xpReward, goldReward, lootTable, level, 0, 0, List.of(), null, null);
         this.spawnPosition = spawnPosition;
         this.aggroRadius = aggroRadius;
-        this.elementalResistances = elementalResistances;
     }
 
     public int getAggroRadius() {
         return aggroRadius;
-    }
-
-    @Override
-    protected Map<SkillElement, Integer> elementalResistanceMap() {
-        return elementalResistances;
     }
 
     public Position getSpawnPosition() {

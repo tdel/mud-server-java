@@ -13,7 +13,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import app.domain.ActiveEffect;
+import app.domain.SkillElement;
 import app.domain.StatModifier;
+import app.domain.actor.AbstractCharacter;
 import app.domain.actor.Attribute;
 import app.domain.actor.ModifiedStat;
 import app.domain.actor.event.CharacterLootedItem;
@@ -45,13 +47,13 @@ public final class InventorySystem {
 
     private static final UUID GRADE_PENALTY_EFFECT_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
 
-    private final PlayerInstance character;
+    private final AbstractCharacter character;
     private final List<Item> items = new CopyOnWriteArrayList<>();
     private int gold;
     private volatile ItemGrade activeSoulshotGrade;
     private volatile ItemGrade activeSpiritshotGrade;
 
-    public InventorySystem(PlayerInstance character, int gold, List<Item> items, ItemGrade activeSoulshotGrade,
+    public InventorySystem(AbstractCharacter character, int gold, List<Item> items, ItemGrade activeSoulshotGrade,
             ItemGrade activeSpiritshotGrade) {
         this.character = character;
         this.gold = gold;
@@ -109,6 +111,11 @@ public final class InventorySystem {
         return getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
     }
 
+    public int getElementalResistance(SkillElement element) {
+        return getEquippedItems().stream().mapToInt(item -> item.getElementalResistances().getOrDefault(element, 0))
+                .sum();
+    }
+
     public void addItem(Item item) {
         items.add(item);
     }
@@ -127,36 +134,44 @@ public final class InventorySystem {
     }
 
     public void receiveGold(int amount) {
+        // Seuls les joueurs ramassent de l'or : receiveGold n'est appelé que sur des
+        // PlayerInstance.
+        PlayerInstance player = (PlayerInstance) character;
         addGold(amount);
         character.send(new GoldLooted(amount));
-        DomainEventPublisher.publish(new CharacterReceivedGold(character, amount));
+        DomainEventPublisher.publish(new CharacterReceivedGold(player, amount));
     }
 
     public void receiveLootItem(Item item) {
+        // Seuls les joueurs ramassent des objets : receiveLootItem n'est appelé que sur
+        // des PlayerInstance.
+        PlayerInstance player = (PlayerInstance) character;
         Optional<Item> stack = mergeIntoExistingStack(item);
         if (stack.isPresent()) {
-            DomainEventPublisher.publish(new CharacterLootedItem(character, stack.get(), true));
+            DomainEventPublisher.publish(new CharacterLootedItem(player, stack.get(), true));
             return;
         }
         item.setCharacter(character);
         addItem(item);
-        DomainEventPublisher.publish(new CharacterLootedItem(character, item, false));
+        DomainEventPublisher.publish(new CharacterLootedItem(player, item, false));
     }
 
     public boolean buyItem(Item item, int price) {
+        // Seuls les joueurs achètent : buyItem n'est appelé que sur des PlayerInstance.
+        PlayerInstance player = (PlayerInstance) character;
         if (!trySpendGold(price)) {
             return false;
         }
         character.send(new GoldSpent(price));
-        DomainEventPublisher.publish(new CharacterSpentGold(character, price));
+        DomainEventPublisher.publish(new CharacterSpentGold(player, price));
         Optional<Item> stack = mergeIntoExistingStack(item);
         if (stack.isPresent()) {
-            DomainEventPublisher.publish(new ItemPurchased(character, stack.get(), price, true));
+            DomainEventPublisher.publish(new ItemPurchased(player, stack.get(), price, true));
             return true;
         }
         item.setCharacter(character);
         addItem(item);
-        DomainEventPublisher.publish(new ItemPurchased(character, item, price, false));
+        DomainEventPublisher.publish(new ItemPurchased(player, item, price, false));
         return true;
     }
 
@@ -177,6 +192,10 @@ public final class InventorySystem {
     // (cf. EquipmentItem.getShotConsumption), à mains nues 1 charge — jamais une
     // constante fixe, cf. plan Soulshot/Spiritshot.
     public ConsumeShotOutcome consumeShot(ItemType shotType, ItemGrade grade) {
+        // Seuls les joueurs utilisent des soulshots/spiritshots : consumeShot n'est
+        // appelé que sur des
+        // PlayerInstance.
+        PlayerInstance player = (PlayerInstance) character;
         Optional<Item> stack = findStackable(shotType, grade);
         if (stack.isEmpty()) {
             return new ConsumeShotOutcome.OutOfStock();
@@ -195,11 +214,11 @@ public final class InventorySystem {
         int remainingQuantity = Math.max(0, remaining);
         character.send(new ShotUsed(shotType, grade, remainingQuantity));
         if (shotType == ItemType.SOULSHOT) {
-            character.broadcast(new SoulshotUsed(character.getId(), character.getName(), grade), character);
+            character.broadcast(new SoulshotUsed(character.getId(), character.getName(), grade), player);
         } else {
-            character.broadcast(new SpiritshotUsed(character.getId(), character.getName(), grade), character);
+            character.broadcast(new SpiritshotUsed(character.getId(), character.getName(), grade), player);
         }
-        DomainEventPublisher.publish(new ShotActivated(character, item, shotType, grade, remainingQuantity));
+        DomainEventPublisher.publish(new ShotActivated(player, item, shotType, grade, remainingQuantity));
         return new ConsumeShotOutcome.Consumed(item, count);
     }
 
@@ -213,11 +232,17 @@ public final class InventorySystem {
     }
 
     public void discardItem(Item item) {
+        // Seuls les joueurs jettent des objets : discardItem n'est appelé que sur des
+        // PlayerInstance.
+        PlayerInstance player = (PlayerInstance) character;
         removeItem(item);
-        DomainEventPublisher.publish(new ItemDiscarded(character, item));
+        DomainEventPublisher.publish(new ItemDiscarded(player, item));
     }
 
     public Optional<EquipmentSlot> equipItem(Item item) {
+        // Seuls les joueurs équipent des objets : equipItem n'est appelé que sur des
+        // PlayerInstance.
+        PlayerInstance player = (PlayerInstance) character;
         List<EquipmentSlot> candidates = item.getType().equipmentSlots();
 
         if (candidates.isEmpty()) {
@@ -238,7 +263,7 @@ public final class InventorySystem {
         }
 
         item.setSlot(slot);
-        DomainEventPublisher.publish(new GamePlayerEquippedItem(character, item, slot, previousOccupants));
+        DomainEventPublisher.publish(new GamePlayerEquippedItem(player, item, slot, previousOccupants));
         recomputeGradePenalty();
         character.getStatSystem().recomputeStats(character.getAttributeSystem().getAttributes(),
                 character.getLevelingSystem().getLevel(), this);
@@ -246,8 +271,11 @@ public final class InventorySystem {
     }
 
     public void unequipItem(Item item) {
+        // Seuls les joueurs déséquipent des objets : unequipItem n'est appelé que sur
+        // des PlayerInstance.
+        PlayerInstance player = (PlayerInstance) character;
         item.setSlot(null);
-        DomainEventPublisher.publish(new GamePlayerUnequippedItem(character, item));
+        DomainEventPublisher.publish(new GamePlayerUnequippedItem(player, item));
         recomputeGradePenalty();
         character.getStatSystem().recomputeStats(character.getAttributeSystem().getAttributes(),
                 character.getLevelingSystem().getLevel(), this);

@@ -3,12 +3,10 @@ package app.domain.actor.instance;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import app.domain.Account;
 import app.domain.PassiveSkill;
 import app.domain.ActiveSkill;
-import app.domain.SkillElement;
 import app.domain.actor.*;
 import app.domain.ActiveEffect;
 import app.domain.actor.system.AppearanceSystem;
@@ -31,7 +29,6 @@ public final class PlayerInstance extends AbstractCharacter {
     private final ClassSystem classSystem;
 
     private Connection connection;
-    private final InventorySystem inventorySystem;
     private final PartySystem partySystem = new PartySystem();
     private final PvPSystem pvpSystem;
 
@@ -43,17 +40,16 @@ public final class PlayerInstance extends AbstractCharacter {
             ItemGrade activeSpiritshotGrade, int karma, int pkCount, int pvpCount, boolean pvpFlagged) {
         super(id, name, attributes, currentHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects,
                 InventorySystem.computeBaseStats(attributes, level, items, race.speed()), false, 0, 0, List.of(), level,
-                xp);
+                xp, gold, items, activeSoulshotGrade, activeSpiritshotGrade);
         this.account = account;
         getMotionSystem().setCurrentMap(map);
         this.appearanceSystem = new AppearanceSystem(this, gender, race);
         this.classSystem = new ClassSystem(this, characterClass, subclasses);
-        this.inventorySystem = new InventorySystem(this, gold, items, activeSoulshotGrade, activeSpiritshotGrade);
         getResourceSystem().setMaxMana(maxMana);
         getResourceSystem().setCurrentMana(currentMana);
         this.pvpSystem = new PvPSystem(this, karma, pkCount, pvpCount, pvpFlagged);
-        inventorySystem.recomputeGradePenalty();
-        getStatSystem().setSetBonuses(inventorySystem.computeSetBonuses());
+        getInventorySystem().recomputeGradePenalty();
+        getStatSystem().setSetBonuses(getInventorySystem().computeSetBonuses());
     }
 
     public Account getAccount() {
@@ -80,13 +76,6 @@ public final class PlayerInstance extends AbstractCharacter {
         return classSystem;
     }
 
-    @Override
-    protected Map<SkillElement, Integer> elementalResistanceMap() {
-        return inventorySystem.getEquippedItems().stream()
-                .flatMap(item -> item.getElementalResistances().entrySet().stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum));
-    }
-
     public Connection getConnection() {
         return connection;
     }
@@ -102,10 +91,6 @@ public final class PlayerInstance extends AbstractCharacter {
     @Override
     public void clearCombatTarget() {
         getCombatSystem().clearTarget();
-    }
-
-    public InventorySystem getInventorySystem() {
-        return inventorySystem;
     }
 
     public PvPSystem getPvpSystem() {
@@ -125,7 +110,7 @@ public final class PlayerInstance extends AbstractCharacter {
                 + getMotionSystem().getCurrentMap().getTemplateId() + ", gender=" + appearanceSystem.getGender()
                 + ", race=" + appearanceSystem.getRace() + ", characterClass=" + classSystem.getCharacterClass()
                 + ", level=" + getLevelingSystem().getLevel() + ", xp=" + getLevelingSystem().getXp() + ", gold="
-                + inventorySystem.getGold() + ", currentHealth=" + getResourceSystem().getCurrentHealth()
+                + getInventorySystem().getGold() + ", currentHealth=" + getResourceSystem().getCurrentHealth()
                 + ", maxHealth=" + getResourceSystem().getMaxHealth() + ", attributes="
                 + getAttributeSystem().getAttributes() + "]";
     }

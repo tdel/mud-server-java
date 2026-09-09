@@ -10,10 +10,10 @@ import org.slf4j.LoggerFactory;
 import app.domain.ActiveEffect;
 import app.domain.ActiveSkill;
 import app.domain.PassiveSkill;
-import app.domain.SkillElement;
 import app.domain.actor.system.AttributeSystem;
 import app.domain.actor.system.CombatSystem;
 import app.domain.actor.system.EffectsSystem;
+import app.domain.actor.system.InventorySystem;
 import app.domain.actor.system.LevelingSystem;
 import app.domain.actor.system.LootSystem;
 import app.domain.actor.system.MotionSystem;
@@ -21,6 +21,8 @@ import app.domain.actor.system.ResourceSystem;
 import app.domain.actor.system.SkillSystem;
 import app.domain.actor.system.StatSystem;
 import app.domain.actor.instance.PlayerInstance;
+import app.domain.item.Item;
+import app.domain.item.ItemGrade;
 import app.domain.item.LootTableEntry;
 import app.domain.world.MapInstance;
 import app.network.OutputMessage;
@@ -38,13 +40,15 @@ public abstract class AbstractCharacter extends AbstractObject {
     private final LootSystem lootSystem;
     private final ResourceSystem resourceSystem;
     private final LevelingSystem levelingSystem;
+    private final InventorySystem inventorySystem;
 
     private final KnownList knownList = new KnownList(this);
 
     protected AbstractCharacter(UUID id, String name, Map<Attribute, Integer> attributes, int currentHealth,
             int maxHealth, Map<ActiveSkill, Integer> knownSkills, Map<PassiveSkill, Integer> knownPassiveSkills,
             List<ActiveEffect> activeEffects, Map<ModifiedStat, Integer> initialBaseStats, boolean invulnerable,
-            int xpReward, int goldReward, List<LootTableEntry> lootTable, int level, int xp) {
+            int xpReward, int goldReward, List<LootTableEntry> lootTable, int level, int xp, int gold, List<Item> items,
+            ItemGrade activeSoulshotGrade, ItemGrade activeSpiritshotGrade) {
         super(id, name);
         this.attributeSystem = new AttributeSystem(attributes);
         this.resourceSystem = new ResourceSystem(this, currentHealth, maxHealth);
@@ -52,6 +56,7 @@ public abstract class AbstractCharacter extends AbstractObject {
         this.combatSystem = new CombatSystem(this, invulnerable);
         this.lootSystem = new LootSystem(this, xpReward, goldReward, lootTable);
         this.levelingSystem = new LevelingSystem(this, level, xp);
+        this.inventorySystem = new InventorySystem(this, gold, items, activeSoulshotGrade, activeSpiritshotGrade);
         knownSkills.forEach((skill, level2) -> getSkillSystem().learn(skill, level2));
         knownPassiveSkills.forEach((passiveSkill, level2) -> getSkillSystem().learn(passiveSkill, level2));
         activeEffects.forEach(getEffectsSystem()::apply);
@@ -65,18 +70,12 @@ public abstract class AbstractCharacter extends AbstractObject {
         return levelingSystem;
     }
 
+    public InventorySystem getInventorySystem() {
+        return inventorySystem;
+    }
+
     public boolean takeDamage(int amount, AbstractCharacter attacker) {
         return combatSystem.takeDamage(amount, attacker);
-    }
-
-    // Défaut neutre : seul PlayerInstance a des objets équipés susceptibles
-    // de porter des résistances élémentaires ; MonsterInstance la surcharge.
-    protected Map<SkillElement, Integer> elementalResistanceMap() {
-        return Map.of();
-    }
-
-    public final int getElementalResistance(SkillElement element) {
-        return elementalResistanceMap().getOrDefault(element, 0);
     }
 
     public EffectsSystem getEffectsSystem() {

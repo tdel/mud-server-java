@@ -24,7 +24,7 @@ public class AbstractNpc extends AbstractCharacter {
                 template.knownSkills().stream().collect(Collectors.toMap(skill -> skill, skill -> 1)),
                 template.knownPassiveSkills().stream().collect(Collectors.toMap(skill -> skill, skill -> 1)),
                 template.activeEffects(), Map.of(ModifiedStat.SPEED, 0), true, 0, 0, List.of(),
-                LevelCatalogHolder.maxLevel(), 0);
+                LevelCatalogHolder.maxLevel(), 0, 0, List.of(), null, null);
         this.template = Objects.requireNonNull(template);
         this.dialogueSystem = new DialogueSystem(template.dialogue());
         setTitle(template.title());

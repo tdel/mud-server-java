@@ -200,7 +200,7 @@ public final class SkillSystem {
         }
         if (activeSkill.element() != SkillElement.NONE) {
             amount = CombatFormulas.applyElementalResistance(amount,
-                    target.getElementalResistance(activeSkill.element()));
+                    target.getInventorySystem().getElementalResistance(activeSkill.element()));
         }
         return new AttackRollOutcome(true, amount);
     }
