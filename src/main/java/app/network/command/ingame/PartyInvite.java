@@ -52,7 +52,7 @@ public class PartyInvite implements CommandHandler {
             return;
         }
 
-        Party myParty = character.getParty();
+        Party myParty = character.getPartySystem().getParty();
         if (myParty != null && !myParty.isLeader(character)) {
             connection.send(new NotPartyLeader());
             return;
@@ -61,13 +61,13 @@ public class PartyInvite implements CommandHandler {
             connection.send(new PartyFull());
             return;
         }
-        if (target.getParty() != null) {
+        if (target.getPartySystem().getParty() != null) {
             connection.send(new AlreadyInParty(target.getName()));
             return;
         }
 
         Party party = myParty != null ? myParty : new Party(character);
-        target.setPendingInvite(new PendingPartyInvite(party, character, System.currentTimeMillis()));
+        target.getPartySystem().setPendingInvite(new PendingPartyInvite(party, character, System.currentTimeMillis()));
 
         connection.send(new PartyInviteSent(target.getId(), target.getName()));
         target.send(new PartyInviteReceived(character.getId(), character.getName()));

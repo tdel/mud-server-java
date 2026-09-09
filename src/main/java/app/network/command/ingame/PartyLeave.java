@@ -28,7 +28,7 @@ public class PartyLeave implements CommandHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         PlayerInstance character = connection.character();
-        Party party = character.getParty();
+        Party party = character.getPartySystem().getParty();
 
         if (party == null) {
             connection.send(new NotInParty());

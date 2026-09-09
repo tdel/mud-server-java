@@ -52,9 +52,9 @@ public class PartyEngine {
     void expireInvites(Collection<PlayerInstance> onlineCharacters) {
         long now = System.currentTimeMillis();
         for (PlayerInstance character : onlineCharacters) {
-            PendingPartyInvite invite = character.getPendingInvite();
+            PendingPartyInvite invite = character.getPartySystem().getPendingInvite();
             if (invite != null && now - invite.sentAtMillis() >= INVITE_TIMEOUT_MS) {
-                character.setPendingInvite(null);
+                character.getPartySystem().setPendingInvite(null);
                 character.send(new PartyInviteDeclined(invite.inviter().getName()));
                 invite.inviter().send(new PartyInviteDeclined(character.getName()));
                 log.info("party.invite_expired inviter={} target={}", invite.inviter().getId(), character.getId());
@@ -65,9 +65,9 @@ public class PartyEngine {
     @EventListener
     void onPlayerRemovedFromWorld(PlayerRemovedFromWorld event) {
         PlayerInstance character = event.character();
-        character.setPendingInvite(null);
-        if (character.getParty() != null) {
-            character.getParty().removeAndNotify(character);
+        character.getPartySystem().setPendingInvite(null);
+        if (character.getPartySystem().getParty() != null) {
+            character.getPartySystem().getParty().removeAndNotify(character);
         }
     }
 
@@ -113,7 +113,7 @@ public class PartyEngine {
         if (!event.hit() || !modifier || !(event.target() instanceof PlayerInstance targetPlayer)) {
             return;
         }
-        Party party = targetPlayer.getParty();
+        Party party = targetPlayer.getPartySystem().getParty();
         if (party != null) {
             long secondsRemaining = Duration.between(Instant.now(), event.expiresAt()).toSeconds();
             String statLabel = event.modifiers().isEmpty() ? "" : event.modifiers().get(0).stat().label();
@@ -125,7 +125,7 @@ public class PartyEngine {
     }
 
     private void broadcastVitals(PlayerInstance character) {
-        Party party = character.getParty();
+        Party party = character.getPartySystem().getParty();
         if (party != null) {
             party.broadcast(new PartyMemberVitalsUpdated(character.getId(), character.getName(),
                     character.getResourceSystem().getCurrentHealth(), character.getResourceSystem().getMaxHealth(),

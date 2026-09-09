@@ -28,14 +28,14 @@ public class PartyDecline implements CommandHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         PlayerInstance character = connection.character();
-        PendingPartyInvite invite = character.getPendingInvite();
+        PendingPartyInvite invite = character.getPartySystem().getPendingInvite();
 
         if (invite == null) {
             connection.send(new NoPendingInvite());
             return;
         }
 
-        character.setPendingInvite(null);
+        character.getPartySystem().setPendingInvite(null);
         connection.send(new PartyInviteDeclined(invite.inviter().getName()));
         invite.inviter().send(new PartyInviteDeclined(character.getName()));
     }

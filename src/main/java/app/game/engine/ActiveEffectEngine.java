@@ -48,7 +48,7 @@ public class ActiveEffectEngine {
                 null);
 
         if (event.character() instanceof PlayerInstance character) {
-            Party party = character.getParty();
+            Party party = character.getPartySystem().getParty();
             if (party != null) {
                 party.broadcast(new PartyMemberEffectExpired(character.getId(), character.getName(),
                         event.effect().skillName()), character);

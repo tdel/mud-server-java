@@ -98,7 +98,7 @@ public class Say implements CommandHandler {
             return;
         }
 
-        Party party = character.getParty();
+        Party party = character.getPartySystem().getParty();
         if (party == null) {
             connection.send(new NotInParty());
             return;

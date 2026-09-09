@@ -49,7 +49,7 @@ public class PartyKick implements CommandHandler {
             return;
         }
 
-        Party party = character.getParty();
+        Party party = character.getPartySystem().getParty();
         if (party == null || !party.isLeader(character)) {
             connection.send(new NotPartyLeader());
             return;

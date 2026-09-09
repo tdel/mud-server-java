@@ -82,7 +82,7 @@ public class RegenHealthEngine {
         monster.getKnownList().clear();
         log.info("regenhp.monster_removed_from_map monster={} map={}", monster.getName(), map.getName());
 
-        Party party = killer.getParty();
+        Party party = killer.getPartySystem().getParty();
         List<PlayerInstance> eligible = party != null
                 ? party.getMembers().stream().filter(
                         member -> member.getMotionSystem().getCurrentMap() == killer.getMotionSystem().getCurrentMap())

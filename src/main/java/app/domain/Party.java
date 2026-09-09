@@ -33,7 +33,7 @@ public class Party {
         this.id = UUID.randomUUID();
         this.leader = leader;
         members.add(leader);
-        leader.setParty(this);
+        leader.getPartySystem().setParty(this);
     }
 
     public UUID getId() {
@@ -103,12 +103,12 @@ public class Party {
 
     public void addMember(PlayerInstance character) {
         members.add(character);
-        character.setParty(this);
+        character.getPartySystem().setParty(this);
     }
 
     public void remove(PlayerInstance character) {
         members.remove(character);
-        character.setParty(null);
+        character.getPartySystem().setParty(null);
         if (members.isEmpty()) {
             leader = null;
             return;
@@ -131,7 +131,7 @@ public class Party {
 
     public void disband() {
         for (PlayerInstance member : members) {
-            member.setParty(null);
+            member.getPartySystem().setParty(null);
         }
         members.clear();
         leader = null;

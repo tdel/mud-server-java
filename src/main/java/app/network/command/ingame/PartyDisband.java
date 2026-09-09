@@ -28,7 +28,7 @@ public class PartyDisband implements CommandHandler {
     @Override
     public void onReceive(Connection connection, String argument) {
         PlayerInstance character = connection.character();
-        Party party = character.getParty();
+        Party party = character.getPartySystem().getParty();
 
         if (party == null || !party.isLeader(character)) {
             connection.send(new NotPartyLeader());
