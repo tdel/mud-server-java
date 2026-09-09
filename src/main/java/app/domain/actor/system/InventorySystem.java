@@ -240,7 +240,8 @@ public final class InventorySystem {
         item.setSlot(slot);
         DomainEventPublisher.publish(new GamePlayerEquippedItem(character, item, slot, previousOccupants));
         recomputeGradePenalty();
-        character.getStatSystem().recomputeStats(character.getAttributes(), character.getLevel(), this);
+        character.getStatSystem().recomputeStats(character.getAttributeSystem().getAttributes(), character.getLevel(),
+                this);
         return Optional.of(slot);
     }
 
@@ -248,7 +249,8 @@ public final class InventorySystem {
         item.setSlot(null);
         DomainEventPublisher.publish(new GamePlayerUnequippedItem(character, item));
         recomputeGradePenalty();
-        character.getStatSystem().recomputeStats(character.getAttributes(), character.getLevel(), this);
+        character.getStatSystem().recomputeStats(character.getAttributeSystem().getAttributes(), character.getLevel(),
+                this);
     }
 
     // Ne dépend que des paramètres reçus (aucun accès à `this`) : appelable

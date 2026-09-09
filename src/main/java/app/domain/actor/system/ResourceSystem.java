@@ -81,11 +81,11 @@ public final class ResourceSystem {
     }
 
     public int healthRegenAmountPerTick() {
-        return CombatFormulas.healthRegenPerTick(maxHealth, character.getAttribute(Attribute.CON));
+        return CombatFormulas.healthRegenPerTick(maxHealth, character.getAttributeSystem().getAttribute(Attribute.CON));
     }
 
     public int manaRegenAmountPerTick() {
-        return CombatFormulas.manaRegenPerTick(maxMana, character.getAttribute(Attribute.MEN));
+        return CombatFormulas.manaRegenPerTick(maxMana, character.getAttributeSystem().getAttribute(Attribute.MEN));
     }
 
     // CharacterRegenerated ne porte qu'un PlayerInstance (seul un joueur est

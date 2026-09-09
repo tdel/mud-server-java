@@ -55,18 +55,19 @@ public final class LevelingSystem {
         level++;
 
         int newMaxHealth = character.getClassSystem().getCharacterClass()
-                .maxHealth(character.getAttribute(Attribute.CON), level);
+                .maxHealth(character.getAttributeSystem().getAttribute(Attribute.CON), level);
         int hpGain = newMaxHealth - character.getResourceSystem().getMaxHealth();
         character.getResourceSystem().setMaxHealth(newMaxHealth);
         character.getResourceSystem().setCurrentHealth(character.getResourceSystem().getCurrentHealth() + hpGain);
 
-        int newMaxMana = character.getClassSystem().getCharacterClass().maxMana(character.getAttribute(Attribute.MEN),
-                level);
+        int newMaxMana = character.getClassSystem().getCharacterClass()
+                .maxMana(character.getAttributeSystem().getAttribute(Attribute.MEN), level);
         int manaGain = newMaxMana - character.getResourceSystem().getMaxMana();
         character.getResourceSystem().setMaxMana(newMaxMana);
         character.getResourceSystem().setCurrentMana(character.getResourceSystem().getCurrentMana() + manaGain);
 
-        character.getStatSystem().recomputeStats(character.getAttributes(), level, character.getInventorySystem());
+        character.getStatSystem().recomputeStats(character.getAttributeSystem().getAttributes(), level,
+                character.getInventorySystem());
 
         character.broadcast(new PlayerLeveledUp(character.getName(), level), null);
         DomainEventPublisher.publish(new CharacterLeveledUp(character, level, hpGain));

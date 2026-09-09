@@ -66,6 +66,7 @@ public record GamePlayerStats(PlayerInstance character) implements OutputJsonMes
     }
 
     private static AttributeScore attributeScore(PlayerInstance c, Attribute attribute) {
-        return new AttributeScore(c.getAttribute(attribute), c.getModifier(attribute));
+        return new AttributeScore(c.getAttributeSystem().getAttribute(attribute),
+                c.getAttributeSystem().getModifier(attribute));
     }
 }

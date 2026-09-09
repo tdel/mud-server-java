@@ -235,8 +235,8 @@ public final class SkillSystem {
     // schéma par level), le poids de chaque StatModifier.value() permet de
     // répartir cette magnitude sur plusieurs stats si besoin.
     private CastOutcome castModifier(ActiveSkill activeSkill, int level, AbstractCharacter target, boolean debuff) {
-        if (debuff && (!rollSkillHit(target)
-                || Randomizer.rollChance(CombatFormulas.debuffResistChance(target.getAttribute(Attribute.MEN))))) {
+        if (debuff && (!rollSkillHit(target) || Randomizer.rollChance(
+                CombatFormulas.debuffResistChance(target.getAttributeSystem().getAttribute(Attribute.MEN))))) {
             return new CastOutcome(false, 0, target.getResourceSystem().getCurrentHealth(),
                     target.getResourceSystem().getMaxHealth(), false, false, null, List.of());
         }

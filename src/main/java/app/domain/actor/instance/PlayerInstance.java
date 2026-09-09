@@ -137,6 +137,7 @@ public final class PlayerInstance extends AbstractCharacter {
                 + ", race=" + appearanceSystem.getRace() + ", characterClass=" + classSystem.getCharacterClass()
                 + ", level=" + levelingSystem.getLevel() + ", xp=" + levelingSystem.getXp() + ", gold="
                 + inventorySystem.getGold() + ", currentHealth=" + getResourceSystem().getCurrentHealth()
-                + ", maxHealth=" + getResourceSystem().getMaxHealth() + ", attributes=" + getAttributes() + "]";
+                + ", maxHealth=" + getResourceSystem().getMaxHealth() + ", attributes="
+                + getAttributeSystem().getAttributes() + "]";
     }
 }

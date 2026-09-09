@@ -34,6 +34,7 @@ public record MonsterStatBlock(MonsterInstance monster) implements OutputJsonMes
     }
 
     private static AttributeScore attributeScore(MonsterInstance m, Attribute attribute) {
-        return new AttributeScore(m.getAttribute(attribute), m.getModifier(attribute));
+        return new AttributeScore(m.getAttributeSystem().getAttribute(attribute),
+                m.getAttributeSystem().getModifier(attribute));
     }
 }

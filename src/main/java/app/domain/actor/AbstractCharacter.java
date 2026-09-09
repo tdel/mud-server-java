@@ -1,6 +1,5 @@
 package app.domain.actor;
 
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -12,6 +11,7 @@ import app.domain.ActiveEffect;
 import app.domain.ActiveSkill;
 import app.domain.PassiveSkill;
 import app.domain.SkillElement;
+import app.domain.actor.system.AttributeSystem;
 import app.domain.actor.system.CombatSystem;
 import app.domain.actor.system.EffectsSystem;
 import app.domain.actor.system.LootSystem;
@@ -28,7 +28,7 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractCharacter.class);
 
-    private final Map<Attribute, Integer> attributes;
+    private final AttributeSystem attributeSystem;
     private final EffectsSystem effectsSystem = new EffectsSystem(this);
     private final SkillSystem skillSystem = new SkillSystem(this);
     private final MotionSystem motionSystem = new MotionSystem(this);
@@ -44,7 +44,7 @@ public abstract class AbstractCharacter extends AbstractObject {
             List<ActiveEffect> activeEffects, Map<ModifiedStat, Integer> initialBaseStats, boolean invulnerable,
             int xpReward, int goldReward, List<LootTableEntry> lootTable) {
         super(id, name);
-        this.attributes = new EnumMap<>(attributes);
+        this.attributeSystem = new AttributeSystem(attributes);
         this.resourceSystem = new ResourceSystem(this, currentHealth, maxHealth);
         this.statSystem = new StatSystem(effectsSystem, initialBaseStats);
         this.combatSystem = new CombatSystem(this, invulnerable);
@@ -54,12 +54,8 @@ public abstract class AbstractCharacter extends AbstractObject {
         activeEffects.forEach(getEffectsSystem()::apply);
     }
 
-    public int getAttribute(Attribute attribute) {
-        return attributes.get(attribute);
-    }
-
-    public int getModifier(Attribute attribute) {
-        return Math.floorDiv(getAttribute(attribute) - 10, 2);
+    public AttributeSystem getAttributeSystem() {
+        return attributeSystem;
     }
 
     public abstract int getLevel();
@@ -110,10 +106,6 @@ public abstract class AbstractCharacter extends AbstractObject {
     // doit être effacée après un kill ; le ciblage d'un MonsterInstance (pursuit,
     // MonsterAiEngine) se recalcule de lui-même au prochain tick d'IA.
     public void clearCombatTarget() {
-    }
-
-    public Map<Attribute, Integer> getAttributes() {
-        return Map.copyOf(attributes);
     }
 
     // No-op par défaut : seul GamePlayer a une Connection à notifier.
