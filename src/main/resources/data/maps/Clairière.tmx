@@ -81,8 +81,8 @@
    <properties>
          <property name="direction" value="E"/>
          <property name="targetMapId" value="9a884ac7-b954-4cd6-ab67-c677d472cb0f"/>
-         <property name="targetX" type="float" value="192.0"/>
-         <property name="targetY" type="float" value="576.0"/>
+         <property name="targetX" type="float" value="256.0"/>
+         <property name="targetY" type="float" value="4320.0"/>
    </properties>
   </object>
   <object id="4" name="" type="monsterSpawn" x="704.0" y="320.0">

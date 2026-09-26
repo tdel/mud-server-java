@@ -24,4 +24,76 @@
         </dialogue>
         <level>2</level>
     </npc>
+    <npc id="6fea25d2-5d6f-474e-adef-c11c1a903843">
+        <name>Gate Guard</name>
+        <title>City Guard</title>
+        <dialogue>
+            <greeting>The forest road is quiet today. Keep it that way.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>2</level>
+    </npc>
+    <npc id="a760adde-b995-4ab8-a073-ac5f4d4e5a23">
+        <name>Gate Guard</name>
+        <title>City Guard</title>
+        <dialogue>
+            <greeting>Mind the cemetery path after dark, traveler.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>2</level>
+    </npc>
+    <npc id="b748cda3-b7ed-4e50-863e-a31bc4815d9f">
+        <name>Gate Guard</name>
+        <title>City Guard</title>
+        <dialogue>
+            <greeting>No trouble inside these walls. Understood?</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>2</level>
+    </npc>
+    <npc id="a38d3420-52b9-498a-ba7a-0248158c1acc">
+        <name>Village Guard</name>
+        <title>City Guard</title>
+        <dialogue>
+            <greeting>The teleporters are safe to use. Step into the circle.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>2</level>
+    </npc>
+    <npc id="f006ec9d-60f1-46e3-9dc8-e10c3fd43338">
+        <name>Village Guard</name>
+        <title>City Guard</title>
+        <dialogue>
+            <greeting>Keep your blade sheathed near the market.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>2</level>
+    </npc>
+    <npc id="7d014cb8-a199-484b-a7b8-24c086f6c797">
+        <name>Village Guard</name>
+        <title>City Guard</title>
+        <dialogue>
+            <greeting>All quiet on the ramparts. Move along.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>2</level>
+    </npc>
 </npcs>

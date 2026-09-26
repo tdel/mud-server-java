@@ -79,8 +79,8 @@
    <properties>
          <property name="direction" value="O"/>
          <property name="targetMapId" value="5e4ada37-37e1-438c-9233-581f10c055c7"/>
-         <property name="targetX" type="float" value="2640.0"/>
-         <property name="targetY" type="float" value="2160.0"/>
+         <property name="targetX" type="float" value="4064.0"/>
+         <property name="targetY" type="float" value="1472.0"/>
    </properties>
   </object>
   <object id="3" name="" type="portal" x="1728.0" y="576.0">
