@@ -91,7 +91,7 @@ public final class CombatSystem {
             return new AttackOutcome.OnCooldown(remainingCooldown().toMillis());
         }
 
-        DomainEventPublisher.publish(new CharacterBeginAttack(character, defender));
+        DomainEventPublisher.publish(new CharacterBeginAttack(character, defender, true));
         // L'attaquant fait face à sa cible — après CharacterBeginAttack, qui arrête son
         // déplacement (MovementEngine), pour qu'un pas en cours ne réécrive pas le
         // heading. Diffusé dans AttackResult (le client n'a pas d'autre moyen de

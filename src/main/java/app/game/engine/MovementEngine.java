@@ -85,7 +85,9 @@ public class MovementEngine {
 
     @EventListener
     void onCharacterBeginAttack(CharacterBeginAttack event) {
-        stopMovement(event.attacker());
+        if (event.stopsAttacker()) {
+            stopMovement(event.attacker());
+        }
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)

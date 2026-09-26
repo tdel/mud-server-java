@@ -206,7 +206,7 @@ public final class SkillSystem {
     }
 
     public CastOutcome applyDamageOutcome(AttackRollOutcome roll, AbstractCharacter target) {
-        DomainEventPublisher.publish(new CharacterBeginAttack(character, target));
+        DomainEventPublisher.publish(new CharacterBeginAttack(character, target, false));
         if (!roll.hit()) {
             return new CastOutcome(false, 0, target.getResourceSystem().getCurrentHealth(),
                     target.getResourceSystem().getMaxHealth(), false, false, null, List.of());
