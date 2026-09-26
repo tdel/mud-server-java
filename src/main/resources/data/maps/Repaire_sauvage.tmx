@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="44" height="36" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="5">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="44" height="36" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="9">
  <properties>
   <property name="id" value="6aade027-6918-4521-925d-86529ac4657e"/>
   <property name="name" value="Repaire sauvage"/>
@@ -83,10 +83,34 @@
          <property name="spawnGroup" value="Repaire_sauvage"/>
    </properties>
   </object>
+  <object id="5" name="" type="monsterSpawn" x="464.0" y="336.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Repaire_sauvage"/>
+   </properties>
+  </object>
+  <object id="6" name="" type="monsterSpawn" x="400.0" y="304.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Repaire_sauvage"/>
+   </properties>
+  </object>
+  <object id="7" name="" type="monsterSpawn" x="464.0" y="272.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Repaire_sauvage"/>
+   </properties>
+  </object>
+  <object id="8" name="" type="monsterSpawn" x="400.0" y="400.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Repaire_sauvage"/>
+   </properties>
+  </object>
   <object id="4" name="" type="monsterSpawnGroup" x="0.0" y="0.0">
    <properties>
          <property name="groupId" value="Repaire_sauvage"/>
-         <property name="maxMonsters" type="int" value="1"/>
+         <property name="maxMonsters" type="int" value="5"/>
          <property name="respawnDelaySeconds" type="int" value="30"/>
    </properties>
   </object>

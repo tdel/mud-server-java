@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="68" height="36" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="8">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="68" height="36" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="20">
  <properties>
   <property name="id" value="7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5"/>
   <property name="name" value="Clairière"/>
@@ -103,10 +103,82 @@
          <property name="spawnGroup" value="Clairière"/>
    </properties>
   </object>
+  <object id="8" name="" type="monsterSpawn" x="560.0" y="368.0">
+   <properties>
+         <property name="templateId" value="8d3b7335-abf5-420e-abf7-3de4160f95ac"/>
+         <property name="spawnGroup" value="Clairière"/>
+   </properties>
+  </object>
+  <object id="9" name="" type="monsterSpawn" x="688.0" y="240.0">
+   <properties>
+         <property name="templateId" value="8d3b7335-abf5-420e-abf7-3de4160f95ac"/>
+         <property name="spawnGroup" value="Clairière"/>
+   </properties>
+  </object>
+  <object id="10" name="" type="monsterSpawn" x="688.0" y="176.0">
+   <properties>
+         <property name="templateId" value="8d3b7335-abf5-420e-abf7-3de4160f95ac"/>
+         <property name="spawnGroup" value="Clairière"/>
+   </properties>
+  </object>
+  <object id="11" name="" type="monsterSpawn" x="688.0" y="432.0">
+   <properties>
+         <property name="templateId" value="8d3b7335-abf5-420e-abf7-3de4160f95ac"/>
+         <property name="spawnGroup" value="Clairière"/>
+   </properties>
+  </object>
+  <object id="12" name="" type="monsterSpawn" x="1456.0" y="752.0">
+   <properties>
+         <property name="templateId" value="dc803de5-e456-4e20-bbdc-ad16faf99af9"/>
+         <property name="spawnGroup" value="Clairière"/>
+   </properties>
+  </object>
+  <object id="13" name="" type="monsterSpawn" x="1456.0" y="656.0">
+   <properties>
+         <property name="templateId" value="dc803de5-e456-4e20-bbdc-ad16faf99af9"/>
+         <property name="spawnGroup" value="Clairière"/>
+   </properties>
+  </object>
+  <object id="14" name="" type="monsterSpawn" x="1520.0" y="848.0">
+   <properties>
+         <property name="templateId" value="dc803de5-e456-4e20-bbdc-ad16faf99af9"/>
+         <property name="spawnGroup" value="Clairière"/>
+   </properties>
+  </object>
+  <object id="15" name="" type="monsterSpawn" x="1488.0" y="976.0">
+   <properties>
+         <property name="templateId" value="dc803de5-e456-4e20-bbdc-ad16faf99af9"/>
+         <property name="spawnGroup" value="Clairière"/>
+   </properties>
+  </object>
+  <object id="16" name="" type="monsterSpawn" x="1712.0" y="400.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Clairière"/>
+   </properties>
+  </object>
+  <object id="17" name="" type="monsterSpawn" x="1648.0" y="400.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Clairière"/>
+   </properties>
+  </object>
+  <object id="18" name="" type="monsterSpawn" x="1488.0" y="496.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Clairière"/>
+   </properties>
+  </object>
+  <object id="19" name="" type="monsterSpawn" x="1680.0" y="336.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Clairière"/>
+   </properties>
+  </object>
   <object id="7" name="" type="monsterSpawnGroup" x="0.0" y="0.0">
    <properties>
          <property name="groupId" value="Clairière"/>
-         <property name="maxMonsters" type="int" value="3"/>
+         <property name="maxMonsters" type="int" value="15"/>
          <property name="respawnDelaySeconds" type="int" value="30"/>
    </properties>
   </object>

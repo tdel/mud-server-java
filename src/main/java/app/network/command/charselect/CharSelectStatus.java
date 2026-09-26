@@ -10,6 +10,7 @@ import app.game.WorldInstanceService;
 import app.network.Connection;
 import app.network.message.charselect.CharacterList;
 import app.network.message.charselect.NoCharacters;
+import app.network.message.ingame.EquipmentView;
 
 @Component
 public class CharSelectStatus {
@@ -31,7 +32,8 @@ public class CharSelectStatus {
         connection.send(new CharacterList(characters.stream()
                 .map(character -> new CharacterList.Entry(character.getName(),
                         character.getAppearanceSystem().getRace(), character.getClassSystem().getCharacterClass(),
-                        character.getLevelingSystem().getLevel()))
+                        character.getLevelingSystem().getLevel(), character.getAppearanceSystem().getGender(),
+                        EquipmentView.listOf(character)))
                 .toList()));
     }
 }

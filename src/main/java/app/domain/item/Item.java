@@ -68,6 +68,10 @@ public class Item {
         return equipment().getArmorCategory();
     }
 
+    public WeaponType getWeaponType() {
+        return equipment().getWeaponType();
+    }
+
     public int getPAtk() {
         return CombatFormulas.enchantBonus(equipment().getPAtk(), enchant, CombatFormulas.ENCHANT_ATK_BONUS_PER_LEVEL);
     }

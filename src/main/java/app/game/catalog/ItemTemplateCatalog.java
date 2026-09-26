@@ -26,6 +26,7 @@ import app.domain.item.ItemExpectation;
 import app.domain.item.ItemGrade;
 import app.domain.item.ItemTemplate;
 import app.domain.item.ItemType;
+import app.domain.item.WeaponType;
 import tools.jackson.core.JacksonException;
 import tools.jackson.dataformat.xml.XmlMapper;
 import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
@@ -91,7 +92,8 @@ public class ItemTemplateCatalog {
                     definition.type(), definition.weight(), definition.armorCategory(), definition.pAtk(),
                     definition.mAtk(), definition.pDef(), definition.mDef(), definition.accuracyBonus(),
                     definition.evasionBonus(), definition.critBonus(), definition.atkSpd(), definition.price(),
-                    grantedSkills, elementalResistances, grade, definition.setId(), expectation, shotConsumption);
+                    grantedSkills, elementalResistances, grade, definition.setId(), expectation, shotConsumption,
+                    definition.weaponType());
             templates.put(template.getId(), template);
         }
     }
@@ -156,7 +158,8 @@ public class ItemTemplateCatalog {
             ItemType type, int weight, ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef,
             int accuracyBonus, int evasionBonus, int critBonus, int atkSpd, int price,
             @JacksonXmlElementWrapper(useWrapping = false) List<UUID> grantedSkillIds,
-            Map<SkillElement, Integer> elementalResistances, String setId, ExpectXml expect, Integer shotConsumption) {
+            Map<SkillElement, Integer> elementalResistances, String setId, ExpectXml expect, Integer shotConsumption,
+            WeaponType weaponType) {
     }
 
     private record OtherDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name, String description,

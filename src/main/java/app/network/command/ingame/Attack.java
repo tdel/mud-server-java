@@ -43,7 +43,7 @@ public class Attack implements CommandHandler {
         PlayerInstance character = connection.character();
         switch (character.getCombatSystem().attack(character.getCombatSystem().getTarget())) {
             case CombatSystem.AttackOutcome.Success(var cooldownMs) ->
-                connection.send(new AttackOnCooldown(cooldownMs));
+                connection.send(new AttackOnCooldown(cooldownMs, false));
             case CombatSystem.AttackOutcome.NoTarget ignored -> connection.send(new NoTargetSelected());
             case CombatSystem.AttackOutcome.TargetInvalid(var targetId) ->
                 connection.send(new TargetNotFound(targetId.toString()));
@@ -52,7 +52,7 @@ public class Attack implements CommandHandler {
             case CombatSystem.AttackOutcome.OutOfRange(var targetName) ->
                 connection.send(new AttackOutOfRange(targetName));
             case CombatSystem.AttackOutcome.OnCooldown(var remainingMs) ->
-                connection.send(new AttackOnCooldown(remainingMs));
+                connection.send(new AttackOnCooldown(remainingMs, true));
         }
     }
 }

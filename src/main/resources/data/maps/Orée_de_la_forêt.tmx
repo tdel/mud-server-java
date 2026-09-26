@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="450" height="270" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="35">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="450" height="270" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="305">
  <properties>
   <property name="id" value="9a884ac7-b954-4cd6-ab67-c677d472cb0f"/>
   <property name="name" value="Orée de la forêt"/>
@@ -505,10 +505,1630 @@
          <property name="spawnGroup" value="Orée_de_la_forêt"/>
    </properties>
   </object>
+  <object id="35" name="" type="monsterSpawn" x="656.0" y="176.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="36" name="" type="monsterSpawn" x="688.0" y="112.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="37" name="" type="monsterSpawn" x="464.0" y="80.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="38" name="" type="monsterSpawn" x="656.0" y="688.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="39" name="" type="monsterSpawn" x="1008.0" y="48.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="40" name="" type="monsterSpawn" x="848.0" y="144.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="41" name="" type="monsterSpawn" x="976.0" y="144.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="42" name="" type="monsterSpawn" x="464.0" y="688.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="43" name="" type="monsterSpawn" x="784.0" y="16.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="44" name="" type="monsterSpawn" x="1392.0" y="880.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="45" name="" type="monsterSpawn" x="1392.0" y="1040.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="46" name="" type="monsterSpawn" x="1296.0" y="1040.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="47" name="" type="monsterSpawn" x="1264.0" y="912.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="48" name="" type="monsterSpawn" x="1616.0" y="1232.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="49" name="" type="monsterSpawn" x="1392.0" y="784.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="50" name="" type="monsterSpawn" x="1296.0" y="560.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="51" name="" type="monsterSpawn" x="1392.0" y="1104.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="52" name="" type="monsterSpawn" x="1392.0" y="1200.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="53" name="" type="monsterSpawn" x="272.0" y="3216.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="54" name="" type="monsterSpawn" x="848.0" y="3536.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="55" name="" type="monsterSpawn" x="176.0" y="3184.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="56" name="" type="monsterSpawn" x="176.0" y="3088.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="57" name="" type="monsterSpawn" x="336.0" y="2864.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="58" name="" type="monsterSpawn" x="432.0" y="2928.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="59" name="" type="monsterSpawn" x="240.0" y="3056.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="60" name="" type="monsterSpawn" x="80.0" y="2800.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="61" name="" type="monsterSpawn" x="816.0" y="2960.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="62" name="" type="monsterSpawn" x="10032.0" y="4432.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="63" name="" type="monsterSpawn" x="9840.0" y="4720.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="64" name="" type="monsterSpawn" x="9776.0" y="4208.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="65" name="" type="monsterSpawn" x="10256.0" y="4528.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="66" name="" type="monsterSpawn" x="9872.0" y="4880.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="67" name="" type="monsterSpawn" x="9744.0" y="4368.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="68" name="" type="monsterSpawn" x="10064.0" y="4816.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="69" name="" type="monsterSpawn" x="10064.0" y="4496.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="70" name="" type="monsterSpawn" x="9584.0" y="4176.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="71" name="" type="monsterSpawn" x="3152.0" y="2800.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="72" name="" type="monsterSpawn" x="3280.0" y="3152.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="73" name="" type="monsterSpawn" x="3472.0" y="2896.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="74" name="" type="monsterSpawn" x="2800.0" y="3088.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="75" name="" type="monsterSpawn" x="2864.0" y="3248.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="76" name="" type="monsterSpawn" x="2992.0" y="3056.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="77" name="" type="monsterSpawn" x="3248.0" y="2864.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="78" name="" type="monsterSpawn" x="2960.0" y="3120.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="79" name="" type="monsterSpawn" x="2992.0" y="2864.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="80" name="" type="monsterSpawn" x="7120.0" y="240.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="81" name="" type="monsterSpawn" x="6992.0" y="496.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="82" name="" type="monsterSpawn" x="6800.0" y="464.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="83" name="" type="monsterSpawn" x="7120.0" y="528.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="84" name="" type="monsterSpawn" x="6960.0" y="208.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="85" name="" type="monsterSpawn" x="6864.0" y="656.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="86" name="" type="monsterSpawn" x="7248.0" y="752.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="87" name="" type="monsterSpawn" x="7312.0" y="720.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="88" name="" type="monsterSpawn" x="6928.0" y="272.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="89" name="" type="monsterSpawn" x="2768.0" y="2096.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="90" name="" type="monsterSpawn" x="3472.0" y="1520.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="91" name="" type="monsterSpawn" x="3408.0" y="1808.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="92" name="" type="monsterSpawn" x="3088.0" y="1648.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="93" name="" type="monsterSpawn" x="2896.0" y="1776.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="94" name="" type="monsterSpawn" x="3376.0" y="1520.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="95" name="" type="monsterSpawn" x="3472.0" y="2000.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="96" name="" type="monsterSpawn" x="2992.0" y="1744.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="97" name="" type="monsterSpawn" x="2960.0" y="1936.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="98" name="" type="monsterSpawn" x="4144.0" y="848.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="99" name="" type="monsterSpawn" x="4464.0" y="720.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="100" name="" type="monsterSpawn" x="4848.0" y="624.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="101" name="" type="monsterSpawn" x="4688.0" y="208.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="102" name="" type="monsterSpawn" x="4304.0" y="560.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="103" name="" type="monsterSpawn" x="4592.0" y="848.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="104" name="" type="monsterSpawn" x="4656.0" y="720.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="105" name="" type="monsterSpawn" x="4528.0" y="560.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="106" name="" type="monsterSpawn" x="4240.0" y="656.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="107" name="" type="monsterSpawn" x="5776.0" y="336.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="108" name="" type="monsterSpawn" x="6064.0" y="688.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="109" name="" type="monsterSpawn" x="5648.0" y="784.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="110" name="" type="monsterSpawn" x="5488.0" y="240.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="111" name="" type="monsterSpawn" x="5968.0" y="528.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="112" name="" type="monsterSpawn" x="5648.0" y="528.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="113" name="" type="monsterSpawn" x="6224.0" y="208.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="114" name="" type="monsterSpawn" x="5872.0" y="336.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="115" name="" type="monsterSpawn" x="5936.0" y="208.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="116" name="" type="monsterSpawn" x="560.0" y="5872.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="117" name="" type="monsterSpawn" x="336.0" y="5552.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="118" name="" type="monsterSpawn" x="240.0" y="5616.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="119" name="" type="monsterSpawn" x="432.0" y="5488.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="120" name="" type="monsterSpawn" x="528.0" y="5680.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="121" name="" type="monsterSpawn" x="240.0" y="5456.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="122" name="" type="monsterSpawn" x="752.0" y="6000.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="123" name="" type="monsterSpawn" x="112.0" y="6096.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="124" name="" type="monsterSpawn" x="400.0" y="5648.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="125" name="" type="monsterSpawn" x="11600.0" y="496.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="126" name="" type="monsterSpawn" x="11312.0" y="432.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="127" name="" type="monsterSpawn" x="11312.0" y="272.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="128" name="" type="monsterSpawn" x="10928.0" y="80.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="129" name="" type="monsterSpawn" x="10864.0" y="848.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="130" name="" type="monsterSpawn" x="11312.0" y="368.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="131" name="" type="monsterSpawn" x="11408.0" y="112.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="132" name="" type="monsterSpawn" x="11536.0" y="688.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="133" name="" type="monsterSpawn" x="11568.0" y="144.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="134" name="" type="monsterSpawn" x="11120.0" y="3088.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="135" name="" type="monsterSpawn" x="11152.0" y="3280.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="136" name="" type="monsterSpawn" x="11536.0" y="2864.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="137" name="" type="monsterSpawn" x="11344.0" y="3184.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="138" name="" type="monsterSpawn" x="10896.0" y="2992.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="139" name="" type="monsterSpawn" x="10896.0" y="3408.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="140" name="" type="monsterSpawn" x="11024.0" y="3216.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="141" name="" type="monsterSpawn" x="10992.0" y="3376.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="142" name="" type="monsterSpawn" x="11056.0" y="2832.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="143" name="" type="monsterSpawn" x="1904.0" y="5616.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="144" name="" type="monsterSpawn" x="2160.0" y="5968.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="145" name="" type="monsterSpawn" x="2032.0" y="5872.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="146" name="" type="monsterSpawn" x="2032.0" y="5520.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="147" name="" type="monsterSpawn" x="2128.0" y="5680.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="148" name="" type="monsterSpawn" x="1456.0" y="6096.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="149" name="" type="monsterSpawn" x="1456.0" y="5616.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="150" name="" type="monsterSpawn" x="2064.0" y="6192.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="151" name="" type="monsterSpawn" x="1808.0" y="6096.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="152" name="" type="monsterSpawn" x="4720.0" y="4880.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="153" name="" type="monsterSpawn" x="4560.0" y="4304.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="154" name="" type="monsterSpawn" x="4880.0" y="4208.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="155" name="" type="monsterSpawn" x="4208.0" y="4368.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="156" name="" type="monsterSpawn" x="4720.0" y="4304.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="157" name="" type="monsterSpawn" x="4528.0" y="4368.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="158" name="" type="monsterSpawn" x="4176.0" y="4656.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="159" name="" type="monsterSpawn" x="4848.0" y="4144.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="160" name="" type="monsterSpawn" x="4112.0" y="4336.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="161" name="" type="monsterSpawn" x="3504.0" y="6864.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="162" name="" type="monsterSpawn" x="2864.0" y="6960.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="163" name="" type="monsterSpawn" x="2928.0" y="7056.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="164" name="" type="monsterSpawn" x="3152.0" y="6992.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="165" name="" type="monsterSpawn" x="3024.0" y="7216.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="166" name="" type="monsterSpawn" x="3536.0" y="7440.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="167" name="" type="monsterSpawn" x="3376.0" y="7248.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="168" name="" type="monsterSpawn" x="2864.0" y="7312.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="169" name="" type="monsterSpawn" x="2992.0" y="7376.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="170" name="" type="monsterSpawn" x="10832.0" y="6064.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="171" name="" type="monsterSpawn" x="10928.0" y="5808.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="172" name="" type="monsterSpawn" x="11600.0" y="5872.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="173" name="" type="monsterSpawn" x="11600.0" y="6096.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="174" name="" type="monsterSpawn" x="11280.0" y="6000.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="175" name="" type="monsterSpawn" x="10992.0" y="5680.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="176" name="" type="monsterSpawn" x="11536.0" y="5520.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="177" name="" type="monsterSpawn" x="11504.0" y="5584.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="178" name="" type="monsterSpawn" x="10896.0" y="5616.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="179" name="" type="monsterSpawn" x="4560.0" y="3536.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="180" name="" type="monsterSpawn" x="4624.0" y="3376.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="181" name="" type="monsterSpawn" x="4816.0" y="2992.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="182" name="" type="monsterSpawn" x="4816.0" y="3536.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="183" name="" type="monsterSpawn" x="4432.0" y="3216.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="184" name="" type="monsterSpawn" x="4240.0" y="2928.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="185" name="" type="monsterSpawn" x="4720.0" y="3376.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="186" name="" type="monsterSpawn" x="4720.0" y="3312.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="187" name="" type="monsterSpawn" x="4848.0" y="2928.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="188" name="" type="monsterSpawn" x="2160.0" y="7472.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="189" name="" type="monsterSpawn" x="1616.0" y="7504.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="190" name="" type="monsterSpawn" x="2096.0" y="7056.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="191" name="" type="monsterSpawn" x="2192.0" y="7024.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="192" name="" type="monsterSpawn" x="1712.0" y="7120.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="193" name="" type="monsterSpawn" x="2064.0" y="7472.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="194" name="" type="monsterSpawn" x="1840.0" y="7504.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="195" name="" type="monsterSpawn" x="1744.0" y="7248.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="196" name="" type="monsterSpawn" x="1936.0" y="7568.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="197" name="" type="monsterSpawn" x="6928.0" y="5456.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="198" name="" type="monsterSpawn" x="6960.0" y="5680.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="199" name="" type="monsterSpawn" x="7184.0" y="5520.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="200" name="" type="monsterSpawn" x="7472.0" y="5744.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="201" name="" type="monsterSpawn" x="7152.0" y="5936.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="202" name="" type="monsterSpawn" x="7280.0" y="5584.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="203" name="" type="monsterSpawn" x="7088.0" y="6096.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="204" name="" type="monsterSpawn" x="7216.0" y="5456.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="205" name="" type="monsterSpawn" x="7440.0" y="5968.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="206" name="" type="monsterSpawn" x="11504.0" y="4272.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="207" name="" type="monsterSpawn" x="11056.0" y="4240.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="208" name="" type="monsterSpawn" x="11216.0" y="4688.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="209" name="" type="monsterSpawn" x="11248.0" y="4880.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="210" name="" type="monsterSpawn" x="11536.0" y="4752.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="211" name="" type="monsterSpawn" x="11184.0" y="4144.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="212" name="" type="monsterSpawn" x="11120.0" y="4752.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="213" name="" type="monsterSpawn" x="10864.0" y="4304.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="214" name="" type="monsterSpawn" x="11024.0" y="4848.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="215" name="" type="monsterSpawn" x="10096.0" y="7440.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="216" name="" type="monsterSpawn" x="9936.0" y="7152.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="217" name="" type="monsterSpawn" x="9552.0" y="7056.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="218" name="" type="monsterSpawn" x="10128.0" y="7248.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="219" name="" type="monsterSpawn" x="9648.0" y="6960.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="220" name="" type="monsterSpawn" x="9840.0" y="6832.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="221" name="" type="monsterSpawn" x="10000.0" y="7088.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="222" name="" type="monsterSpawn" x="9616.0" y="7408.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="223" name="" type="monsterSpawn" x="10032.0" y="7536.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="224" name="" type="monsterSpawn" x="6096.0" y="5648.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="225" name="" type="monsterSpawn" x="6160.0" y="6064.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="226" name="" type="monsterSpawn" x="5840.0" y="5904.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="227" name="" type="monsterSpawn" x="5936.0" y="6224.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="228" name="" type="monsterSpawn" x="5520.0" y="5520.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="229" name="" type="monsterSpawn" x="6096.0" y="6160.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="230" name="" type="monsterSpawn" x="6128.0" y="5744.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="231" name="" type="monsterSpawn" x="5488.0" y="5840.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="232" name="" type="monsterSpawn" x="6160.0" y="5616.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="233" name="" type="monsterSpawn" x="1904.0" y="2864.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="234" name="" type="monsterSpawn" x="2000.0" y="3504.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="235" name="" type="monsterSpawn" x="1968.0" y="2928.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="236" name="" type="monsterSpawn" x="1456.0" y="3472.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="237" name="" type="monsterSpawn" x="1584.0" y="3312.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="238" name="" type="monsterSpawn" x="1808.0" y="3248.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="239" name="" type="monsterSpawn" x="2160.0" y="3536.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="240" name="" type="monsterSpawn" x="1552.0" y="2864.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="241" name="" type="monsterSpawn" x="1840.0" y="3088.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="242" name="" type="monsterSpawn" x="7440.0" y="4208.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="243" name="" type="monsterSpawn" x="7472.0" y="4784.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="244" name="" type="monsterSpawn" x="7056.0" y="4400.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="245" name="" type="monsterSpawn" x="7216.0" y="4720.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="246" name="" type="monsterSpawn" x="6800.0" y="4528.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="247" name="" type="monsterSpawn" x="6960.0" y="4528.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="248" name="" type="monsterSpawn" x="6928.0" y="4240.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="249" name="" type="monsterSpawn" x="7440.0" y="4112.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="250" name="" type="monsterSpawn" x="7280.0" y="4688.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="251" name="" type="monsterSpawn" x="7472.0" y="6800.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="252" name="" type="monsterSpawn" x="7472.0" y="7056.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="253" name="" type="monsterSpawn" x="7376.0" y="7248.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="254" name="" type="monsterSpawn" x="6864.0" y="7280.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="255" name="" type="monsterSpawn" x="7184.0" y="7056.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="256" name="" type="monsterSpawn" x="7248.0" y="7120.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="257" name="" type="monsterSpawn" x="6896.0" y="6928.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="258" name="" type="monsterSpawn" x="7216.0" y="7376.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="259" name="" type="monsterSpawn" x="7344.0" y="7024.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="260" name="" type="monsterSpawn" x="12912.0" y="4240.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="261" name="" type="monsterSpawn" x="12880.0" y="4368.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="262" name="" type="monsterSpawn" x="12528.0" y="4368.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="263" name="" type="monsterSpawn" x="12656.0" y="4144.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="264" name="" type="monsterSpawn" x="12176.0" y="4720.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="265" name="" type="monsterSpawn" x="12848.0" y="4304.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="266" name="" type="monsterSpawn" x="12400.0" y="4368.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="267" name="" type="monsterSpawn" x="12880.0" y="4848.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="268" name="" type="monsterSpawn" x="12624.0" y="4560.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="269" name="" type="monsterSpawn" x="9648.0" y="1424.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="270" name="" type="monsterSpawn" x="9968.0" y="2160.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="271" name="" type="monsterSpawn" x="10256.0" y="1872.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="272" name="" type="monsterSpawn" x="9680.0" y="1872.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="273" name="" type="monsterSpawn" x="9712.0" y="1520.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="274" name="" type="monsterSpawn" x="9872.0" y="1488.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="275" name="" type="monsterSpawn" x="9584.0" y="1616.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="276" name="" type="monsterSpawn" x="9584.0" y="1680.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="277" name="" type="monsterSpawn" x="10000.0" y="1616.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="278" name="" type="monsterSpawn" x="11568.0" y="7504.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="279" name="" type="monsterSpawn" x="11408.0" y="7376.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="280" name="" type="monsterSpawn" x="11408.0" y="7312.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="281" name="" type="monsterSpawn" x="10960.0" y="7440.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="282" name="" type="monsterSpawn" x="11600.0" y="7344.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="283" name="" type="monsterSpawn" x="11344.0" y="7216.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="284" name="" type="monsterSpawn" x="11280.0" y="7344.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="285" name="" type="monsterSpawn" x="11472.0" y="7088.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="286" name="" type="monsterSpawn" x="11504.0" y="7344.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="287" name="" type="monsterSpawn" x="5968.0" y="2096.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="288" name="" type="monsterSpawn" x="6224.0" y="2064.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="289" name="" type="monsterSpawn" x="5648.0" y="1840.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="290" name="" type="monsterSpawn" x="6064.0" y="1840.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="291" name="" type="monsterSpawn" x="5680.0" y="1936.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="292" name="" type="monsterSpawn" x="5648.0" y="1680.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="293" name="" type="monsterSpawn" x="6224.0" y="1840.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="294" name="" type="monsterSpawn" x="6224.0" y="1456.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="295" name="" type="monsterSpawn" x="6128.0" y="2064.0">
+   <properties>
+         <property name="templateId" value="0a88e27c-5487-40d5-b494-b7ea49148171"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="296" name="" type="monsterSpawn" x="9968.0" y="2896.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="297" name="" type="monsterSpawn" x="9968.0" y="2992.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="298" name="" type="monsterSpawn" x="9840.0" y="3376.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="299" name="" type="monsterSpawn" x="10064.0" y="2896.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="300" name="" type="monsterSpawn" x="10160.0" y="2832.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="301" name="" type="monsterSpawn" x="10000.0" y="3280.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="302" name="" type="monsterSpawn" x="9584.0" y="3216.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="303" name="" type="monsterSpawn" x="9552.0" y="3088.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
+  <object id="304" name="" type="monsterSpawn" x="9616.0" y="2800.0">
+   <properties>
+         <property name="templateId" value="de87e00a-eb3f-4885-b6a4-922c426d5fb8"/>
+         <property name="spawnGroup" value="Orée_de_la_forêt"/>
+   </properties>
+  </object>
   <object id="6" name="" type="monsterSpawnGroup" x="0.0" y="0.0">
    <properties>
          <property name="groupId" value="Orée_de_la_forêt"/>
-         <property name="maxMonsters" type="int" value="30"/>
+         <property name="maxMonsters" type="int" value="300"/>
          <property name="respawnDelaySeconds" type="int" value="30"/>
    </properties>
   </object>

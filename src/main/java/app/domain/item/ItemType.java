@@ -23,9 +23,19 @@ public enum ItemType {
         };
     }
 
-    // Un seul Item porte le stock entier (quantity) au lieu d'une ligne par
-    // exemplaire — cf. InventorySystem.findStackable/consumeShot.
+    // Taille maximale d'une pile (Item.quantity) : 1 = non stackable (un Item par
+    // exemplaire). Les soulshots/spiritshots n'ont qu'une pile illimitée par
+    // type+grade (cf. InventorySystem.findStackable/consumeShot) ; les potions se
+    // répartissent en piles de 100 au plus (cf. InventorySystem.store).
+    public int maxStack() {
+        return switch (this) {
+            case SOULSHOT, SPIRITSHOT -> Integer.MAX_VALUE;
+            case POTION -> 100;
+            default -> 1;
+        };
+    }
+
     public boolean stackable() {
-        return this == SOULSHOT || this == SPIRITSHOT;
+        return maxStack() > 1;
     }
 }

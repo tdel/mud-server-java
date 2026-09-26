@@ -89,7 +89,7 @@ public class Cast implements CommandHandler {
             case SkillSystem.CastRequestOutcome.OutOfRange(var skillName, var targetName) ->
                 connection.send(new SkillOutOfRange(skillName, targetName));
             case SkillSystem.CastRequestOutcome.OnCooldown(var skillName, var remainingMs) ->
-                connection.send(new SkillOnCooldown(skillName, remainingMs));
+                connection.send(new SkillOnCooldown(skillName, remainingMs, true));
             case SkillSystem.CastRequestOutcome.InsufficientMana(var skillName, var required, var current) ->
                 connection.send(new NotEnoughMana(skillName, required, current));
         }

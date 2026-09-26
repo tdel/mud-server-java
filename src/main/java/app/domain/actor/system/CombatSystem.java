@@ -92,6 +92,11 @@ public final class CombatSystem {
         }
 
         DomainEventPublisher.publish(new CharacterBeginAttack(character, defender));
+        // L'attaquant fait face à sa cible — après CharacterBeginAttack, qui arrête son
+        // déplacement (MovementEngine), pour qu'un pas en cours ne réécrive pas le
+        // heading. Diffusé dans AttackResult (le client n'a pas d'autre moyen de
+        // l'apprendre à l'arrêt) et repris par EntityView pour les nouveaux arrivants.
+        character.getMotionSystem().faceToward(defender.getMotionSystem().getPosition());
 
         // Le soulshot est consommé à chaque tentative d'attaque (hit ou miss), comme
         // en L2J — d'où sa place ici, avant le jet de touche, une fois l'attaque
@@ -133,7 +138,8 @@ public final class CombatSystem {
                 character.getId(), defender.getId(), hit, critical, damage, healthAfter, defeated);
 
         character.broadcast(new AttackResult(character.getId(), character.getName(), defender.getId(),
-                defender.getName(), hit, critical, damage, healthAfter), null);
+                defender.getName(), hit, critical, damage, healthAfter, character.getMotionSystem().getHeading()),
+                null);
         return new AttackOutcome.Success(cooldown.toMillis());
     }
 

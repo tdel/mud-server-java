@@ -18,6 +18,7 @@ import app.network.message.Usage;
 import app.network.message.ingame.ItemEquipped;
 import app.network.message.ingame.ItemNotCarried;
 import app.network.message.ingame.ItemNotEquippable;
+import app.network.message.ingame.OffHandBlocked;
 
 @Component
 public class Equip implements CommandHandler {
@@ -66,6 +67,11 @@ public class Equip implements CommandHandler {
         Optional<EquipmentSlot> slot = character.getInventorySystem().equipItem(item.get());
 
         if (slot.isEmpty()) {
+            if (item.get().getType().equipmentSlots().contains(EquipmentSlot.OFF_HAND)
+                    && character.getInventorySystem().isOffHandBlocked()) {
+                connection.send(new OffHandBlocked(templateName));
+                return;
+            }
             connection.send(new ItemNotEquippable(templateName));
             return;
         }

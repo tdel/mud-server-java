@@ -48,7 +48,7 @@ public class ProjectileEngine {
                 activeSkill.name(), caster.getMotionSystem().getPosition().x(),
                 caster.getMotionSystem().getPosition().y(), target.getId(), target.getName(),
                 target.getMotionSystem().getPosition().x(), target.getMotionSystem().getPosition().y(),
-                travelDurationMs), null);
+                travelDurationMs, roll.hit()), null);
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)

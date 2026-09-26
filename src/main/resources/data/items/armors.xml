@@ -859,4 +859,21 @@
         <price>1</price>
         <setId>novice-set</setId>
     </armor>
+    <armor id="ab5cce0e-1d3f-49f8-9d6f-d814321a566f">
+        <name>Apprentice's Robe</name>
+        <description>A plain linen robe handed to novice mystics.</description>
+        <type>ARMOR</type>
+        <weight>1</weight>
+        <armorCategory>LIGHT</armorCategory>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>1</pDef>
+        <mDef>2</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>1</price>
+        <setId>novice-set</setId>
+    </armor>
 </armors>

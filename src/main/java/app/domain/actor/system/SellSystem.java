@@ -45,10 +45,11 @@ public final class SellSystem {
         return sell(buyer, input, 1);
     }
 
-    // Une pile stackable (soulshot/spiritshot) est achetée en un seul Item de
-    // quantité `quantity` (un seul débit/événement d'achat) ; un objet non
-    // stackable (arme, potion, ...) est acheté un exemplaire à la fois en boucle
-    // (un Item par exemplaire, cf. ItemType.stackable) — la solvabilité totale est
+    // Un objet stackable (soulshot/spiritshot, potion) est acheté en un seul Item
+    // de quantité `quantity` (un seul débit), que InventorySystem.store répartit
+    // en piles de ItemType.maxStack au plus ; un objet non stackable (arme,
+    // armure, ...) est acheté un exemplaire à la fois en boucle (un Item par
+    // exemplaire, cf. ItemType.stackable) — la solvabilité totale est
     // vérifiée une seule fois en amont pour que l'achat reste tout-ou-rien.
     public PurchaseOutcome sell(PlayerInstance buyer, String input, int quantity) {
         Optional<NpcShopEntry> entry = resolveEntry(input);

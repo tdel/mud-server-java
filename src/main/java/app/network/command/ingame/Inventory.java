@@ -32,7 +32,8 @@ public class Inventory implements CommandHandler {
         List<Item> items = character.getInventorySystem().getItems();
         List<app.network.message.ingame.Inventory.Entry> entries = items.stream().map(Inventory::toEntry).toList();
 
-        connection.send(new app.network.message.ingame.Inventory(entries, character.getInventorySystem().getGold()));
+        connection.send(new app.network.message.ingame.Inventory(entries, character.getInventorySystem().getGold(),
+                character.getInventorySystem().isOffHandBlocked()));
     }
 
     // item.getPAtk()/getArmorCategory()/etc. (Item.java) castent leur template en
@@ -47,6 +48,6 @@ public class Inventory implements CommandHandler {
                 equipment ? item.getMAtk() : 0, equipment ? item.getPDef() : 0, equipment ? item.getMDef() : 0,
                 equipment ? item.getAccuracyBonus() : 0, equipment ? item.getEvasionBonus() : 0,
                 equipment ? item.getCritBonus() : 0, equipment ? item.getAtkSpd() : 0, item.getEnchant(),
-                item.getQuantity());
+                item.getQuantity(), equipment ? item.getWeaponType() : null);
     }
 }

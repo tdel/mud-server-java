@@ -61,6 +61,17 @@ public final class MotionSystem {
         this.heading = heading;
     }
 
+    // Oriente le personnage vers `target` (attaque, incantation) : même convention
+    // que le déplacement (Position.headingTo). Heading inchangé si la cible est
+    // confondue avec le personnage (sort sur soi-même), atan2(0, 0) n'ayant pas
+    // de sens.
+    public void faceToward(Position target) {
+        if (position == null || target == null || position.distanceTo(target) < 1e-6) {
+            return;
+        }
+        this.heading = position.headingTo(target);
+    }
+
     public int getSpeed() {
         return character.getStatSystem().getEffective(ModifiedStat.SPEED);
     }

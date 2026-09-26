@@ -64,6 +64,9 @@ public class SkillCastEngine {
         // (resolveCast) — trop tard, le client continue sinon d'interpoler le
         // déplacement pendant toute la durée de l'incantation.
         movementEngine.stopMovement(caster);
+        // Le lanceur fait face à sa cible dès le début de l'incantation (no-op sur soi,
+        // voir MotionSystem.faceToward) ; diffusé via SkillCastStarted.casterHeading.
+        caster.getMotionSystem().faceToward(target.getMotionSystem().getPosition());
 
         // Le soulshot/spiritshot est consommé au début du cast (pas à sa résolution) :
         // c'est le seul moment qui permet d'appliquer la réduction de temps
@@ -115,7 +118,8 @@ public class SkillCastEngine {
                 Thread.currentThread().getName(), caster.getId(), activeSkill.name(), castingTimeNanos / 1_000_000L,
                 shotCharged);
         caster.broadcast(new SkillCastStarted(caster.getId(), caster.getName(), activeSkill.id(), activeSkill.name(),
-                target.getId(), target.getName(), (int) (castingTimeNanos / 1_000_000L)), null);
+                target.getId(), target.getName(), (int) (castingTimeNanos / 1_000_000L),
+                caster.getMotionSystem().getHeading()), null);
     }
 
     public void cancelCast(AbstractCharacter caster) {
@@ -171,7 +175,7 @@ public class SkillCastEngine {
 
         // Passé ce point le sort va jusqu'au jet (hit ou miss) : le cooldown
         // s'applique dans tous les cas, il faut donc en informer le client ici.
-        caster.send(new SkillOnCooldown(activeSkill.name(), activeSkill.reuseTimeMs()));
+        caster.send(new SkillOnCooldown(activeSkill.name(), activeSkill.reuseTimeMs(), false));
 
         if (activeSkill.skillType() == SkillEffectType.DAMAGE && activeSkill.projectile()) {
             SkillSystem.AttackRollOutcome roll = caster.getSkillSystem().rollDamage(activeSkill, level, primaryTarget,

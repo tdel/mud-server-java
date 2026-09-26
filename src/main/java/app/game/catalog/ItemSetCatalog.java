@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -47,6 +48,12 @@ public class ItemSetCatalog {
         } catch (IOException | JacksonException e) {
             throw new IllegalStateException("Impossible de charger " + ITEM_SET_RESOURCE, e);
         }
+    }
+
+    // Un setId d'objet sans entrée dans item_sets.xml est légitime (set purement
+    // nominal, sans bonus authored — ex. novice-set, doom-set) : pas une erreur.
+    public Optional<ItemSet> findById(String setId) {
+        return Optional.ofNullable(sets.get(setId));
     }
 
     public ItemSet getById(String setId) {

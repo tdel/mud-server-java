@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.AbstractNpc;
+import app.domain.actor.Gender;
 import app.domain.actor.instance.PlayerInstance;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.actor.instance.NpcSellerInstance;
@@ -13,7 +14,7 @@ import app.game.engine.MovementEngine;
 
 public record EntityView(UUID id, String name, String title, String kind, double x, double y, double heading,
         double speed, int currentHealth, int maxHealth, int level, Double targetX, Double targetY, boolean hasShop,
-        boolean pvpFlagged) {
+        boolean pvpFlagged, Gender gender, List<EquipmentView> equipment) {
 
     public static EntityView of(AbstractCharacter character) {
         MovementEngine.ActiveMovement movement = character.getMotionSystem().getActiveMovement();
@@ -31,6 +32,13 @@ public record EntityView(UUID id, String name, String title, String kind, double
         // "character:<nom>"/"npc:<nom>"/"monster:<nom>",
         // repris de l'ancien MapEnter à 3 listes) : aucune table de traduction
         // nécessaire.
+        // Sexe + équipement porté : uniquement pour un joueur (null/vide pour un
+        // monstre/PNJ), pour que le client affiche le bon modèle habillé —
+        // tenu à jour ensuite par CharacterAppearanceChanged.
+        Gender gender = character instanceof PlayerInstance player ? player.getAppearanceSystem().getGender() : null;
+        List<EquipmentView> equipment = character instanceof PlayerInstance player
+                ? EquipmentView.listOf(player)
+                : List.of();
         String kind = character instanceof MonsterInstance
                 ? "monster"
                 : character instanceof AbstractNpc ? "npc" : "character";
@@ -40,6 +48,6 @@ public record EntityView(UUID id, String name, String title, String kind, double
                 MovementEngine.unitsPerSecond(character.getMotionSystem().getSpeed()),
                 character.getResourceSystem().getCurrentHealth(), character.getResourceSystem().getMaxHealth(),
                 character.getLevelingSystem().getLevel(), targetX, targetY, character instanceof NpcSellerInstance,
-                character instanceof PlayerInstance player && player.getPvpSystem().isPvpFlagged());
+                character instanceof PlayerInstance player && player.getPvpSystem().isPvpFlagged(), gender, equipment);
     }
 }

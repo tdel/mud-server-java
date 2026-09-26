@@ -37,6 +37,8 @@ import app.domain.item.ItemSet;
 import app.domain.item.ItemType;
 import app.game.catalog.ItemSetCatalogHolder;
 import app.game.combat.CombatFormulas;
+import app.network.message.ingame.CharacterAppearanceChanged;
+import app.network.message.ingame.EquipmentView;
 import app.network.message.ingame.GoldLooted;
 import app.network.message.ingame.GoldSpent;
 import app.network.message.ingame.ShotUsed;
@@ -124,9 +126,9 @@ public final class InventorySystem {
         items.remove(item);
     }
 
-    // Un item stackable (soulshot/spiritshot) n'a qu'une seule pile par type+grade
-    // dans l'inventaire — jamais équipé, donc getSlot() == null suffit à
-    // identifier la pile.
+    // Un soulshot/spiritshot (pile illimitée, cf. ItemType.maxStack) n'a qu'une
+    // seule pile par type+grade dans l'inventaire — jamais équipé, donc
+    // getSlot() == null suffit à identifier la pile.
     public Optional<Item> findStackable(ItemType type, ItemGrade grade) {
         return items.stream()
                 .filter(item -> item.getSlot() == null && item.getType() == type && item.getGrade() == grade)
@@ -146,14 +148,9 @@ public final class InventorySystem {
         // Seuls les joueurs ramassent des objets : receiveLootItem n'est appelé que sur
         // des PlayerInstance.
         PlayerInstance player = (PlayerInstance) character;
-        Optional<Item> stack = mergeIntoExistingStack(item);
-        if (stack.isPresent()) {
-            DomainEventPublisher.publish(new CharacterLootedItem(player, stack.get(), true));
-            return;
+        for (StoredStack stored : store(item)) {
+            DomainEventPublisher.publish(new CharacterLootedItem(player, stored.stack(), stored.merged()));
         }
-        item.setCharacter(character);
-        addItem(item);
-        DomainEventPublisher.publish(new CharacterLootedItem(player, item, false));
     }
 
     public boolean buyItem(Item item, int price) {
@@ -164,28 +161,74 @@ public final class InventorySystem {
         }
         character.send(new GoldSpent(price));
         DomainEventPublisher.publish(new CharacterSpentGold(player, price));
-        Optional<Item> stack = mergeIntoExistingStack(item);
-        if (stack.isPresent()) {
-            DomainEventPublisher.publish(new ItemPurchased(player, stack.get(), price, true));
-            return true;
+        // Le prix est réparti au prorata entre les piles touchées (un achat de 250
+        // potions peut compléter une pile existante puis en créer plusieurs).
+        int purchased = item.getQuantity();
+        for (StoredStack stored : store(item)) {
+            int stackPrice = (int) ((long) price * stored.added() / purchased);
+            DomainEventPublisher
+                    .publish(new ItemPurchased(player, stored.stack(), stackPrice, stored.added(), stored.merged()));
         }
-        item.setCharacter(character);
-        addItem(item);
-        DomainEventPublisher.publish(new ItemPurchased(player, item, price, false));
         return true;
     }
 
-    // Fusionne un item stackable fraîchement acquis (loot/achat) dans une pile
-    // existante s'il y en a déjà une — sinon laisse l'appelant l'ajouter comme
-    // nouvel item. Retourne la pile mise à jour si un merge a eu lieu.
-    private Optional<Item> mergeIntoExistingStack(Item item) {
+    // Range un item fraîchement acquis (loot/achat) : un objet non stackable est
+    // ajouté tel quel ; un objet stackable complète d'abord les piles non pleines
+    // du même template, puis le reliquat forme de nouvelles piles de
+    // ItemType.maxStack au plus (la première réutilise `item` lui-même).
+    // Retourne chaque pile touchée, merged=true pour une pile déjà existante.
+    private List<StoredStack> store(Item item) {
+        List<StoredStack> stored = new ArrayList<>();
         if (!item.getType().stackable()) {
-            return Optional.empty();
+            item.setCharacter(character);
+            addItem(item);
+            stored.add(new StoredStack(item, 1, false));
+            return stored;
         }
-        return findStackable(item.getType(), item.getGrade()).map(existing -> {
-            existing.setQuantity(existing.getQuantity() + item.getQuantity());
-            return existing;
-        });
+        int maxStack = item.getType().maxStack();
+        int remaining = item.getQuantity();
+        for (Item existing : items) {
+            if (remaining == 0) {
+                break;
+            }
+            if (existing.getSlot() != null || !existing.getTemplateId().equals(item.getTemplateId())
+                    || existing.getQuantity() >= maxStack) {
+                continue;
+            }
+            int added = Math.min(remaining, maxStack - existing.getQuantity());
+            existing.setQuantity(existing.getQuantity() + added);
+            remaining -= added;
+            stored.add(new StoredStack(existing, added, true));
+        }
+        Item next = item;
+        while (remaining > 0) {
+            int size = Math.min(remaining, maxStack);
+            if (next == null) {
+                next = new Item(UUID.randomUUID(), item.getTemplate(), character, null, 0, size);
+            }
+            next.setCharacter(character);
+            next.setQuantity(size);
+            addItem(next);
+            stored.add(new StoredStack(next, size, false));
+            remaining -= size;
+            next = null;
+        }
+        return stored;
+    }
+
+    private record StoredStack(Item stack, int added, boolean merged) {
+    }
+
+    // Retire un exemplaire d'une pile (potion bue...) et retourne la quantité
+    // restante — 0 si la pile a disparu de l'inventaire.
+    public int consumeOne(Item item) {
+        int remaining = item.getQuantity() - 1;
+        if (remaining <= 0) {
+            removeItem(item);
+            return 0;
+        }
+        item.setQuantity(remaining);
+        return remaining;
     }
 
     // Nombre de charges consommées par activation : porté par l'arme équipée
@@ -254,9 +297,18 @@ public final class InventorySystem {
                 .filter(candidate -> equipped.stream().noneMatch(existing -> existing.getSlot() == candidate))
                 .findFirst().orElse(candidates.get(0));
 
+        // Arme à deux mains tenue : la main secondaire est condamnée (refus, cf.
+        // isOffHandBlocked). À l'inverse, équiper une arme à deux mains libère la main
+        // secondaire, retirée avec l'ancienne arme dans le même GamePlayerEquippedItem.
+        if (slot == EquipmentSlot.OFF_HAND && isOffHandBlocked()) {
+            return Optional.empty();
+        }
+        boolean freesOffHand = slot == EquipmentSlot.WEAPON && isTwoHanded(item);
+
         List<Item> previousOccupants = new ArrayList<>();
         for (Item existing : equipped) {
-            if (!existing.getId().equals(item.getId()) && existing.getSlot() == slot) {
+            if (!existing.getId().equals(item.getId())
+                    && (existing.getSlot() == slot || freesOffHand && existing.getSlot() == EquipmentSlot.OFF_HAND)) {
                 previousOccupants.add(existing);
                 existing.setSlot(null);
             }
@@ -264,6 +316,7 @@ public final class InventorySystem {
 
         item.setSlot(slot);
         DomainEventPublisher.publish(new GamePlayerEquippedItem(player, item, slot, previousOccupants));
+        broadcastAppearance(player);
         recomputeGradePenalty();
         character.getStatSystem().recomputeStats(character.getAttributeSystem().getAttributes(),
                 character.getLevelingSystem().getLevel(), this);
@@ -276,9 +329,36 @@ public final class InventorySystem {
         PlayerInstance player = (PlayerInstance) character;
         item.setSlot(null);
         DomainEventPublisher.publish(new GamePlayerUnequippedItem(player, item));
+        broadcastAppearance(player);
         recomputeGradePenalty();
         character.getStatSystem().recomputeStats(character.getAttributeSystem().getAttributes(),
                 character.getLevelingSystem().getLevel(), this);
+    }
+
+    // Vrai tant qu'une arme à deux mains (WeaponType.twoHanded) est équipée : rien
+    // ne peut alors occuper EquipmentSlot.OFF_HAND.
+    public boolean isOffHandBlocked() {
+        return getEquippedWeapon().filter(InventorySystem::isTwoHanded).isPresent();
+    }
+
+    // Répare au chargement un personnage sauvegardé avant cette règle (arme à deux
+    // mains + bouclier) : la main secondaire est retirée comme par un unequip.
+    public void releaseBlockedOffHand() {
+        if (!isOffHandBlocked()) {
+            return;
+        }
+        getEquippedItems().stream().filter(item -> item.getSlot() == EquipmentSlot.OFF_HAND).forEach(this::unequipItem);
+    }
+
+    private static boolean isTwoHanded(Item item) {
+        return item.getType() == ItemType.WEAPON && item.getWeaponType() != null && item.getWeaponType().twoHanded();
+    }
+
+    // Les autres joueurs à portée rhabillent ce personnage (le porteur, lui, a
+    // déjà ItemEquipped/ItemUnequipped puis redemande son Inventory).
+    private void broadcastAppearance(PlayerInstance player) {
+        player.broadcast(new CharacterAppearanceChanged(player.getId(), player.getName(), EquipmentView.listOf(player)),
+                player);
     }
 
     // Ne dépend que des paramètres reçus (aucun accès à `this`) : appelable
@@ -314,7 +394,14 @@ public final class InventorySystem {
 
         Map<ModifiedStat, Integer> modifiers = new EnumMap<>(ModifiedStat.class);
         for (Map.Entry<String, Long> entry : equippedCountBySetId.entrySet()) {
-            ItemSet set = ItemSetCatalogHolder.getById(entry.getKey());
+            // Set sans bonus défini dans item_sets.xml (novice-set, doom-set...) : ignoré.
+            // getById levait ici une IllegalStateException qui faisait échouer le
+            // chargement du personnage (login) dès qu'une pièce d'un tel set était équipée.
+            Optional<ItemSet> found = ItemSetCatalogHolder.findById(entry.getKey());
+            if (found.isEmpty()) {
+                continue;
+            }
+            ItemSet set = found.get();
             int piecesEquipped = entry.getValue().intValue();
             for (Map.Entry<Integer, Map<ModifiedStat, Integer>> tier : set.bonusByPieceCount().entrySet()) {
                 if (piecesEquipped >= tier.getKey()) {

@@ -74,7 +74,8 @@ public class ItemPersistenceListener {
         } else {
             itemDao.insert(event.item());
         }
-        event.character().send(new ItemBought(event.item().getName(), event.item().getGrade(), event.price()));
+        event.character()
+                .send(new ItemBought(event.item().getName(), event.item().getGrade(), event.price(), event.quantity()));
         log.info("dao.item.ItemPurchased object={} [character={}, price={}, merged={}]", event.item().getId(),
                 event.character().getName(), event.price(), event.merged());
     }
@@ -93,15 +94,23 @@ public class ItemPersistenceListener {
 
     @EventListener
     void onGamePlayerUsedPotion(GamePlayerUsedPotion event) {
-        itemDao.delete(event.item().getId());
-        log.info("dao.item.GamePlayerUsedPotion object={} [character={}, healedAmount={}]", event.item().getId(),
-                event.character().getName(), event.healedAmount());
+        if (event.remainingQuantity() <= 0) {
+            itemDao.delete(event.item().getId());
+        } else {
+            itemDao.updateQuantity(event.item().getId(), event.remainingQuantity());
+        }
+        log.info("dao.item.GamePlayerUsedPotion object={} [character={}, healedAmount={}, remaining={}]",
+                event.item().getId(), event.character().getName(), event.healedAmount(), event.remainingQuantity());
     }
 
     @EventListener
     void onGamePlayerUsedManaPotion(GamePlayerUsedManaPotion event) {
-        itemDao.delete(event.item().getId());
-        log.info("dao.item.GamePlayerUsedManaPotion object={} [character={}, restoredAmount={}]", event.item().getId(),
-                event.character().getName(), event.restoredAmount());
+        if (event.remainingQuantity() <= 0) {
+            itemDao.delete(event.item().getId());
+        } else {
+            itemDao.updateQuantity(event.item().getId(), event.remainingQuantity());
+        }
+        log.info("dao.item.GamePlayerUsedManaPotion object={} [character={}, restoredAmount={}, remaining={}]",
+                event.item().getId(), event.character().getName(), event.restoredAmount(), event.remainingQuantity());
     }
 }

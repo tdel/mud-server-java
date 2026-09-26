@@ -78,7 +78,7 @@ public class RegenHealthEngine {
         }
         MapInstance map = monster.getMotionSystem().getCurrentMap();
         map.removeMonster(monster);
-        monster.broadcastToMap(new MonsterDefeated(monster.getName()), null);
+        monster.broadcastToMap(new MonsterDefeated(monster.getId(), monster.getName()), null);
         monster.getKnownList().clear();
         log.info("regenhp.monster_removed_from_map monster={} map={}", monster.getName(), map.getName());
 

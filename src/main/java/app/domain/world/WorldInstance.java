@@ -94,6 +94,9 @@ public class WorldInstance {
     }
 
     public void joinWorld(PlayerInstance character) {
+        // Avant d'entrer sur la carte : les autres joueurs doivent voir d'emblée
+        // l'équipement corrigé (knownList encore vide, aucun broadcast perdu).
+        character.getInventorySystem().releaseBlockedOffHand();
         Position savedPosition = character.getMotionSystem().getPosition();
         if (savedPosition != null) {
             character.getMotionSystem().getCurrentMap().join(character, savedPosition);
