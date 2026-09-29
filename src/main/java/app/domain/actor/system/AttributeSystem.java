@@ -17,8 +17,10 @@ public final class AttributeSystem {
         return attributes.get(attribute);
     }
 
+    // Bonus L2 de l'attribut en % (STR 40 -> +20, WIT 11 -> -36), cf.
+    // Attribute.bonus.
     public int getModifier(Attribute attribute) {
-        return Math.floorDiv(getAttribute(attribute) - 10, 2);
+        return (int) Math.round((attribute.bonus(getAttribute(attribute)) - 1.0) * 100);
     }
 
     public Map<Attribute, Integer> getAttributes() {

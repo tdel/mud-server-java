@@ -10,13 +10,14 @@
     <mpBase>24.6</mpBase>
     <mpAdd>5.37</mpAdd>
     <mpMod>0.03</mpMod>
+    <!-- Attributs L2 retail (datapack L2J H5, stats/chars/baseStats), cf. Attribute.bonus. -->
     <baseAttributes>
-        <STR>15</STR>
-        <DEX>13</DEX>
-        <CON>14</CON>
-        <INT>8</INT>
-        <WIT>12</WIT>
-        <MEN>10</MEN>
+        <STR>40</STR>
+        <DEX>30</DEX>
+        <CON>43</CON>
+        <INT>21</INT>
+        <WIT>11</WIT>
+        <MEN>25</MEN>
     </baseAttributes>
     <skill id="875cbdfc-6be9-5c46-8fb8-3314f7679ccd">
         <!-- Power Strike -->

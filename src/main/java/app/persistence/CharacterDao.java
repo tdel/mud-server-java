@@ -188,9 +188,10 @@ public class CharacterDao {
         List<Item> items = itemDao.findByCharacterId(record.getId());
 
         PlayerInstance character = new PlayerInstance(record.getId(), account, record.getName(), map,
-                Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(), record.getCurrentHealth(),
-                maxHealth, attributes, record.getXp(), record.getGold(), maxMana, record.getCurrentMana(), knownSkills,
-                activeEffects, subclasses, knownPassiveSkills, items, parseGrade(record.getActiveSoulshotGrade()),
+                Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(),
+                Math.min(record.getCurrentHealth(), maxHealth), maxHealth, attributes, record.getXp(), record.getGold(),
+                maxMana, Math.min(record.getCurrentMana(), maxMana), knownSkills, activeEffects, subclasses,
+                knownPassiveSkills, items, parseGrade(record.getActiveSoulshotGrade()),
                 parseGrade(record.getActiveSpiritshotGrade()), record.getKarma(), record.getPkCount(),
                 record.getPvpCount(), record.getPvpFlagged());
         character.setWorldInstance(instance);

@@ -281,7 +281,7 @@ public final class SkillSystem {
         double diff = Math.abs(Math.IEEEremainder(toCaster - target.getMotionSystem().getHeading(), 2 * Math.PI));
         double sideMod = diff > 2 * Math.PI / 3 ? 2.0 : diff > Math.PI / 3 ? 1.5 : 1.0;
         double chance = activeSkill.blowChance() / 100.0
-                * CombatFormulas.statBonus(character.getAttributeSystem().getAttribute(Attribute.DEX)) * sideMod;
+                * Attribute.DEX.bonus(character.getAttributeSystem().getAttribute(Attribute.DEX)) * sideMod;
         return Randomizer.rollChance(Math.min(chance, BLOW_MAX_CHANCE));
     }
 

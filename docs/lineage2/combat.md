@@ -1,4 +1,4 @@
-# Combat
+ = , the retail Lineage 2 per-attribute multipliers (L2J H5 , rounded to 0.01): STR , INT , CON , MEN , DEX , WIT . Attributes use the retail scale, fixed per class (Human Fighter 40/30/43/21/11/25, Human Mystic 22/21/27/41/20/39 for STR/DEX/CON/INT/WIT/MEN; monsters 40/30/43/21/20/20), which yields the retail level-1 values (e.g. Fighter 126 HP / 38 MP / atk.spd 330 / cast.spd 213, Mystic 99 HP / 59 MP / cast.spd 333). .
 
 See `docs/lineage2/README.md` for the caveat on these formulas' provenance (community-reconstructed, not an exact retail reproduction). Implementation: `app.game.combat.CombatFormulas` (pure functions, no RNG) plus the RNG orchestration in `CombatSystem.attack`, `MonsterInstance.attack`, and `SkillSystem.rollDamage`/`castModifier`.
 
@@ -8,16 +8,16 @@ Every `AbstractCharacter` exposes 7 derived stats, computed on the fly from its 
 
 | Stat | Formula | Driven by |
 |---|---|---|
-| P.Atk | `weaponPAtk * statBonus(STR) * levelFactor(level)` | equipped weapon, STR, level |
-| M.Atk | `weaponMAtk * statBonus(INT) * levelFactor(level)` | equipped weapon, INT, level |
-| P.Def | `sum(equipped pDef) + statBonus(CON) * BASE_DEF_FACTOR` | equipped armor, CON |
-| M.Def | `sum(equipped mDef) + statBonus(MEN) * BASE_DEF_FACTOR` | equipped armor, MEN |
-| Accuracy | `BASE_ACCURACY + level + statBonus(DEX) * ACCURACY_FACTOR + itemBonus` | DEX, level, items |
-| Evasion | `BASE_EVASION + level + statBonus(DEX) * EVASION_FACTOR - armorWeightPenalty + itemBonus` | DEX, level, armor weight, items |
-| P.Crit (`getCriticalRate()`) | `BASE_CRIT_RATE + statBonus(DEX) * ACCURACY_FACTOR + itemBonus`, clamped to [1, 90]% | DEX, items |
-| M.Crit (`getMagicalCriticalRate()`) | `BASE_CRIT_RATE + statBonus(WIT) * ACCURACY_FACTOR + itemBonus`, clamped to [1, 90]% | WIT, items |
+| P.Atk | `weaponPAtk * bonus(STR) * levelFactor(level)` | equipped weapon, STR, level |
+| M.Atk | `weaponMAtk * bonus(INT) * levelFactor(level)` | equipped weapon, INT, level |
+| P.Def | `sum(equipped pDef) + bonus(CON) * BASE_DEF_FACTOR` | equipped armor, CON |
+| M.Def | `sum(equipped mDef) + bonus(MEN) * BASE_DEF_FACTOR` | equipped armor, MEN |
+| Accuracy | `BASE_ACCURACY + level + bonus(DEX) * ACCURACY_FACTOR + itemBonus` | DEX, level, items |
+| Evasion | `BASE_EVASION + level + bonus(DEX) * EVASION_FACTOR - armorWeightPenalty + itemBonus` | DEX, level, armor weight, items |
+| P.Crit (`getCriticalRate()`) | `BASE_CRIT_RATE + bonus(DEX) * ACCURACY_FACTOR + itemBonus`, clamped to [1, 90]% | DEX, items |
+| M.Crit (`getMagicalCriticalRate()`) | `BASE_CRIT_RATE + bonus(WIT) * ACCURACY_FACTOR + itemBonus`, clamped to [1, 90]% | WIT, items |
 
-`statBonus(score) = 1.03^(score - 10)` — a smooth exponential centered on score 10 (neutral, bonus = 1.0), used consistently across all 6 attributes instead of DnD5e's `(score-10)/2` linear modifier. `levelFactor(level) = 1 + (level-1) * 0.02`.
+`bonus(ATTR)` = `Attribute.bonus(score)`, the retail Lineage 2 per-attribute multipliers (L2J H5 `data/stats/statBonus.xml`, rounded to 0.01): STR `1.036^(STR-34.845)`, INT `1.020^(INT-31.375)`, CON `1.030^(CON-27.632)`, MEN `1.010^(MEN+0.060)`, DEX `1.009^(DEX-19.360)`, WIT `1.050^(WIT-20.000)`. Attributes use the retail scale and are fixed per class (STR/DEX/CON/INT/WIT/MEN: Human Fighter 40/30/43/21/11/25, Human Mystic 22/21/27/41/20/39, monsters 40/30/43/21/20/20 like almost every L2J H5 NPC), which yields the retail level-1 values (Fighter 126 HP / 38 MP / atk.spd 330 / cast.spd 213, Mystic 99 HP / 59 MP / cast.spd 333). `levelFactor(level) = 1 + (level-1) * 0.02`.
 
 Each stat has an `effective` variant (`getEffectivePAtk()`, etc.) that adds any active buff/debuff from `EffectsSystem` (`ModifiedStat.PATK/PDEF/MATK/MDEF/ACCURACY/EVASION/PCRIT/MCRIT`) — this is what combat resolution actually reads, exactly like `getEffectiveArmorClass()` did before. M.Crit (`CombatFormulas.magicCriticalRate`, driven by WIT) is a straight mirror of P.Crit's DEX formula: WIT had no formula reading it at all before this — the only attribute of the six that was otherwise inert.
 
@@ -28,16 +28,16 @@ Each stat has an `effective` variant (`getEffectivePAtk()`, etc.) that adds any 
 Max HP and max mana follow a retail-accurate **per-class quadratic curve in level**
 (`hpBase + hpAdd*level + hpMod*level²`, resp. `mpBase`/`mpAdd`/`mpMod`), taken directly from
 the official Human Fighter/Human Mystic base HP/MP tables (fitted exactly against the level
-1-20 retail values), then multiplied by `statBonus(CON)`/`statBonus(MEN)` exactly like
+1-20 retail values), then multiplied by `bonus(CON)`/`bonus(MEN)` exactly like
 p.def/m.def — CON/MEN modulate the class curve as a build choice, same relationship as
 CON→P.Def and MEN→M.Def, just applied to the vitals pool instead of a defense stat.
 
 | Stat | Formula | Driven by |
 |---|---|---|
-| Max HP | `(classHpBase + classHpAdd*level + classHpMod*level²) * statBonus(CON)` | class curve (`hpBase`/`hpAdd`/`hpMod`), level, CON |
-| Max Mana | `(classMpBase + classMpAdd*level + classMpMod*level²) * statBonus(MEN)` | class curve (`mpBase`/`mpAdd`/`mpMod`), level, MEN |
-| HP regen/tick (3s) | `maxHealth * HP_REGEN_RATE * statBonus(CON)` | max HP, CON |
-| Mana regen/tick (3s) | `maxMana * MP_REGEN_RATE * statBonus(MEN)` | max mana, MEN |
+| Max HP | `(classHpBase + classHpAdd*level + classHpMod*level²) * bonus(CON)` | class curve (`hpBase`/`hpAdd`/`hpMod`), level, CON |
+| Max Mana | `(classMpBase + classMpAdd*level + classMpMod*level²) * bonus(MEN)` | class curve (`mpBase`/`mpAdd`/`mpMod`), level, MEN |
+| HP regen/tick (3s) | `maxHealth * HP_REGEN_RATE * bonus(CON)` | max HP, CON |
+| Mana regen/tick (3s) | `maxMana * MP_REGEN_RATE * bonus(MEN)` | max mana, MEN |
 
 The tick period is **3 seconds** (`RegenHealthEngine`/`RegenManaEngine`'s `TICK_INTERVAL_MS`), matching retail L2J's `HpTask`/`MpTask` period — not an arbitrary rate. Passive regen without sitting/buffs therefore takes roughly `50 / statBonus(CON or MEN)` ticks (~2.5 minutes at neutral CON/MEN) to refill from empty, in line with the retail pace.
 
@@ -74,7 +74,7 @@ A `SkillEffectType.HEALING` skill (`SkillSystem.castHeal`) heals the skill's act
 
 `ActiveEffect.category()` derives `BUFF`/`DEBUFF` (`EffectCategory`) from `amount`'s sign — no separate persisted field. `EffectsSystem` caps active effects per category: `MAX_BUFF_SLOTS` (6), `MAX_DEBUFF_SLOTS` (4). Applying a new effect (not a refresh of an already-active `skillId`) while a category is full evicts the soonest-to-expire effect of that same category; `SkillSystem.castModifier` publishes `CharacterEffectExpired` for the evicted effect, reusing the exact same expiry pipeline (`ActiveEffectEngine`/`ActiveEffectPersistenceListener`) a natural timeout goes through — no new event type needed.
 
-A debuff can additionally be resisted independently of the skill's normal hit/evasion check: `CombatFormulas.debuffResistChance(menScore)` — `clamp(0, 70, round(5 + statBonus(MEN) * 3.0)) / 100.0` — rolled right after a successful hit in `SkillSystem.castModifier`. A resist is reported the same way as a miss (`CastOutcome.hit() == false`) — there's no separate "resisted" status on the wire yet.
+A debuff can additionally be resisted independently of the skill's normal hit/evasion check: `CombatFormulas.debuffResistChance(menScore)` — `clamp(0, 70, round(5 + bonus(MEN) * 3.0)) / 100.0` — rolled right after a successful hit in `SkillSystem.castModifier`. A resist is reported the same way as a miss (`CastOutcome.hit() == false`) — there's no separate "resisted" status on the wire yet.
 
 ## What didn't change
 

@@ -34,8 +34,6 @@ import app.game.Randomizer;
  */
 public final class CombatFormulas {
 
-    public static final double STAT_BONUS_BASE = 1.03;
-    public static final int NEUTRAL_SCORE = 10;
     public static final double LEVEL_FACTOR_PER_LEVEL = 0.02;
     public static final int UNARMED_PATK = 4;
     public static final double BASE_DEF_FACTOR = 6.0;
@@ -107,73 +105,70 @@ public final class CombatFormulas {
     private CombatFormulas() {
     }
 
-    public static double statBonus(int score) {
-        return Math.pow(STAT_BONUS_BASE, score - NEUTRAL_SCORE);
-    }
-
     public static double levelFactor(int level) {
         return 1.0 + (level - 1) * LEVEL_FACTOR_PER_LEVEL;
     }
 
     public static int physicalAttack(int weaponPAtk, int strengthScore, int level) {
-        return (int) Math.round(weaponPAtk * statBonus(strengthScore) * levelFactor(level));
+        return (int) Math.round(weaponPAtk * Attribute.STR.bonus(strengthScore) * levelFactor(level));
     }
 
     public static int magicalAttack(int weaponMAtk, int intelligenceScore, int level) {
-        return (int) Math.round(weaponMAtk * statBonus(intelligenceScore) * levelFactor(level));
+        return (int) Math.round(weaponMAtk * Attribute.INT.bonus(intelligenceScore) * levelFactor(level));
     }
 
     public static int physicalDefense(int armorPDefSum, int constitutionScore) {
-        return Math.max(1, (int) Math.round(armorPDefSum + statBonus(constitutionScore) * BASE_DEF_FACTOR));
+        return Math.max(1, (int) Math.round(armorPDefSum + Attribute.CON.bonus(constitutionScore) * BASE_DEF_FACTOR));
     }
 
     public static int magicalDefense(int armorMDefSum, int menScore) {
-        return Math.max(1, (int) Math.round(armorMDefSum + statBonus(menScore) * BASE_DEF_FACTOR));
+        return Math.max(1, (int) Math.round(armorMDefSum + Attribute.MEN.bonus(menScore) * BASE_DEF_FACTOR));
     }
 
     // Courbe quadratique en level (hpBase + hpAdd*level + hpMod*level^2),
     // reprenant telle quelle la table officielle L2 des PV de base par niveau
     // (Human Fighter/Mystic, cf. data/classes/*.xml) ; le résultat est ensuite
-    // multiplié par statBonus(CON), comme pour p.def/m.def.
+    // multiplié par le bonus L2 de CON (Attribute.bonus), comme pour p.def/m.def.
     public static int maxHealth(double hpBase, double hpAdd, double hpMod, int level, int constitutionScore) {
         double base = hpBase + hpAdd * level + hpMod * level * level;
-        return Math.max(1, (int) Math.round(base * statBonus(constitutionScore)));
+        return Math.max(1, (int) Math.round(base * Attribute.CON.bonus(constitutionScore)));
     }
 
     public static int maxMana(double mpBase, double mpAdd, double mpMod, int level, int menScore) {
         double base = mpBase + mpAdd * level + mpMod * level * level;
-        return Math.max(0, (int) Math.round(base * statBonus(menScore)));
+        return Math.max(0, (int) Math.round(base * Attribute.MEN.bonus(menScore)));
     }
 
     public static int healthRegenPerTick(int maxHealth, int constitutionScore) {
-        return Math.max(1, (int) Math.round(maxHealth * HP_REGEN_RATE * statBonus(constitutionScore)));
+        return Math.max(1, (int) Math.round(maxHealth * HP_REGEN_RATE * Attribute.CON.bonus(constitutionScore)));
     }
 
     public static int manaRegenPerTick(int maxMana, int menScore) {
-        return Math.max(1, (int) Math.round(maxMana * MP_REGEN_RATE * statBonus(menScore)));
+        return Math.max(1, (int) Math.round(maxMana * MP_REGEN_RATE * Attribute.MEN.bonus(menScore)));
     }
 
     public static int accuracy(int level, int dexterityScore, int accuracyItemBonus) {
-        int raw = (int) Math
-                .round(BASE_ACCURACY + level + statBonus(dexterityScore) * ACCURACY_FACTOR + accuracyItemBonus);
+        int raw = (int) Math.round(
+                BASE_ACCURACY + level + Attribute.DEX.bonus(dexterityScore) * ACCURACY_FACTOR + accuracyItemBonus);
         return Math.max(1, raw);
     }
 
     public static int evasion(int level, int dexterityScore, int armorWeightPenalty, int evasionItemBonus) {
-        int raw = (int) Math.round(BASE_EVASION + level + statBonus(dexterityScore) * EVASION_FACTOR
+        int raw = (int) Math.round(BASE_EVASION + level + Attribute.DEX.bonus(dexterityScore) * EVASION_FACTOR
                 + armorWeightPenalty + evasionItemBonus);
         return Math.max(0, raw);
     }
 
     public static int criticalRate(int dexterityScore, int critItemBonus) {
-        int raw = (int) Math.round(BASE_CRIT_RATE + statBonus(dexterityScore) * ACCURACY_FACTOR + critItemBonus);
+        int raw = (int) Math
+                .round(BASE_CRIT_RATE + Attribute.DEX.bonus(dexterityScore) * ACCURACY_FACTOR + critItemBonus);
         return Math.clamp(raw, MIN_CRIT_RATE, MAX_CRIT_RATE);
     }
 
     // Miroir magique de criticalRate() : DEX pilote le critique physique, WIT le
     // critique magique.
     public static int magicCriticalRate(int witScore, int critItemBonus) {
-        int raw = (int) Math.round(BASE_CRIT_RATE + statBonus(witScore) * ACCURACY_FACTOR + critItemBonus);
+        int raw = (int) Math.round(BASE_CRIT_RATE + Attribute.WIT.bonus(witScore) * ACCURACY_FACTOR + critItemBonus);
         return Math.clamp(raw, MIN_CRIT_RATE, MAX_CRIT_RATE);
     }
 
@@ -230,7 +225,7 @@ public final class CombatFormulas {
     // touche du sort — MEN protège des altérations d'état comme CON protège des
     // dégâts physiques.
     public static double debuffResistChance(int menScore) {
-        int raw = (int) Math.round(BASE_DEBUFF_RESIST + statBonus(menScore) * DEBUFF_RESIST_FACTOR);
+        int raw = (int) Math.round(BASE_DEBUFF_RESIST + Attribute.MEN.bonus(menScore) * DEBUFF_RESIST_FACTOR);
         return Math.clamp(raw, 0, MAX_DEBUFF_RESIST) / 100.0;
     }
 
@@ -252,7 +247,7 @@ public final class CombatFormulas {
     // vitesse d'attaque naturelle de l'arme (0 → dégénère en pur DEX, une arme
     // "lourde" ayant un atkSpd de base plus faible qu'une dague).
     public static int attackSpeed(int weaponAtkSpd, int dexterityScore) {
-        return Math.max(1, (int) Math.round(weaponAtkSpd * statBonus(dexterityScore)));
+        return Math.max(1, (int) Math.round(weaponAtkSpd * Attribute.DEX.bonus(dexterityScore)));
     }
 
     // Formule L2 canonique : délai entre deux coups (ms) = 500 000 / atk.spd —
@@ -271,7 +266,7 @@ public final class CombatFormulas {
     // pour
     // cette nouvelle stat) la font varier.
     public static int castSpeed(int witScore) {
-        return Math.max(1, (int) Math.round(BASE_CAST_SPD * statBonus(witScore)));
+        return Math.max(1, (int) Math.round(BASE_CAST_SPD * Attribute.WIT.bonus(witScore)));
     }
 
     // Formule L2J (Skill.calcHitTime côté client officiel/L2J applique le même

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monsters>
+    <!-- Attributs : valeurs de base des monstres L2 (STR 40, DEX 30, CON 43, INT 21, WIT 20,
+         MEN 20 — quasi tous les PNJ du datapack L2J H5), cf. Attribute.bonus. -->
     <monster id="dc803de5-e456-4e20-bbdc-ad16faf99af9">
         <name>Gremlin</name>
         <maxHealth>38</maxHealth>
@@ -12,12 +14,12 @@
         <critBonus>0</critBonus>
         <xpReward>30</xpReward>
         <attributes>
-            <STR>10</STR>
-            <DEX>12</DEX>
-            <CON>11</CON>
-            <INT>9</INT>
-            <WIT>10</WIT>
-            <MEN>9</MEN>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
         </attributes>
         <loot>
             <gold>6</gold>
@@ -41,12 +43,12 @@
         <critBonus>0</critBonus>
         <xpReward>32</xpReward>
         <attributes>
-            <STR>12</STR>
-            <DEX>9</DEX>
-            <CON>14</CON>
-            <INT>6</INT>
-            <WIT>8</WIT>
-            <MEN>8</MEN>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
         </attributes>
         <loot>
             <gold>4</gold>
@@ -69,12 +71,12 @@
         <critBonus>2</critBonus>
         <xpReward>30</xpReward>
         <attributes>
-            <STR>7</STR>
-            <DEX>16</DEX>
-            <CON>8</CON>
-            <INT>9</INT>
-            <WIT>11</WIT>
-            <MEN>7</MEN>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
         </attributes>
         <loot>
             <gold>3</gold>
@@ -97,12 +99,12 @@
         <critBonus>3</critBonus>
         <xpReward>60</xpReward>
         <attributes>
-            <STR>9</STR>
-            <DEX>15</DEX>
-            <CON>10</CON>
-            <INT>7</INT>
-            <WIT>10</WIT>
-            <MEN>7</MEN>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
         </attributes>
         <loot>
             <gold>8</gold>
@@ -126,12 +128,12 @@
         <critBonus>0</critBonus>
         <xpReward>65</xpReward>
         <attributes>
-            <STR>14</STR>
-            <DEX>9</DEX>
-            <CON>16</CON>
-            <INT>6</INT>
-            <WIT>8</WIT>
-            <MEN>8</MEN>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
         </attributes>
         <loot>
             <gold>10</gold>
