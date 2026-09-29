@@ -39,6 +39,12 @@ public final class ClassSystem {
         return tier >= 1 && tier <= subclasses.size() ? subclasses.get(tier - 1) : null;
     }
 
+    // Sous-classe du palier le plus élevé choisi (celle qu'affiche la fenêtre de
+    // groupe), null tant qu'aucune n'a été choisie.
+    public Subclass getCurrentSubclass() {
+        return subclasses.isEmpty() ? null : subclasses.get(subclasses.size() - 1);
+    }
+
     public Integer getPendingSubclassTier() {
         int nextTier = subclasses.size() + 1;
         if (nextTier == 1 && character.getLevelingSystem().getLevel() >= TIER1_LEVEL) {

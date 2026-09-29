@@ -48,7 +48,7 @@ import app.network.message.ingame.SpiritshotUsed;
 
 public final class InventorySystem {
 
-    private static final UUID GRADE_PENALTY_EFFECT_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    public static final UUID GRADE_PENALTY_EFFECT_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
 
     private final AbstractCharacter character;
     private final List<Item> items = new CopyOnWriteArrayList<>();

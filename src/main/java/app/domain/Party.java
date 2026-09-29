@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import app.domain.actor.instance.PlayerInstance;
 import app.network.OutputMessage;
 import app.network.message.ingame.NewPartyLeader;
+import app.network.message.ingame.PartyDisbanded;
 import app.network.message.ingame.PartyMemberLeft;
 
 public class Party {
@@ -123,10 +124,22 @@ public class Party {
         remove(character);
         if (!isEmpty()) {
             broadcast(new PartyMemberLeft(character.getName()), null);
-            if (wasLeader) {
+            if (!disbandIfAlone() && wasLeader) {
                 broadcast(new NewPartyLeader(leader.getId(), leader.getName()), null);
             }
         }
+    }
+
+    // Comme dans Lineage 2, un groupe réduit à un seul membre est dissous
+    // (départ, exclusion ou déconnexion du dernier coéquipier) : le survivant
+    // reçoit PartyDisbanded et peut de nouveau être invité ailleurs.
+    public boolean disbandIfAlone() {
+        if (members.size() != 1) {
+            return false;
+        }
+        broadcast(new PartyDisbanded(), null);
+        disband();
+        return true;
     }
 
     public void disband() {

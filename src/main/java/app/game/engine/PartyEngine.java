@@ -11,9 +11,12 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import app.domain.ActiveEffect;
+import app.domain.EffectCategory;
 import app.domain.Party;
 import app.domain.PendingPartyInvite;
 import app.domain.SkillEffectType;
+import app.domain.actor.event.CharacterChoseSubclass;
 import app.domain.actor.event.CharacterDamaged;
 import app.domain.actor.event.CharacterLeveledUp;
 import app.domain.actor.event.CharacterRegenerated;
@@ -25,6 +28,7 @@ import app.domain.actor.event.SkillCast;
 import app.domain.actor.instance.PlayerInstance;
 import app.network.message.ingame.PartyInviteDeclined;
 import app.network.message.ingame.PartyMemberEffectApplied;
+import app.network.message.ingame.PartyMemberProfileUpdated;
 import app.network.message.ingame.PartyMemberVitalsUpdated;
 
 @Component
@@ -81,6 +85,21 @@ public class PartyEngine {
     @EventListener
     void onCharacterLeveledUp(CharacterLeveledUp event) {
         broadcastVitals(event.character());
+        broadcastProfile(event.character(), event.newLevel());
+    }
+
+    @EventListener
+    void onCharacterChoseSubclass(CharacterChoseSubclass event) {
+        broadcastProfile(event.character(), event.character().getLevelingSystem().getLevel());
+    }
+
+    private void broadcastProfile(PlayerInstance character, int level) {
+        Party party = character.getPartySystem().getParty();
+        if (party != null) {
+            party.broadcast(new PartyMemberProfileUpdated(character.getId(), character.getName(), level,
+                    character.getClassSystem().getCharacterClass(), character.getClassSystem().getCurrentSubclass()),
+                    character);
+        }
     }
 
     @EventListener
@@ -117,10 +136,9 @@ public class PartyEngine {
         if (party != null) {
             long secondsRemaining = Duration.between(Instant.now(), event.expiresAt()).toSeconds();
             String statLabel = event.modifiers().isEmpty() ? "" : event.modifiers().get(0).stat().label();
-            party.broadcast(
-                    new PartyMemberEffectApplied(targetPlayer.getId(), targetPlayer.getName(),
-                            event.activeSkill().name(), statLabel, event.amount(), Math.max(0, secondsRemaining)),
-                    targetPlayer);
+            party.broadcast(new PartyMemberEffectApplied(targetPlayer.getId(), targetPlayer.getName(),
+                    event.activeSkill().name(), statLabel, event.amount(), Math.max(0, secondsRemaining),
+                    ActiveEffect.categoryOf(event.modifiers()) == EffectCategory.BUFF), targetPlayer);
         }
     }
 
