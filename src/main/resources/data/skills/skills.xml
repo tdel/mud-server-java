@@ -63,6 +63,18 @@
             </effect>
         </effects>
     </skill>
+    <!-- Lancé par le Scroll of Escape (consumables.xml), jamais appris : castTime fixe
+         (non modulé par cast.spd ni spiritshot), la recharge est portée par l'objet. -->
+    <skill id="0fb1e44d-8199-44e7-8165-34403791a682">
+        <name>Teleport</name>
+        <level id="1" mana="0" power="0" />
+        <reuseTime>0</reuseTime>
+        <castTime>8</castTime>
+        <range>0</range>
+        <skillType>TELEPORT</skillType>
+        <target>ONE</target>
+        <element>NONE</element>
+    </skill>
     <skill id="865a7263-fb06-48ef-89c1-9ccbad268215">
         <name>Expertise Grade</name>
         <level id="1" value="D" />

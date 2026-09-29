@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import app.network.message.ActionNotFound;
 import app.network.message.ingame.AlreadyCasting;
 import app.network.message.ingame.CharacterIsDead;
+import app.network.message.ingame.TeleportInProgress;
 
 @Component
 public class CommandDispatcher {
@@ -31,6 +32,12 @@ public class CommandDispatcher {
                     && connection.character().getSkillSystem().isCasting()) {
                 log.debug("command.rejected verb={} reason=character_casting", actionName);
                 connection.send(new AlreadyCasting());
+                return;
+            }
+            if (connection.state() == ConnectionState.INGAME && action.blockedWhileTeleporting()
+                    && connection.character().getCombatSystem().isTeleporting()) {
+                log.debug("command.rejected verb={} reason=character_teleporting", actionName);
+                connection.send(new TeleportInProgress());
                 return;
             }
             log.info("command.received verb={} state={}", actionName, connection.state());

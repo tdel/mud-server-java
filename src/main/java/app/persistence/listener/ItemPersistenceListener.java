@@ -12,6 +12,7 @@ import app.domain.actor.event.GamePlayerEquippedItem;
 import app.domain.actor.event.GamePlayerUnequippedItem;
 import app.domain.actor.event.GamePlayerUsedManaPotion;
 import app.domain.actor.event.GamePlayerUsedPotion;
+import app.domain.actor.event.GamePlayerUsedScroll;
 import app.domain.actor.event.ItemDiscarded;
 import app.domain.actor.event.ItemPurchased;
 import app.domain.actor.event.ShotActivated;
@@ -101,6 +102,17 @@ public class ItemPersistenceListener {
         }
         log.info("dao.item.GamePlayerUsedPotion object={} [character={}, healedAmount={}, remaining={}]",
                 event.item().getId(), event.character().getName(), event.healedAmount(), event.remainingQuantity());
+    }
+
+    @EventListener
+    void onGamePlayerUsedScroll(GamePlayerUsedScroll event) {
+        if (event.remainingQuantity() <= 0) {
+            itemDao.delete(event.item().getId());
+        } else {
+            itemDao.updateQuantity(event.item().getId(), event.remainingQuantity());
+        }
+        log.info("dao.item.GamePlayerUsedScroll object={} [character={}, remaining={}]", event.item().getId(),
+                event.character().getName(), event.remainingQuantity());
     }
 
     @EventListener

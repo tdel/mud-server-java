@@ -40,6 +40,11 @@ public class Portal implements CommandHandler {
     }
 
     @Override
+    public boolean blockedWhileTeleporting() {
+        return true;
+    }
+
+    @Override
     public void onReceive(Connection connection, String argument) {
         PlayerInstance character = connection.character();
         Optional<MapPortal> portal = character.getMotionSystem().getCurrentMap()

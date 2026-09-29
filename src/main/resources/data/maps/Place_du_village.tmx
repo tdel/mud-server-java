@@ -5,6 +5,7 @@
   <property name="name" value="Place du village"/>
   <property name="description" value="Le coeur fortifié du village : une place pavée autour d'une fontaine, entre l'auberge et la forge, à l'abri de hauts remparts gardés. Deux téléporteurs y mènent à l'Orée de la forêt et au Chemin du cimetière."/>
   <property name="isStartingMap" type="bool" value="true"/>
+  <property name="isTown" type="bool" value="true"/>
  </properties>
  <tileset firstgid="1" name="Place du village" tilewidth="32" tileheight="32" tilecount="13" columns="13">
   <tile id="0">

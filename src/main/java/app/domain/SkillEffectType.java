@@ -1,5 +1,5 @@
 package app.domain;
 
 public enum SkillEffectType {
-    DAMAGE, HEALING, BUFF, DEBUFF, PASSIVE
+    DAMAGE, HEALING, BUFF, DEBUFF, PASSIVE, TELEPORT
 }

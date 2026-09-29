@@ -87,6 +87,14 @@ public class MapInstance {
         return template.isStartingMap();
     }
 
+    public boolean isTown() {
+        return template.isTown();
+    }
+
+    public Position randomTownPosition() {
+        return template.randomTownPosition();
+    }
+
     public CollisionGrid getCollisionGrid() {
         return template.getCollisionGrid();
     }

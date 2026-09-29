@@ -1,5 +1,5 @@
 package app.domain;
 
 public enum ConsumableEffect {
-    HEALING, MANA_RESTORE
+    HEALING, MANA_RESTORE, CAST_SKILL
 }

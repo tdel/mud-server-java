@@ -31,10 +31,22 @@ public final class CombatSystem {
     private final boolean invulnerable;
     private volatile AbstractCharacter target;
     private volatile Instant nextAttackAt = Instant.MIN;
+    // Entre la fin de l'incantation d'un Scroll of Escape et la téléportation
+    // effective (cf. EscapeEngine) : intouchable, alors qu'il reste attaquable
+    // pendant l'incantation elle-même.
+    private volatile boolean teleporting;
 
     public CombatSystem(AbstractCharacter character, boolean invulnerable) {
         this.character = character;
         this.invulnerable = invulnerable;
+    }
+
+    public boolean isTeleporting() {
+        return teleporting;
+    }
+
+    public void setTeleporting(boolean teleporting) {
+        this.teleporting = teleporting;
     }
 
     public AbstractCharacter getTarget() {
@@ -67,7 +79,7 @@ public final class CombatSystem {
             setTarget(null);
             return new AttackOutcome.TargetInvalid(defender.getId());
         }
-        if (defender instanceof AbstractNpc) {
+        if (defender instanceof AbstractNpc || defender.getCombatSystem().isTeleporting()) {
             log.debug("attack.rejected character={} reason=target_not_attackable target={}", character.getId(),
                     defender.getId());
             return new AttackOutcome.TargetInvalid(defender.getId());
@@ -153,7 +165,7 @@ public final class CombatSystem {
     // MonsterAiEngine
     // le fait agir), et ne coûte rien de plus pour un joueur (déjà mono-thread).
     public boolean takeDamage(int amount, AbstractCharacter attacker) {
-        if (invulnerable) {
+        if (invulnerable || teleporting) {
             return false;
         }
         boolean defeated;

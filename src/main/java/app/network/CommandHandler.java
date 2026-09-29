@@ -17,4 +17,10 @@ public interface CommandHandler {
     default boolean requiresNotCasting() {
         return false;
     }
+
+    // Refusée entre la fin d'un Scroll of Escape et la téléportation (cf.
+    // EscapeEngine) : par défaut toute action refusée pendant une incantation.
+    default boolean blockedWhileTeleporting() {
+        return requiresNotCasting();
+    }
 }

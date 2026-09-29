@@ -35,6 +35,16 @@ public class AbstractNpc extends AbstractCharacter {
         return dialogueSystem;
     }
 
+    /** Rôle déclaré dans le XML (null : PNJ générique), voir {@link NpcType}. */
+    public NpcType getNpcType() {
+        return template.type();
+    }
+
+    /** Sexe déclaré dans le XML (null : non précisé). */
+    public Gender getGender() {
+        return template.gender();
+    }
+
     protected NpcTemplate getTemplate() {
         return template;
     }

@@ -47,10 +47,13 @@ public class SkillCastEngine {
     private final Map<UUID, AbstractCharacter> casting = new ConcurrentHashMap<>();
     private final MovementEngine movementEngine;
     private final ProjectileEngine projectileEngine;
+    private final EscapeEngine escapeEngine;
 
-    public SkillCastEngine(MovementEngine movementEngine, ProjectileEngine projectileEngine) {
+    public SkillCastEngine(MovementEngine movementEngine, ProjectileEngine projectileEngine,
+            EscapeEngine escapeEngine) {
         this.movementEngine = movementEngine;
         this.projectileEngine = projectileEngine;
+        this.escapeEngine = escapeEngine;
     }
 
     @EventListener
@@ -82,9 +85,12 @@ public class SkillCastEngine {
         // aussi bien pour un joueur qu'un monstre lanceur de sort (tous deux passent
         // par CombatFormulas.baseStats(), voir PlayerInstance/MonsterCatalog).
         int castSpd = caster.getStatSystem().getEffective(ModifiedStat.CASTSPD);
-        long castingTimeNanos = CombatFormulas.effectiveCastingTimeMs(activeSkill.castingTimeMs(), castSpd)
-                * 1_000_000L;
-        if (caster instanceof PlayerInstance player) {
+        // Teleport (Scroll of Escape) : durée fixe, ni cast.spd ni spiritshot.
+        boolean teleport = activeSkill.skillType() == SkillEffectType.TELEPORT;
+        long castingTimeNanos = teleport
+                ? activeSkill.castingTimeMs() * 1_000_000L
+                : CombatFormulas.effectiveCastingTimeMs(activeSkill.castingTimeMs(), castSpd) * 1_000_000L;
+        if (!teleport && caster instanceof PlayerInstance player) {
             ItemType shotType = activeSkill.damageType() == SkillDamageType.PHYSICAL
                     ? ItemType.SOULSHOT
                     : ItemType.SPIRITSHOT;
@@ -162,6 +168,10 @@ public class SkillCastEngine {
         AbstractCharacter primaryTarget = activeCast.target();
 
         if (caster.getResourceSystem().getCurrentHealth() <= 0) {
+            return;
+        }
+        if (activeSkill.skillType() == SkillEffectType.TELEPORT) {
+            escapeEngine.begin(caster);
             return;
         }
         if (!isTargetStillValid(caster, activeSkill, primaryTarget)) {
@@ -257,6 +267,10 @@ public class SkillCastEngine {
         }
         if (target.getResourceSystem().getCurrentHealth() <= 0
                 || !caster.getMotionSystem().getCurrentMap().isPresent(target)) {
+            return false;
+        }
+        if (target.getCombatSystem().isTeleporting() && (activeSkill.skillType() == SkillEffectType.DAMAGE
+                || activeSkill.skillType() == SkillEffectType.DEBUFF)) {
             return false;
         }
         return activeSkill.range() <= 0 || caster.getMotionSystem().getPosition()

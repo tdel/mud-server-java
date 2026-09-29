@@ -136,9 +136,7 @@ public class MonsterAiEngine {
             // joueur, la destination (la cible) bouge en continu, donc le client doit
             // recevoir une cible d'interpolation fraîche à chaque tick pour ne pas
             // diverger.
-            monster.broadcast(new CharacterMovementStarted(monster.getId(), monster.getName(),
-                    target.getMotionSystem().getPosition().x(), target.getMotionSystem().getPosition().y(),
-                    monster.getMotionSystem().getHeading()), null);
+            broadcastMovement(monster, target.getMotionSystem().getPosition());
             monster.pursuit = state.withLastStepAt(nowNanos).withMoving(true);
         }
     }
@@ -156,10 +154,7 @@ public class MonsterAiEngine {
 
         double dtSeconds = (nowNanos - state.lastStepAtNanos()) / 1_000_000_000.0;
         if (stepToward(monster, monster.getSpawnPosition(), dtSeconds)) {
-            monster.broadcast(
-                    new CharacterMovementStarted(monster.getId(), monster.getName(), monster.getSpawnPosition().x(),
-                            monster.getSpawnPosition().y(), monster.getMotionSystem().getHeading()),
-                    null);
+            broadcastMovement(monster, monster.getSpawnPosition());
             monster.pursuit = state.withLastStepAt(nowNanos).withMoving(true);
         } else {
             // Bloqué : on abandonne pour ne pas tourner en rond indéfiniment.
@@ -184,6 +179,19 @@ public class MonsterAiEngine {
         if (target != null) {
             target.send(new MonsterGaveUpChase(monster.getName()));
         }
+    }
+
+    /**
+     * Position actuelle du monstre jointe à sa destination : le client recale en
+     * douceur sa propre interpolation à chaque pas au lieu de le téléporter à
+     * l'arrêt.
+     */
+    private void broadcastMovement(MonsterInstance monster, Position destination) {
+        Position position = monster.getMotionSystem().getPosition();
+        monster.broadcast(
+                new CharacterMovementStarted(monster.getId(), monster.getName(), position.x(), position.y(),
+                        destination.x(), destination.y(), monster.getMotionSystem().getHeading(), List.of(destination)),
+                null);
     }
 
     private boolean stepToward(MonsterInstance monster, Position destination, double dtSeconds) {

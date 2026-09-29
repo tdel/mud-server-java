@@ -43,6 +43,10 @@
                     <itemTemplateId>03c6440a-24d6-426a-bf0a-d3d046c9ad37</itemTemplateId>
                     <price>10</price>
                 </items>
+                <items>
+                    <itemTemplateId>5d6ae0ed-efda-412b-94b4-98677e2c8946</itemTemplateId>
+                    <price>400</price>
+                </items>
             </shop>
         </dialogue>
         <level>1</level>

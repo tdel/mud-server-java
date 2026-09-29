@@ -95,9 +95,10 @@ public final class TiledMapLoader {
                 tilesets, properties);
     }
 
-    public record ParsedMap(UUID id, String name, String description, boolean isStartingMap, CollisionGrid terrain,
-            Position spawnPosition, List<MonsterSpawn> monsterSpawns, List<MonsterSpawnGroup> monsterSpawnGroups,
-            List<NpcSpawn> npcSpawns, List<PortalDraft> portals, List<PeaceZoneDraft> peaceZones) {
+    public record ParsedMap(UUID id, String name, String description, boolean isStartingMap, boolean isTown,
+            CollisionGrid terrain, Position spawnPosition, List<MonsterSpawn> monsterSpawns,
+            List<MonsterSpawnGroup> monsterSpawnGroups, List<NpcSpawn> npcSpawns, List<PortalDraft> portals,
+            List<PeaceZoneDraft> peaceZones) {
     }
 
     public record PortalDraft(Position position, String direction, UUID targetMapId, Position targetPosition,
@@ -112,6 +113,9 @@ public final class TiledMapLoader {
         String name = requireStringProperty(map.properties(), "name");
         String description = requireStringProperty(map.properties(), "description");
         boolean isStartingMap = booleanProperty(map.properties(), "isStartingMap", false);
+        // Ville : destination possible d'un Scroll of Escape (cf.
+        // WorldInstance.nearestTown).
+        boolean isTown = booleanProperty(map.properties(), "isTown", false);
 
         Map<Integer, TileType> tileTypeByGid = buildTileTypeByGid(map, externalTilesetResolver);
         CollisionGrid terrain = parseTerrain(map, tileTypeByGid, id);
@@ -151,7 +155,7 @@ public final class TiledMapLoader {
             }
         }
 
-        return new ParsedMap(id, name, description, isStartingMap, terrain, spawnPositionHolder[0],
+        return new ParsedMap(id, name, description, isStartingMap, isTown, terrain, spawnPositionHolder[0],
                 List.copyOf(monsterSpawns), List.copyOf(monsterSpawnGroups), List.copyOf(npcSpawns),
                 List.copyOf(portals), List.copyOf(peaceZones));
     }

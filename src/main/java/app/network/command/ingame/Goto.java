@@ -70,7 +70,11 @@ public class Goto implements CommandHandler {
         }
 
         Position target = new Position(x.get(), y.get());
-        Optional<List<Position>> path = GridPathfinder.findPath(character.getMotionSystem().getPosition(), target,
+        // Nouveau clic en pleine course : le chemin part de la position à cet
+        // instant, pas de celle du dernier tick (voir MovementEngine.settle).
+        movementEngine.settle(character);
+        Position start = character.getMotionSystem().getPosition();
+        Optional<List<Position>> path = GridPathfinder.findPath(start, target,
                 character.getMotionSystem().getCurrentMap().getCollisionGrid());
 
         if (path.isEmpty()) {
@@ -84,9 +88,10 @@ public class Goto implements CommandHandler {
                 target.y(), waypoints.size());
         movementEngine.startMovement(waypoints, character);
         if (!waypoints.isEmpty()) {
-            connection.send(new MovementStarted(target.x(), target.y(), character.getMotionSystem().getHeading()));
-            character.broadcast(new CharacterMovementStarted(character.getId(), character.getName(), target.x(),
-                    target.y(), character.getMotionSystem().getHeading()), character);
+            connection.send(new MovementStarted(target.x(), target.y(), character.getMotionSystem().getHeading(),
+                    start.x(), start.y(), waypoints));
+            character.broadcast(new CharacterMovementStarted(character.getId(), character.getName(), start.x(),
+                    start.y(), target.x(), target.y(), character.getMotionSystem().getHeading(), waypoints), character);
         }
     }
 

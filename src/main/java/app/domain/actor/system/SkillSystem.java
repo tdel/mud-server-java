@@ -161,6 +161,8 @@ public final class SkillSystem {
             case DEBUFF -> castModifier(activeSkill, level, target, true);
             case PASSIVE -> throw new IllegalStateException(
                     "ActiveSkill " + activeSkill.id() + " (" + activeSkill.name() + ") est PASSIVE, non castable");
+            case TELEPORT -> throw new IllegalStateException("ActiveSkill " + activeSkill.id() + " ("
+                    + activeSkill.name() + ") est TELEPORT, résolu par EscapeEngine");
         };
 
         markCooldown(activeSkill);
@@ -207,7 +209,9 @@ public final class SkillSystem {
 
     public CastOutcome applyDamageOutcome(AttackRollOutcome roll, AbstractCharacter target) {
         DomainEventPublisher.publish(new CharacterBeginAttack(character, target, false));
-        if (!roll.hit()) {
+        // Cible devenue intouchable en vol (fin d'un Scroll of Escape, cf.
+        // CombatSystem.isTeleporting) : le projectile la manque.
+        if (!roll.hit() || target.getCombatSystem().isTeleporting()) {
             return new CastOutcome(false, 0, target.getResourceSystem().getCurrentHealth(),
                     target.getResourceSystem().getMaxHealth(), false, false, null, List.of());
         }
@@ -285,6 +289,14 @@ public final class SkillSystem {
                 || activeSkill.skillType() == SkillEffectType.DEBUFF)) {
             return new CastRequestOutcome.TargetInvalid(target.getId());
         }
+        if (target.getCombatSystem().isTeleporting() && (activeSkill.skillType() == SkillEffectType.DAMAGE
+                || activeSkill.skillType() == SkillEffectType.DEBUFF)) {
+            return new CastRequestOutcome.TargetInvalid(target.getId());
+        }
+        if (activeSkill.skillType() == SkillEffectType.TELEPORT) {
+            // Jamais lancé directement : uniquement via son parchemin (castFromItem).
+            return new CastRequestOutcome.SkillUnknown(activeSkill.name());
+        }
         if (activeSkill.range() > 0 && character.getMotionSystem().getPosition()
                 .distanceTo(target.getMotionSystem().getPosition()) > activeSkill.range()) {
             return new CastRequestOutcome.OutOfRange(activeSkill.name(), target.getName());
@@ -301,6 +313,13 @@ public final class SkillSystem {
 
         DomainEventPublisher.publish(new SkillCastBegin(character, activeSkill, level, target));
         return new CastRequestOutcome.Started();
+    }
+
+    // Sort porté par un consommable (Scroll of Escape -> Teleport) : ni appris ni
+    // soumis à sa propre recharge (le délai est celui de l'objet, cf.
+    // InventorySystem.isItemReady), lancé sur soi-même au level 1.
+    public void castFromItem(ActiveSkill activeSkill) {
+        DomainEventPublisher.publish(new SkillCastBegin(character, activeSkill, GRANTED_SKILL_LEVEL, character));
     }
 
     public sealed interface CastRequestOutcome {

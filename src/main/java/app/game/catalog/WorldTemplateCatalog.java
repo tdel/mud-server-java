@@ -18,6 +18,8 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
 import app.domain.NpcSpawn;
+import app.domain.actor.Gender;
+import app.domain.actor.NpcType;
 import app.domain.item.ItemTemplate;
 import app.domain.world.MapTemplate;
 import app.domain.world.MapTemplatePortal;
@@ -154,7 +156,8 @@ public class WorldTemplateCatalog {
         Map<UUID, MapTemplate> templates = new LinkedHashMap<>();
         for (ParsedMap map : parsedMaps) {
             MapTemplate template = new MapTemplate(map.id(), map.name(), map.description(), map.isStartingMap(),
-                    map.terrain(), map.spawnPosition(), map.monsterSpawns(), map.monsterSpawnGroups(), map.npcSpawns());
+                    map.isTown(), map.terrain(), map.spawnPosition(), map.monsterSpawns(), map.monsterSpawnGroups(),
+                    map.npcSpawns());
             if (!template.isWalkable(map.spawnPosition())) {
                 throw new IllegalStateException("Map " + map.id() + " du monde " + shortName + " a une position de "
                         + "spawn " + map.spawnPosition() + " non praticable de sa carte");
@@ -227,8 +230,8 @@ public class WorldTemplateCatalog {
                 SellSystem.NpcShop shop = toShop(shortName, definition, itemTemplatesById);
 
                 NpcTemplate template = new NpcTemplate(definition.id(), definition.name(), definition.title(),
-                        map.getId(), spawn.position(), dialogue, shop, definition.level(), Set.of(), Set.of(),
-                        List.of());
+                        definition.type(), definition.gender(), map.getId(), spawn.position(), dialogue, shop,
+                        definition.level(), Set.of(), Set.of(), List.of());
                 if (templates.putIfAbsent(template.id(), template) != null) {
                     throw new IllegalStateException("NPC " + definition.id() + " dupliqué dans le monde " + shortName);
                 }
@@ -305,8 +308,12 @@ public class WorldTemplateCatalog {
         return Optional.of(loadedTemplatesById.computeIfAbsent(id, this::loadFullTemplate));
     }
 
-    record NpcDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name, String title,
-            DialogueDefinition dialogue, int level) {
+    /**
+     * {@code type} (ex. GUARD) et {@code gender} (MAN/WOMAN) sont optionnels :
+     * seulement l'apparence côté client.
+     */
+    record NpcDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name, String title, NpcType type,
+            Gender gender, DialogueDefinition dialogue, int level) {
     }
 
     record DialogueDefinition(String greeting,

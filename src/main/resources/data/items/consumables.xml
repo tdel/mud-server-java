@@ -64,4 +64,14 @@
         <consumableEffect>MANA_RESTORE</consumableEffect>
         <effectAmount>100</effectAmount>
     </consumable>
+    <consumable id="5d6ae0ed-efda-412b-94b4-98677e2c8946">
+        <name>Scroll of Escape</name>
+        <description>Après 8 secondes d'incantation, ramène à un endroit au hasard de la ville la plus proche.</description>
+        <type>SCROLL</type>
+        <weight>1</weight>
+        <price>400</price>
+        <consumableEffect>CAST_SKILL</consumableEffect>
+        <skillId>0fb1e44d-8199-44e7-8165-34403791a682</skillId>
+        <reuseDelay>3</reuseDelay>
+    </consumable>
 </consumables>

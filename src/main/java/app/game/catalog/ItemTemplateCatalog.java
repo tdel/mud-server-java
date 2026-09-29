@@ -69,9 +69,19 @@ public class ItemTemplateCatalog {
 
     private void loadConsumables() {
         for (ConsumableDefinition definition : readResource(CONSUMABLES_RESOURCE, ConsumableDefinition.class)) {
+            ActiveSkill skill = null;
+            if (definition.consumableEffect() == ConsumableEffect.CAST_SKILL) {
+                if (definition.skillId() == null) {
+                    throw new IllegalStateException("Consommable " + definition.id() + " (" + definition.name()
+                            + ") est CAST_SKILL sans skillId dans " + CONSUMABLES_RESOURCE);
+                }
+                skill = skillCatalog.getById(definition.skillId());
+            }
+            int reuseDelayMs = definition.reuseDelay() == null ? 0 : Math.round(definition.reuseDelay() * 1000f);
             ItemTemplate template = new ConsumableItem(definition.id(), definition.name(), definition.description(),
                     definition.type(), definition.weight(), definition.price(), ItemGrade.NOGRADE,
-                    definition.consumableEffect(), definition.effectAmount());
+                    definition.consumableEffect(), definition.effectAmount() == null ? 0 : definition.effectAmount(),
+                    skill, reuseDelayMs);
             templates.put(template.getId(), template);
         }
     }
@@ -151,7 +161,7 @@ public class ItemTemplateCatalog {
 
     private record ConsumableDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name,
             String description, ItemType type, int weight, int price, ConsumableEffect consumableEffect,
-            int effectAmount) {
+            Integer effectAmount, UUID skillId, Float reuseDelay) {
     }
 
     private record EquipmentDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name, String description,

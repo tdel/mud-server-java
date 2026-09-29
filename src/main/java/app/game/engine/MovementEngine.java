@@ -6,8 +6,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import app.domain.map.Position;
-import app.domain.world.CollisionGrid;
-import app.domain.world.MapInstance;
 import app.game.engine.ContinuousStep.StepResult;
 
 import org.slf4j.Logger;
@@ -61,11 +59,65 @@ public class MovementEngine {
                 character.getId(), waypoints.size());
     }
 
+    /**
+     * Fait avancer le déplacement en cours jusqu'à maintenant plutôt que jusqu'au
+     * dernier tick (jusqu'à TICK_INTERVAL_MS de retard), sans le terminer : la fin
+     * (MovementFinished/Blocked) reste annoncée par le tick. Appelé avant de
+     * recalculer un chemin (`goto` en pleine course) ou d'arrêter le personnage :
+     * sans ça, le nouveau chemin partait d'une position périmée et le temps écoulé
+     * depuis le tick était perdu — le serveur prenait du retard sur le client à
+     * chaque clic, que le client finissait par rattraper d'un coup (saccade).
+     */
+    public void settle(AbstractCharacter character) {
+        synchronized (character) {
+            ActiveMovement movement = character.getMotionSystem().getActiveMovement();
+            if (movement == null) {
+                return;
+            }
+            long now = System.nanoTime();
+            Position previous = character.getMotionSystem().getPosition();
+            StepResult result = stepTo(character, movement, now);
+            character.getMotionSystem().setPosition(result.position());
+            if (!result.position().equals(previous)) {
+                character.getMotionSystem().setHeading(previous.headingTo(result.position()));
+            }
+            // Destination atteinte : garde un waypoint sur place pour que le prochain tick
+            // annonce la fin comme d'habitude.
+            List<Position> remaining = result.remainingWaypoints().isEmpty()
+                    ? List.of(result.position())
+                    : result.remainingWaypoints();
+            character.getMotionSystem().updateMovement(movement.withRemaining(remaining, now));
+        }
+    }
+
+    /**
+     * Position à l'instant présent, projetée le long du déplacement en cours sans
+     * rien modifier (voir settle) : c'est elle que le client compare à la sienne
+     * pour corriger sa dérive (commande `position`).
+     */
+    public Position currentPosition(AbstractCharacter character) {
+        synchronized (character) {
+            ActiveMovement movement = character.getMotionSystem().getActiveMovement();
+            if (movement == null) {
+                return character.getMotionSystem().getPosition();
+            }
+            return stepTo(character, movement, System.nanoTime()).position();
+        }
+    }
+
+    private StepResult stepTo(AbstractCharacter character, ActiveMovement movement, long now) {
+        double dtSeconds = (now - movement.lastTickAtNanos()) / 1_000_000_000.0;
+        return ContinuousStep.step(character.getMotionSystem().getPosition(), movement.remainingWaypoints(),
+                unitsPerSecond(character.getMotionSystem().getSpeed()), dtSeconds,
+                character.getMotionSystem().getCurrentMap().getCollisionGrid());
+    }
+
     public void stopMovement(AbstractCharacter character) {
         synchronized (character) {
             if (character.getMotionSystem().getActiveMovement() == null) {
                 return;
             }
+            settle(character);
             character.getMotionSystem().clearMovement();
             movingCharacters.remove(character.getId());
         }
@@ -152,13 +204,8 @@ public class MovementEngine {
                 return MovementStepOutcome.NO_MOVEMENT;
             }
 
-            MapInstance map = character.getMotionSystem().getCurrentMap();
-            CollisionGrid grid = map.getCollisionGrid();
-            double dtSeconds = (now - movement.lastTickAtNanos()) / 1_000_000_000.0;
-
             Position previous = character.getMotionSystem().getPosition();
-            StepResult result = ContinuousStep.step(previous, movement.remainingWaypoints(),
-                    unitsPerSecond(character.getMotionSystem().getSpeed()), dtSeconds, grid);
+            StepResult result = stepTo(character, movement, now);
             character.getMotionSystem().setPosition(result.position());
             if (!result.position().equals(previous)) {
                 character.getMotionSystem().setHeading(previous.headingTo(result.position()));

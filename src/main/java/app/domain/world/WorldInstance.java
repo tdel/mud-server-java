@@ -1,17 +1,22 @@
 package app.domain.world;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import app.domain.Account;
+import app.domain.MapPortal;
 import app.domain.actor.Attribute;
 import app.domain.actor.CharacterClass;
 import app.domain.actor.instance.PlayerInstance;
@@ -69,6 +74,31 @@ public class WorldInstance {
 
     public Optional<MapInstance> startingMapInstance() {
         return mapInstances.values().stream().filter(map -> Boolean.TRUE.equals(map.isStartingMap())).findFirst();
+    }
+
+    // Ville la plus proche de `from` (Scroll of Escape) : distance en nombre de
+    // portails à franchir (parcours en largeur du graphe des portails), `from`
+    // elle-même si c'est une ville ; ex æquo départagés au hasard. Repli sur la
+    // starting map si aucune ville n'est atteignable.
+    public Optional<MapInstance> nearestTown(MapInstance from) {
+        List<MapInstance> frontier = List.of(from);
+        Set<MapInstance> visited = new HashSet<>(frontier);
+        while (!frontier.isEmpty()) {
+            List<MapInstance> towns = frontier.stream().filter(MapInstance::isTown).toList();
+            if (!towns.isEmpty()) {
+                return Optional.of(towns.get(ThreadLocalRandom.current().nextInt(towns.size())));
+            }
+            List<MapInstance> next = new ArrayList<>();
+            for (MapInstance map : frontier) {
+                for (MapPortal portal : map.getPortals()) {
+                    if (visited.add(portal.targetMap())) {
+                        next.add(portal.targetMap());
+                    }
+                }
+            }
+            frontier = next;
+        }
+        return startingMapInstance();
     }
 
     // putIfAbsent avant tout join sur la map : ferme le TOCTOU d'un personnage

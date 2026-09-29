@@ -3,6 +3,8 @@
     <npc id="b0362279-5a46-4461-9672-6f4e0b2cf7e0">
         <name>Village Guard</name>
         <title>City Guard</title>
+        <type>GUARD</type>
+        <gender>MAN</gender>
         <dialogue>
             <greeting>Halt! ... Alright, move along.</greeting>
             <options>
@@ -15,6 +17,8 @@
     <npc id="318a4b28-4aae-46fa-ab99-2bc62738f1c3">
         <name>Gate Guard</name>
         <title>City Guard</title>
+        <type>GUARD</type>
+        <gender>MAN</gender>
         <dialogue>
             <greeting>Nothing to report here. Move along.</greeting>
             <options>
@@ -27,6 +31,8 @@
     <npc id="6fea25d2-5d6f-474e-adef-c11c1a903843">
         <name>Gate Guard</name>
         <title>City Guard</title>
+        <type>GUARD</type>
+        <gender>WOMAN</gender>
         <dialogue>
             <greeting>The forest road is quiet today. Keep it that way.</greeting>
             <options>
@@ -39,6 +45,8 @@
     <npc id="a760adde-b995-4ab8-a073-ac5f4d4e5a23">
         <name>Gate Guard</name>
         <title>City Guard</title>
+        <type>GUARD</type>
+        <gender>MAN</gender>
         <dialogue>
             <greeting>Mind the cemetery path after dark, traveler.</greeting>
             <options>
@@ -51,6 +59,8 @@
     <npc id="b748cda3-b7ed-4e50-863e-a31bc4815d9f">
         <name>Gate Guard</name>
         <title>City Guard</title>
+        <type>GUARD</type>
+        <gender>WOMAN</gender>
         <dialogue>
             <greeting>No trouble inside these walls. Understood?</greeting>
             <options>
@@ -63,6 +73,8 @@
     <npc id="a38d3420-52b9-498a-ba7a-0248158c1acc">
         <name>Village Guard</name>
         <title>City Guard</title>
+        <type>GUARD</type>
+        <gender>WOMAN</gender>
         <dialogue>
             <greeting>The teleporters are safe to use. Step into the circle.</greeting>
             <options>
@@ -75,6 +87,8 @@
     <npc id="f006ec9d-60f1-46e3-9dc8-e10c3fd43338">
         <name>Village Guard</name>
         <title>City Guard</title>
+        <type>GUARD</type>
+        <gender>MAN</gender>
         <dialogue>
             <greeting>Keep your blade sheathed near the market.</greeting>
             <options>
@@ -87,6 +101,8 @@
     <npc id="7d014cb8-a199-484b-a7b8-24c086f6c797">
         <name>Village Guard</name>
         <title>City Guard</title>
+        <type>GUARD</type>
+        <gender>MAN</gender>
         <dialogue>
             <greeting>All quiet on the ramparts. Move along.</greeting>
             <options>

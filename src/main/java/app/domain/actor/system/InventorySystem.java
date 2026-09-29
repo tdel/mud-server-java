@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -51,6 +52,7 @@ public final class InventorySystem {
 
     private final AbstractCharacter character;
     private final List<Item> items = new CopyOnWriteArrayList<>();
+    private final Map<UUID, Instant> nextItemUseAt = new ConcurrentHashMap<>();
     private int gold;
     private volatile ItemGrade activeSoulshotGrade;
     private volatile ItemGrade activeSpiritshotGrade;
@@ -217,6 +219,24 @@ public final class InventorySystem {
     }
 
     private record StoredStack(Item stack, int added, boolean merged) {
+    }
+
+    // Délai de réutilisation par template (toutes les piles d'un même objet le
+    // partagent), cf. ConsumableItem.getReuseDelayMs. En mémoire seulement : il
+    // ne survit pas à une reconnexion.
+    public boolean isItemReady(UUID templateId) {
+        return !Instant.now().isBefore(nextItemUseAt.getOrDefault(templateId, Instant.MIN));
+    }
+
+    public Duration remainingItemCooldown(UUID templateId) {
+        Duration remaining = Duration.between(Instant.now(), nextItemUseAt.getOrDefault(templateId, Instant.MIN));
+        return remaining.isNegative() ? Duration.ZERO : remaining;
+    }
+
+    public void markItemCooldown(UUID templateId, long delayMs) {
+        if (delayMs > 0) {
+            nextItemUseAt.put(templateId, Instant.now().plusMillis(delayMs));
+        }
     }
 
     // Retire un exemplaire d'une pile (potion bue...) et retourne la quantité

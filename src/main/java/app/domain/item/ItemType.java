@@ -3,7 +3,7 @@ package app.domain.item;
 import java.util.List;
 
 public enum ItemType {
-    WEAPON, HELMET, ARMOR, PANTS, BOOTS, GLOVES, SHIELD, NECKLACE, EARRING, RING, POTION, KEY, TOOL, MISC, SOULSHOT, SPIRITSHOT;
+    WEAPON, HELMET, ARMOR, PANTS, BOOTS, GLOVES, SHIELD, NECKLACE, EARRING, RING, POTION, SCROLL, KEY, TOOL, MISC, SOULSHOT, SPIRITSHOT;
 
     // Candidate slots in preference order: RING/EARRING have two interchangeable
     // slots, the rest exactly one.
@@ -26,11 +26,12 @@ public enum ItemType {
     // Taille maximale d'une pile (Item.quantity) : 1 = non stackable (un Item par
     // exemplaire). Les soulshots/spiritshots n'ont qu'une pile illimitée par
     // type+grade (cf. InventorySystem.findStackable/consumeShot) ; les potions se
-    // répartissent en piles de 100 au plus (cf. InventorySystem.store).
+    // répartissent en piles de 100 au plus, comme les parchemins (cf.
+    // InventorySystem.store).
     public int maxStack() {
         return switch (this) {
             case SOULSHOT, SPIRITSHOT -> Integer.MAX_VALUE;
-            case POTION -> 100;
+            case POTION, SCROLL -> 100;
             default -> 1;
         };
     }

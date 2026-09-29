@@ -5,16 +5,21 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import app.domain.ActiveSkill;
 import app.domain.ConsumableEffect;
 import app.domain.actor.instance.PlayerInstance;
+import app.domain.actor.system.InventorySystem;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.GamePlayerUsedManaPotion;
 import app.domain.actor.event.GamePlayerUsedPotion;
+import app.domain.actor.event.GamePlayerUsedScroll;
 import app.network.message.ingame.CharacterUsedItem;
 import app.network.message.ingame.HealthAlreadyFull;
+import app.network.message.ingame.ItemOnCooldown;
 import app.network.message.ingame.ItemUsed;
 import app.network.message.ingame.ManaAlreadyFull;
 import app.network.message.ingame.ManaPotionUsed;
+import app.network.message.ingame.ScrollUsed;
 
 public class ConsumableItem extends ItemTemplate {
 
@@ -22,19 +27,62 @@ public class ConsumableItem extends ItemTemplate {
 
     private final ConsumableEffect effect;
     private final int effectAmount;
+    // CAST_SKILL uniquement : sort lancé à l'utilisation (Teleport du Scroll of
+    // Escape), null sinon.
+    private final ActiveSkill skill;
+    // Délai de réutilisation (par template, cf. InventorySystem.isItemReady), 0 =
+    // aucun.
+    private final int reuseDelayMs;
 
     public ConsumableItem(UUID id, String name, String description, ItemType type, int weight, int price,
-            ItemGrade grade, ConsumableEffect effect, int effectAmount) {
+            ItemGrade grade, ConsumableEffect effect, int effectAmount, ActiveSkill skill, int reuseDelayMs) {
         super(id, name, description, type, weight, price, grade);
         this.effect = effect;
         this.effectAmount = effectAmount;
+        this.skill = skill;
+        this.reuseDelayMs = reuseDelayMs;
+    }
+
+    public ActiveSkill getSkill() {
+        return skill;
+    }
+
+    public int getReuseDelayMs() {
+        return reuseDelayMs;
     }
 
     public void consume(PlayerInstance character, Item item) {
         switch (effect) {
             case HEALING -> heal(character, item);
             case MANA_RESTORE -> restoreMana(character, item);
+            case CAST_SKILL -> castSkill(character, item);
         }
+    }
+
+    // Parchemin : consommé dès la lecture, puis son sort démarre une incantation
+    // normale (SkillCastEngine) sur le lecteur lui-même — un cast interrompu ne
+    // rend pas le parchemin. Le délai de réutilisation court dès la lecture.
+    private void castSkill(PlayerInstance character, Item item) {
+        InventorySystem inventory = character.getInventorySystem();
+        if (!inventory.isItemReady(getId())) {
+            long remainingMs = inventory.remainingItemCooldown(getId()).toMillis();
+            log.debug("item.use.rejected character={} reason=on_cooldown item={} remainingMs={}", character.getId(),
+                    item.getId(), remainingMs);
+            character.send(new ItemOnCooldown(item.getName(), remainingMs, true));
+            return;
+        }
+        int remaining = inventory.consumeOne(item);
+        inventory.markItemCooldown(getId(), reuseDelayMs);
+        log.info("item.scroll_used character={} item={} skill={} remaining={}", character.getId(), item.getId(),
+                skill.name(), remaining);
+        character.send(new ScrollUsed(item.getId(), item.getName(), item.getGrade(), skill.name(), remaining));
+        if (reuseDelayMs > 0) {
+            character.send(new ItemOnCooldown(item.getName(), reuseDelayMs, false));
+        }
+        character.broadcast(new CharacterUsedItem(character.getId(), character.getName(), item.getId(), item.getName()),
+                character);
+        DomainEventPublisher.publish(new GamePlayerUsedScroll(character, item, remaining));
+        character.getSkillSystem().castFromItem(skill);
     }
 
     private void heal(PlayerInstance character, Item item) {
