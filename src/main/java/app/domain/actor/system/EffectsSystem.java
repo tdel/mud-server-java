@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import app.domain.ActiveEffect;
@@ -24,6 +25,7 @@ public final class EffectsSystem {
 
     private final AbstractCharacter character;
     private final Map<UUID, ActiveEffect> activeEffects = new ConcurrentHashMap<>();
+    private final Map<UUID, Instant> nextPeriodicTickAt = new ConcurrentHashMap<>();
 
     public EffectsSystem(AbstractCharacter character) {
         this.character = character;
@@ -91,6 +93,49 @@ public final class EffectsSystem {
 
     public boolean isEmpty() {
         return activeEffects.isEmpty();
+    }
+
+    // Effets à dégâts périodiques (poison) dont la prochaine période est échue :
+    // la période suivante est planifiée d'office, l'appelant (ActiveEffectEngine)
+    // applique les dégâts.
+    public List<ActiveEffect> duePeriodicDamage(Instant now) {
+        List<ActiveEffect> due = new ArrayList<>();
+        for (ActiveEffect effect : activeEffects.values()) {
+            if (effect.periodicDamage() == null || !now.isBefore(effect.expiresAt())) {
+                continue;
+            }
+            Instant next = nextPeriodicTickAt.computeIfAbsent(effect.skillId(),
+                    id -> now.plusMillis(effect.periodicDamage().intervalMs()));
+            if (!now.isBefore(next)) {
+                nextPeriodicTickAt.put(effect.skillId(), next.plusMillis(effect.periodicDamage().intervalMs()));
+                due.add(effect);
+            }
+        }
+        nextPeriodicTickAt.keySet().removeIf(id -> !activeEffects.containsKey(id));
+        return due;
+    }
+
+    // Retire (et renvoie) les effets qui cessent au premier geste du porteur
+    // (Relax) : déplacement, attaque ou incantation.
+    public List<ActiveEffect> removeBreakingOnAction() {
+        return removeWhere(ActiveEffect::breaksOnAction);
+    }
+
+    // Cure Poison ou mort du porteur : retire (et renvoie) tous les effets à
+    // dégâts périodiques.
+    public List<ActiveEffect> removePeriodicDamage() {
+        return removeWhere(effect -> effect.periodicDamage() != null);
+    }
+
+    private List<ActiveEffect> removeWhere(Predicate<ActiveEffect> predicate) {
+        List<ActiveEffect> removed = new ArrayList<>();
+        for (ActiveEffect effect : activeEffects.values()) {
+            if (predicate.test(effect) && activeEffects.remove(effect.skillId(), effect)) {
+                nextPeriodicTickAt.remove(effect.skillId());
+                removed.add(effect);
+            }
+        }
+        return removed;
     }
 
     public void remove(UUID effectId) {

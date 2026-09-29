@@ -1,28 +1,158 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Compétences Lineage 2 High Five des classes de base Human Fighter / Human Mystic
+     (levels 1 à 20, datapack L2J H5 : classSkillTree.xml + stats/skills/*.xml).
+     Conversions : portée L2 / 20 (40 -> 2 au corps à corps, 600 -> 30), mana =
+     mpConsume1 + mpConsume2, castTime = hitTime, reuseTime = reuseDelay ; les bonus
+     multiplicatifs sont en % entiers (x1.085 -> 8). Un <apply armor="..."> de passif ne
+     vaut que si le plastron porté est de l'un de ces types (HEAVY/LIGHT/ROBE), un
+     notArmor="..." que s'il n'en est pas (torse nu compris) : Spellcraft et Magician's
+     Movement pénalisent toute tenue autre qu'une robe, comme L2J — les mystiques
+     débutent en Apprentice's Robe (StartingEquipmentEngine). Lucky (pas de perte d'XP à
+     la mort dans ce projet) et les compétences d'artisanat sont omis.
+     Level de personnage requis et apprentissage d'office (autoGet) : data/classes/*.xml. -->
 <skills>
+    <!-- ===================== Human Fighter ===================== -->
     <skill id="875cbdfc-6be9-5c46-8fb8-3314f7679ccd">
         <name>Power Strike</name>
-        <level id="1" mana="2" power="10" />
-        <level id="2" mana="3" power="16" />
-        <level id="3" mana="4" power="22" />
-        <level id="4" mana="5" power="28" />
-        <level id="5" mana="6" power="34" />
-        <reuseTime>13</reuseTime>
+        <description>Rassemble sa force pour porter un coup puissant à l'ennemi. Nécessite une épée, une masse ou une hache.</description>
+        <level id="1" mana="9" power="30" />
+        <level id="2" mana="9" power="32" />
+        <level id="3" mana="10" power="35" />
+        <level id="4" mana="11" power="46" />
+        <level id="5" mana="12" power="51" />
+        <level id="6" mana="13" power="55" />
+        <level id="7" mana="16" power="71" />
+        <level id="8" mana="16" power="78" />
+        <level id="9" mana="17" power="84" />
+        <reuseTime>3</reuseTime>
         <castTime>1.08</castTime>
         <range>2</range>
         <skillType>DAMAGE</skillType>
         <target>ONE</target>
         <element>NONE</element>
         <damageType>PHYSICAL</damageType>
+        <weapon>SWORD</weapon>
+        <weapon>BIG_SWORD</weapon>
+        <weapon>BLUNT</weapon>
+        <weapon>BIG_BLUNT</weapon>
+        <weapon>AXE</weapon>
     </skill>
+    <skill id="c897a40d-0749-4a65-bdaa-12d41a8f5144">
+        <name>Mortal Blow</name>
+        <description>Coup de dague visant un point vital. Peut échouer ; bien plus sûr de flanc ou dans le dos de la cible. Nécessite une dague.</description>
+        <level id="1" mana="8" power="73" />
+        <level id="2" mana="8" power="80" />
+        <level id="3" mana="9" power="88" />
+        <level id="4" mana="10" power="115" />
+        <level id="5" mana="11" power="126" />
+        <level id="6" mana="11" power="137" />
+        <level id="7" mana="14" power="178" />
+        <level id="8" mana="15" power="193" />
+        <level id="9" mana="15" power="210" />
+        <reuseTime>3</reuseTime>
+        <castTime>1.08</castTime>
+        <range>2</range>
+        <skillType>DAMAGE</skillType>
+        <target>ONE</target>
+        <element>NONE</element>
+        <damageType>PHYSICAL</damageType>
+        <weapon>DAGGER</weapon>
+        <blowChance>20</blowChance>
+    </skill>
+    <skill id="6c5a1dab-0d53-430c-ba07-0b71038d571f">
+        <name>Power Shot</name>
+        <description>Bande l'arc au maximum pour décocher une flèche dévastatrice. Nécessite un arc.</description>
+        <level id="1" mana="17" power="65" />
+        <level id="2" mana="18" power="71" />
+        <level id="3" mana="19" power="78" />
+        <level id="4" mana="22" power="102" />
+        <level id="5" mana="23" power="112" />
+        <level id="6" mana="25" power="122" />
+        <level id="7" mana="31" power="158" />
+        <level id="8" mana="32" power="172" />
+        <level id="9" mana="34" power="187" />
+        <reuseTime>6</reuseTime>
+        <castTime>3.2</castTime>
+        <range>35</range>
+        <skillType>DAMAGE</skillType>
+        <target>ONE</target>
+        <element>NONE</element>
+        <damageType>PHYSICAL</damageType>
+        <projectile speed="40" />
+        <weapon>BOW</weapon>
+    </skill>
+    <skill id="38a9cded-3d15-4860-9cca-40bab7f79e7c">
+        <name>Relax</name>
+        <description>S'assoit pour se reposer : les PV se régénèrent bien plus vite. Cesse dès que l'on bouge, attaque ou lance une compétence.</description>
+        <level id="1" mana="2" power="5" />
+        <reuseTime>1</reuseTime>
+        <castTime>0.5</castTime>
+        <range>0</range>
+        <skillType>BUFF</skillType>
+        <target>SELF</target>
+        <element>NONE</element>
+        <breakOnAction>true</breakOnAction>
+        <effects>
+            <effect name="Relax" time="600" type="BUFF">
+                <apply stat="HP_REGEN" value="1" op="ADDITIVE" />
+            </effect>
+        </effects>
+    </skill>
+    <skill id="c11edd17-6384-406a-b32f-7c91e336409d">
+        <name>Weapon Mastery</name>
+        <description>Maîtrise des armes : augmente l'attaque physique.</description>
+        <level id="1">
+            <apply stat="PATK" value="8" op="MULTIPLICATIVE" />
+            <apply stat="PATK" value="2" op="ADDITIVE" />
+        </level>
+        <level id="2">
+            <apply stat="PATK" value="8" op="MULTIPLICATIVE" />
+            <apply stat="PATK" value="3" op="ADDITIVE" />
+        </level>
+        <level id="3">
+            <apply stat="PATK" value="8" op="MULTIPLICATIVE" />
+            <apply stat="PATK" value="4" op="ADDITIVE" />
+        </level>
+        <skillType>PASSIVE</skillType>
+    </skill>
+    <skill id="9011f329-a541-40f1-aa78-8542706baade">
+        <name>Armor Mastery</name>
+        <description>Maîtrise des armures : augmente la défense physique et accélère la régénération des PM de 10 %. Au niveau 4, +3 en esquive sous une armure légère.</description>
+        <level id="1">
+            <apply stat="PDEF" value="9" op="ADDITIVE" />
+            <apply stat="MP_REGEN" value="10" op="MULTIPLICATIVE" />
+        </level>
+        <level id="2">
+            <apply stat="PDEF" value="11" op="ADDITIVE" />
+            <apply stat="MP_REGEN" value="10" op="MULTIPLICATIVE" />
+        </level>
+        <level id="3">
+            <apply stat="PDEF" value="12" op="ADDITIVE" />
+            <apply stat="MP_REGEN" value="10" op="MULTIPLICATIVE" />
+        </level>
+        <level id="4">
+            <apply stat="PDEF" value="13" op="ADDITIVE" />
+            <apply stat="MP_REGEN" value="10" op="MULTIPLICATIVE" />
+            <apply stat="EVASION" value="3" op="ADDITIVE" armor="LIGHT" />
+        </level>
+        <level id="5">
+            <apply stat="PDEF" value="14" op="ADDITIVE" />
+            <apply stat="MP_REGEN" value="10" op="MULTIPLICATIVE" />
+            <apply stat="EVASION" value="3" op="ADDITIVE" armor="LIGHT" />
+        </level>
+        <skillType>PASSIVE</skillType>
+    </skill>
+
+    <!-- ===================== Human Mystic ===================== -->
     <skill id="e85856bd-fe90-5d39-a40a-089be52a89f2">
         <name>Wind Strike</name>
-        <level id="1" mana="3" power="8" />
-        <level id="2" mana="4" power="13" />
-        <level id="3" mana="5" power="18" />
-        <level id="4" mana="6" power="23" />
-        <level id="5" mana="7" power="28" />
-        <reuseTime>6</reuseTime>
+        <description>Projette une lame de vent tranchante sur l'ennemi. Attaque magique de vent.</description>
+        <level id="1" mana="9" power="12" />
+        <level id="2" mana="9" power="13" />
+        <level id="3" mana="10" power="15" />
+        <level id="4" mana="14" power="18" />
+        <level id="5" mana="15" power="21" />
+        <reuseTime>1.2</reuseTime>
         <castTime>4</castTime>
         <range>30</range>
         <skillType>DAMAGE</skillType>
@@ -30,22 +160,248 @@
         <element>WIND</element>
         <projectile speed="20" />
     </skill>
+    <skill id="02a43734-1f51-4352-96fd-ff3b75cb86e0">
+        <name>Ice Bolt</name>
+        <description>Lance un éclat de glace sur l'ennemi. Attaque magique d'eau qui peut ralentir la cible de 20 % pendant 60 s.</description>
+        <level id="1" mana="9" power="8" />
+        <level id="2" mana="10" power="9" />
+        <level id="3" mana="14" power="11" />
+        <level id="4" mana="15" power="13" />
+        <reuseTime>2</reuseTime>
+        <castTime>3.1</castTime>
+        <range>30</range>
+        <skillType>DAMAGE</skillType>
+        <target>ONE</target>
+        <element>WATER</element>
+        <projectile speed="18" />
+        <effects>
+            <effect name="Ice Bolt" time="60" type="DEBUFF" chance="60">
+                <apply stat="SPEED" value="-20" op="MULTIPLICATIVE" />
+            </effect>
+        </effects>
+    </skill>
+    <skill id="d82112e2-2953-4615-b7a0-e6e2e7ad2c73">
+        <name>Vampiric Touch</name>
+        <description>Aspire la force vitale de l'ennemi : attaque magique des ténèbres dont 40 % des dégâts reviennent en PV au lanceur.</description>
+        <level id="1" mana="25" power="18" />
+        <level id="2" mana="28" power="21" />
+        <reuseTime>3</reuseTime>
+        <castTime>4</castTime>
+        <range>30</range>
+        <skillType>DAMAGE</skillType>
+        <target>ONE</target>
+        <element>DARK</element>
+        <drain>40</drain>
+    </skill>
+    <skill id="30f448d4-edf9-4e05-819d-05acd3b59a58">
+        <name>Self Heal</name>
+        <description>Referme ses propres blessures : rend des PV au lanceur.</description>
+        <level id="1" mana="9" power="42" />
+        <reuseTime>3</reuseTime>
+        <castTime>5</castTime>
+        <range>0</range>
+        <skillType>HEALING</skillType>
+        <target>SELF</target>
+        <element>NONE</element>
+    </skill>
     <skill id="e287e606-621f-48c5-b8dc-613fa98709d3">
         <name>Heal</name>
-        <level id="1" mana="3" power="8" />
-        <level id="2" mana="4" power="12" />
-        <level id="3" mana="5" power="16" />
-        <level id="4" mana="6" power="20" />
-        <level id="5" mana="7" power="24" />
-        <reuseTime>10</reuseTime>
+        <description>Rend des PV à la cible.</description>
+        <level id="1" mana="10" power="50" />
+        <level id="2" mana="13" power="58" />
+        <level id="3" mana="14" power="67" />
+        <level id="4" mana="17" power="83" />
+        <level id="5" mana="19" power="95" />
+        <level id="6" mana="22" power="107" />
+        <reuseTime>3</reuseTime>
         <castTime>5</castTime>
         <range>30</range>
         <skillType>HEALING</skillType>
         <target>ONE</target>
         <element>NONE</element>
     </skill>
+    <skill id="7bb4637f-d682-400a-a1e1-a8ea6d996130">
+        <name>Battle Heal</name>
+        <description>Soin d'urgence à l'incantation très rapide, mais coûteux en PM.</description>
+        <level id="1" mana="25" power="83" />
+        <level id="2" mana="28" power="95" />
+        <level id="3" mana="32" power="107" />
+        <reuseTime>1</reuseTime>
+        <castTime>2</castTime>
+        <range>30</range>
+        <skillType>HEALING</skillType>
+        <target>ONE</target>
+        <element>NONE</element>
+    </skill>
+    <skill id="e3095dfc-4c5a-44ff-b497-586e6cfc9c68">
+        <name>Group Heal</name>
+        <description>Rend des PV au lanceur et aux membres de son groupe proches de lui.</description>
+        <level id="1" mana="33" power="66" />
+        <level id="2" mana="38" power="76" />
+        <level id="3" mana="43" power="86" />
+        <reuseTime>6</reuseTime>
+        <castTime>7</castTime>
+        <range>0</range>
+        <aoeRadius>50</aoeRadius>
+        <skillType>HEALING</skillType>
+        <target>PARTY</target>
+        <element>NONE</element>
+    </skill>
+    <skill id="764b902b-189a-4243-ac02-589fa113c34f">
+        <name>Might</name>
+        <description>Augmente l'attaque physique de la cible de 8 % pendant 20 minutes.</description>
+        <level id="1" mana="10" power="8" />
+        <reuseTime>2</reuseTime>
+        <castTime>4</castTime>
+        <range>20</range>
+        <skillType>BUFF</skillType>
+        <target>ONE</target>
+        <element>NONE</element>
+        <effects>
+            <effect name="Might" time="1200" type="BUFF">
+                <apply stat="PATK" value="1" op="MULTIPLICATIVE" />
+            </effect>
+        </effects>
+    </skill>
+    <skill id="25457a5c-35a9-478f-9cc0-2606194452cb">
+        <name>Shield</name>
+        <description>Augmente la défense physique de la cible de 8 % pendant 20 minutes.</description>
+        <level id="1" mana="10" power="8" />
+        <reuseTime>2</reuseTime>
+        <castTime>4</castTime>
+        <range>20</range>
+        <skillType>BUFF</skillType>
+        <target>ONE</target>
+        <element>NONE</element>
+        <effects>
+            <effect name="Shield" time="1200" type="BUFF">
+                <apply stat="PDEF" value="1" op="MULTIPLICATIVE" />
+            </effect>
+        </effects>
+    </skill>
+    <skill id="58c87411-45c5-4557-bd97-6c728662e51c">
+        <name>Curse: Weakness</name>
+        <description>Malédiction qui réduit l'attaque physique de l'ennemi de 17 % pendant 30 s. Résistée par la MEN.</description>
+        <level id="1" mana="3" power="17" />
+        <reuseTime>2</reuseTime>
+        <castTime>1.5</castTime>
+        <range>30</range>
+        <skillType>DEBUFF</skillType>
+        <target>ONE</target>
+        <element>NONE</element>
+        <landRate>80</landRate>
+        <resistAttribute>MEN</resistAttribute>
+        <effects>
+            <effect name="Curse: Weakness" time="30" type="DEBUFF">
+                <apply stat="PATK" value="1" op="MULTIPLICATIVE" />
+            </effect>
+        </effects>
+    </skill>
+    <skill id="97e77056-6402-4f24-bb43-7eceb5c8cab7">
+        <name>Curse: Poison</name>
+        <description>Empoisonne l'ennemi, qui perd des PV toutes les 3 s pendant 30 s. Résistée par la CON.</description>
+        <level id="1" mana="10" power="11" />
+        <reuseTime>3</reuseTime>
+        <castTime>4</castTime>
+        <range>30</range>
+        <skillType>DEBUFF</skillType>
+        <target>ONE</target>
+        <element>NONE</element>
+        <landRate>70</landRate>
+        <resistAttribute>CON</resistAttribute>
+        <effects>
+            <effect name="Curse: Poison" time="30" type="DEBUFF" dotInterval="3" />
+        </effects>
+    </skill>
+    <skill id="c5e78da0-df05-4cc2-aa2e-ca15df84a790">
+        <name>Cure Poison</name>
+        <description>Purifie la cible de tous les poisons qui l'affligent.</description>
+        <level id="1" mana="10" power="0" />
+        <reuseTime>4</reuseTime>
+        <castTime>4</castTime>
+        <range>30</range>
+        <skillType>CURE</skillType>
+        <target>ONE</target>
+        <element>NONE</element>
+    </skill>
+    <skill id="b3fe458a-95ad-41b2-9020-8e155d17eba7">
+        <name>Weapon Mastery</name>
+        <description>Maîtrise des armes du mage : augmente l'attaque physique et l'attaque magique.</description>
+        <level id="1">
+            <apply stat="PATK" value="45" op="MULTIPLICATIVE" />
+            <apply stat="MATK" value="17" op="MULTIPLICATIVE" />
+            <apply stat="PATK" value="2" op="ADDITIVE" />
+            <apply stat="MATK" value="2" op="ADDITIVE" />
+        </level>
+        <level id="2">
+            <apply stat="PATK" value="45" op="MULTIPLICATIVE" />
+            <apply stat="MATK" value="17" op="MULTIPLICATIVE" />
+            <apply stat="PATK" value="3" op="ADDITIVE" />
+            <apply stat="MATK" value="4" op="ADDITIVE" />
+        </level>
+        <skillType>PASSIVE</skillType>
+    </skill>
+    <skill id="2bebe953-3aa0-4388-bdbc-5b70f6d1d94f">
+        <name>Armor Mastery</name>
+        <description>Maîtrise des armures du mage : augmente la défense physique.</description>
+        <level id="1">
+            <apply stat="PDEF" value="7" op="ADDITIVE" />
+        </level>
+        <level id="2">
+            <apply stat="PDEF" value="8" op="ADDITIVE" />
+        </level>
+        <level id="3">
+            <apply stat="PDEF" value="9" op="ADDITIVE" />
+        </level>
+        <skillType>PASSIVE</skillType>
+    </skill>
+    <skill id="208d6036-0859-4677-87ff-0707a53df413">
+        <name>Anti Magic</name>
+        <description>Protection contre la magie : augmente la défense magique.</description>
+        <level id="1">
+            <apply stat="MDEF" value="10" op="ADDITIVE" />
+        </level>
+        <level id="2">
+            <apply stat="MDEF" value="12" op="ADDITIVE" />
+        </level>
+        <level id="3">
+            <apply stat="MDEF" value="14" op="ADDITIVE" />
+        </level>
+        <level id="4">
+            <apply stat="MDEF" value="16" op="ADDITIVE" />
+        </level>
+        <skillType>PASSIVE</skillType>
+    </skill>
+
+    <skill id="95e17cdc-bc03-4770-a719-58dab8026aca">
+        <name>Spellcraft</name>
+        <description>Art de l'incantation en robe : sans robe, la vitesse d'incantation est réduite de moitié.</description>
+        <level id="1">
+            <apply stat="CASTSPD" value="-50" op="MULTIPLICATIVE" notArmor="ROBE" />
+        </level>
+        <skillType>PASSIVE</skillType>
+    </skill>
+    <skill id="0a94c87c-9836-4cfa-866c-820b8fd89d48">
+        <name>Magician's Movement</name>
+        <description>Gestuelle du mage : sans robe, la vitesse d'attaque est réduite de 20 %.</description>
+        <level id="1">
+            <apply stat="ATKSPD" value="-20" op="MULTIPLICATIVE" notArmor="ROBE" />
+        </level>
+        <skillType>PASSIVE</skillType>
+    </skill>
+    <skill id="8b82f475-4051-46d5-85ab-38b7672dd6b1">
+        <name>Mana Recovery</name>
+        <description>Recueillement du mystique : la régénération des PM est accélérée de 20 % en robe.</description>
+        <level id="1">
+            <apply stat="MP_REGEN" value="20" op="MULTIPLICATIVE" armor="ROBE" />
+        </level>
+        <skillType>PASSIVE</skillType>
+    </skill>
+
+    <!-- ===================== Hors arbres de classe ===================== -->
     <skill id="7ee36cfc-4ac5-5d5b-88ef-18ee1c8e890d">
         <name>Empower</name>
+        <description>Augmente l'attaque magique de la cible.</description>
         <level id="1" mana="4" power="3" />
         <level id="2" mana="5" power="5" />
         <level id="3" mana="6" power="7" />
@@ -77,6 +433,7 @@
     </skill>
     <skill id="865a7263-fb06-48ef-89c1-9ccbad268215">
         <name>Expertise Grade</name>
+        <description>Permet d'utiliser sans pénalité l'équipement du grade débloqué (D au level 20).</description>
         <level id="1" value="D" />
         <level id="2" value="C" />
         <level id="3" value="B" />

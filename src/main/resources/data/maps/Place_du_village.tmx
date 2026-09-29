@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="132" height="92" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="15">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="132" height="92" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="16">
  <properties>
   <property name="id" value="5e4ada37-37e1-438c-9233-581f10c055c7"/>
   <property name="name" value="Place du village"/>
@@ -252,7 +252,12 @@
          <property name="npcId" value="7d014cb8-a199-484b-a7b8-24c086f6c797"/>
    </properties>
   </object>
-  <object id="14" name="Peace Zone" type="peaceZone" x="0.0" y="0.0">
+  <object id="14" name="" type="npcSpawn" x="2416.0" y="1772.8">
+   <properties>
+         <property name="npcId" value="b982da01-7dd0-4c8c-84d3-1ce6795fecee"/>
+   </properties>
+  </object>
+  <object id="15" name="Peace Zone" type="peaceZone" x="0.0" y="0.0">
    <polygon points="0,0 4224,0 4224,2944 0,2944"/>
   </object>
  </objectgroup>

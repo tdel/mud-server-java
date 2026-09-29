@@ -291,8 +291,7 @@ public final class CombatFormulas {
             return 0;
         }
         return switch (category) {
-            case LIGHT -> 0;
-            case MEDIUM -> -4;
+            case LIGHT, ROBE -> 0;
             case HEAVY -> -10;
         };
     }

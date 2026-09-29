@@ -16,11 +16,16 @@ import app.domain.Party;
 import app.domain.SkillEffectType;
 import app.domain.actor.AbstractCharacter;
 import app.domain.ActiveEffect;
+import app.domain.PeriodicDamage;
+import app.domain.actor.event.CharacterBeginAttack;
+import app.domain.actor.event.CharacterStartedMoving;
+import app.domain.actor.event.SkillCastBegin;
 import app.domain.actor.event.CharacterEffectExpired;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.PlayerLoadedInWorld;
 import app.domain.actor.event.SkillCast;
 import app.domain.actor.instance.PlayerInstance;
+import app.network.message.ingame.EffectDamage;
 import app.network.message.ingame.PartyMemberEffectExpired;
 import app.network.message.ingame.SkillModifierExpired;
 
@@ -63,15 +68,69 @@ public class ActiveEffectEngine {
         }
     }
 
+    // Poison : chaque période échue retire son montant de PV à la cible, crédité à
+    // son lanceur (XP/loot si le poison achève un monstre). Un poison ne survit
+    // pas à la mort de sa cible.
+    private void applyPeriodicDamage(AbstractCharacter character, Instant now) {
+        if (character.getResourceSystem().getCurrentHealth() <= 0) {
+            character.getEffectsSystem().removePeriodicDamage();
+            return;
+        }
+        for (ActiveEffect effect : character.getEffectsSystem().duePeriodicDamage(now)) {
+            PeriodicDamage damage = effect.periodicDamage();
+            if (character.getResourceSystem().getCurrentHealth() <= 0) {
+                break;
+            }
+            boolean defeated = character.takeDamage(damage.amount(), damage.source());
+            character.broadcast(new EffectDamage(character.getId(), character.getName(), effect.skillName(),
+                    damage.amount(), character.getResourceSystem().getCurrentHealth(),
+                    character.getResourceSystem().getMaxHealth(), defeated, damage.source().getId()), null);
+            log.debug("effect.periodic_damage character={} effect={} amount={} defeated={}", character.getId(),
+                    effect.skillName(), damage.amount(), defeated);
+            if (defeated) {
+                character.getEffectsSystem().removePeriodicDamage();
+            }
+        }
+    }
+
     public void register(AbstractCharacter character) {
         tracked.putIfAbsent(character.getId(), character);
         log.debug("effect.tracking_started character={}", character.getId());
+    }
+
+    // Relax (breakOnAction) cesse au premier geste de son porteur : déplacement,
+    // attaque ou nouvelle incantation.
+    @EventListener
+    void onCharacterStartedMoving(CharacterStartedMoving event) {
+        breakOnAction(event.character());
+    }
+
+    @EventListener
+    void onCharacterBeginAttack(CharacterBeginAttack event) {
+        breakOnAction(event.attacker());
+    }
+
+    @EventListener
+    void onSkillCastBegin(SkillCastBegin event) {
+        breakOnAction(event.caster());
+    }
+
+    private void breakOnAction(AbstractCharacter character) {
+        for (ActiveEffect effect : character.getEffectsSystem().removeBreakingOnAction()) {
+            log.debug("effect.broken_by_action character={} effect={}", character.getId(), effect.skillName());
+            DomainEventPublisher.publish(new CharacterEffectExpired(character, effect));
+        }
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
     void tick() {
         Instant now = Instant.now();
         for (AbstractCharacter character : tracked.values()) {
+            try {
+                applyPeriodicDamage(character, now);
+            } catch (Exception e) {
+                log.error("effect.periodic_damage_failed character={}", character.getId(), e);
+            }
             List<ActiveEffect> expired = character.getEffectsSystem().expireDue(now);
             for (ActiveEffect effect : expired) {
                 DomainEventPublisher.publish(new CharacterEffectExpired(character, effect));

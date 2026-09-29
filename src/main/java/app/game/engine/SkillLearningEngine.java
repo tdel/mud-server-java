@@ -1,5 +1,7 @@
 package app.game.engine;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -12,15 +14,23 @@ import app.domain.actor.event.CharacterLeveledUp;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.NewGamePlayerCreated;
 import app.domain.actor.instance.PlayerInstance;
+import app.game.SkillTrainer;
 import app.game.catalog.PassiveSkillCatalog;
 import app.game.catalog.PassiveSkillCatalogHolder;
 import app.game.catalog.SkillCatalog;
 import app.game.catalog.SkillCatalogHolder;
+import app.network.message.ingame.NewSkillsAvailable;
 
 @Component
 public class SkillLearningEngine {
 
     private static final Logger log = LoggerFactory.getLogger(SkillLearningEngine.class);
+
+    private final SkillTrainer skillTrainer;
+
+    public SkillLearningEngine(SkillTrainer skillTrainer) {
+        this.skillTrainer = skillTrainer;
+    }
 
     @EventListener
     void onNewGamePlayerCreated(NewGamePlayerCreated event) {
@@ -32,6 +42,15 @@ public class SkillLearningEngine {
     void onCharacterLeveledUp(CharacterLeveledUp event) {
         learnSkillsAt(event.character(), event.newLevel());
         learnPassiveSkillsAt(event.character(), event.newLevel());
+        // Seuls les levels autoGet s'apprennent d'office : on signale au joueur
+        // qu'un nouveau palier l'attend chez le maître des compétences.
+        List<SkillTrainer.Offer> offers = skillTrainer.offers(event.character());
+        boolean newPalier = offers.stream()
+                .anyMatch(offer -> offer.available() && offer.requiredLevel() == event.newLevel());
+        if (newPalier) {
+            long count = offers.stream().filter(SkillTrainer.Offer::available).count();
+            event.character().send(new NewSkillsAvailable(event.newLevel(), (int) count));
+        }
     }
 
     private void learnSkillsAt(PlayerInstance character, int level) {

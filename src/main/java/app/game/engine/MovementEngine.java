@@ -15,6 +15,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import app.domain.actor.AbstractCharacter;
+import app.domain.actor.event.DomainEventPublisher;
+import app.domain.actor.event.CharacterStartedMoving;
 import app.domain.actor.event.CharacterBeginAttack;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.instance.PlayerInstance;
@@ -57,6 +59,9 @@ public class MovementEngine {
         }
         log.debug("movement.started thread={} character={} waypoints={}", Thread.currentThread().getName(),
                 character.getId(), waypoints.size());
+        // Hors du verrou : un listener (ActiveEffectEngine, fin de Relax) peut
+        // diffuser des messages.
+        DomainEventPublisher.publish(new CharacterStartedMoving(character));
     }
 
     /**

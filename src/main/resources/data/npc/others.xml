@@ -112,4 +112,30 @@
         </dialogue>
         <level>2</level>
     </npc>
+    <!-- Maître des compétences de la Place du village : apprend les compétences
+         (Human Fighter / Human Mystic) accessibles au level du personnage, cf.
+         commandes skill-list / learn-skill. -->
+    <npc id="b982da01-7dd0-4c8c-84d3-1ce6795fecee">
+        <name>Skill Learner</name>
+        <title>Grand Master</title>
+        <type>SKILL_LEARNER</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>Knowledge is earned, not given. Show me what you have learned out there, and I will teach you what comes next.</greeting>
+            <options>
+                <label>Learn skills</label>
+                <type>SKILL_LEARN</type>
+            </options>
+            <options>
+                <label>Who are you?</label>
+                <type>RESPONSE</type>
+                <response>I trained fighters and mystics alike for thirty winters. Come back each time you grow stronger.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>70</level>
+    </npc>
 </npcs>

@@ -36,12 +36,27 @@ public enum CharacterClass {
 
     private Definition definition;
 
+    // Seuls les levels autoGet sont appris d'office (création, montée de level,
+    // réconciliation au login) ; les autres s'apprennent auprès d'un PNJ
+    // SKILL_LEARNER (cf. game.SkillTrainer), comme chez le Grand Master de L2.
     public List<LearnableSkill> learnableSkillIds(int level) {
-        return definition.skills().stream().flatMap(entry -> entry.level().stream()
-                .filter(l -> l.playerLevel() == level).map(l -> new LearnableSkill(entry.id(), l.id()))).toList();
+        return tree().stream().filter(entry -> entry.autoGet() && entry.playerLevel() == level)
+                .map(entry -> new LearnableSkill(entry.skillId(), entry.level())).toList();
     }
 
     public record LearnableSkill(UUID skillId, int level) {
+    }
+
+    // Arbre complet de la classe : une entrée par (compétence, level), dans
+    // l'ordre du XML.
+    public List<SkillTreeEntry> tree() {
+        return definition.skills().stream()
+                .flatMap(entry -> entry.level().stream().map(
+                        l -> new SkillTreeEntry(entry.id(), l.id(), l.playerLevel(), Boolean.TRUE.equals(l.autoGet()))))
+                .toList();
+    }
+
+    public record SkillTreeEntry(UUID skillId, int level, int playerLevel, boolean autoGet) {
     }
 
     // Courbe L2 retail (Human Fighter/Mystic) : cf. data/classes/*.xml et
@@ -84,6 +99,7 @@ public enum CharacterClass {
     }
 
     private record SkillLevel(@JacksonXmlProperty(isAttribute = true) int id,
-            @JacksonXmlProperty(isAttribute = true) int playerLevel) {
+            @JacksonXmlProperty(isAttribute = true) int playerLevel,
+            @JacksonXmlProperty(isAttribute = true) Boolean autoGet) {
     }
 }

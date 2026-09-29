@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Arbre de compétences Human Mystic (L2 High Five, classId 10) jusqu'au level 20 :
+     playerLevel = level de personnage requis ; autoGet="true" = appris d'office
+     (création, montée de level), sinon auprès du maître des compétences (PNJ
+     SKILL_LEARNER, cf. game.SkillTrainer). -->
 <class>
     <hpBase>85.7</hpBase>
     <hpAdd>15.215</hpAdd>
@@ -16,24 +20,102 @@
     </baseAttributes>
     <skill id="e85856bd-fe90-5d39-a40a-089be52a89f2">
         <!-- Wind Strike -->
-        <level id="1" playerLevel="1"/>
-        <level id="2" playerLevel="4"/>
-        <level id="3" playerLevel="8"/>
-        <level id="4" playerLevel="12"/>
-        <level id="5" playerLevel="16"/>
+        <level id="1" playerLevel="1" autoGet="true"/>
+        <level id="2" playerLevel="7"/>
+        <level id="3" playerLevel="7"/>
+        <level id="4" playerLevel="14"/>
+        <level id="5" playerLevel="14"/>
+    </skill>
+    <skill id="30f448d4-edf9-4e05-819d-05acd3b59a58">
+        <!-- Self Heal -->
+        <level id="1" playerLevel="1" autoGet="true"/>
+    </skill>
+    <skill id="95e17cdc-bc03-4770-a719-58dab8026aca">
+        <!-- Spellcraft -->
+        <level id="1" playerLevel="1" autoGet="true"/>
+    </skill>
+    <skill id="0a94c87c-9836-4cfa-866c-820b8fd89d48">
+        <!-- Magician's Movement -->
+        <level id="1" playerLevel="1" autoGet="true"/>
+    </skill>
+    <skill id="8b82f475-4051-46d5-85ab-38b7672dd6b1">
+        <!-- Mana Recovery -->
+        <level id="1" playerLevel="1" autoGet="true"/>
     </skill>
     <skill id="e287e606-621f-48c5-b8dc-613fa98709d3">
         <!-- Heal -->
-        <level id="1" playerLevel="1"/>
-        <level id="2" playerLevel="4"/>
-        <level id="3" playerLevel="8"/>
-        <level id="4" playerLevel="12"/>
-        <level id="5" playerLevel="16"/>
+        <level id="1" playerLevel="7"/>
+        <level id="2" playerLevel="7"/>
+        <level id="3" playerLevel="7"/>
+        <level id="4" playerLevel="14"/>
+        <level id="5" playerLevel="14"/>
+        <level id="6" playerLevel="14"/>
     </skill>
-
+    <skill id="02a43734-1f51-4352-96fd-ff3b75cb86e0">
+        <!-- Ice Bolt -->
+        <level id="1" playerLevel="7"/>
+        <level id="2" playerLevel="7"/>
+        <level id="3" playerLevel="14"/>
+        <level id="4" playerLevel="14"/>
+    </skill>
+    <skill id="764b902b-189a-4243-ac02-589fa113c34f">
+        <!-- Might -->
+        <level id="1" playerLevel="7"/>
+    </skill>
+    <skill id="25457a5c-35a9-478f-9cc0-2606194452cb">
+        <!-- Shield -->
+        <level id="1" playerLevel="7"/>
+    </skill>
+    <skill id="97e77056-6402-4f24-bb43-7eceb5c8cab7">
+        <!-- Curse: Poison -->
+        <level id="1" playerLevel="7"/>
+    </skill>
+    <skill id="c5e78da0-df05-4cc2-aa2e-ca15df84a790">
+        <!-- Cure Poison -->
+        <level id="1" playerLevel="7"/>
+    </skill>
+    <skill id="b3fe458a-95ad-41b2-9020-8e155d17eba7">
+        <!-- Weapon Mastery -->
+        <level id="1" playerLevel="7"/>
+        <level id="2" playerLevel="14"/>
+    </skill>
+    <skill id="2bebe953-3aa0-4388-bdbc-5b70f6d1d94f">
+        <!-- Armor Mastery -->
+        <level id="1" playerLevel="7"/>
+        <level id="2" playerLevel="14"/>
+        <level id="3" playerLevel="14"/>
+    </skill>
+    <skill id="208d6036-0859-4677-87ff-0707a53df413">
+        <!-- Anti Magic -->
+        <level id="1" playerLevel="7"/>
+        <level id="2" playerLevel="7"/>
+        <level id="3" playerLevel="14"/>
+        <level id="4" playerLevel="14"/>
+    </skill>
+    <skill id="d82112e2-2953-4615-b7a0-e6e2e7ad2c73">
+        <!-- Vampiric Touch -->
+        <level id="1" playerLevel="14"/>
+        <level id="2" playerLevel="14"/>
+    </skill>
+    <skill id="7bb4637f-d682-400a-a1e1-a8ea6d996130">
+        <!-- Battle Heal -->
+        <level id="1" playerLevel="14"/>
+        <level id="2" playerLevel="14"/>
+        <level id="3" playerLevel="14"/>
+    </skill>
+    <skill id="e3095dfc-4c5a-44ff-b497-586e6cfc9c68">
+        <!-- Group Heal -->
+        <level id="1" playerLevel="14"/>
+        <level id="2" playerLevel="14"/>
+        <level id="3" playerLevel="14"/>
+    </skill>
+    <skill id="58c87411-45c5-4557-bd97-6c728662e51c">
+        <!-- Curse: Weakness -->
+        <level id="1" playerLevel="14"/>
+    </skill>
     <skill id="865a7263-fb06-48ef-89c1-9ccbad268215">
         <!-- Expertise Grade -->
-        <level id="1" playerLevel="20"/>
-        <level id="2" playerLevel="40"/>
+        <level id="1" playerLevel="20" autoGet="true"/>
+        <level id="2" playerLevel="40" autoGet="true"/>
     </skill>
 </class>

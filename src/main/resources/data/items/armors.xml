@@ -56,7 +56,7 @@
         <name>Chain Mail</name>
         <type>ARMOR</type>
         <weight>10</weight>
-        <armorCategory>MEDIUM</armorCategory>
+        <armorCategory>HEAVY</armorCategory>
         <pAtk>0</pAtk>
         <mAtk>0</mAtk>
         <pDef>10</pDef>
@@ -160,7 +160,7 @@
         <name>Chain Mail +1</name>
         <type>ARMOR</type>
         <weight>10</weight>
-        <armorCategory>MEDIUM</armorCategory>
+        <armorCategory>HEAVY</armorCategory>
         <pAtk>0</pAtk>
         <mAtk>0</mAtk>
         <pDef>13</pDef>
@@ -534,7 +534,7 @@
         <name>Tallum Tunic</name>
         <type>ARMOR</type>
         <weight>6</weight>
-        <armorCategory>LIGHT</armorCategory>
+        <armorCategory>ROBE</armorCategory>
         <pAtk>0</pAtk>
         <mAtk>0</mAtk>
         <pDef>15</pDef>
@@ -587,7 +587,7 @@
         <name>Major Arcana Robe</name>
         <type>ARMOR</type>
         <weight>3</weight>
-        <armorCategory>LIGHT</armorCategory>
+        <armorCategory>ROBE</armorCategory>
         <pAtk>0</pAtk>
         <mAtk>0</mAtk>
         <pDef>10</pDef>
@@ -864,7 +864,7 @@
         <description>A plain linen robe handed to novice mystics.</description>
         <type>ARMOR</type>
         <weight>1</weight>
-        <armorCategory>LIGHT</armorCategory>
+        <armorCategory>ROBE</armorCategory>
         <pAtk>0</pAtk>
         <mAtk>0</mAtk>
         <pDef>1</pDef>

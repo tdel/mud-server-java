@@ -1,5 +1,6 @@
 package app.game.engine;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Component;
 import app.domain.ActiveSkill;
 import app.domain.SkillDamageType;
 import app.domain.SkillEffectType;
-import app.domain.SkillTargetType;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.ModifiedStat;
 import app.domain.actor.system.InventorySystem;
@@ -32,6 +32,7 @@ import app.network.message.ingame.CastResult;
 import app.network.message.ingame.SkillCastAnnounced;
 import app.network.message.ingame.SkillCastCancelled;
 import app.network.message.ingame.SkillCastStarted;
+import app.network.message.ingame.SkillDrained;
 import app.network.message.ingame.SkillFizzled;
 import app.network.message.ingame.SkillModifierAnnounced;
 import app.network.message.ingame.SkillOnCooldown;
@@ -48,12 +49,14 @@ public class SkillCastEngine {
     private final MovementEngine movementEngine;
     private final ProjectileEngine projectileEngine;
     private final EscapeEngine escapeEngine;
+    private final SkillEffectApplier skillEffectApplier;
 
-    public SkillCastEngine(MovementEngine movementEngine, ProjectileEngine projectileEngine,
-            EscapeEngine escapeEngine) {
+    public SkillCastEngine(MovementEngine movementEngine, ProjectileEngine projectileEngine, EscapeEngine escapeEngine,
+            SkillEffectApplier skillEffectApplier) {
         this.movementEngine = movementEngine;
         this.projectileEngine = projectileEngine;
         this.escapeEngine = escapeEngine;
+        this.skillEffectApplier = skillEffectApplier;
     }
 
     @EventListener
@@ -90,7 +93,9 @@ public class SkillCastEngine {
         long castingTimeNanos = teleport
                 ? activeSkill.castingTimeMs() * 1_000_000L
                 : CombatFormulas.effectiveCastingTimeMs(activeSkill.castingTimeMs(), castSpd) * 1_000_000L;
-        if (!teleport && caster instanceof PlayerInstance player) {
+        // Relax (breakOnAction) ne consomme jamais de charge : ce n'est pas une
+        // attaque.
+        if (!teleport && !activeSkill.breakOnAction() && caster instanceof PlayerInstance player) {
             ItemType shotType = activeSkill.damageType() == SkillDamageType.PHYSICAL
                     ? ItemType.SOULSHOT
                     : ItemType.SPIRITSHOT;
@@ -197,9 +202,11 @@ public class SkillCastEngine {
             return;
         }
 
-        List<AbstractCharacter> targets = activeSkill.target() == SkillTargetType.AOE
-                ? resolveAoeTargets(caster, activeSkill, primaryTarget)
-                : List.of(primaryTarget);
+        List<AbstractCharacter> targets = switch (activeSkill.target()) {
+            case AOE -> resolveAoeTargets(caster, activeSkill, primaryTarget);
+            case PARTY -> resolvePartyTargets(caster, activeSkill);
+            case ONE, SELF -> List.of(primaryTarget);
+        };
 
         // cast(...) marque le cooldown à chaque appel (une fois par cible touchée en
         // AOE) : les timestamps successifs sont assez proches pour ne pas dériver.
@@ -224,7 +231,12 @@ public class SkillCastEngine {
         DomainEventPublisher.publish(new SkillCast(caster, activeSkill, level, target, outcome.amount(),
                 outcome.targetDefeated(), outcome.hit(), outcome.effectExpiresAt(), outcome.modifiers()));
         if (outcome.hit()) {
-            SkillEffectApplier.applySecondaryEffects(activeSkill, target);
+            skillEffectApplier.applySecondaryEffects(caster, activeSkill, target);
+        }
+        if (outcome.drained() > 0) {
+            caster.broadcast(new SkillDrained(caster.getId(), caster.getName(), target.getId(), activeSkill.name(),
+                    outcome.drained(), caster.getResourceSystem().getCurrentHealth(),
+                    caster.getResourceSystem().getMaxHealth()), null);
         }
 
         if (activeSkill.skillType() == SkillEffectType.BUFF || activeSkill.skillType() == SkillEffectType.DEBUFF) {
@@ -259,6 +271,27 @@ public class SkillCastEngine {
         double radius = activeSkill.aoeRadius() > 0 ? activeSkill.aoeRadius() : activeSkill.range();
         Position center = primaryTarget.getMotionSystem().getPosition();
         return caster.getMotionSystem().getCurrentMap().occupantsWithin(center, radius);
+    }
+
+    // Group Heal : le lanceur et les membres vivants de son groupe présents sur
+    // la même carte dans le rayon du sort (aoeRadius, à défaut range) autour de
+    // lui — le lanceur seul hors groupe.
+    private List<AbstractCharacter> resolvePartyTargets(AbstractCharacter caster, ActiveSkill activeSkill) {
+        if (!(caster instanceof PlayerInstance player) || player.getPartySystem().getParty() == null) {
+            return List.of(caster);
+        }
+        double radius = activeSkill.aoeRadius() > 0 ? activeSkill.aoeRadius() : activeSkill.range();
+        Position center = caster.getMotionSystem().getPosition();
+        List<AbstractCharacter> targets = new ArrayList<>();
+        targets.add(caster);
+        for (PlayerInstance member : player.getPartySystem().getParty().getMembers()) {
+            if (member != caster && member.getResourceSystem().getCurrentHealth() > 0
+                    && caster.getMotionSystem().getCurrentMap().isPresent(member)
+                    && member.getMotionSystem().getPosition().distanceTo(center) <= radius) {
+                targets.add(member);
+            }
+        }
+        return targets;
     }
 
     private boolean isTargetStillValid(AbstractCharacter caster, ActiveSkill activeSkill, AbstractCharacter target) {

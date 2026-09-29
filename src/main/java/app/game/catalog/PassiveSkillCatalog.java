@@ -2,18 +2,26 @@ package app.game.catalog;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import app.domain.PassiveSkill;
-import app.domain.PassiveSkill.GradeLevel;
+import app.domain.PassiveSkill.PassiveLevel;
+import app.domain.PassiveSkill.PassiveModifier;
 import app.domain.SkillEffectType;
+import app.domain.StatModifier;
+import app.domain.StatOperator;
+import app.domain.actor.ModifiedStat;
+import app.domain.item.ArmorCategory;
 import app.domain.actor.CharacterClass;
 import app.domain.item.ItemGrade;
 import tools.jackson.core.JacksonException;
@@ -47,15 +55,26 @@ public class PassiveSkillCatalog {
                     throw new IllegalStateException("Compétence passive " + definition.id() + " (" + definition.name()
                             + ") n'a aucun level dans " + PASSIVE_SKILL_RESOURCE);
                 }
-                List<GradeLevel> levels = definition.levels().stream().map(l -> new GradeLevel(l.id(), l.value()))
+                // Un level porte soit un grade (value="D", Expertise Grade), soit des
+                // <apply> (passif de stats, Weapon Mastery...) — au moins l'un des deux.
+                List<PassiveLevel> levels = definition.levels().stream()
+                        .map(l -> new PassiveLevel(l.id(), l.value(), l.apply() == null
+                                ? List.<PassiveModifier>of()
+                                : l.apply().stream()
+                                        .map(a -> new PassiveModifier(new StatModifier(a.stat(), a.value(), a.op()),
+                                                parseArmor(definition.name(), a.armor()),
+                                                parseArmor(definition.name(), a.notArmor())))
+                                        .toList()))
                         .toList();
                 for (int i = 0; i < levels.size(); i++) {
-                    if (levels.get(i).level() != i + 1 || levels.get(i).grade() == null) {
+                    PassiveLevel level = levels.get(i);
+                    if (level.level() != i + 1 || level.grade() == null && level.modifiers().isEmpty()) {
                         throw new IllegalStateException("Compétence passive " + definition.id() + " ("
                                 + definition.name() + ") a des levels invalides dans " + PASSIVE_SKILL_RESOURCE);
                     }
                 }
-                PassiveSkill passiveSkill = new PassiveSkill(definition.id(), definition.name(), levels);
+                PassiveSkill passiveSkill = new PassiveSkill(definition.id(), definition.name(),
+                        definition.description() == null ? "" : definition.description().strip(), levels);
                 if (passiveSkills.containsKey(passiveSkill.id())) {
                     throw new IllegalStateException("Compétence passive " + passiveSkill.id() + " ("
                             + passiveSkill.name() + ") a un id déjà utilisé par "
@@ -66,6 +85,21 @@ public class PassiveSkillCatalog {
             log.info("passive_skill.templates_loaded count={}", passiveSkills.size());
         } catch (IOException | JacksonException e) {
             throw new IllegalStateException("Impossible de charger " + PASSIVE_SKILL_RESOURCE, e);
+        }
+    }
+
+    // armor="LIGHT,HEAVY" / notArmor="ROBE" : liste de types d'armure séparés par
+    // des virgules.
+    private static Set<ArmorCategory> parseArmor(String skillName, String armor) {
+        if (armor == null || armor.isBlank()) {
+            return Set.of();
+        }
+        try {
+            return Arrays.stream(armor.split(",")).map(String::strip).map(ArmorCategory::valueOf)
+                    .collect(Collectors.toUnmodifiableSet());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalStateException("Compétence passive " + skillName + " : type d'armure inconnu \"" + armor
+                    + "\" dans " + PASSIVE_SKILL_RESOURCE, e);
         }
     }
 
@@ -100,12 +134,19 @@ public class PassiveSkillCatalog {
             @JacksonXmlProperty(localName = "skill") @JacksonXmlElementWrapper(useWrapping = false) List<SkillDefinition> skills) {
     }
 
-    private record SkillDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name,
+    private record SkillDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name, String description,
             SkillEffectType skillType,
             @JacksonXmlProperty(localName = "level") @JacksonXmlElementWrapper(useWrapping = false) List<LevelXml> levels) {
     }
 
     private record LevelXml(@JacksonXmlProperty(isAttribute = true) int id,
-            @JacksonXmlProperty(isAttribute = true) ItemGrade value) {
+            @JacksonXmlProperty(isAttribute = true) ItemGrade value,
+            @JacksonXmlProperty(localName = "apply") @JacksonXmlElementWrapper(useWrapping = false) List<StatModifierXml> apply) {
+    }
+
+    private record StatModifierXml(@JacksonXmlProperty(isAttribute = true) ModifiedStat stat,
+            @JacksonXmlProperty(isAttribute = true) int value, @JacksonXmlProperty(isAttribute = true) StatOperator op,
+            @JacksonXmlProperty(isAttribute = true) String armor,
+            @JacksonXmlProperty(isAttribute = true) String notArmor) {
     }
 }

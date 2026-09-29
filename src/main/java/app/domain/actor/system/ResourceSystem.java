@@ -2,6 +2,7 @@ package app.domain.actor.system;
 
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.Attribute;
+import app.domain.actor.ModifiedStat;
 import app.domain.actor.event.CharacterRegenerated;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.instance.PlayerInstance;
@@ -80,12 +81,16 @@ public final class ResourceSystem {
         return gained;
     }
 
+    // Relax (+PV/tick), Armor Mastery (+10 % PM) : cf.
+    // ModifiedStat.HP_REGEN/MP_REGEN.
     public int healthRegenAmountPerTick() {
-        return CombatFormulas.healthRegenPerTick(maxHealth, character.getAttributeSystem().getAttribute(Attribute.CON));
+        return character.getStatSystem().adjust(ModifiedStat.HP_REGEN, CombatFormulas.healthRegenPerTick(maxHealth,
+                character.getAttributeSystem().getAttribute(Attribute.CON)));
     }
 
     public int manaRegenAmountPerTick() {
-        return CombatFormulas.manaRegenPerTick(maxMana, character.getAttributeSystem().getAttribute(Attribute.MEN));
+        return character.getStatSystem().adjust(ModifiedStat.MP_REGEN,
+                CombatFormulas.manaRegenPerTick(maxMana, character.getAttributeSystem().getAttribute(Attribute.MEN)));
     }
 
     // CharacterRegenerated ne porte qu'un PlayerInstance (seul un joueur est

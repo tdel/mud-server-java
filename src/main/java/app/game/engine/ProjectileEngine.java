@@ -32,6 +32,11 @@ public class ProjectileEngine {
     private static final long TICK_INTERVAL_MS = 100L;
 
     private final Map<UUID, InFlightProjectile> projectiles = new ConcurrentHashMap<>();
+    private final SkillEffectApplier skillEffectApplier;
+
+    public ProjectileEngine(SkillEffectApplier skillEffectApplier) {
+        this.skillEffectApplier = skillEffectApplier;
+    }
 
     public void launch(AbstractCharacter caster, ActiveSkill activeSkill, int level, AbstractCharacter target,
             SkillSystem.AttackRollOutcome roll) {
@@ -77,9 +82,10 @@ public class ProjectileEngine {
             return;
         }
 
-        SkillSystem.CastOutcome outcome = caster.getSkillSystem().applyDamageOutcome(projectile.roll(), target);
+        SkillSystem.CastOutcome outcome = caster.getSkillSystem().applyDamageOutcome(activeSkill, projectile.roll(),
+                target);
         if (outcome.hit()) {
-            SkillEffectApplier.applySecondaryEffects(activeSkill, target);
+            skillEffectApplier.applySecondaryEffects(caster, activeSkill, target);
         }
 
         caster.send(new CastResult(activeSkill.id(), activeSkill.name(), target.getId(), target.getName(),

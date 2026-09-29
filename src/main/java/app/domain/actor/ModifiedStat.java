@@ -1,7 +1,10 @@
 package app.domain.actor;
 
 public enum ModifiedStat {
-    ACCURACY, EVASION, PATK, PDEF, MATK, MDEF, PCRIT, MCRIT, ATKSPD, CASTSPD, SPEED;
+    // HP_REGEN/MP_REGEN : jamais dans les stats de base (0) — seuls des effets et
+    // des passifs les modifient, appliqués au montant de régénération par tick
+    // (cf. ResourceSystem.healthRegenAmountPerTick / StatSystem.adjust).
+    ACCURACY, EVASION, PATK, PDEF, MATK, MDEF, PCRIT, MCRIT, ATKSPD, CASTSPD, SPEED, HP_REGEN, MP_REGEN;
 
     public String label() {
         return switch (this) {
@@ -16,6 +19,8 @@ public enum ModifiedStat {
             case ATKSPD -> "Atk.Spd.";
             case CASTSPD -> "Casting Spd.";
             case SPEED -> "Speed";
+            case HP_REGEN -> "HP Regen.";
+            case MP_REGEN -> "MP Regen.";
         };
     }
 }

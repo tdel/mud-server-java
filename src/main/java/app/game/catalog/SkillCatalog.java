@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,8 +22,10 @@ import app.domain.SkillLevel;
 import app.domain.SkillTargetType;
 import app.domain.StatModifier;
 import app.domain.StatOperator;
+import app.domain.actor.Attribute;
 import app.domain.actor.CharacterClass;
 import app.domain.actor.ModifiedStat;
+import app.domain.item.WeaponType;
 import tools.jackson.core.JacksonException;
 import tools.jackson.dataformat.xml.XmlMapper;
 import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
@@ -88,18 +91,30 @@ public class SkillCatalog {
                 }
                 List<SkillEffectDefinition> effects = definition.effects() == null
                         ? List.of()
-                        : definition.effects().effect().stream()
-                                .map(e -> new SkillEffectDefinition(e.name(), e.time(),
-                                        e.power() == null ? 0 : e.power(), e.type(), e.apply().stream()
-                                                .map(a -> new StatModifier(a.stat(), a.value(), a.op())).toList()))
+                        : definition.effects().effect().stream().map(e -> new SkillEffectDefinition(e.name(), e.time(),
+                                e.power() == null ? 0 : e.power(), e.type(),
+                                e.apply() == null
+                                        ? List.of()
+                                        : e.apply().stream().map(a -> new StatModifier(a.stat(), a.value(), a.op()))
+                                                .toList(),
+                                e.chance() == null ? 100 : e.chance(), e.dotInterval() == null ? 0 : e.dotInterval()))
                                 .toList();
                 int reuseTimeMs = Math.round(definition.reuseTime() * 1000f);
                 int castingTimeMs = Math.round(definition.castTime() * 1000f);
-                ActiveSkill activeSkill = new ActiveSkill(definition.id(), definition.name(), levels, reuseTimeMs,
+                Set<WeaponType> requiredWeapons = definition.weapon() == null
+                        ? Set.of()
+                        : Set.copyOf(definition.weapon());
+                ActiveSkill activeSkill = new ActiveSkill(definition.id(), definition.name(),
+                        definition.description() == null ? "" : definition.description().strip(), levels, reuseTimeMs,
                         castingTimeMs, definition.range(), aoeRadius, definition.skillType(), target,
                         definition.element() == null ? SkillElement.NONE : definition.element(),
                         definition.damageType() == null ? SkillDamageType.MAGICAL : definition.damageType(), projectile,
-                        projectileSpeed, effects);
+                        projectileSpeed, effects, requiredWeapons,
+                        definition.blowChance() == null ? 0 : definition.blowChance(),
+                        definition.drain() == null ? 0 : definition.drain(),
+                        definition.landRate() == null ? 0 : definition.landRate(),
+                        definition.resistAttribute() == null ? Attribute.MEN : definition.resistAttribute(),
+                        Boolean.TRUE.equals(definition.breakOnAction()));
                 if (activeSkills.containsKey(activeSkill.id())) {
                     throw new IllegalStateException("ActiveSkill " + activeSkill.id() + " (" + activeSkill.name()
                             + ") a un id déjà utilisé par " + activeSkills.get(activeSkill.id()).name() + " dans "
@@ -120,6 +135,10 @@ public class SkillCatalog {
                     "ActiveSkill " + skillId + " absent du cache — warmSkills() a-t-il été appelé ?");
         }
         return activeSkill;
+    }
+
+    public boolean isKnownId(UUID skillId) {
+        return activeSkills.containsKey(skillId);
     }
 
     // learnableSkillIds(level) mélange sorts actifs et compétences passives
@@ -152,11 +171,15 @@ public class SkillCatalog {
             @JacksonXmlProperty(localName = "skill") @JacksonXmlElementWrapper(useWrapping = false) List<SkillDefinition> skills) {
     }
 
-    private record SkillDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name,
+    // <weapon> répété (non wrappé) : familles d'arme exigées, cf.
+    // ActiveSkill.requiredWeapons.
+    private record SkillDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name, String description,
             @JacksonXmlProperty(localName = "level") @JacksonXmlElementWrapper(useWrapping = false) List<SkillLevelXml> levels,
             Float reuseTime, Float castTime, Integer range, Integer aoeRadius, SkillEffectType skillType,
             SkillTargetType target, SkillElement element, SkillDamageType damageType, ProjectileXml projectile,
-            EffectsXml effects) {
+            EffectsXml effects,
+            @JacksonXmlProperty(localName = "weapon") @JacksonXmlElementWrapper(useWrapping = false) List<WeaponType> weapon,
+            Integer blowChance, Integer drain, Integer landRate, Attribute resistAttribute, Boolean breakOnAction) {
     }
 
     // mana/power sont Integer (et non int) car un skill PASSIVE (Expertise Grade)
@@ -182,6 +205,8 @@ public class SkillCatalog {
     private record SkillEffectDefinitionXml(@JacksonXmlProperty(isAttribute = true) String name,
             @JacksonXmlProperty(isAttribute = true) int time, @JacksonXmlProperty(isAttribute = true) Integer power,
             @JacksonXmlProperty(isAttribute = true) EffectCategory type,
+            @JacksonXmlProperty(isAttribute = true) Integer chance,
+            @JacksonXmlProperty(isAttribute = true) Integer dotInterval,
             @JacksonXmlProperty(localName = "apply") @JacksonXmlElementWrapper(useWrapping = false) List<StatModifierXml> apply) {
     }
 

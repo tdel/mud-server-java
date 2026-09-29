@@ -8,8 +8,13 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import app.domain.ActiveSkill;
+import app.domain.PassiveSkill;
+import app.domain.SkillEffectType;
+import app.domain.SkillElement;
+import app.domain.SkillTargetType;
 import app.domain.actor.instance.PlayerInstance;
 import app.domain.actor.system.SkillSystem;
+import app.game.catalog.PassiveSkillCatalog;
 import app.game.catalog.SkillCatalog;
 import app.network.CommandHandler;
 import app.network.Connection;
@@ -20,9 +25,11 @@ import app.network.message.ingame.KnownSkills;
 public class Skills implements CommandHandler {
 
     private final SkillCatalog skillCatalog;
+    private final PassiveSkillCatalog passiveSkillCatalog;
 
-    public Skills(SkillCatalog skillCatalog) {
+    public Skills(SkillCatalog skillCatalog, PassiveSkillCatalog passiveSkillCatalog) {
         this.skillCatalog = skillCatalog;
+        this.passiveSkillCatalog = passiveSkillCatalog;
     }
 
     @Override
@@ -50,6 +57,13 @@ public class Skills implements CommandHandler {
             ActiveSkill skill = skillCatalog.getById(skillId);
             entriesByName.put(skill.name(), toEntry(skill, level, false));
         });
+        skillSystem.knownPassiveSkillLevels().forEach((skillId, level) -> {
+            PassiveSkill skill = passiveSkillCatalog.getById(skillId);
+            entriesByName.put(skill.name(),
+                    new KnownSkills.Entry(skill.id(), skill.name(), level, 0, 0, 0, SkillEffectType.PASSIVE, 0, false,
+                            skill.description(), skill.maxLevel(), 0, SkillTargetType.SELF, SkillElement.NONE,
+                            Set.of()));
+        });
 
         List<KnownSkills.Entry> entries = List.copyOf(entriesByName.values());
 
@@ -59,6 +73,7 @@ public class Skills implements CommandHandler {
     private KnownSkills.Entry toEntry(ActiveSkill skill, int level, boolean granted) {
         return new KnownSkills.Entry(skill.id(), skill.name(), level, skill.manaCostAt(level),
                 skill.reuseTimeMs() / 1000, skill.range(), skill.skillType(),
-                skill.effects().isEmpty() ? 0 : skill.effects().get(0).time(), granted);
+                skill.effects().isEmpty() ? 0 : skill.effects().get(0).time(), granted, skill.description(),
+                skill.maxLevel(), skill.castingTimeMs(), skill.target(), skill.element(), skill.requiredWeapons());
     }
 }

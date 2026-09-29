@@ -11,8 +11,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import app.domain.ActiveEffect;
-import app.domain.EffectCategory;
 import app.domain.Party;
 import app.domain.PendingPartyInvite;
 import app.domain.SkillEffectType;
@@ -138,7 +136,7 @@ public class PartyEngine {
             String statLabel = event.modifiers().isEmpty() ? "" : event.modifiers().get(0).stat().label();
             party.broadcast(new PartyMemberEffectApplied(targetPlayer.getId(), targetPlayer.getName(),
                     event.activeSkill().name(), statLabel, event.amount(), Math.max(0, secondsRemaining),
-                    ActiveEffect.categoryOf(event.modifiers()) == EffectCategory.BUFF), targetPlayer);
+                    event.activeSkill().skillType() == SkillEffectType.BUFF), targetPlayer);
         }
     }
 

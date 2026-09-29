@@ -30,6 +30,11 @@ public class ActiveEffectPersistenceListener {
         if (!event.hit() || !modifier || !(event.target() instanceof PlayerInstance targetPlayer)) {
             return;
         }
+        // Poison (aucun modificateur, dégâts périodiques purement en mémoire) et
+        // Relax (cesse au premier geste) ne survivent pas à une déconnexion.
+        if (event.modifiers().isEmpty() || event.activeSkill().breakOnAction()) {
+            return;
+        }
         characterActiveEffectDao.upsert(targetPlayer.getId(), new ActiveEffect(event.activeSkill().id(),
                 event.activeSkill().name(), event.modifiers(), event.expiresAt()));
 

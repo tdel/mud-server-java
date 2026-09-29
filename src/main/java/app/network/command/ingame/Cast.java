@@ -20,6 +20,7 @@ import app.network.message.ingame.NotEnoughMana;
 import app.network.message.ingame.SkillNotKnown;
 import app.network.message.ingame.SkillOnCooldown;
 import app.network.message.ingame.SkillOutOfRange;
+import app.network.message.ingame.SkillWeaponRequired;
 import app.network.message.ingame.TargetNotFound;
 
 @Component
@@ -92,6 +93,8 @@ public class Cast implements CommandHandler {
                 connection.send(new SkillOnCooldown(skillName, remainingMs, true));
             case SkillSystem.CastRequestOutcome.InsufficientMana(var skillName, var required, var current) ->
                 connection.send(new NotEnoughMana(skillName, required, current));
+            case SkillSystem.CastRequestOutcome.WeaponRequired(var skillName, var weaponTypes) ->
+                connection.send(new SkillWeaponRequired(skillName, weaponTypes));
         }
     }
 }

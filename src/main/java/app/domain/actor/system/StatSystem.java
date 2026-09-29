@@ -9,11 +9,13 @@ import app.domain.actor.ModifiedStat;
 public final class StatSystem {
 
     private final EffectsSystem effectsSystem;
+    private final SkillSystem skillSystem;
     private final Map<ModifiedStat, Integer> base = new EnumMap<>(ModifiedStat.class);
     private Map<ModifiedStat, Integer> setBonuses = Map.of();
 
-    public StatSystem(EffectsSystem effectsSystem, Map<ModifiedStat, Integer> initialBase) {
+    public StatSystem(EffectsSystem effectsSystem, SkillSystem skillSystem, Map<ModifiedStat, Integer> initialBase) {
         this.effectsSystem = effectsSystem;
+        this.skillSystem = skillSystem;
         this.base.putAll(initialBase);
     }
 
@@ -21,9 +23,18 @@ public final class StatSystem {
         return base.getOrDefault(stat, 0);
     }
 
+    // Base + bonus de set + effets actifs (buffs/debuffs) + compétences passives
+    // de stats (Weapon Mastery, Armor Mastery, Anti Magic...).
     public int getEffective(ModifiedStat stat) {
-        int flat = getBase(stat) + setBonuses.getOrDefault(stat, 0) + effectsSystem.additiveModifier(stat);
-        double multiplier = effectsSystem.multiplicativeFactor(stat);
+        return adjust(stat, getBase(stat) + setBonuses.getOrDefault(stat, 0));
+    }
+
+    // Applique à `value` les modificateurs d'effets et de passifs portant sur
+    // `stat` : additifs d'abord, puis multiplicatifs. Sert aussi aux stats sans
+    // base (HP_REGEN/MP_REGEN), appliquées au montant de régénération par tick.
+    public int adjust(ModifiedStat stat, int value) {
+        int flat = value + effectsSystem.additiveModifier(stat) + skillSystem.passiveAdditive(stat);
+        double multiplier = effectsSystem.multiplicativeFactor(stat) * skillSystem.passiveFactor(stat);
         return (int) Math.round(flat * multiplier);
     }
 

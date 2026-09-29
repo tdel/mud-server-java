@@ -52,7 +52,7 @@ public abstract class AbstractCharacter extends AbstractObject {
         super(id, name);
         this.attributeSystem = new AttributeSystem(attributes);
         this.resourceSystem = new ResourceSystem(this, currentHealth, maxHealth);
-        this.statSystem = new StatSystem(effectsSystem, initialBaseStats);
+        this.statSystem = new StatSystem(effectsSystem, skillSystem, initialBaseStats);
         this.combatSystem = new CombatSystem(this, invulnerable);
         this.lootSystem = new LootSystem(this, xpReward, goldReward, lootTable);
         this.levelingSystem = new LevelingSystem(this, level, xp);

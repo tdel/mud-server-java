@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Arbre de compétences Human Fighter (L2 High Five, classId 0) jusqu'au level 20 :
+     playerLevel = level de personnage requis ; autoGet="true" = appris d'office
+     (création, montée de level), sinon auprès du maître des compétences (PNJ
+     SKILL_LEARNER, cf. game.SkillTrainer). -->
 <class>
     <hpBase>68.3</hpBase>
     <hpAdd>11.635</hpAdd>
@@ -16,15 +20,61 @@
     </baseAttributes>
     <skill id="875cbdfc-6be9-5c46-8fb8-3314f7679ccd">
         <!-- Power Strike -->
-        <level id="1" playerLevel="1"/>
-        <level id="2" playerLevel="4"/>
-        <level id="3" playerLevel="8"/>
-        <level id="4" playerLevel="12"/>
-        <level id="5" playerLevel="16"/>
+        <level id="1" playerLevel="5"/>
+        <level id="2" playerLevel="5"/>
+        <level id="3" playerLevel="5"/>
+        <level id="4" playerLevel="10"/>
+        <level id="5" playerLevel="10"/>
+        <level id="6" playerLevel="10"/>
+        <level id="7" playerLevel="15"/>
+        <level id="8" playerLevel="15"/>
+        <level id="9" playerLevel="15"/>
+    </skill>
+    <skill id="c897a40d-0749-4a65-bdaa-12d41a8f5144">
+        <!-- Mortal Blow -->
+        <level id="1" playerLevel="5"/>
+        <level id="2" playerLevel="5"/>
+        <level id="3" playerLevel="5"/>
+        <level id="4" playerLevel="10"/>
+        <level id="5" playerLevel="10"/>
+        <level id="6" playerLevel="10"/>
+        <level id="7" playerLevel="15"/>
+        <level id="8" playerLevel="15"/>
+        <level id="9" playerLevel="15"/>
+    </skill>
+    <skill id="6c5a1dab-0d53-430c-ba07-0b71038d571f">
+        <!-- Power Shot -->
+        <level id="1" playerLevel="5"/>
+        <level id="2" playerLevel="5"/>
+        <level id="3" playerLevel="5"/>
+        <level id="4" playerLevel="10"/>
+        <level id="5" playerLevel="10"/>
+        <level id="6" playerLevel="10"/>
+        <level id="7" playerLevel="15"/>
+        <level id="8" playerLevel="15"/>
+        <level id="9" playerLevel="15"/>
+    </skill>
+    <skill id="38a9cded-3d15-4860-9cca-40bab7f79e7c">
+        <!-- Relax -->
+        <level id="1" playerLevel="5"/>
+    </skill>
+    <skill id="c11edd17-6384-406a-b32f-7c91e336409d">
+        <!-- Weapon Mastery -->
+        <level id="1" playerLevel="5"/>
+        <level id="2" playerLevel="10"/>
+        <level id="3" playerLevel="15"/>
+    </skill>
+    <skill id="9011f329-a541-40f1-aa78-8542706baade">
+        <!-- Armor Mastery -->
+        <level id="1" playerLevel="5"/>
+        <level id="2" playerLevel="10"/>
+        <level id="3" playerLevel="10"/>
+        <level id="4" playerLevel="15"/>
+        <level id="5" playerLevel="15"/>
     </skill>
     <skill id="865a7263-fb06-48ef-89c1-9ccbad268215">
         <!-- Expertise Grade -->
-        <level id="1" playerLevel="20"/>
-        <level id="2" playerLevel="40"/>
+        <level id="1" playerLevel="20" autoGet="true"/>
+        <level id="2" playerLevel="40" autoGet="true"/>
     </skill>
 </class>
