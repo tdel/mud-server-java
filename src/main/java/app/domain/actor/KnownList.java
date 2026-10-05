@@ -75,19 +75,31 @@ public final class KnownList {
         notifyPortalsAppeared(owner, nearbyPortals);
     }
 
-    /** Retrait bidirectionnel complet (voir leave/disconnect/mort de monstre). */
+    /**
+     * Retrait bidirectionnel complet (voir leave/disconnect/mort de monstre). owner
+     * est lui aussi prévenu de tout ce qu'il connaissait : lors d'un changement de
+     * carte (leave puis join), le client met en cache les
+     * EntityAppeared/PortalAppeared de la nouvelle carte, poussés par
+     * {@link #populate} AVANT MapView, et les rejoue après avoir reconstruit la
+     * carte — sans ce retrait explicite, les entités et portails de l'ancienne
+     * carte resteraient dans ce cache et réapparaîtraient sur la nouvelle.
+     */
     public void clear() {
         MapInstance map = owner.getMotionSystem().getCurrentMap();
         Set<AbstractCharacter> previouslyKnown;
+        Set<MapPortal> previouslyKnownPortals;
         synchronized (map) {
             previouslyKnown = Set.copyOf(known);
             for (AbstractCharacter other : previouslyKnown) {
                 other.getKnownList().known.remove(owner);
             }
+            previouslyKnownPortals = Set.copyOf(knownPortals);
             known.clear();
             knownPortals.clear();
         }
+        notifyDisappeared(owner, previouslyKnown);
         notifyDisappearedToEach(previouslyKnown, owner);
+        notifyPortalsDisappeared(owner, previouslyKnownPortals);
     }
 
     /**
