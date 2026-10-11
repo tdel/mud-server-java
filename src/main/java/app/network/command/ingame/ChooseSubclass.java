@@ -12,9 +12,13 @@ import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
+import app.network.message.ingame.ClassOptionView;
 import app.network.message.ingame.InvalidSubclass;
 import app.network.message.ingame.NoPendingSubclassChoice;
 
+// "choose-subclass <nom>" : nom d'enum (DARK_AVENGER) ou nom L2 ("Dark
+// Avenger", "Human Wizard"). Succès : SubclassChosen, puis NewSkillsAvailable
+// si la nouvelle profession ouvre des compétences (SkillLearningEngine).
 @Component
 public class ChooseSubclass implements CommandHandler {
 
@@ -26,6 +30,11 @@ public class ChooseSubclass implements CommandHandler {
     @Override
     public Set<ConnectionState> states() {
         return Set.of(ConnectionState.INGAME);
+    }
+
+    @Override
+    public boolean requiresAlive() {
+        return true;
     }
 
     @Override
@@ -41,27 +50,29 @@ public class ChooseSubclass implements CommandHandler {
         Integer tier = character.getClassSystem().getPendingSubclassTier();
 
         if (tier == null) {
-            connection.send(new NoPendingSubclassChoice());
+            connection.send(new NoPendingSubclassChoice(character.getClassSystem().nextChangeLevel()));
             return;
         }
 
-        List<Subclass> options = Subclass.availableAt(character.getClassSystem().getCharacterClass(), tier);
+        List<Subclass> options = character.getClassSystem().nextOptions();
         Subclass subclass = parseSubclass(input);
 
         if (subclass == null || !options.contains(subclass)) {
-            connection.send(new InvalidSubclass(input, options));
+            connection.send(new InvalidSubclass(input, ClassOptionView.listOf(options)));
             return;
         }
 
         character.getClassSystem().chooseSubclass(subclass);
     }
 
-    private Subclass parseSubclass(String input) {
-        String normalized = input.strip().toLowerCase(Locale.ROOT).replace(' ', '_').replace('-', '_');
-        try {
-            return Subclass.valueOf(normalized.toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException e) {
-            return null;
+    static Subclass parseSubclass(String input) {
+        String normalized = input.strip().toUpperCase(Locale.ROOT).replace(' ', '_').replace('-', '_');
+        for (Subclass subclass : Subclass.values()) {
+            if (subclass.name().equals(normalized)
+                    || subclass.label().toUpperCase(Locale.ROOT).replace(' ', '_').equals(normalized)) {
+                return subclass;
+            }
         }
+        return null;
     }
 }

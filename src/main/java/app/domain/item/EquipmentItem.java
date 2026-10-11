@@ -25,12 +25,16 @@ public class EquipmentItem extends ItemTemplate {
     private ItemExpectation expectation;
     private int shotConsumption;
     private WeaponType weaponType;
+    // Bonus de PM max (robes, certains bijoux L2).
+    private int maxMp;
+    // Armure d'une pièce L2 (onepiece) : couvre aussi l'emplacement des jambes.
+    private boolean fullArmor;
 
     public EquipmentItem(UUID id, String name, String description, ItemType type, int weight,
             ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus, int evasionBonus,
             int critBonus, int atkSpd, int price, List<ActiveSkill> grantedSkills,
             Map<SkillElement, Integer> elementalResistances, ItemGrade grade, String setId, ItemExpectation expectation,
-            int shotConsumption, WeaponType weaponType) {
+            int shotConsumption, WeaponType weaponType, int maxMp, boolean fullArmor) {
         super(id, name, description, type, weight, price, grade);
         this.armorCategory = armorCategory;
         this.pAtk = pAtk;
@@ -47,6 +51,16 @@ public class EquipmentItem extends ItemTemplate {
         this.expectation = expectation;
         this.shotConsumption = shotConsumption;
         this.weaponType = weaponType;
+        this.maxMp = maxMp;
+        this.fullArmor = fullArmor;
+    }
+
+    public int getMaxMp() {
+        return maxMp;
+    }
+
+    public boolean isFullArmor() {
+        return fullArmor;
     }
 
     public ArmorCategory getArmorCategory() {

@@ -2,9 +2,10 @@ package app.network.message.ingame;
 
 import java.util.List;
 
-import app.domain.actor.Subclass;
 import app.network.OutputJsonMessage;
 
-public record SubclassChoiceOffered(int tier, List<Subclass> options) implements OutputJsonMessage {
+// Envoyé à la montée au level 20/40 : un changement de profession attend le
+// joueur auprès du Grand Master (PNJ SKILL_LEARNER).
+public record SubclassChoiceOffered(int tier, List<ClassOptionView> options) implements OutputJsonMessage {
 
 }

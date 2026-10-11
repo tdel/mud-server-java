@@ -1,65 +1,46 @@
- = , the retail Lineage 2 per-attribute multipliers (L2J H5 , rounded to 0.01): STR , INT , CON , MEN , DEX , WIT . Attributes use the retail scale, fixed per class (Human Fighter 40/30/43/21/11/25, Human Mystic 22/21/27/41/20/39 for STR/DEX/CON/INT/WIT/MEN; monsters 40/30/43/21/20/20), which yields the retail level-1 values (e.g. Fighter 126 HP / 38 MP / atk.spd 330 / cast.spd 213, Mystic 99 HP / 59 MP / cast.spd 333). .
+# Combat stats & resolution
 
-See `docs/lineage2/README.md` for the caveat on these formulas' provenance (community-reconstructed, not an exact retail reproduction). Implementation: `app.game.combat.CombatFormulas` (pure functions, no RNG) plus the RNG orchestration in `CombatSystem.attack`, `MonsterInstance.attack`, and `SkillSystem.rollDamage`/`castModifier`.
+Since 2026-10-11 every derived stat is the **Lineage 2 High Five** one: the stat functions of the L2JMobius H5 server (`model/stats/functions/formulas/Func*`, `Formulas.calcHpRegen/calcMpRegen`, `FuncEnchant`) applied to the H5 datapack base values — class templates (`stats/chars/baseStats`, copied into `data/classes/*.xml`), items (`stats/items`, copied into `data/items/*.xml` by the client repo's `tools/item_gen/build_items.py`) and NPCs (`stats/npcs`, copied into `data/monsters.xml` by `tools/monster_gen/build_monsters.py` and into `data/summons/summons.xml`). A character, a monster or a summon therefore shows the same numbers as in L2 (level-1 Human Fighter: 126 HP, P.Def 72, M.Def 47, accuracy/evasion 34, critical 88, atk.spd 417, speed 126). Implementation: `app.game.combat.CombatFormulas` (pure functions, no RNG) plus the RNG orchestration in `CombatSystem.attack`, `SkillSystem.rollDamage`/`castModifier` and `DamageModifiers`.
 
 ## Derived combat stats
 
-Every `AbstractCharacter` exposes 7 derived stats, computed on the fly from its 6 attributes (STR/DEX/CON/INT/WIT/MEN), level, and equipped items — never persisted, same as the old `armorClass` was not:
+`CombatFormulas.stats(BaseValues, attributes, level)` turns base values into the stat map of `StatSystem`; `levelMod = (level + 89) / 100` (0.90 at level 1, 1.29 at 40), `bonus(ATTR)` = `Attribute.bonus` (L2J `statBonus.xml`).
 
-| Stat | Formula | Driven by |
+| Stat | Formula | Base value (player / NPC) |
 |---|---|---|
-| P.Atk | `weaponPAtk * bonus(STR) * levelFactor(level)` | equipped weapon, STR, level |
-| M.Atk | `weaponMAtk * bonus(INT) * levelFactor(level)` | equipped weapon, INT, level |
-| P.Def | `sum(equipped pDef) + bonus(CON) * BASE_DEF_FACTOR` | equipped armor, CON |
-| M.Def | `sum(equipped mDef) + bonus(MEN) * BASE_DEF_FACTOR` | equipped armor, MEN |
-| Accuracy | `BASE_ACCURACY + level + bonus(DEX) * ACCURACY_FACTOR + itemBonus` | DEX, level, items |
-| Evasion | `BASE_EVASION + level + bonus(DEX) * EVASION_FACTOR - armorWeightPenalty + itemBonus` | DEX, level, armor weight, items |
-| P.Crit (`getCriticalRate()`) | `BASE_CRIT_RATE + bonus(DEX) * ACCURACY_FACTOR + itemBonus`, clamped to [1, 90]% | DEX, items |
-| M.Crit (`getMagicalCriticalRate()`) | `BASE_CRIT_RATE + bonus(WIT) * ACCURACY_FACTOR + itemBonus`, clamped to [1, 90]% | WIT, items |
+| P.Atk | `base * bonus(STR) * levelMod` | weapon P.Atk, else class fist (4 fighter, 3 mystic) / NPC `pAtk` |
+| M.Atk | `base * bonus(INT)² * levelMod²` | weapon M.Atk, else 6 / NPC `mAtk` |
+| P.Def | `base * levelMod` (no CON) | worn pieces + bare defense of each empty slot (fighter chest 31, legs 18, head 12, feet 7, gloves 8, + underwear 3 and cloak 1 which have no slot here; mystic chest 15, legs 8); a full armor (`fullArmor`) also covers the legs; the shield adds nothing / NPC `pDef` |
+| M.Def | `base * bonus(MEN) * levelMod` | worn jewels + bare defense of each empty jewel slot (earrings 9, rings 5, necklace 13) / NPC `mDef` |
+| Accuracy | `sqrt(DEX)*6 + level + bonus` (+ L2 steps past level 69) | weapon type `accCombat` (`accuracyBonus`: blunt +5, dagger/bow/pole -4) / NPC `accuracy` |
+| Evasion | `sqrt(DEX)*6 + level + bonus` | shield -8 / NPC `evasion` |
+| P.Crit | `base * bonus(DEX) * 10`, ‰, max 500 | weapon base crit (`critBonus`: 8 sword/pole/dual, 12 dagger/bow, 4 blunt), else 4 / NPC `critical` |
+| M.Crit | `(int)(1 * bonus(WIT) * 10) * 10`, ‰, max 200 (WIT counts only weapon in hand for a player) | — |
+| Atk.Spd | `base * bonus(DEX)`; delay = `500000 / atkSpd` ms | weapon (379 one-hand, 433 dagger, 325 two-hand, 293 bow), else 300 / NPC `attackSpeed` |
+| Cast.Spd | `333 * bonus(WIT)` | — |
+| Speed | `base * bonus(DEX)` (L2 run speed; `MovementEngine.SPEED_DIVISOR` = 26 L2 units per grid cell per second) | class run speed (115 fighter, 120 mystic) / NPC `run` |
 
-`bonus(ATTR)` = `Attribute.bonus(score)`, the retail Lineage 2 per-attribute multipliers (L2J H5 `data/stats/statBonus.xml`, rounded to 0.01): STR `1.036^(STR-34.845)`, INT `1.020^(INT-31.375)`, CON `1.030^(CON-27.632)`, MEN `1.010^(MEN+0.060)`, DEX `1.009^(DEX-19.360)`, WIT `1.050^(WIT-20.000)`. Attributes use the retail scale and are fixed per class (STR/DEX/CON/INT/WIT/MEN: Human Fighter 40/30/43/21/11/25, Human Mystic 22/21/27/41/20/39, monsters 40/30/43/21/20/20 like almost every L2J H5 NPC), which yields the retail level-1 values (Fighter 126 HP / 38 MP / atk.spd 330 / cast.spd 213, Mystic 99 HP / 59 MP / cast.spd 333). `levelFactor(level) = 1 + (level-1) * 0.02`.
-
-Each stat has an `effective` variant (`getEffectivePAtk()`, etc.) that adds any active buff/debuff from `EffectsSystem` (`ModifiedStat.PATK/PDEF/MATK/MDEF/ACCURACY/EVASION/PCRIT/MCRIT`) — this is what combat resolution actually reads, exactly like `getEffectiveArmorClass()` did before. M.Crit (`CombatFormulas.magicCriticalRate`, driven by WIT) is a straight mirror of P.Crit's DEX formula: WIT had no formula reading it at all before this — the only attribute of the six that was otherwise inert.
-
-`AbstractCharacter` exposes these via 8 `protected` hooks (`basePAtk()`, `baseMAtk()`, `basePDefSum()`, `baseMDefSum()`, `accuracyItemBonus()`, `evasionItemBonus()`, `armorWeightPenalty()`, `critItemBonus()`) with neutral defaults; `PlayerInstance` sums its equipped items, `MonsterInstance` reads its `MonsterTemplate`'s natural values (monsters keep a full STR/DEX/CON/INT/WIT/MEN block, same as players — their "weapon+armor" is just baked into the template's natural pAtk/pDef/etc.).
+Critical rates are per mille like in L2 (`CombatFormulas.critChance`: 88 = 8.8 %). Each stat's effective value (`StatSystem.getEffective`) adds set bonuses, buffs/debuffs and passive skills (additive first, then multiplicative, both after the L2 functions, like L2J's `add`/`mul` funcs of order 0x40/0x30).
 
 ## Health & Mana pools
 
-Max HP and max mana follow a retail-accurate **per-class quadratic curve in level**
-(`hpBase + hpAdd*level + hpMod*level²`, resp. `mpBase`/`mpAdd`/`mpMod`), taken directly from
-the official Human Fighter/Human Mystic base HP/MP tables (fitted exactly against the level
-1-20 retail values), then multiplied by `bonus(CON)`/`bonus(MEN)` exactly like
-p.def/m.def — CON/MEN modulate the class curve as a build choice, same relationship as
-CON→P.Def and MEN→M.Def, just applied to the vitals pool instead of a defense stat.
-
 | Stat | Formula | Driven by |
 |---|---|---|
-| Max HP | `(classHpBase + classHpAdd*level + classHpMod*level²) * bonus(CON)` | class curve (`hpBase`/`hpAdd`/`hpMod`), level, CON |
-| Max Mana | `(classMpBase + classMpAdd*level + classMpMod*level²) * bonus(MEN)` | class curve (`mpBase`/`mpAdd`/`mpMod`), level, MEN |
-| HP regen/tick (3s) | `maxHealth * HP_REGEN_RATE * bonus(CON)` | max HP, CON |
-| Mana regen/tick (3s) | `maxMana * MP_REGEN_RATE * bonus(MEN)` | max mana, MEN |
+| Max HP | `vitals(level).hp * bonus(CON)` | per-level table of the current class (`<vitals>` of `data/classes/<class>.xml`, L2 `lvlUpgainData`) |
+| Max Mana | `vitals(level).mp * bonus(MEN)` + robe/jewel `maxMp` | same table, MEN, equipment |
+| HP regen/tick (3s) | `vitals(level).hpRegen * levelMod * bonus(CON) * activity` | class table, level, CON, activity |
+| Mana regen/tick (3s) | `vitals(level).mpRegen * levelMod * bonus(MEN) * activity` | class table, level, MEN, activity |
 
-The tick period is **3 seconds** (`RegenHealthEngine`/`RegenManaEngine`'s `TICK_INTERVAL_MS`), matching retail L2J's `HpTask`/`MpTask` period — not an arbitrary rate. Passive regen without sitting/buffs therefore takes roughly `50 / statBonus(CON or MEN)` ticks (~2.5 minutes at neutral CON/MEN) to refill from empty, in line with the retail pace.
-
-The 6 per-class curve coefficients live in `data/class.json` (`CharacterClass.maxHealth`/
-`maxMana`, backed by `CombatFormulas.maxHealth`/`maxMana`) — no more DnD5e `hitDie`/
-`manaGainPerLevel`/`primaryAbility` fields, all three were removed as dead SRD leftovers once
-this curve replaced them. Unlike p.atk/p.def, `maxHealth`/`maxMana` stay **persisted fields**
-(`PlayerInstance`, recomputed at character creation, level-up, and on every DB load in
-`CharacterDao.toDomain`) rather than recomputed on every read: CON/MEN never change after
-character creation in this project (no stat allocation, no attribute-granting gear, no passive
-skill grants one yet either), so recomputing only at those three points is equivalent to a
-fully derived stat, without the larger refactor a truly always-derived HP/mana would require
-(see `CombatFormulas.maxHealth`/`maxMana`/`healthRegenPerTick`/`manaRegenPerTick`).
+`activity` is L2's: ×1.5 resting (Relax), ×1.1 standing still, ×0.7 moving. The table is the one of the current profession (`ClassSystem.vitals`): a profession's table follows its parents' up to its access level then grows faster (Warrior level 40: 1044 base HP vs 637 for a Human Fighter without profession), so max HP/MP are recomputed (`ClassSystem.refreshVitals`) on level-up and class change, and on every DB load (`CharacterDao.toDomain`). Monsters use their datapack HP times CON (`CombatFormulas.maxHealth`) and do not regenerate.
 
 ## Resolving a hit
 
 Hit/evasion resolution is shared between a melee attack and a damage skill; the damage formula itself then diverges between physical and magic, each ported from L2J's `Formulas.calcPhysDam`/`calcMagicDam` (`net.sf.l2j.gameserver.skills.Formulas`) with the mechanics this project doesn't implement stripped out (soulshots/blessed-spiritshots, shield block, weapon-type/monster-race vulnerability stats, the optional magic-failure system, PvP damage bonuses):
 
 1. `hitChance = clamp(0.80 + 0.02 * (accuracy - evasion), [0.20, 0.98])` (`CombatFormulas.hitChance`) — L2J's `calcHitMiss` stripped of its height/day-night/facing modifiers (no Z axis, no day/night cycle, no front/back facing in this project).
-2. Roll `DiceRoller.rollChance(hitChance)`. Miss → 0 damage.
-3. On a hit, roll critical independently: `DiceRoller.rollChance(criticalRate / 100.0)` — melee/`CombatSystem` and monster attacks use effective P.Crit; damage skills (`SkillSystem.rollDamage`) use effective P.Crit for a `SkillDamageType.PHYSICAL` skill, effective M.Crit for `MAGICAL`.
-4. **Physical** (melee, or a `PHYSICAL` skill) — `CombatFormulas.resolvePhysicalDamage`: `damage = max(1, round(70 * atk / def * DiceRoller.randomVariance(0.9, 1.1) * (critical ? 2.0 : 1.0)))`. A skill's `power` (a flat, per-tier integer from `data/skills/skills.xml`) is added to the caster's effective P.Atk before this ratio, so skill tiers of the same name still scale meaningfully instead of all hitting identically; melee has no skill, so `atk` is just effective P.Atk.
+2. Roll `Randomizer.rollChance(hitChance)`. Miss → 0 damage.
+3. On a hit, roll critical independently: `Randomizer.rollChance(criticalRate / 1000.0)` (per mille) — melee/`CombatSystem` and monster attacks use effective P.Crit; damage skills (`SkillSystem.rollDamage`) use effective P.Crit for a `SkillDamageType.PHYSICAL` skill, effective M.Crit for `MAGICAL`.
+4. **Physical** (melee, or a `PHYSICAL` skill) — `CombatFormulas.resolvePhysicalDamage`: `damage = max(1, round(70 * atk / def * Randomizer.randomVariance(0.9, 1.1) * (critical ? 2.0 : 1.0)))`. A skill's `power` (a flat, per-tier integer from `data/skills/skills.xml`) is added to the caster's effective P.Atk before this ratio, so skill tiers of the same name still scale meaningfully instead of all hitting identically; melee has no skill, so `atk` is just effective P.Atk.
 5. **Magic** (a `MAGICAL` skill only — melee is never magic) — `CombatFormulas.resolveMagicalDamage`: `damage = max(1, round(91 * sqrt(mAtk) / mDef * power(level) * (critical ? 4.0 : 1.0)))`. Unlike physical, `power` is a *multiplicative* factor of the ratio (not added to M.Atk), a magic critical multiplies by 4 instead of 2, and there is no random variance — all three quirks are carried over as-is from the L2J source rather than smoothed into the physical shape.
 
 ## Elemental resistance

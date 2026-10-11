@@ -75,6 +75,26 @@
             </options>
             <shop>
                 <items>
+                    <itemTemplateId>5b1f2d3e-6a7c-4e8f-9a01-2b3c4d5e6f70</itemTemplateId>
+                    <price>30</price>
+                </items>
+                <items>
+                    <itemTemplateId>6c2e3f4a-7b8d-4f90-ab12-3c4d5e6f7081</itemTemplateId>
+                    <price>1500</price>
+                </items>
+                <items>
+                    <itemTemplateId>7d3f4a5b-8c9e-4a01-bc23-4d5e6f708192</itemTemplateId>
+                    <price>100</price>
+                </items>
+                <items>
+                    <itemTemplateId>8e4a5b6c-9daf-4b12-cd34-5e6f708192a3</itemTemplateId>
+                    <price>3000</price>
+                </items>
+                <items>
+                    <itemTemplateId>9f5b6c7d-aeb0-4c23-de45-6f708192a3b4</itemTemplateId>
+                    <price>2500</price>
+                </items>
+                <items>
                     <itemTemplateId>019fa0a5-80c0-7035-9c2d-113b09a275df</itemTemplateId>
                     <price>10</price>
                 </items>
@@ -105,6 +125,586 @@
                 <items>
                     <itemTemplateId>019fe3f6-b1ee-78f8-a681-d288c7f87511</itemTemplateId>
                     <price>500</price>
+                </items>
+            </shop>
+        </dialogue>
+        <level>1</level>
+    </npc>
+    <!-- Épicier de Dion (Town of Dion) : même étal que l'aubergiste de Gludio. -->
+    <npc id="f420cf7c-5fa8-4a14-b0ef-e6414a40bcd8">
+        <name>Grocer</name>
+        <title>General Shop</title>
+        <type>MERCHANT</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>Welcome to my shop! Supplies for the road, fresh from the fields of Floran.</greeting>
+            <options>
+                <label>See what you sell</label>
+                <type>SHOP</type>
+            </options>
+            <options>
+                <label>Where are you from?</label>
+                <type>RESPONSE</type>
+                <response>Born and raised in Dion. My family has kept this shop since the old king.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+            <shop>
+                <items>
+                    <itemTemplateId>019fa0a5-80bf-7e84-87bf-5cf699c00315</itemTemplateId>
+                    <price>50</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fa0a5-80c0-7035-9c2d-113b09a275df</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fcf0d-1f8f-7d01-8e4f-fd592812a1a7</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>3a4a5836-051e-4641-aef8-7b6e6792322e</itemTemplateId>
+                    <price>60</price>
+                </items>
+                <items>
+                    <itemTemplateId>4623f73d-821b-4dc4-b723-b9353bdca64c</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>03c6440a-24d6-426a-bf0a-d3d046c9ad37</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>5d6ae0ed-efda-412b-94b4-98677e2c8946</itemTemplateId>
+                    <price>400</price>
+                </items>
+            </shop>
+        </dialogue>
+        <level>1</level>
+    </npc>
+
+    <!-- ===== Town of Gludio : marchands de la place du monument ===== -->
+    <npc id="da89a3cf-d3a2-486b-96f2-0171130b4c9d">
+        <name>Weapon Merchant</name>
+        <title>Weapon Merchant</title>
+        <type>WEAPON_MERCHANT</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>Blades, bows and axes, all tested on the training dummies of the castle. Take your pick.</greeting>
+            <options>
+                <label>See what you sell</label>
+                <type>SHOP</type>
+            </options>
+            <options>
+                <label>Which weapon should I choose?</label>
+                <type>RESPONSE</type>
+                <response>Fighters favor a sword and shield, rogues a dagger or a bow. Whatever you choose, keep soulshots in your bag.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+            <shop>
+                <items>
+                    <itemTemplateId>558543a4-39d4-4f36-ac1e-2881deac24a6</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fa0a5-80c0-7035-9c2d-113b09a275df</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd</itemTemplateId>
+                    <price>2</price>
+                </items>
+                <items>
+                    <itemTemplateId>f3c8a065-ac0d-4913-9774-41098a6e088d</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>3c966b19-8f40-4791-9dd7-3a489f090f7b</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>45785ec3-8118-4938-b614-3e3a03dabc5e</itemTemplateId>
+                    <price>15</price>
+                </items>
+                <items>
+                    <itemTemplateId>5b1f2d3e-6a7c-4e8f-9a01-2b3c4d5e6f70</itemTemplateId>
+                    <price>30</price>
+                </items>
+                <items>
+                    <itemTemplateId>21a73422-e8ee-49ba-8137-05b49a5dbea5</itemTemplateId>
+                    <price>40</price>
+                </items>
+                <items>
+                    <itemTemplateId>7d3f4a5b-8c9e-4a01-bc23-4d5e6f708192</itemTemplateId>
+                    <price>100</price>
+                </items>
+                <items>
+                    <itemTemplateId>7ad6443f-65cf-4761-b894-5fa8dc859e2e</itemTemplateId>
+                    <price>800</price>
+                </items>
+                <items>
+                    <itemTemplateId>84349095-9c39-49e4-9f0a-1819dc7d1748</itemTemplateId>
+                    <price>1200</price>
+                </items>
+                <items>
+                    <itemTemplateId>9f5b6c7d-aeb0-4c23-de45-6f708192a3b4</itemTemplateId>
+                    <price>2500</price>
+                </items>
+                <items>
+                    <itemTemplateId>4623f73d-821b-4dc4-b723-b9353bdca64c</itemTemplateId>
+                    <price>10</price>
+                </items>
+            </shop>
+        </dialogue>
+        <level>1</level>
+    </npc>
+    <npc id="36ad12c4-1a36-4ee4-9026-3a97accd736e">
+        <name>Armor Merchant</name>
+        <title>Armor Merchant</title>
+        <type>ARMOR_MERCHANT</type>
+        <gender>WOMAN</gender>
+        <dialogue>
+            <greeting>Leather for the quick, steel for the stubborn. What will it be?</greeting>
+            <options>
+                <label>See what you sell</label>
+                <type>SHOP</type>
+            </options>
+            <options>
+                <label>Heavy or light armor?</label>
+                <type>RESPONSE</type>
+                <response>Heavy armor stops blows, light armor lets you dodge them. Mystics should stick to robes: steel gets in the way of their spells.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+            <shop>
+                <items>
+                    <itemTemplateId>d410f08b-8872-4ad1-984a-665dab47fd75</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>aa24f9ec-0608-4b46-819d-4c6087df1320</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>83b1c12e-c594-4a7b-b0d0-cdd7dc2fca8f</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>4200e028-982b-4267-8c69-e62e305a5080</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>8e96906e-1f06-40aa-b986-7946c1acd72d</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>8a692c7f-8461-4994-ab61-69d0079ed3fc</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>4ecc0ffd-3a7c-49ea-8af6-d0e76b0bb9dd</itemTemplateId>
+                    <price>15</price>
+                </items>
+                <items>
+                    <itemTemplateId>153c7ce9-f976-45c5-ab58-5b5f42665e68</itemTemplateId>
+                    <price>30</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>019faec6-116d-723d-b04c-76d51a2a2cb7</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fcf0d-1f8f-7d01-8e4f-fd592812a1a7</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fcf0d-1f8c-7d43-9e98-a9944b4ccefe</itemTemplateId>
+                    <price>50</price>
+                </items>
+                <items>
+                    <itemTemplateId>8b3e4c5a-0d6f-4a9c-9e4b-3c5f7a9b1d3e</itemTemplateId>
+                    <price>200</price>
+                </items>
+                <items>
+                    <itemTemplateId>9c4f5d6b-1e7a-4b0d-8f5c-4d6a8b0c2e4f</itemTemplateId>
+                    <price>200</price>
+                </items>
+                <items>
+                    <itemTemplateId>3b1d09c8-a3ec-4159-9f7d-403754c5ef39</itemTemplateId>
+                    <price>300</price>
+                </items>
+                <items>
+                    <itemTemplateId>3ca4de84-6813-4846-9fe7-9dfb3c245aa9</itemTemplateId>
+                    <price>400</price>
+                </items>
+                <items>
+                    <itemTemplateId>044f02d7-ebcf-4275-8be2-c41a93695f96</itemTemplateId>
+                    <price>1000</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fcf0d-1f8d-7c4c-9275-33c4af4410a8</itemTemplateId>
+                    <price>1500</price>
+                </items>
+            </shop>
+        </dialogue>
+        <level>1</level>
+    </npc>
+    <npc id="41984f3b-9cb7-43f6-98be-fdee6c6483da">
+        <name>Magister</name>
+        <title>Magic Trader</title>
+        <type>MAGISTER</type>
+        <gender>WOMAN</gender>
+        <dialogue>
+            <greeting>Staves, potions, spiritshots and a few charmed trinkets. Magic has its price, traveler.</greeting>
+            <options>
+                <label>See what you sell</label>
+                <type>SHOP</type>
+            </options>
+            <options>
+                <label>What are spiritshots?</label>
+                <type>RESPONSE</type>
+                <response>Crystals that strengthen your spells and quicken your casting. No mystic should leave town without them.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+            <shop>
+                <items>
+                    <itemTemplateId>03c6440a-24d6-426a-bf0a-d3d046c9ad37</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>3a4a5836-051e-4641-aef8-7b6e6792322e</itemTemplateId>
+                    <price>60</price>
+                </items>
+                <items>
+                    <itemTemplateId>7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e</itemTemplateId>
+                    <price>180</price>
+                </items>
+                <items>
+                    <itemTemplateId>ab5cce0e-1d3f-49f8-9d6f-d814321a566f</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>7b268503-d3f0-43eb-9144-bbb008d6ddeb</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>ac9fe757-ab75-47ef-b413-8844d5c5ed73</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>6f1c2a3e-8b4d-4e7a-9c2f-1a3d5e7b9c1f</itemTemplateId>
+                    <price>100</price>
+                </items>
+                <items>
+                    <itemTemplateId>7a2d3b4f-9c5e-4f8b-8d3a-2b4e6f8a0c2d</itemTemplateId>
+                    <price>150</price>
+                </items>
+                <items>
+                    <itemTemplateId>1d4e6f80-2a9c-4b7e-8d1f-5c3a7e9b0d2f</itemTemplateId>
+                    <price>4500</price>
+                </items>
+                <items>
+                    <itemTemplateId>0f50e068-ab87-41aa-9169-5eaa17a3c7ce</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>b0bc4f00-8f9f-44a4-9b7f-0095ab837218</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>2f76ba65-4e52-45d0-b6ba-8c932fd699d7</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>001d1121-6760-4831-83a3-a72b126f79f3</itemTemplateId>
+                    <price>15</price>
+                </items>
+                <items>
+                    <itemTemplateId>bedb6df2-7bab-443c-8a3c-e97b9150d977</itemTemplateId>
+                    <price>15</price>
+                </items>
+                <items>
+                    <itemTemplateId>57201423-ae58-4cb7-a6c4-9bf856a76d4a</itemTemplateId>
+                    <price>20</price>
+                </items>
+                <items>
+                    <itemTemplateId>40c0606e-29cc-448e-8906-8e229f0d5079</itemTemplateId>
+                    <price>800</price>
+                </items>
+                <items>
+                    <itemTemplateId>eb8c7be8-e57b-417e-bc9f-cf572a4f0948</itemTemplateId>
+                    <price>800</price>
+                </items>
+                <items>
+                    <itemTemplateId>5da404a5-8f6e-4b67-9d06-556efdbddbd3</itemTemplateId>
+                    <price>1000</price>
+                </items>
+            </shop>
+        </dialogue>
+        <level>1</level>
+    </npc>
+    <!-- ===== Town of Dion ===== -->
+    <npc id="5c63ff85-2055-44d3-9df6-ed12fea6fbc5">
+        <name>Blacksmith</name>
+        <title>Blacksmith of Dion</title>
+        <type>BLACKSMITH</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>The forge of Dion is small, but my steel is as good as any in Gludio.</greeting>
+            <options>
+                <label>See what you sell</label>
+                <type>SHOP</type>
+            </options>
+            <options>
+                <label>Where does your iron come from?</label>
+                <type>RESPONSE</type>
+                <response>From the mines past the cemetery road. The marsh rusts everything else.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+            <shop>
+                <items>
+                    <itemTemplateId>5b1f2d3e-6a7c-4e8f-9a01-2b3c4d5e6f70</itemTemplateId>
+                    <price>30</price>
+                </items>
+                <items>
+                    <itemTemplateId>6c2e3f4a-7b8d-4f90-ab12-3c4d5e6f7081</itemTemplateId>
+                    <price>1500</price>
+                </items>
+                <items>
+                    <itemTemplateId>7d3f4a5b-8c9e-4a01-bc23-4d5e6f708192</itemTemplateId>
+                    <price>100</price>
+                </items>
+                <items>
+                    <itemTemplateId>8e4a5b6c-9daf-4b12-cd34-5e6f708192a3</itemTemplateId>
+                    <price>3000</price>
+                </items>
+                <items>
+                    <itemTemplateId>9f5b6c7d-aeb0-4c23-de45-6f708192a3b4</itemTemplateId>
+                    <price>2500</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fa0a5-80c0-7035-9c2d-113b09a275df</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd</itemTemplateId>
+                    <price>2</price>
+                </items>
+                <items>
+                    <itemTemplateId>019faec6-116d-723d-b04c-76d51a2a2cb7</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fcf0d-1f8c-7d43-9e98-a9944b4ccefe</itemTemplateId>
+                    <price>50</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fcf0d-1f8d-7c4c-9275-33c4af4410a8</itemTemplateId>
+                    <price>1500</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fcf0d-1f8f-7d01-8e4f-fd592812a1a7</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fe3f6-b1ee-78f8-a681-d288c7f87511</itemTemplateId>
+                    <price>500</price>
+                </items>
+            </shop>
+        </dialogue>
+        <level>1</level>
+    </npc>
+    <npc id="5a13fda9-438d-4a0b-a79c-427fae6503c6">
+        <name>Magister</name>
+        <title>Magic Trader</title>
+        <type>MAGISTER</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>Potions and staves for the road. The marsh spirits do not care for unprepared mystics.</greeting>
+            <options>
+                <label>See what you sell</label>
+                <type>SHOP</type>
+            </options>
+            <options>
+                <label>What are spiritshots?</label>
+                <type>RESPONSE</type>
+                <response>Crystals that strengthen your spells and quicken your casting. Buy plenty before you head into the marsh.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+            <shop>
+                <items>
+                    <itemTemplateId>03c6440a-24d6-426a-bf0a-d3d046c9ad37</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>3a4a5836-051e-4641-aef8-7b6e6792322e</itemTemplateId>
+                    <price>60</price>
+                </items>
+                <items>
+                    <itemTemplateId>7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e</itemTemplateId>
+                    <price>180</price>
+                </items>
+                <items>
+                    <itemTemplateId>ab5cce0e-1d3f-49f8-9d6f-d814321a566f</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>7b268503-d3f0-43eb-9144-bbb008d6ddeb</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>ac9fe757-ab75-47ef-b413-8844d5c5ed73</itemTemplateId>
+                    <price>10</price>
+                </items>
+                <items>
+                    <itemTemplateId>6f1c2a3e-8b4d-4e7a-9c2f-1a3d5e7b9c1f</itemTemplateId>
+                    <price>100</price>
+                </items>
+                <items>
+                    <itemTemplateId>7a2d3b4f-9c5e-4f8b-8d3a-2b4e6f8a0c2d</itemTemplateId>
+                    <price>150</price>
+                </items>
+                <items>
+                    <itemTemplateId>1d4e6f80-2a9c-4b7e-8d1f-5c3a7e9b0d2f</itemTemplateId>
+                    <price>4500</price>
+                </items>
+                <items>
+                    <itemTemplateId>0f50e068-ab87-41aa-9169-5eaa17a3c7ce</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>b0bc4f00-8f9f-44a4-9b7f-0095ab837218</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>2f76ba65-4e52-45d0-b6ba-8c932fd699d7</itemTemplateId>
+                    <price>1</price>
+                </items>
+                <items>
+                    <itemTemplateId>001d1121-6760-4831-83a3-a72b126f79f3</itemTemplateId>
+                    <price>15</price>
+                </items>
+                <items>
+                    <itemTemplateId>bedb6df2-7bab-443c-8a3c-e97b9150d977</itemTemplateId>
+                    <price>15</price>
+                </items>
+                <items>
+                    <itemTemplateId>57201423-ae58-4cb7-a6c4-9bf856a76d4a</itemTemplateId>
+                    <price>20</price>
+                </items>
+                <items>
+                    <itemTemplateId>40c0606e-29cc-448e-8906-8e229f0d5079</itemTemplateId>
+                    <price>800</price>
+                </items>
+                <items>
+                    <itemTemplateId>eb8c7be8-e57b-417e-bc9f-cf572a4f0948</itemTemplateId>
+                    <price>800</price>
+                </items>
+                <items>
+                    <itemTemplateId>5da404a5-8f6e-4b67-9d06-556efdbddbd3</itemTemplateId>
+                    <price>1000</price>
+                </items>
+            </shop>
+        </dialogue>
+        <level>1</level>
+    </npc>
+    <!-- ===== Gludio Castle : armurerie de la garnison ===== -->
+    <npc id="1fd6bc54-02da-4d17-995a-b3f177790f22">
+        <name>Castle Blacksmith</name>
+        <title>Gludio Castle Armory</title>
+        <type>BLACKSMITH</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>The garrison's armory. I sell what the soldiers can spare, at the lord's price.</greeting>
+            <options>
+                <label>See what you sell</label>
+                <type>SHOP</type>
+            </options>
+            <options>
+                <label>Why so expensive?</label>
+                <type>RESPONSE</type>
+                <response>Castle steel is forged for sieges, not for hunting rabbits. You get what you pay for.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+            <shop>
+                <items>
+                    <itemTemplateId>7ad6443f-65cf-4761-b894-5fa8dc859e2e</itemTemplateId>
+                    <price>800</price>
+                </items>
+                <items>
+                    <itemTemplateId>84349095-9c39-49e4-9f0a-1819dc7d1748</itemTemplateId>
+                    <price>1200</price>
+                </items>
+                <items>
+                    <itemTemplateId>2f7c7759-45c8-4652-aea5-f244e1b11fc5</itemTemplateId>
+                    <price>6000</price>
+                </items>
+                <items>
+                    <itemTemplateId>7b732096-7d14-434b-b7d6-1569dd6ee37b</itemTemplateId>
+                    <price>7000</price>
+                </items>
+                <items>
+                    <itemTemplateId>6c2e3f4a-7b8d-4f90-ab12-3c4d5e6f7081</itemTemplateId>
+                    <price>1500</price>
+                </items>
+                <items>
+                    <itemTemplateId>9f5b6c7d-aeb0-4c23-de45-6f708192a3b4</itemTemplateId>
+                    <price>2500</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fcf0d-1f8c-7d43-9e98-a9944b4ccefe</itemTemplateId>
+                    <price>50</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fcf0d-1f8d-7c4c-9275-33c4af4410a8</itemTemplateId>
+                    <price>1500</price>
+                </items>
+                <items>
+                    <itemTemplateId>044f02d7-ebcf-4275-8be2-c41a93695f96</itemTemplateId>
+                    <price>1000</price>
+                </items>
+                <items>
+                    <itemTemplateId>3ca4de84-6813-4846-9fe7-9dfb3c245aa9</itemTemplateId>
+                    <price>400</price>
+                </items>
+                <items>
+                    <itemTemplateId>3b1d09c8-a3ec-4159-9f7d-403754c5ef39</itemTemplateId>
+                    <price>300</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fe3f6-b1ef-786d-bc17-46dd46660eb0</itemTemplateId>
+                    <price>400</price>
+                </items>
+                <items>
+                    <itemTemplateId>4623f73d-821b-4dc4-b723-b9353bdca64c</itemTemplateId>
+                    <price>10</price>
                 </items>
             </shop>
         </dialogue>

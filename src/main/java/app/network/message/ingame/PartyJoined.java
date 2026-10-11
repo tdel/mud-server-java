@@ -26,14 +26,14 @@ public record PartyJoined(UUID leaderId, String leaderName, int memberCount,
         List<MemberView> members) implements OutputJsonMessage {
 
     public record MemberView(UUID id, String name, int level, CharacterClass characterClass, Subclass subclass,
-            int currentHealth, int maxHealth, int currentMana, int maxMana, List<PartyEffectView> effects) {
+            int currentHealth, int maxHealth, int currentMana, int maxMana, List<ActiveEffectView> effects) {
 
         public static MemberView of(PlayerInstance member) {
             return new MemberView(member.getId(), member.getName(), member.getLevelingSystem().getLevel(),
                     member.getClassSystem().getCharacterClass(), member.getClassSystem().getCurrentSubclass(),
                     member.getResourceSystem().getCurrentHealth(), member.getResourceSystem().getMaxHealth(),
                     member.getResourceSystem().getCurrentMana(), member.getResourceSystem().getMaxMana(),
-                    PartyEffectView.listOf(member));
+                    ActiveEffectView.listOf(member));
         }
     }
 }

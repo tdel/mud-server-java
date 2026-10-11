@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Arbre de compétences Warrior (L2 High Five, classId 1, classSkillTree L2J) jusqu'au
+     level 40 : playerLevel = level de personnage requis, appris auprès du maître des
+     compétences (PNJ SKILL_LEARNER) une fois la profession choisie. S'ajoute à l'arbre de la
+     classe de base et des professions précédentes (cf. ClassSystem.skillTree). -->
+<class>
+    <!-- PV/PM et régénération (par tick de 3 s) de base par niveau : lvlUpgainData de
+         stats/chars/baseStats/Warrior.xml (L2J H5), cf. ClassVitals. -->
+    <vitals>
+        <level val="1" hp="80" mp="30" hpRegen="2" mpRegen="0.9" />
+        <level val="2" hp="91.83" mp="35.46" hpRegen="2.05" mpRegen="0.9" />
+        <level val="3" hp="103.79" mp="40.98" hpRegen="2.1" mpRegen="0.9" />
+        <level val="4" hp="115.88" mp="46.56" hpRegen="2.15" mpRegen="0.9" />
+        <level val="5" hp="128.1" mp="52.2" hpRegen="2.2" mpRegen="0.9" />
+        <level val="6" hp="140.45" mp="57.9" hpRegen="2.25" mpRegen="0.9" />
+        <level val="7" hp="152.93" mp="63.66" hpRegen="2.3" mpRegen="0.9" />
+        <level val="8" hp="165.54" mp="69.48" hpRegen="2.35" mpRegen="0.9" />
+        <level val="9" hp="178.28" mp="75.36" hpRegen="2.4" mpRegen="0.9" />
+        <level val="10" hp="191.15" mp="81.3" hpRegen="2.45" mpRegen="0.9" />
+        <level val="11" hp="204.15" mp="87.3" hpRegen="2.5" mpRegen="1.2" />
+        <level val="12" hp="217.28" mp="93.36" hpRegen="2.6" mpRegen="1.2" />
+        <level val="13" hp="230.54" mp="99.48" hpRegen="2.7" mpRegen="1.2" />
+        <level val="14" hp="243.93" mp="105.66" hpRegen="2.8" mpRegen="1.2" />
+        <level val="15" hp="257.45" mp="111.9" hpRegen="2.9" mpRegen="1.2" />
+        <level val="16" hp="271.1" mp="118.2" hpRegen="3" mpRegen="1.2" />
+        <level val="17" hp="284.88" mp="124.56" hpRegen="3.1" mpRegen="1.2" />
+        <level val="18" hp="298.79" mp="130.98" hpRegen="3.2" mpRegen="1.2" />
+        <level val="19" hp="312.83" mp="137.46" hpRegen="3.3" mpRegen="1.2" />
+        <level val="20" hp="327" mp="144" hpRegen="3.4" mpRegen="1.2" />
+        <level val="21" hp="360" mp="153.9" hpRegen="3.5" mpRegen="1.5" />
+        <level val="22" hp="393.3" mp="163.89" hpRegen="3.6" mpRegen="1.5" />
+        <level val="23" hp="426.9" mp="173.97" hpRegen="3.7" mpRegen="1.5" />
+        <level val="24" hp="460.8" mp="184.14" hpRegen="3.8" mpRegen="1.5" />
+        <level val="25" hp="495" mp="194.4" hpRegen="3.9" mpRegen="1.5" />
+        <level val="26" hp="529.5" mp="204.75" hpRegen="4" mpRegen="1.5" />
+        <level val="27" hp="564.3" mp="215.19" hpRegen="4.1" mpRegen="1.5" />
+        <level val="28" hp="599.4" mp="225.72" hpRegen="4.2" mpRegen="1.5" />
+        <level val="29" hp="634.8" mp="236.34" hpRegen="4.3" mpRegen="1.5" />
+        <level val="30" hp="670.5" mp="247.05" hpRegen="4.4" mpRegen="1.5" />
+        <level val="31" hp="706.5" mp="257.85" hpRegen="4.5" mpRegen="1.8" />
+        <level val="32" hp="742.8" mp="268.74" hpRegen="4.6" mpRegen="1.8" />
+        <level val="33" hp="779.4" mp="279.72" hpRegen="4.7" mpRegen="1.8" />
+        <level val="34" hp="816.3" mp="290.79" hpRegen="4.8" mpRegen="1.8" />
+        <level val="35" hp="853.5" mp="301.95" hpRegen="4.9" mpRegen="1.8" />
+        <level val="36" hp="891" mp="313.2" hpRegen="5" mpRegen="1.8" />
+        <level val="37" hp="928.8" mp="324.54" hpRegen="5.1" mpRegen="1.8" />
+        <level val="38" hp="966.9" mp="335.97" hpRegen="5.2" mpRegen="1.8" />
+        <level val="39" hp="1005.3" mp="347.49" hpRegen="5.3" mpRegen="1.8" />
+        <level val="40" hp="1044" mp="359.1" hpRegen="5.4" mpRegen="1.8" />
+    </vitals>
+    <skill id="947d844d-c2eb-5134-a158-caec7f7c42ff">
+        <!-- Sword/Blunt Weapon Mastery -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="24"/>
+        <level id="3" playerLevel="28"/>
+        <level id="4" playerLevel="28"/>
+        <level id="5" playerLevel="32"/>
+        <level id="6" playerLevel="32"/>
+        <level id="7" playerLevel="36"/>
+        <level id="8" playerLevel="36"/>
+    </skill>
+    <skill id="75d2ea83-4cda-5573-a8c3-7ad82b90c942">
+        <!-- Polearm Mastery -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="24"/>
+        <level id="3" playerLevel="28"/>
+        <level id="4" playerLevel="28"/>
+        <level id="5" playerLevel="32"/>
+        <level id="6" playerLevel="32"/>
+        <level id="7" playerLevel="36"/>
+        <level id="8" playerLevel="36"/>
+    </skill>
+    <skill id="f0d08eed-223e-55b2-9519-a09e4674ea87">
+        <!-- Light Armor Mastery -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="20"/>
+        <level id="3" playerLevel="24"/>
+        <level id="4" playerLevel="24"/>
+        <level id="5" playerLevel="28"/>
+        <level id="6" playerLevel="28"/>
+        <level id="7" playerLevel="28"/>
+        <level id="8" playerLevel="32"/>
+        <level id="9" playerLevel="32"/>
+        <level id="10" playerLevel="32"/>
+        <level id="11" playerLevel="36"/>
+        <level id="12" playerLevel="36"/>
+        <level id="13" playerLevel="36"/>
+    </skill>
+    <skill id="384e1706-532b-5ed3-a187-e9e71e04e40a">
+        <!-- Heavy Armor Mastery -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="20"/>
+        <level id="3" playerLevel="24"/>
+        <level id="4" playerLevel="24"/>
+        <level id="5" playerLevel="28"/>
+        <level id="6" playerLevel="28"/>
+        <level id="7" playerLevel="28"/>
+        <level id="8" playerLevel="32"/>
+        <level id="9" playerLevel="32"/>
+        <level id="10" playerLevel="32"/>
+        <level id="11" playerLevel="36"/>
+        <level id="12" playerLevel="36"/>
+        <level id="13" playerLevel="36"/>
+    </skill>
+    <skill id="050ac6bc-3766-5261-ab3c-48453e2b722c">
+        <!-- Power Smash -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="20"/>
+        <level id="3" playerLevel="20"/>
+        <level id="4" playerLevel="24"/>
+        <level id="5" playerLevel="24"/>
+        <level id="6" playerLevel="24"/>
+        <level id="7" playerLevel="28"/>
+        <level id="8" playerLevel="28"/>
+        <level id="9" playerLevel="28"/>
+        <level id="10" playerLevel="32"/>
+        <level id="11" playerLevel="32"/>
+        <level id="12" playerLevel="32"/>
+        <level id="13" playerLevel="36"/>
+        <level id="14" playerLevel="36"/>
+        <level id="15" playerLevel="36"/>
+    </skill>
+    <skill id="81ecca3f-51ac-5c08-8880-77695356529d">
+        <!-- Stun Attack -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="20"/>
+        <level id="3" playerLevel="20"/>
+        <level id="4" playerLevel="24"/>
+        <level id="5" playerLevel="24"/>
+        <level id="6" playerLevel="24"/>
+        <level id="7" playerLevel="28"/>
+        <level id="8" playerLevel="28"/>
+        <level id="9" playerLevel="28"/>
+        <level id="10" playerLevel="32"/>
+        <level id="11" playerLevel="32"/>
+        <level id="12" playerLevel="32"/>
+        <level id="13" playerLevel="36"/>
+        <level id="14" playerLevel="36"/>
+        <level id="15" playerLevel="36"/>
+    </skill>
+    <skill id="0c74cbaa-991a-5540-b995-86a34ba67675">
+        <!-- Wild Sweep -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="20"/>
+        <level id="3" playerLevel="20"/>
+        <level id="4" playerLevel="24"/>
+        <level id="5" playerLevel="24"/>
+        <level id="6" playerLevel="24"/>
+        <level id="7" playerLevel="28"/>
+        <level id="8" playerLevel="28"/>
+        <level id="9" playerLevel="28"/>
+        <level id="10" playerLevel="32"/>
+        <level id="11" playerLevel="32"/>
+        <level id="12" playerLevel="32"/>
+        <level id="13" playerLevel="36"/>
+        <level id="14" playerLevel="36"/>
+        <level id="15" playerLevel="36"/>
+    </skill>
+    <skill id="84e61d63-b87f-59b9-9441-44e615e3f31f">
+        <!-- Vicious Stance -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="24"/>
+        <level id="3" playerLevel="28"/>
+        <level id="4" playerLevel="32"/>
+        <level id="5" playerLevel="36"/>
+    </skill>
+    <skill id="7cdf77ad-d6b5-5450-8b38-ada41d9756c9">
+        <!-- Boost HP -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="28"/>
+        <level id="3" playerLevel="36"/>
+    </skill>
+    <skill id="72653e3d-5dd3-5c7e-90b3-bc3f521feeee">
+        <!-- War Cry -->
+        <level id="1" playerLevel="20"/>
+    </skill>
+    <skill id="a55e14d9-0548-526f-8e0b-30cc09e5e4d1">
+        <!-- Fast HP Recovery -->
+        <level id="1" playerLevel="24"/>
+        <level id="2" playerLevel="32"/>
+    </skill>
+    <skill id="6458136c-6596-57cc-86c3-cb1f5e131eca">
+        <!-- Vital Force -->
+        <level id="1" playerLevel="24"/>
+        <level id="2" playerLevel="32"/>
+    </skill>
+    <skill id="3fb58fa5-7af3-579e-a3bd-586acf0dee5a">
+        <!-- Accuracy -->
+        <level id="1" playerLevel="24"/>
+    </skill>
+    <skill id="92c38a90-1593-5f02-acda-5a86b34d1c65">
+        <!-- Battle Roar -->
+        <level id="1" playerLevel="28"/>
+    </skill>
+    <skill id="20557f6d-dd2a-52bc-9e7d-506940f7d260">
+        <!-- Detect Insect Weakness -->
+        <level id="1" playerLevel="32"/>
+    </skill>
+    <skill id="cc920bd2-6c3e-54d3-80a1-7b4f7239358d">
+        <!-- Lionheart -->
+        <level id="1" playerLevel="36"/>
+    </skill>
+</class>

@@ -21,6 +21,8 @@ import app.domain.actor.Attribute;
 import app.domain.ActiveEffect;
 import app.domain.actor.instance.PlayerInstance;
 import app.domain.actor.CharacterClass;
+import app.domain.actor.ClassVitals;
+import app.domain.actor.system.ClassSystem;
 import app.domain.actor.Gender;
 import app.domain.actor.Race;
 import app.domain.actor.Subclass;
@@ -69,7 +71,8 @@ public class CharacterDao {
                         character.getAppearanceSystem().getGender().name(),
                         character.getAppearanceSystem().getRace().name(),
                         character.getClassSystem().getCharacterClass().name(), character.getLevelingSystem().getLevel(),
-                        character.getResourceSystem().getCurrentHealth(), character.getResourceSystem().getMaxHealth(),
+                        character.getResourceSystem().getCurrentHealth(),
+                        character.getResourceSystem().getBaseMaxHealth(),
                         character.getAttributeSystem().getAttribute(Attribute.STR),
                         character.getAttributeSystem().getAttribute(Attribute.DEX),
                         character.getAttributeSystem().getAttribute(Attribute.CON),
@@ -77,7 +80,7 @@ public class CharacterDao {
                         character.getAttributeSystem().getAttribute(Attribute.WIT),
                         character.getAttributeSystem().getAttribute(Attribute.MEN),
                         character.getLevelingSystem().getXp(), character.getInventorySystem().getGold(),
-                        character.getResourceSystem().getMaxMana(), character.getResourceSystem().getCurrentMana(),
+                        character.getResourceSystem().getBaseMaxMana(), character.getResourceSystem().getCurrentMana(),
                         name(character.getClassSystem().getSubclass(1)),
                         name(character.getClassSystem().getSubclass(2)),
                         gradeName(character.getInventorySystem().getActiveSoulshotGrade()),
@@ -127,9 +130,9 @@ public class CharacterDao {
                 .set(CHARACTER.CURRENT_HEALTH, character.getResourceSystem().getCurrentHealth())
                 .set(CHARACTER.XP, character.getLevelingSystem().getXp())
                 .set(CHARACTER.LEVEL, character.getLevelingSystem().getLevel())
-                .set(CHARACTER.MAX_HEALTH, character.getResourceSystem().getMaxHealth())
+                .set(CHARACTER.MAX_HEALTH, character.getResourceSystem().getBaseMaxHealth())
                 .set(CHARACTER.GOLD, character.getInventorySystem().getGold())
-                .set(CHARACTER.MAX_MANA, character.getResourceSystem().getMaxMana())
+                .set(CHARACTER.MAX_MANA, character.getResourceSystem().getBaseMaxMana())
                 .set(CHARACTER.CURRENT_MANA, character.getResourceSystem().getCurrentMana())
                 .set(CHARACTER.SUBCLASS_TIER1, name(character.getClassSystem().getSubclass(1)))
                 .set(CHARACTER.SUBCLASS_TIER2, name(character.getClassSystem().getSubclass(2)))
@@ -182,18 +185,20 @@ public class CharacterDao {
             subclasses.add(Subclass.valueOf(record.getSubclassTier2()));
         }
 
-        int maxHealth = characterClass.maxHealth(record.getConstitution(), record.getLevel());
-        int maxMana = characterClass.maxMana(record.getMen(), record.getLevel());
+        ClassVitals vitals = ClassSystem.vitalsOf(characterClass, subclasses);
+        int maxHealth = ClassSystem.maxHealth(vitals, record.getLevel(), record.getConstitution());
+        int maxMana = ClassSystem.maxMana(vitals, record.getLevel(), record.getMen());
 
         List<Item> items = itemDao.findByCharacterId(record.getId());
 
         PlayerInstance character = new PlayerInstance(record.getId(), account, record.getName(), map,
                 Gender.valueOf(record.getGender()), race, characterClass, record.getLevel(),
-                Math.min(record.getCurrentHealth(), maxHealth), maxHealth, attributes, record.getXp(), record.getGold(),
-                maxMana, Math.min(record.getCurrentMana(), maxMana), knownSkills, activeEffects, subclasses,
-                knownPassiveSkills, items, parseGrade(record.getActiveSoulshotGrade()),
-                parseGrade(record.getActiveSpiritshotGrade()), record.getKarma(), record.getPkCount(),
-                record.getPvpCount(), record.getPvpFlagged());
+                // PV/PM courants plafonnés paresseusement au max effectif (passifs Boost
+                // HP/Mana compris) par ResourceSystem.getCurrentHealth/Mana.
+                record.getCurrentHealth(), maxHealth, attributes, record.getXp(), record.getGold(), maxMana,
+                record.getCurrentMana(), knownSkills, activeEffects, subclasses, knownPassiveSkills, items,
+                parseGrade(record.getActiveSoulshotGrade()), parseGrade(record.getActiveSpiritshotGrade()),
+                record.getKarma(), record.getPkCount(), record.getPvpCount(), record.getPvpFlagged());
         character.setWorldInstance(instance);
 
         Double posX = record.getPosX();

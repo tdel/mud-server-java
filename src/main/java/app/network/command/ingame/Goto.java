@@ -16,6 +16,7 @@ import app.network.CommandHandler;
 import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
+import app.network.message.ingame.CannotActNow;
 import app.network.message.ingame.CharacterMovementStarted;
 import app.network.message.ingame.MovementStarted;
 import app.network.message.ingame.NoPathToDestination;
@@ -66,6 +67,12 @@ public class Goto implements CommandHandler {
         Optional<Double> y = parseDouble(tokens[1]);
         if (x.isEmpty() || y.isEmpty()) {
             connection.send(new Usage("goto <x> <y>"));
+            return;
+        }
+
+        // Étourdi, endormi, enraciné, terrorisé... : impossible de se déplacer.
+        if (!character.getEffectsSystem().canMove()) {
+            connection.send(new CannotActNow("Vous ne pouvez pas bouger dans cet état."));
             return;
         }
 

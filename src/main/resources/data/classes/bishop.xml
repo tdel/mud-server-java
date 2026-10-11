@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Arbre de compétences Bishop (L2 High Five, classId 16, classSkillTree L2J) jusqu'au
+     level 40 : playerLevel = level de personnage requis, appris auprès du maître des
+     compétences (PNJ SKILL_LEARNER) une fois la profession choisie. S'ajoute à l'arbre de la
+     classe de base et des professions précédentes (cf. ClassSystem.skillTree).
+     Omis (sans équivalent dans ce jeu) : Inquisitor. -->
+<class>
+    <!-- PV/PM et régénération (par tick de 3 s) de base par niveau : lvlUpgainData de
+         stats/chars/baseStats/Bishop.xml (L2J H5), cf. ClassVitals. -->
+    <vitals>
+        <level val="1" hp="101" mp="40" hpRegen="2" mpRegen="0.9" />
+        <level val="2" hp="116.47" mp="47.28" hpRegen="2.05" mpRegen="0.9" />
+        <level val="3" hp="132.11" mp="54.64" hpRegen="2.1" mpRegen="0.9" />
+        <level val="4" hp="147.92" mp="62.08" hpRegen="2.15" mpRegen="0.9" />
+        <level val="5" hp="163.9" mp="69.6" hpRegen="2.2" mpRegen="0.9" />
+        <level val="6" hp="180.05" mp="77.2" hpRegen="2.25" mpRegen="0.9" />
+        <level val="7" hp="196.37" mp="84.88" hpRegen="2.3" mpRegen="0.9" />
+        <level val="8" hp="212.86" mp="92.64" hpRegen="2.35" mpRegen="0.9" />
+        <level val="9" hp="229.52" mp="100.48" hpRegen="2.4" mpRegen="0.9" />
+        <level val="10" hp="246.35" mp="108.4" hpRegen="2.45" mpRegen="0.9" />
+        <level val="11" hp="263.35" mp="116.4" hpRegen="2.5" mpRegen="1.2" />
+        <level val="12" hp="280.52" mp="124.48" hpRegen="2.6" mpRegen="1.2" />
+        <level val="13" hp="297.86" mp="132.64" hpRegen="2.7" mpRegen="1.2" />
+        <level val="14" hp="315.37" mp="140.88" hpRegen="2.8" mpRegen="1.2" />
+        <level val="15" hp="333.05" mp="149.2" hpRegen="2.9" mpRegen="1.2" />
+        <level val="16" hp="350.9" mp="157.6" hpRegen="3" mpRegen="1.2" />
+        <level val="17" hp="368.92" mp="166.08" hpRegen="3.1" mpRegen="1.2" />
+        <level val="18" hp="387.11" mp="174.64" hpRegen="3.2" mpRegen="1.2" />
+        <level val="19" hp="405.47" mp="183.28" hpRegen="3.3" mpRegen="1.2" />
+        <level val="20" hp="424" mp="192" hpRegen="3.4" mpRegen="1.2" />
+        <level val="21" hp="458.1" mp="205.2" hpRegen="3.5" mpRegen="1.5" />
+        <level val="22" hp="492.51" mp="218.52" hpRegen="3.6" mpRegen="1.5" />
+        <level val="23" hp="527.23" mp="231.96" hpRegen="3.7" mpRegen="1.5" />
+        <level val="24" hp="562.26" mp="245.52" hpRegen="3.8" mpRegen="1.5" />
+        <level val="25" hp="597.6" mp="259.2" hpRegen="3.9" mpRegen="1.5" />
+        <level val="26" hp="633.25" mp="273" hpRegen="4" mpRegen="1.5" />
+        <level val="27" hp="669.21" mp="286.92" hpRegen="4.1" mpRegen="1.5" />
+        <level val="28" hp="705.48" mp="300.96" hpRegen="4.2" mpRegen="1.5" />
+        <level val="29" hp="742.06" mp="315.12" hpRegen="4.3" mpRegen="1.5" />
+        <level val="30" hp="778.95" mp="329.4" hpRegen="4.4" mpRegen="1.5" />
+        <level val="31" hp="816.15" mp="343.8" hpRegen="4.5" mpRegen="1.8" />
+        <level val="32" hp="853.66" mp="358.32" hpRegen="4.6" mpRegen="1.8" />
+        <level val="33" hp="891.48" mp="372.96" hpRegen="4.7" mpRegen="1.8" />
+        <level val="34" hp="929.61" mp="387.72" hpRegen="4.8" mpRegen="1.8" />
+        <level val="35" hp="968.05" mp="402.6" hpRegen="4.9" mpRegen="1.8" />
+        <level val="36" hp="1006.8" mp="417.6" hpRegen="5" mpRegen="1.8" />
+        <level val="37" hp="1045.86" mp="432.72" hpRegen="5.1" mpRegen="1.8" />
+        <level val="38" hp="1085.23" mp="447.96" hpRegen="5.2" mpRegen="1.8" />
+        <level val="39" hp="1124.91" mp="463.32" hpRegen="5.3" mpRegen="1.8" />
+        <level val="40" hp="1164.9" mp="478.8" hpRegen="5.4" mpRegen="1.8" />
+    </vitals>
+    <skill id="b3fe458a-95ad-41b2-9020-8e155d17eba7">
+        <!-- Weapon Mastery -->
+        <level id="10" playerLevel="40"/>
+        <level id="11" playerLevel="40"/>
+        <level id="12" playerLevel="40"/>
+    </skill>
+    <skill id="0818da1d-c164-58a3-a83e-4ba42410ea8e">
+        <!-- Robe Mastery -->
+        <level id="9" playerLevel="40"/>
+        <level id="10" playerLevel="40"/>
+        <level id="11" playerLevel="40"/>
+    </skill>
+    <skill id="701312dc-b991-5fbc-b41f-1760c512a645">
+        <!-- Light Armor Mastery -->
+        <level id="9" playerLevel="40"/>
+        <level id="10" playerLevel="40"/>
+        <level id="11" playerLevel="40"/>
+    </skill>
+    <skill id="208d6036-0859-4677-87ff-0707a53df413">
+        <!-- Anti Magic -->
+        <level id="13" playerLevel="40"/>
+        <level id="14" playerLevel="40"/>
+        <level id="15" playerLevel="40"/>
+    </skill>
+    <skill id="b3dfb416-a907-5ec9-afa0-172da5fec462">
+        <!-- Boost Mana -->
+        <level id="3" playerLevel="40"/>
+    </skill>
+    <skill id="92a26f53-e267-53e3-ab5a-4c90bf74c520">
+        <!-- Fast Spell Casting -->
+        <level id="2" playerLevel="40"/>
+    </skill>
+    <skill id="e5a87306-f89c-58e5-9fe3-7537ac3c5093">
+        <!-- Sleep -->
+        <level id="10" playerLevel="40"/>
+        <level id="11" playerLevel="40"/>
+        <level id="12" playerLevel="40"/>
+    </skill>
+    <skill id="a49eeb95-3839-5c8c-afc3-4aa16e0e8d70">
+        <!-- Greater Group Heal -->
+        <level id="1" playerLevel="40"/>
+        <level id="2" playerLevel="40"/>
+        <level id="3" playerLevel="40"/>
+    </skill>
+    <skill id="f85c678c-4fe3-5804-aa31-7a733d0ffc53">
+        <!-- Greater Battle Heal -->
+        <level id="1" playerLevel="40"/>
+        <level id="2" playerLevel="40"/>
+        <level id="3" playerLevel="40"/>
+    </skill>
+    <skill id="f259abc7-580c-5242-9ea9-a6dcf5193eaa">
+        <!-- Greater Heal -->
+        <level id="1" playerLevel="40"/>
+        <level id="2" playerLevel="40"/>
+        <level id="3" playerLevel="40"/>
+    </skill>
+    <skill id="b39ab81a-b626-528e-90a0-4f838ce36d9c">
+        <!-- Might of Heaven -->
+        <level id="1" playerLevel="40"/>
+        <level id="2" playerLevel="40"/>
+    </skill>
+    <skill id="6bfb74a7-8333-5f7a-96ae-29b9b4b05cdf">
+        <!-- Peace -->
+        <level id="2" playerLevel="40"/>
+    </skill>
+    <skill id="77ece519-fe59-527d-bb63-a137a3f9d3c6">
+        <!-- Resurrection -->
+        <level id="3" playerLevel="40"/>
+    </skill>
+    <skill id="4b29d9ce-c28e-5271-b6ca-1e97f578d219">
+        <!-- Mass Resurrection -->
+        <level id="1" playerLevel="40"/>
+    </skill>
+    <skill id="934ff82c-ca3e-5b1a-bed4-36e1b2d5192b">
+        <!-- Requiem -->
+        <level id="1" playerLevel="40"/>
+    </skill>
+</class>

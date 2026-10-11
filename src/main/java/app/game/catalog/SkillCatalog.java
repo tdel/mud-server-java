@@ -12,7 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import app.domain.AbnormalStatus;
 import app.domain.ActiveSkill;
+import app.domain.CubicType;
+import app.domain.CureKind;
+import app.domain.PeriodicKind;
 import app.domain.EffectCategory;
 import app.domain.SkillDamageType;
 import app.domain.SkillEffectDefinition;
@@ -23,7 +27,7 @@ import app.domain.SkillTargetType;
 import app.domain.StatModifier;
 import app.domain.StatOperator;
 import app.domain.actor.Attribute;
-import app.domain.actor.CharacterClass;
+import app.domain.actor.SkillTree;
 import app.domain.actor.ModifiedStat;
 import app.domain.item.WeaponType;
 import tools.jackson.core.JacksonException;
@@ -68,7 +72,12 @@ public class SkillCatalog {
                         throw new IllegalStateException("ActiveSkill " + definition.id() + " (" + definition.name()
                                 + ") a un level sans mana/power dans " + SKILL_RESOURCE);
                     }
-                    return new SkillLevel(l.id(), l.mana(), l.power());
+                    return new SkillLevel(l.id(), l.mana(), l.power(), l.hp() == null ? 0 : l.hp(),
+                            l.mpPerTick() == null ? 0 : l.mpPerTick(), l.hot() == null ? 0 : l.hot(),
+                            l.apply() == null
+                                    ? List.of()
+                                    : l.apply().stream().map(a -> new StatModifier(a.stat(), a.value(), a.op()))
+                                            .toList());
                 }).toList();
                 for (int i = 0; i < levels.size(); i++) {
                     if (levels.get(i).level() != i + 1) {
@@ -97,8 +106,9 @@ public class SkillCatalog {
                                         ? List.of()
                                         : e.apply().stream().map(a -> new StatModifier(a.stat(), a.value(), a.op()))
                                                 .toList(),
-                                e.chance() == null ? 100 : e.chance(), e.dotInterval() == null ? 0 : e.dotInterval()))
-                                .toList();
+                                e.chance() == null ? 100 : e.chance(), e.dotInterval() == null ? 0 : e.dotInterval(),
+                                e.kind() == null ? PeriodicKind.POISON : e.kind(),
+                                e.hotInterval() == null ? 0 : e.hotInterval(), e.status())).toList();
                 int reuseTimeMs = Math.round(definition.reuseTime() * 1000f);
                 int castingTimeMs = Math.round(definition.castTime() * 1000f);
                 Set<WeaponType> requiredWeapons = definition.weapon() == null
@@ -114,7 +124,10 @@ public class SkillCatalog {
                         definition.drain() == null ? 0 : definition.drain(),
                         definition.landRate() == null ? 0 : definition.landRate(),
                         definition.resistAttribute() == null ? Attribute.MEN : definition.resistAttribute(),
-                        Boolean.TRUE.equals(definition.breakOnAction()));
+                        Boolean.TRUE.equals(definition.breakOnAction()),
+                        Boolean.TRUE.equals(definition.shieldRequired()), Boolean.TRUE.equals(definition.behindOnly()),
+                        definition.halfLethal() == null ? 0 : definition.halfLethal(), definition.targetRace(),
+                        definition.summon(), definition.cubic(), definition.cure());
                 if (activeSkills.containsKey(activeSkill.id())) {
                     throw new IllegalStateException("ActiveSkill " + activeSkill.id() + " (" + activeSkill.name()
                             + ") a un id déjà utilisé par " + activeSkills.get(activeSkill.id()).name() + " dans "
@@ -141,21 +154,20 @@ public class SkillCatalog {
         return activeSkills.containsKey(skillId);
     }
 
-    // learnableSkillIds(level) mélange sorts actifs et compétences passives
+    // autoLearnableAt(level) mélange sorts actifs et compétences passives
     // (ex: Expertise Grade) ; seuls les ids présents dans activeSkills nous
     // concernent ici, le reste est géré par PassiveSkillCatalog — mais un id qui
-    // n'est ni l'un ni l'autre (donnée de classe désynchronisée de skills.xml,
-    // ex: Rage/Guidance/Bulwark après la migration XML) doit être visible en log
-    // plutôt que silencieusement absorbé.
-    public List<LearnableSkill> skillsLearnableAt(CharacterClass characterClass, int level) {
-        return characterClass.learnableSkillIds(level).stream().filter(learnable -> {
+    // n'est ni l'un ni l'autre (donnée de classe désynchronisée de skills.xml)
+    // doit être visible en log plutôt que silencieusement absorbé.
+    public List<LearnableSkill> skillsLearnableAt(SkillTree tree, int level) {
+        return tree.autoLearnableAt(level).stream().filter(learnable -> {
             if (activeSkills.containsKey(learnable.skillId())) {
                 return true;
             }
             if (!PassiveSkillCatalogHolder.isKnownId(learnable.skillId())) {
                 log.warn(
-                        "characterClass.unknown_skill_id characterClass={} skillId={} — absent à la fois de skills.xml (actifs) et des compétences passives connues",
-                        characterClass, learnable.skillId());
+                        "characterClass.unknown_skill_id skillId={} — absent à la fois de skills.xml (actifs) et des compétences passives connues",
+                        learnable.skillId());
             }
             return false;
         }).map(learnable -> new LearnableSkill(getById(learnable.skillId()), learnable.level())).toList();
@@ -179,15 +191,20 @@ public class SkillCatalog {
             SkillTargetType target, SkillElement element, SkillDamageType damageType, ProjectileXml projectile,
             EffectsXml effects,
             @JacksonXmlProperty(localName = "weapon") @JacksonXmlElementWrapper(useWrapping = false) List<WeaponType> weapon,
-            Integer blowChance, Integer drain, Integer landRate, Attribute resistAttribute, Boolean breakOnAction) {
+            Integer blowChance, Integer drain, Integer landRate, Attribute resistAttribute, Boolean breakOnAction,
+            Boolean shieldRequired, Boolean behindOnly, Integer halfLethal, String targetRace, String summon,
+            CubicType cubic, CureKind cure) {
     }
 
     // mana/power sont Integer (et non int) car un skill PASSIVE (Expertise Grade)
     // partage ce même schéma <level> mais n'en a pas — cf. warmSkills(), qui
     // saute ces définitions avant de déréférencer mana/power.
     private record SkillLevelXml(@JacksonXmlProperty(isAttribute = true) int id,
-            @JacksonXmlProperty(isAttribute = true) Integer mana,
-            @JacksonXmlProperty(isAttribute = true) Integer power) {
+            @JacksonXmlProperty(isAttribute = true) Integer mana, @JacksonXmlProperty(isAttribute = true) Integer power,
+            @JacksonXmlProperty(isAttribute = true) Integer hp,
+            @JacksonXmlProperty(isAttribute = true) Integer mpPerTick,
+            @JacksonXmlProperty(isAttribute = true) Integer hot,
+            @JacksonXmlProperty(localName = "apply") @JacksonXmlElementWrapper(useWrapping = false) List<StatModifierXml> apply) {
     }
 
     private record ProjectileXml(@JacksonXmlProperty(isAttribute = true) int speed) {
@@ -207,6 +224,9 @@ public class SkillCatalog {
             @JacksonXmlProperty(isAttribute = true) EffectCategory type,
             @JacksonXmlProperty(isAttribute = true) Integer chance,
             @JacksonXmlProperty(isAttribute = true) Integer dotInterval,
+            @JacksonXmlProperty(isAttribute = true) Integer hotInterval,
+            @JacksonXmlProperty(isAttribute = true) PeriodicKind kind,
+            @JacksonXmlProperty(isAttribute = true) AbnormalStatus status,
             @JacksonXmlProperty(localName = "apply") @JacksonXmlElementWrapper(useWrapping = false) List<StatModifierXml> apply) {
     }
 

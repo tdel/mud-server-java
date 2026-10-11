@@ -30,12 +30,12 @@ import app.network.message.ingame.MovementStopped;
 @Component
 public class MovementEngine {
 
-    // speed est le run speed L2 (Human ~110, monstres ~55-75, cf. race.xml /
-    // monsters.xml) — pas une distance de case DnD5e. Le diviseur convertit
-    // cette valeur "unités L2" en cases de la CollisionGrid par seconde, calibré
-    // pour garder le rythme de déplacement déjà éprouvé sur la grille (un Human à
-    // 110 fait ~2.44 case/s).
-    public static final double SPEED_DIVISOR = 45.0;
+    // speed est la vitesse de course L2 (FuncMoveSpeed : base x DEX ; Human
+    // Fighter 126, Human Mystic 122, monstres du datapack ~55-190) — pas une
+    // distance de case DnD5e. Le diviseur convertit ces unités L2 en cases de la
+    // CollisionGrid par seconde, calibré pour garder le rythme de déplacement déjà
+    // éprouvé sur la grille (un Human Fighter fait ~4.85 cases/s).
+    public static final double SPEED_DIVISOR = 26.0;
 
     private static final Logger log = LoggerFactory.getLogger(MovementEngine.class);
 

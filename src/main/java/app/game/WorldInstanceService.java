@@ -105,15 +105,36 @@ public class WorldInstanceService {
         MapInstance map = character.getMotionSystem().getCurrentMap();
         WorldInstance instance = character.getWorldInstance();
 
-        characterDao.update(character);
-        Position position = character.getMotionSystem().getPosition();
-        if (position != null) {
-            characterDao.updatePosition(character.getId(), position.x(), position.y());
+        // Chaque étape est isolée : un échec de sauvegarde (ou de diffusion) ne doit
+        // jamais laisser le personnage en mémoire — fantôme visible sur la map, et
+        // personnage impossible à recharger (WorldInstance.reservePlayer le refuse
+        // tant qu'il est dans players).
+        try {
+            characterDao.update(character);
+            Position position = character.getMotionSystem().getPosition();
+            if (position != null) {
+                characterDao.updatePosition(character.getId(), position.x(), position.y());
+            }
+        } catch (Exception e) {
+            log.error("world.session_save_failed character={}", character.getName(), e);
         }
-        movementEngine.stopMovement(character);
-        map.disconnect(character);
-        instance.removePlayer(character);
-        log.info("world.session_ended character={} map={}", character.getName(), map.getName());
+        try {
+            movementEngine.stopMovement(character);
+            if (map != null) {
+                map.disconnect(character);
+            }
+        } catch (Exception e) {
+            log.error("world.session_map_leave_failed character={}", character.getName(), e);
+        } finally {
+            try {
+                instance.removePlayer(character);
+            } finally {
+                // Un moteur encore porteur d'une référence à ce personnage ne peut plus
+                // écrire sur la socket (PlayerInstance.send() no-op sans connexion).
+                character.setConnection(null);
+            }
+        }
+        log.info("world.session_ended character={} map={}", character.getName(), map != null ? map.getName() : null);
         MDC.remove("character");
     }
 

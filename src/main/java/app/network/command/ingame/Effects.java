@@ -40,7 +40,9 @@ public class Effects implements CommandHandler {
     }
 
     private EffectView toView(ActiveEffect effect, Instant now) {
-        long secondsRemaining = Duration.between(now, effect.expiresAt()).toSeconds();
+        // Effet permanent (pénalité de grade) : pas d'échéance, 0 comme
+        // ActiveEffectView.
+        long secondsRemaining = effect.isPermanent() ? 0 : Duration.between(now, effect.expiresAt()).toSeconds();
         return new EffectView(effect.skillName(), effect.modifiers(), Math.max(0, secondsRemaining));
     }
 }

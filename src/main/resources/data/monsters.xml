@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <monsters>
-    <!-- Attributs : valeurs de base des monstres L2 (STR 40, DEX 30, CON 43, INT 21, WIT 20,
-         MEN 20 — quasi tous les PNJ du datapack L2J H5), cf. Attribute.bonus. -->
+    <!-- race : race L2 du monstre (Detect Animal Weakness, sorts anti-morts-vivants).
+         Stats : valeurs de base du PNJ dans le datapack L2JMobius H5 (stats/npcs), avant les
+         fonctions de stats L2 que le serveur leur applique (CombatFormulas.stats) : maxHealth
+         (x CON), pAtk (x STR x niveau), mAtk (x INT² x niveau²), pDef (x niveau), mDef (x MEN x
+         niveau), accuracyBonus/evasionBonus (accuracy/evasion du PNJ, + sqrt(DEX)*6 + niveau),
+         critBonus (critique de base, x DEX x 10), speed (course, x DEX), atkSpd (x DEX).
+         Attributs : ceux du PNJ L2 (STR 40, DEX 30, CON 43, INT 21, WIT 20, MEN 20 pour quasi
+         tous), cf. Attribute.bonus. Fiches régénérées par tools/monster_gen/build_monsters.py. -->
     <monster id="dc803de5-e456-4e20-bbdc-ad16faf99af9">
         <name>Gremlin</name>
-        <maxHealth>38</maxHealth>
-        <pAtk>1</pAtk>
-        <pDef>34</pDef>
-        <mAtk>0</mAtk>
-        <mDef>17</mDef>
-        <accuracyBonus>0</accuracyBonus>
+        <race>FAIRY</race>
+        <maxHealth>39.75</maxHealth>
+        <pAtk>8.47</pAtk>
+        <pDef>44.44</pDef>
+        <mAtk>5.79</mAtk>
+        <mDef>29.59</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
         <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
+        <critBonus>4</critBonus>
         <xpReward>30</xpReward>
         <attributes>
             <STR>40</STR>
@@ -26,21 +33,22 @@
             <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
             <item templateId="ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd" chance="0.02" />
         </loot>
-        <aggroRadius>2</aggroRadius>
-        <speed>55</speed>
-        <atkSpd>280</atkSpd>
+        <aggroRadius>0</aggroRadius>
+        <speed>50</speed>
+        <atkSpd>253</atkSpd>
         <level>1</level>
     </monster>
     <monster id="8d3b7335-abf5-420e-abf7-3de4160f95ac">
         <name>Young Keltir</name>
-        <maxHealth>44</maxHealth>
-        <pAtk>1</pAtk>
-        <pDef>38</pDef>
-        <mAtk>0</mAtk>
-        <mDef>15</mDef>
-        <accuracyBonus>-2</accuracyBonus>
-        <evasionBonus>-3</evasionBonus>
-        <critBonus>0</critBonus>
+        <race>ANIMAL</race>
+        <maxHealth>39.75</maxHealth>
+        <pAtk>8.47</pAtk>
+        <pDef>44.44</pDef>
+        <mAtk>5.79</mAtk>
+        <mDef>29.59</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
         <xpReward>32</xpReward>
         <attributes>
             <STR>40</STR>
@@ -54,21 +62,22 @@
             <gold>4</gold>
             <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.08" />
         </loot>
-        <aggroRadius>1</aggroRadius>
-        <speed>45</speed>
-        <atkSpd>260</atkSpd>
+        <aggroRadius>0</aggroRadius>
+        <speed>110</speed>
+        <atkSpd>253</atkSpd>
         <level>1</level>
     </monster>
     <monster id="e8553837-b812-4826-8740-72df0d9280fd">
         <name>Elpy</name>
-        <maxHealth>28</maxHealth>
-        <pAtk>1</pAtk>
-        <pDef>28</pDef>
-        <mAtk>0</mAtk>
-        <mDef>18</mDef>
-        <accuracyBonus>2</accuracyBonus>
-        <evasionBonus>6</evasionBonus>
-        <critBonus>2</critBonus>
+        <race>ANIMAL</race>
+        <maxHealth>39.75</maxHealth>
+        <pAtk>8.47</pAtk>
+        <pDef>44.44</pDef>
+        <mAtk>5.79</mAtk>
+        <mDef>29.59</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
         <xpReward>30</xpReward>
         <attributes>
             <STR>40</STR>
@@ -82,21 +91,22 @@
             <gold>3</gold>
             <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.05" />
         </loot>
-        <aggroRadius>1</aggroRadius>
-        <speed>70</speed>
-        <atkSpd>300</atkSpd>
+        <aggroRadius>0</aggroRadius>
+        <speed>80</speed>
+        <atkSpd>253</atkSpd>
         <level>1</level>
     </monster>
     <monster id="0a88e27c-5487-40d5-b494-b7ea49148171">
         <name>Fox</name>
-        <maxHealth>44</maxHealth>
-        <pAtk>1</pAtk>
-        <pDef>36</pDef>
-        <mAtk>0</mAtk>
-        <mDef>17</mDef>
-        <accuracyBonus>1</accuracyBonus>
-        <evasionBonus>4</evasionBonus>
-        <critBonus>3</critBonus>
+        <race>ANIMAL</race>
+        <maxHealth>48.09</maxHealth>
+        <pAtk>9.32</pAtk>
+        <pDef>46.15</pDef>
+        <mAtk>6.37</mAtk>
+        <mDef>30.73</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
         <xpReward>60</xpReward>
         <attributes>
             <STR>40</STR>
@@ -111,21 +121,22 @@
             <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
             <item templateId="019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518" chance="0.02" />
         </loot>
-        <aggroRadius>2</aggroRadius>
-        <speed>70</speed>
-        <atkSpd>300</atkSpd>
+        <aggroRadius>0</aggroRadius>
+        <speed>110</speed>
+        <atkSpd>253</atkSpd>
         <level>2</level>
     </monster>
     <monster id="de87e00a-eb3f-4885-b6a4-922c426d5fb8">
         <name>Brown Keltir</name>
-        <maxHealth>55</maxHealth>
-        <pAtk>1</pAtk>
-        <pDef>47</pDef>
-        <mAtk>0</mAtk>
-        <mDef>16</mDef>
-        <accuracyBonus>-2</accuracyBonus>
-        <evasionBonus>-3</evasionBonus>
-        <critBonus>0</critBonus>
+        <race>ANIMAL</race>
+        <maxHealth>48.09</maxHealth>
+        <pAtk>9.32</pAtk>
+        <pDef>46.15</pDef>
+        <mAtk>6.37</mAtk>
+        <mDef>30.73</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
         <xpReward>65</xpReward>
         <attributes>
             <STR>40</STR>
@@ -141,9 +152,2286 @@
             <item templateId="019faec6-116d-723d-b04c-76d51a2a2cb7" chance="0.02" />
             <item templateId="019fcf0d-1f8f-7d01-8e4f-fd592812a1a7" chance="0.005" />
         </loot>
-        <aggroRadius>2</aggroRadius>
-        <speed>45</speed>
-        <atkSpd>260</atkSpd>
+        <aggroRadius>0</aggroRadius>
+        <speed>110</speed>
+        <atkSpd>253</atkSpd>
         <level>2</level>
     </monster>
+    <!-- ===== Fiches générées par tools/monster_gen/build_monsters.py : ne pas éditer à la main ===== -->
+    <!-- Elder Keltir (L2 npc 20544, niveau 3, passif) -->
+    <monster id="a5d41623-ef47-595b-9907-2e1f95f74f5e">
+        <name>Elder Keltir</name>
+        <race>ANIMAL</race>
+        <maxHealth>57.55</maxHealth>
+        <pAtk>11.27</pAtk>
+        <pDef>43.6</pDef>
+        <mAtk>8.47</mAtk>
+        <mDef>29.03</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>105</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>14</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
+            <item templateId="83b1c12e-c594-4a7b-b0d0-cdd7dc2fca8f" chance="0.03" />
+            <item templateId="aa24f9ec-0608-4b46-819d-4c6087df1320" chance="0.03" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>110</speed>
+        <atkSpd>253</atkSpd>
+        <level>3</level>
+    </monster>
+    <!-- Wolf (L2 npc 20120, niveau 4, passif) -->
+    <monster id="07b2080c-005f-5f49-8f75-7a91217779d4">
+        <name>Wolf</name>
+        <race>ANIMAL</race>
+        <maxHealth>68.21</maxHealth>
+        <pAtk>11.25</pAtk>
+        <pDef>49.73</pDef>
+        <mAtk>7.68</mAtk>
+        <mDef>33.11</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>141</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>19</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
+            <item templateId="3c966b19-8f40-4791-9dd7-3a489f090f7b" chance="0.02" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>110</speed>
+        <atkSpd>253</atkSpd>
+        <level>4</level>
+    </monster>
+    <!-- Elder Wolf (L2 npc 20442, niveau 5, passif) -->
+    <monster id="a24a1968-4d75-5194-901a-80868655a1f4">
+        <name>Elder Wolf</name>
+        <race>ANIMAL</race>
+        <maxHealth>80.17</maxHealth>
+        <pAtk>12.34</pAtk>
+        <pDef>51.61</pDef>
+        <mAtk>8.43</mAtk>
+        <mDef>34.36</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>176</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>25</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
+            <item templateId="4200e028-982b-4267-8c69-e62e305a5080" chance="0.03" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>110</speed>
+        <atkSpd>253</atkSpd>
+        <level>5</level>
+    </monster>
+    <!-- Giant Toad (L2 npc 20121, niveau 5, passif) -->
+    <monster id="917b0780-9d63-5e51-861e-138e69e79dc1">
+        <name>Giant Toad</name>
+        <race>ANIMAL</race>
+        <maxHealth>80.17</maxHealth>
+        <pAtk>12.34</pAtk>
+        <pDef>51.61</pDef>
+        <mAtk>8.43</mAtk>
+        <mDef>34.36</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>178</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>25</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
+            <item templateId="8e96906e-1f06-40aa-b986-7946c1acd72d" chance="0.03" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>100</speed>
+        <atkSpd>253</atkSpd>
+        <level>5</level>
+    </monster>
+    <!-- Goblin (L2 npc 20003, niveau 5, passif) -->
+    <monster id="edc65f4f-c5aa-5683-9367-5b9a8ec421ff">
+        <name>Goblin</name>
+        <race>HUMANOID</race>
+        <maxHealth>80.17</maxHealth>
+        <pAtk>12.34</pAtk>
+        <pDef>51.61</pDef>
+        <mAtk>8.43</mAtk>
+        <mDef>34.36</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>176</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>25</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
+            <item templateId="0f50e068-ab87-41aa-9169-5eaa17a3c7ce" chance="0.03" />
+            <item templateId="b0bc4f00-8f9f-44a4-9b7f-0095ab837218" chance="0.02" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>110</speed>
+        <atkSpd>253</atkSpd>
+        <level>5</level>
+    </monster>
+    <!-- Orc (L2 npc 20130, niveau 6, passif) -->
+    <monster id="9e29e62f-8c6f-5979-9d61-e68657938fa3">
+        <name>Orc</name>
+        <race>HUMANOID</race>
+        <maxHealth>93.54</maxHealth>
+        <pAtk>13.52</pAtk>
+        <pDef>53.53</pDef>
+        <mAtk>9.24</mAtk>
+        <mDef>35.64</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>213</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>31</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
+            <item templateId="f3c8a065-ac0d-4913-9774-41098a6e088d" chance="0.03" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>110</speed>
+        <atkSpd>253</atkSpd>
+        <level>6</level>
+    </monster>
+    <!-- Orc Grunt (L2 npc 20131, niveau 7, passif) -->
+    <monster id="f9502f1e-9c06-589e-818d-ea26f6dd15ee">
+        <name>Orc Grunt</name>
+        <race>HUMANOID</race>
+        <maxHealth>108.42</maxHealth>
+        <pAtk>14.81</pAtk>
+        <pDef>55.52</pDef>
+        <mAtk>10.11</mAtk>
+        <mDef>36.97</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>249</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>38</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
+            <item templateId="8a692c7f-8461-4994-ab61-69d0079ed3fc" chance="0.04" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>110</speed>
+        <atkSpd>253</atkSpd>
+        <level>7</level>
+    </monster>
+    <!-- Orc Archer (L2 npc 20006, niveau 8, passif) -->
+    <monster id="c4f9b1f2-3d2f-50f9-99bb-eb161585bf17">
+        <name>Orc Archer</name>
+        <race>HUMANOID</race>
+        <maxHealth>124.93</maxHealth>
+        <pAtk>16.2</pAtk>
+        <pDef>57.56</pDef>
+        <mAtk>11.06</mAtk>
+        <mDef>38.33</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <xpReward>293</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>45</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
+            <item templateId="3c966b19-8f40-4791-9dd7-3a489f090f7b" chance="0.05" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>110</speed>
+        <atkSpd>253</atkSpd>
+        <level>8</level>
+    </monster>
+    <!-- Goblin Scout (L2 npc 20326, niveau 8, passif) -->
+    <monster id="8f2fd6d8-3613-5cce-9f77-4143b783443f">
+        <name>Goblin Scout</name>
+        <race>HUMANOID</race>
+        <maxHealth>124.93</maxHealth>
+        <pAtk>16.2</pAtk>
+        <pDef>57.56</pDef>
+        <mAtk>11.06</mAtk>
+        <mDef>38.33</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>284</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>45</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
+            <item templateId="d410f08b-8872-4ad1-984a-665dab47fd75" chance="0.04" />
+            <item templateId="aa24f9ec-0608-4b46-819d-4c6087df1320" chance="0.01" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>110</speed>
+        <atkSpd>253</atkSpd>
+        <level>8</level>
+    </monster>
+    <!-- Werewolf (L2 npc 20132, niveau 9, passif) -->
+    <monster id="23bc72d4-52a9-50f5-a9e5-21c3418dfeca">
+        <name>Werewolf</name>
+        <race>HUMANOID</race>
+        <maxHealth>143.18</maxHealth>
+        <pAtk>17.71</pAtk>
+        <pDef>59.66</pDef>
+        <mAtk>12.09</mAtk>
+        <mDef>39.72</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>321</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>52</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
+            <item templateId="d410f08b-8872-4ad1-984a-665dab47fd75" chance="0.03" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>120</speed>
+        <atkSpd>253</atkSpd>
+        <level>9</level>
+    </monster>
+    <!-- Orc Fighter (L2 npc 20093, niveau 10, agressif) -->
+    <monster id="d87dc4f2-6e67-56bb-9840-1eeefa6a21c3">
+        <name>Orc Fighter</name>
+        <race>HUMANOID</race>
+        <maxHealth>163.29</maxHealth>
+        <pAtk>19.34</pAtk>
+        <pDef>61.83</pDef>
+        <mAtk>13.21</mAtk>
+        <mDef>41.16</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>363</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>60</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
+            <item templateId="019fa0a5-80c0-7035-9c2d-113b09a275df" chance="0.04" />
+            <item templateId="019fe3f6-b1ee-78f8-a681-d288c7f87511" chance="0.01" />
+        </loot>
+        <aggroRadius>6</aggroRadius>
+        <speed>110</speed>
+        <atkSpd>253</atkSpd>
+        <level>10</level>
+    </monster>
+    <!-- Werewolf Hunter (L2 npc 20343, niveau 10, agressif) -->
+    <monster id="bef4ed13-2690-5fee-9378-451ed1f59a8f">
+        <name>Werewolf Hunter</name>
+        <race>HUMANOID</race>
+        <maxHealth>163.29</maxHealth>
+        <pAtk>21.27</pAtk>
+        <pDef>56.26</pDef>
+        <mAtk>15.98</mAtk>
+        <mDef>37.46</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>363</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>60</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.1" />
+            <item templateId="0f50e068-ab87-41aa-9169-5eaa17a3c7ce" chance="0.02" />
+        </loot>
+        <aggroRadius>6</aggroRadius>
+        <speed>120</speed>
+        <atkSpd>253</atkSpd>
+        <level>10</level>
+    </monster>
+    <!-- Vuku Orc (L2 npc 20009, niveau 14, passif) -->
+    <monster id="b8c1bc45-c1fd-54ad-bd86-3c845a624e34">
+        <name>Vuku Orc</name>
+        <race>HUMANOID</race>
+        <maxHealth>230.39</maxHealth>
+        <pAtk>27.25</pAtk>
+        <pDef>71.08</pDef>
+        <mAtk>18.61</mAtk>
+        <mDef>47.33</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>650</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>95</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="5b1f2d3e-6a7c-4e8f-9a01-2b3c4d5e6f70" chance="0.02" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>110</speed>
+        <atkSpd>253</atkSpd>
+        <level>14</level>
+    </monster>
+    <!-- Vuku Orc Archer (L2 npc 20011, niveau 15, passif) -->
+    <monster id="5d3132d0-3ffa-5732-b9ed-bc12f2875b6b">
+        <name>Vuku Orc Archer</name>
+        <race>HUMANOID</race>
+        <maxHealth>246.95</maxHealth>
+        <pAtk>29.62</pAtk>
+        <pDef>73.55</pDef>
+        <mAtk>20.22</mAtk>
+        <mDef>48.97</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <xpReward>700</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>105</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="3c966b19-8f40-4791-9dd7-3a489f090f7b" chance="0.04" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>110</speed>
+        <atkSpd>253</atkSpd>
+        <level>15</level>
+    </monster>
+    <!-- Shadow Beast (L2 npc 20023, niveau 15, passif) -->
+    <monster id="f461a7f4-767f-5852-8ba0-ef11f044b5e7">
+        <name>Shadow Beast</name>
+        <race>BEAST</race>
+        <maxHealth>246.95</maxHealth>
+        <pAtk>32.58</pAtk>
+        <pDef>66.93</pDef>
+        <mAtk>24.47</mAtk>
+        <mDef>44.56</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>720</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>105</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518" chance="0.02" />
+        </loot>
+        <elementalResistances>
+            <DARK>20</DARK>
+            <HOLY>-20</HOLY>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>120</speed>
+        <atkSpd>253</atkSpd>
+        <level>15</level>
+    </monster>
+    <!-- Ruin Zombie (L2 npc 20026, niveau 15, passif) -->
+    <monster id="53a8f8d2-a4b5-51bb-aca5-ecb9398e16f6">
+        <name>Ruin Zombie</name>
+        <race>UNDEAD</race>
+        <maxHealth>246.95</maxHealth>
+        <pAtk>32.58</pAtk>
+        <pDef>66.93</pDef>
+        <mAtk>24.47</mAtk>
+        <mDef>95.01</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>755</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>105</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="153c7ce9-f976-45c5-ab58-5b5f42665e68" chance="0.03" />
+        </loot>
+        <elementalResistances>
+            <HOLY>-50</HOLY>
+            <DARK>30</DARK>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>15</speed>
+        <atkSpd>253</atkSpd>
+        <level>15</level>
+    </monster>
+    <!-- Ruin Zombie Leader (L2 npc 20029, niveau 16, passif) -->
+    <monster id="53814b51-10e4-5982-986b-3377393d15d1">
+        <name>Ruin Zombie Leader</name>
+        <race>UNDEAD</race>
+        <maxHealth>264.34</maxHealth>
+        <pAtk>29.27</pAtk>
+        <pDef>83.69</pDef>
+        <mAtk>18.23</mAtk>
+        <mDef>108.41</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>807</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>115</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518" chance="0.03" />
+        </loot>
+        <elementalResistances>
+            <HOLY>-50</HOLY>
+            <DARK>30</DARK>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>15</speed>
+        <atkSpd>253</atkSpd>
+        <level>16</level>
+    </monster>
+    <!-- Skeleton Tracker (L2 npc 20035, niveau 17, passif) -->
+    <monster id="6ed54746-6621-5428-84b8-79647d41b0bc">
+        <name>Skeleton Tracker</name>
+        <race>UNDEAD</race>
+        <maxHealth>282.57</maxHealth>
+        <pAtk>38.39</pAtk>
+        <pDef>71.6</pDef>
+        <mAtk>28.84</mAtk>
+        <mDef>47.67</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <xpReward>605</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>126</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd" chance="0.04" />
+            <item templateId="8a692c7f-8461-4994-ab61-69d0079ed3fc" chance="0.03" />
+        </loot>
+        <elementalResistances>
+            <HOLY>-50</HOLY>
+            <DARK>30</DARK>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>140</speed>
+        <atkSpd>253</atkSpd>
+        <level>17</level>
+    </monster>
+    <!-- Skeleton Tracker Leader (L2 npc 20042, niveau 18, agressif) -->
+    <monster id="65541341-c485-525c-8169-254cb9be7d32">
+        <name>Skeleton Tracker Leader</name>
+        <race>UNDEAD</race>
+        <maxHealth>301.67</maxHealth>
+        <pAtk>41.61</pAtk>
+        <pDef>74.03</pDef>
+        <mAtk>31.26</mAtk>
+        <mDef>49.29</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <xpReward>652</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>137</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd" chance="0.05" />
+            <item templateId="019fcf0d-1f8f-7d01-8e4f-fd592812a1a7" chance="0.02" />
+        </loot>
+        <elementalResistances>
+            <HOLY>-50</HOLY>
+            <DARK>30</DARK>
+        </elementalResistances>
+        <aggroRadius>6</aggroRadius>
+        <speed>140</speed>
+        <atkSpd>253</atkSpd>
+        <level>18</level>
+    </monster>
+    <!-- Skeleton Scout (L2 npc 20045, niveau 19, passif) -->
+    <monster id="6801c518-7d10-5807-9fab-2b40686fb61f">
+        <name>Skeleton Scout</name>
+        <race>UNDEAD</race>
+        <maxHealth>321.64</maxHealth>
+        <pAtk>37.28</pAtk>
+        <pDef>92.48</pDef>
+        <mAtk>23.22</mAtk>
+        <mDef>61.58</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <xpReward>698</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>148</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="3c966b19-8f40-4791-9dd7-3a489f090f7b" chance="0.05" />
+        </loot>
+        <elementalResistances>
+            <HOLY>-50</HOLY>
+            <DARK>30</DARK>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>140</speed>
+        <atkSpd>253</atkSpd>
+        <level>19</level>
+    </monster>
+    <!-- Skeleton Bowman (L2 npc 20051, niveau 20, passif) -->
+    <monster id="7bf4ebdd-7408-5fc1-b887-36d875046f43">
+        <name>Skeleton Bowman</name>
+        <race>UNDEAD</race>
+        <maxHealth>342.51</maxHealth>
+        <pAtk>40.34</pAtk>
+        <pDef>95.56</pDef>
+        <mAtk>25.12</mAtk>
+        <mDef>63.62</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <xpReward>734</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>160</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="3c966b19-8f40-4791-9dd7-3a489f090f7b" chance="0.004" />
+        </loot>
+        <elementalResistances>
+            <HOLY>-50</HOLY>
+            <DARK>30</DARK>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>140</speed>
+        <atkSpd>253</atkSpd>
+        <level>20</level>
+    </monster>
+    <!-- Ruin Spartoi (L2 npc 20054, niveau 21, passif) -->
+    <monster id="73968160-5efb-5f74-b5dd-dc089a6de8ad">
+        <name>Ruin Spartoi</name>
+        <race>UNDEAD</race>
+        <maxHealth>364.3</maxHealth>
+        <pAtk>43.61</pAtk>
+        <pDef>98.7</pDef>
+        <mAtk>27.16</mAtk>
+        <mDef>65.72</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>917</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>172</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="45785ec3-8118-4938-b614-3e3a03dabc5e" chance="0.04" />
+            <item templateId="7d3f4a5b-8c9e-4a01-bc23-4d5e6f708192" chance="0.004" />
+        </loot>
+        <elementalResistances>
+            <HOLY>-50</HOLY>
+            <DARK>30</DARK>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>140</speed>
+        <atkSpd>253</atkSpd>
+        <level>21</level>
+    </monster>
+    <!-- Raging Spartoi (L2 npc 20060, niveau 22, agressif) -->
+    <monster id="215fa1ad-e3cb-54dc-a16a-f0b3201b5c4a">
+        <name>Raging Spartoi</name>
+        <race>UNDEAD</race>
+        <maxHealth>387.03</maxHealth>
+        <pAtk>47.1</pAtk>
+        <pDef>101.92</pDef>
+        <mAtk>29.33</mAtk>
+        <mDef>67.86</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <xpReward>1005</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>185</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="019faec6-116d-723d-b04c-76d51a2a2cb7" chance="0.03" />
+            <item templateId="7d3f4a5b-8c9e-4a01-bc23-4d5e6f708192" chance="0.005" />
+        </loot>
+        <elementalResistances>
+            <HOLY>-50</HOLY>
+            <DARK>30</DARK>
+        </elementalResistances>
+        <aggroRadius>6</aggroRadius>
+        <speed>140</speed>
+        <atkSpd>253</atkSpd>
+        <level>22</level>
+    </monster>
+    <!-- Tumran Bugbear Warrior (L2 npc 20064, niveau 24, agressif) -->
+    <monster id="b9286bb9-7b27-5cde-bab3-ff4d71c24bff">
+        <name>Tumran Bugbear Warrior</name>
+        <race>GIANT</race>
+        <maxHealth>435.34</maxHealth>
+        <pAtk>66.22</pAtk>
+        <pDef>89.83</pDef>
+        <mAtk>49.74</mAtk>
+        <mDef>59.81</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>1145</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>211</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="6c2e3f4a-7b8d-4f90-ab12-3c4d5e6f7081" chance="0.04" />
+            <item templateId="019fcf0d-1f8c-7d43-9e98-a9944b4ccefe" chance="0.01" />
+        </loot>
+        <aggroRadius>6</aggroRadius>
+        <speed>130</speed>
+        <atkSpd>253</atkSpd>
+        <level>24</level>
+    </monster>
+    <!-- Soul Scavenger (L2 npc 25369, niveau 25, boss de raid) -->
+    <monster id="d330c90e-943f-5e96-8fd9-2602887c70ea">
+        <name>Soul Scavenger</name>
+        <race>UNDEAD</race>
+        <maxHealth>43316.3</maxHealth>
+        <pAtk>74.22</pAtk>
+        <pDef>305.51</pDef>
+        <mAtk>4.68</mAtk>
+        <mDef>149.04</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>-18</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>127051</xpReward>
+        <attributes>
+            <STR>60</STR>
+            <DEX>73</DEX>
+            <CON>57</CON>
+            <INT>76</INT>
+            <WIT>70</WIT>
+            <MEN>80</MEN>
+        </attributes>
+        <loot>
+            <gold>5000</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="7ad6443f-65cf-4761-b894-5fa8dc859e2e" chance="0.35" />
+            <item templateId="84349095-9c39-49e4-9f0a-1819dc7d1748" chance="0.2" />
+            <item templateId="3b1d09c8-a3ec-4159-9f7d-403754c5ef39" chance="0.3" />
+            <item templateId="40c0606e-29cc-448e-8906-8e229f0d5079" chance="0.25" />
+            <item templateId="f9083584-d5af-458c-bb9b-3ee7714452e3" chance="0.5" />
+        </loot>
+        <elementalResistances>
+            <HOLY>-50</HOLY>
+            <DARK>30</DARK>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>190</speed>
+        <atkSpd>253</atkSpd>
+        <level>25</level>
+    </monster>
+    <!-- Shield Skeleton (L2 npc 20514, niveau 15, passif) -->
+    <monster id="fad45921-b52b-5742-b59e-5992dd430030">
+        <name>Shield Skeleton</name>
+        <race>UNDEAD</race>
+        <maxHealth>246.95</maxHealth>
+        <pAtk>32.58</pAtk>
+        <pDef>66.93</pDef>
+        <mAtk>24.47</mAtk>
+        <mDef>44.56</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>534</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>105</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="019fcf0d-1f8f-7d01-8e4f-fd592812a1a7" chance="0.04" />
+            <item templateId="f3c8a065-ac0d-4913-9774-41098a6e088d" chance="0.04" />
+        </loot>
+        <elementalResistances>
+            <HOLY>-50</HOLY>
+            <DARK>30</DARK>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>140</speed>
+        <atkSpd>253</atkSpd>
+        <level>15</level>
+    </monster>
+    <!-- Skeleton Infantryman (L2 npc 20515, niveau 16, passif) -->
+    <monster id="3d884f61-5374-542f-93e0-630a9d9e0667">
+        <name>Skeleton Infantryman</name>
+        <race>UNDEAD</race>
+        <maxHealth>264.34</maxHealth>
+        <pAtk>35.38</pAtk>
+        <pDef>69.24</pDef>
+        <mAtk>26.58</mAtk>
+        <mDef>46.1</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>570</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>115</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="8a692c7f-8461-4994-ab61-69d0079ed3fc" chance="0.05" />
+        </loot>
+        <elementalResistances>
+            <HOLY>-50</HOLY>
+            <DARK>30</DARK>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>140</speed>
+        <atkSpd>253</atkSpd>
+        <level>16</level>
+    </monster>
+    <!-- Ruin Imp (L2 npc 20506, niveau 17, passif) -->
+    <monster id="de809447-0f18-515c-87a0-b53109c7b749">
+        <name>Ruin Imp</name>
+        <race>FAIRY</race>
+        <maxHealth>282.57</maxHealth>
+        <pAtk>38.39</pAtk>
+        <pDef>71.6</pDef>
+        <mAtk>28.84</mAtk>
+        <mDef>47.67</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>605</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>126</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="bedb6df2-7bab-443c-8a3c-e97b9150d977" chance="0.02" />
+        </loot>
+        <elementalResistances>
+            <WIND>15</WIND>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>80</speed>
+        <atkSpd>253</atkSpd>
+        <level>17</level>
+    </monster>
+    <!-- Scavenger Bat (L2 npc 20411, niveau 18, passif) -->
+    <monster id="5f0ee501-903d-5469-9d21-3b1ac12918ab">
+        <name>Scavenger Bat</name>
+        <race>ANIMAL</race>
+        <maxHealth>301.67</maxHealth>
+        <pAtk>41.61</pAtk>
+        <pDef>74.03</pDef>
+        <mAtk>31.26</mAtk>
+        <mDef>49.29</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>640</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>137</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="b0bc4f00-8f9f-44a4-9b7f-0095ab837218" chance="0.03" />
+        </loot>
+        <elementalResistances>
+            <WIND>-25</WIND>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>80</speed>
+        <atkSpd>253</atkSpd>
+        <level>18</level>
+    </monster>
+    <!-- Zombie Soldier (L2 npc 20457, niveau 19, passif) -->
+    <monster id="8271cbcb-212b-53ee-84de-6b8efc879ea1">
+        <name>Zombie Soldier</name>
+        <race>UNDEAD</race>
+        <maxHealth>321.64</maxHealth>
+        <pAtk>45.07</pAtk>
+        <pDef>76.51</pDef>
+        <mAtk>33.85</mAtk>
+        <mDef>108.6</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>958</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>148</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="019faec6-116d-723d-b04c-76d51a2a2cb7" chance="0.03" />
+            <item templateId="019fcf0d-1f8c-7d43-9e98-a9944b4ccefe" chance="0.008" />
+        </loot>
+        <elementalResistances>
+            <HOLY>-50</HOLY>
+            <DARK>30</DARK>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>15</speed>
+        <atkSpd>253</atkSpd>
+        <level>19</level>
+    </monster>
+    <!-- Ruin Bat (L2 npc 20505, niveau 20, passif) -->
+    <monster id="54d7d93c-438f-55d6-a6e4-75f081821535">
+        <name>Ruin Bat</name>
+        <race>ANIMAL</race>
+        <maxHealth>342.51</maxHealth>
+        <pAtk>48.76</pAtk>
+        <pDef>79.05</pDef>
+        <mAtk>36.63</mAtk>
+        <mDef>52.63</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>712</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>160</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="001d1121-6760-4831-83a3-a72b126f79f3" chance="0.02" />
+        </loot>
+        <elementalResistances>
+            <WIND>-25</WIND>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>80</speed>
+        <atkSpd>253</atkSpd>
+        <level>20</level>
+    </monster>
+    <!-- Ruin Imp Elder (L2 npc 20507, niveau 21, agressif) -->
+    <monster id="11243475-243b-5cb2-9a16-6a17f8cdefd3">
+        <name>Ruin Imp Elder</name>
+        <race>FAIRY</race>
+        <maxHealth>364.3</maxHealth>
+        <pAtk>52.71</pAtk>
+        <pDef>81.65</pDef>
+        <mAtk>39.59</mAtk>
+        <mDef>54.37</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>935</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>172</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="ac9fe757-ab75-47ef-b413-8844d5c5ed73" chance="0.02" />
+            <item templateId="57201423-ae58-4cb7-a6c4-9bf856a76d4a" chance="0.02" />
+        </loot>
+        <elementalResistances>
+            <WIND>15</WIND>
+        </elementalResistances>
+        <aggroRadius>6</aggroRadius>
+        <speed>80</speed>
+        <atkSpd>253</atkSpd>
+        <level>21</level>
+    </monster>
+    <!-- Zombie Warrior (L2 npc 20458, niveau 22, agressif) -->
+    <monster id="b09908f3-6346-5cee-af52-467a9ad455e9">
+        <name>Zombie Warrior</name>
+        <race>UNDEAD</race>
+        <maxHealth>387.03</maxHealth>
+        <pAtk>56.93</pAtk>
+        <pDef>84.32</pDef>
+        <mAtk>42.76</mAtk>
+        <mDef>119.68</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>1421</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>185</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="019fcf0d-1f8c-7d43-9e98-a9944b4ccefe" chance="0.01" />
+            <item templateId="019faec6-116d-723d-b04c-76d51a2a2cb7" chance="0.004" />
+        </loot>
+        <elementalResistances>
+            <HOLY>-50</HOLY>
+            <DARK>30</DARK>
+        </elementalResistances>
+        <aggroRadius>6</aggroRadius>
+        <speed>15</speed>
+        <atkSpd>253</atkSpd>
+        <level>22</level>
+    </monster>
+    <!-- Veelan Bugbear (L2 npc 20401, niveau 23, passif) -->
+    <monster id="1b471703-1e6c-52a2-b22f-709ed9ea9033">
+        <name>Veelan Bugbear</name>
+        <race>GIANT</race>
+        <maxHealth>410.7</maxHealth>
+        <pAtk>50.82</pAtk>
+        <pDef>105.21</pDef>
+        <mAtk>31.65</mAtk>
+        <mDef>70.05</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>1054</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>198</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="6c2e3f4a-7b8d-4f90-ab12-3c4d5e6f7081" chance="0.04" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>130</speed>
+        <atkSpd>253</atkSpd>
+        <level>23</level>
+    </monster>
+    <!-- Veelan Bugbear Warrior (L2 npc 20402, niveau 24, agressif) -->
+    <monster id="dbceafd4-03fe-524c-b160-e3cd999f6022">
+        <name>Veelan Bugbear Warrior</name>
+        <race>GIANT</race>
+        <maxHealth>435.34</maxHealth>
+        <pAtk>66.22</pAtk>
+        <pDef>89.83</pDef>
+        <mAtk>49.74</mAtk>
+        <mDef>59.81</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>1145</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>211</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="5b1f2d3e-6a7c-4e8f-9a01-2b3c4d5e6f70" chance="0.04" />
+            <item templateId="019fcf0d-1f8c-7d43-9e98-a9944b4ccefe" chance="0.01" />
+        </loot>
+        <aggroRadius>6</aggroRadius>
+        <speed>130</speed>
+        <atkSpd>253</atkSpd>
+        <level>24</level>
+    </monster>
+    <!-- Zombie Lord Crowl (L2 npc 25149, niveau 25, boss de raid) -->
+    <monster id="452f7ab0-7715-50b2-b39c-ad80af7d3ad7">
+        <name>Zombie Lord Crowl</name>
+        <race>UNDEAD</race>
+        <maxHealth>43316.3</maxHealth>
+        <pAtk>74.22</pAtk>
+        <pDef>305.51</pDef>
+        <mAtk>4.68</mAtk>
+        <mDef>149.04</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>-18</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>127051</xpReward>
+        <attributes>
+            <STR>60</STR>
+            <DEX>73</DEX>
+            <CON>57</CON>
+            <INT>76</INT>
+            <WIT>70</WIT>
+            <MEN>80</MEN>
+        </attributes>
+        <loot>
+            <gold>5000</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="84349095-9c39-49e4-9f0a-1819dc7d1748" chance="0.25" />
+            <item templateId="019fcf0d-1f8d-7c4c-9275-33c4af4410a8" chance="0.15" />
+            <item templateId="3ca4de84-6813-4846-9fe7-9dfb3c245aa9" chance="0.3" />
+            <item templateId="5da404a5-8f6e-4b67-9d06-556efdbddbd3" chance="0.2" />
+            <item templateId="f9083584-d5af-458c-bb9b-3ee7714452e3" chance="0.5" />
+        </loot>
+        <elementalResistances>
+            <HOLY>-50</HOLY>
+            <DARK>30</DARK>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>190</speed>
+        <atkSpd>253</atkSpd>
+        <level>25</level>
+    </monster>
+    <!-- Giant Mist Leech (L2 npc 20225, niveau 25, passif) -->
+    <monster id="604a0517-20b8-5c98-9f97-798eb49e7826">
+        <name>Giant Mist Leech</name>
+        <race>BUG</race>
+        <maxHealth>460.96</maxHealth>
+        <pAtk>64.83</pAtk>
+        <pDef>101.84</pDef>
+        <mAtk>44.27</mAtk>
+        <mDef>67.8</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>1190</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>225</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518" chance="0.02" />
+        </loot>
+        <elementalResistances>
+            <FIRE>-25</FIRE>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>110</speed>
+        <atkSpd>253</atkSpd>
+        <level>25</level>
+    </monster>
+    <!-- Gray Ant (L2 npc 20226, niveau 26, passif) -->
+    <monster id="af21daea-e695-5006-b64d-de1b34d57f1f">
+        <name>Gray Ant</name>
+        <race>BUG</race>
+        <maxHealth>487.57</maxHealth>
+        <pAtk>63.48</pAtk>
+        <pDef>115.53</pDef>
+        <mAtk>39.54</mAtk>
+        <mDef>76.92</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>1268</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>239</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="019faec6-116d-723d-b04c-76d51a2a2cb7" chance="0.02" />
+        </loot>
+        <elementalResistances>
+            <FIRE>-25</FIRE>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>130</speed>
+        <atkSpd>253</atkSpd>
+        <level>26</level>
+    </monster>
+    <!-- Horror Mist Ripper (L2 npc 20227, niveau 27, agressif) -->
+    <monster id="b975cfc3-f4a4-58d5-83a4-48504ec57715">
+        <name>Horror Mist Ripper</name>
+        <race>UNDEAD</race>
+        <maxHealth>515.18</maxHealth>
+        <pAtk>82.49</pAtk>
+        <pDef>98.54</pDef>
+        <mAtk>61.96</mAtk>
+        <mDef>65.61</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>1349</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>254</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="57201423-ae58-4cb7-a6c4-9bf856a76d4a" chance="0.02" />
+        </loot>
+        <elementalResistances>
+            <HOLY>-50</HOLY>
+            <DARK>30</DARK>
+        </elementalResistances>
+        <aggroRadius>6</aggroRadius>
+        <speed>100</speed>
+        <atkSpd>253</atkSpd>
+        <level>27</level>
+    </monster>
+    <!-- Giant Crimson Ant (L2 npc 20228, niveau 28, passif) -->
+    <monster id="f0c0c125-7a93-588f-bd7c-d48884b9b3a2">
+        <name>Giant Crimson Ant</name>
+        <race>BUG</race>
+        <maxHealth>543.8</maxHealth>
+        <pAtk>88.59</pAtk>
+        <pDef>101.57</pDef>
+        <mAtk>66.55</mAtk>
+        <mDef>67.63</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>1555</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>269</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518" chance="0.01" />
+        </loot>
+        <elementalResistances>
+            <FIRE>-25</FIRE>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>130</speed>
+        <atkSpd>253</atkSpd>
+        <level>28</level>
+    </monster>
+    <!-- Marsh Stakato (L2 npc 20157, niveau 29, agressif) -->
+    <monster id="09941f01-9b22-5c0c-9443-157318319382">
+        <name>Marsh Stakato</name>
+        <race>HUMANOID</race>
+        <maxHealth>573.43</maxHealth>
+        <pAtk>95.06</pAtk>
+        <pDef>104.66</pDef>
+        <mAtk>71.41</mAtk>
+        <mDef>69.68</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <xpReward>1811</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>284</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="001d1121-6760-4831-83a3-a72b126f79f3" chance="0.008" />
+            <item templateId="ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd" chance="0.03" />
+        </loot>
+        <elementalResistances>
+            <FIRE>-25</FIRE>
+        </elementalResistances>
+        <aggroRadius>6</aggroRadius>
+        <speed>120</speed>
+        <atkSpd>253</atkSpd>
+        <level>29</level>
+    </monster>
+    <!-- Stinger Wasp (L2 npc 20229, niveau 30, agressif) -->
+    <monster id="67211bd0-25ff-55fc-b20a-4236119d0c10">
+        <name>Stinger Wasp</name>
+        <race>BUG</race>
+        <maxHealth>604.08</maxHealth>
+        <pAtk>84.3</pAtk>
+        <pDef>130.31</pDef>
+        <mAtk>52.51</mAtk>
+        <mDef>86.76</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>1744</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>300</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="40c0606e-29cc-448e-8906-8e229f0d5079" chance="0.004" />
+        </loot>
+        <elementalResistances>
+            <FIRE>-25</FIRE>
+        </elementalResistances>
+        <aggroRadius>6</aggroRadius>
+        <speed>90</speed>
+        <atkSpd>253</atkSpd>
+        <level>30</level>
+    </monster>
+    <!-- Marsh Stakato Worker (L2 npc 20230, niveau 31, passif) -->
+    <monster id="26d564e5-5191-5ce1-bb8a-125755000940">
+        <name>Marsh Stakato Worker</name>
+        <race>HUMANOID</race>
+        <maxHealth>635.76</maxHealth>
+        <pAtk>99.22</pAtk>
+        <pDef>121.99</pDef>
+        <mAtk>67.75</mAtk>
+        <mDef>81.22</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>1995</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>316</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="9c4f5d6b-1e7a-4b0d-8f5c-4d6a8b0c2e4f" chance="0.008" />
+            <item templateId="019fcf0d-1f8c-7d43-9e98-a9944b4ccefe" chance="0.015" />
+        </loot>
+        <elementalResistances>
+            <FIRE>-25</FIRE>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>140</speed>
+        <atkSpd>253</atkSpd>
+        <level>31</level>
+    </monster>
+    <!-- Toad Lord (L2 npc 20231, niveau 32, passif) -->
+    <monster id="52f5142a-d107-5abe-bf9f-423f93df3bd1">
+        <name>Toad Lord</name>
+        <race>ANIMAL</race>
+        <maxHealth>668.47</maxHealth>
+        <pAtk>96.61</pAtk>
+        <pDef>138.13</pDef>
+        <mAtk>60.17</mAtk>
+        <mDef>91.97</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>1946</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>333</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="9c4f5d6b-1e7a-4b0d-8f5c-4d6a8b0c2e4f" chance="0.01" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>100</speed>
+        <atkSpd>253</atkSpd>
+        <level>32</level>
+    </monster>
+    <!-- Marsh Stakato Soldier (L2 npc 20232, niveau 33, passif) -->
+    <monster id="73cff337-3159-5f55-b51a-7f0c5242512c">
+        <name>Marsh Stakato Soldier</name>
+        <race>HUMANOID</race>
+        <maxHealth>702.2</maxHealth>
+        <pAtk>103.28</pAtk>
+        <pDef>142.15</pDef>
+        <mAtk>64.32</mAtk>
+        <mDef>94.65</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <xpReward>1900</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>350</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="7ad6443f-65cf-4761-b894-5fa8dc859e2e" chance="0.004" />
+            <item templateId="019fe3f6-b1ef-786d-bc17-46dd46660eb0" chance="0.004" />
+        </loot>
+        <elementalResistances>
+            <FIRE>-25</FIRE>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>155</speed>
+        <atkSpd>253</atkSpd>
+        <level>33</level>
+    </monster>
+    <!-- Marsh Spider (L2 npc 20233, niveau 34, agressif) -->
+    <monster id="4dee2069-5773-5a38-8aa2-6c2aee81c11d">
+        <name>Marsh Spider</name>
+        <race>BUG</race>
+        <maxHealth>736.96</maxHealth>
+        <pAtk>121.21</pAtk>
+        <pDef>132.95</pDef>
+        <mAtk>82.77</mAtk>
+        <mDef>88.52</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>2241</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>367</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="8b3e4c5a-0d6f-4a9c-9e4b-3c5f7a9b1d3e" chance="0.004" />
+        </loot>
+        <elementalResistances>
+            <FIRE>-25</FIRE>
+        </elementalResistances>
+        <aggroRadius>6</aggroRadius>
+        <speed>140</speed>
+        <atkSpd>253</atkSpd>
+        <level>34</level>
+    </monster>
+    <!-- Marsh Stakato Drone (L2 npc 20234, niveau 35, agressif) -->
+    <monster id="d39ecf0a-1579-5138-80f3-5845ae45aff4">
+        <name>Marsh Stakato Drone</name>
+        <race>HUMANOID</race>
+        <maxHealth>772.74</maxHealth>
+        <pAtk>142.26</pAtk>
+        <pDef>124.42</pDef>
+        <mAtk>106.86</mAtk>
+        <mDef>82.84</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <xpReward>2267</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>385</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="21a73422-e8ee-49ba-8137-05b49a5dbea5" chance="0.003" />
+            <item templateId="5da404a5-8f6e-4b67-9d06-556efdbddbd3" chance="0.004" />
+        </loot>
+        <elementalResistances>
+            <FIRE>-25</FIRE>
+        </elementalResistances>
+        <aggroRadius>6</aggroRadius>
+        <speed>174</speed>
+        <atkSpd>253</atkSpd>
+        <level>35</level>
+    </monster>
+    <!-- Stakato Queen Zyrnna (L2 npc 25023, niveau 34, boss de raid) -->
+    <monster id="d6cc26ce-08cc-52ea-af82-462d09635a24">
+        <name>Stakato Queen Zyrnna</name>
+        <race>HUMANOID</race>
+        <maxHealth>87403</maxHealth>
+        <pAtk>284.02</pAtk>
+        <pDef>398.85</pDef>
+        <mAtk>41.78</mAtk>
+        <mDef>194.58</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>-18</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>115829</xpReward>
+        <attributes>
+            <STR>60</STR>
+            <DEX>73</DEX>
+            <CON>57</CON>
+            <INT>76</INT>
+            <WIT>70</WIT>
+            <MEN>80</MEN>
+        </attributes>
+        <loot>
+            <gold>6800</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="7b732096-7d14-434b-b7d6-1569dd6ee37b" chance="0.15" />
+            <item templateId="2f7c7759-45c8-4652-aea5-f244e1b11fc5" chance="0.2" />
+            <item templateId="019fcf0d-1f8d-7c4c-9275-33c4af4410a8" chance="0.3" />
+            <item templateId="044f02d7-ebcf-4275-8be2-c41a93695f96" chance="0.35" />
+            <item templateId="f9083584-d5af-458c-bb9b-3ee7714452e3" chance="0.6" />
+        </loot>
+        <elementalResistances>
+            <FIRE>-25</FIRE>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>170</speed>
+        <atkSpd>253</atkSpd>
+        <level>34</level>
+    </monster>
+    <!-- Maille Lizardman (L2 npc 20919, niveau 20, passif) -->
+    <monster id="017a86a7-b167-5f63-832e-2c8bc1bfd60a">
+        <name>Maille Lizardman</name>
+        <race>HUMANOID</race>
+        <maxHealth>171.26</maxHealth>
+        <pAtk>44.33</pAtk>
+        <pDef>86.87</pDef>
+        <mAtk>30.27</mAtk>
+        <mDef>57.84</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>320</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>160</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="5b1f2d3e-6a7c-4e8f-9a01-2b3c4d5e6f70" chance="0.03" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>130</speed>
+        <atkSpd>253</atkSpd>
+        <level>20</level>
+    </monster>
+    <!-- Maille Lizardman Scout (L2 npc 20920, niveau 22, passif) -->
+    <monster id="3bdc2d3d-e723-5696-8c86-643e4e6921a4">
+        <name>Maille Lizardman Scout</name>
+        <race>HUMANOID</race>
+        <maxHealth>193.51</maxHealth>
+        <pAtk>51.75</pAtk>
+        <pDef>92.66</pDef>
+        <mAtk>35.34</mAtk>
+        <mDef>61.69</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <xpReward>712</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>185</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="3c966b19-8f40-4791-9dd7-3a489f090f7b" chance="0.04" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>130</speed>
+        <atkSpd>253</atkSpd>
+        <level>22</level>
+    </monster>
+    <!-- Maille Lizardman Guard (L2 npc 20921, niveau 24, agressif) -->
+    <monster id="ea1d0442-15ea-5102-bdcd-601edf5939ca">
+        <name>Maille Lizardman Guard</name>
+        <race>HUMANOID</race>
+        <maxHealth>217.67</maxHealth>
+        <pAtk>60.2</pAtk>
+        <pDef>98.71</pDef>
+        <mAtk>41.11</mAtk>
+        <mDef>65.72</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>515</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>211</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="5b1f2d3e-6a7c-4e8f-9a01-2b3c4d5e6f70" chance="0.04" />
+            <item templateId="6c2e3f4a-7b8d-4f90-ab12-3c4d5e6f7081" chance="0.003" />
+        </loot>
+        <aggroRadius>6</aggroRadius>
+        <speed>130</speed>
+        <atkSpd>253</atkSpd>
+        <level>24</level>
+    </monster>
+    <!-- Giant Araneid (L2 npc 20925, niveau 24, passif) -->
+    <monster id="470b821d-20ee-5da0-9999-de75a9610b43">
+        <name>Giant Araneid</name>
+        <race>BUG</race>
+        <maxHealth>217.67</maxHealth>
+        <pAtk>60.2</pAtk>
+        <pDef>98.71</pDef>
+        <mAtk>41.11</mAtk>
+        <mDef>65.72</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>525</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>211</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518" chance="0.03" />
+        </loot>
+        <elementalResistances>
+            <FIRE>-25</FIRE>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>130</speed>
+        <atkSpd>253</atkSpd>
+        <level>24</level>
+    </monster>
+    <!-- Poison Araneid (L2 npc 20926, niveau 25, passif) -->
+    <monster id="1a89f9fb-4795-5a6f-8c04-f1406f784d28">
+        <name>Poison Araneid</name>
+        <race>BUG</race>
+        <maxHealth>230.48</maxHealth>
+        <pAtk>64.83</pAtk>
+        <pDef>101.84</pDef>
+        <mAtk>44.27</mAtk>
+        <mDef>67.8</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>607</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>225</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518" chance="0.01" />
+        </loot>
+        <elementalResistances>
+            <FIRE>-25</FIRE>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>140</speed>
+        <atkSpd>253</atkSpd>
+        <level>25</level>
+    </monster>
+    <!-- Maille Lizardman Warrior (L2 npc 20922, niveau 26, passif) -->
+    <monster id="0aebd7d2-ab8e-5d92-bb18-8d2a4d892a45">
+        <name>Maille Lizardman Warrior</name>
+        <race>HUMANOID</race>
+        <maxHealth>243.79</maxHealth>
+        <pAtk>69.76</pAtk>
+        <pDef>105.03</pDef>
+        <mAtk>47.64</mAtk>
+        <mDef>69.93</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>570</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>239</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="6c2e3f4a-7b8d-4f90-ab12-3c4d5e6f7081" chance="0.004" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>130</speed>
+        <atkSpd>253</atkSpd>
+        <level>26</level>
+    </monster>
+    <!-- King of the Araneid (L2 npc 20927, niveau 27, agressif) -->
+    <monster id="a27792ad-736b-52f5-b97b-fa254db9b3c5">
+        <name>King of the Araneid</name>
+        <race>BUG</race>
+        <maxHealth>257.59</maxHealth>
+        <pAtk>74.99</pAtk>
+        <pDef>108.29</pDef>
+        <mAtk>51.21</mAtk>
+        <mDef>72.1</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>872</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>254</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="bedb6df2-7bab-443c-8a3c-e97b9150d977" chance="0.01" />
+        </loot>
+        <elementalResistances>
+            <FIRE>-25</FIRE>
+        </elementalResistances>
+        <aggroRadius>6</aggroRadius>
+        <speed>130</speed>
+        <atkSpd>253</atkSpd>
+        <level>27</level>
+    </monster>
+    <!-- Maille Lizardman Shaman (L2 npc 20923, niveau 28, passif) -->
+    <monster id="e7ebc4d6-eb09-5c3a-9363-c29742f541b3">
+        <name>Maille Lizardman Shaman</name>
+        <race>HUMANOID</race>
+        <maxHealth>271.9</maxHealth>
+        <pAtk>80.54</pAtk>
+        <pDef>111.61</pDef>
+        <mAtk>55</mAtk>
+        <mDef>74.31</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>835</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>269</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="ac9fe757-ab75-47ef-b413-8844d5c5ed73" chance="0.03" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>120</speed>
+        <atkSpd>253</atkSpd>
+        <level>28</level>
+    </monster>
+    <!-- Maille Lizardman Matriarch (L2 npc 20924, niveau 30, agressif) -->
+    <monster id="c474826f-4440-58f1-aeb1-e1dd9a66a9e0">
+        <name>Maille Lizardman Matriarch</name>
+        <race>HUMANOID</race>
+        <maxHealth>302.04</maxHealth>
+        <pAtk>92.64</pAtk>
+        <pDef>118.46</pDef>
+        <mAtk>63.26</mAtk>
+        <mDef>78.87</mDef>
+        <accuracyBonus>9</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>1</critBonus>
+        <xpReward>1025</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>300</gold>
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.1" />
+            <item templateId="7c1e9a4b-2d6f-4e8a-9c3b-5f1a7d9b0c2e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.02" />
+            <item templateId="019fe3f6-b1ef-786d-bc17-46dd46660eb0" chance="0.006" />
+            <item templateId="9c4f5d6b-1e7a-4b0d-8f5c-4d6a8b0c2e4f" chance="0.01" />
+        </loot>
+        <aggroRadius>6</aggroRadius>
+        <speed>130</speed>
+        <atkSpd>253</atkSpd>
+        <level>30</level>
+    </monster>
+    <!-- Ratman Spy (L2 npc 20360, niveau 16, passif) -->
+    <monster id="b4059949-d39a-5e50-8eb9-0fdada3095e1">
+        <name>Ratman Spy</name>
+        <race>HUMANOID</race>
+        <maxHealth>264.34</maxHealth>
+        <pAtk>35.38</pAtk>
+        <pDef>69.24</pDef>
+        <mAtk>26.58</mAtk>
+        <mDef>46.1</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <xpReward>570</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>115</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd" chance="0.04" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>120</speed>
+        <atkSpd>253</atkSpd>
+        <level>16</level>
+    </monster>
+    <!-- Pinrul (L2 npc 20032, niveau 17, passif) -->
+    <monster id="0312364c-5b30-5367-840f-405cf2d3fcba">
+        <name>Pinrul</name>
+        <race>BUG</race>
+        <maxHealth>282.57</maxHealth>
+        <pAtk>38.39</pAtk>
+        <pDef>71.6</pDef>
+        <mAtk>28.84</mAtk>
+        <mDef>47.67</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>605</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>126</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="153c7ce9-f976-45c5-ab58-5b5f42665e68" chance="0.03" />
+        </loot>
+        <elementalResistances>
+            <FIRE>-25</FIRE>
+        </elementalResistances>
+        <aggroRadius>0</aggroRadius>
+        <speed>130</speed>
+        <atkSpd>253</atkSpd>
+        <level>17</level>
+    </monster>
+    <!-- Bugbear Raider (L2 npc 20775, niveau 17, agressif) -->
+    <monster id="febebf61-a51e-53a4-9db0-6b4070a8e52c">
+        <name>Bugbear Raider</name>
+        <race>GIANT</race>
+        <maxHealth>282.57</maxHealth>
+        <pAtk>38.39</pAtk>
+        <pDef>71.6</pDef>
+        <mAtk>28.84</mAtk>
+        <mDef>47.67</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>599</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>126</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="6c2e3f4a-7b8d-4f90-ab12-3c4d5e6f7081" chance="0.03" />
+        </loot>
+        <aggroRadius>6</aggroRadius>
+        <speed>130</speed>
+        <atkSpd>253</atkSpd>
+        <level>17</level>
+    </monster>
+    <!-- Ratman Hunter (L2 npc 20358, niveau 18, passif) -->
+    <monster id="ae47b62a-16af-597e-a9db-0bb4ee5c62ad">
+        <name>Ratman Hunter</name>
+        <race>HUMANOID</race>
+        <maxHealth>301.67</maxHealth>
+        <pAtk>34.42</pAtk>
+        <pDef>89.48</pDef>
+        <mAtk>21.44</mAtk>
+        <mDef>59.58</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <xpReward>640</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>137</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518" chance="0.02" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>120</speed>
+        <atkSpd>253</atkSpd>
+        <level>18</level>
+    </monster>
+    <!-- Ratman Sub Chieftain (L2 npc 21093, niveau 19, agressif) -->
+    <monster id="ba868ae6-1f94-5d61-8f05-987047b92783">
+        <name>Ratman Sub Chieftain</name>
+        <race>HUMANOID</race>
+        <maxHealth>321.64</maxHealth>
+        <pAtk>45.07</pAtk>
+        <pDef>76.51</pDef>
+        <mAtk>33.85</mAtk>
+        <mDef>50.94</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>691</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>148</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="45785ec3-8118-4938-b614-3e3a03dabc5e" chance="0.03" />
+        </loot>
+        <aggroRadius>6</aggroRadius>
+        <speed>150</speed>
+        <atkSpd>253</atkSpd>
+        <level>19</level>
+    </monster>
+    <!-- Ratman Chieftain (L2 npc 21094, niveau 20, passif) -->
+    <monster id="dddb1094-eece-5d20-af65-8253da94cfe7">
+        <name>Ratman Chieftain</name>
+        <race>HUMANOID</race>
+        <maxHealth>342.51</maxHealth>
+        <pAtk>40.34</pAtk>
+        <pDef>95.56</pDef>
+        <mAtk>25.12</mAtk>
+        <mDef>63.62</mDef>
+        <accuracyBonus>4.75</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <xpReward>712</xpReward>
+        <attributes>
+            <STR>40</STR>
+            <DEX>30</DEX>
+            <CON>43</CON>
+            <INT>21</INT>
+            <WIT>20</WIT>
+            <MEN>20</MEN>
+        </attributes>
+        <loot>
+            <gold>160</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="45785ec3-8118-4938-b614-3e3a03dabc5e" chance="0.003" />
+            <item templateId="019faec6-116d-723d-b04c-76d51a2a2cb7" chance="0.03" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>155</speed>
+        <atkSpd>253</atkSpd>
+        <level>20</level>
+    </monster>
+    <!-- Sukar Wererat Chief (L2 npc 25357, niveau 21, boss de raid) -->
+    <monster id="24f68ef9-2c4a-5611-bf7d-309716445593">
+        <name>Sukar Wererat Chief</name>
+        <race>HUMANOID</race>
+        <maxHealth>37886.5</maxHealth>
+        <pAtk>53.13</pAtk>
+        <pDef>269.19</pDef>
+        <mAtk>3.17</mAtk>
+        <mDef>131.32</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>-18</evasionBonus>
+        <critBonus>8</critBonus>
+        <xpReward>132318</xpReward>
+        <attributes>
+            <STR>60</STR>
+            <DEX>73</DEX>
+            <CON>57</CON>
+            <INT>76</INT>
+            <WIT>70</WIT>
+            <MEN>80</MEN>
+        </attributes>
+        <loot>
+            <gold>4200</gold>
+            <item templateId="019fa0a5-80bf-7e84-87bf-5cf699c00315" chance="0.12" />
+            <item templateId="6aeb7483-2694-4388-8c6b-f841fd5e48b4" chance="0.03" />
+            <item templateId="3a4a5836-051e-4641-aef8-7b6e6792322e" chance="0.05" />
+            <item templateId="5d6ae0ed-efda-412b-94b4-98677e2c8946" chance="0.01" />
+            <item templateId="7ad6443f-65cf-4761-b894-5fa8dc859e2e" chance="0.3" />
+            <item templateId="019fcf0d-1f8c-7d43-9e98-a9944b4ccefe" chance="0.4" />
+            <item templateId="40c0606e-29cc-448e-8906-8e229f0d5079" chance="0.2" />
+            <item templateId="f9083584-d5af-458c-bb9b-3ee7714452e3" chance="0.4" />
+        </loot>
+        <aggroRadius>0</aggroRadius>
+        <speed>190</speed>
+        <atkSpd>253</atkSpd>
+        <level>21</level>
+    </monster>
+    <!-- ===== Fin des fiches générées ===== -->
 </monsters>

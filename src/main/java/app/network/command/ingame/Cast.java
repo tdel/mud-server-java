@@ -16,7 +16,10 @@ import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.Usage;
 import app.network.message.ingame.NoTargetSelected;
+import app.network.message.ingame.CannotActNow;
 import app.network.message.ingame.NotEnoughMana;
+import app.network.message.ingame.SkillConditionFailed;
+import app.network.message.ingame.ToggleDeactivated;
 import app.network.message.ingame.SkillNotKnown;
 import app.network.message.ingame.SkillOnCooldown;
 import app.network.message.ingame.SkillOutOfRange;
@@ -95,6 +98,12 @@ public class Cast implements CommandHandler {
                 connection.send(new NotEnoughMana(skillName, required, current));
             case SkillSystem.CastRequestOutcome.WeaponRequired(var skillName, var weaponTypes) ->
                 connection.send(new SkillWeaponRequired(skillName, weaponTypes));
+            case SkillSystem.CastRequestOutcome.Incapacitated ignored ->
+                connection.send(new CannotActNow("Vous ne pouvez pas lancer de sort dans cet état."));
+            case SkillSystem.CastRequestOutcome.ConditionFailed(var skillName, var reason) ->
+                connection.send(new SkillConditionFailed(skillName, reason));
+            case SkillSystem.CastRequestOutcome.ToggledOff(var skillName) ->
+                connection.send(new ToggleDeactivated(skillName, false));
         }
     }
 }

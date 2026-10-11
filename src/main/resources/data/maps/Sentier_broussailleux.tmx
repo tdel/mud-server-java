@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="60" height="32" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="4">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="60" height="32" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="15">
  <properties>
   <property name="id" value="8203e5a0-9fa2-4799-a6d8-398b11292c17"/>
   <property name="name" value="Sentier broussailleux"/>
@@ -85,6 +85,73 @@
          <property name="targetMapId" value="7f55fd0c-23f8-4a3b-82a2-95a79bdbf2b5"/>
          <property name="targetX" type="float" value="192.0"/>
          <property name="targetY" type="float" value="576.0"/>
+   </properties>
+  </object>
+  <object id="4" name="zone:Sentier_Loups" type="monsterSpawn" x="624.0" y="400.0">
+   <properties>
+    <property name="templateId" value="a5d41623-ef47-595b-9907-2e1f95f74f5e"/>
+    <property name="spawnGroup" value="Sentier_Loups"/>
+   </properties>
+  </object>
+  <object id="5" name="zone:Sentier_Loups" type="monsterSpawn" x="624.0" y="624.0">
+   <properties>
+    <property name="templateId" value="07b2080c-005f-5f49-8f75-7a91217779d4"/>
+    <property name="spawnGroup" value="Sentier_Loups"/>
+   </properties>
+  </object>
+  <object id="6" name="zone:Sentier_Loups" type="monsterSpawn" x="912.0" y="752.0">
+   <properties>
+    <property name="templateId" value="a24a1968-4d75-5194-901a-80868655a1f4"/>
+    <property name="spawnGroup" value="Sentier_Loups"/>
+   </properties>
+  </object>
+  <object id="7" name="zone:Sentier_Loups" type="monsterSpawn" x="1296.0" y="464.0">
+   <properties>
+    <property name="templateId" value="917b0780-9d63-5e51-861e-138e69e79dc1"/>
+    <property name="spawnGroup" value="Sentier_Loups"/>
+   </properties>
+  </object>
+  <object id="8" name="zone:Sentier_Loups" type="monsterSpawn" x="144.0" y="848.0">
+   <properties>
+    <property name="templateId" value="917b0780-9d63-5e51-861e-138e69e79dc1"/>
+    <property name="spawnGroup" value="Sentier_Loups"/>
+   </properties>
+  </object>
+  <object id="9" name="zone:Sentier_Loups" type="monsterSpawn" x="304.0" y="272.0">
+   <properties>
+    <property name="templateId" value="a24a1968-4d75-5194-901a-80868655a1f4"/>
+    <property name="spawnGroup" value="Sentier_Loups"/>
+   </properties>
+  </object>
+  <object id="10" name="zone:Sentier_Loups" type="monsterSpawn" x="1712.0" y="208.0">
+   <properties>
+    <property name="templateId" value="a5d41623-ef47-595b-9907-2e1f95f74f5e"/>
+    <property name="spawnGroup" value="Sentier_Loups"/>
+   </properties>
+  </object>
+  <object id="11" name="zone:Sentier_Loups" type="monsterSpawn" x="624.0" y="720.0">
+   <properties>
+    <property name="templateId" value="a5d41623-ef47-595b-9907-2e1f95f74f5e"/>
+    <property name="spawnGroup" value="Sentier_Loups"/>
+   </properties>
+  </object>
+  <object id="12" name="zone:Sentier_Loups" type="monsterSpawn" x="1488.0" y="752.0">
+   <properties>
+    <property name="templateId" value="917b0780-9d63-5e51-861e-138e69e79dc1"/>
+    <property name="spawnGroup" value="Sentier_Loups"/>
+   </properties>
+  </object>
+  <object id="13" name="zone:Sentier_Loups" type="monsterSpawn" x="1584.0" y="784.0">
+   <properties>
+    <property name="templateId" value="a24a1968-4d75-5194-901a-80868655a1f4"/>
+    <property name="spawnGroup" value="Sentier_Loups"/>
+   </properties>
+  </object>
+  <object id="14" name="zone:Sentier_Loups" type="monsterSpawnGroup" x="0.0" y="0.0">
+   <properties>
+    <property name="groupId" value="Sentier_Loups"/>
+    <property name="maxMonsters" type="int" value="10"/>
+    <property name="respawnDelaySeconds" type="int" value="30"/>
    </properties>
   </object>
  </objectgroup>

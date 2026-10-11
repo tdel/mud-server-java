@@ -17,8 +17,9 @@ public final class DialogueSystem {
 
     public enum NpcDialogueOptionType {
         // SKILL_LEARN : ouvre la liste des compétences à apprendre (commande
-        // skill-list, PNJ de type SKILL_LEARNER uniquement).
-        RESPONSE, SHOP, SKILL_LEARN, LEAVE
+        // skill-list, PNJ de type SKILL_LEARNER uniquement) ; CLASS_CHANGE : la
+        // fenêtre de changement de profession (commande class-list, même PNJ).
+        RESPONSE, SHOP, SKILL_LEARN, CLASS_CHANGE, LEAVE
     }
 
     public record NpcDialogue(String greeting, List<NpcDialogueOption> options) {

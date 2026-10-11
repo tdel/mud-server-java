@@ -18,8 +18,9 @@ import java.util.concurrent.ThreadLocalRandom;
 public class MapTemplate {
 
     // Arrivée d'un Scroll of Escape : case au hasard à moins de ce rayon (en
-    // cases) du playerSpawn — le cœur de la ville (la Place du village a ses
-    // remparts à ~26 cases du spawn), jamais dans la campagne alentour.
+    // cases) du playerSpawn — le cœur de la ville (la Town of Gludio a ses
+    // remparts à ~40 cases du spawn, sur sa grand-place), jamais dans la
+    // campagne alentour.
     private static final int TOWN_SCATTER_RADIUS_CELLS = 20;
     // Même garde que TiledMapLoader.MIN_SPAWN_PORTAL_DISTANCE : ne jamais
     // arriver sur (ou tout contre) un téléporteur.

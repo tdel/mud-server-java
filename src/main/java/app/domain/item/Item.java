@@ -72,20 +72,30 @@ public class Item {
         return equipment().getWeaponType();
     }
 
+    // Enchantement : règles L2 (CombatFormulas.enchantPAtk/enchantMAtk/
+    // enchantDefense), selon le grade et la tenue de l'arme.
     public int getPAtk() {
-        return CombatFormulas.enchantBonus(equipment().getPAtk(), enchant, CombatFormulas.ENCHANT_ATK_BONUS_PER_LEVEL);
+        return CombatFormulas.enchantPAtk(equipment().getPAtk(), enchant, getGrade(), equipment().getWeaponType());
     }
 
     public int getMAtk() {
-        return CombatFormulas.enchantBonus(equipment().getMAtk(), enchant, CombatFormulas.ENCHANT_ATK_BONUS_PER_LEVEL);
+        return CombatFormulas.enchantMAtk(equipment().getMAtk(), enchant, getGrade());
     }
 
     public int getPDef() {
-        return CombatFormulas.enchantBonus(equipment().getPDef(), enchant, CombatFormulas.ENCHANT_DEF_BONUS_PER_LEVEL);
+        return CombatFormulas.enchantDefense(equipment().getPDef(), enchant);
     }
 
     public int getMDef() {
-        return CombatFormulas.enchantBonus(equipment().getMDef(), enchant, CombatFormulas.ENCHANT_DEF_BONUS_PER_LEVEL);
+        return CombatFormulas.enchantDefense(equipment().getMDef(), enchant);
+    }
+
+    public int getMaxMp() {
+        return equipment().getMaxMp();
+    }
+
+    public boolean isFullArmor() {
+        return template instanceof EquipmentItem equipment && equipment.isFullArmor();
     }
 
     public int getEnchant() {

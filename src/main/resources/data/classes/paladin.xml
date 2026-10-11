@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Arbre de compétences Paladin (L2 High Five, classId 5, classSkillTree L2J) jusqu'au
+     level 40 : playerLevel = level de personnage requis, appris auprès du maître des
+     compétences (PNJ SKILL_LEARNER) une fois la profession choisie. S'ajoute à l'arbre de la
+     classe de base et des professions précédentes (cf. ClassSystem.skillTree).
+     Omis (sans équivalent dans ce jeu) : Vanguard. -->
+<class>
+    <!-- PV/PM et régénération (par tick de 3 s) de base par niveau : lvlUpgainData de
+         stats/chars/baseStats/Paladin.xml (L2J H5), cf. ClassVitals. -->
+    <vitals>
+        <level val="1" hp="80" mp="30" hpRegen="2" mpRegen="0.9" />
+        <level val="2" hp="91.83" mp="35.46" hpRegen="2.05" mpRegen="0.9" />
+        <level val="3" hp="103.79" mp="40.98" hpRegen="2.1" mpRegen="0.9" />
+        <level val="4" hp="115.88" mp="46.56" hpRegen="2.15" mpRegen="0.9" />
+        <level val="5" hp="128.1" mp="52.2" hpRegen="2.2" mpRegen="0.9" />
+        <level val="6" hp="140.45" mp="57.9" hpRegen="2.25" mpRegen="0.9" />
+        <level val="7" hp="152.93" mp="63.66" hpRegen="2.3" mpRegen="0.9" />
+        <level val="8" hp="165.54" mp="69.48" hpRegen="2.35" mpRegen="0.9" />
+        <level val="9" hp="178.28" mp="75.36" hpRegen="2.4" mpRegen="0.9" />
+        <level val="10" hp="191.15" mp="81.3" hpRegen="2.45" mpRegen="0.9" />
+        <level val="11" hp="204.15" mp="87.3" hpRegen="2.5" mpRegen="1.2" />
+        <level val="12" hp="217.28" mp="93.36" hpRegen="2.6" mpRegen="1.2" />
+        <level val="13" hp="230.54" mp="99.48" hpRegen="2.7" mpRegen="1.2" />
+        <level val="14" hp="243.93" mp="105.66" hpRegen="2.8" mpRegen="1.2" />
+        <level val="15" hp="257.45" mp="111.9" hpRegen="2.9" mpRegen="1.2" />
+        <level val="16" hp="271.1" mp="118.2" hpRegen="3" mpRegen="1.2" />
+        <level val="17" hp="284.88" mp="124.56" hpRegen="3.1" mpRegen="1.2" />
+        <level val="18" hp="298.79" mp="130.98" hpRegen="3.2" mpRegen="1.2" />
+        <level val="19" hp="312.83" mp="137.46" hpRegen="3.3" mpRegen="1.2" />
+        <level val="20" hp="327" mp="144" hpRegen="3.4" mpRegen="1.2" />
+        <level val="21" hp="356.7" mp="153.9" hpRegen="3.5" mpRegen="1.5" />
+        <level val="22" hp="386.67" mp="163.89" hpRegen="3.6" mpRegen="1.5" />
+        <level val="23" hp="416.91" mp="173.97" hpRegen="3.7" mpRegen="1.5" />
+        <level val="24" hp="447.42" mp="184.14" hpRegen="3.8" mpRegen="1.5" />
+        <level val="25" hp="478.2" mp="194.4" hpRegen="3.9" mpRegen="1.5" />
+        <level val="26" hp="509.25" mp="204.75" hpRegen="4" mpRegen="1.5" />
+        <level val="27" hp="540.57" mp="215.19" hpRegen="4.1" mpRegen="1.5" />
+        <level val="28" hp="572.16" mp="225.72" hpRegen="4.2" mpRegen="1.5" />
+        <level val="29" hp="604.02" mp="236.34" hpRegen="4.3" mpRegen="1.5" />
+        <level val="30" hp="636.15" mp="247.05" hpRegen="4.4" mpRegen="1.5" />
+        <level val="31" hp="668.55" mp="257.85" hpRegen="4.5" mpRegen="1.8" />
+        <level val="32" hp="701.22" mp="268.74" hpRegen="4.6" mpRegen="1.8" />
+        <level val="33" hp="734.16" mp="279.72" hpRegen="4.7" mpRegen="1.8" />
+        <level val="34" hp="767.37" mp="290.79" hpRegen="4.8" mpRegen="1.8" />
+        <level val="35" hp="800.85" mp="301.95" hpRegen="4.9" mpRegen="1.8" />
+        <level val="36" hp="834.6" mp="313.2" hpRegen="5" mpRegen="1.8" />
+        <level val="37" hp="868.62" mp="324.54" hpRegen="5.1" mpRegen="1.8" />
+        <level val="38" hp="902.91" mp="335.97" hpRegen="5.2" mpRegen="1.8" />
+        <level val="39" hp="937.47" mp="347.49" hpRegen="5.3" mpRegen="1.8" />
+        <level val="40" hp="972.3" mp="359.1" hpRegen="5.4" mpRegen="1.8" />
+    </vitals>
+    <skill id="86daa980-75b1-52c7-bc33-2f46fe28829c">
+        <!-- Sword/Blunt Weapon Mastery -->
+        <level id="9" playerLevel="40"/>
+        <level id="10" playerLevel="40"/>
+        <level id="11" playerLevel="40"/>
+    </skill>
+    <skill id="26e37756-ce05-52c3-9800-29ffefe3d957">
+        <!-- Heavy Armor Mastery -->
+        <level id="16" playerLevel="40"/>
+        <level id="17" playerLevel="40"/>
+        <level id="18" playerLevel="40"/>
+    </skill>
+    <skill id="b6d98243-ce5c-56f9-9a7a-07203f47dfd7">
+        <!-- Magic Resistance -->
+        <level id="15" playerLevel="40"/>
+        <level id="16" playerLevel="40"/>
+        <level id="17" playerLevel="40"/>
+    </skill>
+    <skill id="1bfd8a28-8e91-5bd8-9593-a5f126066e0d">
+        <!-- Shield Stun -->
+        <level id="16" playerLevel="40"/>
+        <level id="17" playerLevel="40"/>
+        <level id="18" playerLevel="40"/>
+    </skill>
+    <skill id="9c186730-308c-5d5a-b236-da9544b358c4">
+        <!-- Aggression -->
+        <level id="13" playerLevel="40"/>
+        <level id="14" playerLevel="40"/>
+        <level id="15" playerLevel="40"/>
+    </skill>
+    <skill id="1c69bd65-1778-54ff-978c-127937b64d78">
+        <!-- Holy Blessing -->
+        <level id="1" playerLevel="40"/>
+        <level id="2" playerLevel="40"/>
+        <level id="3" playerLevel="40"/>
+    </skill>
+    <skill id="eb59bdf9-ce04-5a6c-b952-3aaa9442a76c">
+        <!-- Aura of Hate -->
+        <level id="1" playerLevel="40"/>
+        <level id="2" playerLevel="40"/>
+        <level id="3" playerLevel="40"/>
+    </skill>
+    <skill id="a041ee98-fab6-5eb7-84bb-0591a80bf921">
+        <!-- Majesty -->
+        <level id="2" playerLevel="40"/>
+    </skill>
+    <skill id="89974f1e-f306-5da2-ae16-375131a97c06">
+        <!-- Shield Mastery -->
+        <level id="3" playerLevel="40"/>
+    </skill>
+    <skill id="14649e1e-8f47-5210-8080-495358c29074">
+        <!-- Holy Armor -->
+        <level id="1" playerLevel="40"/>
+    </skill>
+    <skill id="811a7f55-8457-5993-876c-3f0088af6c6a">
+        <!-- Remedy -->
+        <level id="1" playerLevel="40"/>
+    </skill>
+</class>

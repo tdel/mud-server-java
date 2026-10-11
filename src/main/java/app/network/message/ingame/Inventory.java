@@ -18,10 +18,15 @@ public record Inventory(List<Entry> items, int gold, boolean offHandBlocked) imp
     // non équipable (potion, clé...) — voir Inventory (command), qui ne les
     // renseigne que pour un Item adossé à un EquipmentItem (cf. Item.equipment(),
     // qui lèverait une ClassCastException sur un template non-équipement).
-    // weaponType : famille d'arme (null hors arme), voir WeaponType.
+    // weaponType : famille d'arme (null hors arme), voir WeaponType. critBonus
+    // d'une
+    // arme : son critique de base L2 (8 épée, 12 dague/arc, 4 masse) ;
+    // accuracyBonus/evasionBonus : modificateurs L2 (arme, bouclier -8). maxMp :
+    // bonus de PM (robes) ; fullArmor : armure d'une pièce (couvre les jambes).
     public record Entry(UUID id, String name, ItemGrade grade, EquipmentSlot slot, ItemType type, String description,
             int weight, ArmorCategory armorCategory, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus,
-            int evasionBonus, int critBonus, int atkSpd, int enchant, int quantity, WeaponType weaponType) {
+            int evasionBonus, int critBonus, int atkSpd, int enchant, int quantity, WeaponType weaponType, int maxMp,
+            boolean fullArmor) {
     }
 
 }

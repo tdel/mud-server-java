@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Arbre de compétences Human Wizard (L2 High Five, classId 11, classSkillTree L2J) jusqu'au
+     level 40 : playerLevel = level de personnage requis, appris auprès du maître des
+     compétences (PNJ SKILL_LEARNER) une fois la profession choisie. S'ajoute à l'arbre de la
+     classe de base et des professions précédentes (cf. ClassSystem.skillTree). -->
+<class>
+    <!-- PV/PM et régénération (par tick de 3 s) de base par niveau : lvlUpgainData de
+         stats/chars/baseStats/HumanWizard.xml (L2J H5), cf. ClassVitals. -->
+    <vitals>
+        <level val="1" hp="101" mp="40" hpRegen="2" mpRegen="0.9" />
+        <level val="2" hp="116.47" mp="47.28" hpRegen="2.05" mpRegen="0.9" />
+        <level val="3" hp="132.11" mp="54.64" hpRegen="2.1" mpRegen="0.9" />
+        <level val="4" hp="147.92" mp="62.08" hpRegen="2.15" mpRegen="0.9" />
+        <level val="5" hp="163.9" mp="69.6" hpRegen="2.2" mpRegen="0.9" />
+        <level val="6" hp="180.05" mp="77.2" hpRegen="2.25" mpRegen="0.9" />
+        <level val="7" hp="196.37" mp="84.88" hpRegen="2.3" mpRegen="0.9" />
+        <level val="8" hp="212.86" mp="92.64" hpRegen="2.35" mpRegen="0.9" />
+        <level val="9" hp="229.52" mp="100.48" hpRegen="2.4" mpRegen="0.9" />
+        <level val="10" hp="246.35" mp="108.4" hpRegen="2.45" mpRegen="0.9" />
+        <level val="11" hp="263.35" mp="116.4" hpRegen="2.5" mpRegen="1.2" />
+        <level val="12" hp="280.52" mp="124.48" hpRegen="2.6" mpRegen="1.2" />
+        <level val="13" hp="297.86" mp="132.64" hpRegen="2.7" mpRegen="1.2" />
+        <level val="14" hp="315.37" mp="140.88" hpRegen="2.8" mpRegen="1.2" />
+        <level val="15" hp="333.05" mp="149.2" hpRegen="2.9" mpRegen="1.2" />
+        <level val="16" hp="350.9" mp="157.6" hpRegen="3" mpRegen="1.2" />
+        <level val="17" hp="368.92" mp="166.08" hpRegen="3.1" mpRegen="1.2" />
+        <level val="18" hp="387.11" mp="174.64" hpRegen="3.2" mpRegen="1.2" />
+        <level val="19" hp="405.47" mp="183.28" hpRegen="3.3" mpRegen="1.2" />
+        <level val="20" hp="424" mp="192" hpRegen="3.4" mpRegen="1.2" />
+        <level val="21" hp="451.5" mp="205.2" hpRegen="3.5" mpRegen="1.5" />
+        <level val="22" hp="479.25" mp="218.52" hpRegen="3.6" mpRegen="1.5" />
+        <level val="23" hp="507.25" mp="231.96" hpRegen="3.7" mpRegen="1.5" />
+        <level val="24" hp="535.5" mp="245.52" hpRegen="3.8" mpRegen="1.5" />
+        <level val="25" hp="564" mp="259.2" hpRegen="3.9" mpRegen="1.5" />
+        <level val="26" hp="592.75" mp="273" hpRegen="4" mpRegen="1.5" />
+        <level val="27" hp="621.75" mp="286.92" hpRegen="4.1" mpRegen="1.5" />
+        <level val="28" hp="651" mp="300.96" hpRegen="4.2" mpRegen="1.5" />
+        <level val="29" hp="680.5" mp="315.12" hpRegen="4.3" mpRegen="1.5" />
+        <level val="30" hp="710.25" mp="329.4" hpRegen="4.4" mpRegen="1.5" />
+        <level val="31" hp="740.25" mp="343.8" hpRegen="4.5" mpRegen="1.8" />
+        <level val="32" hp="770.5" mp="358.32" hpRegen="4.6" mpRegen="1.8" />
+        <level val="33" hp="801" mp="372.96" hpRegen="4.7" mpRegen="1.8" />
+        <level val="34" hp="831.75" mp="387.72" hpRegen="4.8" mpRegen="1.8" />
+        <level val="35" hp="862.75" mp="402.6" hpRegen="4.9" mpRegen="1.8" />
+        <level val="36" hp="894" mp="417.6" hpRegen="5" mpRegen="1.8" />
+        <level val="37" hp="925.5" mp="432.72" hpRegen="5.1" mpRegen="1.8" />
+        <level val="38" hp="957.25" mp="447.96" hpRegen="5.2" mpRegen="1.8" />
+        <level val="39" hp="989.25" mp="463.32" hpRegen="5.3" mpRegen="1.8" />
+        <level val="40" hp="1021.5" mp="478.8" hpRegen="5.4" mpRegen="1.8" />
+    </vitals>
+    <skill id="b3fe458a-95ad-41b2-9020-8e155d17eba7">
+        <!-- Weapon Mastery -->
+        <level id="3" playerLevel="20"/>
+        <level id="4" playerLevel="25"/>
+        <level id="5" playerLevel="25"/>
+        <level id="6" playerLevel="30"/>
+        <level id="7" playerLevel="30"/>
+        <level id="8" playerLevel="35"/>
+        <level id="9" playerLevel="35"/>
+    </skill>
+    <skill id="25584902-5b52-529c-8137-e0b70f25a818">
+        <!-- Robe Mastery -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="20"/>
+        <level id="3" playerLevel="25"/>
+        <level id="4" playerLevel="25"/>
+        <level id="5" playerLevel="30"/>
+        <level id="6" playerLevel="30"/>
+        <level id="7" playerLevel="35"/>
+        <level id="8" playerLevel="35"/>
+    </skill>
+    <skill id="208d6036-0859-4677-87ff-0707a53df413">
+        <!-- Anti Magic -->
+        <level id="5" playerLevel="20"/>
+        <level id="6" playerLevel="20"/>
+        <level id="7" playerLevel="25"/>
+        <level id="8" playerLevel="25"/>
+        <level id="9" playerLevel="30"/>
+        <level id="10" playerLevel="30"/>
+        <level id="11" playerLevel="35"/>
+        <level id="12" playerLevel="35"/>
+    </skill>
+    <skill id="8a7f5679-ba25-57ad-8990-efb38b85ad6c">
+        <!-- Higher Mana Gain -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="20"/>
+        <level id="3" playerLevel="25"/>
+        <level id="4" playerLevel="25"/>
+        <level id="5" playerLevel="30"/>
+        <level id="6" playerLevel="30"/>
+        <level id="7" playerLevel="35"/>
+        <level id="8" playerLevel="35"/>
+    </skill>
+    <skill id="b3dfb416-a907-5ec9-afa0-172da5fec462">
+        <!-- Boost Mana -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="30"/>
+    </skill>
+    <skill id="7a854912-df5d-595a-98b7-5a962a7bb8d8">
+        <!-- Quick Recycle -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="30"/>
+    </skill>
+    <skill id="92a26f53-e267-53e3-ab5a-4c90bf74c520">
+        <!-- Fast Spell Casting -->
+        <level id="1" playerLevel="25"/>
+    </skill>
+    <skill id="35e74cfb-6675-5af4-acbd-a49b86b8d7a2">
+        <!-- Fast Mana Recovery -->
+        <level id="1" playerLevel="25"/>
+        <level id="2" playerLevel="35"/>
+    </skill>
+    <skill id="a55e14d9-0548-526f-8e0b-30cc09e5e4d1">
+        <!-- Fast HP Recovery -->
+        <level id="1" playerLevel="35"/>
+    </skill>
+    <skill id="02a43734-1f51-4352-96fd-ff3b75cb86e0">
+        <!-- Ice Bolt -->
+        <level id="5" playerLevel="20"/>
+        <level id="6" playerLevel="20"/>
+    </skill>
+    <skill id="d82112e2-2953-4615-b7a0-e6e2e7ad2c73">
+        <!-- Vampiric Touch -->
+        <level id="3" playerLevel="20"/>
+        <level id="4" playerLevel="20"/>
+        <level id="5" playerLevel="25"/>
+        <level id="6" playerLevel="25"/>
+    </skill>
+    <skill id="7707fc08-16f6-5052-a596-c3a6ad45f316">
+        <!-- Blaze -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="20"/>
+        <level id="3" playerLevel="25"/>
+        <level id="4" playerLevel="25"/>
+        <level id="5" playerLevel="30"/>
+        <level id="6" playerLevel="30"/>
+        <level id="7" playerLevel="35"/>
+        <level id="8" playerLevel="35"/>
+    </skill>
+    <skill id="e65613c3-8439-5e5a-b75f-96d831e88648">
+        <!-- Aura Burn -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="20"/>
+        <level id="3" playerLevel="25"/>
+        <level id="4" playerLevel="25"/>
+        <level id="5" playerLevel="30"/>
+        <level id="6" playerLevel="30"/>
+        <level id="7" playerLevel="35"/>
+        <level id="8" playerLevel="35"/>
+    </skill>
+    <skill id="72118d88-3413-5d20-9d16-c7f9019011d3">
+        <!-- Servitor Heal -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="20"/>
+        <level id="3" playerLevel="20"/>
+        <level id="4" playerLevel="25"/>
+        <level id="5" playerLevel="25"/>
+        <level id="6" playerLevel="25"/>
+        <level id="7" playerLevel="30"/>
+        <level id="8" playerLevel="30"/>
+        <level id="9" playerLevel="30"/>
+        <level id="10" playerLevel="35"/>
+        <level id="11" playerLevel="35"/>
+        <level id="12" playerLevel="35"/>
+    </skill>
+    <skill id="58c87411-45c5-4557-bd97-6c728662e51c">
+        <!-- Curse: Weakness -->
+        <level id="2" playerLevel="20"/>
+        <level id="3" playerLevel="25"/>
+        <level id="4" playerLevel="30"/>
+        <level id="5" playerLevel="35"/>
+    </skill>
+    <skill id="9ee89f3d-46fb-59fd-91df-39609816bd0c">
+        <!-- Energy Bolt -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="25"/>
+        <level id="3" playerLevel="30"/>
+        <level id="4" playerLevel="35"/>
+    </skill>
+    <skill id="fd96e735-8f89-5756-8fc3-5a85ac13d230">
+        <!-- Flame Strike -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="25"/>
+        <level id="3" playerLevel="30"/>
+    </skill>
+    <skill id="97e77056-6402-4f24-bb43-7eceb5c8cab7">
+        <!-- Curse: Poison -->
+        <level id="2" playerLevel="20"/>
+        <level id="3" playerLevel="30"/>
+    </skill>
+    <skill id="d48d3455-8aa9-51ba-8dff-0d05ed855cba">
+        <!-- Summon Kat the Cat -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="25"/>
+        <level id="3" playerLevel="30"/>
+        <level id="4" playerLevel="35"/>
+    </skill>
+    <skill id="c4055d9d-870b-5298-8545-90567197572b">
+        <!-- Summon Mew the Cat -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="25"/>
+        <level id="3" playerLevel="30"/>
+        <level id="4" playerLevel="35"/>
+    </skill>
+    <skill id="697aea80-51ae-5111-9305-b8a95b2d3d22">
+        <!-- Concentration -->
+        <level id="1" playerLevel="20"/>
+        <level id="2" playerLevel="30"/>
+    </skill>
+    <skill id="e5a87306-f89c-58e5-9fe3-7537ac3c5093">
+        <!-- Sleep -->
+        <level id="1" playerLevel="25"/>
+        <level id="2" playerLevel="25"/>
+        <level id="3" playerLevel="25"/>
+        <level id="4" playerLevel="30"/>
+        <level id="5" playerLevel="30"/>
+        <level id="6" playerLevel="30"/>
+        <level id="7" playerLevel="35"/>
+        <level id="8" playerLevel="35"/>
+        <level id="9" playerLevel="35"/>
+    </skill>
+    <skill id="5777b4fb-a1cd-5c36-98c7-f7dac854ae03">
+        <!-- Servitor Recharge -->
+        <level id="1" playerLevel="25"/>
+        <level id="2" playerLevel="25"/>
+        <level id="3" playerLevel="30"/>
+        <level id="4" playerLevel="30"/>
+        <level id="5" playerLevel="35"/>
+        <level id="6" playerLevel="35"/>
+    </skill>
+    <skill id="977a7fa4-c9f4-5e10-a089-ad7d52766e12">
+        <!-- Surrender To Fire -->
+        <level id="1" playerLevel="25"/>
+        <level id="2" playerLevel="30"/>
+        <level id="3" playerLevel="35"/>
+    </skill>
+    <skill id="ffa55fb0-9320-562a-96c7-0e932d12ac76">
+        <!-- Poisonous Cloud -->
+        <level id="1" playerLevel="25"/>
+        <level id="2" playerLevel="35"/>
+    </skill>
+    <skill id="6d367e97-04ff-5c2d-9d41-e582adc98da4">
+        <!-- Body To Mind -->
+        <level id="1" playerLevel="25"/>
+    </skill>
+    <skill id="606d73bf-d6e1-55e8-a45f-27207b15a30a">
+        <!-- Corpse Life Drain -->
+        <level id="1" playerLevel="30"/>
+        <level id="2" playerLevel="35"/>
+    </skill>
+    <skill id="d5357d0e-d68a-510e-a4d5-6e19eb8a8084">
+        <!-- Slow -->
+        <level id="1" playerLevel="35"/>
+    </skill>
+    <skill id="6b44997a-a3f0-560b-81c7-ee2006fffba7">
+        <!-- Curse Chaos -->
+        <level id="1" playerLevel="35"/>
+    </skill>
+    <skill id="d3e540f4-3a11-5a52-8ca7-cf3139ea37fc">
+        <!-- Servitor Wind Walk -->
+        <level id="1" playerLevel="35"/>
+    </skill>
+</class>

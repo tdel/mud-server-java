@@ -11,6 +11,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import app.domain.actor.event.PlayerRemovedFromWorld;
 import app.domain.actor.event.CharacterPositionChanged;
 import app.domain.actor.instance.PlayerInstance;
 import app.domain.map.Position;
@@ -33,6 +34,12 @@ public class PersistenceEngine {
     @EventListener
     void onCharacterPositionChanged(CharacterPositionChanged event) {
         dirtyPositions.put(event.character().getId(), event.character());
+    }
+
+    // WorldInstanceService.exitGame sauvegarde déjà la position à la sortie.
+    @EventListener
+    void onPlayerRemovedFromWorld(PlayerRemovedFromWorld event) {
+        dirtyPositions.remove(event.character().getId());
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)

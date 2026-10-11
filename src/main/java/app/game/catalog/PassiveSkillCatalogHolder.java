@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import app.domain.PassiveSkill;
-import app.domain.actor.CharacterClass;
+import app.domain.actor.SkillTree;
 
 public final class PassiveSkillCatalogHolder {
 
@@ -25,8 +25,7 @@ public final class PassiveSkillCatalogHolder {
         return catalog.isKnownId(passiveSkillId);
     }
 
-    public static List<PassiveSkillCatalog.LearnablePassiveSkill> passiveSkillsLearnableAt(
-            CharacterClass characterClass, int level) {
-        return catalog.passiveSkillsLearnableAt(characterClass, level);
+    public static List<PassiveSkillCatalog.LearnablePassiveSkill> passiveSkillsLearnableAt(SkillTree tree, int level) {
+        return catalog.passiveSkillsLearnableAt(tree, level);
     }
 }

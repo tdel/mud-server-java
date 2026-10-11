@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import app.domain.ActiveEffect;
 import app.domain.ActiveSkill;
 import app.domain.PassiveSkill;
+import app.domain.SkillElement;
 import app.domain.actor.system.AttributeSystem;
 import app.domain.actor.system.CombatSystem;
 import app.domain.actor.system.EffectsSystem;
@@ -114,6 +115,30 @@ public abstract class AbstractCharacter extends AbstractObject {
 
     // No-op par défaut : seul GamePlayer a une Connection à notifier.
     public void send(OutputMessage message) {
+    }
+
+    // Race L2 (monstres, serviteurs), null pour un joueur ou un PNJ.
+    public CreatureRace getCreatureRace() {
+        return null;
+    }
+
+    // Résistance élémentaire totale : équipement + effets/passifs (RES_*,
+    // Resist Fire, Surrender To Fire) + résistance naturelle (monstres).
+    public int elementalResistance(SkillElement element) {
+        int fromStats = switch (element) {
+            case FIRE -> statSystem.adjust(ModifiedStat.RES_FIRE, 0);
+            case WATER -> statSystem.adjust(ModifiedStat.RES_WATER, 0);
+            case WIND -> statSystem.adjust(ModifiedStat.RES_WIND, 0);
+            case EARTH -> statSystem.adjust(ModifiedStat.RES_EARTH, 0);
+            case HOLY -> statSystem.adjust(ModifiedStat.RES_HOLY, 0);
+            case DARK -> statSystem.adjust(ModifiedStat.RES_DARK, 0);
+            case NONE -> 0;
+        };
+        return inventorySystem.getElementalResistance(element) + fromStats + naturalElementalResistance(element);
+    }
+
+    protected int naturalElementalResistance(SkillElement element) {
+        return 0;
     }
 
     public KnownList getKnownList() {

@@ -2,577 +2,588 @@
 <weapons>
     <weapon id="019fa0a5-80c0-7035-9c2d-113b09a275df">
         <name>Short Sword</name>
+        <!-- L2 H5 : Short Sword (#1, sans grade) -->
         <type>WEAPON</type>
         <weaponType>SWORD</weaponType>
-        <weight>1</weight>
-        <pAtk>9</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>300</atkSpd>
-        <price>10</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - D -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </weapon>
-    <weapon id="ac9fe757-ab75-47ef-b413-8844d5c5ed73">
-        <name>Basic Wizard Staff</name>
-        <type>WEAPON</type>
-        <weaponType>STAFF</weaponType>
-        <weight>1</weight>
-        <pAtk>5</pAtk>
-        <mAtk>10</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>280</atkSpd>
-        <price>10</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - D -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </weapon>
-    <weapon id="ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd">
-        <name>Dagger</name>
-        <type>WEAPON</type>
-        <weaponType>DAGGER</weaponType>
-        <weight>1</weight>
-        <pAtk>6</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>340</atkSpd>
-        <price>2</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - D -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </weapon>
-    <weapon id="019fe3f6-b1ee-78f8-a681-d288c7f87511">
-        <name>Long Sword +1</name>
-        <type>WEAPON</type>
-        <weaponType>SWORD</weaponType>
-        <weight>3</weight>
-        <pAtk>12</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>2</critBonus>
-        <atkSpd>300</atkSpd>
-        <price>500</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - C -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </weapon>
-    <weapon id="019fe3f6-b1f0-7e00-a18d-ee3ac38f9332">
-        <name>Long Sword +2</name>
-        <type>WEAPON</type>
-        <weaponType>SWORD</weaponType>
-        <weight>3</weight>
-        <pAtk>16</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>4</critBonus>
-        <atkSpd>300</atkSpd>
-        <price>4000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - B -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </weapon>
-    <weapon id="6f1c2a3e-8b4d-4e7a-9c2f-1a3d5e7b9c1f">
-        <name>Wand of Flames</name>
-        <description>A wand engraved with fiery runes; wielding it lets you conjure a bolt of flame.</description>
-        <type>WEAPON</type>
-        <weaponType>WAND</weaponType>
-        <weight>1</weight>
-        <pAtk>5</pAtk>
-        <mAtk>16</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>280</atkSpd>
-        <price>100</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - C -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </weapon>
-    <weapon id="7a2d3b4f-9c5e-4f8b-8d3a-2b4e6f8a0c2d">
-        <name>Staff of Healing</name>
-        <description>A white wooden staff that channels healing energy on contact.</description>
-        <type>WEAPON</type>
-        <weaponType>STAFF</weaponType>
-        <weight>2</weight>
-        <pAtk>5</pAtk>
-        <mAtk>16</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>280</atkSpd>
-        <price>150</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - C -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <grantedSkillIds>e287e606-621f-48c5-b8dc-613fa98709d3</grantedSkillIds>
-    </weapon>
-    <weapon id="558543a4-39d4-4f36-ac1e-2881deac24a6">
-        <name>Wooden Sword</name>
-        <type>WEAPON</type>
-        <weaponType>SWORD</weaponType>
-        <weight>1</weight>
-        <pAtk>4</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>300</atkSpd>
-        <price>1</price>
-    </weapon>
-    <weapon id="45785ec3-8118-4938-b614-3e3a03dabc5e">
-        <name>Saber</name>
-        <type>WEAPON</type>
-        <weaponType>SWORD</weaponType>
-        <weight>2</weight>
-        <pAtk>10</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>1</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>320</atkSpd>
-        <price>15</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - D -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </weapon>
-    <weapon id="21a73422-e8ee-49ba-8137-05b49a5dbea5">
-        <name>Battle Axe</name>
-        <type>WEAPON</type>
-        <weaponType>AXE</weaponType>
-        <weight>4</weight>
-        <pAtk>13</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>1</critBonus>
-        <atkSpd>250</atkSpd>
-        <price>40</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - D -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </weapon>
-    <weapon id="7ad6443f-65cf-4761-b894-5fa8dc859e2e">
-        <name>Tsurugi</name>
-        <type>WEAPON</type>
-        <weaponType>BIG_SWORD</weaponType>
-        <weight>3</weight>
-        <pAtk>14</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>1</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>3</critBonus>
-        <atkSpd>300</atkSpd>
-        <price>800</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - C -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </weapon>
-    <weapon id="84349095-9c39-49e4-9f0a-1819dc7d1748">
-        <name>Sword of Valhalla</name>
-        <type>WEAPON</type>
-        <weaponType>SWORD</weaponType>
-        <weight>3</weight>
-        <pAtk>15</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>2</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>2</critBonus>
-        <atkSpd>300</atkSpd>
-        <price>1200</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - C -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </weapon>
-    <weapon id="2f7c7759-45c8-4652-aea5-f244e1b11fc5">
-        <name>Hammer of Ruin</name>
-        <type>WEAPON</type>
-        <weaponType>BIG_BLUNT</weaponType>
-        <weight>8</weight>
-        <pAtk>20</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>-1</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>5</critBonus>
-        <atkSpd>220</atkSpd>
-        <price>6000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - B -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </weapon>
-    <weapon id="7b732096-7d14-434b-b7d6-1569dd6ee37b">
-        <name>Sword of Miracle</name>
-        <type>WEAPON</type>
-        <weaponType>SWORD</weaponType>
-        <weight>3</weight>
-        <pAtk>19</pAtk>
-        <mAtk>5</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>1</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>4</critBonus>
-        <atkSpd>300</atkSpd>
-        <price>7000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - B -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </weapon>
-    <weapon id="fa447243-9fbf-40a4-9801-e28af85d9aac">
-        <name>Tallum Blade</name>
-        <type>WEAPON</type>
-        <weaponType>SWORD</weaponType>
-        <weight>2</weight>
-        <pAtk>24</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>2</accuracyBonus>
-        <evasionBonus>1</evasionBonus>
-        <critBonus>6</critBonus>
-        <atkSpd>310</atkSpd>
-        <price>35000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - A -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </weapon>
-    <weapon id="dbdbe1db-48f7-43c0-8aa6-177fe50bc04f">
-        <name>Dynasty Sword</name>
-        <type>WEAPON</type>
-        <weaponType>SWORD</weaponType>
-        <weight>3</weight>
-        <pAtk>30</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>2</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>8</critBonus>
-        <atkSpd>300</atkSpd>
-        <price>80000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - S -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </weapon>
-    <weapon id="b1d88de4-2eb3-4665-864b-4309cdc0736c">
-        <name>Dynasty Dagger</name>
-        <type>WEAPON</type>
-        <weaponType>DAGGER</weaponType>
-        <weight>1</weight>
-        <pAtk>26</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>3</accuracyBonus>
-        <evasionBonus>2</evasionBonus>
-        <critBonus>10</critBonus>
-        <atkSpd>380</atkSpd>
-        <price>75000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - S -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </weapon>
-    <weapon id="f42c73a9-d99f-4812-9798-8cd2d08b70a6">
-        <name>Wooden Dagger</name>
-        <type>WEAPON</type>
-        <weaponType>DAGGER</weaponType>
-        <weight>1</weight>
-        <pAtk>3</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>340</atkSpd>
-        <price>1</price>
-    </weapon>
-    <weapon id="7b268503-d3f0-43eb-9144-bbb008d6ddeb">
-        <name>Wooden Staff</name>
-        <type>WEAPON</type>
-        <weaponType>STAFF</weaponType>
-        <weight>1</weight>
-        <pAtk>2</pAtk>
+        <weight>1600</weight>
+        <pAtk>8</pAtk>
         <mAtk>6</mAtk>
         <pDef>0</pDef>
         <mDef>0</mDef>
         <accuracyBonus>0</accuracyBonus>
         <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>280</atkSpd>
-        <price>1</price>
+        <critBonus>8</critBonus>
+        <atkSpd>379</atkSpd>
+        <price>590</price>
     </weapon>
-    <weapon id="f3c8a065-ac0d-4913-9774-41098a6e088d">
-        <name>Wooden Club</name>
-        <type>WEAPON</type>
-        <weaponType>BLUNT</weaponType>
-        <weight>3</weight>
-        <pAtk>5</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>260</atkSpd>
-        <price>1</price>
-    </weapon>
-    <weapon id="3c966b19-8f40-4791-9dd7-3a489f090f7b">
-        <name>Wooden Bow</name>
-        <type>WEAPON</type>
-        <weaponType>BOW</weaponType>
-        <weight>2</weight>
-        <pAtk>4</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>0</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>1</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>300</atkSpd>
-        <price>1</price>
-    </weapon>
-    <weapon id="1d4e6f80-2a9c-4b7e-8d1f-5c3a7e9b0d2f">
-        <name>Staff of the Magus</name>
-        <description>A polished staff favored by battle-mages, humming with contained power.</description>
+    <weapon id="ac9fe757-ab75-47ef-b413-8844d5c5ed73">
+        <name>Basic Wizard Staff</name>
+        <!-- L2 H5 : Bone Staff (#178, grade D) -->
         <type>WEAPON</type>
         <weaponType>STAFF</weaponType>
-        <weight>2</weight>
-        <pAtk>6</pAtk>
-        <mAtk>22</mAtk>
+        <weight>1060</weight>
+        <pAtk>39</pAtk>
+        <mAtk>39</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>5</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <atkSpd>325</atkSpd>
+        <price>315000</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - D -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
+            </conditions>
+        </expect>
+    </weapon>
+    <weapon id="ca8be0a4-9f92-4630-a918-2c7b3cf7c3cd">
+        <name>Dagger</name>
+        <!-- L2 H5 : Dagger (#10, sans grade) -->
+        <type>WEAPON</type>
+        <weaponType>DAGGER</weaponType>
+        <weight>1160</weight>
+        <pAtk>5</pAtk>
+        <mAtk>5</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>-4</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>12</critBonus>
+        <atkSpd>433</atkSpd>
+        <price>106</price>
+    </weapon>
+    <weapon id="019fe3f6-b1ee-78f8-a681-d288c7f87511">
+        <name>Long Sword +1</name>
+        <!-- L2 H5 : Long Sword +1 (#2, sans grade) -->
+        <type>WEAPON</type>
+        <weaponType>SWORD</weaponType>
+        <weight>1560</weight>
+        <pAtk>26</pAtk>
+        <mAtk>19</mAtk>
         <pDef>0</pDef>
         <mDef>0</mDef>
         <accuracyBonus>0</accuracyBonus>
         <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>280</atkSpd>
-        <price>4500</price>
+        <critBonus>8</critBonus>
+        <atkSpd>379</atkSpd>
+        <price>105000</price>
+    </weapon>
+    <weapon id="019fe3f6-b1f0-7e00-a18d-ee3ac38f9332">
+        <name>Long Sword +2</name>
+        <!-- L2 H5 : Long Sword +2 (#2, sans grade) -->
+        <type>WEAPON</type>
+        <weaponType>SWORD</weaponType>
+        <weight>1560</weight>
+        <pAtk>28</pAtk>
+        <mAtk>21</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <atkSpd>379</atkSpd>
+        <price>105000</price>
+    </weapon>
+    <weapon id="6f1c2a3e-8b4d-4e7a-9c2f-1a3d5e7b9c1f">
+        <name>Wand of Flames</name>
+        <!-- L2 H5 : Stick of Faith (#193, grade C) -->
+        <description>A wand engraved with fiery runes; wielding it lets you conjure a bolt of flame.</description>
+        <type>WEAPON</type>
+        <weaponType>WAND</weaponType>
+        <weight>1160</weight>
+        <pAtk>85</pAtk>
+        <mAtk>81</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>5</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <atkSpd>379</atkSpd>
+        <price>1762900</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - C -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+        </expect>
+    </weapon>
+    <weapon id="7a2d3b4f-9c5e-4f8b-8d3a-2b4e6f8a0c2d">
+        <name>Staff of Healing</name>
+        <!-- L2 H5 : Crystal Staff (#192, grade C) -->
+        <description>A white wooden staff that channels healing energy on contact.</description>
+        <type>WEAPON</type>
+        <weaponType>STAFF</weaponType>
+        <weight>1020</weight>
+        <pAtk>103</pAtk>
+        <mAtk>89</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>5</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <atkSpd>325</atkSpd>
+        <price>1762900</price>
+        <grantedSkillIds>e287e606-621f-48c5-b8dc-613fa98709d3</grantedSkillIds>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - C -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+        </expect>
+    </weapon>
+    <weapon id="558543a4-39d4-4f36-ac1e-2881deac24a6">
+        <name>Wooden Sword</name>
+        <!-- L2 H5 : Squire's Sword (#2369, sans grade) -->
+        <type>WEAPON</type>
+        <weaponType>SWORD</weaponType>
+        <weight>1600</weight>
+        <pAtk>6</pAtk>
+        <mAtk>5</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <atkSpd>379</atkSpd>
+        <price>106</price>
+    </weapon>
+    <weapon id="45785ec3-8118-4938-b614-3e3a03dabc5e">
+        <name>Saber</name>
+        <!-- L2 H5 : Saber (#123, grade D) -->
+        <type>WEAPON</type>
+        <weaponType>SWORD</weaponType>
+        <weight>1520</weight>
+        <pAtk>40</pAtk>
+        <mAtk>26</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <atkSpd>379</atkSpd>
+        <price>315000</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - D -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
+            </conditions>
+        </expect>
+    </weapon>
+    <weapon id="21a73422-e8ee-49ba-8137-05b49a5dbea5">
+        <name>Battle Axe</name>
+        <!-- L2 H5 : Battle Axe (#160, grade C) -->
+        <type>WEAPON</type>
+        <weaponType>AXE</weaponType>
+        <weight>1720</weight>
+        <pAtk>107</pAtk>
+        <mAtk>61</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>5</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <atkSpd>379</atkSpd>
+        <price>1762900</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - C -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+        </expect>
+    </weapon>
+    <weapon id="7ad6443f-65cf-4761-b894-5fa8dc859e2e">
+        <name>Tsurugi</name>
+        <!-- L2 H5 : Tsurugi (#77, grade C) -->
+        <type>WEAPON</type>
+        <weaponType>SWORD</weaponType>
+        <weight>1400</weight>
+        <pAtk>139</pAtk>
+        <mAtk>76</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <atkSpd>379</atkSpd>
+        <price>3304300</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - C -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+        </expect>
+    </weapon>
+    <weapon id="84349095-9c39-49e4-9f0a-1819dc7d1748">
+        <name>Sword of Valhalla</name>
+        <!-- L2 H5 : Sword of Valhalla (#148, grade B) -->
+        <type>WEAPON</type>
+        <weaponType>SWORD</weaponType>
+        <weight>900</weight>
+        <pAtk>140</pAtk>
+        <mAtk>122</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <atkSpd>379</atkSpd>
+        <price>6680500</price>
         <expect>
             <conditions>
                 <!-- Expertise Grade - B -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
             </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
         </expect>
     </weapon>
-    <weapon id="2e5f7a91-3b0d-4c8f-9e2a-6d4b8f0c1e3a">
-        <name>Archmage's Staff</name>
-        <description>Carved with sigils that channel the wielder's will into raw destruction.</description>
+    <weapon id="2f7c7759-45c8-4652-aea5-f244e1b11fc5">
+        <name>Hammer of Ruin</name>
+        <!-- L2 H5 : Ice Storm Hammer (#7900, grade B) -->
         <type>WEAPON</type>
-        <weaponType>STAFF</weaponType>
-        <weight>2</weight>
-        <pAtk>7</pAtk>
-        <mAtk>30</mAtk>
+        <weaponType>BIG_BLUNT</weaponType>
+        <weight>1950</weight>
+        <pAtk>213</pAtk>
+        <mAtk>91</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>5</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <atkSpd>325</atkSpd>
+        <price>6680500</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - B -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
+            </conditions>
+        </expect>
+    </weapon>
+    <weapon id="7b732096-7d14-434b-b7d6-1569dd6ee37b">
+        <name>Sword of Miracle</name>
+        <!-- L2 H5 : Sword of Miracles (#151, grade A) -->
+        <type>WEAPON</type>
+        <weaponType>SWORD</weaponType>
+        <weight>840</weight>
+        <pAtk>186</pAtk>
+        <mAtk>152</mAtk>
         <pDef>0</pDef>
         <mDef>0</mDef>
         <accuracyBonus>0</accuracyBonus>
         <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>280</atkSpd>
-        <price>32000</price>
+        <critBonus>8</critBonus>
+        <atkSpd>379</atkSpd>
+        <price>20741000</price>
         <expect>
             <conditions>
                 <!-- Expertise Grade - A -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
             </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
         </expect>
     </weapon>
-    <weapon id="3f6a8b02-4c1e-4d9a-8f3b-7e5c9a1d2f4b">
-        <name>Staff of Arcana</name>
-        <description>A relic staff said to have channeled the spells of an archmage long turned to dust.</description>
+    <weapon id="fa447243-9fbf-40a4-9801-e28af85d9aac">
+        <name>Tallum Blade</name>
+        <!-- L2 H5 : Tallum Blade (#80, grade A) -->
         <type>WEAPON</type>
-        <weaponType>STAFF</weaponType>
-        <weight>2</weight>
-        <pAtk>8</pAtk>
-        <mAtk>40</mAtk>
+        <weaponType>SWORD</weaponType>
+        <weight>1330</weight>
+        <pAtk>213</pAtk>
+        <mAtk>107</mAtk>
         <pDef>0</pDef>
         <mDef>0</mDef>
         <accuracyBonus>0</accuracyBonus>
         <evasionBonus>0</evasionBonus>
-        <critBonus>1</critBonus>
-        <atkSpd>290</atkSpd>
-        <price>80000</price>
+        <critBonus>8</critBonus>
+        <atkSpd>379</atkSpd>
+        <price>14098000</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - A -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
+            </conditions>
+        </expect>
+    </weapon>
+    <weapon id="dbdbe1db-48f7-43c0-8aa6-177fe50bc04f">
+        <name>Dynasty Sword</name>
+        <!-- L2 H5 : Dynasty Sword (#9442, grade S) -->
+        <type>WEAPON</type>
+        <weaponType>SWORD</weaponType>
+        <weight>1520</weight>
+        <pAtk>333</pAtk>
+        <mAtk>151</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <atkSpd>379</atkSpd>
+        <price>74946000</price>
         <expect>
             <conditions>
                 <!-- Expertise Grade - S -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
             </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
+        </expect>
+    </weapon>
+    <weapon id="b1d88de4-2eb3-4665-864b-4309cdc0736c">
+        <name>Dynasty Dagger</name>
+        <!-- L2 H5 : Dynasty Knife (#9446, grade S) -->
+        <type>WEAPON</type>
+        <weaponType>DAGGER</weaponType>
+        <weight>1520</weight>
+        <pAtk>291</pAtk>
+        <mAtk>151</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>-4</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>12</critBonus>
+        <atkSpd>433</atkSpd>
+        <price>74946000</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - S -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
+            </conditions>
+        </expect>
+    </weapon>
+    <weapon id="f42c73a9-d99f-4812-9798-8cd2d08b70a6">
+        <name>Wooden Dagger</name>
+        <!-- L2 H5 : Dagger (#10, sans grade) -->
+        <type>WEAPON</type>
+        <weaponType>DAGGER</weaponType>
+        <weight>1160</weight>
+        <pAtk>5</pAtk>
+        <mAtk>5</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>-4</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>12</critBonus>
+        <atkSpd>433</atkSpd>
+        <price>106</price>
+    </weapon>
+    <weapon id="7b268503-d3f0-43eb-9144-bbb008d6ddeb">
+        <name>Wooden Staff</name>
+        <!-- L2 H5 : Apprentice's Wand (#6, sans grade) -->
+        <type>WEAPON</type>
+        <weaponType>STAFF</weaponType>
+        <weight>1350</weight>
+        <pAtk>5</pAtk>
+        <mAtk>7</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>5</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <atkSpd>325</atkSpd>
+        <price>106</price>
+    </weapon>
+    <weapon id="f3c8a065-ac0d-4913-9774-41098a6e088d">
+        <name>Wooden Club</name>
+        <!-- L2 H5 : Club (#4, sans grade) -->
+        <type>WEAPON</type>
+        <weaponType>BLUNT</weaponType>
+        <weight>1870</weight>
+        <pAtk>8</pAtk>
+        <mAtk>6</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>5</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <atkSpd>379</atkSpd>
+        <price>590</price>
+    </weapon>
+    <weapon id="3c966b19-8f40-4791-9dd7-3a489f090f7b">
+        <name>Wooden Bow</name>
+        <!-- L2 H5 : Short Bow (#13, sans grade) -->
+        <type>WEAPON</type>
+        <weaponType>BOW</weaponType>
+        <weight>1950</weight>
+        <pAtk>16</pAtk>
+        <mAtk>6</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>-4</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>12</critBonus>
+        <atkSpd>293</atkSpd>
+        <price>590</price>
+    </weapon>
+    <weapon id="1d4e6f80-2a9c-4b7e-8d1f-5c3a7e9b0d2f">
+        <name>Staff of the Magus</name>
+        <!-- L2 H5 : Sprite's Staff (#92, grade B) -->
+        <description>A polished staff favored by battle-mages, humming with contained power.</description>
+        <type>WEAPON</type>
+        <weaponType>STAFF</weaponType>
+        <weight>960</weight>
+        <pAtk>170</pAtk>
+        <mAtk>134</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>5</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <atkSpd>325</atkSpd>
+        <price>6680500</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - B -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
+            </conditions>
+        </expect>
+    </weapon>
+    <weapon id="2e5f7a91-3b0d-4c8f-9e2a-6d4b8f0c1e3a">
+        <name>Archmage's Staff</name>
+        <!-- L2 H5 : Dasparion's Staff (#212, grade A) -->
+        <description>Carved with sigils that channel the wielder's will into raw destruction.</description>
+        <type>WEAPON</type>
+        <weaponType>STAFF</weaponType>
+        <weight>920</weight>
+        <pAtk>207</pAtk>
+        <mAtk>157</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>5</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <atkSpd>325</atkSpd>
+        <price>14098000</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - A -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
+            </conditions>
+        </expect>
+    </weapon>
+    <weapon id="3f6a8b02-4c1e-4d9a-8f3b-7e5c9a1d2f4b">
+        <name>Staff of Arcana</name>
+        <!-- L2 H5 : Imperial Staff (#6366, grade S) -->
+        <description>A relic staff said to have channeled the spells of an archmage long turned to dust.</description>
+        <type>WEAPON</type>
+        <weaponType>STAFF</weaponType>
+        <weight>910</weight>
+        <pAtk>274</pAtk>
+        <mAtk>193</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>5</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>4</critBonus>
+        <atkSpd>325</atkSpd>
+        <price>42759400</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - S -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
+            </conditions>
+        </expect>
+    </weapon>
+    <!-- Armes des professions L2 : lances (Warrior/Warlord), épées doubles (Gladiator),
+         arc de grade D (Hawkeye). -->
+    <weapon id="5b1f2d3e-6a7c-4e8f-9a01-2b3c4d5e6f70">
+        <name>Spear</name>
+        <!-- L2 H5 : Short Spear (#15, sans grade) -->
+        <type>WEAPON</type>
+        <weaponType>POLE</weaponType>
+        <weight>2140</weight>
+        <pAtk>24</pAtk>
+        <mAtk>17</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>-4</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <atkSpd>325</atkSpd>
+        <price>105000</price>
+    </weapon>
+    <weapon id="6c2e3f4a-7b8d-4f90-ab12-3c4d5e6f7081">
+        <name>Pike</name>
+        <!-- L2 H5 : Pike (#292, grade D) -->
+        <type>WEAPON</type>
+        <weaponType>POLE</weaponType>
+        <weight>2090</weight>
+        <pAtk>51</pAtk>
+        <mAtk>32</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>-4</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <atkSpd>325</atkSpd>
+        <price>495500</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - D -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
+            </conditions>
+        </expect>
+    </weapon>
+    <weapon id="7d3f4a5b-8c9e-4a01-bc23-4d5e6f708192">
+        <name>Saber*Saber</name>
+        <!-- L2 H5 : Saber*Saber (#2516, grade D) -->
+        <type>WEAPON</type>
+        <weaponType>DUAL</weaponType>
+        <weight>2530</weight>
+        <pAtk>73</pAtk>
+        <mAtk>37</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <atkSpd>325</atkSpd>
+        <price>674400</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - D -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
+            </conditions>
+        </expect>
+    </weapon>
+    <weapon id="8e4a5b6c-9daf-4b12-cd34-5e6f708192a3">
+        <name>Sword of Revolution*Sword of Revolution</name>
+        <!-- L2 H5 : Sword of Revolution*Sword of Revolution (#2558, grade C) -->
+        <type>WEAPON</type>
+        <weaponType>DUAL</weaponType>
+        <weight>2360</weight>
+        <pAtk>148</pAtk>
+        <mAtk>68</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>8</critBonus>
+        <atkSpd>325</atkSpd>
+        <price>2209700</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - C -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+        </expect>
+    </weapon>
+    <weapon id="9f5b6c7d-aeb0-4c23-de45-6f708192a3b4">
+        <name>Bow of Peril</name>
+        <!-- L2 H5 : Bow of Peril (#287, grade B) -->
+        <type>WEAPON</type>
+        <weaponType>BOW</weaponType>
+        <weight>1700</weight>
+        <pAtk>400</pAtk>
+        <mAtk>99</mAtk>
+        <pDef>0</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>-4</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>12</critBonus>
+        <atkSpd>293</atkSpd>
+        <price>10091400</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - B -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
+            </conditions>
         </expect>
     </weapon>
 </weapons>

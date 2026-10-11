@@ -18,13 +18,13 @@ import app.network.OutputJsonMessage;
  */
 public record PartyMemberJoined(UUID memberId, String memberName, int level, CharacterClass characterClass,
         Subclass subclass, int currentHealth, int maxHealth, int currentMana, int maxMana,
-        List<PartyEffectView> effects) implements OutputJsonMessage {
+        List<ActiveEffectView> effects) implements OutputJsonMessage {
 
     public static PartyMemberJoined of(PlayerInstance member) {
         return new PartyMemberJoined(member.getId(), member.getName(), member.getLevelingSystem().getLevel(),
                 member.getClassSystem().getCharacterClass(), member.getClassSystem().getCurrentSubclass(),
                 member.getResourceSystem().getCurrentHealth(), member.getResourceSystem().getMaxHealth(),
                 member.getResourceSystem().getCurrentMana(), member.getResourceSystem().getMaxMana(),
-                PartyEffectView.listOf(member));
+                ActiveEffectView.listOf(member));
     }
 }

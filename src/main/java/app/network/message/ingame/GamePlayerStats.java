@@ -6,6 +6,7 @@ import java.util.UUID;
 import app.network.OutputJsonMessage;
 import app.domain.actor.Attribute;
 import app.domain.actor.ModifiedStat;
+import app.domain.actor.Subclass;
 import app.domain.actor.instance.PlayerInstance;
 import app.domain.item.ItemGrade;
 import app.game.catalog.LevelCatalogHolder;
@@ -24,13 +25,18 @@ public record GamePlayerStats(PlayerInstance character) implements OutputJsonMes
     // se reconnecte n'a aucun moyen de savoir que le toggle persisté côté serveur
     // (voir
     // CharacterDao) est actif tant qu'il n'a pas reçu un ShotUsed/ShotGradeChanged.
+    // criticalRate/magicCriticalRate : taux L2 en millièmes (88 = 8,8 %) ;
+    // runSpeed : vitesse de course L2 affichée, speed : la même en cases/s.
+    // subclass : profession actuelle (nom d'enum, null avant le level 20) ;
+    // className : son nom L2 (Sorcerer...), à défaut celui de la classe de base.
     public record Payload(UUID id, String name, String title, String gender, int level, String characterClass,
-            int currentHealth, int maxHealth, int healthRegenPerSecond, int currentMana, int maxMana,
-            int manaRegenPerSecond, int pAtk, int pDef, int mAtk, int mDef, int accuracy, int evasion, int criticalRate,
-            int atkSpd, int castSpd, AttributeScore strength, AttributeScore dexterity, AttributeScore constitution,
-            AttributeScore intelligence, AttributeScore wit, AttributeScore men, double speed, int xp,
-            int xpForCurrentLevel, int xpForNextLevel, ItemGrade activeSoulshotGrade, ItemGrade activeSpiritshotGrade,
-            int karma, int pkCount, int pvpCount, boolean pvpFlagged) {
+            Subclass subclass, String className, int currentHealth, int maxHealth, int healthRegenPerSecond,
+            int currentMana, int maxMana, int manaRegenPerSecond, int pAtk, int pDef, int mAtk, int mDef, int accuracy,
+            int evasion, int criticalRate, int magicCriticalRate, int atkSpd, int castSpd, int runSpeed,
+            AttributeScore strength, AttributeScore dexterity, AttributeScore constitution, AttributeScore intelligence,
+            AttributeScore wit, AttributeScore men, double speed, int xp, int xpForCurrentLevel, int xpForNextLevel,
+            ItemGrade activeSoulshotGrade, ItemGrade activeSpiritshotGrade, int karma, int pkCount, int pvpCount,
+            boolean pvpFlagged, List<ActiveEffectView> effects) {
     }
 
     @Override
@@ -47,7 +53,8 @@ public record GamePlayerStats(PlayerInstance character) implements OutputJsonMes
                 : xpForCurrentLevel;
         output.write("GamePlayerStats", new Payload(c.getId(), c.getName(), c.getTitle(),
                 c.getAppearanceSystem().getGender().label(), c.getLevelingSystem().getLevel(),
-                c.getClassSystem().getCharacterClass().label(), c.getResourceSystem().getCurrentHealth(),
+                c.getClassSystem().getCharacterClass().label(), c.getClassSystem().getCurrentSubclass(),
+                c.getClassSystem().currentClassLabel(), c.getResourceSystem().getCurrentHealth(),
                 c.getResourceSystem().getMaxHealth(), c.getResourceSystem().healthRegenAmountPerTick(),
                 c.getResourceSystem().getCurrentMana(), c.getResourceSystem().getMaxMana(),
                 c.getResourceSystem().manaRegenAmountPerTick(), c.getStatSystem().getEffective(ModifiedStat.PATK),
@@ -55,14 +62,16 @@ public record GamePlayerStats(PlayerInstance character) implements OutputJsonMes
                 c.getStatSystem().getEffective(ModifiedStat.MDEF),
                 c.getStatSystem().getEffective(ModifiedStat.ACCURACY),
                 c.getStatSystem().getEffective(ModifiedStat.EVASION),
-                c.getStatSystem().getEffective(ModifiedStat.PCRIT), c.getStatSystem().getEffective(ModifiedStat.ATKSPD),
-                c.getStatSystem().getEffective(ModifiedStat.CASTSPD), attributeScore(c, Attribute.STR),
-                attributeScore(c, Attribute.DEX), attributeScore(c, Attribute.CON), attributeScore(c, Attribute.INT),
-                attributeScore(c, Attribute.WIT), attributeScore(c, Attribute.MEN),
+                c.getStatSystem().getEffective(ModifiedStat.PCRIT), c.getStatSystem().getEffective(ModifiedStat.MCRIT),
+                c.getStatSystem().getEffective(ModifiedStat.ATKSPD),
+                c.getStatSystem().getEffective(ModifiedStat.CASTSPD), c.getMotionSystem().getSpeed(),
+                attributeScore(c, Attribute.STR), attributeScore(c, Attribute.DEX), attributeScore(c, Attribute.CON),
+                attributeScore(c, Attribute.INT), attributeScore(c, Attribute.WIT), attributeScore(c, Attribute.MEN),
                 MovementEngine.unitsPerSecond(c.getMotionSystem().getSpeed()), c.getLevelingSystem().getXp(),
                 xpForCurrentLevel, xpForNextLevel, c.getInventorySystem().getActiveSoulshotGrade(),
                 c.getInventorySystem().getActiveSpiritshotGrade(), c.getPvpSystem().getKarma(),
-                c.getPvpSystem().getPkCount(), c.getPvpSystem().getPvpCount(), c.getPvpSystem().isPvpFlagged()));
+                c.getPvpSystem().getPkCount(), c.getPvpSystem().getPvpCount(), c.getPvpSystem().isPvpFlagged(),
+                ActiveEffectView.listOf(c)));
     }
 
     private static AttributeScore attributeScore(PlayerInstance c, Attribute attribute) {

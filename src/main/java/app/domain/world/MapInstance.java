@@ -1,6 +1,7 @@
 package app.domain.world;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import app.domain.actor.AbstractCharacter;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.actor.AbstractNpc;
 import app.domain.actor.instance.PlayerInstance;
+import app.domain.actor.instance.SummonInstance;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.GamePlayerSpawnedToMap;
 import app.domain.map.Position;
@@ -43,6 +45,8 @@ public class MapInstance {
     private final Map<UUID, PlayerInstance> clients = new ConcurrentHashMap<>();
     private final List<MonsterInstance> monsters = new CopyOnWriteArrayList<>();
     private final List<AbstractNpc> npcs = new CopyOnWriteArrayList<>();
+    private final List<SummonInstance> summons = new CopyOnWriteArrayList<>();
+    private final List<Corpse> corpses = new CopyOnWriteArrayList<>();
 
     // Résolus paresseusement puis mémoïsés : toMapPortal a besoin que
     // worldInstance.mapInstances soit déjà renseigné (voir
@@ -169,6 +173,11 @@ public class MapInstance {
         if (monster.isPresent()) {
             return Optional.of(monster.get());
         }
+        Optional<SummonInstance> summon = summons.stream().filter(candidate -> candidate.getId().equals(id))
+                .findFirst();
+        if (summon.isPresent()) {
+            return Optional.of(summon.get());
+        }
         return findNpcById(id).map(AbstractCharacter.class::cast);
     }
 
@@ -204,6 +213,38 @@ public class MapInstance {
         addMonster(monster);
         monster.getMotionSystem().setPosition(position);
         monster.getMotionSystem().setHeading(randomHeading());
+    }
+
+    // Cadavres frais (cf. Corpse) : ajoutés à la mort d'un monstre, oubliés à
+    // expiration ou une fois consommés.
+    public void addCorpse(Corpse corpse) {
+        corpses.removeIf(existing -> !Instant.now().isBefore(existing.expiresAt()));
+        corpses.add(corpse);
+    }
+
+    public Optional<Corpse> nearestCorpse(Position center, double radius) {
+        Instant now = Instant.now();
+        return corpses.stream().filter(corpse -> now.isBefore(corpse.expiresAt()))
+                .filter(corpse -> corpse.position().distanceTo(center) <= radius)
+                .min(java.util.Comparator.comparingDouble(corpse -> corpse.position().distanceTo(center)));
+    }
+
+    public boolean consumeCorpse(Corpse corpse) {
+        return corpses.remove(corpse);
+    }
+
+    public List<SummonInstance> getSummons() {
+        return List.copyOf(summons);
+    }
+
+    public void addSummon(SummonInstance summon, Position position) {
+        summon.getMotionSystem().setCurrentMap(this);
+        summon.getMotionSystem().setPosition(position);
+        summons.add(summon);
+    }
+
+    public void removeSummon(SummonInstance summon) {
+        summons.remove(summon);
     }
 
     public List<AbstractNpc> getNpcs() {
@@ -249,6 +290,7 @@ public class MapInstance {
             case PlayerInstance c -> clients.containsKey(c.getId());
             case MonsterInstance m -> monsters.contains(m);
             case AbstractNpc n -> npcs.contains(n);
+            case SummonInstance s -> summons.contains(s);
             default -> false;
         };
     }
@@ -265,6 +307,12 @@ public class MapInstance {
             if (monster.getMotionSystem().getPosition() != null
                     && monster.getMotionSystem().getPosition().distanceTo(center) <= radius) {
                 nearby.add(monster);
+            }
+        }
+        for (SummonInstance summon : summons) {
+            if (summon.getMotionSystem().getPosition() != null
+                    && summon.getMotionSystem().getPosition().distanceTo(center) <= radius) {
+                nearby.add(summon);
             }
         }
         for (AbstractNpc npc : npcs) {

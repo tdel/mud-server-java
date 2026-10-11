@@ -1,15 +1,19 @@
 package app.game.engine;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import app.domain.actor.event.PlayerRemovedFromWorld;
 import app.domain.Party;
 import app.domain.actor.event.CharacterDamaged;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.GamePlayerRespawned;
 import app.domain.actor.instance.MonsterInstance;
+import app.domain.actor.instance.SummonInstance;
+import app.domain.world.Corpse;
 import app.domain.actor.system.PvPSystem;
 import app.domain.world.MapInstance;
 import app.network.message.ingame.GamePlayerDefeated;
@@ -33,6 +37,9 @@ public class RegenHealthEngine {
     // pas 1 seconde.
     private static final long TICK_INTERVAL_MS = 3_000L;
 
+    // Durée pendant laquelle le cadavre d'un monstre reste consommable.
+    private static final long CORPSE_SECONDS = 15;
+
     private final Map<UUID, PlayerInstance> regenerating = new ConcurrentHashMap<>();
 
     @EventListener
@@ -54,6 +61,13 @@ public class RegenHealthEngine {
         regenerating.putIfAbsent(character.getId(), character);
     }
 
+    // Le personnage quitte le jeu : PlayerLoadedInWorld réinscrira à son retour la
+    // nouvelle instance chargée depuis la base.
+    @EventListener
+    void onPlayerRemovedFromWorld(PlayerRemovedFromWorld event) {
+        regenerating.remove(event.character().getId());
+    }
+
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
     void tick() {
         for (PlayerInstance character : regenerating.values()) {
@@ -72,15 +86,28 @@ public class RegenHealthEngine {
     @EventListener
     @Transactional
     void onMonsterDied(CharacterDied event) {
-        if (!(event.character() instanceof MonsterInstance monster)
-                || !(event.killer() instanceof PlayerInstance killer)) {
+        if (!(event.character() instanceof MonsterInstance monster)) {
             return;
         }
         MapInstance map = monster.getMotionSystem().getCurrentMap();
+        // Le cadavre reste consommable quelques secondes (Corpse Life Drain).
+        map.addCorpse(new Corpse(monster.getId(), monster.getName(), monster.getMotionSystem().getPosition(),
+                Instant.now().plusSeconds(CORPSE_SECONDS)));
         map.removeMonster(monster);
         monster.broadcastToMap(new MonsterDefeated(monster.getId(), monster.getName()), null);
         monster.getKnownList().clear();
         log.info("regenhp.monster_removed_from_map monster={} map={}", monster.getName(), map.getName());
+
+        // Victime d'un serviteur : XP et butin reviennent à son maître. Tué par un
+        // autre monstre (Curse Discord) : retiré de la carte comme les autres — sinon
+        // il resterait, mort, dans la map et les KnownList, et son emplacement de
+        // spawn compterait toujours comme occupé — mais personne n'est récompensé.
+        PlayerInstance killer = event.killer() instanceof PlayerInstance player
+                ? player
+                : event.killer() instanceof SummonInstance summon ? summon.getOwner() : null;
+        if (killer == null) {
+            return;
+        }
 
         Party party = killer.getPartySystem().getParty();
         List<PlayerInstance> eligible = party != null

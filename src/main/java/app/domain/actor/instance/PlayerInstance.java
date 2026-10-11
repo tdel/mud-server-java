@@ -31,6 +31,8 @@ public final class PlayerInstance extends AbstractCharacter {
     private Connection connection;
     private final PartySystem partySystem = new PartySystem();
     private final PvPSystem pvpSystem;
+    // Serviteur invoqué (Summon Kat the Cat...), null sans invocation active.
+    private volatile SummonInstance summon;
 
     public PlayerInstance(UUID id, Account account, String name, MapInstance map, Gender gender, Race race,
             CharacterClass characterClass, int level, int currentHealth, int maxHealth,
@@ -39,8 +41,8 @@ public final class PlayerInstance extends AbstractCharacter {
             Map<PassiveSkill, Integer> knownPassiveSkills, List<Item> items, ItemGrade activeSoulshotGrade,
             ItemGrade activeSpiritshotGrade, int karma, int pkCount, int pvpCount, boolean pvpFlagged) {
         super(id, name, attributes, currentHealth, maxHealth, knownSkills, knownPassiveSkills, activeEffects,
-                InventorySystem.computeBaseStats(attributes, level, items, race.speed()), false, 0, 0, List.of(), level,
-                xp, gold, items, activeSoulshotGrade, activeSpiritshotGrade);
+                InventorySystem.computeBaseStats(attributes, level, items, characterClass.baseStats()), false, 0, 0,
+                List.of(), level, xp, gold, items, activeSoulshotGrade, activeSpiritshotGrade);
         this.account = account;
         getMotionSystem().setCurrentMap(map);
         this.appearanceSystem = new AppearanceSystem(this, gender, race);
@@ -48,7 +50,7 @@ public final class PlayerInstance extends AbstractCharacter {
         getResourceSystem().setMaxMana(maxMana);
         getResourceSystem().setCurrentMana(currentMana);
         this.pvpSystem = new PvPSystem(this, karma, pkCount, pvpCount, pvpFlagged);
-        getInventorySystem().recomputeGradePenalty();
+        getInventorySystem().initGradePenalties();
         getStatSystem().setSetBonuses(getInventorySystem().computeSetBonuses());
     }
 
@@ -91,6 +93,14 @@ public final class PlayerInstance extends AbstractCharacter {
     @Override
     public void clearCombatTarget() {
         getCombatSystem().clearTarget();
+    }
+
+    public SummonInstance getSummon() {
+        return summon;
+    }
+
+    public void setSummon(SummonInstance summon) {
+        this.summon = summon;
     }
 
     public PvPSystem getPvpSystem() {

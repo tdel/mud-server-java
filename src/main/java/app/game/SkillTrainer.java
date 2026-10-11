@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import app.domain.ActiveSkill;
 import app.domain.PassiveSkill;
-import app.domain.actor.CharacterClass.SkillTreeEntry;
+import app.domain.actor.SkillTree.Entry;
 import app.domain.actor.event.CharacterLearnedPassiveSkill;
 import app.domain.actor.event.CharacterLearnedSkill;
 import app.domain.actor.event.DomainEventPublisher;
@@ -48,7 +48,7 @@ public class SkillTrainer {
     }
 
     public List<Offer> offers(PlayerInstance character) {
-        List<SkillTreeEntry> tree = character.getClassSystem().getCharacterClass().tree();
+        List<Entry> tree = character.getClassSystem().skillTree().entries();
         Set<UUID> skillIds = new LinkedHashSet<>();
         tree.forEach(entry -> skillIds.add(entry.skillId()));
 
@@ -56,12 +56,12 @@ public class SkillTrainer {
         List<Offer> offers = new ArrayList<>();
         for (UUID skillId : skillIds) {
             int current = knownLevel(character, skillId);
-            Optional<SkillTreeEntry> next = entryFor(tree, skillId, current + 1);
+            Optional<Entry> next = entryFor(tree, skillId, current + 1);
             if (next.isEmpty() || next.get().autoGet()) {
                 continue;
             }
             int maxLevel = (int) tree.stream().filter(entry -> entry.skillId().equals(skillId)).count();
-            SkillTreeEntry entry = next.get();
+            Entry entry = next.get();
             if (skillCatalog.isKnownId(skillId)) {
                 ActiveSkill skill = skillCatalog.getById(skillId);
                 offers.add(new Offer(skillId, skill.name(), skill.description(), false, skill, entry.level(), current,
@@ -91,7 +91,7 @@ public class SkillTrainer {
     }
 
     public LearnOutcome learn(PlayerInstance character, UUID skillId) {
-        List<SkillTreeEntry> tree = character.getClassSystem().getCharacterClass().tree();
+        List<Entry> tree = character.getClassSystem().skillTree().entries();
         boolean active = skillCatalog.isKnownId(skillId);
         boolean passive = passiveSkillCatalog.isKnownId(skillId);
         String name = active
@@ -102,7 +102,7 @@ public class SkillTrainer {
         }
 
         int current = knownLevel(character, skillId);
-        Optional<SkillTreeEntry> next = entryFor(tree, skillId, current + 1);
+        Optional<Entry> next = entryFor(tree, skillId, current + 1);
         if (next.isEmpty()) {
             return new LearnOutcome.Refused(name, "MAX_LEVEL", 0);
         }
@@ -136,7 +136,7 @@ public class SkillTrainer {
                 character.getSkillSystem().passiveLevelOf(skillId));
     }
 
-    private static Optional<SkillTreeEntry> entryFor(List<SkillTreeEntry> tree, UUID skillId, int level) {
+    private static Optional<Entry> entryFor(List<Entry> tree, UUID skillId, int level) {
         return tree.stream().filter(entry -> entry.skillId().equals(skillId) && entry.level() == level).findFirst();
     }
 }

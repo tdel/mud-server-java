@@ -1,7 +1,6 @@
 package app.domain.actor.system;
 
 import app.domain.actor.AbstractCharacter;
-import app.domain.actor.Attribute;
 import app.domain.actor.event.CharacterGainedXp;
 import app.domain.actor.event.CharacterLeveledUp;
 import app.domain.actor.event.DomainEventPublisher;
@@ -59,20 +58,12 @@ public final class LevelingSystem {
     public void applyLevelUp(PlayerInstance player) {
         level++;
 
-        int newMaxHealth = player.getClassSystem().getCharacterClass()
-                .maxHealth(character.getAttributeSystem().getAttribute(Attribute.CON), level);
-        int hpGain = newMaxHealth - character.getResourceSystem().getMaxHealth();
-        character.getResourceSystem().setMaxHealth(newMaxHealth);
-        character.getResourceSystem().setCurrentHealth(character.getResourceSystem().getCurrentHealth() + hpGain);
-
-        int newMaxMana = player.getClassSystem().getCharacterClass()
-                .maxMana(character.getAttributeSystem().getAttribute(Attribute.MEN), level);
-        int manaGain = newMaxMana - character.getResourceSystem().getMaxMana();
-        character.getResourceSystem().setMaxMana(newMaxMana);
-        character.getResourceSystem().setCurrentMana(character.getResourceSystem().getCurrentMana() + manaGain);
+        int previousMaxHealth = character.getResourceSystem().getBaseMaxHealth();
+        player.getClassSystem().refreshVitals();
+        int hpGain = character.getResourceSystem().getBaseMaxHealth() - previousMaxHealth;
 
         character.getStatSystem().recomputeStats(character.getAttributeSystem().getAttributes(), level,
-                player.getInventorySystem());
+                player.getInventorySystem(), player.getClassSystem().getCharacterClass().baseStats());
 
         character.broadcast(new PlayerLeveledUp(character.getName(), level), null);
         DomainEventPublisher.publish(new CharacterLeveledUp(player, level, hpGain));

@@ -6,49 +6,31 @@ import java.util.Map;
 
 import app.domain.actor.Attribute;
 import app.domain.actor.ModifiedStat;
-import app.domain.item.ArmorCategory;
+import app.domain.item.ItemGrade;
+import app.domain.item.WeaponType;
 import app.game.Randomizer;
 
 /**
- * Formules de combat façon Lineage2 : stats dérivées (p.atk/p.def/m.atk/m.def
- * /accuracy/evasion/criticalRate) et résolution d'un coup (touche, critique,
- * dégâts). Reconstruites à partir des mécaniques largement documentées par la
- * communauté (notamment le moteur open-source L2J) — les constantes ci-dessous
- * sont un point de départ à équilibrer en jeu, pas une reproduction garantie du
- * client retail.
+ * Formules de combat de Lineage 2 High Five : stats dérivées (p.atk, m.atk,
+ * p.def, m.def, précision, esquive, critiques, vitesses, PV/PM, régénération)
+ * et résolution d'un coup (touche, critique, dégâts). Portées des fonctions de
+ * stats du serveur L2JMobius H5 ({@code model/stats/functions/formulas/Func*},
+ * {@code Formulas}) appliquées aux valeurs de base du datapack (classes
+ * {@code stats/chars/baseStats}, objets {@code stats/items}, PNJ
+ * {@code stats/npcs}) : un joueur, un monstre ou un serviteur affiche ici les
+ * mêmes valeurs qu'en jeu L2.
  *
  * <p>
  * Fonctions pures, sans dépendance Spring ni RNG : le tirage aléatoire réel
  * (hit/critique/variance) reste à la charge de l'appelant, via
  * {@code app.game.Randomizer}.
- *
- * <p>
- * Constantes calibrées par simulation déterministe (espérance de dégâts, pas de
- * tirages réels) sur un Fighter/Mystic niveau 1 fraîchement créé (arme de
- * départ, sans armure) contre chaque monstre de {@code data/monsters
- * .xml} : viser un hitChance en miroir ~65-70%, une marge de temps-de-mise-
- * à-mort favorable au joueur sur les monstres "starter" (même niveau, faible
- * récompense XP), et une difficulté réelle sur les monstres au-dessus du niveau
- * du joueur. Point de départ à retester après tout changement de contenu
- * (nouvelles armes/armures, nouveaux monstres).
  */
 public final class CombatFormulas {
 
-    public static final double LEVEL_FACTOR_PER_LEVEL = 0.02;
-    public static final int UNARMED_PATK = 4;
-    public static final double BASE_DEF_FACTOR = 6.0;
-    public static final double ACCURACY_FACTOR = 3.0;
-    public static final double EVASION_FACTOR = 3.0;
-    // Écart accuracy/evasion volontairement faible (contrairement à un ancien
-    // 45/15) : depuis le passage de hitChance() à la formule additive L2J
-    // (calcHitMiss), l'écart pèse directement en points de pourcentage (facteur
-    // HIT_CHANCE_FACTOR) plutôt que comme un ratio auto-limité — un écart de 30
-    // saturait quasi toujours le hitChance à MAX_HIT_CHANCE, quel que soit DEX.
-    public static final int BASE_ACCURACY = 30;
-    public static final int BASE_EVASION = 36;
-    public static final int BASE_CRIT_RATE = 8;
-    public static final int MIN_CRIT_RATE = 1;
-    public static final int MAX_CRIT_RATE = 90;
+    // Plafonds L2J (Config.MAX_PCRIT_RATE / MAX_MCRIT_RATE) des taux critiques,
+    // exprimés comme en L2 en millièmes (88 = 8,8 % de chance).
+    public static final int MAX_CRIT_RATE = 500;
+    public static final int MAX_MAGIC_CRIT_RATE = 200;
     public static final double MIN_HIT_CHANCE = 0.20;
     public static final double MAX_HIT_CHANCE = 0.98;
     // calcHitMiss L2J : chance = clamp(80 + 2*(accuracy-evasion), [20,98]) %.
@@ -75,8 +57,6 @@ public final class CombatFormulas {
     public static final double ELEMENT_RESIST_FACTOR = 0.01;
     public static final double MIN_ELEMENT_MULTIPLIER = 0.1;
     public static final double MAX_ELEMENT_MULTIPLIER = 2.0;
-    public static final int ENCHANT_ATK_BONUS_PER_LEVEL = 2;
-    public static final int ENCHANT_DEF_BONUS_PER_LEVEL = 1;
     // Multiplicateur de m.atk dans la formule de heal L2J (handler
     // net.sf.l2j...skillhandlers.Heal) une fois les spiritshots retirés : sans
     // charge (sps/bsps), ce chemin retombe systématiquement sur mAtkMul=2.
@@ -84,19 +64,17 @@ public final class CombatFormulas {
     public static final int BASE_DEBUFF_RESIST = 5;
     public static final double DEBUFF_RESIST_FACTOR = 3.0;
     public static final int MAX_DEBUFF_RESIST = 70;
-    // Fraction du pool max régénérée par tick de RegenHealthEngine/RegenManaEngine
-    // (toutes les 3s, période retail L2J HpTask/MpTask — cf. TICK_INTERVAL_MS).
-    public static final double HP_REGEN_RATE = 0.02;
-    public static final double MP_REGEN_RATE = 0.02;
-    public static final int BASE_ATK_SPD = 300;
+    // Régénération L2 selon l'activité (Formulas.calcHpRegen/calcMpRegen) : assis
+    // (Relax) x1.5, immobile x1.1, en course x0.7.
+    public static final double REGEN_RESTING_FACTOR = 1.5;
+    public static final double REGEN_STANDING_FACTOR = 1.1;
+    public static final double REGEN_MOVING_FACTOR = 0.7;
     public static final double ATK_SPD_DELAY_CONSTANT = 500_000.0;
-    // Valeur de base canonique L2J (cf. baseMAtkSpd des templates de classe
-    // officiels,
-    // quasi tous à 333 pour la vitesse d'incantation neutre) — contrairement à
-    // BASE_ATK_SPD ci-dessus (qui n'est qu'un delta appliqué à weaponAtkSpd, propre
-    // à
-    // l'arme), cette constante EST la valeur de référence de castSpeed() elle-même.
+    // Vitesse d'incantation de base de toute créature L2 (baseMAtkSpd 333).
     public static final int BASE_CAST_SPD = 333;
+    // Critique magique de base (MCRITICAL_RATE initial de
+    // CharStat.getMCriticalHit).
+    public static final double BASE_MAGIC_CRIT = 1.0;
     // 2 unités ≈ 2x largeur d'un personnage + longueur d'une épée longue (1 unité
     // = 1 case Tiled = 32px) ; couvre aussi confortablement l'adjacence en
     // diagonale (√2 ≈ 1.41), non couverte par l'ancienne valeur de 1.0.
@@ -105,71 +83,113 @@ public final class CombatFormulas {
     private CombatFormulas() {
     }
 
-    public static double levelFactor(int level) {
-        return 1.0 + (level - 1) * LEVEL_FACTOR_PER_LEVEL;
+    // Modificateur de niveau L2 (L2Character.getLevelMod) : 0.90 au niveau 1,
+    // 1.29 au niveau 40.
+    public static double levelMod(int level) {
+        return (level + 89) / 100.0;
     }
 
-    public static int physicalAttack(int weaponPAtk, int strengthScore, int level) {
-        return (int) Math.round(weaponPAtk * Attribute.STR.bonus(strengthScore) * levelFactor(level));
+    // FuncPAtkMod : p.atk de base (arme, sinon poing de la classe) x STR x niveau.
+    public static int physicalAttack(double basePAtk, int strengthScore, int level) {
+        return (int) Math.round(basePAtk * Attribute.STR.bonus(strengthScore) * levelMod(level));
     }
 
-    public static int magicalAttack(int weaponMAtk, int intelligenceScore, int level) {
-        return (int) Math.round(weaponMAtk * Attribute.INT.bonus(intelligenceScore) * levelFactor(level));
+    // FuncMAtkMod : m.atk de base x INT² x niveau².
+    public static int magicalAttack(double baseMAtk, int intelligenceScore, int level) {
+        double intBonus = Attribute.INT.bonus(intelligenceScore);
+        double levelMod = levelMod(level);
+        return (int) Math.round(baseMAtk * intBonus * intBonus * levelMod * levelMod);
     }
 
-    public static int physicalDefense(int armorPDefSum, int constitutionScore) {
-        return Math.max(1, (int) Math.round(armorPDefSum + Attribute.CON.bonus(constitutionScore) * BASE_DEF_FACTOR));
+    // FuncPDefMod : somme des défenses (pièces portées, et défense "nue" de la
+    // classe pour les emplacements vides) x niveau. CON n'y joue pas.
+    public static int physicalDefense(double basePDef, int level) {
+        return Math.max(1, (int) Math.round(basePDef * levelMod(level)));
     }
 
-    public static int magicalDefense(int armorMDefSum, int menScore) {
-        return Math.max(1, (int) Math.round(armorMDefSum + Attribute.MEN.bonus(menScore) * BASE_DEF_FACTOR));
+    // FuncMDefMod : somme des bijoux (ou défense nue par emplacement) x MEN x
+    // niveau.
+    public static int magicalDefense(double baseMDef, int menScore, int level) {
+        return Math.max(1, (int) Math.round(baseMDef * Attribute.MEN.bonus(menScore) * levelMod(level)));
     }
 
-    // Courbe quadratique en level (hpBase + hpAdd*level + hpMod*level^2),
-    // reprenant telle quelle la table officielle L2 des PV de base par niveau
-    // (Human Fighter/Mystic, cf. data/classes/*.xml) ; le résultat est ensuite
-    // multiplié par le bonus L2 de CON (Attribute.bonus), comme pour p.def/m.def.
-    public static int maxHealth(double hpBase, double hpAdd, double hpMod, int level, int constitutionScore) {
-        double base = hpBase + hpAdd * level + hpMod * level * level;
-        return Math.max(1, (int) Math.round(base * Attribute.CON.bonus(constitutionScore)));
+    // FuncMaxHpMul / FuncMaxMpMul : PV/PM de base (table par niveau de la classe,
+    // ou valeur du PNJ) x CON / MEN.
+    public static int maxHealth(double baseHp, int constitutionScore) {
+        return Math.max(1, (int) Math.round(baseHp * Attribute.CON.bonus(constitutionScore)));
     }
 
-    public static int maxMana(double mpBase, double mpAdd, double mpMod, int level, int menScore) {
-        double base = mpBase + mpAdd * level + mpMod * level * level;
-        return Math.max(0, (int) Math.round(base * Attribute.MEN.bonus(menScore)));
+    public static int maxMana(double baseMp, int menScore) {
+        return Math.max(0, (int) Math.round(baseMp * Attribute.MEN.bonus(menScore)));
     }
 
-    public static int healthRegenPerTick(int maxHealth, int constitutionScore) {
-        return Math.max(1, (int) Math.round(maxHealth * HP_REGEN_RATE * Attribute.CON.bonus(constitutionScore)));
+    // Formulas.calcHpRegen/calcMpRegen (joueur) : régénération de base de la
+    // classe au niveau x modificateur de niveau x CON (PV) / MEN (PM) x facteur
+    // d'activité, par tick de 3 s.
+    public static int healthRegenPerTick(double baseRegen, int level, int constitutionScore, double activityFactor) {
+        double regen = Math.max(1, baseRegen * levelMod(level) * Attribute.CON.bonus(constitutionScore));
+        return Math.max(1, (int) Math.round(regen * activityFactor));
     }
 
-    public static int manaRegenPerTick(int maxMana, int menScore) {
-        return Math.max(1, (int) Math.round(maxMana * MP_REGEN_RATE * Attribute.MEN.bonus(menScore)));
+    public static int manaRegenPerTick(double baseRegen, int level, int menScore, double activityFactor) {
+        double regen = Math.max(1, baseRegen * levelMod(level) * Attribute.MEN.bonus(menScore));
+        return Math.max(1, (int) Math.round(regen * activityFactor));
     }
 
-    public static int accuracy(int level, int dexterityScore, int accuracyItemBonus) {
-        int raw = (int) Math.round(
-                BASE_ACCURACY + level + Attribute.DEX.bonus(dexterityScore) * ACCURACY_FACTOR + accuracyItemBonus);
-        return Math.max(1, raw);
+    // FuncAtkAccuracy : sqrt(DEX)*6 + niveau + bonus de l'arme (accCombat, ex.
+    // +4.75 masse, -3.75 dague/arc/hast), avec les paliers L2 au-delà du niveau 69.
+    public static int accuracy(int level, int dexterityScore, double accuracyBonus) {
+        double value = Math.sqrt(dexterityScore) * 6 + level + accuracyBonus;
+        if (level > 77) {
+            value += level - 76;
+        }
+        if (level > 69) {
+            value += level - 69;
+        }
+        return (int) Math.round(value);
     }
 
-    public static int evasion(int level, int dexterityScore, int armorWeightPenalty, int evasionItemBonus) {
-        int raw = (int) Math.round(BASE_EVASION + level + Attribute.DEX.bonus(dexterityScore) * EVASION_FACTOR
-                + armorWeightPenalty + evasionItemBonus);
-        return Math.max(0, raw);
+    // FuncAtkEvasion : sqrt(DEX)*6 + niveau + bonus (bouclier -8, PNJ : evasion
+    // du datapack).
+    public static int evasion(int level, int dexterityScore, double evasionBonus, boolean player) {
+        double value = Math.sqrt(dexterityScore) * 6 + level + evasionBonus;
+        if (player && level >= 70) {
+            value += (level - 69) * (level >= 78 ? 1.2 : 1.0);
+        } else if (!player && level > 69) {
+            value += level - 69 + 2;
+        }
+        return (int) Math.round(value);
     }
 
-    public static int criticalRate(int dexterityScore, int critItemBonus) {
-        int raw = (int) Math
-                .round(BASE_CRIT_RATE + Attribute.DEX.bonus(dexterityScore) * ACCURACY_FACTOR + critItemBonus);
-        return Math.clamp(raw, MIN_CRIT_RATE, MAX_CRIT_RATE);
+    // FuncAtkCritical : critique de base (arme : 8 épée, 12 dague/arc, 4 masse/
+    // poing...) x DEX x 10, en millièmes, plafonné à MAX_CRIT_RATE.
+    public static int criticalRate(double baseCritRate, int dexterityScore) {
+        int rate = (int) Math.round(baseCritRate * Attribute.DEX.bonus(dexterityScore) * 10);
+        return Math.min(rate, MAX_CRIT_RATE);
     }
 
-    // Miroir magique de criticalRate() : DEX pilote le critique physique, WIT le
-    // critique magique.
-    public static int magicCriticalRate(int witScore, int critItemBonus) {
-        int raw = (int) Math.round(BASE_CRIT_RATE + Attribute.WIT.bonus(witScore) * ACCURACY_FACTOR + critItemBonus);
-        return Math.clamp(raw, MIN_CRIT_RATE, MAX_CRIT_RATE);
+    // CharStat.getMCriticalHit + FuncMAtkCritical : 1 x WIT x 10 (bonus de WIT
+    // seulement arme en main pour un joueur, toujours pour un PNJ), tronqué puis
+    // x10, en millièmes, plafonné à MAX_MAGIC_CRIT_RATE.
+    public static int magicCriticalRate(int witScore, boolean witApplies) {
+        double base = witApplies ? BASE_MAGIC_CRIT * Attribute.WIT.bonus(witScore) * 10 : BASE_MAGIC_CRIT;
+        return Math.min((int) base * 10, MAX_MAGIC_CRIT_RATE);
+    }
+
+    // FuncPAtkSpeed : vitesse d'attaque de l'arme (379 épée/masse, 433 dague, 325
+    // deux mains, 293 arc ; 300 à mains nues) x DEX.
+    public static int attackSpeed(int baseAtkSpd, int dexterityScore) {
+        return Math.max(1, (int) Math.round(baseAtkSpd * Attribute.DEX.bonus(dexterityScore)));
+    }
+
+    // FuncMAtkSpeed : 333 x WIT.
+    public static int castSpeed(int witScore) {
+        return Math.max(1, (int) Math.round(BASE_CAST_SPD * Attribute.WIT.bonus(witScore)));
+    }
+
+    // FuncMoveSpeed : vitesse de course de base (classe ou PNJ) x DEX.
+    public static int runSpeed(double baseRunSpeed, int dexterityScore) {
+        return Math.max(0, (int) Math.round(baseRunSpeed * Attribute.DEX.bonus(dexterityScore)));
     }
 
     // calcHitMiss L2J, débarrassée des bonus de hauteur/nuit/position (pas d'axe
@@ -177,6 +197,11 @@ public final class CombatFormulas {
     public static double hitChance(int accuracy, int evasion) {
         double chance = HIT_CHANCE_BASE + HIT_CHANCE_FACTOR * (accuracy - evasion);
         return Math.clamp(chance, MIN_HIT_CHANCE, MAX_HIT_CHANCE);
+    }
+
+    // Chance (0-1) d'un taux critique L2 exprimé en millièmes.
+    public static double critChance(int rate) {
+        return Math.max(0, rate) / 1000.0;
     }
 
     // calcPhysDam L2J, débarrassée des soulshots, du blocage au bouclier, des
@@ -229,10 +254,49 @@ public final class CombatFormulas {
         return Math.clamp(raw, 0, MAX_DEBUFF_RESIST) / 100.0;
     }
 
-    // N'applique le bonus d'enchant que si l'item porte déjà ce stat (baseStat >
-    // 0) : évite qu'une armure enchantée gagne un p.atk fantôme, et vice versa.
-    public static int enchantBonus(int baseStat, int enchantLevel, int bonusPerLevel) {
-        return baseStat > 0 ? baseStat + enchantLevel * bonusPerLevel : baseStat;
+    // FuncEnchant L2J, p.atk d'une arme : bonus par niveau selon le grade et la
+    // tenue (une main, deux mains, arc), doublé au-delà de +3 (sur-enchantement).
+    // Rien sur un objet qui ne porte pas déjà la stat (base 0).
+    public static int enchantPAtk(int base, int enchant, ItemGrade grade, WeaponType weaponType) {
+        if (base <= 0 || enchant <= 0 || weaponType == null) {
+            return base;
+        }
+        boolean bow = weaponType == WeaponType.BOW;
+        boolean twoHanded = weaponType.twoHanded();
+        int perLevel = switch (grade) {
+            case S -> bow ? 10 : twoHanded ? 6 : 5;
+            case A -> bow ? 8 : twoHanded ? 5 : 4;
+            case B, C -> bow ? 6 : twoHanded ? 4 : 3;
+            case D, NOGRADE -> bow ? 4 : 2;
+        };
+        return base + enchantSteps(enchant, perLevel);
+    }
+
+    // FuncEnchant L2J, m.atk : +2 (D/sans grade), +3 (C/B/A), +4 (S) par niveau.
+    public static int enchantMAtk(int base, int enchant, ItemGrade grade) {
+        if (base <= 0 || enchant <= 0) {
+            return base;
+        }
+        int perLevel = switch (grade) {
+            case S -> 4;
+            case A, B, C -> 3;
+            case D, NOGRADE -> 2;
+        };
+        return base + enchantSteps(enchant, perLevel);
+    }
+
+    // FuncEnchant L2J, p.def/m.def : +1 par niveau jusqu'à +3, +3 au-delà.
+    public static int enchantDefense(int base, int enchant) {
+        if (base <= 0 || enchant <= 0) {
+            return base;
+        }
+        int safe = Math.min(enchant, 3);
+        return base + safe + 3 * (enchant - safe);
+    }
+
+    private static int enchantSteps(int enchant, int perLevel) {
+        int safe = Math.min(enchant, 3);
+        return perLevel * safe + 2 * perLevel * (enchant - safe);
     }
 
     // Un score positif (résistance) réduit les dégâts jusqu'à x0.1, un score
@@ -243,75 +307,74 @@ public final class CombatFormulas {
         return Math.max(1, (int) Math.round(rawDamage * multiplier));
     }
 
-    // atk.spd suit DEX comme p.crit/accuracy (même statBonus), pondéré par la
-    // vitesse d'attaque naturelle de l'arme (0 → dégénère en pur DEX, une arme
-    // "lourde" ayant un atkSpd de base plus faible qu'une dague).
-    public static int attackSpeed(int weaponAtkSpd, int dexterityScore) {
-        return Math.max(1, (int) Math.round(weaponAtkSpd * Attribute.DEX.bonus(dexterityScore)));
-    }
-
     // Formule L2 canonique : délai entre deux coups (ms) = 500 000 / atk.spd —
-    // atk.spd=300 (base, à neutre) donne ~1666ms, plus l'atk.spd est haut, plus
+    // 379 (épée, DEX neutre) donne ~1319 ms, plus l'atk.spd est haut, plus
     // l'attaque est rapide.
     public static Duration attackCooldown(int atkSpd) {
         return Duration.ofMillis(Math.round(ATK_SPD_DELAY_CONSTANT / Math.max(1, atkSpd)));
     }
 
-    // m.atk.spd (cast.spd) suit WIT comme m.crit (même statBonus), SANS dépendance
-    // à
-    // l'arme contrairement à atk.spd/attackSpeed ci-dessus : en L2 (et L2J), la
-    // vitesse d'incantation est une valeur de base par personnage (BASE_CAST_SPD),
-    // pas une caractéristique de l'arme équipée — seuls WIT et les buffs/debuffs
-    // (déjà couverts par EffectsSystem via StatSystem.getEffective, gratuitement
-    // pour
-    // cette nouvelle stat) la font varier.
-    public static int castSpeed(int witScore) {
-        return Math.max(1, (int) Math.round(BASE_CAST_SPD * Attribute.WIT.bonus(witScore)));
-    }
-
     // Formule L2J (Skill.calcHitTime côté client officiel/L2J applique le même
     // ratio) : durée réelle d'incantation = durée d'auteur du sort (calibrée pour
-    // un
-    // cast.spd neutre, BASE_CAST_SPD) * BASE_CAST_SPD / cast.spd effectif — à la
-    // différence d'attackCooldown ci-dessus (délai absolu dérivé d'une seule
-    // constante), la référence ici est ActiveSkill.castingTimeMs(), propre à chaque
-    // sort : plus cast.spd dépasse BASE_CAST_SPD (WIT élevé), plus l'incantation
-    // réelle se raccourcit proportionnellement par rapport à cette durée d'auteur.
+    // un cast.spd neutre, BASE_CAST_SPD) * BASE_CAST_SPD / cast.spd effectif.
     public static long effectiveCastingTimeMs(long authoredCastingTimeMs, int castSpd) {
         return Math.round(authoredCastingTimeMs * (double) BASE_CAST_SPD / Math.max(1, castSpd));
     }
 
-    public static int armorWeightPenalty(ArmorCategory category) {
-        if (category == null) {
-            return 0;
-        }
-        return switch (category) {
-            case LIGHT, ROBE -> 0;
-            case HEAVY -> -10;
-        };
+    /**
+     * Valeurs de base d'une créature avant les fonctions de stats L2 : celles de
+     * l'équipement (ou de la classe à nu) pour un joueur, celles du datapack pour
+     * un PNJ.
+     *
+     * @param pAtk
+     *            p.atk de l'arme, ou du poing de la classe
+     * @param mAtk
+     *            m.atk de l'arme, ou de la classe
+     * @param pDef
+     *            somme des p.def portées et des défenses nues restantes
+     * @param mDef
+     *            somme des m.def portées et des défenses nues restantes
+     * @param accuracyBonus
+     *            accCombat (arme, ou accuracy du PNJ)
+     * @param evasionBonus
+     *            bonus/malus d'esquive (bouclier, evasion du PNJ)
+     * @param critRate
+     *            critique de base (arme, ou classe/PNJ)
+     * @param critBonus
+     *            bonus de critique plat ajouté après DEX (millièmes)
+     * @param atkSpd
+     *            vitesse d'attaque de base
+     * @param runSpeed
+     *            vitesse de course de base
+     * @param magicCritFromWit
+     *            WIT augmente le critique magique (PNJ, joueur arme en main)
+     * @param player
+     *            esquive façon joueur (paliers au-delà du niveau 69)
+     */
+    public record BaseValues(double pAtk, double mAtk, double pDef, double mDef, double accuracyBonus,
+            double evasionBonus, double critRate, int critBonus, int atkSpd, double runSpeed, boolean magicCritFromWit,
+            boolean player) {
     }
 
-    // Assemble en une seule map les 10 stats de combat dérivées (p.atk, m.atk,
-    // p.def, m.def, accuracy, evasion, p.crit, m.crit, atk.spd, cast.spd) à partir
-    // des
-    // composantes brutes (arme/armure ou équivalent monstre) et des attributs —
-    // consommé par StatSystem, aussi bien pour un PlayerInstance (équipement
-    // réel) qu'un MonsterInstance (stats naturelles issues de son template).
-    public static Map<ModifiedStat, Integer> baseStats(int weaponPAtk, int weaponMAtk, int armorPDefSum,
-            int armorMDefSum, int accuracyItemBonus, int evasionItemBonus, int critItemBonus, int armorWeightPenalty,
-            int weaponAtkSpd, Map<Attribute, Integer> attributes, int level) {
+    // Applique les fonctions de stats L2 (Func*) aux valeurs de base : p.atk,
+    // m.atk, p.def, m.def, précision, esquive, critiques, vitesses d'attaque,
+    // d'incantation et de course — consommé par StatSystem, pour un joueur
+    // (InventorySystem.computeBaseStats), un monstre (MonsterCatalog) ou un
+    // serviteur (SummonInstance).
+    public static Map<ModifiedStat, Integer> stats(BaseValues base, Map<Attribute, Integer> attributes, int level) {
         Map<ModifiedStat, Integer> stats = new EnumMap<>(ModifiedStat.class);
-        stats.put(ModifiedStat.PATK, physicalAttack(weaponPAtk, attributes.get(Attribute.STR), level));
-        stats.put(ModifiedStat.MATK, magicalAttack(weaponMAtk, attributes.get(Attribute.INT), level));
-        stats.put(ModifiedStat.PDEF, physicalDefense(armorPDefSum, attributes.get(Attribute.CON)));
-        stats.put(ModifiedStat.MDEF, magicalDefense(armorMDefSum, attributes.get(Attribute.MEN)));
-        stats.put(ModifiedStat.ACCURACY, accuracy(level, attributes.get(Attribute.DEX), accuracyItemBonus));
-        stats.put(ModifiedStat.EVASION,
-                evasion(level, attributes.get(Attribute.DEX), armorWeightPenalty, evasionItemBonus));
-        stats.put(ModifiedStat.PCRIT, criticalRate(attributes.get(Attribute.DEX), critItemBonus));
-        stats.put(ModifiedStat.MCRIT, magicCriticalRate(attributes.get(Attribute.WIT), critItemBonus));
-        stats.put(ModifiedStat.ATKSPD, attackSpeed(weaponAtkSpd, attributes.get(Attribute.DEX)));
+        int dex = attributes.get(Attribute.DEX);
+        stats.put(ModifiedStat.PATK, physicalAttack(base.pAtk(), attributes.get(Attribute.STR), level));
+        stats.put(ModifiedStat.MATK, magicalAttack(base.mAtk(), attributes.get(Attribute.INT), level));
+        stats.put(ModifiedStat.PDEF, physicalDefense(base.pDef(), level));
+        stats.put(ModifiedStat.MDEF, magicalDefense(base.mDef(), attributes.get(Attribute.MEN), level));
+        stats.put(ModifiedStat.ACCURACY, accuracy(level, dex, base.accuracyBonus()));
+        stats.put(ModifiedStat.EVASION, evasion(level, dex, base.evasionBonus(), base.player()));
+        stats.put(ModifiedStat.PCRIT, Math.min(criticalRate(base.critRate(), dex) + base.critBonus(), MAX_CRIT_RATE));
+        stats.put(ModifiedStat.MCRIT, magicCriticalRate(attributes.get(Attribute.WIT), base.magicCritFromWit()));
+        stats.put(ModifiedStat.ATKSPD, attackSpeed(base.atkSpd(), dex));
         stats.put(ModifiedStat.CASTSPD, castSpeed(attributes.get(Attribute.WIT)));
+        stats.put(ModifiedStat.SPEED, runSpeed(base.runSpeed(), dex));
         return stats;
     }
 }

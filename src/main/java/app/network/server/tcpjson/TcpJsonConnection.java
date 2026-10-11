@@ -108,9 +108,27 @@ public class TcpJsonConnection implements Connection, TcpJsonOutput {
 
     @Override
     public void write(String type, Object payload) {
-        log.debug("message.sent type={} connectionId={} state={} character={} account={}", type, connectionId, state,
-                state == ConnectionState.INGAME ? player.getName() : "-",
-                state != ConnectionState.CONNECTED ? account.getLogin() : "-");
+        if (log.isDebugEnabled()) {
+            // Copies locales : write() tourne aussi hors du thread de la connexion
+            // (ticks des moteurs, Ping de l'event loop) pendant que la fin de
+            // session remet player/account à null.
+            PlayerInstance currentPlayer = player;
+            Account currentAccount = account;
+            log.debug("message.sent type={} connectionId={} state={} character={} account={}", type, connectionId,
+                    state, currentPlayer != null ? currentPlayer.getName() : "-",
+                    currentAccount != null ? currentAccount.getLogin() : "-");
+        }
+        // Client qui ne lit plus ses messages (figé, réseau saturé) : chaque diffusion
+        // s'empilerait sinon dans son tampon d'envoi jusqu'à épuiser le tas. Au-delà
+        // du seuil haut (TcpJsonServerInitializer), on coupe : la déconnexion suit le
+        // chemin normal (channelInactive → handleClose).
+        if (!channel.isWritable()) {
+            if (channel.isActive()) {
+                log.warn("tcpjson.slow_consumer_closed connectionId={} type={}", connectionId, type);
+                channel.close();
+            }
+            return;
+        }
         try {
             byte[] json = encode(type, payload);
             channel.writeAndFlush(Unpooled.wrappedBuffer(json));
@@ -133,6 +151,11 @@ public class TcpJsonConnection implements Connection, TcpJsonOutput {
     @Override
     public void close() {
         channel.close();
+    }
+
+    @Override
+    public boolean isOpen() {
+        return channel.isActive();
     }
 
     @Override
@@ -182,6 +205,7 @@ public class TcpJsonConnection implements Connection, TcpJsonOutput {
     @Override
     public void detachWorldInstance() {
         this.worldInstance = null;
+        this.player = null;
         this.setState(ConnectionState.CONNECTED);
     }
 

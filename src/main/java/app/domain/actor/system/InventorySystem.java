@@ -15,10 +15,12 @@ import java.util.stream.Collectors;
 
 import app.domain.ActiveEffect;
 import app.domain.SkillElement;
-import app.domain.StatModifier;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.Attribute;
+import app.domain.actor.ClassBaseStats;
 import app.domain.actor.ModifiedStat;
+import app.domain.actor.event.CharacterEffectApplied;
+import app.domain.actor.event.CharacterEffectExpired;
 import app.domain.actor.event.CharacterLootedItem;
 import app.domain.actor.event.CharacterReceivedGold;
 import app.domain.actor.event.CharacterSpentGold;
@@ -31,6 +33,7 @@ import app.domain.actor.event.ShotActivated;
 import app.domain.actor.instance.PlayerInstance;
 import app.domain.item.EquipmentItem;
 import app.domain.item.EquipmentSlot;
+import app.domain.item.GradePenalty;
 import app.domain.item.Item;
 import app.domain.item.ItemExpectation;
 import app.domain.item.ItemGrade;
@@ -47,8 +50,6 @@ import app.network.message.ingame.SoulshotUsed;
 import app.network.message.ingame.SpiritshotUsed;
 
 public final class InventorySystem {
-
-    public static final UUID GRADE_PENALTY_EFFECT_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
 
     private final AbstractCharacter character;
     private final List<Item> items = new CopyOnWriteArrayList<>();
@@ -324,11 +325,18 @@ public final class InventorySystem {
             return Optional.empty();
         }
         boolean freesOffHand = slot == EquipmentSlot.WEAPON && isTwoHanded(item);
+        // Armure complète (robe/armure d'une pièce L2) : elle couvre les jambes, les
+        // jambières portées sont retirées ; à l'inverse, enfiler des jambières retire
+        // l'armure complète, comme dans L2.
+        boolean freesLegs = slot == EquipmentSlot.CHEST && item.isFullArmor();
+        boolean freesFullArmor = slot == EquipmentSlot.LEGS;
 
         List<Item> previousOccupants = new ArrayList<>();
         for (Item existing : equipped) {
             if (!existing.getId().equals(item.getId())
-                    && (existing.getSlot() == slot || freesOffHand && existing.getSlot() == EquipmentSlot.OFF_HAND)) {
+                    && (existing.getSlot() == slot || freesOffHand && existing.getSlot() == EquipmentSlot.OFF_HAND
+                            || freesLegs && existing.getSlot() == EquipmentSlot.LEGS
+                            || freesFullArmor && existing.getSlot() == EquipmentSlot.CHEST && existing.isFullArmor())) {
                 previousOccupants.add(existing);
                 existing.setSlot(null);
             }
@@ -337,9 +345,10 @@ public final class InventorySystem {
         item.setSlot(slot);
         DomainEventPublisher.publish(new GamePlayerEquippedItem(player, item, slot, previousOccupants));
         broadcastAppearance(player);
-        recomputeGradePenalty();
+        refreshGradePenalties();
         character.getStatSystem().recomputeStats(character.getAttributeSystem().getAttributes(),
-                character.getLevelingSystem().getLevel(), this);
+                character.getLevelingSystem().getLevel(), this,
+                player.getClassSystem().getCharacterClass().baseStats());
         return Optional.of(slot);
     }
 
@@ -350,9 +359,10 @@ public final class InventorySystem {
         item.setSlot(null);
         DomainEventPublisher.publish(new GamePlayerUnequippedItem(player, item));
         broadcastAppearance(player);
-        recomputeGradePenalty();
+        refreshGradePenalties();
         character.getStatSystem().recomputeStats(character.getAttributeSystem().getAttributes(),
-                character.getLevelingSystem().getLevel(), this);
+                character.getLevelingSystem().getLevel(), this,
+                player.getClassSystem().getCharacterClass().baseStats());
     }
 
     // Vrai tant qu'une arme à deux mains (WeaponType.twoHanded) est équipée : rien
@@ -381,30 +391,52 @@ public final class InventorySystem {
                 player);
     }
 
-    // Ne dépend que des paramètres reçus (aucun accès à `this`) : appelable
-    // avant que le InventorySystem du personnage n'existe (PlayerInstance
-    // l'appelle avant super(...)), et réutilisée par
-    // StatSystem.recomputeStats() pour les recalculs post-construction.
+    // Stats de base d'un joueur selon les fonctions L2 (CombatFormulas.stats) :
+    // arme en main (p.atk, m.atk, vitesse, critique et précision de son type), à
+    // défaut le poing de la classe ; p.def = pièces portées + défense nue des
+    // emplacements vides (une armure complète couvre aussi les jambes) ; m.def =
+    // bijoux portés + défense nue des emplacements de bijou vides. Le bouclier
+    // n'ajoute pas de p.def : sa défense ne compte qu'en cas de blocage
+    // (DamageModifiers.defenseWithBlock), il retire 8 d'esquive. MAX_MP porte le
+    // bonus de PM des robes et bijoux (ajouté par ResourceSystem.getMaxMana).
+    // Appelé à la construction de PlayerInstance (avant que son StatSystem existe)
+    // puis par StatSystem.recomputeStats.
     public static Map<ModifiedStat, Integer> computeBaseStats(Map<Attribute, Integer> attributes, int level,
-            List<Item> items, int baseSpeed) {
+            List<Item> items, ClassBaseStats classBase) {
         List<Item> equipped = items.stream().filter(item -> item.getSlot() != null).toList();
         Optional<Item> weapon = equipped.stream().filter(item -> item.getSlot() == EquipmentSlot.WEAPON).findFirst();
 
-        int weaponPAtk = weapon.map(Item::getPAtk).orElse(CombatFormulas.UNARMED_PATK);
-        int weaponMAtk = weapon.map(Item::getMAtk).orElse(0);
-        int weaponAtkSpd = weapon.map(Item::getAtkSpd).orElse(CombatFormulas.BASE_ATK_SPD);
-        int armorPDefSum = equipped.stream().mapToInt(Item::getPDef).sum();
-        int armorMDefSum = equipped.stream().mapToInt(Item::getMDef).sum();
-        int accuracyItemBonus = equipped.stream().mapToInt(Item::getAccuracyBonus).sum();
-        int evasionItemBonus = equipped.stream().mapToInt(Item::getEvasionBonus).sum();
-        int critItemBonus = equipped.stream().mapToInt(Item::getCritBonus).sum();
-        int armorWeightPenalty = equipped.stream().filter(item -> item.getSlot() == EquipmentSlot.CHEST).findFirst()
-                .map(item -> CombatFormulas.armorWeightPenalty(item.getArmorCategory())).orElse(0);
+        double pDef = classBase.totalBarePDef();
+        double mDef = classBase.totalBareMDef();
+        double accuracyBonus = 0;
+        double evasionBonus = 0;
+        int critBonus = 0;
+        int maxMp = 0;
+        for (Item item : equipped) {
+            EquipmentSlot slot = item.getSlot();
+            if (slot != EquipmentSlot.WEAPON && slot != EquipmentSlot.OFF_HAND) {
+                pDef += item.getPDef() - classBase.barePDef(slot);
+                if (slot == EquipmentSlot.CHEST && item.isFullArmor()) {
+                    pDef -= classBase.barePDef(EquipmentSlot.LEGS);
+                }
+            }
+            mDef += item.getMDef() - classBase.bareMDef(slot);
+            accuracyBonus += item.getAccuracyBonus();
+            evasionBonus += item.getEvasionBonus();
+            if (slot != EquipmentSlot.WEAPON) {
+                critBonus += item.getCritBonus();
+            }
+            maxMp += item.getMaxMp();
+        }
 
-        Map<ModifiedStat, Integer> stats = CombatFormulas.baseStats(weaponPAtk, weaponMAtk, armorPDefSum, armorMDefSum,
-                accuracyItemBonus, evasionItemBonus, critItemBonus, armorWeightPenalty, weaponAtkSpd, attributes,
-                level);
-        stats.put(ModifiedStat.SPEED, baseSpeed);
+        CombatFormulas.BaseValues base = new CombatFormulas.BaseValues(
+                weapon.map(Item::getPAtk).map(Double::valueOf).orElse(classBase.pAtk()),
+                weapon.map(Item::getMAtk).map(Double::valueOf).orElse(classBase.mAtk()), pDef, mDef, accuracyBonus,
+                evasionBonus, weapon.map(Item::getCritBonus).map(Double::valueOf).orElse(classBase.critRate()),
+                critBonus, weapon.map(Item::getAtkSpd).orElse(classBase.atkSpd()), classBase.runSpeed(),
+                weapon.isPresent(), true);
+        Map<ModifiedStat, Integer> stats = CombatFormulas.stats(base, attributes, level);
+        stats.put(ModifiedStat.MAX_MP, maxMp);
         return stats;
     }
 
@@ -432,30 +464,65 @@ public final class InventorySystem {
         return modifiers;
     }
 
-    // Marqueur unique dans ActiveEffects tant qu'au moins un objet équipé a un
-    // ItemExpectation (cf. EquipmentItem.getExpectation) non rempli — typiquement
-    // un grade au-delà de l'expertise débloquée (SkillSystem.passiveLevelOf). Pas
-    // de vraie expiration (le malus dure tant que l'objet reste équipé) : on
-    // recalcule/rafraîchit à chaque equip/unequip plutôt que de s'appuyer sur un
-    // minuteur. Les actions des ItemExpectation non remplies sont fusionnées en un
-    // seul ActiveEffect (id fixe) plutôt qu'un effet par objet.
-    public void recomputeGradePenalty() {
-        List<ItemExpectation.ExpectationEffect> unmetActions = getEquippedItems().stream().map(Item::getTemplate)
-                .filter(EquipmentItem.class::isInstance).map(EquipmentItem.class::cast)
-                .map(EquipmentItem::getExpectation).filter(Objects::nonNull)
-                .filter(expectation -> !isSatisfied(expectation)).flatMap(expectation -> expectation.actions().stream())
-                .toList();
+    // Pénalités de grade (GradePenalty) : un objet équipé dont l'ItemExpectation
+    // (cf. EquipmentItem.getExpectation) n'est pas remplie — un grade au-delà de
+    // l'expertise débloquée — pose la pénalité d'arme (slot WEAPON) ou d'armure
+    // (tout le reste : armures, bouclier, bijoux), au niveau de l'écart de grade
+    // le plus grand. Pas de minuteur : on recalcule à chaque equip/unequip et à
+    // chaque compétence passive apprise (Expertise Grade).
+    //
+    // Chargement du personnage (PlayerInstance) : posées en silence, le client
+    // les reçoit avec l'état initial (GamePlayerStats/EntityView.effects).
+    public void initGradePenalties() {
+        updateGradePenalties(false);
+    }
 
-        if (unmetActions.isEmpty()) {
-            character.getEffectsSystem().remove(GRADE_PENALTY_EFFECT_ID);
+    // Changement en jeu : chaque pénalité posée, changée de niveau ou levée est
+    // publiée comme un effet (CharacterEffectApplied/Expired) — icône chez tous
+    // ceux qui voient le porteur, son groupe, et ses stats renvoyées.
+    public void refreshGradePenalties() {
+        updateGradePenalties(true);
+    }
+
+    private void updateGradePenalties(boolean announce) {
+        ItemGrade expertise = character.getSkillSystem().unlockedGrade();
+        int weaponLevel = 0;
+        int armorLevel = 0;
+        for (Item item : getEquippedItems()) {
+            if (!(item.getTemplate() instanceof EquipmentItem equipment) || equipment.getExpectation() == null
+                    || isSatisfied(equipment.getExpectation())) {
+                continue;
+            }
+            int level = Math.max(1, GradePenalty.levelFor(item.getGrade(), expertise));
+            if (item.getSlot() == EquipmentSlot.WEAPON) {
+                weaponLevel = Math.max(weaponLevel, level);
+            } else {
+                armorLevel = Math.max(armorLevel, level);
+            }
+        }
+        updateGradePenalty(GradePenalty.WEAPON_EFFECT_ID, GradePenalty.weapon(weaponLevel), announce);
+        updateGradePenalty(GradePenalty.ARMOR_EFFECT_ID, GradePenalty.armor(armorLevel), announce);
+    }
+
+    private void updateGradePenalty(UUID effectId, Optional<ActiveEffect> wanted, boolean announce) {
+        EffectsSystem effects = character.getEffectsSystem();
+        Optional<ActiveEffect> current = effects.find(effectId);
+        if (wanted.isEmpty()) {
+            if (current.isPresent()) {
+                effects.remove(effectId);
+                if (announce) {
+                    DomainEventPublisher.publish(new CharacterEffectExpired(character, current.get()));
+                }
+            }
             return;
         }
-
-        List<StatModifier> modifiers = unmetActions.stream().flatMap(action -> action.modifiers().stream()).toList();
-        Duration duration = unmetActions.stream().map(ItemExpectation.ExpectationEffect::duration)
-                .max(Duration::compareTo).orElse(Duration.ZERO);
-        character.getEffectsSystem().apply(new ActiveEffect(GRADE_PENALTY_EFFECT_ID, unmetActions.get(0).name(),
-                modifiers, Instant.now().plus(duration)));
+        if (current.equals(wanted)) {
+            return;
+        }
+        effects.apply(wanted.get());
+        if (announce) {
+            DomainEventPublisher.publish(new CharacterEffectApplied(character, wanted.get()));
+        }
     }
 
     private boolean isSatisfied(ItemExpectation expectation) {

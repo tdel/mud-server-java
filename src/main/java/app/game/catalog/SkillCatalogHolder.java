@@ -2,7 +2,7 @@ package app.game.catalog;
 
 import java.util.List;
 
-import app.domain.actor.CharacterClass;
+import app.domain.actor.SkillTree;
 
 public final class SkillCatalogHolder {
 
@@ -15,7 +15,7 @@ public final class SkillCatalogHolder {
         SkillCatalogHolder.catalog = catalog;
     }
 
-    public static List<SkillCatalog.LearnableSkill> skillsLearnableAt(CharacterClass characterClass, int level) {
-        return catalog.skillsLearnableAt(characterClass, level);
+    public static List<SkillCatalog.LearnableSkill> skillsLearnableAt(SkillTree tree, int level) {
+        return catalog.skillsLearnableAt(tree, level);
     }
 }

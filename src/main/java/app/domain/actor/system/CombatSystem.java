@@ -16,6 +16,9 @@ import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.DomainEventPublisher;
 import app.domain.actor.event.ShotGradeDepleted;
 import app.domain.actor.instance.PlayerInstance;
+import app.domain.actor.instance.SummonInstance;
+import app.domain.item.WeaponType;
+import app.game.combat.DamageModifiers;
 import app.domain.item.ItemGrade;
 import app.domain.item.ItemType;
 import app.domain.world.PeaceZone;
@@ -26,6 +29,9 @@ import app.network.message.ingame.AttackResult;
 public final class CombatSystem {
 
     private static final Logger log = LoggerFactory.getLogger(CombatSystem.class);
+
+    // Portée de base de l'arc (500 unités L2 / 20).
+    public static final double BOW_ATTACK_RANGE = 25.0;
 
     private final AbstractCharacter character;
     private final boolean invulnerable;
@@ -79,7 +85,9 @@ public final class CombatSystem {
             setTarget(null);
             return new AttackOutcome.TargetInvalid(defender.getId());
         }
-        if (defender instanceof AbstractNpc || defender.getCombatSystem().isTeleporting()) {
+        // Les serviteurs invoqués ne sont attaquables que par les monstres.
+        if (defender instanceof AbstractNpc || defender.getCombatSystem().isTeleporting()
+                || defender instanceof SummonInstance && character instanceof PlayerInstance) {
             log.debug("attack.rejected character={} reason=target_not_attackable target={}", character.getId(),
                     defender.getId());
             return new AttackOutcome.TargetInvalid(defender.getId());
@@ -92,8 +100,11 @@ public final class CombatSystem {
                     peaceZone.getName(), defender.getId());
             return new AttackOutcome.ForbiddenZone(peaceZone.getName());
         }
+        if (character.getEffectsSystem().isIncapacitated()) {
+            return new AttackOutcome.Incapacitated();
+        }
         if (character.getMotionSystem().getPosition()
-                .distanceTo(defender.getMotionSystem().getPosition()) > CombatFormulas.ATTACK_RANGE) {
+                .distanceTo(defender.getMotionSystem().getPosition()) > attackRange()) {
             log.debug("attack.rejected character={} reason=out_of_range target={}", character.getId(),
                     defender.getId());
             return new AttackOutcome.OutOfRange(defender.getName());
@@ -135,11 +146,20 @@ public final class CombatSystem {
         int healthAfter = defender.getResourceSystem().getCurrentHealth();
 
         if (hit) {
-            critical = Randomizer.rollChance(character.getStatSystem().getEffective(ModifiedStat.PCRIT) / 100.0);
+            critical = Randomizer.rollChance(DamageModifiers.physicalCritChance(character, defender));
             damage = CombatFormulas.resolvePhysicalDamage(character.getStatSystem().getEffective(ModifiedStat.PATK),
-                    defender.getStatSystem().getEffective(ModifiedStat.PDEF), critical, shotCharged);
-            healthAfter = Math.max(0, defender.getResourceSystem().getCurrentHealth() - damage);
+                    DamageModifiers.defenseWithBlock(defender), critical, shotCharged);
+            damage = DamageModifiers.applyPhysical(character, defender, damage, critical);
             defeated = applyDamage(defender, damage);
+            healthAfter = defender.getResourceSystem().getCurrentHealth();
+            // Reflect Damage / Blazing Skin : une part des coups de mêlée revient à
+            // l'attaquant.
+            int reflected = character.getSkillSystem().wieldedWeapon() == WeaponType.BOW
+                    ? 0
+                    : DamageModifiers.reflected(defender, damage);
+            if (reflected > 0 && !defeated) {
+                character.takeDamage(reflected, defender);
+            }
         }
 
         Duration cooldown = CombatFormulas.attackCooldown(character.getStatSystem().getEffective(ModifiedStat.ATKSPD));
@@ -155,6 +175,15 @@ public final class CombatSystem {
         return new AttackOutcome.Success(cooldown.toMillis());
     }
 
+    // Portée de l'attaque normale : corps à corps, ou portée de l'arc (500 en L2,
+    // soit 25 cases) allongée par Long Shot (ATTACK_RANGE).
+    public double attackRange() {
+        double base = character.getSkillSystem().wieldedWeapon() == WeaponType.BOW
+                ? BOW_ATTACK_RANGE
+                : CombatFormulas.ATTACK_RANGE;
+        return base + character.getStatSystem().adjust(ModifiedStat.ATTACK_RANGE, 0);
+    }
+
     private boolean applyDamage(AbstractCharacter defender, int damage) {
         return defender.takeDamage(damage, character);
     }
@@ -167,6 +196,20 @@ public final class CombatSystem {
     public boolean takeDamage(int amount, AbstractCharacter attacker) {
         if (invulnerable || teleporting) {
             return false;
+        }
+        // Transfer Pain : une part des dégâts subis par un joueur passe à son
+        // serviteur tant que celui-ci tient debout.
+        if (character instanceof PlayerInstance player && player.getSummon() != null
+                && attacker != player.getSummon()) {
+            int percent = character.getStatSystem().adjust(ModifiedStat.TRANSFER_DAMAGE, 0);
+            SummonInstance summon = player.getSummon();
+            if (percent > 0 && summon.getResourceSystem().getCurrentHealth() > 1) {
+                int transferred = Math.min(amount * percent / 100, summon.getResourceSystem().getCurrentHealth() - 1);
+                if (transferred > 0) {
+                    summon.takeDamage(transferred, attacker);
+                    amount -= transferred;
+                }
+            }
         }
         boolean defeated;
         synchronized (character) {
@@ -206,6 +249,10 @@ public final class CombatSystem {
         }
 
         record OnCooldown(long remainingMs) implements AttackOutcome {
+        }
+
+        // Étourdi, endormi, paralysé, terrorisé ou en mort feinte.
+        record Incapacitated() implements AttackOutcome {
         }
     }
 }

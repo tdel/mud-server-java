@@ -4,6 +4,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import app.domain.actor.Attribute;
+import app.domain.actor.ClassBaseStats;
 import app.domain.actor.ModifiedStat;
 
 public final class StatSystem {
@@ -50,9 +51,9 @@ public final class StatSystem {
     // Appelé après toute mutation de l'équipement (equip/unequip, voir
     // InventorySystem) ou de niveau (applyLevelUp) : p.atk/m.atk/accuracy/...
     // dépendent de l'arme/armure équipée et de level.
-    public void recomputeStats(Map<Attribute, Integer> attributes, int level, InventorySystem inventorySystem) {
-        int baseSpeed = getBase(ModifiedStat.SPEED);
-        updateBase(InventorySystem.computeBaseStats(attributes, level, inventorySystem.getItems(), baseSpeed));
+    public void recomputeStats(Map<Attribute, Integer> attributes, int level, InventorySystem inventorySystem,
+            ClassBaseStats classBaseStats) {
+        updateBase(InventorySystem.computeBaseStats(attributes, level, inventorySystem.getItems(), classBaseStats));
         setSetBonuses(inventorySystem.computeSetBonuses());
     }
 }

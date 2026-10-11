@@ -10,6 +10,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import app.domain.actor.event.PlayerRemovedFromWorld;
 import app.domain.actor.event.CharacterDied;
 import app.domain.actor.event.GamePlayerRespawned;
 import app.domain.actor.event.PlayerLoadedInWorld;
@@ -57,6 +58,13 @@ public class RegenManaEngine {
         }
         regenerating.putIfAbsent(character.getId(), character);
         log.debug("regen.mana.registered character={}", character.getId());
+    }
+
+    // Le personnage quitte le jeu : PlayerLoadedInWorld réinscrira à son retour la
+    // nouvelle instance chargée depuis la base.
+    @EventListener
+    void onPlayerRemovedFromWorld(PlayerRemovedFromWorld event) {
+        regenerating.remove(event.character().getId());
     }
 
     @Scheduled(fixedRate = TICK_INTERVAL_MS)

@@ -34,7 +34,7 @@
         <type>GUARD</type>
         <gender>WOMAN</gender>
         <dialogue>
-            <greeting>The forest road is quiet today. Keep it that way.</greeting>
+            <greeting>The castle road is quiet today. Keep it that way.</greeting>
             <options>
                 <label>Goodbye</label>
                 <type>LEAVE</type>
@@ -48,7 +48,7 @@
         <type>GUARD</type>
         <gender>MAN</gender>
         <dialogue>
-            <greeting>Mind the cemetery path after dark, traveler.</greeting>
+            <greeting>Mind the road to the Ruins of Despair after dark, traveler.</greeting>
             <options>
                 <label>Goodbye</label>
                 <type>LEAVE</type>
@@ -112,7 +112,7 @@
         </dialogue>
         <level>2</level>
     </npc>
-    <!-- Maître des compétences de la Place du village : apprend les compétences
+    <!-- Maître des compétences de Gludio (Town of Gludio) : apprend les compétences
          (Human Fighter / Human Mystic) accessibles au level du personnage, cf.
          commandes skill-list / learn-skill. -->
     <npc id="b982da01-7dd0-4c8c-84d3-1ce6795fecee">
@@ -127,6 +127,10 @@
                 <type>SKILL_LEARN</type>
             </options>
             <options>
+                <label>Change class</label>
+                <type>CLASS_CHANGE</type>
+            </options>
+            <options>
                 <label>Who are you?</label>
                 <type>RESPONSE</type>
                 <response>I trained fighters and mystics alike for thirty winters. Come back each time you grow stronger.</response>
@@ -137,5 +141,370 @@
             </options>
         </dialogue>
         <level>70</level>
+    </npc>
+    <!-- Garde de Dion (Town of Dion) : une fiche par garde, un PNJ n'apparaissant qu'une fois. -->
+    <npc id="ec36e6cb-b1ad-42a9-8d63-e3a4d4aa4b77">
+        <name>Dion Guard</name>
+        <title>City Guard</title>
+        <type>GUARD</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>Welcome to Dion. The marsh road is no place to linger.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>2</level>
+    </npc>
+    <!-- Garde de Dion (Town of Dion) : une fiche par garde, un PNJ n'apparaissant qu'une fois. -->
+    <npc id="c84a818f-805d-4427-863d-d5ff095b5a1f">
+        <name>Dion Guard</name>
+        <title>City Guard</title>
+        <type>GUARD</type>
+        <gender>WOMAN</gender>
+        <dialogue>
+            <greeting>Cruma lies north of here. Few come back from beyond the marsh.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>2</level>
+    </npc>
+    <!-- Garde de Dion (Town of Dion) : une fiche par garde, un PNJ n'apparaissant qu'une fois. -->
+    <npc id="a06f057b-b604-4de0-871b-6169c2cb0691">
+        <name>Dion Guard</name>
+        <title>City Guard</title>
+        <type>GUARD</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>The bridge holds, but the ruins beyond do not forgive.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>2</level>
+    </npc>
+    <!-- Garde de Dion (Town of Dion) : une fiche par garde, un PNJ n'apparaissant qu'une fois. -->
+    <npc id="3273435f-ff91-46e5-b17f-ba77fa718421">
+        <name>Dion Guard</name>
+        <title>City Guard</title>
+        <type>GUARD</type>
+        <gender>WOMAN</gender>
+        <dialogue>
+            <greeting>The old cemetery road starts east of the gate. Mind your step.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>2</level>
+    </npc>
+
+    <!-- ===== Town of Gludio : services de la ville (rôles des villes de Lineage 2) ===== -->
+    <npc id="6b6ab0bc-ff53-430c-bc32-30f330f37f07">
+        <name>Gatekeeper</name>
+        <title>Gatekeeper</title>
+        <type>GATEKEEPER</type>
+        <gender>WOMAN</gender>
+        <dialogue>
+            <greeting>Welcome to Gludio, traveler. The four teleport circles at the end of the roads will carry you wherever the roads go.</greeting>
+            <options>
+                <label>Where do the teleporters lead?</label>
+                <type>RESPONSE</type>
+                <response>North to Gludio Castle, west to the Ruins of Agony, south to the Ruins of Despair, and east, past the river, to the Cruma Marshlands. Dion lies beyond the marsh.</response>
+            </options>
+            <options>
+                <label>Which places are safe for a beginner?</label>
+                <type>RESPONSE</type>
+                <response>Beginners should hurry west along the old road through the Ruins of Agony, to the Forest's Edge beyond: the beasts there are gentle, and the woods further on grow wilder as you grow stronger. Come back to the Ruins of Agony and of Despair around level fifteen; the Cruma Marshlands are for hunters of level twenty-five and more. Stay on the roads: the restless dead attack anyone who strays too close.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>70</level>
+    </npc>
+    <npc id="6132be62-3c93-4057-8054-75214f3dda20">
+        <name>Warehouse Keeper</name>
+        <title>Warehouse Keeper</title>
+        <type>WAREHOUSE_KEEPER</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>The Dwarven Guild keeps the town's goods safe. What brings you to my counter?</greeting>
+            <options>
+                <label>Can I store my belongings here?</label>
+                <type>RESPONSE</type>
+                <response>Not yet, friend: the vaults are being rebuilt after the last siege. Come back once the guild has finished its work.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>70</level>
+    </npc>
+    <npc id="5d3f1aee-8877-4399-bf8f-567b1ad2d242">
+        <name>Priest</name>
+        <title>Priest of Einhasad</title>
+        <type>PRIEST</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>May the light of Einhasad guide your steps, child.</greeting>
+            <options>
+                <label>Who is Einhasad?</label>
+                <type>RESPONSE</type>
+                <response>The goddess of light, mother of the humans. Her temple watches over Gludio, and her priests bring the fallen back to life.</response>
+            </options>
+            <options>
+                <label>The undead in the ruins...</label>
+                <type>RESPONSE</type>
+                <response>The Ruins of Agony and of Despair are cursed ground. Holy magic burns the restless dead: remember it when you walk among them.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>70</level>
+    </npc>
+    <npc id="7af55075-ef37-485d-a17b-a3ab7982d8bf">
+        <name>Townswoman</name>
+        <title>Citizen of Gludio</title>
+        <gender>WOMAN</gender>
+        <dialogue>
+            <greeting>Have you seen the statue? They say it honors the hero who drove the orcs from these walls.</greeting>
+            <options>
+                <label>Any news?</label>
+                <type>RESPONSE</type>
+                <response>Merchants from Dion say giant insects roam the Cruma Marshlands again. I would not take the east road alone.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>1</level>
+    </npc>
+    <npc id="4fb1d6bd-021b-44d2-8226-541c70b3486e">
+        <name>Farmer</name>
+        <title>Farmer</title>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>Mind the crops! It took me all spring to sow these fields.</greeting>
+            <options>
+                <label>How is the harvest?</label>
+                <type>RESPONSE</type>
+                <response>Good, as long as the keltirs from the woods keep away. The castle guards used to hunt them... not anymore.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>1</level>
+    </npc>
+
+    <!-- ===== Town of Dion ===== -->
+    <npc id="c303c33d-1c11-4ccf-b502-bea677e8cd5c">
+        <name>Skill Learner</name>
+        <title>Grand Master</title>
+        <type>SKILL_LEARNER</type>
+        <gender>WOMAN</gender>
+        <dialogue>
+            <greeting>The marsh teaches patience; I teach the rest. Show me how far you have come.</greeting>
+            <options>
+                <label>Learn skills</label>
+                <type>SKILL_LEARN</type>
+            </options>
+            <options>
+                <label>Change class</label>
+                <type>CLASS_CHANGE</type>
+            </options>
+            <options>
+                <label>Who are you?</label>
+                <type>RESPONSE</type>
+                <response>I studied under the masters of Gludio before settling in Dion. Fighters and mystics alike come to me.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>70</level>
+    </npc>
+    <npc id="a4970e86-708e-4dd8-87b4-fd679a9d4051">
+        <name>Priest</name>
+        <title>Priest of Einhasad</title>
+        <type>PRIEST</type>
+        <gender>WOMAN</gender>
+        <dialogue>
+            <greeting>Rest a while in the chapel. The road through the marsh is long.</greeting>
+            <options>
+                <label>Tell me about this chapel.</label>
+                <type>RESPONSE</type>
+                <response>It was raised by the farmers of Floran, in thanks for a harvest saved from the locusts. Einhasad has watched over Dion ever since.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>70</level>
+    </npc>
+    <npc id="30a00cb4-dd8f-42a3-ba2f-c02a86dd181e">
+        <name>Gatekeeper</name>
+        <title>Gatekeeper</title>
+        <type>GATEKEEPER</type>
+        <gender>WOMAN</gender>
+        <dialogue>
+            <greeting>Welcome to Dion. Each gate of the town has its teleport circle beyond the walls.</greeting>
+            <options>
+                <label>Where do the teleporters lead?</label>
+                <type>RESPONSE</type>
+                <response>North to the Cruma Marshlands, west to the Ruins of Despair and Gludio beyond, east to the old cemetery road.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>70</level>
+    </npc>
+    <npc id="d7df2469-1f0a-409d-978b-8eaf4b635ca8">
+        <name>Warehouse Keeper</name>
+        <title>Warehouse Keeper</title>
+        <type>WAREHOUSE_KEEPER</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>Grain, wool, iron... the whole of Floran passes through my warehouse.</greeting>
+            <options>
+                <label>Can I store my belongings here?</label>
+                <type>RESPONSE</type>
+                <response>The guild only takes merchants' goods for now. Ask again when the new vaults are open.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>70</level>
+    </npc>
+    <npc id="924e30ad-82f3-4c4f-8d1b-01b3b49028b7">
+        <name>Farmer</name>
+        <title>Floran Farmer</title>
+        <gender>WOMAN</gender>
+        <dialogue>
+            <greeting>Good day! The fields of Floran feed half the kingdom, you know.</greeting>
+            <options>
+                <label>Any trouble around here?</label>
+                <type>RESPONSE</type>
+                <response>Only the stakatos. They come down from Cruma at night and chew through the fences.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>1</level>
+    </npc>
+
+    <!-- ===== Gludio Castle : garnison du château (zone de siège, sans zone de paix) ===== -->
+    <npc id="bfe9bed7-4db0-4f01-9036-08a666866b0e">
+        <name>Chamberlain</name>
+        <title>Chamberlain of Gludio</title>
+        <type>CHAMBERLAIN</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>The castle belongs to the lord of Gludio... until a clan takes it from him. What is your business here?</greeting>
+            <options>
+                <label>How can a clan take the castle?</label>
+                <type>RESPONSE</type>
+                <response>By siege, as it has always been. Break the gate, hold the keep, and the crown of Gludio is yours. No law protects you inside these walls.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>70</level>
+    </npc>
+    <npc id="398d224a-9d99-48a5-bdc9-b6c58f77ecee">
+        <name>Castle Guard</name>
+        <title>Gludio Castle</title>
+        <type>GUARD</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>State your business or turn back. This gate answers to the lord of Gludio.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>40</level>
+    </npc>
+    <npc id="b4fc367b-a548-4c5e-ab22-498bbd89eca3">
+        <name>Castle Guard</name>
+        <title>Gludio Castle</title>
+        <type>GUARD</type>
+        <gender>WOMAN</gender>
+        <dialogue>
+            <greeting>Keep your weapon low near the gatehouse.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>40</level>
+    </npc>
+    <npc id="701aaf3a-d298-4d02-bde4-f0772309b0e7">
+        <name>Castle Guard</name>
+        <title>Gludio Castle</title>
+        <type>GUARD</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>None may enter the keep without the chamberlain's leave.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>40</level>
+    </npc>
+    <npc id="a0794050-4aab-408a-abc4-4289d7851716">
+        <name>Castle Guard</name>
+        <title>Gludio Castle</title>
+        <type>GUARD</type>
+        <gender>WOMAN</gender>
+        <dialogue>
+            <greeting>The keep is closed to visitors. Move along.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>40</level>
+    </npc>
+    <npc id="fafba5b9-40b3-40fb-8660-506ba3373506">
+        <name>Mercenary Captain</name>
+        <title>Mercenary Manager</title>
+        <type>GUARD</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>Looking for work? The castle always needs swords before a siege.</greeting>
+            <options>
+                <label>When is the next siege?</label>
+                <type>RESPONSE</type>
+                <response>When a clan dares to declare it. Until then, my men drill in the barracks and wait.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>40</level>
     </npc>
 </npcs>

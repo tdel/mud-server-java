@@ -10,12 +10,15 @@ import app.domain.actor.NpcType;
 import app.domain.actor.instance.PlayerInstance;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.actor.instance.NpcSellerInstance;
+import app.domain.actor.instance.SummonInstance;
 import app.domain.map.Position;
+import app.game.engine.MonsterAiEngine;
 import app.game.engine.MovementEngine;
 
 public record EntityView(UUID id, String name, String title, String kind, double x, double y, double heading,
         double speed, int currentHealth, int maxHealth, int level, Double targetX, Double targetY, boolean hasShop,
-        boolean pvpFlagged, Gender gender, List<EquipmentView> equipment, List<Position> waypoints, NpcType npcType) {
+        boolean pvpFlagged, Gender gender, List<EquipmentView> equipment, List<Position> waypoints, NpcType npcType,
+        List<ActiveEffectView> effects, UUID ownerId, String model) {
 
     public static EntityView of(AbstractCharacter character) {
         MovementEngine.ActiveMovement movement = character.getMotionSystem().getActiveMovement();
@@ -28,6 +31,15 @@ public record EntityView(UUID id, String name, String title, String kind, double
         if (movement != null && !movement.remainingWaypoints().isEmpty()) {
             waypoints = movement.remainingWaypoints();
             Position destination = waypoints.get(waypoints.size() - 1);
+            targetX = destination.x();
+            targetY = destination.y();
+        } else if (character instanceof MonsterInstance monster
+                && monster.pursuit instanceof MonsterAiEngine.PursuitState pursuit
+                && pursuit.destination() instanceof Position destination) {
+            // Monstre en poursuite/retour : sa course n'est réannoncée qu'au
+            // changement de destination (voir MonsterAiEngine), le nouvel
+            // observateur reçoit donc la destination en cours.
+            waypoints = List.of(destination);
             targetX = destination.x();
             targetY = destination.y();
         }
@@ -48,9 +60,16 @@ public record EntityView(UUID id, String name, String title, String kind, double
         List<EquipmentView> equipment = character instanceof PlayerInstance player
                 ? EquipmentView.listOf(player)
                 : List.of();
+        // Buffs/debuffs déjà actifs quand l'entité entre en perception : les
+        // suivants arrivent par EffectApplied/SkillModifierExpired.
+        // "summon" : serviteur invoqué (ownerId = son maître, model = son modèle 3D).
         String kind = character instanceof MonsterInstance
                 ? "monster"
-                : character instanceof AbstractNpc ? "npc" : "character";
+                : character instanceof AbstractNpc
+                        ? "npc"
+                        : character instanceof SummonInstance ? "summon" : "character";
+        UUID ownerId = character instanceof SummonInstance summon ? summon.getOwner().getId() : null;
+        String model = character instanceof SummonInstance summon ? summon.getTemplate().model() : null;
         return new EntityView(character.getId(), character.getName(), character.getTitle(), kind,
                 character.getMotionSystem().getPosition().x(), character.getMotionSystem().getPosition().y(),
                 character.getMotionSystem().getHeading(),
@@ -58,6 +77,6 @@ public record EntityView(UUID id, String name, String title, String kind, double
                 character.getResourceSystem().getCurrentHealth(), character.getResourceSystem().getMaxHealth(),
                 character.getLevelingSystem().getLevel(), targetX, targetY, character instanceof NpcSellerInstance,
                 character instanceof PlayerInstance player && player.getPvpSystem().isPvpFlagged(), gender, equipment,
-                waypoints, npcType);
+                waypoints, npcType, ActiveEffectView.listOf(character), ownerId, model);
     }
 }

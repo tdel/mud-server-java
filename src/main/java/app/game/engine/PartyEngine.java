@@ -1,6 +1,5 @@
 package app.game.engine;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 
@@ -11,19 +10,21 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import app.domain.ActiveEffect;
 import app.domain.Party;
 import app.domain.PendingPartyInvite;
-import app.domain.SkillEffectType;
+import app.domain.StatModifier;
 import app.domain.actor.event.CharacterChoseSubclass;
 import app.domain.actor.event.CharacterDamaged;
+import app.domain.actor.event.CharacterEffectApplied;
 import app.domain.actor.event.CharacterLeveledUp;
 import app.domain.actor.event.CharacterRegenerated;
 import app.domain.actor.event.GamePlayerRespawned;
 import app.domain.actor.event.GamePlayerUsedManaPotion;
 import app.domain.actor.event.GamePlayerUsedPotion;
 import app.domain.actor.event.PlayerRemovedFromWorld;
-import app.domain.actor.event.SkillCast;
 import app.domain.actor.instance.PlayerInstance;
+import app.network.message.ingame.ActiveEffectView;
 import app.network.message.ingame.PartyInviteDeclined;
 import app.network.message.ingame.PartyMemberEffectApplied;
 import app.network.message.ingame.PartyMemberProfileUpdated;
@@ -120,23 +121,22 @@ public class PartyEngine {
         broadcastVitals(event.character());
     }
 
-    // Filtre le miroir de ActiveEffectPersistenceListener.onSkillCast (cible
-    // joueur ET buff/debuff appliqué) : les deux listeners partagent SkillCast
-    // sans dépendance d'ordre entre eux (cf. CLAUDE.md).
+    // Tout effet posé sur un membre (sort BUFF/DEBUFF ou effet secondaire, comme
+    // le ralentissement d'Ice Bolt) — même événement que la persistance
+    // (ActiveEffectPersistenceListener), sans dépendance d'ordre entre eux.
     @EventListener
-    void onSkillCast(SkillCast event) {
-        boolean modifier = event.activeSkill().skillType() == SkillEffectType.BUFF
-                || event.activeSkill().skillType() == SkillEffectType.DEBUFF;
-        if (!event.hit() || !modifier || !(event.target() instanceof PlayerInstance targetPlayer)) {
+    void onCharacterEffectApplied(CharacterEffectApplied event) {
+        if (!(event.character() instanceof PlayerInstance targetPlayer)) {
             return;
         }
         Party party = targetPlayer.getPartySystem().getParty();
         if (party != null) {
-            long secondsRemaining = Duration.between(Instant.now(), event.expiresAt()).toSeconds();
-            String statLabel = event.modifiers().isEmpty() ? "" : event.modifiers().get(0).stat().label();
+            ActiveEffect effect = event.effect();
+            ActiveEffectView view = ActiveEffectView.of(effect, Instant.now());
+            StatModifier first = effect.modifiers().isEmpty() ? null : effect.modifiers().get(0);
             party.broadcast(new PartyMemberEffectApplied(targetPlayer.getId(), targetPlayer.getName(),
-                    event.activeSkill().name(), statLabel, event.amount(), Math.max(0, secondsRemaining),
-                    event.activeSkill().skillType() == SkillEffectType.BUFF), targetPlayer);
+                    effect.skillName(), first == null ? "" : first.stat().label(), first == null ? 0 : first.value(),
+                    view.secondsRemaining(), view.beneficial(), view), targetPlayer);
         }
     }
 

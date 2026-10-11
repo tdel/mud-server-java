@@ -4,12 +4,76 @@
      (création, montée de level), sinon auprès du maître des compétences (PNJ
      SKILL_LEARNER, cf. game.SkillTrainer). -->
 <class>
-    <hpBase>85.7</hpBase>
-    <hpAdd>15.215</hpAdd>
-    <hpMod>0.085</hpMod>
-    <mpBase>32.8</mpBase>
-    <mpAdd>7.16</mpAdd>
-    <mpMod>0.04</mpMod>
+    <!-- Valeurs à nu L2 H5 (staticData de stats/chars/baseStats/HumanMystic.xml), cf.
+         ClassBaseStats : poing, vitesse d'attaque et critique à mains nues, vitesse de course,
+         défenses de base par emplacement (remplacées par la pièce portée). -->
+    <baseStats>
+        <pAtk>3</pAtk>
+        <mAtk>6</mAtk>
+        <atkSpd>300</atkSpd>
+        <critRate>4</critRate>
+        <runSpeed>120</runSpeed>
+        <pDef>
+            <chest>15</chest>
+            <legs>8</legs>
+            <head>12</head>
+            <feet>7</feet>
+            <gloves>8</gloves>
+            <underwear>3</underwear>
+            <cloak>1</cloak>
+        </pDef>
+        <mDef>
+            <rear>9</rear>
+            <lear>9</lear>
+            <rfinger>5</rfinger>
+            <lfinger>5</lfinger>
+            <neck>13</neck>
+        </mDef>
+    </baseStats>
+    <!-- PV/PM et régénération (par tick de 3 s) de base par niveau : lvlUpgainData de
+         stats/chars/baseStats/HumanMystic.xml (L2J H5), cf. ClassVitals. -->
+    <vitals>
+        <level val="1" hp="101" mp="40" hpRegen="2" mpRegen="0.9" />
+        <level val="2" hp="116.47" mp="47.28" hpRegen="2.05" mpRegen="0.9" />
+        <level val="3" hp="132.11" mp="54.64" hpRegen="2.1" mpRegen="0.9" />
+        <level val="4" hp="147.92" mp="62.08" hpRegen="2.15" mpRegen="0.9" />
+        <level val="5" hp="163.9" mp="69.6" hpRegen="2.2" mpRegen="0.9" />
+        <level val="6" hp="180.05" mp="77.2" hpRegen="2.25" mpRegen="0.9" />
+        <level val="7" hp="196.37" mp="84.88" hpRegen="2.3" mpRegen="0.9" />
+        <level val="8" hp="212.86" mp="92.64" hpRegen="2.35" mpRegen="0.9" />
+        <level val="9" hp="229.52" mp="100.48" hpRegen="2.4" mpRegen="0.9" />
+        <level val="10" hp="246.35" mp="108.4" hpRegen="2.45" mpRegen="0.9" />
+        <level val="11" hp="263.35" mp="116.4" hpRegen="2.5" mpRegen="1.2" />
+        <level val="12" hp="280.52" mp="124.48" hpRegen="2.6" mpRegen="1.2" />
+        <level val="13" hp="297.86" mp="132.64" hpRegen="2.7" mpRegen="1.2" />
+        <level val="14" hp="315.37" mp="140.88" hpRegen="2.8" mpRegen="1.2" />
+        <level val="15" hp="333.05" mp="149.2" hpRegen="2.9" mpRegen="1.2" />
+        <level val="16" hp="350.9" mp="157.6" hpRegen="3" mpRegen="1.2" />
+        <level val="17" hp="368.92" mp="166.08" hpRegen="3.1" mpRegen="1.2" />
+        <level val="18" hp="387.11" mp="174.64" hpRegen="3.2" mpRegen="1.2" />
+        <level val="19" hp="405.47" mp="183.28" hpRegen="3.3" mpRegen="1.2" />
+        <level val="20" hp="424" mp="192" hpRegen="3.4" mpRegen="1.2" />
+        <level val="21" hp="442.7" mp="200.8" hpRegen="3.5" mpRegen="1.5" />
+        <level val="22" hp="461.57" mp="209.68" hpRegen="3.6" mpRegen="1.5" />
+        <level val="23" hp="480.61" mp="218.64" hpRegen="3.7" mpRegen="1.5" />
+        <level val="24" hp="499.82" mp="227.68" hpRegen="3.8" mpRegen="1.5" />
+        <level val="25" hp="519.2" mp="236.8" hpRegen="3.9" mpRegen="1.5" />
+        <level val="26" hp="538.75" mp="246" hpRegen="4" mpRegen="1.5" />
+        <level val="27" hp="558.47" mp="255.28" hpRegen="4.1" mpRegen="1.5" />
+        <level val="28" hp="578.36" mp="264.64" hpRegen="4.2" mpRegen="1.5" />
+        <level val="29" hp="598.42" mp="274.08" hpRegen="4.3" mpRegen="1.5" />
+        <level val="30" hp="618.65" mp="283.6" hpRegen="4.4" mpRegen="1.5" />
+        <level val="31" hp="639.05" mp="293.2" hpRegen="4.5" mpRegen="1.8" />
+        <level val="32" hp="659.62" mp="302.88" hpRegen="4.6" mpRegen="1.8" />
+        <level val="33" hp="680.36" mp="312.64" hpRegen="4.7" mpRegen="1.8" />
+        <level val="34" hp="701.27" mp="322.48" hpRegen="4.8" mpRegen="1.8" />
+        <level val="35" hp="722.35" mp="332.4" hpRegen="4.9" mpRegen="1.8" />
+        <level val="36" hp="743.6" mp="342.4" hpRegen="5" mpRegen="1.8" />
+        <level val="37" hp="765.02" mp="352.48" hpRegen="5.1" mpRegen="1.8" />
+        <level val="38" hp="786.61" mp="362.64" hpRegen="5.2" mpRegen="1.8" />
+        <level val="39" hp="808.37" mp="372.88" hpRegen="5.3" mpRegen="1.8" />
+        <level val="40" hp="830.3" mp="383.2" hpRegen="5.4" mpRegen="1.8" />
+    </vitals>
     <!-- Attributs L2 retail (datapack L2J H5, stats/chars/baseStats), cf. Attribute.bonus. -->
     <baseAttributes>
         <STR>22</STR>

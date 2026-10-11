@@ -2,7 +2,7 @@
 
 Reference documentation for the current combat/stats model, which replaced the DnD5e-based combat engine (attack roll + AC) with a Lineage2-style model (p.atk/p.def/m.atk/m.def, accuracy/evasion, criticalRate). See `CLAUDE.md` for the overall project scope: races/classes/leveling had already deviated from strict DnD5e compliance before this change; combat now deviates too.
 
-These formulas are **not** an exact reproduction of Lineage2's retail client — NCSoft never published them. They are reconstructed from mechanics widely documented by the community (notably the open-source L2J server emulator), and the numeric constants are a starting point to balance-test, not a guaranteed byte-for-byte match. See `app.game.combat.CombatFormulas` for the authoritative implementation.
+NCSoft never published the retail formulas: the derived stats are a port of the open-source L2JMobius High Five server (stat functions) applied to the H5 datapack values (classes, items, NPCs), see [combat.md](combat.md); damage resolution keeps a simplified L2J `calcPhysDam`/`calcMagicDam`. See `app.game.combat.CombatFormulas` for the authoritative implementation.
 
 | File | Covers |
 |---|---|

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Arbre de compétences Treasure Hunter (L2 High Five, classId 8, classSkillTree L2J) jusqu'au
+     level 40 : playerLevel = level de personnage requis, appris auprès du maître des
+     compétences (PNJ SKILL_LEARNER) une fois la profession choisie. S'ajoute à l'arbre de la
+     classe de base et des professions précédentes (cf. ClassSystem.skillTree).
+     Omis (sans équivalent dans ce jeu) : Unlock. -->
+<class>
+    <!-- PV/PM et régénération (par tick de 3 s) de base par niveau : lvlUpgainData de
+         stats/chars/baseStats/TreasureHunter.xml (L2J H5), cf. ClassVitals. -->
+    <vitals>
+        <level val="1" hp="80" mp="30" hpRegen="2" mpRegen="0.9" />
+        <level val="2" hp="91.83" mp="35.46" hpRegen="2.05" mpRegen="0.9" />
+        <level val="3" hp="103.79" mp="40.98" hpRegen="2.1" mpRegen="0.9" />
+        <level val="4" hp="115.88" mp="46.56" hpRegen="2.15" mpRegen="0.9" />
+        <level val="5" hp="128.1" mp="52.2" hpRegen="2.2" mpRegen="0.9" />
+        <level val="6" hp="140.45" mp="57.9" hpRegen="2.25" mpRegen="0.9" />
+        <level val="7" hp="152.93" mp="63.66" hpRegen="2.3" mpRegen="0.9" />
+        <level val="8" hp="165.54" mp="69.48" hpRegen="2.35" mpRegen="0.9" />
+        <level val="9" hp="178.28" mp="75.36" hpRegen="2.4" mpRegen="0.9" />
+        <level val="10" hp="191.15" mp="81.3" hpRegen="2.45" mpRegen="0.9" />
+        <level val="11" hp="204.15" mp="87.3" hpRegen="2.5" mpRegen="1.2" />
+        <level val="12" hp="217.28" mp="93.36" hpRegen="2.6" mpRegen="1.2" />
+        <level val="13" hp="230.54" mp="99.48" hpRegen="2.7" mpRegen="1.2" />
+        <level val="14" hp="243.93" mp="105.66" hpRegen="2.8" mpRegen="1.2" />
+        <level val="15" hp="257.45" mp="111.9" hpRegen="2.9" mpRegen="1.2" />
+        <level val="16" hp="271.1" mp="118.2" hpRegen="3" mpRegen="1.2" />
+        <level val="17" hp="284.88" mp="124.56" hpRegen="3.1" mpRegen="1.2" />
+        <level val="18" hp="298.79" mp="130.98" hpRegen="3.2" mpRegen="1.2" />
+        <level val="19" hp="312.83" mp="137.46" hpRegen="3.3" mpRegen="1.2" />
+        <level val="20" hp="327" mp="144" hpRegen="3.4" mpRegen="1.2" />
+        <level val="21" hp="354.5" mp="153.9" hpRegen="3.5" mpRegen="1.5" />
+        <level val="22" hp="382.25" mp="163.89" hpRegen="3.6" mpRegen="1.5" />
+        <level val="23" hp="410.25" mp="173.97" hpRegen="3.7" mpRegen="1.5" />
+        <level val="24" hp="438.5" mp="184.14" hpRegen="3.8" mpRegen="1.5" />
+        <level val="25" hp="467" mp="194.4" hpRegen="3.9" mpRegen="1.5" />
+        <level val="26" hp="495.75" mp="204.75" hpRegen="4" mpRegen="1.5" />
+        <level val="27" hp="524.75" mp="215.19" hpRegen="4.1" mpRegen="1.5" />
+        <level val="28" hp="554" mp="225.72" hpRegen="4.2" mpRegen="1.5" />
+        <level val="29" hp="583.5" mp="236.34" hpRegen="4.3" mpRegen="1.5" />
+        <level val="30" hp="613.25" mp="247.05" hpRegen="4.4" mpRegen="1.5" />
+        <level val="31" hp="643.25" mp="257.85" hpRegen="4.5" mpRegen="1.8" />
+        <level val="32" hp="673.5" mp="268.74" hpRegen="4.6" mpRegen="1.8" />
+        <level val="33" hp="704" mp="279.72" hpRegen="4.7" mpRegen="1.8" />
+        <level val="34" hp="734.75" mp="290.79" hpRegen="4.8" mpRegen="1.8" />
+        <level val="35" hp="765.75" mp="301.95" hpRegen="4.9" mpRegen="1.8" />
+        <level val="36" hp="797" mp="313.2" hpRegen="5" mpRegen="1.8" />
+        <level val="37" hp="828.5" mp="324.54" hpRegen="5.1" mpRegen="1.8" />
+        <level val="38" hp="860.25" mp="335.97" hpRegen="5.2" mpRegen="1.8" />
+        <level val="39" hp="892.25" mp="347.49" hpRegen="5.3" mpRegen="1.8" />
+        <level val="40" hp="924.5" mp="359.1" hpRegen="5.4" mpRegen="1.8" />
+    </vitals>
+    <skill id="f661332c-1b9f-59ad-8071-6e8c77007d24">
+        <!-- Dagger Mastery -->
+        <level id="9" playerLevel="40"/>
+        <level id="10" playerLevel="40"/>
+        <level id="11" playerLevel="40"/>
+    </skill>
+    <skill id="20c0ef56-041a-55cf-b273-5270dedee0b9">
+        <!-- Light Armor Mastery -->
+        <level id="11" playerLevel="40"/>
+        <level id="12" playerLevel="40"/>
+        <level id="13" playerLevel="40"/>
+    </skill>
+    <skill id="5c3f50a7-ef08-522b-b5d3-b9d261cabf95">
+        <!-- Deadly Blow -->
+        <level id="1" playerLevel="40"/>
+        <level id="2" playerLevel="40"/>
+        <level id="3" playerLevel="40"/>
+    </skill>
+    <skill id="24c8b6b0-fb90-5f59-aeee-626cd0a26da0">
+        <!-- Backstab -->
+        <level id="1" playerLevel="40"/>
+        <level id="2" playerLevel="40"/>
+        <level id="3" playerLevel="40"/>
+    </skill>
+    <skill id="84e61d63-b87f-59b9-9441-44e615e3f31f">
+        <!-- Vicious Stance -->
+        <level id="6" playerLevel="40"/>
+    </skill>
+    <skill id="6458136c-6596-57cc-86c3-cb1f5e131eca">
+        <!-- Vital Force -->
+        <level id="3" playerLevel="40"/>
+    </skill>
+    <skill id="d3790444-7a18-5c88-8096-515426358180">
+        <!-- Critical Power -->
+        <level id="3" playerLevel="40"/>
+    </skill>
+    <skill id="93f8d244-f9c1-5c0e-a606-2b8999093ff9">
+        <!-- Critical Chance -->
+        <level id="2" playerLevel="40"/>
+    </skill>
+    <skill id="7dcd41b8-8f65-53e6-b6d1-ecefdcc7e0de">
+        <!-- Silent Move -->
+        <level id="1" playerLevel="40"/>
+    </skill>
+    <skill id="51e226d1-9615-5f75-834d-e709074cb199">
+        <!-- Fake Death -->
+        <level id="1" playerLevel="40"/>
+    </skill>
+    <skill id="518cf417-06f4-582c-a39c-f3f077b47cf2">
+        <!-- Shadow Step -->
+        <level id="1" playerLevel="40"/>
+    </skill>
+</class>

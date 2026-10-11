@@ -11,6 +11,7 @@ import app.network.Connection;
 import app.network.ConnectionState;
 import app.network.message.ingame.AttackOnCooldown;
 import app.network.message.ingame.AttackOutOfRange;
+import app.network.message.ingame.CannotActNow;
 import app.network.message.ingame.CombatForbiddenHere;
 import app.network.message.ingame.NoTargetSelected;
 import app.network.message.ingame.TargetNotFound;
@@ -53,6 +54,8 @@ public class Attack implements CommandHandler {
                 connection.send(new AttackOutOfRange(targetName));
             case CombatSystem.AttackOutcome.OnCooldown(var remainingMs) ->
                 connection.send(new AttackOnCooldown(remainingMs, true));
+            case CombatSystem.AttackOutcome.Incapacitated ignored ->
+                connection.send(new CannotActNow("Vous ne pouvez pas attaquer dans cet état."));
         }
     }
 }

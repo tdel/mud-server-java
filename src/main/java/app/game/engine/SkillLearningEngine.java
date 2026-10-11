@@ -53,9 +53,17 @@ public class SkillLearningEngine {
         }
     }
 
+    // Expertise Grade apprise (d'office en montant de niveau ou chez le maître des
+    // compétences) : le grade débloqué peut lever ou alléger une pénalité de grade
+    // sur l'équipement déjà porté.
+    @EventListener
+    void onCharacterLearnedPassiveSkill(CharacterLearnedPassiveSkill event) {
+        event.character().getInventorySystem().refreshGradePenalties();
+    }
+
     private void learnSkillsAt(PlayerInstance character, int level) {
         for (SkillCatalog.LearnableSkill entry : SkillCatalogHolder
-                .skillsLearnableAt(character.getClassSystem().getCharacterClass(), level)) {
+                .skillsLearnableAt(character.getClassSystem().skillTree(), level)) {
             int previousLevel = character.getSkillSystem().levelOf(entry.skill().id());
             LearnResult result = character.getSkillSystem().learn(entry.skill(), entry.level());
             if (result == LearnResult.NEW || result == LearnResult.UPGRADED) {
@@ -69,7 +77,7 @@ public class SkillLearningEngine {
 
     private void learnPassiveSkillsAt(PlayerInstance character, int level) {
         for (PassiveSkillCatalog.LearnablePassiveSkill entry : PassiveSkillCatalogHolder
-                .passiveSkillsLearnableAt(character.getClassSystem().getCharacterClass(), level)) {
+                .passiveSkillsLearnableAt(character.getClassSystem().skillTree(), level)) {
             int previousLevel = character.getSkillSystem().passiveLevelOf(entry.passiveSkill().id());
             boolean learned = character.getSkillSystem().learn(entry.passiveSkill(), entry.level());
             if (learned) {

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Serviteurs invoqués (Summon Kat/Mew/Kai the Cat, Corrupted Man, Dark Panther), stats des
+     PNJ L2J H5 14111-14115, 14159-14163, 14207, 14038, 14799 (stats/npcs) : un <level> par
+     level de la compétence d'invocation, valeurs de base L2 (modificateurs du PNJ inclus) passées
+     par les fonctions de stats L2 (CombatFormulas.stats). speed : vitesse de course L2. special : RECHARGE_OWNER (Kat : rend
+     régulièrement des PM à son maître), STORM (Mew : tempête magique sur sa cible), DRAIN
+     (Corrupted Man : vole de la vie en frappant). lifetime : durée (s) avant de repartir. -->
+<summons>
+    <summon id="KAT_THE_CAT">
+        <name>Kat the Cat</name>
+        <race>ELEMENTAL</race>
+        <model>cat_kat</model>
+        <special>RECHARGE_OWNER</special>
+        <lifetime>1200</lifetime>
+        <speed>120</speed>
+        <atkSpd>253</atkSpd>
+        <level id="1" level="22" hp="623.12" pAtk="62.62" mAtk="35.34" pDef="92.66" mDef="67.8" />
+        <level id="2" level="27" hp="829.44" pAtk="90.74" mAtk="51.21" pDef="108.29" mDef="79.24" />
+        <level id="3" level="32" hp="1076.24" pAtk="128.46" mAtk="72.5" pDef="125.58" mDef="91.89" />
+        <level id="4" level="37" hp="1364.18" pAtk="177.66" mAtk="100.26" pDef="144.48" mDef="105.72" />
+        <level id="5" level="42" hp="1691.81" pAtk="240" mAtk="135.44" pDef="181.37" mDef="132.72" />
+    </summon>
+    <summon id="MEW_THE_CAT">
+        <name>Mew the Cat</name>
+        <race>ELEMENTAL</race>
+        <model>cat_mew</model>
+        <special>STORM</special>
+        <lifetime>1200</lifetime>
+        <speed>140</speed>
+        <atkSpd>253</atkSpd>
+        <level id="1" level="22" hp="623.12" pAtk="56.93" mAtk="42.76" pDef="92.66" mDef="67.8" />
+        <level id="2" level="27" hp="829.44" pAtk="82.49" mAtk="61.96" pDef="108.29" mDef="79.24" />
+        <level id="3" level="32" hp="1076.24" pAtk="116.78" mAtk="87.72" pDef="125.58" mDef="91.89" />
+        <level id="4" level="37" hp="1364.18" pAtk="161.51" mAtk="121.32" pDef="144.48" mDef="105.72" />
+        <level id="5" level="42" hp="1691.81" pAtk="218.18" mAtk="163.89" pDef="181.37" mDef="132.72" />
+    </summon>
+    <summon id="KAI_THE_CAT">
+        <name>Kai the Cat</name>
+        <race>ELEMENTAL</race>
+        <model>cat_kai</model>
+        <lifetime>3600</lifetime>
+        <speed>180</speed>
+        <atkSpd>253</atkSpd>
+        <level id="1" level="42" hp="1271.49" pAtk="263.8" mAtk="135.44" pDef="181.37" mDef="132.72" />
+    </summon>
+    <summon id="CORRUPTED_MAN">
+        <name>Corrupted Man</name>
+        <race>UNDEAD</race>
+        <model>undead</model>
+        <special>DRAIN</special>
+        <lifetime>3600</lifetime>
+        <speed>140</speed>
+        <atkSpd>253</atkSpd>
+        <level id="1" level="42" hp="1691.81" pAtk="240" mAtk="135.44" pDef="164.89" mDef="120.66" />
+    </summon>
+    <summon id="DARK_PANTHER">
+        <name>Dark Panther</name>
+        <race>ANIMAL</race>
+        <model>panther</model>
+        <lifetime>1200</lifetime>
+        <speed>150</speed>
+        <atkSpd>253</atkSpd>
+        <level id="1" level="42" hp="1397.59" pAtk="218.18" mAtk="135.44" pDef="164.89" mDef="120.66" />
+    </summon>
+</summons>

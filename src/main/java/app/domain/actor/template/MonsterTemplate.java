@@ -11,38 +11,40 @@ import app.domain.ActiveSkill;
 import app.domain.PassiveSkill;
 import app.domain.SkillElement;
 import app.domain.actor.Attribute;
+import app.domain.actor.CreatureRace;
 import app.domain.item.LootTableEntry;
 
 public class MonsterTemplate {
 
     private UUID id;
     private String name;
-    private int maxHealth;
+    private double maxHealth;
     private Map<Attribute, Integer> attributes;
-    private int pAtk;
-    private int mAtk;
-    private int pDef;
-    private int mDef;
-    private int accuracyBonus;
-    private int evasionBonus;
-    private int critBonus;
+    private double pAtk;
+    private double mAtk;
+    private double pDef;
+    private double mDef;
+    private double accuracyBonus;
+    private double evasionBonus;
+    private double critBonus;
     private int xpReward;
     private int goldReward;
     private List<LootTableEntry> lootTable;
     private int aggroRadius;
-    private int speed;
+    private double speed;
     private int atkSpd;
     private int level;
     private Map<SkillElement, Integer> elementalResistances;
     private Set<ActiveSkill> knownSkills;
     private Set<PassiveSkill> knownPassiveSkills;
     private List<ActiveEffect> activeEffects;
+    private CreatureRace race;
 
-    public MonsterTemplate(UUID id, String name, int maxHealth, Map<Attribute, Integer> attributes, int pAtk, int mAtk,
-            int pDef, int mDef, int accuracyBonus, int evasionBonus, int critBonus, int xpReward, int goldReward,
-            List<LootTableEntry> lootTable, int aggroRadius, int speed, int atkSpd, int level,
-            Map<SkillElement, Integer> elementalResistances, Set<ActiveSkill> knownSkills,
-            Set<PassiveSkill> knownPassiveSkills, List<ActiveEffect> activeEffects) {
+    public MonsterTemplate(UUID id, String name, double maxHealth, Map<Attribute, Integer> attributes, double pAtk,
+            double mAtk, double pDef, double mDef, double accuracyBonus, double evasionBonus, double critBonus,
+            int xpReward, int goldReward, List<LootTableEntry> lootTable, int aggroRadius, double speed, int atkSpd,
+            int level, Map<SkillElement, Integer> elementalResistances, Set<ActiveSkill> knownSkills,
+            Set<PassiveSkill> knownPassiveSkills, List<ActiveEffect> activeEffects, CreatureRace race) {
         this.id = id;
         this.name = name;
         this.maxHealth = maxHealth;
@@ -65,6 +67,11 @@ public class MonsterTemplate {
         this.knownSkills = knownSkills == null ? Set.of() : knownSkills;
         this.knownPassiveSkills = knownPassiveSkills == null ? Set.of() : knownPassiveSkills;
         this.activeEffects = activeEffects == null ? List.of() : activeEffects;
+        this.race = race;
+    }
+
+    public CreatureRace getRace() {
+        return race;
     }
 
     public UUID getId() {
@@ -75,7 +82,7 @@ public class MonsterTemplate {
         return name;
     }
 
-    public int getMaxHealth() {
+    public double getMaxHealth() {
         return maxHealth;
     }
 
@@ -83,31 +90,31 @@ public class MonsterTemplate {
         return attributes;
     }
 
-    public int getPAtk() {
+    public double getPAtk() {
         return pAtk;
     }
 
-    public int getMAtk() {
+    public double getMAtk() {
         return mAtk;
     }
 
-    public int getPDef() {
+    public double getPDef() {
         return pDef;
     }
 
-    public int getMDef() {
+    public double getMDef() {
         return mDef;
     }
 
-    public int getAccuracyBonus() {
+    public double getAccuracyBonus() {
         return accuracyBonus;
     }
 
-    public int getEvasionBonus() {
+    public double getEvasionBonus() {
         return evasionBonus;
     }
 
-    public int getCritBonus() {
+    public double getCritBonus() {
         return critBonus;
     }
 
@@ -127,7 +134,7 @@ public class MonsterTemplate {
         return aggroRadius;
     }
 
-    public int getSpeed() {
+    public double getSpeed() {
         return speed;
     }
 

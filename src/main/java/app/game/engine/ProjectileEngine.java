@@ -6,9 +6,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import app.domain.actor.event.PlayerRemovedFromWorld;
 import app.domain.ActiveSkill;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.system.SkillSystem;
@@ -56,6 +58,15 @@ public class ProjectileEngine {
                 travelDurationMs, roll.hit()), null);
     }
 
+    // Projectile lancé par ou vers un personnage qui quitte le jeu : abandonné,
+    // pour ne pas appliquer d'effet à (ou depuis) une instance déconnectée.
+    @EventListener
+    void onPlayerRemovedFromWorld(PlayerRemovedFromWorld event) {
+        PlayerInstance character = event.character();
+        projectiles.values()
+                .removeIf(projectile -> projectile.caster() == character || projectile.target() == character);
+    }
+
     @Scheduled(fixedRate = TICK_INTERVAL_MS)
     void tick() {
         long now = System.nanoTime();
@@ -85,7 +96,7 @@ public class ProjectileEngine {
         SkillSystem.CastOutcome outcome = caster.getSkillSystem().applyDamageOutcome(activeSkill, projectile.roll(),
                 target);
         if (outcome.hit()) {
-            skillEffectApplier.applySecondaryEffects(caster, activeSkill, target);
+            skillEffectApplier.applySecondaryEffects(caster, activeSkill, projectile.level(), target);
         }
 
         caster.send(new CastResult(activeSkill.id(), activeSkill.name(), target.getId(), target.getName(),

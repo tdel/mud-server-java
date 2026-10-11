@@ -11,12 +11,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import app.domain.AbnormalStatus;
 import app.domain.ActiveEffect;
+import app.domain.CureKind;
 import app.domain.EffectCategory;
 import app.domain.StatModifier;
 import app.domain.StatOperator;
 import app.domain.actor.AbstractCharacter;
 import app.domain.actor.ModifiedStat;
+import app.domain.item.GradePenalty;
 
 public final class EffectsSystem {
 
@@ -37,16 +40,23 @@ public final class EffectsSystem {
     // n'est pas un nouveau slot.
     public Optional<ActiveEffect> apply(ActiveEffect effect) {
         Optional<ActiveEffect> evicted = Optional.empty();
-        if (!activeEffects.containsKey(effect.skillId())) {
+        if (!activeEffects.containsKey(effect.skillId()) && occupiesSlot(effect)) {
             evicted = evictIfFull(effect.category());
         }
         activeEffects.put(effect.skillId(), effect);
         return evicted;
     }
 
+    // Les pénalités de grade (passives liées à l'équipement, comme dans L2), les
+    // toggles et les cubiques n'occupent pas de slot et ne sont jamais évincés.
+    private static boolean occupiesSlot(ActiveEffect effect) {
+        return !GradePenalty.isGradePenalty(effect.skillId()) && !effect.isToggle() && effect.cubic() == null;
+    }
+
     private Optional<ActiveEffect> evictIfFull(EffectCategory category) {
         int max = category == EffectCategory.BUFF ? MAX_BUFF_SLOTS : MAX_DEBUFF_SLOTS;
-        List<ActiveEffect> sameCategory = active().stream().filter(effect -> effect.category() == category).toList();
+        List<ActiveEffect> sameCategory = active().stream()
+                .filter(effect -> effect.category() == category && occupiesSlot(effect)).toList();
         if (sameCategory.size() < max) {
             return Optional.empty();
         }
@@ -95,24 +105,64 @@ public final class EffectsSystem {
         return activeEffects.isEmpty();
     }
 
-    // Effets à dégâts périodiques (poison) dont la prochaine période est échue :
-    // la période suivante est planifiée d'office, l'appelant (ActiveEffectEngine)
-    // applique les dégâts.
+    // Effets à dégâts périodiques (poison, saignement) ou à soin régulier
+    // (Greater Heal) dont la prochaine période est échue : la période suivante
+    // est planifiée d'office, l'appelant (ActiveEffectEngine) applique les
+    // dégâts/soins.
     public List<ActiveEffect> duePeriodicDamage(Instant now) {
+        return duePeriodic(now, effect -> effect.periodicDamage() != null ? effect.periodicDamage().intervalMs() : 0);
+    }
+
+    public List<ActiveEffect> duePeriodicHeal(Instant now) {
+        return duePeriodic(now, effect -> effect.periodicHeal() != null ? effect.periodicHeal().intervalMs() : 0);
+    }
+
+    private List<ActiveEffect> duePeriodic(Instant now, java.util.function.ToLongFunction<ActiveEffect> interval) {
         List<ActiveEffect> due = new ArrayList<>();
         for (ActiveEffect effect : activeEffects.values()) {
-            if (effect.periodicDamage() == null || !now.isBefore(effect.expiresAt())) {
+            long intervalMs = interval.applyAsLong(effect);
+            if (intervalMs <= 0 || !now.isBefore(effect.expiresAt())) {
                 continue;
             }
-            Instant next = nextPeriodicTickAt.computeIfAbsent(effect.skillId(),
-                    id -> now.plusMillis(effect.periodicDamage().intervalMs()));
+            Instant next = nextPeriodicTickAt.computeIfAbsent(effect.skillId(), id -> now.plusMillis(intervalMs));
             if (!now.isBefore(next)) {
-                nextPeriodicTickAt.put(effect.skillId(), next.plusMillis(effect.periodicDamage().intervalMs()));
+                nextPeriodicTickAt.put(effect.skillId(), next.plusMillis(intervalMs));
                 due.add(effect);
             }
         }
         nextPeriodicTickAt.keySet().removeIf(id -> !activeEffects.containsKey(id));
         return due;
+    }
+
+    // Altérations d'état actives (STUN, ROOT...), cf. AbnormalStatus.
+    public boolean hasStatus(AbnormalStatus status) {
+        return active().stream().anyMatch(effect -> effect.status() == status);
+    }
+
+    // Au repos (assis) : Relax actif, seul effet breakOnAction sans statut.
+    public boolean isResting() {
+        return active().stream().anyMatch(effect -> effect.breaksOnAction() && effect.status() == null);
+    }
+
+    public boolean isIncapacitated() {
+        return active().stream().anyMatch(effect -> effect.status() != null && effect.status().incapacitates());
+    }
+
+    public boolean canMove() {
+        return active().stream().noneMatch(effect -> effect.status() != null && effect.status().blocksMovement());
+    }
+
+    // Retire (et renvoie) les effets portant ce statut (Sleep au premier dégât).
+    public List<ActiveEffect> removeStatus(AbnormalStatus status) {
+        return removeWhere(effect -> effect.status() == status);
+    }
+
+    public List<ActiveEffect> toggles() {
+        return activeEffects.values().stream().filter(ActiveEffect::isToggle).toList();
+    }
+
+    public List<ActiveEffect> cubics() {
+        return active().stream().filter(effect -> effect.cubic() != null).toList();
     }
 
     // Retire (et renvoie) les effets qui cessent au premier geste du porteur
@@ -121,10 +171,25 @@ public final class EffectsSystem {
         return removeWhere(ActiveEffect::breaksOnAction);
     }
 
-    // Cure Poison ou mort du porteur : retire (et renvoie) tous les effets à
-    // dégâts périodiques.
+    // Mort du porteur : retire (et renvoie) tous les effets à dégâts
+    // périodiques.
     public List<ActiveEffect> removePeriodicDamage() {
         return removeWhere(effect -> effect.periodicDamage() != null);
+    }
+
+    // Cure Poison (POISON), Remedy (BLEED), Servitor Cure (ALL).
+    public List<ActiveEffect> removePeriodicDamage(CureKind cure) {
+        return removeWhere(effect -> effect.periodicDamage() != null && effect.periodicDamage().kind().curedBy(cure));
+    }
+
+    // Mort du porteur : comme dans L2, tous ses buffs et debuffs tombent (les
+    // pénalités de grade, liées à l'équipement porté, restent).
+    public List<ActiveEffect> removeAllOnDeath() {
+        return removeWhere(effect -> !GradePenalty.isGradePenalty(effect.skillId()));
+    }
+
+    public Optional<ActiveEffect> find(UUID effectId) {
+        return Optional.ofNullable(activeEffects.get(effectId));
     }
 
     private List<ActiveEffect> removeWhere(Predicate<ActiveEffect> predicate) {

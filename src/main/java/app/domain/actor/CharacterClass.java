@@ -2,16 +2,15 @@ package app.domain.actor;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.util.EnumMap;
 import java.util.Map;
-import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.dataformat.xml.XmlMapper;
-import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
-import app.game.combat.CombatFormulas;
+import app.domain.item.EquipmentSlot;
 
 public enum CharacterClass {
     FIGHTER, MYSTIC;
@@ -26,52 +25,41 @@ public enum CharacterClass {
                 if (in == null) {
                     throw new IllegalStateException("Ressource introuvable : " + resource);
                 }
-                Json json = xmlMapper.readValue(in, Json.class);
-                characterClass.definition = json.toDefinition();
+                Definition definition = xmlMapper.readValue(in, Definition.class);
+                characterClass.baseAttributes = definition.baseAttributes();
+                characterClass.baseStats = definition.baseStats().toDomain();
             } catch (IOException | JacksonException e) {
                 throw new IllegalStateException("Impossible de charger " + resource, e);
             }
+            characterClass.tree = SkillTree.load(resource);
+            characterClass.vitals = ClassVitals.load(resource);
         }
     }
 
-    private Definition definition;
+    private Map<Attribute, Integer> baseAttributes;
+    private ClassBaseStats baseStats;
+    private ClassVitals vitals;
+    private SkillTree tree;
 
-    // Seuls les levels autoGet sont appris d'office (création, montée de level,
-    // réconciliation au login) ; les autres s'apprennent auprès d'un PNJ
-    // SKILL_LEARNER (cf. game.SkillTrainer), comme chez le Grand Master de L2.
-    public List<LearnableSkill> learnableSkillIds(int level) {
-        return tree().stream().filter(entry -> entry.autoGet() && entry.playerLevel() == level)
-                .map(entry -> new LearnableSkill(entry.skillId(), entry.level())).toList();
+    // Arbre de la classe de base seule (levels 1-19 + Expertise Grade) ; celui
+    // d'un personnage y ajoute ses sous-classes, cf. ClassSystem.skillTree.
+    public SkillTree tree() {
+        return tree;
     }
 
-    public record LearnableSkill(UUID skillId, int level) {
+    // PV/PM/régénération de base par niveau (Human Fighter/Mystic resté sans
+    // profession) ; cf. ClassSystem.vitals pour celle d'un personnage.
+    public ClassVitals vitals() {
+        return vitals;
     }
 
-    // Arbre complet de la classe : une entrée par (compétence, level), dans
-    // l'ordre du XML.
-    public List<SkillTreeEntry> tree() {
-        return definition.skills().stream()
-                .flatMap(entry -> entry.level().stream().map(
-                        l -> new SkillTreeEntry(entry.id(), l.id(), l.playerLevel(), Boolean.TRUE.equals(l.autoGet()))))
-                .toList();
-    }
-
-    public record SkillTreeEntry(UUID skillId, int level, int playerLevel, boolean autoGet) {
-    }
-
-    // Courbe L2 retail (Human Fighter/Mystic) : cf. data/classes/*.xml et
-    // CombatFormulas.maxHealth/maxMana pour la formule.
-    public int maxHealth(int constitutionScore, int level) {
-        return CombatFormulas.maxHealth(definition.hpBase(), definition.hpAdd(), definition.hpMod(), level,
-                constitutionScore);
-    }
-
-    public int maxMana(int menScore, int level) {
-        return CombatFormulas.maxMana(definition.mpBase(), definition.mpAdd(), definition.mpMod(), level, menScore);
+    // Poing, défenses nues, vitesses : cf. ClassBaseStats.
+    public ClassBaseStats baseStats() {
+        return baseStats;
     }
 
     public Map<Attribute, Integer> baseAttributes() {
-        return definition.baseAttributes();
+        return baseAttributes;
     }
 
     public String label() {
@@ -81,25 +69,37 @@ public enum CharacterClass {
         };
     }
 
-    private record Definition(double hpBase, double hpAdd, double hpMod, double mpBase, double mpAdd, double mpMod,
-            Map<Attribute, Integer> baseAttributes, List<SkillEntry> skills) {
+    // Les <skill> de l'arbre et <vitals> sont lus à part par SkillTree.load et
+    // ClassVitals.load.
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private record Definition(Map<Attribute, Integer> baseAttributes, BaseStatsXml baseStats) {
     }
 
-    private record Json(double hpBase, double hpAdd, double hpMod, double mpBase, double mpAdd, double mpMod,
-            Map<Attribute, Integer> baseAttributes,
-            @JacksonXmlElementWrapper(useWrapping = false) List<SkillEntry> skill) {
-        Definition toDefinition() {
-            return new Definition(hpBase, hpAdd, hpMod, mpBase, mpAdd, mpMod, Map.copyOf(baseAttributes),
-                    List.copyOf(skill));
+    private record BaseStatsXml(double pAtk, double mAtk, int atkSpd, double critRate, double runSpeed, PDefXml pDef,
+            MDefXml mDef) {
+
+        ClassBaseStats toDomain() {
+            Map<EquipmentSlot, Double> pDefBySlot = new EnumMap<>(EquipmentSlot.class);
+            pDefBySlot.put(EquipmentSlot.CHEST, pDef.chest());
+            pDefBySlot.put(EquipmentSlot.LEGS, pDef.legs());
+            pDefBySlot.put(EquipmentSlot.HEAD, pDef.head());
+            pDefBySlot.put(EquipmentSlot.FEET, pDef.feet());
+            pDefBySlot.put(EquipmentSlot.HANDS, pDef.gloves());
+            Map<EquipmentSlot, Double> mDefBySlot = new EnumMap<>(EquipmentSlot.class);
+            mDefBySlot.put(EquipmentSlot.RIGHT_EARRING, mDef.rear());
+            mDefBySlot.put(EquipmentSlot.LEFT_EARRING, mDef.lear());
+            mDefBySlot.put(EquipmentSlot.RIGHT_RING, mDef.rfinger());
+            mDefBySlot.put(EquipmentSlot.LEFT_RING, mDef.lfinger());
+            mDefBySlot.put(EquipmentSlot.NECKLACE, mDef.neck());
+            return new ClassBaseStats(pAtk, mAtk, atkSpd, critRate, runSpeed, pDefBySlot,
+                    pDef.underwear() + pDef.cloak(), mDefBySlot);
         }
     }
 
-    private record SkillEntry(@JacksonXmlProperty(isAttribute = true) UUID id,
-            @JacksonXmlProperty(localName = "level") @JacksonXmlElementWrapper(useWrapping = false) List<SkillLevel> level) {
+    private record PDefXml(double chest, double legs, double head, double feet, double gloves, double underwear,
+            double cloak) {
     }
 
-    private record SkillLevel(@JacksonXmlProperty(isAttribute = true) int id,
-            @JacksonXmlProperty(isAttribute = true) int playerLevel,
-            @JacksonXmlProperty(isAttribute = true) Boolean autoGet) {
+    private record MDefXml(double rear, double lear, double rfinger, double lfinger, double neck) {
     }
 }

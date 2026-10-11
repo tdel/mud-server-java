@@ -91,6 +91,16 @@ public class AuthWorld {
     // simultanés.
     public boolean tryEnterWorld(Connection connection, Account account) {
         Connection previous = connectionsByAccount.putIfAbsent(account.getId(), connection);
+        // Filet de sécurité : une connexion à la socket déjà fermée et sortie du jeu
+        // ne doit jamais bloquer le compte (nettoyage de fin de session en retard ou
+        // en échec). Encore INGAME, son personnage n'est pas sorti du monde : on
+        // refuse, le nettoyage (TcpJsonConnection.handleClose) va libérer le compte.
+        // replace(k, old, new) reste atomique face à un login concurrent.
+        if (previous != null && !previous.isOpen() && previous.state() != ConnectionState.INGAME
+                && connectionsByAccount.replace(account.getId(), previous, connection)) {
+            log.warn("auth.stale_connection_replaced accountId={}", account.getId());
+            previous = null;
+        }
         if (previous != null) {
             log.warn("auth.duplicate_connection_detected thread={} accountId={}", Thread.currentThread().getName(),
                     account.getId());
@@ -107,15 +117,19 @@ public class AuthWorld {
         return true;
     }
 
+    // Retrait par identité de la connexion, sans passer par connection.account()
+    // (qui lève en état CONNECTED) : libérer le compte ne doit dépendre ni de
+    // l'état courant de la connexion ni de l'ordre des appels côté appelant —
+    // sinon le compte reste marqué connecté jusqu'au redémarrage du serveur.
     public void exitWorld(Connection connection) {
-        Account account = connection.account();
-        if (account != null) {
-            connectionsByAccount.remove(account.getId(), connection);
-        }
-        String login = account != null ? account.getLogin() : null;
+        Account account = connection.state() != ConnectionState.CONNECTED ? connection.account() : null;
+        boolean released = connectionsByAccount.values().remove(connection);
         connection.setAccount(null);
         connection.setState(ConnectionState.CONNECTED);
-        log.info("auth.exited_world thread={} account={}", Thread.currentThread().getName(), login);
+        if (released || account != null) {
+            log.info("auth.exited_world thread={} account={}", Thread.currentThread().getName(),
+                    account != null ? account.getLogin() : null);
+        }
         MDC.remove("account");
     }
 }

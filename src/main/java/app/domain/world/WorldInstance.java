@@ -19,6 +19,7 @@ import app.domain.Account;
 import app.domain.MapPortal;
 import app.domain.actor.Attribute;
 import app.domain.actor.CharacterClass;
+import app.domain.actor.system.ClassSystem;
 import app.domain.actor.instance.PlayerInstance;
 import app.domain.actor.Gender;
 import app.domain.actor.Race;
@@ -168,9 +169,9 @@ public class WorldInstance {
 
         Map<Attribute, Integer> scores = characterClass.baseAttributes();
 
-        int maxHealth = characterClass.maxHealth(scores.get(Attribute.CON), 1);
+        int maxHealth = ClassSystem.maxHealth(characterClass.vitals(), 1, scores.get(Attribute.CON));
 
-        int startingMana = characterClass.maxMana(scores.get(Attribute.MEN), 1);
+        int startingMana = ClassSystem.maxMana(characterClass.vitals(), 1, scores.get(Attribute.MEN));
 
         PlayerInstance character = new PlayerInstance(UUID.randomUUID(), account, name, startingMap, gender, race,
                 characterClass, 1, maxHealth, maxHealth, scores, 0, 0, startingMana, startingMana, Map.of(), List.of(),

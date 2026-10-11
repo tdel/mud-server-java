@@ -48,6 +48,7 @@ public class Inventory implements CommandHandler {
                 equipment ? item.getMAtk() : 0, equipment ? item.getPDef() : 0, equipment ? item.getMDef() : 0,
                 equipment ? item.getAccuracyBonus() : 0, equipment ? item.getEvasionBonus() : 0,
                 equipment ? item.getCritBonus() : 0, equipment ? item.getAtkSpd() : 0, item.getEnchant(),
-                item.getQuantity(), equipment ? item.getWeaponType() : null);
+                item.getQuantity(), equipment ? item.getWeaponType() : null, equipment ? item.getMaxMp() : 0,
+                item.isFullArmor());
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import app.domain.SkillElement;
 import app.domain.actor.Attribute;
+import app.domain.actor.CreatureRace;
 import app.domain.actor.ModifiedStat;
 import app.domain.actor.instance.MonsterInstance;
 import app.domain.actor.template.MonsterTemplate;
@@ -89,15 +90,20 @@ public class MonsterCatalog {
                     + " référence le template " + spawn.templateId() + ", absent de " + MONSTERS_RESOURCE);
         }
 
-        Map<ModifiedStat, Integer> baseStats = CombatFormulas.baseStats(template.getPAtk(), template.getMAtk(),
-                template.getPDef(), template.getMDef(), template.getAccuracyBonus(), template.getEvasionBonus(),
-                template.getCritBonus(), 0, template.getAtkSpd(), template.getAttributes(), template.getLevel());
-        baseStats.put(ModifiedStat.SPEED, template.getSpeed());
+        // Valeurs de base du datapack L2 (data/monsters.xml) passées par les fonctions
+        // de stats des PNJ L2J (NPC_STD_CALCULATOR) : PV x CON, p.atk x STR x niveau...
+        Map<ModifiedStat, Integer> baseStats = CombatFormulas.stats(
+                new CombatFormulas.BaseValues(template.getPAtk(), template.getMAtk(), template.getPDef(),
+                        template.getMDef(), template.getAccuracyBonus(), template.getEvasionBonus(),
+                        template.getCritBonus(), 0, template.getAtkSpd(), template.getSpeed(), true, false),
+                template.getAttributes(), template.getLevel());
+        int maxHealth = CombatFormulas.maxHealth(template.getMaxHealth(), template.getAttributes().get(Attribute.CON));
 
         MonsterInstance monster = new MonsterInstance(spawn.id(), template.getName(), template.getAttributes(),
-                template.getMaxHealth(), baseStats, spawn.position(), template.getKnownSkills(),
-                template.getKnownPassiveSkills(), template.getActiveEffects(), template.getLevel(),
-                template.getAggroRadius(), template.getXpReward(), template.getGoldReward(), template.getLootTable());
+                maxHealth, baseStats, spawn.position(), template.getKnownSkills(), template.getKnownPassiveSkills(),
+                template.getActiveEffects(), template.getLevel(), template.getAggroRadius(), template.getXpReward(),
+                template.getGoldReward(), template.getLootTable(), template.getRace(),
+                template.getElementalResistances());
         monster.getMotionSystem().setCurrentMap(map);
         map.placeMonster(monster, spawn.position());
         log.info("monster.spawned name={} map={} position={} id={}", monster.getName(), map.getName(), spawn.position(),
@@ -132,7 +138,7 @@ public class MonsterCatalog {
                             definition.mDef(), definition.accuracyBonus(), definition.evasionBonus(),
                             definition.critBonus(), definition.xpReward(), definition.loot().gold(), lootTable,
                             definition.aggroRadius(), definition.speed(), definition.atkSpd(), definition.level(),
-                            elementalResistances, Set.of(), Set.of(), List.of()));
+                            elementalResistances, Set.of(), Set.of(), List.of(), definition.race()));
         }
         log.info("monster.templates_loaded count={}", templates.size());
     }
@@ -144,9 +150,10 @@ public class MonsterCatalog {
     record LootDefinition(int gold, @JacksonXmlElementWrapper(useWrapping = false) List<ItemDropDefinition> item) {
     }
 
-    record MonsterTemplateDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name, int maxHealth,
-            Map<Attribute, Integer> attributes, int pAtk, int mAtk, int pDef, int mDef, int accuracyBonus,
-            int evasionBonus, int critBonus, int xpReward, LootDefinition loot, int aggroRadius, int speed, int atkSpd,
-            int level, Map<SkillElement, Integer> elementalResistances) {
+    record MonsterTemplateDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name, double maxHealth,
+            Map<Attribute, Integer> attributes, double pAtk, double mAtk, double pDef, double mDef,
+            double accuracyBonus, double evasionBonus, double critBonus, int xpReward, LootDefinition loot,
+            int aggroRadius, double speed, int atkSpd, int level, Map<SkillElement, Integer> elementalResistances,
+            CreatureRace race) {
     }
 }

@@ -28,15 +28,6 @@ public enum Race {
         }
     }
 
-    // Vitesse fixe par race : les stats de personnage viennent uniquement de la
-    // classe (cf. data/classes/*.xml), la race ne sert plus qu'à identifier le
-    // joueur pour le moment (human-only).
-    public int speed() {
-        return switch (this) {
-            case HUMAN -> 220;
-        };
-    }
-
     public String label() {
         return switch (this) {
             case HUMAN -> "Human";

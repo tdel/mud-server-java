@@ -5,11 +5,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import app.domain.SkillEffectType;
 import app.domain.ActiveEffect;
+import app.domain.actor.event.CharacterEffectApplied;
 import app.domain.actor.event.CharacterEffectExpired;
-import app.domain.actor.event.SkillCast;
 import app.domain.actor.instance.PlayerInstance;
+import app.domain.item.GradePenalty;
 import app.persistence.CharacterActiveEffectDao;
 
 @Service
@@ -24,22 +24,27 @@ public class ActiveEffectPersistenceListener {
     }
 
     @EventListener
-    void onSkillCast(SkillCast event) {
-        boolean modifier = event.activeSkill().skillType() == SkillEffectType.BUFF
-                || event.activeSkill().skillType() == SkillEffectType.DEBUFF;
-        if (!event.hit() || !modifier || !(event.target() instanceof PlayerInstance targetPlayer)) {
+    void onCharacterEffectApplied(CharacterEffectApplied event) {
+        if (!(event.character() instanceof PlayerInstance targetPlayer)) {
             return;
         }
+        ActiveEffect effect = event.effect();
         // Poison (aucun modificateur, dégâts périodiques purement en mémoire) et
-        // Relax (cesse au premier geste) ne survivent pas à une déconnexion.
-        if (event.modifiers().isEmpty() || event.activeSkill().breakOnAction()) {
+        // Relax (cesse au premier geste) ne survivent pas à une déconnexion ; les
+        // pénalités de grade sont recalculées depuis l'équipement au chargement.
+        // Altérations d'état, toggles, cubiques et soins réguliers non plus (leur
+        // catégorie imposée serait aussi perdue au rechargement).
+        if (effect.modifiers().isEmpty() || effect.periodicDamage() != null || effect.breaksOnAction()
+                || GradePenalty.isGradePenalty(effect.skillId()) || effect.status() != null || effect.isToggle()
+                || effect.cubic() != null || effect.periodicHeal() != null
+                || effect.category() != ActiveEffect.categoryOf(effect.modifiers())) {
             return;
         }
-        characterActiveEffectDao.upsert(targetPlayer.getId(), new ActiveEffect(event.activeSkill().id(),
-                event.activeSkill().name(), event.modifiers(), event.expiresAt()));
+        characterActiveEffectDao.upsert(targetPlayer.getId(),
+                new ActiveEffect(effect.skillId(), effect.skillName(), effect.modifiers(), effect.expiresAt()));
 
-        log.info("dao.activeeffect.SkillCast object={} [activeSkill={}, expiresAt={}]", targetPlayer.getId(),
-                event.activeSkill().name(), event.expiresAt());
+        log.info("dao.activeeffect.CharacterEffectApplied object={} [effect={}, expiresAt={}]", targetPlayer.getId(),
+                effect.skillName(), effect.expiresAt());
     }
 
     @EventListener

@@ -22,7 +22,8 @@ import app.domain.StatModifier;
 import app.domain.StatOperator;
 import app.domain.actor.ModifiedStat;
 import app.domain.item.ArmorCategory;
-import app.domain.actor.CharacterClass;
+import app.domain.item.WeaponType;
+import app.domain.actor.SkillTree;
 import app.domain.item.ItemGrade;
 import tools.jackson.core.JacksonException;
 import tools.jackson.dataformat.xml.XmlMapper;
@@ -63,7 +64,8 @@ public class PassiveSkillCatalog {
                                 : l.apply().stream()
                                         .map(a -> new PassiveModifier(new StatModifier(a.stat(), a.value(), a.op()),
                                                 parseArmor(definition.name(), a.armor()),
-                                                parseArmor(definition.name(), a.notArmor())))
+                                                parseArmor(definition.name(), a.notArmor()),
+                                                parseWeapons(definition.name(), a.weapon()), a.state()))
                                         .toList()))
                         .toList();
                 for (int i = 0; i < levels.size(); i++) {
@@ -103,6 +105,20 @@ public class PassiveSkillCatalog {
         }
     }
 
+    // weapon="SWORD,BLUNT" : familles d'arme séparées par des virgules.
+    private static Set<WeaponType> parseWeapons(String skillName, String weapons) {
+        if (weapons == null || weapons.isBlank()) {
+            return Set.of();
+        }
+        try {
+            return Arrays.stream(weapons.split(",")).map(String::strip).map(WeaponType::valueOf)
+                    .collect(Collectors.toUnmodifiableSet());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalStateException("Compétence passive " + skillName + " : type d'arme inconnu \"" + weapons
+                    + "\" dans " + PASSIVE_SKILL_RESOURCE, e);
+        }
+    }
+
     public PassiveSkill getById(UUID passiveSkillId) {
         PassiveSkill passiveSkill = passiveSkills.get(passiveSkillId);
         if (passiveSkill == null) {
@@ -118,9 +134,8 @@ public class PassiveSkillCatalog {
 
     // Symétrique de SkillCatalog.skillsLearnableAt, pour les compétences
     // passives (ex: Expertise Grade) référencées par une classe.
-    public List<LearnablePassiveSkill> passiveSkillsLearnableAt(CharacterClass characterClass, int level) {
-        return characterClass.learnableSkillIds(level).stream()
-                .filter(learnable -> passiveSkills.containsKey(learnable.skillId()))
+    public List<LearnablePassiveSkill> passiveSkillsLearnableAt(SkillTree tree, int level) {
+        return tree.autoLearnableAt(level).stream().filter(learnable -> passiveSkills.containsKey(learnable.skillId()))
                 .map(learnable -> new LearnablePassiveSkill(getById(learnable.skillId()), learnable.level())).toList();
     }
 
@@ -147,6 +162,8 @@ public class PassiveSkillCatalog {
     private record StatModifierXml(@JacksonXmlProperty(isAttribute = true) ModifiedStat stat,
             @JacksonXmlProperty(isAttribute = true) int value, @JacksonXmlProperty(isAttribute = true) StatOperator op,
             @JacksonXmlProperty(isAttribute = true) String armor,
-            @JacksonXmlProperty(isAttribute = true) String notArmor) {
+            @JacksonXmlProperty(isAttribute = true) String notArmor,
+            @JacksonXmlProperty(isAttribute = true) String weapon,
+            @JacksonXmlProperty(isAttribute = true) PassiveSkill.PassiveState state) {
     }
 }

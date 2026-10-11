@@ -2,87 +2,667 @@
 <armors>
     <armor id="019faec6-116d-723d-b04c-76d51a2a2cb7">
         <name>Iron Helmet</name>
+        <!-- L2 H5 : Helmet (#47, grade D) -->
         <type>HELMET</type>
-        <weight>2</weight>
+        <weight>640</weight>
         <pAtk>0</pAtk>
         <mAtk>0</mAtk>
-        <pDef>2</pDef>
+        <pDef>37</pDef>
         <mDef>0</mDef>
         <accuracyBonus>0</accuracyBonus>
         <evasionBonus>0</evasionBonus>
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
-        <price>10</price>
+        <price>58600</price>
+        <setId>plate-set</setId>
         <expect>
             <conditions>
                 <!-- Expertise Grade - D -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
             </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
         </expect>
-        <setId>plate-set</setId>
     </armor>
     <armor id="019fcf0d-1f8b-7bc4-b7d8-eddd6c83c518">
         <name>Leather Armor</name>
+        <!-- L2 H5 : Reinforced Leather Shirt (#394, grade D) -->
         <type>ARMOR</type>
-        <weight>5</weight>
+        <weight>4570</weight>
         <armorCategory>LIGHT</armorCategory>
         <pAtk>0</pAtk>
         <mAtk>0</mAtk>
-        <pDef>5</pDef>
+        <pDef>73</pDef>
         <mDef>0</mDef>
         <accuracyBonus>0</accuracyBonus>
         <evasionBonus>0</evasionBonus>
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
-        <price>10</price>
+        <price>117000</price>
         <expect>
             <conditions>
                 <!-- Expertise Grade - D -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
             </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
         </expect>
     </armor>
     <armor id="019fcf0d-1f8c-7d43-9e98-a9944b4ccefe">
         <name>Chain Mail</name>
+        <!-- L2 H5 : Ring Mail Breastplate (#347, grade D) -->
         <type>ARMOR</type>
-        <weight>10</weight>
+        <weight>8820</weight>
         <armorCategory>HEAVY</armorCategory>
         <pAtk>0</pAtk>
         <mAtk>0</mAtk>
-        <pDef>10</pDef>
+        <pDef>77</pDef>
         <mDef>0</mDef>
         <accuracyBonus>0</accuracyBonus>
         <evasionBonus>0</evasionBonus>
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
-        <price>50</price>
+        <price>64210</price>
         <expect>
             <conditions>
                 <!-- Expertise Grade - D -->
                 <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
             </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
         </expect>
     </armor>
     <armor id="019fcf0d-1f8d-7c4c-9275-33c4af4410a8">
         <name>Plate Armor</name>
+        <!-- L2 H5 : Full Plate Armor (#356, grade C) -->
         <type>ARMOR</type>
-        <weight>30</weight>
+        <weight>10480</weight>
         <armorCategory>HEAVY</armorCategory>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>239</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <fullArmor>true</fullArmor>
+        <price>1788000</price>
+        <setId>plate-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - C -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="019fcf0d-1f8f-7d01-8e4f-fd592812a1a7">
+        <name>Shield</name>
+        <!-- L2 H5 : Bronze Shield (#626, grade D) -->
+        <type>SHIELD</type>
+        <weight>1370</weight>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>101</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>-8</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>16900</price>
+        <setId>plate-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - D -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="019fe3f6-b1ef-786d-bc17-46dd46660eb0">
+        <name>Shield +1</name>
+        <!-- L2 H5 : Bronze Shield +1 (#626, grade D) -->
+        <type>SHIELD</type>
+        <weight>1370</weight>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>102</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>-8</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>16900</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - D -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="019fe3f6-b1f2-7ac5-9ca3-2a4aa1f21cde">
+        <name>Chain Mail +1</name>
+        <!-- L2 H5 : Ring Mail Breastplate +1 (#347, grade D) -->
+        <type>ARMOR</type>
+        <weight>8820</weight>
+        <armorCategory>HEAVY</armorCategory>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>78</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>64210</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - D -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="019fe3f6-b1f3-7285-8107-94d2bf661434">
+        <name>Plate Armor +2</name>
+        <!-- L2 H5 : Full Plate Armor +2 (#356, grade C) -->
+        <type>ARMOR</type>
+        <weight>10480</weight>
+        <armorCategory>HEAVY</armorCategory>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>241</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <fullArmor>true</fullArmor>
+        <price>1788000</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - C -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="019fe3f6-b1f4-78c7-8791-3103eb639821">
+        <name>Shield +3</name>
+        <!-- L2 H5 : Bronze Shield +3 (#626, grade D) -->
+        <type>SHIELD</type>
+        <weight>1370</weight>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>104</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>-8</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>16900</price>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - D -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="8b3e4c5a-0d6f-4a9c-9e4b-3c5f7a9b1d3e">
+        <name>Zealot's Armor</name>
+        <!-- L2 H5 : Mithril Shirt (#397, grade C) -->
+        <description>A blessed light armor that instills its fervor in whoever wears it.</description>
+        <type>ARMOR</type>
+        <weight>4470</weight>
+        <armorCategory>LIGHT</armorCategory>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>90</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>291000</price>
+        <elementalResistances>
+            <HOLY>15</HOLY>
+        </elementalResistances>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - C -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="9c4f5d6b-1e7a-4b0d-8f5c-4d6a8b0c2e4f">
+        <name>Helm of Terror</name>
+        <!-- L2 H5 : Great Helmet (#500, grade C) -->
+        <description>A fanged helm that spreads its curse to nearby enemies.</description>
+        <type>HELMET</type>
+        <weight>610</weight>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>51</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>185800</price>
+        <elementalResistances>
+            <DARK>15</DARK>
+        </elementalResistances>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - C -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="153c7ce9-f976-45c5-ab58-5b5f42665e68">
+        <name>Padded Armor</name>
+        <!-- L2 H5 : Puma Skin Shirt (#391, grade D) -->
+        <type>ARMOR</type>
+        <weight>4700</weight>
+        <armorCategory>LIGHT</armorCategory>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>58</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>48200</price>
+        <setId>padded-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - D -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="4ecc0ffd-3a7c-49ea-8af6-d0e76b0bb9dd">
+        <name>Padded Helmet</name>
+        <!-- L2 H5 : Bone Helmet (#45, grade D) -->
+        <type>HELMET</type>
+        <weight>640</weight>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>29</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>24100</price>
+        <setId>padded-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - D -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="044f02d7-ebcf-4275-8be2-c41a93695f96">
+        <name>Doom Breastplate</name>
+        <!-- L2 H5 : Leather Armor of Doom (#2392, grade B) -->
+        <type>ARMOR</type>
+        <weight>5500</weight>
+        <armorCategory>LIGHT</armorCategory>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>202</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <fullArmor>true</fullArmor>
+        <price>3017000</price>
+        <setId>doom-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - B -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="3ca4de84-6813-4846-9fe7-9dfb3c245aa9">
+        <name>Doom Helmet</name>
+        <!-- L2 H5 : Doom Helmet (#2417, grade B) -->
+        <type>HELMET</type>
+        <weight>580</weight>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>66</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>928300</price>
+        <setId>doom-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - B -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="3b1d09c8-a3ec-4159-9f7d-403754c5ef39">
+        <name>Doom Gloves</name>
+        <!-- L2 H5 : Doom Gloves - Light Armor (#5723, grade B) -->
+        <type>GLOVES</type>
+        <weight>580</weight>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>44</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>618800</price>
+        <setId>doom-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - B -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="510c5996-52d6-44cb-82a5-8a29b661ee70">
+        <name>Dark Crystal Breastplate</name>
+        <!-- L2 H5 : Dark Crystal Breastplate (#365, grade A) -->
+        <type>ARMOR</type>
+        <weight>7700</weight>
+        <armorCategory>HEAVY</armorCategory>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>171</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>3562000</price>
+        <setId>dark-crystal-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - A -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="6ebb2836-0463-4fa2-ab51-182138be9f6c">
+        <name>Dark Crystal Helmet</name>
+        <!-- L2 H5 : Dark Crystal Helmet (#512, grade A) -->
+        <type>HELMET</type>
+        <weight>570</weight>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>69</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>1336000</price>
+        <setId>dark-crystal-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - A -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="c6d6b492-acb1-4eb1-a4ac-aa473e5749c8">
+        <name>Dark Crystal Leggings</name>
+        <!-- L2 H5 : Dark Crystal Gaiters (#388, grade A) -->
+        <type>PANTS</type>
+        <weight>3320</weight>
+        <armorCategory>HEAVY</armorCategory>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>107</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>2226000</price>
+        <setId>dark-crystal-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - A -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="a93c8d4a-18f6-47e8-b23b-a7539ceb6a11">
+        <name>Dark Crystal Boots</name>
+        <!-- L2 H5 : Dark Crystal Boots (#563, grade A) -->
+        <type>BOOTS</type>
+        <weight>1110</weight>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>45</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>890000</price>
+        <setId>dark-crystal-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - A -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="62464e30-2034-44c7-97d4-c5072e78eefc">
+        <name>Tallum Tunic</name>
+        <!-- L2 H5 : Tallum Tunic (#2400, grade A) -->
+        <type>ARMOR</type>
+        <weight>1860</weight>
+        <armorCategory>ROBE</armorCategory>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>86</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <maxMp>409</maxMp>
+        <price>2671000</price>
+        <setId>tallum-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - A -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="4a172ced-5aa4-4699-85d1-eabdd20d9ff7">
+        <name>Tallum Hood</name>
+        <!-- L2 H5 : Tallum Helm (#547, grade A) -->
+        <type>HELMET</type>
+        <weight>570</weight>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>69</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>1336000</price>
+        <setId>tallum-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - A -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="d9a090f3-c30c-4a1c-b06c-ca5a5b42d26a">
+        <name>Major Arcana Robe</name>
+        <!-- L2 H5 : Major Arcana Robe (#6383, grade S) -->
+        <type>ARMOR</type>
+        <weight>2300</weight>
+        <armorCategory>ROBE</armorCategory>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>166</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <fullArmor>true</fullArmor>
+        <maxMp>866</maxMp>
+        <price>15577000</price>
+        <setId>major-arcana-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - S -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="8276dc92-4ac8-4071-a673-616767f327a3">
+        <name>Major Arcana Circlet</name>
+        <!-- L2 H5 : Major Arcana Circlet (#6386, grade S) -->
+        <type>HELMET</type>
+        <weight>550</weight>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>83</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>4793000</price>
+        <setId>major-arcana-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - S -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="87bdc819-985d-4921-8300-ad84f7e480fb">
+        <name>Draconic Cuirass</name>
+        <!-- L2 H5 : Draconic Leather Armor (#6379, grade S) -->
+        <type>ARMOR</type>
+        <weight>4950</weight>
+        <armorCategory>LIGHT</armorCategory>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>249</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <fullArmor>true</fullArmor>
+        <price>15577000</price>
+        <setId>draconic-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - S -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="96ac0867-6a5e-432f-a2ba-bc9050e92b53">
+        <name>Draconic Helmet</name>
+        <!-- L2 H5 : Draconic Leather Helmet (#6382, grade S) -->
+        <type>HELMET</type>
+        <weight>550</weight>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>83</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>4793000</price>
+        <setId>draconic-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - S -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="c7c73cf7-897d-4152-ba7d-2980986b11f0">
+        <name>Draconic Gauntlets</name>
+        <!-- L2 H5 : Draconic Leather Gloves (#6380, grade S) -->
+        <type>GLOVES</type>
+        <weight>540</weight>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>55</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>3195000</price>
+        <setId>draconic-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - S -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="f82c02d5-189d-4bdd-864e-4cb5d4355f6b">
+        <name>Draconic Boots</name>
+        <!-- L2 H5 : Draconic Leather Boots (#6381, grade S) -->
+        <type>BOOTS</type>
+        <weight>1110</weight>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>55</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>3195000</price>
+        <setId>draconic-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - S -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="ec8b6fdb-8731-4863-8ba8-eae446aa66a6">
+        <name>Draconic Shield</name>
+        <!-- L2 H5 : Dragon Shield (#634, grade S) -->
+        <type>SHIELD</type>
+        <weight>1170</weight>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>269</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>-8</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>1949000</price>
+        <setId>draconic-set</setId>
+        <expect>
+            <conditions>
+                <!-- Expertise Grade - S -->
+                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
+            </conditions>
+        </expect>
+    </armor>
+    <armor id="d410f08b-8872-4ad1-984a-665dab47fd75">
+        <name>Leather Cap</name>
+        <!-- L2 H5 : Leather Cap (#42, sans grade) -->
+        <type>HELMET</type>
+        <weight>660</weight>
         <pAtk>0</pAtk>
         <mAtk>0</mAtk>
         <pDef>16</pDef>
@@ -91,76 +671,47 @@
         <evasionBonus>0</evasionBonus>
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
-        <price>1500</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - C -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>plate-set</setId>
+        <price>700</price>
+        <setId>novice-set</setId>
     </armor>
-    <armor id="019fcf0d-1f8f-7d01-8e4f-fd592812a1a7">
-        <name>Shield</name>
-        <type>SHIELD</type>
-        <weight>3</weight>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>4</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>10</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - D -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>plate-set</setId>
-    </armor>
-    <armor id="019fe3f6-b1ef-786d-bc17-46dd46660eb0">
-        <name>Shield +1</name>
-        <type>SHIELD</type>
-        <weight>3</weight>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>6</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>400</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - C -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </armor>
-    <armor id="019fe3f6-b1f2-7ac5-9ca3-2a4aa1f21cde">
-        <name>Chain Mail +1</name>
+    <armor id="aa24f9ec-0608-4b46-819d-4c6087df1320">
+        <name>Leather Tunic</name>
+        <!-- L2 H5 : Leather Shirt (#22, sans grade) -->
         <type>ARMOR</type>
-        <weight>10</weight>
-        <armorCategory>HEAVY</armorCategory>
+        <weight>4830</weight>
+        <armorCategory>LIGHT</armorCategory>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>43</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>1870</price>
+        <setId>novice-set</setId>
+    </armor>
+    <armor id="4200e028-982b-4267-8c69-e62e305a5080">
+        <name>Leather Gloves</name>
+        <!-- L2 H5 : Leather Gloves (#50, sans grade) -->
+        <type>GLOVES</type>
+        <weight>650</weight>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>15</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>0</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>5210</price>
+        <setId>novice-set</setId>
+    </armor>
+    <armor id="8e96906e-1f06-40aa-b986-7946c1acd72d">
+        <name>Leather Boots</name>
+        <!-- L2 H5 : Leather Shoes (#37, sans grade) -->
+        <type>BOOTS</type>
+        <weight>1320</weight>
         <pAtk>0</pAtk>
         <mAtk>0</mAtk>
         <pDef>13</pDef>
@@ -169,711 +720,59 @@
         <evasionBonus>0</evasionBonus>
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
-        <price>4500</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - B -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </armor>
-    <armor id="019fe3f6-b1f3-7285-8107-94d2bf661434">
-        <name>Plate Armor +2</name>
-        <type>ARMOR</type>
-        <weight>30</weight>
-        <armorCategory>HEAVY</armorCategory>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>22</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>40000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - A -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </armor>
-    <armor id="019fe3f6-b1f4-78c7-8791-3103eb639821">
-        <name>Shield +3</name>
-        <type>SHIELD</type>
-        <weight>3</weight>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>10</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>60000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - S -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-    </armor>
-    <armor id="8b3e4c5a-0d6f-4a9c-9e4b-3c5f7a9b1d3e">
-        <name>Zealot's Armor</name>
-        <description>A blessed light armor that instills its fervor in whoever wears it.</description>
-        <type>ARMOR</type>
-        <weight>5</weight>
-        <armorCategory>LIGHT</armorCategory>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>5</pDef>
-        <mDef>4</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>200</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - C -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <elementalResistances>
-            <HOLY>15</HOLY>
-        </elementalResistances>
-    </armor>
-    <armor id="9c4f5d6b-1e7a-4b0d-8f5c-4d6a8b0c2e4f">
-        <name>Helm of Terror</name>
-        <description>A fanged helm that spreads its curse to nearby enemies.</description>
-        <type>HELMET</type>
-        <weight>2</weight>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>2</pDef>
-        <mDef>3</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>200</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - C -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <elementalResistances>
-            <DARK>15</DARK>
-        </elementalResistances>
-    </armor>
-    <armor id="153c7ce9-f976-45c5-ab58-5b5f42665e68">
-        <name>Padded Armor</name>
-        <type>ARMOR</type>
-        <weight>3</weight>
-        <armorCategory>LIGHT</armorCategory>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>4</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>1</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>30</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - D -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>padded-set</setId>
-    </armor>
-    <armor id="4ecc0ffd-3a7c-49ea-8af6-d0e76b0bb9dd">
-        <name>Padded Helmet</name>
-        <type>HELMET</type>
-        <weight>1</weight>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>1</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>15</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - D -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="1" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>padded-set</setId>
-    </armor>
-    <armor id="044f02d7-ebcf-4275-8be2-c41a93695f96">
-        <name>Doom Breastplate</name>
-        <type>ARMOR</type>
-        <weight>4</weight>
-        <armorCategory>LIGHT</armorCategory>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>7</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>3</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>1000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - C -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>doom-set</setId>
-    </armor>
-    <armor id="3ca4de84-6813-4846-9fe7-9dfb3c245aa9">
-        <name>Doom Helmet</name>
-        <type>HELMET</type>
-        <weight>1</weight>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>2</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>1</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>400</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - C -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>doom-set</setId>
-    </armor>
-    <armor id="3b1d09c8-a3ec-4159-9f7d-403754c5ef39">
-        <name>Doom Gloves</name>
-        <type>GLOVES</type>
-        <weight>1</weight>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>1</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>1</accuracyBonus>
-        <evasionBonus>1</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>300</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - C -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="2" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>doom-set</setId>
-    </armor>
-    <armor id="510c5996-52d6-44cb-82a5-8a29b661ee70">
-        <name>Dark Crystal Breastplate</name>
-        <type>ARMOR</type>
-        <weight>15</weight>
-        <armorCategory>HEAVY</armorCategory>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>20</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>8000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - B -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>dark-crystal-set</setId>
-    </armor>
-    <armor id="6ebb2836-0463-4fa2-ab51-182138be9f6c">
-        <name>Dark Crystal Helmet</name>
-        <type>HELMET</type>
-        <weight>3</weight>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>5</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>3000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - B -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>dark-crystal-set</setId>
-    </armor>
-    <armor id="c6d6b492-acb1-4eb1-a4ac-aa473e5749c8">
-        <name>Dark Crystal Leggings</name>
-        <type>PANTS</type>
-        <weight>8</weight>
-        <armorCategory>HEAVY</armorCategory>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>8</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>4000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - B -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>dark-crystal-set</setId>
-    </armor>
-    <armor id="a93c8d4a-18f6-47e8-b23b-a7539ceb6a11">
-        <name>Dark Crystal Boots</name>
-        <type>BOOTS</type>
-        <weight>2</weight>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>3</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>2000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - B -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="3" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>dark-crystal-set</setId>
-    </armor>
-    <armor id="62464e30-2034-44c7-97d4-c5072e78eefc">
-        <name>Tallum Tunic</name>
-        <type>ARMOR</type>
-        <weight>6</weight>
-        <armorCategory>ROBE</armorCategory>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>15</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>5</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>30000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - A -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>tallum-set</setId>
-    </armor>
-    <armor id="4a172ced-5aa4-4699-85d1-eabdd20d9ff7">
-        <name>Tallum Hood</name>
-        <type>HELMET</type>
-        <weight>1</weight>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>4</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>2</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>12000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - A -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>tallum-set</setId>
-    </armor>
-    <armor id="d9a090f3-c30c-4a1c-b06c-ca5a5b42d26a">
-        <name>Major Arcana Robe</name>
-        <type>ARMOR</type>
-        <weight>3</weight>
-        <armorCategory>ROBE</armorCategory>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>10</pDef>
-        <mDef>12</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>32000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - A -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>major-arcana-set</setId>
-    </armor>
-    <armor id="8276dc92-4ac8-4071-a673-616767f327a3">
-        <name>Major Arcana Circlet</name>
-        <type>HELMET</type>
-        <weight>1</weight>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>2</pDef>
-        <mDef>5</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>13000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - A -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="4" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>major-arcana-set</setId>
-    </armor>
-    <armor id="87bdc819-985d-4921-8300-ad84f7e480fb">
-        <name>Draconic Cuirass</name>
-        <type>ARMOR</type>
-        <weight>25</weight>
-        <armorCategory>HEAVY</armorCategory>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>30</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>90000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - S -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>draconic-set</setId>
-    </armor>
-    <armor id="96ac0867-6a5e-432f-a2ba-bc9050e92b53">
-        <name>Draconic Helmet</name>
-        <type>HELMET</type>
-        <weight>4</weight>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>8</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>40000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - S -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>draconic-set</setId>
-    </armor>
-    <armor id="c7c73cf7-897d-4152-ba7d-2980986b11f0">
-        <name>Draconic Gauntlets</name>
-        <type>GLOVES</type>
-        <weight>3</weight>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>5</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>2</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>35000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - S -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>draconic-set</setId>
-    </armor>
-    <armor id="f82c02d5-189d-4bdd-864e-4cb5d4355f6b">
-        <name>Draconic Boots</name>
-        <type>BOOTS</type>
-        <weight>3</weight>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>5</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>2</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>35000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - S -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>draconic-set</setId>
-    </armor>
-    <armor id="ec8b6fdb-8731-4863-8ba8-eae446aa66a6">
-        <name>Draconic Shield</name>
-        <type>SHIELD</type>
-        <weight>5</weight>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>12</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>45000</price>
-        <expect>
-            <conditions>
-                <!-- Expertise Grade - S -->
-                <skill id="865a7263-fb06-48ef-89c1-9ccbad268215" level="5" />
-            </conditions>
-            <actions>
-                <effect name="Grade Penalty" time="unlimited" type="DEBUFF">
-                    <apply stat="PATK" value="-1" op="ADDITIVE" />
-                </effect>
-            </actions>
-        </expect>
-        <setId>draconic-set</setId>
-    </armor>
-    <armor id="d410f08b-8872-4ad1-984a-665dab47fd75">
-        <name>Leather Cap</name>
-        <type>HELMET</type>
-        <weight>1</weight>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>1</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>1</price>
-        <setId>novice-set</setId>
-    </armor>
-    <armor id="aa24f9ec-0608-4b46-819d-4c6087df1320">
-        <name>Leather Tunic</name>
-        <type>ARMOR</type>
-        <weight>2</weight>
-        <armorCategory>LIGHT</armorCategory>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>2</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>1</price>
-        <setId>novice-set</setId>
-    </armor>
-    <armor id="4200e028-982b-4267-8c69-e62e305a5080">
-        <name>Leather Gloves</name>
-        <type>GLOVES</type>
-        <weight>1</weight>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>1</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>1</price>
-        <setId>novice-set</setId>
-    </armor>
-    <armor id="8e96906e-1f06-40aa-b986-7946c1acd72d">
-        <name>Leather Boots</name>
-        <type>BOOTS</type>
-        <weight>1</weight>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>1</pDef>
-        <mDef>0</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>1</price>
+        <price>2040</price>
         <setId>novice-set</setId>
     </armor>
     <armor id="83b1c12e-c594-4a7b-b0d0-cdd7dc2fca8f">
         <name>Leather Pants</name>
+        <!-- L2 H5 : Leather Pants (#29, sans grade) -->
         <type>PANTS</type>
-        <weight>2</weight>
+        <weight>1730</weight>
         <armorCategory>LIGHT</armorCategory>
         <pAtk>0</pAtk>
         <mAtk>0</mAtk>
-        <pDef>1</pDef>
+        <pDef>27</pDef>
         <mDef>0</mDef>
         <accuracyBonus>0</accuracyBonus>
         <evasionBonus>0</evasionBonus>
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
-        <price>1</price>
+        <price>1170</price>
         <setId>novice-set</setId>
     </armor>
     <armor id="8a692c7f-8461-4994-ab61-69d0079ed3fc">
         <name>Wooden Shield</name>
+        <!-- L2 H5 : Small Shield (#19, sans grade) -->
         <type>SHIELD</type>
-        <weight>2</weight>
+        <weight>1420</weight>
         <pAtk>0</pAtk>
         <mAtk>0</mAtk>
-        <pDef>2</pDef>
+        <pDef>56</pDef>
+        <mDef>0</mDef>
+        <accuracyBonus>0</accuracyBonus>
+        <evasionBonus>-8</evasionBonus>
+        <critBonus>0</critBonus>
+        <atkSpd>0</atkSpd>
+        <price>490</price>
+        <setId>novice-set</setId>
+    </armor>
+    <armor id="ab5cce0e-1d3f-49f8-9d6f-d814321a566f">
+        <name>Apprentice's Robe</name>
+        <!-- L2 H5 : Apprentice's Tunic (#425, sans grade) -->
+        <description>A plain linen robe handed to novice mystics.</description>
+        <type>ARMOR</type>
+        <weight>2150</weight>
+        <armorCategory>ROBE</armorCategory>
+        <pAtk>0</pAtk>
+        <mAtk>0</mAtk>
+        <pDef>17</pDef>
         <mDef>0</mDef>
         <accuracyBonus>0</accuracyBonus>
         <evasionBonus>0</evasionBonus>
         <critBonus>0</critBonus>
         <atkSpd>0</atkSpd>
-        <price>1</price>
-        <setId>novice-set</setId>
-    </armor>
-    <armor id="ab5cce0e-1d3f-49f8-9d6f-d814321a566f">
-        <name>Apprentice's Robe</name>
-        <description>A plain linen robe handed to novice mystics.</description>
-        <type>ARMOR</type>
-        <weight>1</weight>
-        <armorCategory>ROBE</armorCategory>
-        <pAtk>0</pAtk>
-        <mAtk>0</mAtk>
-        <pDef>1</pDef>
-        <mDef>2</mDef>
-        <accuracyBonus>0</accuracyBonus>
-        <evasionBonus>0</evasionBonus>
-        <critBonus>0</critBonus>
-        <atkSpd>0</atkSpd>
-        <price>1</price>
+        <maxMp>19</maxMp>
+        <price>20</price>
         <setId>novice-set</setId>
     </armor>
 </armors>

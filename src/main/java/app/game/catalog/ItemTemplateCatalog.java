@@ -2,7 +2,6 @@ package app.game.catalog;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -14,11 +13,7 @@ import org.springframework.stereotype.Service;
 
 import app.domain.ConsumableEffect;
 import app.domain.ActiveSkill;
-import app.domain.EffectCategory;
 import app.domain.SkillElement;
-import app.domain.StatModifier;
-import app.domain.StatOperator;
-import app.domain.actor.ModifiedStat;
 import app.domain.item.ArmorCategory;
 import app.domain.item.ConsumableItem;
 import app.domain.item.EquipmentItem;
@@ -103,7 +98,8 @@ public class ItemTemplateCatalog {
                     definition.mAtk(), definition.pDef(), definition.mDef(), definition.accuracyBonus(),
                     definition.evasionBonus(), definition.critBonus(), definition.atkSpd(), definition.price(),
                     grantedSkills, elementalResistances, grade, definition.setId(), expectation, shotConsumption,
-                    definition.weaponType());
+                    definition.weaponType(), definition.maxMp() == null ? 0 : definition.maxMp(),
+                    Boolean.TRUE.equals(definition.fullArmor()));
             templates.put(template.getId(), template);
         }
     }
@@ -169,7 +165,7 @@ public class ItemTemplateCatalog {
             int accuracyBonus, int evasionBonus, int critBonus, int atkSpd, int price,
             @JacksonXmlElementWrapper(useWrapping = false) List<UUID> grantedSkillIds,
             Map<SkillElement, Integer> elementalResistances, String setId, ExpectXml expect, Integer shotConsumption,
-            WeaponType weaponType) {
+            WeaponType weaponType, Integer maxMp, Boolean fullArmor) {
     }
 
     private record OtherDefinition(@JacksonXmlProperty(isAttribute = true) UUID id, String name, String description,
@@ -186,24 +182,16 @@ public class ItemTemplateCatalog {
         }
         List<ItemExpectation.SkillRequirement> conditions = xml.conditions().skill().stream()
                 .map(c -> new ItemExpectation.SkillRequirement(c.id(), c.level())).toList();
-        List<ItemExpectation.ExpectationEffect> actions = xml.actions().effect().stream()
-                .map(e -> new ItemExpectation.ExpectationEffect(e.name(), parseDuration(e.time()), e.type(),
-                        e.apply().stream().map(a -> new StatModifier(a.stat(), a.value(), a.op())).toList()))
-                .toList();
-        return new ItemExpectation(conditions, actions);
+        return new ItemExpectation(conditions);
     }
 
-    private static Duration parseDuration(String time) {
-        return "unlimited".equalsIgnoreCase(time) ? Duration.ofDays(3650) : Duration.ofSeconds(Long.parseLong(time));
-    }
-
-    // <expect> décrit les prérequis (compétences+level) d'un EquipmentItem et le
-    // debuff à appliquer s'ils ne sont pas remplis (cf. ItemExpectation,
-    // InventorySystem.recomputeGradePenalty). Chaque sous-liste passe par un objet
-    // imbriqué unique (conditions/actions) plutôt qu'une liste wrappée : cf. le
-    // commentaire sur EffectsXml dans SkillCatalog pour la raison (bug de
+    // <expect> décrit les prérequis (compétences+level) d'un EquipmentItem ; la
+    // pénalité encourue s'ils ne sont pas remplis est celle de L2, calculée par
+    // GradePenalty (cf. InventorySystem.refreshGradePenalties). La liste passe
+    // par un objet imbriqué unique (conditions) plutôt qu'une liste wrappée : cf.
+    // le commentaire sur EffectsXml dans SkillCatalog pour la raison (bug de
     // tools.jackson.dataformat.xml avec les records).
-    private record ExpectXml(ConditionsXml conditions, ActionsXml actions) {
+    private record ExpectXml(ConditionsXml conditions) {
     }
 
     private record ConditionsXml(
@@ -212,20 +200,5 @@ public class ItemTemplateCatalog {
 
     private record SkillRequirementXml(@JacksonXmlProperty(isAttribute = true) UUID id,
             @JacksonXmlProperty(isAttribute = true) int level) {
-    }
-
-    private record ActionsXml(
-            @JacksonXmlProperty(localName = "effect") @JacksonXmlElementWrapper(useWrapping = false) List<ExpectationEffectXml> effect) {
-    }
-
-    private record ExpectationEffectXml(@JacksonXmlProperty(isAttribute = true) String name,
-            @JacksonXmlProperty(isAttribute = true) String time,
-            @JacksonXmlProperty(isAttribute = true) EffectCategory type,
-            @JacksonXmlProperty(localName = "apply") @JacksonXmlElementWrapper(useWrapping = false) List<StatModifierXml> apply) {
-    }
-
-    private record StatModifierXml(@JacksonXmlProperty(isAttribute = true) ModifiedStat stat,
-            @JacksonXmlProperty(isAttribute = true) int value,
-            @JacksonXmlProperty(isAttribute = true) StatOperator op) {
     }
 }

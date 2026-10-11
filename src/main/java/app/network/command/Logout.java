@@ -49,8 +49,10 @@ public class Logout implements CommandHandler {
             connection.send(new StoppedPlaying(character.getName()));
         }
 
-        connection.detachWorldInstance();
+        // exitWorld d'abord : detachWorldInstance repasse la connexion en CONNECTED,
+        // état où connection.account() n'est plus lisible.
         authWorld.exitWorld(connection);
+        connection.detachWorldInstance();
         log.info("auth.logged_out account={}", account.getLogin());
         connection.send(new LoggedOut());
     }
