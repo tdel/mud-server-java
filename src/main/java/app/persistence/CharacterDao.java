@@ -163,9 +163,12 @@ public class CharacterDao {
         CharacterClass characterClass = CharacterClass.valueOf(record.getCharacterClass());
         Race race = Race.valueOf(record.getRace());
 
-        MapInstance map = instance.mapInstanceForTemplate(record.getCurrentMapId()).or(instance::startingMapInstance)
-                .orElseThrow(() -> new IllegalStateException(
-                        "WorldInstance " + instance.getId() + " n'a aucune map de départ"));
+        // Carte enregistrée retirée du monde : retour au point d'apparition de la carte
+        // de départ
+        // (la position enregistrée appartenait à l'ancienne carte).
+        Optional<MapInstance> savedMap = instance.mapInstanceForTemplate(record.getCurrentMapId());
+        MapInstance map = savedMap.or(instance::startingMapInstance).orElseThrow(
+                () -> new IllegalStateException("WorldInstance " + instance.getId() + " n'a aucune map de départ"));
 
         Map<ActiveSkill, Integer> knownSkills = characterSkillDao.findByCharacter(record.getId()).stream()
                 .collect(Collectors.toMap(row -> skillCatalog.getById(row.skillId()),
@@ -203,7 +206,7 @@ public class CharacterDao {
 
         Double posX = record.getPosX();
         Double posY = record.getPosY();
-        if (posX != null && posY != null) {
+        if (savedMap.isPresent() && posX != null && posY != null) {
             character.getMotionSystem().setPosition(new Position(posX, posY));
         }
 

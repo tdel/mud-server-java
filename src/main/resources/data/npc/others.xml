@@ -194,7 +194,7 @@
         <type>GUARD</type>
         <gender>WOMAN</gender>
         <dialogue>
-            <greeting>The old cemetery road starts east of the gate. Mind your step.</greeting>
+            <greeting>The road east of the gate leads to the Execution Grounds. Mind your step.</greeting>
             <options>
                 <label>Goodbye</label>
                 <type>LEAVE</type>
@@ -214,7 +214,7 @@
             <options>
                 <label>Where do the teleporters lead?</label>
                 <type>RESPONSE</type>
-                <response>North to Gludio Castle, west to the Ruins of Agony, south to the Ruins of Despair, and east, past the river, to the Cruma Marshlands. Dion lies beyond the marsh.</response>
+                <response>North to Gludio Castle, west to the Ruins of Agony, south to the Ruins of Despair, and east, past the river, to the Cruma Marshlands. The north-west circle leads to the Neutral Zone, the south-east one straight to Dion.</response>
             </options>
             <options>
                 <label>Which places are safe for a beginner?</label>
@@ -365,7 +365,7 @@
             <options>
                 <label>Where do the teleporters lead?</label>
                 <type>RESPONSE</type>
-                <response>North to the Cruma Marshlands, west to the Ruins of Despair and Gludio beyond, east to the old cemetery road.</response>
+                <response>North to the Cruma Marshlands, north-west straight to Gludio, west to the Ruins of Despair, east to the Execution Grounds and south to Dion Castle.</response>
             </options>
             <options>
                 <label>Goodbye</label>
@@ -506,5 +506,248 @@
             </options>
         </dialogue>
         <level>40</level>
+    </npc>
+
+    <!-- ===== Dion Castle : garnison du château (zone de siège, sans zone de paix), PNJ du château de Dion de Lineage 2 ===== -->
+    <npc id="16e4b9fa-d800-496b-98d4-a7b0c7c97a38">
+        <name>Outer Doorman</name>
+        <title>Dion</title>
+        <type>GUARD</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>The outer gate of Dion Castle. Lord Crosby receives visitors in the keep.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>40</level>
+    </npc>
+    <npc id="eca5f0d6-eb04-4ab4-97c7-0a991b610655">
+        <name>Outer Doorman</name>
+        <title>Dion</title>
+        <type>GUARD</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>Keep to the causeway. The moat has swallowed more than one careless soldier.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>40</level>
+    </npc>
+    <npc id="60f8ff14-718d-4cdb-a718-e7bfd02f9f88">
+        <name>Inner Doorman</name>
+        <title>Dion</title>
+        <type>GUARD</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>Beyond this door lies the keep. Mind your manners before the chamberlain.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>40</level>
+    </npc>
+    <npc id="6f108b2c-1275-48d2-a2ed-3ebfaeef5065">
+        <name>Inner Doorman</name>
+        <title>Dion</title>
+        <type>GUARD</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>The holy artifact rests inside. Whoever seals it rules Dion.</greeting>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>40</level>
+    </npc>
+    <npc id="d41b67ba-1546-4a84-9caa-50d42ea5dfa6">
+        <name>Crosby</name>
+        <title>Chamberlain</title>
+        <type>CHAMBERLAIN</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>Welcome to Dion Castle. I keep the lord's accounts... and his patience. What do you need?</greeting>
+            <options>
+                <label>Who rules Dion?</label>
+                <type>RESPONSE</type>
+                <response>The clan that holds this castle, for now. Floran's harvest and Dion's markets fill its coffers, which is why so many covet it.</response>
+            </options>
+            <options>
+                <label>How is a castle taken?</label>
+                <type>RESPONSE</type>
+                <response>By siege. Break the gates, reach the holy artifact and seal it. No peace is kept within these walls.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>70</level>
+    </npc>
+    <npc id="764b97b5-9400-4f3c-b51f-9740b55fc60d">
+        <name>Mercenary Manager Sanford</name>
+        <title>Mercenary Manager</title>
+        <type>GUARD</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>Swords for hire, posted where the lord needs them. Before a siege, every blade counts.</greeting>
+            <options>
+                <label>Where do your men fight?</label>
+                <type>RESPONSE</type>
+                <response>On the walls and in the plains. The Delu lizardmen raid the fields of Floran when the garrison looks away.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>50</level>
+    </npc>
+    <npc id="7f930559-ca67-451f-88dd-6020fdf0458d">
+        <name>Warehouse Keeper</name>
+        <title>Dion</title>
+        <type>WAREHOUSE_KEEPER</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>The castle stores: grain from Floran, arrows, pitch for the walls.</greeting>
+            <options>
+                <label>Can I store my belongings here?</label>
+                <type>RESPONSE</type>
+                <response>Castle stores are for the garrison. The warehouse of Dion, in town, serves travelers.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>70</level>
+    </npc>
+    <npc id="29687d1d-82cf-4f22-a9af-daa6043c2ff7">
+        <name>Gibbson</name>
+        <title>Herald</title>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>Hear ye! Dion Castle stands in the name of its lord, and all who would challenge it must declare their siege!</greeting>
+            <options>
+                <label>Any news?</label>
+                <type>RESPONSE</type>
+                <response>The plains are restless: lizardmen to the south, strange eyes watching from the hills. And the Execution Grounds east of town are haunted again.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>20</level>
+    </npc>
+    <npc id="1d0060d9-7de8-41d4-9a16-f8692d2bcc64">
+        <name>Hodler</name>
+        <title>Wyvern Manager</title>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>The lord's wyverns roost on the keep. Only the castle's lord and his knights may ride them.</greeting>
+            <options>
+                <label>Can I ride a wyvern?</label>
+                <type>RESPONSE</type>
+                <response>Not unless your clan holds this castle. Come back with a crown, friend.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>50</level>
+    </npc>
+    <npc id="bf0a92ae-432d-47e3-8288-98bc631b0ba3">
+        <name>Mass Gatekeeper</name>
+        <title>Dion</title>
+        <type>GATEKEEPER</type>
+        <gender>WOMAN</gender>
+        <dialogue>
+            <greeting>Welcome to Dion Castle. The teleport circle north of the bridge leads back to the town of Dion.</greeting>
+            <options>
+                <label>Where else can I go?</label>
+                <type>RESPONSE</type>
+                <response>From Dion: Gludio by the north-west road, the Cruma Marshlands to the north, the Ruins of Despair to the west and the Execution Grounds to the east.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>70</level>
+    </npc>
+
+    <!-- ===== Execution Grounds : gardiens du lieu d'exécution (PNJ des Execution Grounds de Lineage 2) ===== -->
+    <npc id="e72933b2-d487-42e7-ba42-49773a84ca95">
+        <name>Roderik</name>
+        <title>Warden</title>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>These grounds belong to the dead now. We keep watch so that what was hanged here stays here.</greeting>
+            <options>
+                <label>What happened here?</label>
+                <type>RESPONSE</type>
+                <response>Dion executed its criminals on these grounds for a century. Their spirits never left: specters, ghouls, even the old headsman they call Guillotine.</response>
+            </options>
+            <options>
+                <label>Is it safe?</label>
+                <type>RESPONSE</type>
+                <response>Near the portal, mostly. Past the gallows, nothing is. The hangman trees have taken a liking to the living.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>40</level>
+    </npc>
+    <npc id="dab6ea7f-a69f-4da6-bd9b-71bcb980088f">
+        <name>Endrigo</name>
+        <title>Warden</title>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>Another hunter? Bring holy water, and do not linger after nightfall.</greeting>
+            <options>
+                <label>Who is Sir Calibus?</label>
+                <type>RESPONSE</type>
+                <response>A knight condemned for a crime he swore he never committed. His revenant still wanders the burial field, looking for his judges.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>40</level>
+    </npc>
+
+    <!-- ===== Neutral Zone : PNJ de la Neutral Zone de Lineage 2 ===== -->
+    <npc id="e9a4c850-1a05-4707-ae86-ab630282208e">
+        <name>Prias</name>
+        <title>Wanderer</title>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>The Neutral Zone: no kingdom claims it, so every beast does. Watch the moonstone beasts, they hunt in packs.</greeting>
+            <options>
+                <label>Why is it called neutral?</label>
+                <type>RESPONSE</type>
+                <response>Humans, elves and dark elves all walk these hills. By old treaty none may build here, so it stays wild.</response>
+            </options>
+            <options>
+                <label>What lives here?</label>
+                <type>RESPONSE</type>
+                <response>Scavenger spiders and arachnid trackers in the woods, wererats along the river, and lycanthropes when the moon rises.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+        </dialogue>
+        <level>30</level>
     </npc>
 </npcs>

@@ -472,7 +472,7 @@
             <options>
                 <label>Where does your iron come from?</label>
                 <type>RESPONSE</type>
-                <response>From the mines past the cemetery road. The marsh rusts everything else.</response>
+                <response>From the mines beyond the Execution Grounds. The marsh rusts everything else.</response>
             </options>
             <options>
                 <label>Goodbye</label>
@@ -648,6 +648,84 @@
                 <label>Why so expensive?</label>
                 <type>RESPONSE</type>
                 <response>Castle steel is forged for sieges, not for hunting rabbits. You get what you pay for.</response>
+            </options>
+            <options>
+                <label>Goodbye</label>
+                <type>LEAVE</type>
+            </options>
+            <shop>
+                <items>
+                    <itemTemplateId>7ad6443f-65cf-4761-b894-5fa8dc859e2e</itemTemplateId>
+                    <price>800</price>
+                </items>
+                <items>
+                    <itemTemplateId>84349095-9c39-49e4-9f0a-1819dc7d1748</itemTemplateId>
+                    <price>1200</price>
+                </items>
+                <items>
+                    <itemTemplateId>2f7c7759-45c8-4652-aea5-f244e1b11fc5</itemTemplateId>
+                    <price>6000</price>
+                </items>
+                <items>
+                    <itemTemplateId>7b732096-7d14-434b-b7d6-1569dd6ee37b</itemTemplateId>
+                    <price>7000</price>
+                </items>
+                <items>
+                    <itemTemplateId>6c2e3f4a-7b8d-4f90-ab12-3c4d5e6f7081</itemTemplateId>
+                    <price>1500</price>
+                </items>
+                <items>
+                    <itemTemplateId>9f5b6c7d-aeb0-4c23-de45-6f708192a3b4</itemTemplateId>
+                    <price>2500</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fcf0d-1f8c-7d43-9e98-a9944b4ccefe</itemTemplateId>
+                    <price>50</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fcf0d-1f8d-7c4c-9275-33c4af4410a8</itemTemplateId>
+                    <price>1500</price>
+                </items>
+                <items>
+                    <itemTemplateId>044f02d7-ebcf-4275-8be2-c41a93695f96</itemTemplateId>
+                    <price>1000</price>
+                </items>
+                <items>
+                    <itemTemplateId>3ca4de84-6813-4846-9fe7-9dfb3c245aa9</itemTemplateId>
+                    <price>400</price>
+                </items>
+                <items>
+                    <itemTemplateId>3b1d09c8-a3ec-4159-9f7d-403754c5ef39</itemTemplateId>
+                    <price>300</price>
+                </items>
+                <items>
+                    <itemTemplateId>019fe3f6-b1ef-786d-bc17-46dd46660eb0</itemTemplateId>
+                    <price>400</price>
+                </items>
+                <items>
+                    <itemTemplateId>4623f73d-821b-4dc4-b723-b9353bdca64c</itemTemplateId>
+                    <price>10</price>
+                </items>
+            </shop>
+        </dialogue>
+        <level>1</level>
+    </npc>
+    <!-- ===== Dion Castle : forge de la garnison ===== -->
+    <npc id="99356390-f92d-4b8f-9db9-823f56040404">
+        <name>Blacksmith</name>
+        <title>Dion</title>
+        <type>BLACKSMITH</type>
+        <gender>MAN</gender>
+        <dialogue>
+            <greeting>Castle forge. Siege steel, sold at the lord's price.</greeting>
+            <options>
+                <label>See what you sell</label>
+                <type>SHOP</type>
+            </options>
+            <options>
+                <label>Why so expensive?</label>
+                <type>RESPONSE</type>
+                <response>Every blade here was forged to hold a wall. You pay for the steel and for the oath behind it.</response>
             </options>
             <options>
                 <label>Goodbye</label>

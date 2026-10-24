@@ -4,5 +4,5 @@ package app.domain.actor;
 // compétences de faiblesse (Detect Animal/Insect Weakness, DMG_VS_*) et des
 // sorts réservés aux morts-vivants (Disrupt Undead, Requiem).
 public enum CreatureRace {
-    ANIMAL, BEAST, BUG, UNDEAD, HUMANOID, FAIRY, ELEMENTAL, PLANT, DEMONIC, GIANT
+    ANIMAL, BEAST, BUG, UNDEAD, HUMANOID, FAIRY, ELEMENTAL, PLANT, DEMONIC, GIANT, CONSTRUCT
 }
